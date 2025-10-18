@@ -1,0 +1,331 @@
+{
+	"Scene": "Test Arena",
+	"Version": "1.0",
+	"Entities": [
+		{
+			"ID": 0,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Player"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 1.0, 0.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 1.0, 2.0, 1.0 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 75.0,
+						"IsKinematic": false,
+						"UseGravity": true,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 1,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "MainCamera"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 3.0, 10.0 ],
+						"Rotation": [ -20.0, 0.0, 0.0 ],
+						"Scale": [ 1.0, 1.0, 1.0 ]
+					}
+				},
+				{
+					"Type": "CameraComponent",
+					"Properties": {
+						"FOV": 75.0,
+						"NearClip": 0.1,
+						"FarClip": 500.0,
+						"Primary": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 2,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Arena Floor"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 0.0, 0.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 20.0, 0.5, 20.0 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.0,
+						"IsKinematic": true,
+						"UseGravity": false,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 3,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Wall_North"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 2.5, -10.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 20.0, 5.0, 0.5 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.0,
+						"IsKinematic": true,
+						"UseGravity": false,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 4,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Wall_South"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 2.5, 10.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 20.0, 5.0, 0.5 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.0,
+						"IsKinematic": true,
+						"UseGravity": false,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 5,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Wall_East"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 10.0, 2.5, 0.0 ],
+						"Rotation": [ 0.0, 90.0, 0.0 ],
+						"Scale": [ 20.0, 5.0, 0.5 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.0,
+						"IsKinematic": true,
+						"UseGravity": false,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 6,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Wall_West"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ -10.0, 2.5, 0.0 ],
+						"Rotation": [ 0.0, 90.0, 0.0 ],
+						"Scale": [ 20.0, 5.0, 0.5 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.0,
+						"IsKinematic": true,
+						"UseGravity": false,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 7,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Obstacle_1"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 3.0, 1.0, 3.0 ],
+						"Rotation": [ 0.0, 45.0, 0.0 ],
+						"Scale": [ 2.0, 2.0, 2.0 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 10.0,
+						"IsKinematic": false,
+						"UseGravity": true,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 8,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Obstacle_2"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ -4.0, 1.0, -2.0 ],
+						"Rotation": [ 0.0, 30.0, 0.0 ],
+						"Scale": [ 1.5, 3.0, 1.5 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 15.0,
+						"IsKinematic": false,
+						"UseGravity": true,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 9,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Pickup_Health"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 5.0, 0.5, -5.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 0.5, 0.5, 0.5 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		}
+	]
+}

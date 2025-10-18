@@ -1,0 +1,161 @@
+{
+	"Scene": "Example Game Scene",
+	"Version": "1.0",
+	"Entities": [
+		{
+			"ID": 0,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Player"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 0.0, -5.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 1.0, 1.0, 1.0 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 1.0,
+						"IsKinematic": false,
+						"UseGravity": true,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 1,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "MainCamera"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 2.0, 5.0 ],
+						"Rotation": [ -15.0, 0.0, 0.0 ],
+						"Scale": [ 1.0, 1.0, 1.0 ]
+					}
+				},
+				{
+					"Type": "CameraComponent",
+					"Properties": {
+						"FOV": 60.0,
+						"NearClip": 0.1,
+						"FarClip": 1000.0,
+						"Primary": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 2,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Ground"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, -1.0, 0.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 10.0, 0.1, 10.0 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.0,
+						"IsKinematic": true,
+						"UseGravity": false,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 3,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Enemy"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 5.0, 0.0, 0.0 ],
+						"Rotation": [ 0.0, 45.0, 0.0 ],
+						"Scale": [ 1.0, 1.0, 1.0 ]
+					}
+				},
+				{
+					"Type": "RigidbodyComponent",
+					"Properties": {
+						"Mass": 0.8,
+						"IsKinematic": false,
+						"UseGravity": true,
+						"Velocity": [ 0.0, 0.0, 0.0 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		},
+		{
+			"ID": 4,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Collectible"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ -3.0, 1.0, -2.0 ],
+						"Rotation": [ 0.0, 0.0, 0.0 ],
+						"Scale": [ 0.5, 0.5, 0.5 ]
+					}
+				},
+				{
+					"Type": "MeshRendererComponent",
+					"Properties": {
+						"Visible": true
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,62 @@
+# ====================================
+# Game Executable Configuration
+# ====================================
+message(STATUS "Configuring Game executable...")
+
+# Create game executable
+add_executable(GameEngine
+    Main.cpp
+    Game.cpp
+    Game.h
+)
+
+# Set target properties
+set_target_properties(GameEngine PROPERTIES
+    FOLDER "Game"
+    OUTPUT_NAME "GameEngine"
+)
+
+# Link engine library (which transitively links External)
+target_link_libraries(GameEngine PRIVATE EngineLib)
+
+# Set as startup project in Visual Studio
+set_property(DIRECTORY ${CMAKE_SOURCE_DIR} 
+             PROPERTY VS_STARTUP_PROJECT GameEngine)
+
+# Windows-specific: Copy FMOD DLLs to executable directory
+if(WIN32)
+    add_custom_command(TARGET GameEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmod.dll"
+            "$<TARGET_FILE_DIR:GameEngine>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodl.dll"
+            "$<TARGET_FILE_DIR:GameEngine>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodstudio.dll"
+            "$<TARGET_FILE_DIR:GameEngine>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodstudiol.dll"
+            "$<TARGET_FILE_DIR:GameEngine>"
+        COMMENT "Copying FMOD DLLs to output directory"
+    )
+endif()
+
+# Copy Resources folder to build directory
+add_custom_command(TARGET GameEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory 
+        "$<TARGET_FILE_DIR:GameEngine>/Resources/Scenes"
+    COMMENT "Creating Resources directory structure"
+)
+
+# If scene files exist, copy them
+if(EXISTS "${CMAKE_SOURCE_DIR}/Resources/Scenes")
+    add_custom_command(TARGET GameEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/Resources/Scenes"
+            "$<TARGET_FILE_DIR:GameEngine>/Resources/Scenes"
+        COMMENT "Copying scene files to build directory"
+    )
+endif()
+
+message(STATUS "Game executable configured successfully")
