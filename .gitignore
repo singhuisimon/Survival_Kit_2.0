@@ -6,7 +6,10 @@ out/
 bin/
 lib/
 cmake-build-*/
-[Bb]uild/
+
+# Only ignore build directory in root directory
+/[Bb]uild/     
+
 [Oo]ut/
 [Bb]in/
 [Ll]ib/
@@ -39,7 +42,6 @@ CMakeFiles/
 cmake_install.cmake
 install_manifest.txt
 Makefile
-*.cmake
 !CMakeLists.txt
 !cmake/*.cmake
 
