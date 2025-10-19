@@ -2,17 +2,18 @@
 # ==================================
 # Build Directories
 # ==================================
-out/
-bin/
-lib/
-cmake-build-*/
-
-# Only ignore build directory in root directory
-/[Bb]uild/     
-
-[Oo]ut/
-[Bb]in/
-[Ll]ib/
+# Primary build directory (where Visual Studio solution lives)
+/build/
+/Build/
+/out/
+/bin/
+/lib/
+/cmake-build/
+/cmake-build-debug/
+/cmake-build-release/
+/cmake-build-*/
+/.build/
+/_build/
 
 # ==================================
 # Visual Studio
@@ -77,10 +78,10 @@ Makefile
 # ==================================
 # Compiled Static Libraries
 # ==================================
-*.lai
-*.la
-*.a
-*.lib
+/build/**/*.lib
+/out/**/*.lib
+/bin/**/*.lib
+/lib/**/*.lib
 
 # ==================================
 # Executables
