@@ -104,19 +104,73 @@ set_target_properties(Jolt PROPERTIES FOLDER "External")
 
 # FMOD - Audio library
 message(STATUS "Configuring FMOD...")
-add_library(fmod INTERFACE)
-target_include_directories(fmod INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/fmod/core/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/fmod/studio/inc
-)
-target_link_directories(fmod INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/fmod/core/lib/x64
-    ${CMAKE_CURRENT_SOURCE_DIR}/fmod/studio/lib/x64
-)
-target_link_libraries(fmod INTERFACE
-    fmod_vc.lib
-    fmodstudio_vc.lib
-)
+
+if(WIN32)
+    set(FMOD_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/fmod")
+    
+    # Include directories
+    set(FMOD_CORE_INCLUDE "${FMOD_ROOT}/core/inc")
+    set(FMOD_STUDIO_INCLUDE "${FMOD_ROOT}/studio/inc")
+    
+    # Library directories
+    set(FMOD_LIB_DIR "${FMOD_ROOT}/lib/x64")
+    set(FMOD_DLL_DIR "${FMOD_ROOT}/dll/x64")
+    
+    # Check if library files exist
+    if(EXISTS "${FMOD_LIB_DIR}/fmod_vc.lib")
+        message(STATUS "  FMOD libraries found")
+        message(STATUS "    Include: ${FMOD_CORE_INCLUDE}")
+        message(STATUS "    Lib dir: ${FMOD_LIB_DIR}")
+        
+        # Create FMOD interface library
+        add_library(fmod INTERFACE)
+        
+        # Include directories
+        target_include_directories(fmod INTERFACE
+            ${FMOD_CORE_INCLUDE}
+            ${FMOD_STUDIO_INCLUDE}
+        )
+        
+        # Link libraries with full paths
+        target_link_libraries(fmod INTERFACE
+            # Release libraries
+            $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod_vc.lib>
+            $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmodstudio_vc.lib>
+            
+            # Debug libraries
+            $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL_vc.lib>
+            $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodstudioL_vc.lib>
+        )
+        
+        set(FMOD_FOUND TRUE)
+        
+    else()
+        message(WARNING "  FMOD .lib files not found at: ${FMOD_LIB_DIR}")
+        message(WARNING "    Expected files:")
+        message(WARNING "      - fmod_vc.lib")
+        message(WARNING "      - fmodL_vc.lib")
+        message(WARNING "      - fmodstudio_vc.lib")
+        message(WARNING "      - fmodstudioL_vc.lib")
+        message(WARNING "    Audio system will be disabled")
+        
+        # Create empty interface so project still compiles
+        add_library(fmod INTERFACE)
+        set(FMOD_FOUND FALSE)
+    endif()
+    
+elseif(UNIX AND NOT APPLE)
+    message(STATUS "  FMOD not configured for Linux yet")
+    add_library(fmod INTERFACE)
+    set(FMOD_FOUND FALSE)
+    
+elseif(APPLE)
+    message(STATUS "  FMOD not configured for macOS yet")
+    add_library(fmod INTERFACE)
+    set(FMOD_FOUND FALSE)
+else()
+    add_library(fmod INTERFACE)
+    set(FMOD_FOUND FALSE)
+endif()
 
 # ImGui - UI library
 message(STATUS "Configuring ImGui...")

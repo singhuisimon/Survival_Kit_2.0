@@ -25,21 +25,26 @@ set_property(DIRECTORY ${CMAKE_SOURCE_DIR}
 
 # Windows-specific: Copy FMOD DLLs to executable directory
 if(WIN32)
-    add_custom_command(TARGET GameEngine POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmod.dll"
-            "$<TARGET_FILE_DIR:GameEngine>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodl.dll"
-            "$<TARGET_FILE_DIR:GameEngine>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodstudio.dll"
-            "$<TARGET_FILE_DIR:GameEngine>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodstudiol.dll"
-            "$<TARGET_FILE_DIR:GameEngine>"
-        COMMENT "Copying FMOD DLLs to output directory"
-    )
+    # Only copy DLLs if FMOD was found
+    if(FMOD_FOUND)
+        add_custom_command(TARGET GameEngine POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmod.dll"
+                "$<TARGET_FILE_DIR:GameEngine>"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodL.dll"
+                "$<TARGET_FILE_DIR:GameEngine>"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodstudio.dll"
+                "$<TARGET_FILE_DIR:GameEngine>"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/External/fmod/dll/x64/fmodstudioL.dll"
+                "$<TARGET_FILE_DIR:GameEngine>"
+            COMMENT "Copying FMOD DLLs to output directory"
+        )
+    else()
+        message(STATUS "  FMOD DLLs not copied (FMOD not found)")
+    endif()
 endif()
 
 # Copy Resources folder to build directory
