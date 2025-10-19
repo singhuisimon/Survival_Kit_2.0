@@ -2,6 +2,20 @@
 
 For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysics/blob/master/Docs/APIChanges.md).
 
+## Unreleased Changes
+
+### New functionality
+
+* Added new define `JPH_TRACK_SIMULATION_STATS` which tracks simulation statistics on a per body basis. This can be used to figure out bodies are the most expensive to simulate.
+* Added `RagdollSettings::CalculateConstraintPriorities` which calculates constraint priorities that boost the priority of joints towards the root of the ragdoll.
+
+### Bug Fixes
+
+* A 6DOF constraint that constrains all rotation axis in combination with a body that has some of its rotation axis locked would not constrain the rotation in the unlocked axis.
+* Added include `type_traits` for `std::is_trivial` to avoid compile error on macOS with clang 21.
+* Fixed compilation error when using Jolt in conjunction with the `_CRTDBG_MAP_ALLOC` define on Windows.
+* Fixed cast shape possibly not returning a hit when a shape cast starts touching (but not intersecting) another shape and requesting the deepest hit.
+
 ## v5.4.0
 
 ### New functionality
