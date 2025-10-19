@@ -1,5 +1,6 @@
 #pragma once
 #include "Entity.h"
+#include "ECS/SystemRegistry.h"
 #include <entt/entt.hpp>
 #include <string>
 
@@ -66,9 +67,81 @@ namespace Engine {
          */
         bool LoadFromFile(const std::string& filepath);
 
+        // ===== SYSTEM MANAGEMENT =====
+
+        /**
+         * @brief Add a system to the scene
+         * @tparam T System type
+         * @tparam Args Constructor argument types
+         * @param args Arguments to pass to system constructor
+         * @return Pointer to the created system
+         *
+         * Example:
+         * ```cpp
+         * auto* physics = scene->AddSystem<PhysicsSystem>();
+         * auto* renderer = scene->AddSystem<RenderSystem>(width, height);
+         * ```
+         */
+        template<typename T, typename... Args>
+        T* AddSystem(Args&&... args) {
+            return m_SystemRegistry.AddSystem<T>(std::forward<Args>(args)...);
+        }
+
+        /**
+         * @brief Remove a system from the scene
+         * @tparam T System type to remove
+         * @return True if system was found and removed
+         */
+        template<typename T>
+        bool RemoveSystem() {
+            return m_SystemRegistry.RemoveSystem<T>();
+        }
+
+        /**
+         * @brief Get a system from the scene
+         * @tparam T System type to get
+         * @return Pointer to system, or nullptr if not found
+         */
+        template<typename T>
+        T* GetSystem() {
+            return m_SystemRegistry.GetSystem<T>();
+        }
+
+        /**
+         * @brief Check if scene has a system
+         * @tparam T System type to check
+         * @return True if system exists
+         */
+        template<typename T>
+        bool HasSystem() const {
+            return m_SystemRegistry.HasSystem<T>();
+        }
+
+        /**
+         * @brief Get the system registry
+         */
+        SystemRegistry& GetSystemRegistry() { return m_SystemRegistry; }
+
+        /**
+         * @brief Initialize all systems
+         * @details Called automatically when scene is loaded/created
+         */
+        void InitializeSystems() {
+            m_SystemRegistry.OnInit(this);
+        }
+
+        /**
+         * @brief Shutdown all systems
+         * @details Called automatically when scene is destroyed
+         */
+        void ShutdownSystems() {
+            m_SystemRegistry.OnShutdown(this);
+        }
+
     private:
         std::string m_Name;
         entt::registry m_Registry;
+        SystemRegistry m_SystemRegistry;
 
         friend class SceneSerializer;
     };

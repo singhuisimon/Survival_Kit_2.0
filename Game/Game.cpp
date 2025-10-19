@@ -13,13 +13,12 @@ Game::Game()
     , m_Scene(nullptr)
     , m_ColorShift(0.0f) {
     LOG_INFO("Game constructor body executing");
-    LOG_INFO("Scene pointer after constructor: ", (void*)m_Scene.get());
 }
 
 void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
 
-    // IMPORTANT: Register all component types for reflection/serialization
+    // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
     try {
         Engine::ComponentRegistry::RegisterAllComponents();
@@ -27,10 +26,10 @@ void Game::OnInit() {
     }
     catch (const std::exception& e) {
         LOG_CRITICAL("  -> FAILED to register components: ", e.what());
-        return;  // Don't close, just skip initialization
+        return;
     }
 
-    // Create scene
+    // Step 2: Create scene
     LOG_INFO("Step 2: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
@@ -47,8 +46,32 @@ void Game::OnInit() {
         return;
     }
 
-    // Try to load scene from file first
-    LOG_INFO("Step 3: Attempting to load scene from file...");
+    // Step 3: Add systems to the scene
+    LOG_INFO("Step 3: Adding systems to scene...");
+    try {
+        // TODO: Add more systems here as they're created by team members:
+        // m_Scene->AddSystem<Engine::PhysicsSystem>();
+        // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
+        // m_Scene->AddSystem<Engine::AudioSystem>();
+
+        LOG_INFO("  -> Systems added successfully");
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("  -> Exception while adding systems: ", e.what());
+    }
+
+    // Step 4: Initialize all systems
+    LOG_INFO("Step 4: Initializing systems...");
+    try {
+        m_Scene->InitializeSystems();
+        LOG_INFO("  -> Systems initialized successfully");
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("  -> Exception while initializing systems: ", e.what());
+    }
+
+    // Step 5: Load scene from file or create default
+    LOG_INFO("Step 5: Loading scene content...");
     bool loadedFromFile = false;
 
     try {
@@ -67,14 +90,14 @@ void Game::OnInit() {
     }
 
     if (!loadedFromFile) {
-        LOG_INFO("Step 4: Creating default scene...");
+        LOG_INFO("Step 6: Creating default scene...");
         try {
             CreateDefaultScene();
             LOG_INFO("  -> Default scene created successfully");
         }
         catch (const std::exception& e) {
             LOG_CRITICAL("  -> Failed to create default scene: ", e.what());
-            m_Scene.reset();  // Clear the scene on failure
+            m_Scene.reset();
             return;
         }
     }
@@ -89,12 +112,12 @@ void Game::OnInit() {
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
     LOG_INFO("");
     LOG_INFO("=== CONTROLS ===");
-    LOG_INFO("  WASD: Test movement input");
+    LOG_INFO("  WASD: Test movement (hold to move continuously)");
     LOG_INFO("  Space: Test action input");
     LOG_INFO("  Mouse: Click to test mouse input");
     LOG_INFO("  Scroll: Test scroll wheel");
     LOG_INFO("  F1: Toggle cursor visibility");
-    LOG_INFO("  F2: Create test entity");
+    LOG_INFO("  F2: Create test entity with velocity");
     LOG_INFO("  F5: Save scene to file");
     LOG_INFO("  F9: Load scene from file");
     LOG_INFO("  ESC: Exit");
@@ -112,7 +135,7 @@ void Game::CreateDefaultScene() {
     player.AddComponent<Engine::TagComponent>("Player");
 
     auto& transform = player.AddComponent<Engine::TransformComponent>();
-    transform.Position = glm::vec3(0, 0, -5);
+    transform.Position = glm::vec3(0, 5, -5);  // Start above ground
     transform.Rotation = glm::vec3(0, 0, 0);
     transform.Scale = glm::vec3(1.0f);
 
@@ -120,10 +143,10 @@ void Game::CreateDefaultScene() {
     rb.Mass = 1.0f;
     rb.UseGravity = true;
     rb.IsKinematic = false;
-    rb.Velocity = glm::vec3(0, 0, 0);
+    rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
 
     player.AddComponent<Engine::MeshRendererComponent>();
-    LOG_TRACE("  -> Player created");
+    LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
 
     LOG_TRACE("  Creating Camera entity...");
     auto camera = m_Scene->CreateEntity("Camera");
@@ -163,7 +186,6 @@ void Game::CreateDefaultScene() {
 void Game::OnUpdate(Engine::Timestep ts) {
     // Check scene validity
     if (!m_Scene) {
-        // Only log once to avoid spam
         static bool errorLogged = false;
         if (!errorLogged) {
             LOG_ERROR("ERROR: Scene is null in OnUpdate!");
@@ -172,7 +194,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
             errorLogged = true;
         }
 
-        // Still render something so the window doesn't freeze
+        // Still render something so window doesn't freeze
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         return;
@@ -181,12 +203,12 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Get input reference
     auto& input = GetInput();
 
-    // Update scene
+    // Update scene (this will call all systems in priority order)
     m_Scene->OnUpdate(ts);
 
     // === Test Input System ===
 
-    // Movement keys - use IsKeyPressed() for continuous input while held
+    // Movement keys - continuous input while held
     if (input.IsKeyPressed(GLFW_KEY_W)) {
         LOG_DEBUG("W held - Moving forward");
     }
@@ -200,7 +222,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
         LOG_DEBUG("D held - Moving right");
     }
 
-    // Action keys - use IsKeyJustPressed() for one-time actions
+    // Action keys - one-time press
     if (input.IsKeyJustPressed(GLFW_KEY_SPACE)) {
         LOG_DEBUG("Space pressed - Jump action!");
     }
@@ -229,17 +251,32 @@ void Game::OnUpdate(Engine::Timestep ts) {
     }
 
     if (input.IsKeyJustPressed(GLFW_KEY_F2)) {
-        LOG_INFO("F2 pressed - Creating test entity...");
+        LOG_INFO("F2 pressed - Creating test entity with velocity...");
         static int entityCounter = 0;
 
         auto newEntity = m_Scene->CreateEntity("DynamicEntity_" + std::to_string(entityCounter));
         newEntity.AddComponent<Engine::TagComponent>("DynamicEntity_" + std::to_string(entityCounter));
 
         auto& transform = newEntity.AddComponent<Engine::TransformComponent>();
-        transform.Position = glm::vec3(entityCounter * 2.0f, 0, 0);
+        transform.Position = glm::vec3(entityCounter * 2.0f, 10.0f, 0);
+        transform.Rotation = glm::vec3(0, 0, 0);
+        transform.Scale = glm::vec3(1, 1, 1);
+
+        // Add rigidbody with random velocity to demonstrate MovementSystem
+        auto& rb = newEntity.AddComponent<Engine::RigidbodyComponent>();
+        rb.Mass = 1.0f;
+        rb.UseGravity = true;
+        rb.IsKinematic = false;
+        rb.Velocity = glm::vec3(
+            (entityCounter % 2 == 0 ? 1.0f : -1.0f),
+            0.0f,
+            0.0f
+        );
+
+        newEntity.AddComponent<Engine::MeshRendererComponent>();
 
         entityCounter++;
-        LOG_INFO("Created entity ID: ", (uint32_t)newEntity);
+        LOG_INFO("Created falling entity ID: ", (uint32_t)newEntity, " with velocity (will demonstrate MovementSystem)");
     }
 
     // Serialization controls
@@ -251,8 +288,20 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     if (input.IsKeyJustPressed(GLFW_KEY_F9)) {
         LOG_INFO("=== LOADING SCENE ===");
+
+        // Shutdown systems before loading new scene
+        m_Scene->ShutdownSystems();
+
         bool success = m_Scene->LoadFromFile("Resources/Scenes/ExampleScene.json");
-        LOG_INFO(success ? "Scene loaded!" : "Load failed!");
+
+        // Reinitialize systems after loading
+        if (success) {
+            m_Scene->InitializeSystems();
+            LOG_INFO("Scene loaded and systems reinitialized!");
+        }
+        else {
+            LOG_ERROR("Load failed!");
+        }
     }
 
     // === Render ===
@@ -269,6 +318,12 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
 void Game::OnShutdown() {
     LOG_INFO("Game shutting down...");
+
+    if (m_Scene) {
+        // Shutdown all systems before destroying scene
+        m_Scene->ShutdownSystems();
+    }
+
     m_Scene.reset();
     LOG_INFO("Game shutdown complete");
 }
