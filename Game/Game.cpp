@@ -63,12 +63,28 @@ void Game::OnInit() {
     // Step 4: Initialize all systems
     LOG_INFO("Step 4: Initializing systems...");
     try {
+        m_Scene->AddSystem<Engine::ScriptSystem>();
         m_Scene->InitializeSystems();
         LOG_INFO("  -> Systems initialized successfully");
     }
     catch (const std::exception& e) {
         LOG_ERROR("  -> Exception while initializing systems: ", e.what());
     }
+
+
+    // Create a test entity with a script
+    LOG_INFO("Creating scripted test entity...");
+    auto scriptedPlayer = m_Scene->CreateEntity("ScriptedPlayer");
+
+    auto& transform = scriptedPlayer.AddComponent<Engine::TransformComponent>();
+    transform.Position = glm::vec3(0, 5, 0);
+
+    auto& scriptComp = scriptedPlayer.AddComponent<Engine::ScriptComponent>();
+    scriptComp.AddScript("PlayerController");
+    scriptComp.AddScript("TestScript");
+
+    LOG_INFO("Scripts attached to entity");
+
 
     // Step 5: Load scene from file or create default
     LOG_INFO("Step 5: Loading scene content...");

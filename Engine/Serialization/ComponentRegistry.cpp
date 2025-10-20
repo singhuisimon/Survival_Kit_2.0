@@ -110,6 +110,17 @@ namespace Engine {
                 [](RigidbodyComponent& c, const glm::vec3& v) { c.Velocity = v; }
             );
         }
+        // Register ScriptComponent
+        {
+            auto& meta = REGISTER_COMPONENT(ScriptComponent);
+            meta.AddProperty<ScriptComponent, bool>(
+                "Enabled",
+                PropertyType::Bool,
+                [](const ScriptComponent& c) { return c.Enabled; },
+                [](ScriptComponent& c, const bool& v) { c.Enabled = v; }
+            );
+            // Scripts are handled specially - we'll serialize the script names as a string array
+        }
 
         LOG_INFO("Component reflection registration complete");
         LOG_INFO("  - Registered 5 component types");

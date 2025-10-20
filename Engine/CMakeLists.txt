@@ -40,6 +40,7 @@ set(ENGINE_SOURCES
     ${UTILITY_SOURCES}
     ${EDITOR_SOURCES}
     ${SERIALIZATION_SOURCES}
+    ${SCRIPTING_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -49,6 +50,7 @@ set(ENGINE_HEADERS
     ${UTILITY_HEADERS}
     ${EDITOR_HEADERS}
     ${SERIALIZATION_HEADERS}
+    ${SCRIPTING_HEADERS}
 )
 
 # Create engine static library
@@ -95,6 +97,9 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
 
+
+source_group("Scripting\\Header" FILES ${SCRIPTING_HEADERS})
+source_group("Scripting\\Source" FILES ${SCRIPTING_SOURCES})
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
     FOLDER "Engine"

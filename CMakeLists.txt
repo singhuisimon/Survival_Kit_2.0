@@ -29,10 +29,45 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# Scripting Module (if enabled)
+if(WIN32 AND MSVC)
+    option(ENABLE_SCRIPTING "Enable C# scripting system" ON)
+    if(ENABLE_SCRIPTING)
+        file(GLOB_RECURSE SCRIPTING_SOURCES 
+            "${ENGINE_ROOT}/Scripting/*.cpp"
+            "${CMAKE_SOURCE_DIR}/ScriptCore/*.cpp"
+        )
+        file(GLOB_RECURSE SCRIPTING_HEADERS 
+            "${ENGINE_ROOT}/Scripting/*.h"
+            "${CMAKE_SOURCE_DIR}/ScriptCore/*.h"
+        )
+        
+        # Add to engine sources
+        set(ENGINE_SOURCES ${ENGINE_SOURCES} ${SCRIPTING_SOURCES})
+        set(ENGINE_HEADERS ${ENGINE_HEADERS} ${SCRIPTING_HEADERS})
+        
+        # Add include directories for scripting
+        target_include_directories(EngineLib PUBLIC
+            ${CMAKE_SOURCE_DIR}/ScriptCore
+            ${CMAKE_SOURCE_DIR}/External/dotnet/include
+        )
+        
+        # Define scripting enabled
+        target_compile_definitions(EngineLib PUBLIC SCRIPTING_ENABLED)
+        
+        # Link required libraries
+        target_link_libraries(EngineLib PUBLIC shlwapi)
+    endif()
+endif()
+
 # Add subdirectories
 add_subdirectory(External)
 add_subdirectory(Engine)
 add_subdirectory(Game)
+
+# After the External and Engine subdirectories, add:
+# Scripting System (Windows only for now)
+include(${CMAKE_SOURCE_DIR}/Scripting.cmake)
 
 # Copy resources to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/Resources 

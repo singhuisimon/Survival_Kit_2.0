@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
-
+#include "../Scripting/ScriptComponent.h"  // Add at the top with other includes
 namespace Engine {
 
     /**
