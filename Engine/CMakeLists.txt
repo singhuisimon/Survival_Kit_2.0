@@ -3,24 +3,54 @@
 # ====================================
 message(STATUS "Configuring Engine...")
 
-# Collect all engine source files recursively
-file(GLOB_RECURSE ENGINE_SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ECS/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Graphics/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Utility/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Editor/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Serialization/*.cpp"
+# Creating a variable locally for the engine
+set(ENGINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Collect each module's source and header files recursively
+
+file(GLOB_RECURSE CORE_SOURCES "")
+
+# Core Module
+file(GLOB_RECURSE CORE_SOURCES "${ENGINE_ROOT}/Core/*.cpp")
+file(GLOB_RECURSE CORE_HEADERS "${ENGINE_ROOT}/Core/*.h")
+
+# ECS Module
+file(GLOB_RECURSE ECS_SOURCES "${ENGINE_ROOT}/ECS/*.cpp")
+file(GLOB_RECURSE ECS_HEADERS "${ENGINE_ROOT}/ECS/*.h")
+
+# Graphics Module
+file(GLOB_RECURSE GRAPHICS_SOURCES "${ENGINE_ROOT}/Graphics/*.cpp")
+file(GLOB_RECURSE GRAPHICS_HEADERS "${ENGINE_ROOT}/Graphics/*.h")
+
+# Utility Module
+file(GLOB_RECURSE UTILITY_SOURCES "${ENGINE_ROOT}/Utility/*.cpp")
+file(GLOB_RECURSE UTILITY_HEADERS "${ENGINE_ROOT}/Utility/*.h")
+
+# Editor Module
+file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
+file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
+
+# Serialization Module
+file(GLOB_RECURSE SERIALIZATION_SOURCES "${ENGINE_ROOT}/Serialization/*.cpp")
+file(GLOB_RECURSE SERIALIZATION_HEADERS "${ENGINE_ROOT}/Serialization/*.h")
+
+# Combine all files
+set(ENGINE_SOURCES
+    ${CORE_SOURCES}
+    ${ECS_SOURCES}
+    ${GRAPHICS_SOURCES}
+    ${UTILITY_SOURCES}
+    ${EDITOR_SOURCES}
+    ${SERIALIZATION_SOURCES}
 )
 
-# Collect all engine header files recursively
-file(GLOB_RECURSE ENGINE_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/Core/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ECS/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Graphics/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Utility/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Editor/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Serialization/*.h"
+set(ENGINE_HEADERS
+    ${CORE_HEADERS}
+    ${ECS_HEADERS}
+    ${GRAPHICS_HEADERS}
+    ${UTILITY_HEADERS}
+    ${EDITOR_HEADERS}
+    ${SERIALIZATION_HEADERS}
 )
 
 # Create engine static library
@@ -38,6 +68,34 @@ else()
     )
     message(WARNING "No engine sources found, using dummy file")
 endif()
+
+# ====================================
+# SOURCE GROUPS - Header/Source Split
+# ====================================
+
+# Core Module
+source_group("Core\\Header" FILES ${CORE_HEADERS})
+source_group("Core\\Source" FILES ${CORE_SOURCES})
+
+# ECS Module
+source_group("ECS\\Header" FILES ${ECS_HEADERS})
+source_group("ECS\\Source" FILES ${ECS_SOURCES})
+
+# Graphics Module
+source_group("Graphics\\Header" FILES ${GRAPHICS_HEADERS})
+source_group("Graphics\\Source" FILES ${GRAPHICS_SOURCES})
+
+# Utility Module
+source_group("Utility\\Header" FILES ${UTILITY_HEADERS})
+source_group("Utility\\Source" FILES ${UTILITY_SOURCES})
+
+# Editor Module
+source_group("Editor\\Header" FILES ${EDITOR_HEADERS})
+source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
+
+# Serialization Module
+source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
+source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
