@@ -8,8 +8,6 @@ set(ENGINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Collect each module's source and header files recursively
 
-file(GLOB_RECURSE CORE_SOURCES "")
-
 # Core Module
 file(GLOB_RECURSE CORE_SOURCES "${ENGINE_ROOT}/Core/*.cpp")
 file(GLOB_RECURSE CORE_HEADERS "${ENGINE_ROOT}/Core/*.h")
