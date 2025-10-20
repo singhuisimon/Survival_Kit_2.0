@@ -67,6 +67,16 @@ else()
     message(WARNING "No engine sources found, using dummy file")
 endif()
 
+target_link_libraries(EngineLib PUBLIC ScriptCore ScriptAPI)
+
+
+target_include_directories(EngineLib PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/ScriptCore/include
+    ${CMAKE_SOURCE_DIR}/ScriptAPI/include
+)
+
+
 # ====================================
 # SOURCE GROUPS - Header/Source Split
 # ====================================

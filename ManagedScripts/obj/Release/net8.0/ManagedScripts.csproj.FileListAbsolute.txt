@@ -1,0 +1,5 @@
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\ManagedScripts\obj\Release\net8.0\ManagedScripts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\ManagedScripts\obj\Release\net8.0\ManagedScripts.AssemblyInfoInputs.cache
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\ManagedScripts\obj\Release\net8.0\ManagedScripts.AssemblyInfo.cs
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\ManagedScripts\obj\Release\net8.0\ManagedScripts.csproj.CoreCompileInputs.cache
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\ManagedScripts\obj\Release\net8.0\ManagedScripts.sourcelink.json
