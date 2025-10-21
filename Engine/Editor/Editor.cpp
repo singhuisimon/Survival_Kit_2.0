@@ -10,8 +10,9 @@
 
 // Include Header Files
 #include "Editor.h"
-// Include other necessary headers
 
+// Include other necessary headers
+#include <GLFW/glfw3.h>
 
 namespace Engine
 {
@@ -25,13 +26,13 @@ namespace Engine
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io = &ImGui::GetIO(); (void)io;
 
 		// Set config flag
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+		io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+		io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
@@ -40,7 +41,7 @@ namespace Engine
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		// Set WindowRounding and ImGuiCol_WindowBg when viewport is enabled
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
@@ -52,5 +53,29 @@ namespace Engine
 
 		m_Initialized = true;
 		
+	}
+
+	void Editor::StartImguiFrame() {
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+	}
+
+	void Editor::RenderEditor() {
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		// Update and Render additional Platform Windows
+		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
+
 	}
 } // end of namespace Engine
