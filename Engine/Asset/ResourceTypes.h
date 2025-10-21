@@ -23,7 +23,6 @@
 #include <vector>
 #include <algorithm>
 
-namespace gam300 {
 
 	/*
 	* @brief enum for resource types
@@ -169,11 +168,6 @@ namespace gam300 {
 			}
 		}
 	}
-
-
-
-} // end of name space gam300
-
 
     //namespace std {
     //template<>

@@ -18,7 +18,6 @@
 //external library for GUID
 #include "../xresource_guid/include/xresource_guid.h"
 
-namespace gam300 {
 
 	//generate GUIDs using xresource_guid library
 	static xresource::instance_guid GenId()
@@ -145,4 +144,3 @@ namespace gam300 {
 		bySourcePath.clear();
 	}
 
-} //end of namespace gam300

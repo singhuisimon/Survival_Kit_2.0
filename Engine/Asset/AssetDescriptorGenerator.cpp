@@ -7,7 +7,6 @@
 
 namespace fs = std::filesystem;
 
-namespace gam300 {
 
         // ==================== PUBLIC API ====================
 
@@ -279,5 +278,3 @@ namespace gam300 {
             return false;
         }
     }
-
-}//end of namespace gam300

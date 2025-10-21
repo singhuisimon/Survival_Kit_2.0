@@ -10,7 +10,6 @@
 #include <ctime>
 #include <filesystem>
 
-namespace gam300 {
 
 	/**
 	* @brief Change description for a scanned source file.
@@ -115,7 +114,5 @@ namespace gam300 {
 		bool m_include_hidden = false; //  Include dotfiles
 	};
 
-
-} //end of namespace gam300
 
 #endif // __ASSET_SCANNER_H__

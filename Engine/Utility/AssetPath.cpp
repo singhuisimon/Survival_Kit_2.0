@@ -14,10 +14,9 @@
 
 namespace fs = std::filesystem;
 
-namespace gam300 {
 
     // Base path to the assets directory - modify this to match your project structure
-    const std::string BASE_ASSETS_PATH = std::filesystem::current_path().string() + "\\Assets\\";
+    const std::string BASE_ASSETS_PATH = std::filesystem::current_path().string() + "\\Resources\\";
 
     // Format the filepath for the assets directory
     std::string getAssetsPath() {
@@ -244,5 +243,3 @@ namespace gam300 {
 
         return escaped;
     }
-
-} // end of namespace gam300

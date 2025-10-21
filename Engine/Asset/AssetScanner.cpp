@@ -11,7 +11,6 @@
 
 namespace fs = std::filesystem;
 
-namespace gam300 {
 
 	// Convert filesystem clock to system_clock-backed time_t (portable approach)
 	std::time_t AssetScanner::toTimeT(fs::file_time_type ftime) {
@@ -218,5 +217,3 @@ namespace gam300 {
 		}
 		return true;
 	}
-
-} //end of namespace gam300

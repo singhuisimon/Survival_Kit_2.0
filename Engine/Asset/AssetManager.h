@@ -38,9 +38,9 @@
 
 
 //define acronym for easier access 
-#define AM gam300::AssetManager::getInstance()
+#define AM AssetManager::getInstance()
 
-namespace gam300 {
+
 
 
 	/**
@@ -49,7 +49,7 @@ namespace gam300 {
 	*/
 	class AssetManager {
 	private:
-		AssetManager(); // singleton
+		AssetManager()=default; // singleton
 		AssetManager(const AssetManager&) = delete; // no copy
 		void operator=(const AssetManager&) = delete; // no assign
 
@@ -215,6 +215,5 @@ namespace gam300 {
 
 	};
 
-}	//end of namespace gam300
 
 #endif // __ASSET_MANAGER_H__

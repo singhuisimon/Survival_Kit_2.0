@@ -14,8 +14,6 @@
 #include <string>
 #include <vector>
 
-namespace gam300 {
-
     /**
      * @brief Get the absolute path to the assets directory.
      * @return The absolute path to the assets directory.
@@ -72,5 +70,5 @@ namespace gam300 {
 
     std::string getRelativeAssetPath(const std::string& absolutePath);
     std::string escapeBackslashesForJSON(const std::string& input);
-} // end of namespace gam300
+
 #endif // __ASSET_PATH_H__

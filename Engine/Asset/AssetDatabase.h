@@ -19,7 +19,6 @@
 #include "../xresource_guid/include/xresource_guid.h"
 #include "ResourceTypes.h"  // Use existing ResourceType enum
 
-namespace gam300{
 
     struct AssetRecord{
 
@@ -99,6 +98,6 @@ namespace gam300{
 
     };
 
-}//endof nnamespace gam300
+
 
 #endif

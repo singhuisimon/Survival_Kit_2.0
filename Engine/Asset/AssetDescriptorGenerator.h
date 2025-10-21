@@ -10,7 +10,7 @@
 #include "AssetDatabase.h"
 #include "../Utility/AssetPath.h"
 
-namespace gam300 {
+
 
 	// Forward declaration to avoid coupling. Defined in AssetDatabase.h
 	struct AssetRecord;
@@ -212,7 +212,5 @@ namespace gam300 {
 		
 	};
 
-
-} //end of namespace gam300
 
 #endif // __ASSET_DESCGENERATOR_H__

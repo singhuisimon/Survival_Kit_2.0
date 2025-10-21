@@ -18,7 +18,6 @@
 
 namespace fs = std::filesystem;
 
-namespace gam300 {
 
 	// Singleton plumbing
 	//AssetManager::AssetManager() {
@@ -322,11 +321,11 @@ namespace gam300 {
 		// Iterate changes from the scanner and act on them
 		for (const auto& c : m_scanner.Scan()) {
 			switch (c.kind) {
-			case ::gam300::ScanChange::Kind::Added:
-			case ::gam300::ScanChange::Kind::Modified:
+			case ScanChange::Kind::Added:
+			case ScanChange::Kind::Modified:
 				handleAddedOrModified(c.sourcePath);
 				break;
-			case ::gam300::ScanChange::Kind::Removed:
+			case ScanChange::Kind::Removed:
 				handleRemoved(c.sourcePath);
 				break;
 			}
@@ -372,4 +371,3 @@ namespace gam300 {
 		return m_db.FindBySource(sourcePath) != nullptr;
 	}
 
-} // end of namespace gam300
