@@ -24,8 +24,8 @@
 #include <filesystem>
 #include <algorithm>
 
-
 // Include other necessary headers
+#include "../Utility/Timestep.h"
 
 namespace Engine
 {
@@ -52,8 +52,12 @@ namespace Engine
 		// Deleted copy assignment operator
 		Editor& operator=(const Editor&) = delete;
 
+		// Initialise Imgui
+		void OnInit();
+
 		// still figure out
-		//int starup();
+		void OnUpdate(Engine::Timestep ts);
+
 	};
 
 
