@@ -35,11 +35,16 @@ void Game::OnInit() {
     LOG_INFO("Step 2: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
-        m_Editor = std::make_unique<Engine::Editor>(GetWindow());
 
-        // TODO:: Add Set Scene 
-        // m_Editor->SetScene(m_Scene.get()); 
-        m_Editor->OnInit(); 
+        if (!m_Editor)
+        {
+            m_Editor = std::make_unique<Engine::Editor>(GetWindow());
+            // TODO:: Add Set Scene 
+            // m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->OnInit(); 
+
+        }
+
 
 
         if (!m_Scene) {

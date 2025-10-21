@@ -26,6 +26,7 @@
 
 // Include other necessary headers
 #include "../Utility/Timestep.h"
+#include "../Utility/Logger.h"
 
 namespace Engine
 {
@@ -36,12 +37,12 @@ namespace Engine
 	class Editor
 	{
 	private:
-
-		
+		GLFWwindow* m_Window = nullptr;
+		bool m_Initialized = false;
 
 	public:
 		// Default contructor 
-		Editor() {};
+		Editor(GLFWwindow* window): m_Window(window) {};
 
 		// Deconstuctor
 		~Editor() = default;
@@ -56,7 +57,7 @@ namespace Engine
 		void OnInit();
 
 		// still figure out
-		void OnUpdate(Engine::Timestep ts);
+		void OnUpdate(Timestep ts);
 
 	};
 
