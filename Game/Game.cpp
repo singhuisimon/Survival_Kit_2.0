@@ -20,29 +20,6 @@ Game::Game()
 void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
 
-    // ============================ Editor ===========================
- /*   LOG_INFO("Step 2: Creating editor object...");
-    try {
-        m_Editor = std::make_unique<Engine::Editor>("Main Scene");
-
-        if (!m_Editor) {
-            LOG_CRITICAL("  -> Editor pointer is null after make_unique!");
-            return;
-        }
-
-        LOG_INFO("  -> Editor created at address: ", (void*)m_Editor.get());
-    }
-    catch (const std::exception& e) {
-        LOG_CRITICAL("  -> Exception while creating editor: ", e.what());
-        return;
-    }*/
-    // Handles Imgui Initialization 
-    m_Editor = std::make_unique<Engine::Editor>(GetWindow());
-
-
-
-    // ============================= Editor =================================
-
     // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
     try {
@@ -58,6 +35,12 @@ void Game::OnInit() {
     LOG_INFO("Step 2: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
+        m_Editor = std::make_unique<Engine::Editor>(GetWindow());
+
+        // TODO:: Add Set Scene 
+        // m_Editor->SetScene(m_Scene.get()); 
+        m_Editor->OnInit(); 
+
 
         if (!m_Scene) {
             LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
@@ -134,7 +117,18 @@ void Game::OnInit() {
         return;
     }
 
+    // ============================ Editor ===========================
+
+    // Handles Imgui Initialization 
     
+    
+    m_Editor->OnInit();
+
+    if (!m_Editor) {
+        LOG_CRITICAL("CRITICAL: Editor is null at end of OnInit()!");
+        return;
+    }
+    // ============================= Editor =================================
 
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
