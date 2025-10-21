@@ -55,6 +55,104 @@ namespace Engine
 		
 	}
 
+	void Editor::OnUpdate(Timestep ts)
+	{
+		if (!m_Initialized) return;
+
+		// Start ImGui Frame
+		StartImguiFrame();
+
+		displayTopMenu();
+
+		// Enable Docking Function
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		
+		// Panel Logic
+		displayPropertiesPanel();
+
+		displayHierarchyPanel();
+
+		displayAssetsBrowserPanel();
+
+		displayPerformanceProfilePanel();
+	}
+
+	void Editor::displayTopMenu()
+	{
+		// To start top menu
+		if (ImGui::BeginMainMenuBar())
+		{
+			ImGui::Separator();
+			// First item in top menu
+			if (ImGui::BeginMenu("File"))
+			{	
+				// Under file menu list
+				if(ImGui::MenuItem("New"))
+				{
+
+				}
+				if (ImGui::IsAnyItemHovered())
+				{
+					ImGui::SetTooltip("Create new scene.");
+				}
+				// close File menu
+				ImGui::EndMenu();
+			}
+			// close main menu bar
+			ImGui::EndMainMenuBar();
+			
+		}
+	}
+
+	void Editor::displayPropertiesPanel()
+	{
+		ImGui::SetNextWindowSize(ImVec2(600, 400));
+
+		// Begin properties dockable window
+		if (ImGui::Begin("Properties/ Inspector", &inspectorWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		{
+
+		}
+
+		ImGui::End(); // End of the properties window
+	}
+
+	void Editor::displayHierarchyPanel()
+	{
+		ImGui::SetNextWindowSize(ImVec2(600, 400));
+
+		// Begin properties dockable window
+		if (ImGui::Begin("Hierarchy", &hierachyWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		{
+			
+		}
+
+		ImGui::End(); // End of the properties window
+	}
+
+	void Editor::displayAssetsBrowserPanel()
+	{
+		ImGui::SetNextWindowSize(ImVec2(600, 400));
+
+		// Begin properties dockable window
+		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		{
+
+		}
+
+		ImGui::End(); // End of the assets browser window
+	}
+
+	void Editor::displayPerformanceProfilePanel()
+	{
+		ImGui::SetNextWindowSize(ImVec2(200, 100));
+		if (ImGui::Begin("Performance Profile", &performanceProfileWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		{
+
+		}
+		ImGui::End(); // end of performance profile panel
+	}
+
 	void Editor::StartImguiFrame() {
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -63,6 +161,12 @@ namespace Engine
 
 	}
 
+	void Editor::renderViewport()
+	{
+		// Logic here 
+	}
+
+	// Render after Render System
 	void Editor::RenderEditor() {
 
 		ImGui::Render();

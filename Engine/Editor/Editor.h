@@ -41,6 +41,12 @@ namespace Engine
 		bool m_Initialized = false;
 		ImGuiIO* io;
 
+		// ImGui Window functionality
+		bool inspectorWindow = true; 
+		bool hierachyWindow = true;
+		bool assetsWindow = true;
+		bool performanceProfileWindow = true;
+
 	public:
 		// Default contructor 
 		Editor(GLFWwindow* window): m_Window(window), io(nullptr) {};
@@ -62,8 +68,27 @@ namespace Engine
 
 		void StartImguiFrame();
 
+		// display top menu 
+		void displayTopMenu();
+
+		// display properties list
+		void displayPropertiesPanel();
+
+		// display hierarchy list
+		void displayHierarchyPanel();
+
+		// display assets browser list
+		void displayAssetsBrowserPanel();
+
+		// display performance profile
+		void displayPerformanceProfilePanel();
+
+		// Render Viewport
+		void renderViewport();
+
 		// Render IMGUI UI
 		void RenderEditor();
+
 
 	};
 

@@ -36,20 +36,20 @@ void Game::OnInit() {
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
+       
+        if (!m_Scene) {
+            LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
+            return;
+        }
+
         if (!m_Editor)
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
             // TODO:: Add Set Scene 
             // m_Editor->SetScene(m_Scene.get()); 
-            m_Editor->OnInit(); 
+            m_Editor->OnInit();
+            LOG_INFO("Editor initialized successfully.");
 
-        }
-
-
-
-        if (!m_Scene) {
-            LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
-            return;
         }
 
         // Editor get scene
@@ -122,18 +122,6 @@ void Game::OnInit() {
         return;
     }
 
-    // ============================ Editor ===========================
-
-    // Handles Imgui Initialization 
-    
-    
-    m_Editor->OnInit();
-
-    if (!m_Editor) {
-        LOG_CRITICAL("CRITICAL: Editor is null at end of OnInit()!");
-        return;
-    }
-    // ============================= Editor =================================
 
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
@@ -334,11 +322,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
     }
 
-    m_Editor->StartImguiFrame();
+    //m_Editor->StartImguiFrame();
 
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
-    
+    m_Editor->OnUpdate(ts);
 
     // === Render ===
     m_ColorShift += ts * 0.5f;
