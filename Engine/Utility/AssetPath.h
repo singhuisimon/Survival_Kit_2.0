@@ -8,11 +8,11 @@
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 #pragma once
-#ifndef __ASSET_PATH_H__
-#define __ASSET_PATH_H__
 
 #include <string>
 #include <vector>
+
+namespace Engine {
 
     /**
      * @brief Get the absolute path to the assets directory.
@@ -70,5 +70,5 @@
 
     std::string getRelativeAssetPath(const std::string& absolutePath);
     std::string escapeBackslashesForJSON(const std::string& input);
+} // end of namespace Engine
 
-#endif // __ASSET_PATH_H__

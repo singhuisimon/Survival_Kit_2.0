@@ -8,12 +8,13 @@
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
-#include "AssetPath.h"
+#include "../Utility/AssetPath.h"
 #include <filesystem>
 #include <iostream>
 
 namespace fs = std::filesystem;
 
+namespace Engine {
 
     // Base path to the assets directory - modify this to match your project structure
     const std::string BASE_ASSETS_PATH = std::filesystem::current_path().string() + "\\Resources\\";
@@ -243,3 +244,5 @@ namespace fs = std::filesystem;
 
         return escaped;
     }
+
+} // end of namespace gam300
