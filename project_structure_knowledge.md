@@ -4,7 +4,7 @@
 **Name:** Property-Based ECS Game Engine  
 **Architecture:** Entity Component System (ECS) using EnTT  
 **Build System:** CMake  
-**C++ Standard:** C++17  
+**C++ Standard:** C++20  
 **Primary Libraries:** GLFW, GLAD, GLM, EnTT, Jolt Physics, FMOD, ImGui, Tracy, RapidJSON
 
 ---
@@ -71,11 +71,13 @@ GameEngine/
 │   │   └── Random.cpp           # Random number generation (future)   
 │   │
 │   └── Editor/                   # Editor Tools (Optional/Future)
-│       ├── EditorCamera.h       # Editor-specific camera
-│       ├── EditorCamera.cpp
-│       ├── Gizmos.h             # Transform gizmos
-│       └── Gizmos.cpp
-│
+│   │   ├── EditorCamera.h       # Editor-specific camera
+│   │   ├── EditorCamera.cpp
+│   │   ├── Gizmos.h             # Transform gizmos
+│   │   └── Gizmos.cpp
+│   │ 
+│   └── Asset/                   # Asset Pipeline tools
+│   
 ├── Game/                          # GAME EXECUTABLE
 │   ├── CMakeLists.txt            # Game CMake config
 │   ├── Main.cpp                 # Entry point (creates Game instance)
@@ -96,17 +98,21 @@ GameEngine/
 │   ├── tracy/                   # Profiler
 │   ├── rapidjson/               # JSON parsing (for serialization)
 │   └── openFBX/                 # FBX model loading
+│   └── xresource_guid/          # GUID creation
+│   └── xresource_mgr/           # Resource Loading
 │
 └── Resources/                     # GAME ASSETS
-    ├── Shaders/                  # GLSL shaders
-    ├── Models/                   # 3D models
-    ├── Textures/                 # Image files
-    ├── Audio/                    # Sound files
-    └── Scenes/                   # Scene JSON files
-        ├── ExampleScene.json     # Example game scene
-        ├── TestScene.json        # Arena test scene
-        └── SavedScene.json       # Runtime save location
-
+    ├──Sources                      # Original Files
+        ├── Shaders/                  # GLSL shaders
+        ├── Models/                   # 3D models
+        ├── Textures/                 # Image files
+        ├── Audio/                    # Sound files
+        └── Scenes/                   # Scene JSON files
+            ├── ExampleScene.json     # Example game scene
+            ├── TestScene.json        # Arena test scene
+            └── SavedScene.json       # Runtime save location
+    ├──Descriptors                    # Descriptor Files for Assets
+    ├──Compiled                       # Compiled format for Assets
 ```
 
 ---

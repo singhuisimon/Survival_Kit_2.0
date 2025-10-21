@@ -75,7 +75,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -282,7 +282,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Serialization controls
     if (input.IsKeyJustPressed(GLFW_KEY_F5)) {
         LOG_INFO("=== SAVING SCENE ===");
-        bool success = m_Scene->SaveToFile("Resources/Scenes/SavedScene.json");
+        bool success = m_Scene->SaveToFile("Resources/Sources/Scenes/SavedScene.json");
         LOG_INFO(success ? "Scene saved!" : "Save failed!");
     }
 
@@ -292,7 +292,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
         // Shutdown systems before loading new scene
         m_Scene->ShutdownSystems();
 
-        bool success = m_Scene->LoadFromFile("Resources/Scenes/ExampleScene.json");
+        bool success = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
         // Reinitialize systems after loading
         if (success) {

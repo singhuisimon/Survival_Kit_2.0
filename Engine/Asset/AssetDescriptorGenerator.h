@@ -8,7 +8,7 @@
 #include <ctime>
 #include <iomanip>
 #include "AssetDatabase.h"
-#include "AssetPath.h"
+#include "../Utility/AssetPath.h"
 
 namespace gam300 {
 

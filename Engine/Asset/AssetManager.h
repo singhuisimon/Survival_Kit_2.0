@@ -34,7 +34,7 @@
 
 
 //asset path
-#include "AssetPath.h"
+#include "../Utility/AssetPath.h"
 
 
 //define acronym for easier access 
@@ -88,12 +88,16 @@ namespace gam300 {
 		static Config createDefaultConfig() {
 			Config cfg{};
 
-			//returns "Assets/"
+			//returns "Resources/"
 			std::string assetsPath = getAssetsPath();
 
 			//=============== SOURCE ROOTS ===============
 			cfg.sourceRoots = {
-				assetsPath + "Sources" //every folder under Sources is a source
+				assetsPath + "Sources/Scenes", //every folder under Sources is a source
+				assetsPath + "Sources/Shaders",
+				assetsPath + "Sources/Meshes",
+				assetsPath + "Sources/Textures",
+				assetsPath + "Sources/Audio"
 
 			};
 

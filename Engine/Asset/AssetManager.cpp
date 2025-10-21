@@ -14,7 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "AssetPath.h"
+#include "../Utility/AssetPath.h"
 
 namespace fs = std::filesystem;
 
