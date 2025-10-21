@@ -13,9 +13,9 @@
 #define SK_IMGUI_MANAGER_H
 
 // Include Editor Header Files
-#include "../IMGUI/imgui.h"
-#include "../IMGUI/imgui_impl_glfw.h"
-#include "../IMGUI/imgui_impl_opengl3.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 // Include Standard Headers
 #include <string>
