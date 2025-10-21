@@ -333,6 +333,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
             LOG_ERROR("Load failed!");
         }
     }
+
+    m_Editor->StartImguiFrame();
+
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     
@@ -348,8 +351,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
     glClearColor(r, g, b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-    
+    m_Editor->RenderEditor();
 }
 
 void Game::OnShutdown() {

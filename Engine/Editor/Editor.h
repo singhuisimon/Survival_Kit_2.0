@@ -39,10 +39,11 @@ namespace Engine
 	private:
 		GLFWwindow* m_Window = nullptr;
 		bool m_Initialized = false;
+		ImGuiIO* io;
 
 	public:
 		// Default contructor 
-		Editor(GLFWwindow* window): m_Window(window) {};
+		Editor(GLFWwindow* window): m_Window(window), io(nullptr) {};
 
 		// Deconstuctor
 		~Editor() = default;
@@ -58,6 +59,11 @@ namespace Engine
 
 		// still figure out
 		void OnUpdate(Timestep ts);
+
+		void StartImguiFrame();
+
+		// Render IMGUI UI
+		void RenderEditor();
 
 	};
 
