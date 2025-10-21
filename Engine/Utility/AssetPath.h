@@ -70,4 +70,5 @@ namespace Engine {
 
     std::string getRelativeAssetPath(const std::string& absolutePath);
     std::string escapeBackslashesForJSON(const std::string& input);
-} // end of namespace gam300
+} // end of namespace Engine
+
