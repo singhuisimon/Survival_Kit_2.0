@@ -80,6 +80,48 @@ namespace Engine {
                 [](const MeshRendererComponent& c) { return c.Visible; },
                 [](MeshRendererComponent& c, const bool& v) { c.Visible = v; }
             );
+
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "ShadowReceive",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.ShadowReceive; },
+                [](MeshRendererComponent& c, const bool& v) { c.ShadowReceive = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "ShadowCast",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.ShadowCast; },
+                [](MeshRendererComponent& c, const bool& v) { c.ShadowCast = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "GlobalIlluminate",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.GlobalIlluminate; },
+                [](MeshRendererComponent& c, const bool& v) { c.GlobalIlluminate = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "MeshType",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.MeshType; },
+                [](MeshRendererComponent& c, const bool& v) { c.MeshType = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "Material",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.Material; },
+                [](MeshRendererComponent& c, const bool& v) { c.Material = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "Texture",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.Texture; },
+                [](MeshRendererComponent& c, const bool& v) { c.Texture = v; }
+            );
         }
 
         // Register RigidbodyComponent
