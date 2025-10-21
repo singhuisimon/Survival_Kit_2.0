@@ -3,6 +3,7 @@
 #include "Core/Input.h"
 #include "Utility/Logger.h"
 #include "ECS/Components.h"
+#include "Editor/Editor.h"
 #include "Serialization/ComponentRegistry.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,12 +12,36 @@
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
     , m_Scene(nullptr)
+    , m_Editor(nullptr)
     , m_ColorShift(0.0f) {
     LOG_INFO("Game constructor body executing");
 }
 
 void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
+
+    // ============================ Editor ===========================
+ /*   LOG_INFO("Step 2: Creating editor object...");
+    try {
+        m_Editor = std::make_unique<Engine::Editor>("Main Scene");
+
+        if (!m_Editor) {
+            LOG_CRITICAL("  -> Editor pointer is null after make_unique!");
+            return;
+        }
+
+        LOG_INFO("  -> Editor created at address: ", (void*)m_Editor.get());
+    }
+    catch (const std::exception& e) {
+        LOG_CRITICAL("  -> Exception while creating editor: ", e.what());
+        return;
+    }*/
+    // Handles Imgui Initialization 
+    m_Editor = std::make_unique<Engine::Editor>(GetWindow());
+
+
+
+    // ============================= Editor =================================
 
     // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
@@ -39,6 +64,7 @@ void Game::OnInit() {
             return;
         }
 
+        // Editor get scene
         LOG_INFO("  -> Scene created at address: ", (void*)m_Scene.get());
     }
     catch (const std::exception& e) {
@@ -107,6 +133,8 @@ void Game::OnInit() {
         LOG_CRITICAL("CRITICAL: Scene is null at end of OnInit()!");
         return;
     }
+
+    
 
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
@@ -206,6 +234,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update scene (this will call all systems in priority order)
     m_Scene->OnUpdate(ts);
 
+    
+
+
     // === Test Input System ===
 
     // Movement keys - continuous input while held
@@ -303,6 +334,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
             LOG_ERROR("Load failed!");
         }
     }
+    // Update Editor To Do
+    //m_Editor->OnUpdate(Engine::Timestep ts);
+    
 
     // === Render ===
     m_ColorShift += ts * 0.5f;
@@ -314,6 +348,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     glClearColor(r, g, b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+    
 }
 
 void Game::OnShutdown() {
@@ -325,5 +362,6 @@ void Game::OnShutdown() {
     }
 
     m_Scene.reset();
+    m_Editor.reset();
     LOG_INFO("Game shutdown complete");
 }
