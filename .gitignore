@@ -177,9 +177,9 @@ External/openFBX/build/
 # Asset Processing (Future)
 # ==================================
 # Generated metadata and compiled assets (auto-generated, don't commit)
-Resources/DB/              # Asset database
-Resources/Descriptors/     # Generated descriptor files
-Resources/Compiled/        # Compiled/optimized assets
+Resources/DB/              
+Resources/Descriptors/     
+Resources/Compiled/       
 
 # ==================================
 # Documentation Build
