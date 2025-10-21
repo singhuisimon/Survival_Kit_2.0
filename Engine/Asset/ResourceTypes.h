@@ -46,7 +46,7 @@
 		case ResourceType::TEXTURE: 
 			return "Texture";
 		case ResourceType::MESH: 
-			return "Meshe";
+			return "Mesh";
 		case ResourceType::MATERIAL: 
 			return "Material";
 		case ResourceType::AUDIO: 

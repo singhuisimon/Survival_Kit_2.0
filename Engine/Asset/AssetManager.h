@@ -81,6 +81,17 @@
 			bool writeDescriptors = true; // generate descriptor files
 		};
 
+		static std::string GetSourceResourcesPath() {
+
+			//get project root using existing function
+			std::string projectRoot = Engine::getRepository();
+
+			//add the Resources path
+			std::filesystem::path resourcesPath = std::filesystem::path(projectRoot) / "Resources";
+
+			return resourcesPath.string();
+		}
+
 		/**
 		* @brief Create default configuration for the project
 		* @return Configured AssetManager::Config with sensible defaults
@@ -88,26 +99,29 @@
 		static Config createDefaultConfig() {
 			Config cfg{};
 
-			//returns "Resources/"
-			std::string assetsPath = getAssetsPath();
+			//resource path (get from the /Resources not from the build folder)
+			std::string sourcesPath = GetSourceResourcesPath();
+
+			//get the build/Resources path for compiled path
+			std::string assetsPath = Engine::getAssetsPath();
 
 			//=============== SOURCE ROOTS ===============
 			cfg.sourceRoots = {
-				assetsPath + "Sources/Scenes", //every folder under Sources is a source
-				assetsPath + "Sources/Shaders",
-				assetsPath + "Sources/Meshes",
-				assetsPath + "Sources/Textures",
-				assetsPath + "Sources/Audio"
+				sourcesPath + "/Sources/Scenes", //every folder under Sources is a source
+				sourcesPath + "/Sources/Shaders",
+				sourcesPath + "/Sources/Meshes",
+				sourcesPath + "/Sources/Textures",
+				sourcesPath + "/Sources/Audio"
 
 			};
 
 			//================= OUTPUT PATHS ===============
-			cfg.descriptorRoot = assetsPath + "Descriptors";
-			cfg.compiledPath = assetsPath + "Compiled";
+			cfg.descriptorRoot = sourcesPath + "/Descriptors";
+			cfg.compiledPath = assetsPath + "/Compiled";
 
 			//================= INTERNAL PATHS ===================
-			cfg.databaseFile = assetsPath + "DB/assetdb.txt";
-			cfg.snapshotFile = assetsPath + "DB/scan.snapshot";
+			cfg.databaseFile = sourcesPath + "/DB/assetdb.txt";
+			cfg.snapshotFile = sourcesPath + "/DB/scan.snapshot";
 
 			// ==================== IGNORE PATTERNS ====================
 			cfg.ignoreSubstrings = {};

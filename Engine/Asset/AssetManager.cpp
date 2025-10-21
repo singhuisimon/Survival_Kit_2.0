@@ -15,6 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include "../Utility/AssetPath.h"
+#include "../Utility/Logger.h"
 
 namespace fs = std::filesystem;
 
@@ -50,7 +51,7 @@ namespace fs = std::filesystem;
 		}
 
 		//get assetpath (with the utility fun)
-		std::string assetsPath = getAssetsPath();
+		std::string assetsPath = Engine::getAssetsPath();
 
 		//create directories 
 		try {
@@ -117,19 +118,18 @@ namespace fs = std::filesystem;
 	//this handleAddedOrModified is 
 	void AssetManager::handleAddedOrModified(const std::string& src) {
 
-
 		// Ensure we have a guid for this source path
 		xresource::instance_guid guid = m_db.EnsureIdForPath(src);
 		auto* rec = m_db.FindMutable(guid);
 		if (!rec) {
-		//	LM.writeLog("AssetManager::handleAddedOrModified - ERROR: failed to create/find record for :%s", src.c_str());
+			LOG_ERROR("Failed to create/find record for: ", src);
 			return;
 		}
 
 		//detect the resource type from file extension
 		rec->type = detectResourceTypeFromPath(src);
 		if (rec->type == ResourceType::UNKNOWN) {
-		//	LM.writeLog("AssetManager::handleAddedOrModified - WARNING: unknown resource type for :%s", src.c_str());
+			LOG_WARNING("Unknown resource type: ", src);
 			rec->valid = false;
 			return;
 		}
@@ -137,7 +137,7 @@ namespace fs = std::filesystem;
 		//get the basic extension for metadata
 		rec->ext = AssetDatabase::ExtensionLower(src);
 
-		//get file timestemp
+		//get file timestamp
 		try {
 			if (fs::exists(src)) {
 				auto ftime = fs::last_write_time(src);
@@ -147,8 +147,7 @@ namespace fs = std::filesystem;
 			}
 		}
 		catch (const std::exception& e) {
-		//	LM.writeLog("AssetManager - WARNING: Could not get timestamp for %s: %s",
-			//	src.c_str(), e.what());
+			LOG_WARNING("Could not get timestamp for ", src);
 			rec->lastWriteTime = std::time(nullptr);
 		}
 
@@ -166,6 +165,7 @@ namespace fs = std::filesystem;
 
 			// Generate type-specific descriptors based on ResourceType
 			bool descriptorGenerated = false;
+			std::string descriptorPath;
 
 			switch (rec->type) {
 			case ResourceType::TEXTURE: {
@@ -177,7 +177,7 @@ namespace fs = std::filesystem;
 				settings.generateMipmaps = true;
 				settings.srgb = true;
 
-				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings);
+				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings, &descriptorPath);
 				break;
 			}
 
@@ -191,7 +191,7 @@ namespace fs = std::filesystem;
 				settings.indexType = "UINT32";
 				settings.optimizeVertices = true;
 
-				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings);
+				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings, &descriptorPath);
 				break;
 			}
 
@@ -204,7 +204,7 @@ namespace fs = std::filesystem;
 				settings.sampleRate = 44100;
 				settings.channelMode = "STEREO";
 
-				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings);
+				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings, &descriptorPath);
 				break;
 			}
 
@@ -223,30 +223,23 @@ namespace fs = std::filesystem;
 
 			case ResourceType::MATERIAL: {
 				// Materials might not need settings initially, just Info.txt
-				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, MeshSettings());
+				MeshSettings settings;
+				descriptorGenerated = m_descGen.GenerateFor(*rec, &extras, settings, &descriptorPath);
 				break;
 			}
 
 			default:
-				//LM.writeLog("AssetManager - No descriptor settings defined for type: %s",
-				//	resourceTypeToString(rec->type).c_str());
+				LOG_WARNING("No descriptor settings defined for type: ", resourceTypeToString(rec->type));
 				break;
 			}
 
-			if (descriptorGenerated) {
-				std::string descriptorFolder = m_descGen.GetDescriptorFolderPath(*rec);
-				//LM.writeLog("AssetManager - Generated descriptors for: %s -> %s",
-				//	src.c_str(), descriptorFolder.c_str());
-			}
-			else {
-				//LM.writeLog("AssetManager - WARNING: Failed to generate descriptors for: %s",
-				//	src.c_str());
+			if (!descriptorGenerated) {
+				LOG_ERROR("Failed to generate descriptors for: ", src);
 			}
 		}
 
-		//LM.writeLog("AssetManager - Processed: %s (GUID: %016llX, Type: %s)",
-		//	src.c_str(), rec->guid.m_Value, resourceTypeToString(rec->type).c_str());
-
+		LOG_INFO("Asset processed: ", src, " (GUID: ", std::hex, rec->guid.m_Value, std::dec,
+			", Type: ", resourceTypeToString(rec->type), ")");
 	}
 
 	void AssetManager::handleRemoved(const std::string& src) {
@@ -315,31 +308,58 @@ namespace fs = std::filesystem;
 	}
 
 	void AssetManager::scanAndProcess() {
-		//LM.writeLog("AssetManager::scanAndProcess() - Snapshot has %zu files before scan",
-		//	m_scanner.GetSnapshotSize());
+
+		LOG_INFO("===========================================");
+		LOG_INFO("  Asset Scan & Process");
+		LOG_INFO("===========================================");
+		LOG_DEBUG("Snapshot has ", m_scanner.GetSnapshotSize(), " files before scan");
+
+		// Iterate changes from the scanner and act on them
+		int addedCount = 0;
+		int modifiedCount = 0;
+		int removedCount = 0;
 
 		// Iterate changes from the scanner and act on them
 		for (const auto& c : m_scanner.Scan()) {
 			switch (c.kind) {
 			case ScanChange::Kind::Added:
+				handleAddedOrModified(c.sourcePath);
+				addedCount++;
+				break;
+
 			case ScanChange::Kind::Modified:
 				handleAddedOrModified(c.sourcePath);
+				modifiedCount++;
 				break;
+
 			case ScanChange::Kind::Removed:
 				handleRemoved(c.sourcePath);
+				removedCount++;
 				break;
 			}
 		}
 
-		//LM.writeLog("AssetManager::scanAndProcess() - Snapshot has %zu files after scan",
-		//	m_scanner.GetSnapshotSize());
+		LOG_INFO("Scan complete:");
+		LOG_INFO("  Added: ", addedCount);
+		LOG_INFO("  Modified: ", modifiedCount);
+		LOG_INFO("  Removed: ", removedCount);
+		LOG_INFO("  Total assets: ", m_db.Count());
 
 		// Persist after a pass
-		if (!m_cfg.databaseFile.empty())
-			m_db.Save(m_cfg.databaseFile);
+		if (!m_cfg.databaseFile.empty()) {
 
-		// NEW: Process any completed compilations
-		//processCompilationQueue();
+			if (!m_db.Save(m_cfg.databaseFile)) {
+				LOG_ERROR("Failed to save asset database");
+			}
+		}
+	
+		if (!m_cfg.snapshotFile.empty()) {
+			if (!m_scanner.SaveSnapshot(m_cfg.snapshotFile)) {
+				LOG_ERROR("Failed to save scan snapshot");
+			}
+		}
+
+		LOG_INFO("===========================================");
 	}
 
 

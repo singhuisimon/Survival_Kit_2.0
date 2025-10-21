@@ -113,7 +113,7 @@ namespace fs = std::filesystem;
                     //get the file path (metadata)
 					const std::string pathStr = path.string();
 					const std::time_t t = toTimeT(entry.last_write_time());
-					const std::uintmax_t sz = (entry.is_regular_file() ? entry.file_size() : 0);
+					const std::uintmax_t sz = entry.file_size();
 
                     //mark the file as seen
 					seen.insert(pathStr);
@@ -127,17 +127,21 @@ namespace fs = std::filesystem;
 						m_snapshot[pathStr] = { t, sz };
 						changes.push_back({ ScanChange::Kind::Added, pathStr });
 					}
-					else
-					{
-                        //file exists, but check if the file is changed
+					else {
+						// File exists, check if changed
 						FileStamp& stamp = found->second;
-						if (stamp.lastWrite != t || stamp.size != sz)
-						{
+
+						// Add tolerance for timestamp comparison (1 second)
+						// Filesystem timestamps can have rounding differences
+						bool timeChanged = std::abs(static_cast<long long>(stamp.lastWrite) -
+							static_cast<long long>(t)) > 1;
+						bool sizeChanged = stamp.size != sz;
+
+						if (timeChanged || sizeChanged) {
 							stamp.lastWrite = t;
 							stamp.size = sz;
 							changes.push_back({ ScanChange::Kind::Modified, pathStr });
 						}
-                        //file did not change
 					}
 				}
 			}

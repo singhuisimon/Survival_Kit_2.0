@@ -49,19 +49,23 @@ endif()
 
 # Copy Resources folder to build directory
 add_custom_command(TARGET GameEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory 
-        "$<TARGET_FILE_DIR:GameEngine>/Resources/Scenes"
-    COMMENT "Creating Resources directory structure"
-)
+    COMMAND ${CMAKE_COMMAND} -E echo "Copying Resources to: $<TARGET_FILE_DIR:GameEngine>/Resources"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/Resources"
+        "$<TARGET_FILE_DIR:GameEngine>/Resources"
+    
+    COMMENT "Copying Resources to executable directory")
 
-# If scene files exist, copy them
-if(EXISTS "${CMAKE_SOURCE_DIR}/Resources/Scenes")
-    add_custom_command(TARGET GameEngine POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_SOURCE_DIR}/Resources/Scenes"
-            "$<TARGET_FILE_DIR:GameEngine>/Resources/Scenes"
-        COMMENT "Copying scene files to build directory"
-    )
-endif()
+# Create asset pipeline directories (even if empty)
+add_custom_command(TARGET GameEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory 
+        "$<TARGET_FILE_DIR:GameEngine>/Resources/Descriptors"
+    COMMAND ${CMAKE_COMMAND} -E make_directory 
+        "$<TARGET_FILE_DIR:GameEngine>/Resources/Compiled"
+    COMMAND ${CMAKE_COMMAND} -E make_directory 
+        "$<TARGET_FILE_DIR:GameEngine>/Resources/DB"
+    
+    COMMENT "Creating asset pipeline directories"
+)
 
 message(STATUS "Game executable configured successfully")

@@ -1,5 +1,9 @@
 #include "AssetDescriptorGenerator.h"
 #include "AssetDatabase.h"
+#include "../Utility/Logger.h"
+#include "../Utility/AssetPath.h"
+
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -9,6 +13,8 @@ namespace fs = std::filesystem;
 
 
         // ==================== PUBLIC API ====================
+
+
 
     void AssetDescriptorGenerator::SetOutputRoot(const std::string& root) {
         m_outputRoot = root;
@@ -30,11 +36,18 @@ namespace fs = std::filesystem;
         // Get resource type folder name
         std::string typeFolder = resourceTypeToString(rec.type);
 
-        // Build path: Descriptors/Texture/40/03/5F7ED05B14224003/
-        std::string path = m_outputRoot + "/" + typeFolder + "/" + dir1 + "/" + dir2 + "/" + guidHex + "/";
+        // Build path using filesystem::path to handle separators correctly
+        fs::path descriptorPath = fs::path(m_outputRoot) / typeFolder / dir1 / dir2 / guidHex;
 
-        return path;
-    }
+        // Convert to generic string with forward slashes
+        std::string result = descriptorPath.generic_string();
+
+        // Ensure trailing slash
+        if (!result.empty() && result.back() != '/') {
+            result += '/';
+        }
+        return result;
+        }
  // ==================== INFO.TXT GENERATION ====================
     bool AssetDescriptorGenerator::WriteInfoFile(
         const std::string& folderPath,
@@ -43,7 +56,14 @@ namespace fs = std::filesystem;
     {
         std::string infoPath = folderPath + "Info.txt";
         std::string json = BuildInfoJson(rec, extras);
-        return WriteText(infoPath, json);
+
+        bool result =  WriteText(infoPath, json);
+
+        if (!result) {
+            LOG_ERROR("Failed to write Info.txt");
+        }
+
+        return result;
     }
 
     std::string AssetDescriptorGenerator::BuildInfoJson(
@@ -130,8 +150,11 @@ namespace fs = std::filesystem;
     {
         std::ostringstream ss;
 
+        //change to relative path
+        std::string relativePath = Engine::getRelativeAssetPath(sourcePath);
+
         ss << "{\n";
-        ss << "  \"sourcePath\": \"" << EscapeJson(sourcePath) << "\",\n";
+        ss << "  \"sourcePath\": \"" << EscapeJson(relativePath) << "\",\n";
         ss << "  \"textureSettings\": {\n";
         ss << "    \"usageType\": \"" << EscapeJson(settings.usageType) << "\",\n";
         ss << "    \"compression\": \"" << EscapeJson(settings.compression) << "\",\n";
@@ -151,10 +174,10 @@ namespace fs = std::filesystem;
         {
 
             std::ostringstream ss; 
-            
-           
+            std::string relativePath = Engine::getRelativeAssetPath(sourcePath);
+
             ss << "{\n";
-            ss << "  \"sourcePath\": \"" << EscapeJson(sourcePath) << "\",\n";
+            ss << "  \"sourcePath\": \"" << EscapeJson(relativePath) << "\",\n";
             ss << "  \"audioSettings\": {\n";
             ss << "    \"outputFormat\": \"" << EscapeJson(settings.outputFormat) << "\",\n";
             ss << "    \"compression\": \"" << EscapeJson(settings.compression) << "\",\n";
@@ -174,9 +197,9 @@ namespace fs = std::filesystem;
         const MeshSettings& settings) const
     {
         std::ostringstream ss;
-
+        std::string relativePath = Engine::getRelativeAssetPath(sourcePath);
         ss << "{\n";
-        ss << "  \"sourcePath\": \"" << EscapeJson(sourcePath) << "\",\n";
+        ss << "  \"sourcePath\": \"" << EscapeJson(relativePath) << "\",\n";
         ss << "  \"meshSettings\": {\n";
         ss << "    \"outputFormat\": \"" << EscapeJson(settings.outputFormat) << "\",\n";
         ss << "    \"includePos\": " << (settings.includePos ? "true" : "false") << ",\n";
@@ -198,9 +221,9 @@ namespace fs = std::filesystem;
         const ShaderSettings& settings) const
     {
         std::ostringstream ss;
-
+        std::string relativePath = Engine::getRelativeAssetPath(sourcePath);
         ss << "{\n";
-        ss << "  \"sourcePath\": \"" << EscapeJson(sourcePath) << "\",\n";
+        ss << "  \"sourcePath\": \"" << EscapeJson(relativePath) << "\",\n";
         ss << "  \"shaderSettings\": {\n";
 
         if (!settings.vertexShader.empty()) {
@@ -255,26 +278,67 @@ namespace fs = std::filesystem;
     bool AssetDescriptorGenerator::EnsureDirectory(const std::string& path) {
         try {
             fs::path p(path);
-            if (!fs::exists(p)) {
-                return fs::create_directories(p);
+
+
+            // Check if already exists
+            if (fs::exists(p)) {
+                if (fs::is_directory(p)) {
+                    return true;
+                }
+                else {
+                    LOG_ERROR("Path exists but is not a directory!", path);
+                    return false;
+                }
             }
-            return true;
+
+            // Try to create with error code
+            std::error_code ec;
+            bool created = fs::create_directories(p, ec);
+
+            if (ec) {
+                LOG_ERROR("Failed to create directory: ", path);
+                LOG_ERROR("  Error: ", ec.message(), " (code: ", ec.value(), ")");
+                return false;
+            }
+
+            // Verify creation
+            if (fs::exists(p) && fs::is_directory(p)) {
+                LOG_DEBUG("Directory created successfully");
+                return true;
+            }
+
+            LOG_ERROR("Creation succeeded but directory doesn't exist!", path);
+            return false;
+
         }
-        catch (...) {
+        catch (const std::exception& e) {
+            LOG_ERROR("Exception creating directory: ", path, " - ", e.what());
             return false;
         }
     }
 
     bool AssetDescriptorGenerator::WriteText(const std::string& path, const std::string& text) {
         try {
+            LOG_DEBUG("Opening file for writing: ", path);
+
             std::ofstream file(path);
             if (!file.is_open()) {
+                LOG_ERROR("Failed to open file: ", path);
                 return false;
             }
+
             file << text;
-            return file.good();
+
+            if (!file.good()) {
+                LOG_ERROR("Failed to write to file: ", path);
+                return false;
+            }
+
+            file.close();
+            return true;
         }
-        catch (...) {
+        catch (const std::exception& e) {
+            LOG_ERROR("Exception writing file: ", path, " - ", e.what());
             return false;
         }
     }

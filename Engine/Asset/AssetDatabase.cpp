@@ -17,7 +17,9 @@
 
 //external library for GUID
 #include "../xresource_guid/include/xresource_guid.h"
+#include "../Utility/Logger.h"
 
+namespace fs = std::filesystem;
 
 	//generate GUIDs using xresource_guid library
 	static xresource::instance_guid GenId()
@@ -46,20 +48,94 @@
 
 	bool AssetDatabase::Load(const std::string& file)
 	{
+		std::ifstream in(file);
+		if (!in.is_open()) {
+			LOG_DEBUG("Asset database not found (first run): ", file);
+			return false;
+		}
 
-        //TODO:: update this for after the storage format is finalized
+		Clear();
 
-		// Reset in-memory state first to avoid mixing sessions
-		byId.clear();
-		bySourcePath.clear();
+		std::string line;
+		int lineNum = 0;
+		int loadedCount = 0;
 
+		while (std::getline(in, line)) {
+			lineNum++;
+
+			// Skip comments and empty lines
+			if (line.empty() || line[0] == '#') {
+				continue;
+			}
+
+			// Parse line: guid|type|sourcePath|ext|contentHash|lastWriteTime|valid
+			std::stringstream ss(line);
+			std::string guidStr, typeStr, sourcePath, ext, contentHash, timeStr, validStr;
+
+			if (!std::getline(ss, guidStr, '|')) continue;
+			if (!std::getline(ss, typeStr, '|')) continue;
+			if (!std::getline(ss, sourcePath, '|')) continue;
+			if (!std::getline(ss, ext, '|')) continue;
+			if (!std::getline(ss, contentHash, '|')) continue;
+			if (!std::getline(ss, timeStr, '|')) continue;
+			if (!std::getline(ss, validStr)) continue;
+
+			try {
+				AssetRecord rec;
+				rec.guid.m_Value = std::stoull(guidStr, nullptr, 16);
+				rec.type = static_cast<ResourceType>(std::stoi(typeStr));
+				rec.sourcePath = sourcePath;
+				rec.ext = ext;
+				rec.contentHash = contentHash;
+				rec.lastWriteTime = static_cast<std::time_t>(std::stoll(timeStr));
+				rec.valid = (validStr == "1");
+
+				byId[rec.guid] = rec;
+				bySourcePath[rec.sourcePath] = rec.guid;
+				loadedCount++;
+			}
+			catch (const std::exception& e) {
+				LOG_WARNING("Failed to parse database line ", lineNum, ": ", e.what());
+			}
+		}
+
+		LOG_INFO("Loaded ", loadedCount, " asset records from database");
 		return true;
 	}
 
 	bool AssetDatabase::Save(const std::string& file) const
 	{
-        //TODO:: update later after finalizing the storage format
-        return true;
+
+		// Ensure directory exists
+		fs::path filepath(file);
+		if (filepath.has_parent_path()) {
+			fs::create_directories(filepath.parent_path());
+		}
+
+		std::ofstream out(file, std::ios::trunc);
+		if (!out.is_open()) {
+			LOG_ERROR("Failed to open database file for writing: ", file);
+			return false;
+		}
+
+		// Write header
+		out << "# Asset Database\n";
+		out << "# Format: guid|type|sourcePath|ext|contentHash|lastWriteTime|valid\n";
+		out << "# Version: 1.0\n\n";
+
+		// Write records
+		for (const auto& [guid, rec] : byId) {
+			out << std::hex << guid.m_Value << std::dec << '|'
+				<< static_cast<int>(rec.type) << '|'
+				<< rec.sourcePath << '|'
+				<< rec.ext << '|'
+				<< rec.contentHash << '|'
+				<< rec.lastWriteTime << '|'
+				<< (rec.valid ? '1' : '0') << '\n';
+		}
+
+		LOG_DEBUG("Saved ", byId.size(), " asset records to database");
+		return true;
 	}
 
 	xresource::instance_guid AssetDatabase::EnsureIdForPath(const std::string& path)

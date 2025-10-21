@@ -9,6 +9,7 @@
 #include <iomanip>
 #include "AssetDatabase.h"
 #include "../Utility/AssetPath.h"
+#include "../Utility/Logger.h"
 
 
 
@@ -185,7 +186,17 @@
 		{
 			std::string descriptorPath = folderPath + "Descriptor.txt";
 			std::string json = BuildDescriptorJson(sourcePath, settings);
-			return WriteText(descriptorPath, json);
+			//std::string json = BuildDescriptorJson(sourcePath, settings);
+
+			bool result = WriteText(descriptorPath, json);
+			if (result) {
+				LOG_DEBUG("Descriptor.txt written successfully");
+			}
+			else {
+				LOG_ERROR("Failed to write Descriptor.txt");
+			}
+
+			return result;
 		}
 
 		// Overloaded JSON builders for each settings type
