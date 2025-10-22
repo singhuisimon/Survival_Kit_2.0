@@ -126,7 +126,8 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+        //loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -252,6 +253,7 @@ void Game::CreateDefaultScene() {
 
     ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
+
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -317,6 +319,57 @@ void Game::OnUpdate(Engine::Timestep ts) {
         m_AudioManager->GetGroupVolume(Engine::AudioType::SFX, volume);
         m_AudioManager->SetGroupVolume(Engine::AudioType::SFX, volume-0.1f);
         LOG_TRACE("Reducing Audio SFX Group Volume by 0.1 Currently it is: ", volume);
+    }
+
+
+    // Audio Testing if Attentuation works
+    //LOG_INFO("[TEST] Searching for entity named 'Player'...");
+
+    auto& registry = m_Scene->GetRegistry();
+
+    Engine::Entity foundEntity;
+    bool found = false;
+
+    auto view = registry.view<Engine::TagComponent>();
+    for (auto entityHandle : view) {
+        auto& tag = view.get<Engine::TagComponent>(entityHandle);
+        if (tag.Tag == "Player") { // change to whatever name you want
+            foundEntity = Engine::Entity(entityHandle, &registry);
+            found = true;
+            break;
+        }
+    }
+
+    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+
+        auto& transform = foundEntity.GetComponent<Engine::TransformComponent>();
+
+        if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+        if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+        if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+        if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+    }
+
+    // Test the DSP Global Effects
+
+    FMOD::DSP* dsp = nullptr;
+    if (input.IsKeyJustPressed(GLFW_KEY_ENTER)) {
+        dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
+        m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
+            FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
+    }    
+    
+    if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET)) {
+        m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
+    }
+    if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET)) {
+        m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
+    }
+
+    if (dsp) {
+        float cutoff;
+        dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
+        LOG_INFO("LowPass cutoff currently: ", cutoff);
     }
 
     // === Test Input System ===

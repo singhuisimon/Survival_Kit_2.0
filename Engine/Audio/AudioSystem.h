@@ -22,7 +22,7 @@ namespace Engine {
      */
     class AudioSystem : public System {
     public:
-        AudioSystem(AudioManager* audioManager);
+        explicit AudioSystem(AudioManager* audioManager);
         ~AudioSystem() override;
 
 		void OnInit(Scene* scene) override;
@@ -45,17 +45,7 @@ namespace Engine {
         void ProcessAudioEntities(Scene* scene);
         void UpdateAudioComponentState(Entity entity, AudioComponent& audio,
             TransformComponent* transform, RigidbodyComponent* rb);
-
-        //std::unordered_map<Entity, FMOD::Reverb3D*> reverbzones;
-		//void UpdateReverbZones(Scene* scene);
-        //
-        //std::vector<FMOD::DSP*> dspeffects;
-        //void RegisterDSPCallbacks();
-        //void OnDSPProcess(FMOD_DSP_STATE* state, float* inbuffer, float* outbuffer,
-        //    unsigned int length, int channels);
-
-        // Instance pointer for callback
-        //static AudioSystem* s_Instance;
+        void OnAudioComponentRemoved(entt::registry& registry, entt::entity entity);
     };
 
 } // namespace Engine

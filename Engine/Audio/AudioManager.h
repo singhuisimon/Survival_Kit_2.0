@@ -1,5 +1,6 @@
 #pragma once
 #include "ECS/Components.h"
+#include "DSPEffect.h"
 #include <fmod.hpp>
 #include <fmod_errors.h>
 #include <unordered_map>
@@ -61,13 +62,26 @@ namespace Engine {
 
 		FMOD::ChannelGroup* GetGroup(AudioType type);
 
+		FMOD::DSP* CreateDSP(DSPEffectType effect, AudioType group);
+		void EnableDSP(AudioType group, DSPEffectType effect, bool enable);
+		FMOD::DSP* GetDSP(AudioType group, DSPEffectType effect);
+		void SetDSPParameter(AudioType group, DSPEffectType effect, int paramIndex, float value);
+		void ReleaseDSP(AudioType group, DSPEffectType effect);
+		void ReleaseDSPByGroup(AudioType group);
+		void ReleaseAllDSPs();
+
 		FMOD::System* GetSystem() const { return coresystem; }
 		std::unordered_map<std::string, FMOD::Sound*>& GetSoundCache() { return soundCache; }
+
     private:
         bool CreateChannelGroups();
+
 		FMOD::Sound* LoadSound(const std::string& filepath, bool stream);
+
 		void UnloadSound(const std::string& filepath);
+
 		static bool LogFMODError(FMOD_RESULT result, const char* context);
+
 		std::string GetFullPath(const std::string& filepath);
 
 		FMOD::System* coresystem = nullptr;
@@ -78,6 +92,12 @@ namespace Engine {
 		FMOD::ChannelGroup* uigroup = nullptr;
 
 		std::unordered_map<std::string, FMOD::Sound*> soundCache;
+
+		std::unordered_map<DSPEffectType, FMOD::DSP*> m_MasterDSPs;
+		std::unordered_map<DSPEffectType, FMOD::DSP*> m_SFXDSPs;
+		std::unordered_map<DSPEffectType, FMOD::DSP*> m_BGMDSPs;
+		std::unordered_map<DSPEffectType, FMOD::DSP*> m_UIDSPs;
+
 		bool initialized = false;
     };
 

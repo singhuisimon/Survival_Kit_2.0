@@ -138,9 +138,8 @@ namespace Engine {
         }
     };
 
-    enum class AudioType {SFX, BGM, UI};
+    enum class AudioType {MASTER, SFX, BGM, UI};
     enum class PlayState {PLAY, PAUSE, STOP};
-    enum class ReverbPreset {Custom, Generic, Bathroom, Room, Cave, Arena};
 
     struct AudioComponent {
 		std::string AudioFilePath;  // Path to the audio asset
@@ -175,36 +174,7 @@ namespace Engine {
             , PreviousPath("") 
             , PreviousState(PlayState::STOP){
 		}
-
-        
     };
-
-    struct ReverbComponent{
-        ReverbPreset Preset;
-        float MinDistance;
-        float MaxDistance;
-        float DecayTime;
-		float HfDecayRatio;
-        float Diffusion;
-        float Density;
-        float WetLevel;
-
-        FMOD::Reverb3D* ReverbZone;
-
-        ReverbComponent()
-            : Preset(ReverbPreset::Generic),
-			MinDistance(1.0f),
-            MaxDistance(20.0f),
-			DecayTime(1.5f),
-            HfDecayRatio(50.0f),
-            Diffusion(50.0f),
-            Density(100.0f),
-            WetLevel(-6.0f),
-            ReverbZone(nullptr){
-		}
-
-		
-	};
 
     struct ListenerComponent {
         bool Active;

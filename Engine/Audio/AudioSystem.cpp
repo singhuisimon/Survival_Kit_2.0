@@ -16,6 +16,11 @@ namespace Engine {
 			return;
 		}
 
+		auto& registry = scene->GetRegistry();
+
+		// Cleanup AudioComponent on destroy
+		registry.on_destroy<AudioComponent>().connect<&AudioSystem::OnAudioComponentRemoved>(*this);
+
 		Initialized = true;
 		LOG_INFO("AudioSystem initialized successfully");
 	}
@@ -33,7 +38,6 @@ namespace Engine {
 		UpdateListenerPosition(scene);
 
 		ProcessAudioEntities(scene);
-
 	}
 
 	void AudioSystem::OnShutdown(Scene* scene) {
@@ -42,9 +46,9 @@ namespace Engine {
 		if (!Initialized)
 			return;
 
-		if (m_AudioManager) {
-			m_AudioManager->StopByType(AudioType::SFX);
-			//if need to stop bgm do say --> or add a way to track in audio manager.
+		if (scene) {
+			auto& registry = scene->GetRegistry();
+			registry.on_destroy<AudioComponent>().disconnect<&AudioSystem::OnAudioComponentRemoved>(*this);
 		}
 
 		LOG_INFO("AudioSystem shutting down....");
@@ -153,6 +157,24 @@ namespace Engine {
 
 		default: 
 			break;
+		}
+	}
+
+	void AudioSystem::OnAudioComponentRemoved(entt::registry& registry, entt::entity entity) {
+		Entity e(entity, &registry);
+
+		if (!e.HasComponent<AudioComponent>()) return;
+
+		auto& audio = e.GetComponent<AudioComponent>();
+
+		if (audio.Channel) {
+			LOG_INFO("AudioSystem cleanup - releasing FMOD channel for entity {}", (uint32_t)entity);
+			
+			if (audio.Type != AudioType::UI) {
+				audio.Channel->stop();
+			}
+
+			audio.Channel = nullptr;
 		}
 	}
 

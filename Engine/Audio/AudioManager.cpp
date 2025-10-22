@@ -1,5 +1,6 @@
 #include <fmod.hpp>
 #include "Utility/Logger.h"
+#include "Utility/AssetPath.h"
 #include "AudioManager.h"
 
 namespace Engine {
@@ -107,6 +108,8 @@ namespace Engine {
 		// Stop all sounds
 		StopAll();
 
+		ReleaseAllDSPs();
+
 		// Release sounds
 		for (auto& pair : soundCache) {
 			if (pair.second) {
@@ -115,6 +118,10 @@ namespace Engine {
 		}
 
 		soundCache.clear();
+		m_MasterDSPs.clear();
+		m_BGMDSPs.clear();
+		m_SFXDSPs.clear();
+		m_UIDSPs.clear();
 
 		// Release channel groups
 		if (uigroup) {
@@ -464,7 +471,7 @@ namespace Engine {
 
 		if(!mastergroup)
 			return;
-
+		
 		mastergroup->stop();
 	}
 
@@ -476,6 +483,8 @@ namespace Engine {
 		if (group) {
 			group->stop();
 		}
+
+		ReleaseDSPByGroup(type);
 	}
 
 	FMOD::Sound* AudioManager::LoadSound(const std::string& filepath, bool stream) {
@@ -489,6 +498,10 @@ namespace Engine {
 			return soundCache[filepath];
 		}
 
+
+		// Use AssetPath helper
+		std::string fullpath = getAssetFilePath("Audio/" + filepath);
+
 		FMOD::Sound* newSound = nullptr;
 
 		FMOD_MODE mode = FMOD_DEFAULT;
@@ -500,8 +513,6 @@ namespace Engine {
 		} else {
 			mode |= FMOD_CREATESAMPLE;
 		}
-		
-		std::string fullpath = GetFullPath(filepath);
 
 		FMOD_RESULT result = coresystem->createSound(fullpath.c_str(), mode, nullptr, &newSound);
 		if (!LogFMODError(result, ("createSound - " + fullpath).c_str())) {
@@ -641,6 +652,8 @@ namespace Engine {
 
 	FMOD::ChannelGroup* AudioManager::GetGroup(AudioType type) {
 		switch (type) {
+		case AudioType::MASTER:
+			return mastergroup;
 		case AudioType::SFX:
 			return sfxgroup;
 		case AudioType::BGM:
@@ -668,4 +681,142 @@ namespace Engine {
 		// Path is: C:\Users\Admin\source\repos\Survival_Kit_2.0\Resources\Sources\Audio
 		return "C:/Users/Admin/source/repos/Survival_Kit_2.0/Resources/Audio/" + filepath;
 	}
+
+	FMOD::DSP* AudioManager::CreateDSP(DSPEffectType effect, AudioType group) {
+		if (!initialized || !coresystem) {
+			return nullptr;
+		}
+
+		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
+						(group == AudioType::SFX) ? m_SFXDSPs :
+						(group == AudioType::BGM) ? m_BGMDSPs : m_UIDSPs;
+
+		//If already created for this group, just reuse it
+		if (auto it = dspMap.find(effect); it != dspMap.end() && it->second) {
+			return it->second;
+		}
+
+		FMOD::DSP* dsp = nullptr;
+		FMOD_RESULT result = coresystem->createDSPByType(DSPEffectUtil::ToFMODType(effect), &dsp);
+		if (!LogFMODError(result, DSPEffectUtil::ToString(effect).c_str())) {
+			return nullptr;
+		}
+
+		FMOD::ChannelGroup* targetgroup = GetGroup(group);
+		if (!targetgroup) {
+			dsp->release();
+			return nullptr;
+		}
+
+		targetgroup->addDSP(FMOD_CHANNELCONTROL_DSP_TAIL, dsp);
+		dsp->setBypass(true); //start disabled
+
+		dspMap[effect] = dsp;
+
+		LOG_INFO("Created DSP: ", DSPEffectUtil::ToString(effect), " for group ", (int)group);
+		return dsp;
+	}
+
+	void AudioManager::EnableDSP(AudioType group, DSPEffectType effect, bool enable) {
+		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
+					(group == AudioType::SFX) ? m_SFXDSPs :
+					(group == AudioType::BGM) ? m_BGMDSPs :
+					m_UIDSPs;
+
+		auto it = dspMap.find(effect);
+		if (it == dspMap.end() || !it->second) {
+			LOG_WARNING("EnableDSP: DSP not found for ", DSPEffectUtil::ToString(effect));
+			return;
+		}
+
+		it->second->setBypass(!enable);
+		LOG_INFO("DSP ", DSPEffectUtil::ToString(effect), (enable ? " enabled" : " disabled"),
+			" on group ", (int)group);
+	}
+
+	FMOD::DSP* AudioManager::GetDSP(AudioType group, DSPEffectType effect) {
+		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
+			(group == AudioType::SFX) ? m_SFXDSPs :
+			(group == AudioType::BGM) ? m_BGMDSPs : m_UIDSPs;
+		auto it = dspMap.find(effect);
+		return (it != dspMap.end()) ? it->second : nullptr;
+	}
+
+	void AudioManager::SetDSPParameter(AudioType group, DSPEffectType effect, int paramIndex, float value) {
+		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
+					(group == AudioType::SFX) ? m_SFXDSPs :
+					(group == AudioType::BGM) ? m_BGMDSPs :
+					m_UIDSPs;
+
+		auto it = dspMap.find(effect);
+		if (it != dspMap.end() && it->second) {
+			it->second->setParameterFloat(paramIndex, value);
+			LOG_TRACE("Set parameter ", paramIndex, " = ", value,
+				" for DSP ", DSPEffectUtil::ToString(effect), " in group ", (int)group);
+		}
+	}
+
+	void AudioManager::ReleaseDSP(AudioType group, DSPEffectType effect) {
+		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
+					(group == AudioType::SFX) ? m_SFXDSPs :
+					(group == AudioType::BGM) ? m_BGMDSPs :
+					m_UIDSPs;
+
+		auto it = dspMap.find(effect);
+		if (it != dspMap.end() && it->second) {
+			FMOD::DSP* dsp = it->second;
+			FMOD::ChannelGroup* groupPtr = GetGroup(group);
+
+			if (groupPtr) {
+				//Directly remove the DSP from the chain
+				groupPtr->removeDSP(dsp);
+			}
+
+			//Then release and erase
+			dsp->release();
+			dspMap.erase(it);
+
+			LOG_INFO("Released DSP: ", DSPEffectUtil::ToString(effect));
+		}
+	}
+
+	void AudioManager::ReleaseDSPByGroup(AudioType group)
+	{
+		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
+			(group == AudioType::SFX) ? m_SFXDSPs :
+			(group == AudioType::BGM) ? m_BGMDSPs :
+			m_UIDSPs;
+
+		for (auto& [effect, dsp] : dspMap)
+		{
+			if (dsp)
+			{
+				FMOD::ChannelGroup* groupPtr = GetGroup(group);
+				if (groupPtr)
+					groupPtr->removeDSP(dsp);
+
+				dsp->release();
+				LOG_INFO("Released DSP: ", DSPEffectUtil::ToString(effect), " from group ", (int)group);
+			}
+		}
+		dspMap.clear();
+	}
+
+	void AudioManager::ReleaseAllDSPs() {
+		auto releaseMap = [](std::unordered_map<DSPEffectType, FMOD::DSP*>& map) {
+			for (auto& [type, dsp] : map) {
+				if (dsp) dsp->release();
+			}
+			map.clear();
+		};
+
+		releaseMap(m_MasterDSPs);
+		releaseMap(m_SFXDSPs);
+		releaseMap(m_BGMDSPs);
+		releaseMap(m_UIDSPs);
+
+		LOG_INFO("All DSPs released");
+	}
+
+
 } // namespace Engine
