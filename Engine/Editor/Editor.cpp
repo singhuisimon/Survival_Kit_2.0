@@ -69,8 +69,8 @@ namespace Engine
 
 		displayTopMenu();
 
-		// Enable Docking Function
-		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		//// Enable Docking Function
+		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
 		// Panel Logic
 		displayPropertiesPanel();
@@ -303,6 +303,7 @@ namespace Engine
 	void Editor::renderViewport()
 	{
 		// Logic here 
+
 	}
 
 	// Render after Render System

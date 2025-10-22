@@ -191,9 +191,10 @@ void Game::CreateDefaultScene() {
     player.AddComponent<Engine::TagComponent>("Player");
 
     auto& transform = player.AddComponent<Engine::TransformComponent>();
-    transform.Position = glm::vec3(0, 5, -5);  // Start above ground
-    transform.Rotation = glm::vec3(0, 0, 0);
-    transform.Scale = glm::vec3(1.0f);
+    transform.Position = glm::vec3(1, 2, 0);  // Start above ground
+    transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+
+    auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
 
     auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     rb.Mass = 1.0f;
@@ -226,8 +227,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Rotation = glm::vec3(0, 0, 0);
-    groundTransform.Scale = glm::vec3(10, 0.1f, 10);
+    groundTransform.Scale = glm::vec3(1, 0.1f, 1);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -368,18 +368,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     m_Editor->OnUpdate(ts);
-
-    // === Render ===
-    m_ColorShift += ts * 0.5f;
-    if (m_ColorShift > 6.28318f) m_ColorShift -= 6.28318f;
-
-    float r = 0.2f + 0.1f * std::sin(m_ColorShift);
-    float g = 0.3f + 0.1f * std::sin(m_ColorShift + 2.0f);
-    float b = 0.4f + 0.1f * std::sin(m_ColorShift + 4.0f);
-
-    glClearColor(r, g, b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     m_Editor->RenderEditor();
 }
 

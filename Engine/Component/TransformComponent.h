@@ -31,7 +31,9 @@ namespace Engine {
             , Rotation(1, 0, 0, 0)
             , Scale(1.0f, 1.0f, 1.0f)
             , LocalTransform(1.0f)
-            , WorldTransform(1.0f) {
+            , WorldTransform(1.0f)
+            , IsDirty(true)
+            , Parent(entt::null){
         }
 
         // Constructor with position
@@ -40,7 +42,9 @@ namespace Engine {
             , Rotation(1, 0, 0, 0)
             , Scale(1.0f, 1.0f, 1.0f)
             , LocalTransform(1.0f)
-            , WorldTransform(1.0f) {
+            , WorldTransform(1.0f)
+            , IsDirty(true) 
+            , Parent(entt::null) {
         }
 
         void SetPosition(glm::vec3 const& pos) {
