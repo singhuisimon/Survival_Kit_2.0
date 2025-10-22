@@ -44,6 +44,7 @@ namespace Engine
 		bool m_Initialized = false;
 		ImGuiIO* io;
 		Scene* m_Scene;
+		Entity m_SelectedEntity{};
 
 		// ImGui Window functionality
 		bool inspectorWindow = true; 

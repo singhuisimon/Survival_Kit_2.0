@@ -171,7 +171,42 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Properties/ Inspector", &inspectorWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
-			
+			if (m_SelectedEntity) {
+
+				if (m_SelectedEntity.HasComponent<TagComponent>())
+				{
+					//Display and Edit Entity Name
+					auto& tag = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+					char nameBuffer[128];
+					strcpy_s(nameBuffer, sizeof(nameBuffer), tag.c_str());
+					
+					// Add ImGuiInputTextFlags_EnterReturnsTrue to ensure only change name after user press enter
+					// Game crash if delete the last alphabet since it keep updating the frame and cause a empty ID 
+					// TODO: Check the above
+					if (ImGui::InputText("Entity Name", nameBuffer, sizeof(nameBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+						
+						std::string newName = nameBuffer;
+						if (newName.empty()) {
+							newName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+						}
+						tag = newName;
+					}
+				}
+				
+				// TODO: Display Entity ID (Need to make getter for m_EntityHandle)
+
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+				{
+					// TODO: Make the functions for collapsing headers
+					if (ImGui::CollapsingHeader("Transform")) {
+						auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
+						ImGui::DragFloat3("Position", &transform.Position.x, 0.1f);
+						ImGui::DragFloat3("Rotation", &transform.Rotation.x, 0.1f);
+						ImGui::DragFloat3("Scale", &transform.Scale.x, 0.1f);
+					}
+
+				}
+			}
 		}
 
 		ImGui::End(); // End of the properties window
@@ -184,8 +219,9 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Hierarchy", &hierachyWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
-
 			if (m_Scene) {
+
+				//List of entities
 				auto& registry = m_Scene->GetRegistry();
 				auto view = registry.view<TagComponent>();
 
@@ -193,16 +229,16 @@ namespace Engine
 
 					Entity entity(entityHandle, &registry);
 
+					//Get entity name
 					std::string name = "Unnamed Entity";
 					if (entity.HasComponent<TagComponent>())
 					{
 						name = entity.GetComponent<TagComponent>().Tag;
 					}
 
-					// TODO: Add Selection logic
-					if (ImGui::Selectable(name.c_str()))
+					if (ImGui::Selectable(name.c_str(), (m_SelectedEntity == entity)))
 					{
-
+						m_SelectedEntity = entity;
 						
 					}
 				}
