@@ -72,6 +72,8 @@ namespace Engine
 		//// Enable Docking Function
 		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
+		renderViewport();
+
 		// Panel Logic
 		displayPropertiesPanel();
 
@@ -302,8 +304,50 @@ namespace Engine
 
 	void Editor::renderViewport()
 	{
-		// Logic here 
+		// TODO: Get Texture from Graphics
+		// auto texture = GFXM.getImguiTex();
 
+		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
+
+		// Hard-coded values just in case (Will change values later)
+		ImVec2 viewportSize =
+		{
+			 600,
+			 600
+		};
+
+		if (m_Window) {
+
+			int width = 0.f;
+			int height = 0.f;
+			glfwGetWindowSize(m_Window, &width, &height);
+
+			viewportSize =
+			{
+				 static_cast<float>(static_cast<float>(width)) / 2.0f,
+				 static_cast<float>(static_cast<float>(height)) / 2.0f
+			};
+
+		}
+
+		ImGui::Begin("Viewport");
+
+		// Uncomment this once the viewport texture has been obtained
+		/*if (texture) {
+
+			ImVec2 imagePos = ImGui::GetCursorScreenPos();
+
+			ImGui::Image((ImTextureID)(intptr_t)GFXM.getImguiTex(),
+				viewportSize,
+				ImVec2(0, 1), ImVec2(1, 0));
+
+			// TODO: Handle mouse in viewport
+			//handleViewPortClick(imagePos, viewportSize);
+		}*/
+
+		ImGui::End();
+		
+		
 	}
 
 	// Render after Render System
