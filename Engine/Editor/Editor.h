@@ -98,7 +98,7 @@ namespace Engine
 		void displayAssetsBrowserPanel();
 
 		// display performance profile
-		void displayPerformanceProfilePanel();
+		void displayPerformanceProfilePanel(Timestep ts);
 
 		// Render Viewport
 		void renderViewport();
