@@ -113,6 +113,22 @@ namespace Engine
 				{
 					ImGui::SetTooltip("Open Scene from file.");
 				}
+				// --------------- Save Scene -------------------
+				if (ImGui::MenuItem("Save"))
+				{
+					if (!currScenePath.empty())
+					{
+						LOG_INFO("Current scene path: ", currScenePath);
+					}
+					else
+					{
+						LOG_INFO("Current scene has not been saved yet (no file path).");
+					}
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Open Scene from file.");
+				}
 				// ------------------ Save as Scene -----------------------
 				if (ImGui::MenuItem("Save as"))
 				{
@@ -397,19 +413,20 @@ namespace Engine
 						LOG_ERROR("No active scene exists to load into!");
 						continue;
 					}
-					LOG_DEBUG("This is in", fullPath);
+					//LOG_DEBUG("This is in", fullPath);
 					// clear current scene
 					auto& registry = m_Scene->GetRegistry();
 					registry.clear();
 					
 					// load the selected scene file
-					if (!m_Scene->LoadFromFile(fullPath))
+					if (m_Scene->LoadFromFile(fullPath))
 					{
 						//LOG_ERROR("Failed to load scene %s", sceneFiles);
-					}
-					openScenePanel = false; //  reset after select scene
-					ImGui::CloseCurrentPopup();
-					
+						currScenePath = fullPath;
+						LOG_INFO("Scene loaded successfully: ", currScenePath);
+						openScenePanel = false; //  reset after select scene
+						ImGui::CloseCurrentPopup();
+					}				
 				}
 			}
 			// --------------- Cancel Selection for Open Scene -----------------------
@@ -489,7 +506,6 @@ namespace Engine
 
 					}
 				}
-
 			}
 
 			// ------------------- Cancel save as button ---------------------
