@@ -109,6 +109,9 @@ namespace Engine {
         int m_FrameCount = 0;
         float m_CurrentFPS = 0.0f;
 
+        // Editor 
+        Camera3D m_Editor_camera;
+        Light    m_Editor_light;
 
     };
 

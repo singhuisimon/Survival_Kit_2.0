@@ -31,6 +31,8 @@ namespace Engine {
 	class Renderer {
 
 	public:
+		Renderer(Camera3D& cam, Light& light);
+
 		/**
 		 * @brief Initializes the renderer and sets up required resources
 		 */
@@ -39,10 +41,8 @@ namespace Engine {
 		/**
 		 * @brief Renders a complete frame with the given draw items
 		 * @param draw_items Collection of drawable objects to render
-		 * @param active_cam Camera used for view and projection transformations
-		 * @param light Light source affecting the scene illumination
 		 */
-		void render_frame(std::span<const DrawItem> draw_items, Camera3D& active_cam, Light& light);
+		void render_frame(std::span<const DrawItem> draw_items);
 
 		/**
 		 * @brief Retrieves the OpenGL texture handle for ImGui rendering
@@ -85,10 +85,8 @@ namespace Engine {
 		 * @brief Executes draw calls for all items in the current render pass
 		 * @param pass The active render pass configuration
 		 * @param draw_items Collection of objects to draw
-		 * @param active_cam Camera for view/projection matrices
-		 * @param light Light source for shading calculations
 		 */
-		void draw(RenderPass const& pass, std::span<const DrawItem> draw_items, Camera3D& active_cam, Light& light);
+		void draw(RenderPass const& pass, std::span<const DrawItem> draw_items);
 
 		/**
 		 * @brief Finalizes the render pass and performs cleanup
@@ -96,9 +94,13 @@ namespace Engine {
 		 */
 		void endFrame(RenderPass const& pass);
 
+		Camera3D& editor_camera;
+		Light& editor_light;
+
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
 
+		// Temporary object
 		GraphicsLoader m_gl;
 	};
 

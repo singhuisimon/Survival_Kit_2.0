@@ -108,6 +108,8 @@ namespace Engine {
 
 namespace Engine {
 
+	Renderer::Renderer(Camera3D& cam, Light& light) : editor_camera(cam), editor_light(light) { }
+
 	// On first load, setup some simple stuff
 	void Renderer::setup() {
 
@@ -303,30 +305,30 @@ namespace Engine {
 		prog.programUse();
 	}
 
-	void Renderer::render_frame(std::span<const DrawItem> draw_items, Camera3D& active_cam, Light& light) {
+	void Renderer::render_frame(std::span<const DrawItem> draw_items) {
 
 		for (const auto& pass : m_passes) {
 
 			if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
 			beginFrame(pass);
-			draw(pass, draw_items, active_cam, light);
+			draw(pass, draw_items);
 			endFrame(pass);
 		}
 	}
 
-	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, Camera3D& active_cam, Light& light) {
+	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items) {
 
 
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
-		prog.setUniform("V", active_cam.getLookAt());                // View transform
-		prog.setUniform("P", active_cam.getPerspective());           // Perspective transform
+		prog.setUniform("V", editor_camera.getLookAt());                // View transform
+		prog.setUniform("P", editor_camera.getPerspective());           // Perspective transform
 
-		prog.setUniform("light.position", light.getLightPos());      // Position
-		prog.setUniform("light.La", light.getLightAmbient());        // Ambient
-		prog.setUniform("light.Ld", light.getLightDiffuse());        // Diffuse
-		prog.setUniform("light.Ls", light.getLightSpecular());       // Specular
+		prog.setUniform("light.position", editor_light.getLightPos());      // Position
+		prog.setUniform("light.La", editor_light.getLightAmbient());        // Ambient
+		prog.setUniform("light.Ld", editor_light.getLightDiffuse());        // Diffuse
+		prog.setUniform("light.Ls", editor_light.getLightSpecular());       // Specular
 
 
 #pragma region SET_UNIFORM_TEMP

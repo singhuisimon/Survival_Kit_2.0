@@ -68,7 +68,7 @@ namespace Engine {
         glfwSwapInterval(1); // VSync
 
         // Initialize Renderer
-        m_Renderer = std::make_unique<Renderer>();
+        m_Renderer = std::make_unique<Renderer>(m_Editor_camera, m_Editor_light);
         m_Renderer->setup();
         LOG_INFO("Renderer setup initialized");
 

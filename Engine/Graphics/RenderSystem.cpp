@@ -26,6 +26,7 @@ namespace Engine {
 		}
 
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());
+		renderer.render_frame(drawitem_span);
 	}
 
 	int RenderSystem::GetPriority() const { return 100; }
