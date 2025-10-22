@@ -149,7 +149,12 @@ namespace Engine
 
 			// close main menu bar
 			ImGui::EndMainMenuBar();
+		} //  end of begin main menu bar
 
+		//  =========================== Open Scene pop up panel =====================================
+		if (openScenePanel)
+		{
+			sceneOpenPanel();
 		}
 	}
 
@@ -258,7 +263,7 @@ namespace Engine
 	void Editor::sceneOpenPanel()
 	{
 		// get all files inside scene
-		auto sceneFiles = getFilesInFolder("Scene");
+		auto sceneFiles = getFilesInFolder("Scenes");
 
 		if (openScenePanel)
 		{
@@ -275,8 +280,32 @@ namespace Engine
 			{
 				if (ImGui::Selectable(fileName.c_str()))
 				{
+
+					if (!m_Scene)
+					{
+						LOG_ERROR("No active scene exists to load into!");
+						continue;
+					}
+
+					// clear current scene
+					auto& registry = m_Scene->GetRegistry();
+					registry.clear();
+
+					// load the selected scene file
+					if (!m_Scene->LoadFromFile(fullPath))
+					{
+						//LOG_ERROR("Failed to load scene %s", sceneFiles);
+					}
+					openScenePanel = false; //  reset after select scene
+					ImGui::CloseCurrentPopup();
 					
 				}
+			}
+			// --------------- Cancel Selection for Open Scene -----------------------
+			if (ImGui::Button("Cancel"))
+			{
+				openScenePanel = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
 			}
 
 
