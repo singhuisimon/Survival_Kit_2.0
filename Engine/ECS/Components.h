@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+#include <vector>
+#include "../xresource_guid/include/xresource_guid.h"
 
 namespace Engine {
 
@@ -17,23 +19,31 @@ namespace Engine {
       * @brief Gives an entity a human-readable name
       */
     struct TagComponent {
+        xresource::instance_guid ComponentGUID;
         std::string Tag;
 
         // Default constructor
-        TagComponent() : Tag("Entity") {}
+        TagComponent() : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()), Tag("Entity") {}
 
         // Constructor with name
-        TagComponent(const std::string& tag) : Tag(tag) {}
+        TagComponent(const std::string& tag)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()), Tag(tag) {
+        }
 
         // Copy constructor
-        TagComponent(const TagComponent& other) : Tag(other.Tag) {}
+        TagComponent(const TagComponent& other)
+            : ComponentGUID(other.ComponentGUID), Tag(other.Tag) {
+        }
 
         // Move constructor
-        TagComponent(TagComponent&& other) noexcept : Tag(std::move(other.Tag)) {}
+        TagComponent(TagComponent&& other) noexcept
+            : ComponentGUID(other.ComponentGUID), Tag(std::move(other.Tag)) {
+        }
 
         // Assignment operator
         TagComponent& operator=(const TagComponent& other) {
             if (this != &other) {
+                ComponentGUID = other.ComponentGUID;
                 Tag = other.Tag;
             }
             return *this;
@@ -42,6 +52,7 @@ namespace Engine {
         // Move assignment
         TagComponent& operator=(TagComponent&& other) noexcept {
             if (this != &other) {
+                ComponentGUID = other.ComponentGUID;
                 Tag = std::move(other.Tag);
             }
             return *this;
@@ -52,20 +63,23 @@ namespace Engine {
      * @brief Transform component - position, rotation, scale
      */
     struct TransformComponent {
+        xresource::instance_guid ComponentGUID;
         glm::vec3 Position;
         glm::vec3 Rotation; // Euler angles in degrees
         glm::vec3 Scale;
 
         // Default constructor
         TransformComponent()
-            : Position(0.0f, 0.0f, 0.0f)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Position(0.0f, 0.0f, 0.0f)
             , Rotation(0.0f, 0.0f, 0.0f)
             , Scale(1.0f, 1.0f, 1.0f) {
         }
 
         // Constructor with position
         TransformComponent(const glm::vec3& position)
-            : Position(position)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Position(position)
             , Rotation(0.0f, 0.0f, 0.0f)
             , Scale(1.0f, 1.0f, 1.0f) {
         }
@@ -89,6 +103,7 @@ namespace Engine {
      * @brief Camera component
      */
     struct CameraComponent {
+        xresource::instance_guid ComponentGUID;
         float FOV;
         float NearClip;
         float FarClip;
@@ -96,7 +111,8 @@ namespace Engine {
 
         // Default constructor
         CameraComponent()
-            : FOV(45.0f)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , FOV(45.0f)
             , NearClip(0.1f)
             , FarClip(1000.0f)
             , Primary(true) {
@@ -111,11 +127,13 @@ namespace Engine {
      * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
+        xresource::instance_guid ComponentGUID;
         bool Visible;
 
         // Default constructor
         MeshRendererComponent()
-            : Visible(true) {
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Visible(true) {
         }
     };
 
@@ -123,6 +141,7 @@ namespace Engine {
      * @brief Rigidbody component (for Jolt Physics)
      */
     struct RigidbodyComponent {
+        xresource::instance_guid ComponentGUID;
         float Mass;
         bool IsKinematic;
         bool UseGravity;
@@ -130,10 +149,48 @@ namespace Engine {
 
         // Default constructor
         RigidbodyComponent()
-            : Mass(1.0f)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Mass(1.0f)
             , IsKinematic(false)
             , UseGravity(true)
             , Velocity(0.0f, 0.0f, 0.0f) {
+        }
+    };
+
+    /**
+     * @brief Prefab component - tracks prefab instances and their overrides
+     * @note This is an invisible component that marks an entity as a prefab instance
+     */
+    struct PrefabComponent {
+        xresource::instance_guid ComponentGUID;
+
+        // Reference to the prefab resource
+        xresource::instance_guid PrefabGUID;
+
+        // Track added components (components not in original prefab)
+        std::vector<xresource::instance_guid> AddedComponents;
+
+        // Track deleted components (components removed from prefab)
+        std::vector<xresource::instance_guid> DeletedComponents;
+
+        // Track overridden properties
+        struct OverriddenProperty {
+            xresource::instance_guid ComponentGUID;  // Which component?
+            std::string PropertyPath;                // Which property?
+            std::string Value;                       // Serialized value
+        };
+        std::vector<OverriddenProperty> OverriddenProperties;
+
+        // Default constructor
+        PrefabComponent()
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , PrefabGUID(xresource::instance_guid{}) {
+        }
+
+        // Constructor with prefab GUID
+        PrefabComponent(xresource::instance_guid prefabGuid)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , PrefabGUID(prefabGuid) {
         }
     };
 

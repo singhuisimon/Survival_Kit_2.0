@@ -36,6 +36,10 @@ file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
 file(GLOB_RECURSE SERIALIZATION_SOURCES "${ENGINE_ROOT}/Serialization/*.cpp")
 file(GLOB_RECURSE SERIALIZATION_HEADERS "${ENGINE_ROOT}/Serialization/*.h")
 
+# Prefabs Module
+file(GLOB_RECURSE PREFAB_SOURCES "${ENGINE_ROOT}/Prefab/*.cpp")
+file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
+
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
@@ -45,6 +49,7 @@ set(ENGINE_SOURCES
     ${UTILITY_SOURCES}
     ${EDITOR_SOURCES}
     ${SERIALIZATION_SOURCES}
+    ${PREFAB_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -55,6 +60,7 @@ set(ENGINE_HEADERS
     ${UTILITY_HEADERS}
     ${EDITOR_HEADERS}
     ${SERIALIZATION_HEADERS}
+    ${PREFAB_HEADERS}
 )
 
 # Create engine static library
@@ -104,6 +110,10 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 # Serialization Module
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
+
+# Prefab Module
+source_group("Prefab\\Header" FILES ${PREFAB_HEADERS})
+source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES

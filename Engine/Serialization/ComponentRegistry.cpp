@@ -111,8 +111,15 @@ namespace Engine {
             );
         }
 
+        // Register PrefabComponent
+        {
+            auto& meta = REGISTER_COMPONENT(PrefabComponent);
+            // PrefabComponent properties are managed internally
+            // No user-editable properties exposed in inspector by default
+        }
+
         LOG_INFO("Component reflection registration complete");
-        LOG_INFO("  - Registered 5 component types");
+        LOG_INFO("  - Registered 6 component types");
     }
 
 } // namespace Engine
