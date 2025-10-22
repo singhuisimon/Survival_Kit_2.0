@@ -233,6 +233,8 @@ namespace Engine {
 
         // Read scene name
         if (doc.HasMember("Scene")) {
+            std::string sceneName = doc["Scene"].GetString();
+            m_Scene->SetName(sceneName);  // Actually update the scene name
             LOG_INFO("Loading scene: ", doc["Scene"].GetString());
         }
 
