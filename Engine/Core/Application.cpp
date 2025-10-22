@@ -50,7 +50,7 @@ namespace Engine {
 
         // Create window
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
@@ -67,17 +67,10 @@ namespace Engine {
         glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
         glfwSwapInterval(1); // VSync
 
-        // Initialize GLAD
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-            LOG_CRITICAL("Failed to initialize GLAD!");
-            return;
-        }
-
-        LOG_INFO("OpenGL initialized");
-        LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
-        LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
-        LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
-        LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+        // Initialize Renderer
+        m_Renderer = std::make_unique<Renderer>();
+        m_Renderer->setup();
+        LOG_INFO("Renderer setup initialized");
 
         glViewport(0, 0, m_WindowWidth, m_WindowHeight);
         glEnable(GL_DEPTH_TEST);

@@ -1,0 +1,34 @@
+#include "../Graphics/RenderSystem.h"
+#include "../ECS/Scene.h"
+
+namespace Engine {
+
+	RenderSystem::RenderSystem(Renderer& renderer_ref) : System(), renderer(renderer_ref) { m_drawitems.reserve(1000); }
+
+	void RenderSystem::OnUpdate(Scene* scene, Timestep ts) {
+		
+		(void)ts;
+
+		m_drawitems.clear();
+
+		auto view = scene->GetRegistry().view<TransformComponent, MeshRendererComponent>();
+
+		for (auto entity : view) {
+			auto& renderable = view.get<MeshRendererComponent>(entity);
+			auto& transform = view.get<TransformComponent>(entity);
+
+			m_drawitems.push_back({
+				renderable.MeshType,
+				renderable.Material,
+				renderable.Texture,
+				transform.WorldTransform
+				});
+		}
+
+		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());
+	}
+
+	int RenderSystem::GetPriority() const { return 100; }
+
+	const char* RenderSystem::GetName() const { return "RenderSystem"; }
+}

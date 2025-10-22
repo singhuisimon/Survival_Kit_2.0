@@ -20,14 +20,6 @@
 #include <glad/glad.h>
 
 // For graphics related defines and functionality
-//#include "../Graphics/Light.h"
-//#include "../Graphics/Camera.h"
-//#include "../Graphics/DrawItem.h"
-//#include "../Graphics/Primitives.h"
-//#include "../Graphics/Framebuffer.h"
-//#include "../Graphics/RenderPass.h"
-//#include "../Graphics/Texture.h"
-//#include "../Graphics/Material.h"
 #include "Graphics/GraphicsLoader.h"
 
 namespace Engine {
@@ -56,31 +48,31 @@ namespace Engine {
 		 * @brief Retrieves the OpenGL texture handle for ImGui rendering
 		 * @return GLuint handle to the first texture in storage
 		 */
-		inline GLuint get_imgui_texture() const { return static_cast<GLuint>(m_textures[0].handle()); }
+		inline GLuint get_imgui_texture() const { return static_cast<GLuint>(m_gl.m_textures[0].handle()); }
 
 		/**
 		 * @brief Gets the number of meshes currently stored
 		 * @return Size of the mesh storage container
 		 */
-		inline const size_t mesh_count() const { return m_mesh_storage.size(); }
+		inline const size_t mesh_count() const { return m_gl.m_mesh_storage.size(); }
 
 		/**
 		 * @brief Provides read-only access to mesh data storage
 		 * @return Const reference to the mesh data container
 		 */
-		inline const std::vector<MeshData>& getMeshDataStorage() { return m_mesh_data_storage; }
+		inline const std::vector<MeshData>& getMeshDataStorage() { return m_gl.m_mesh_data_storage; }
 
 		/**
 		 * @brief Provides read-only access to material storage
 		 * @return Const reference to the material container
 		 */
-		inline const std::vector<Material>& getMaterialStorage() { return t_testing_material;  }
+		inline const std::vector<Material>& getMaterialStorage() { return m_gl.t_testing_material;  }
 
 		/**
 		 * @brief Provides read-only access to texture storage
 		 * @return Const reference to the texture container
 		 */
-		inline const std::vector<Texture>& getTextureStorage()   { return t_testing_textures; }
+		inline const std::vector<Texture>& getTextureStorage()   { return m_gl.t_testing_textures; }
 
 	private:
 		/**
@@ -104,15 +96,10 @@ namespace Engine {
 		 */
 		void endFrame(RenderPass const& pass);
 
-		//std::vector<MeshGL>                      m_mesh_storage;
-		//std::vector<MeshData>                    m_mesh_data_storage;
-		//std::vector<ShaderProgram>               m_shader_storage;
-		//std::vector<RenderPass>                  m_passes;
-		//std::vector<FrameBuffer>                 m_framebuffers;
-		//std::vector<Texture>                     m_textures;
+		std::vector<RenderPass>  m_passes;
+		std::vector<FrameBuffer> m_framebuffers;
 
-		//std::vector<Texture>                     t_testing_textures;
-		//std::vector<Material>                    t_testing_material;
+		GraphicsLoader m_gl;
 	};
 
 }

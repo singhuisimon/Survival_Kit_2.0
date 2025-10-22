@@ -1,8 +1,13 @@
 #pragma once
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <string>
 #include "Utility/Types.h"
+
+// Components
+#include "../Component/TransformComponent.h"
 
 namespace Engine {
 
@@ -46,43 +51,6 @@ namespace Engine {
                 Tag = std::move(other.Tag);
             }
             return *this;
-        }
-    };
-
-    /**
-     * @brief Transform component - position, rotation, scale
-     */
-    struct TransformComponent {
-        glm::vec3 Position;
-        glm::vec3 Rotation; // Euler angles in degrees
-        glm::vec3 Scale;
-
-        // Default constructor
-        TransformComponent()
-            : Position(0.0f, 0.0f, 0.0f)
-            , Rotation(0.0f, 0.0f, 0.0f)
-            , Scale(1.0f, 1.0f, 1.0f) {
-        }
-
-        // Constructor with position
-        TransformComponent(const glm::vec3& position)
-            : Position(position)
-            , Rotation(0.0f, 0.0f, 0.0f)
-            , Scale(1.0f, 1.0f, 1.0f) {
-        }
-
-        /**
-         * @brief Calculate transformation matrix
-         * @note This is OK - it's just a calculation, not game logic
-         */
-        glm::mat4 GetTransform() const {
-            glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1, 0, 0))
-                * glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0, 1, 0))
-                * glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0, 0, 1));
-
-            return glm::translate(glm::mat4(1.0f), Position)
-                * rotation
-                * glm::scale(glm::mat4(1.0f), Scale);
         }
     };
 

@@ -18,6 +18,9 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
+#include <GLFW/glfw3.h>
+
+#include <filesystem>
 
 #pragma region NAMESPACE
 
@@ -53,11 +56,11 @@ namespace {
 
 	inline void test_load_shaders(std::vector<Engine::ShaderProgram>& shd) {
 
-		std::string vertex_obj_path{ Engine::getAssetFilePath("Shaders/survival_kit_obj.vert")   };
-		std::string fragment_obj_path{ Engine::getAssetFilePath("Shaders/survival_kit_obj.frag") };
+		std::string vertex_obj_path{ "..//Resources//Shaders//survival_kit_obj.vert"};
+		std::string fragment_obj_path{ "..//Resources//Shaders//survival_kit_obj.frag" };
 
-		std::string vertex_debug_path{ Engine::getAssetFilePath("Shaders/debug.vert") };
-		std::string fragment_debug_path{ Engine::getAssetFilePath("Shaders/debug.frag") };
+		std::string vertex_debug_path{ "..//Resources//Shaders//debug.vert" };
+		std::string fragment_debug_path{ "..//Resources//Shaders//debug.frag" };
 
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
@@ -108,11 +111,25 @@ namespace Engine {
 	// On first load, setup some simple stuff
 	void Renderer::setup() {
 
+		// Load OpenGL function pointers with GLAD
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+			LOG_ERROR("Renderer::setup() - Failed to load OpenGL, GLAD failed to initialized");
+		}
+		else {
+			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
+		}
+
+		LOG_INFO("OpenGL initialized");
+		LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
+		LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
+		LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
+		LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+
 		// Temporary functions, used for testing only
-		test_load_shaders(m_shader_storage);
+		test_load_shaders(m_gl.m_shader_storage);
 
 		// Load a set of basic primitives: Cube, Plane, Sphere
-		load_basic_primitives(m_mesh_storage, m_mesh_data_storage);
+		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
 
 		// Create a framebuffer and configure it's settings
 		auto fp_fbo = FrameBuffer::create();
@@ -126,7 +143,7 @@ namespace Engine {
 		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
 		auto fp_tex = Texture::alloc_storage_on_gpu(width, height);
 		if (fp_tex.has_value()) {
-			m_textures.push_back(std::move(*fp_tex));
+			m_gl.m_textures.push_back(std::move(*fp_tex));
 		}
 		else {
 			LOG_ERROR("Renderer::setup() - Failed to allocate storage on the GPU!");
@@ -141,7 +158,7 @@ namespace Engine {
 		// end testing
 
 		auto& fpfbo_ = m_framebuffers[0];
-		auto& fptex_ = m_textures[0];
+		auto& fptex_ = m_gl.m_textures[0];
 
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_depth(GL_DEPTH_ATTACHMENT, rboDepth);
@@ -158,6 +175,7 @@ namespace Engine {
 
 		// Register the pass with the renderer
 		m_passes.push_back(first_pass);
+
 
 #pragma region TEST_TO_SEE_TEXTURE_PASS_TEMP
 
@@ -193,6 +211,7 @@ namespace Engine {
 
 		m_passes.push_back(debug_pass);
 
+#if 0
 #pragma region TEXTURE_LOAD_TEMP
 		{
 
@@ -212,18 +231,18 @@ namespace Engine {
 			}
 		}
 #pragma endregion
-
+#endif
 
 #pragma region MATERIAL_LOAD_TEMP
 		{
 			Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
 			Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
-			t_testing_material.emplace_back(mat1);
-			t_testing_material.emplace_back(mat2);
+			m_gl.t_testing_material.emplace_back(mat1);
+			m_gl.t_testing_material.emplace_back(mat2);
 		}
 #pragma endregion
 
-
+		LOG_TRACE("Renderer::setup() - Renderer started successfully!");
 	}
 
 	void Renderer::beginFrame(RenderPass const& pass) {
@@ -280,7 +299,7 @@ namespace Engine {
 
 		glDepthMask(pass.depth_write ? GL_TRUE : GL_FALSE);
 
-		auto& prog = m_shader_storage[pass.shdpgm_handle];
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 		prog.programUse();
 	}
 
@@ -299,7 +318,7 @@ namespace Engine {
 	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, Camera3D& active_cam, Light& light) {
 
 
-		auto& prog = m_shader_storage[pass.shdpgm_handle];
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
 		prog.setUniform("V", active_cam.getLookAt());                // View transform
 		prog.setUniform("P", active_cam.getPerspective());           // Perspective transform
@@ -312,11 +331,11 @@ namespace Engine {
 
 #pragma region SET_UNIFORM_TEMP
 		if (textureMode) {
-			glBindTextureUnit(0, static_cast<GLuint>(t_testing_textures[selected_texture].handle()));
+			glBindTextureUnit(0, static_cast<GLuint>(m_gl.t_testing_textures[selected_texture].handle()));
 			prog.setUniform("Texture2D", 0);
 			prog.setUniform("isTexture", true);
 
-			if (t_testing_textures[selected_texture].is_srgb()) {
+			if (m_gl.t_testing_textures[selected_texture].is_srgb()) {
 				prog.setUniform("isGamma", true);
 			}
 			else {
@@ -351,7 +370,7 @@ namespace Engine {
 
 #pragma region TESTING
 			size_t material_handle = static_cast<size_t>(item.m_material_handle);
-			Material& test_material = t_testing_material[material_handle];
+			Material& test_material = m_gl.t_testing_material[material_handle];
 #pragma endregion
 
 			// Temporary transformations
@@ -362,11 +381,11 @@ namespace Engine {
 			prog.setUniform("material.shininess", test_material.getMaterialShininess());
 
 			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
-			m_mesh_storage[mesh_handle].vao.bind();
+			m_gl.m_mesh_storage[mesh_handle].vao.bind();
 
-			GLenum  primitive  = m_mesh_storage[mesh_handle].primitive_type;
-			GLsizei draw_count = m_mesh_storage[mesh_handle].draw_count;
-			GLenum  index_type = m_mesh_storage[mesh_handle].index_type;
+			GLenum  primitive  = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
 			glDrawElements(primitive, draw_count, index_type, NULL);
 			glBindVertexArray(0);
@@ -374,7 +393,7 @@ namespace Engine {
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
-		auto& prog = m_shader_storage[pass.shdpgm_handle];
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 		prog.programFree();
 		glBindTextureUnit(0, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

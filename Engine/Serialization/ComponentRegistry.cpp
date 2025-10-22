@@ -28,11 +28,11 @@ namespace Engine {
                 [](const TransformComponent& c) { return c.Position; },
                 [](TransformComponent& c, const glm::vec3& v) { c.Position = v; }
             );
-            meta.AddProperty<TransformComponent, glm::vec3>(
+            meta.AddProperty<TransformComponent, glm::quat>(
                 "Rotation",
-                PropertyType::Vec3,
+                PropertyType::Quat,
                 [](const TransformComponent& c) { return c.Rotation; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Rotation = v; }
+                [](TransformComponent& c, const glm::quat& v) { c.Rotation = v; }
             );
             meta.AddProperty<TransformComponent, glm::vec3>(
                 "Scale",

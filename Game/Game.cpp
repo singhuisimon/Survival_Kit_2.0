@@ -9,6 +9,10 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
+// Adding systems
+#include "Graphics/RenderSystem.h"
+#include "Transform/TransformSystem.h"
+
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
     , m_Scene(nullptr)
@@ -89,6 +93,9 @@ void Game::OnInit() {
         // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
         // m_Scene->AddSystem<Engine::AudioSystem>();
 
+        m_Scene->AddSystem<Engine::TransformSystem>();
+        m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+       
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {

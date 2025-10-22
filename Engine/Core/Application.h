@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <memory>
+
+#include "../Graphics/Renderer.h"
 #include "../Utility/Timestep.h"
 
 // Forward declare GLFW types to avoid including GLFW in header
@@ -81,6 +83,11 @@ namespace Engine {
          */
         virtual void OnShutdown() {}
 
+
+    protected:
+        // Renderer
+        std::unique_ptr<Renderer> m_Renderer;
+
     private:
         void Init();
         void Shutdown();
@@ -101,6 +108,8 @@ namespace Engine {
         float m_FpsUpdateTimer = 0.0f;
         int m_FrameCount = 0;
         float m_CurrentFPS = 0.0f;
+
+
     };
 
 } // namespace Engine

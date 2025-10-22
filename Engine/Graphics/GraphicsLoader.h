@@ -12,14 +12,13 @@
 
 namespace Engine {
 
-	std::vector<MeshGL>                      m_mesh_storage;
-	std::vector<MeshData>                    m_mesh_data_storage;
-	std::vector<ShaderProgram>               m_shader_storage;
-	std::vector<RenderPass>                  m_passes;
-	std::vector<FrameBuffer>                 m_framebuffers;
-	std::vector<Texture>                     m_textures;
+	struct GraphicsLoader {
+		std::vector<MeshGL>                      m_mesh_storage;
+		std::vector<MeshData>                    m_mesh_data_storage;
+		std::vector<ShaderProgram>               m_shader_storage;
+		std::vector<Texture>                     m_textures;
 
-	std::vector<Texture>                     t_testing_textures;
-	std::vector<Material>                    t_testing_material;
-
+		std::vector<Texture>                     t_testing_textures;
+		std::vector<Material>                    t_testing_material;
+	};
 }
