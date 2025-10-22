@@ -31,7 +31,13 @@
 				{
 					"Type": "MeshRendererComponent",
 					"Properties": {
-						"Visible": true
+						"Visible": true,
+						"ShadowReceive": false,
+						"ShadowCast": false,
+						"GlobalIlluminate": true,
+						"MeshType": 0,
+						"Material": 0,
+						"Texture": 0
 					}
 				}
 			]
@@ -93,7 +99,13 @@
 				{
 					"Type": "MeshRendererComponent",
 					"Properties": {
-						"Visible": true
+						"Visible": true,
+						"ShadowReceive": false,
+						"ShadowCast": false,
+						"GlobalIlluminate": true,
+						"MeshType": 0,
+						"Material": 0,
+						"Texture": 0
 					}
 				}
 			]
@@ -127,7 +139,13 @@
 				{
 					"Type": "MeshRendererComponent",
 					"Properties": {
-						"Visible": true
+						"Visible": true,
+						"ShadowReceive": false,
+						"ShadowCast": false,
+						"GlobalIlluminate": true,
+						"MeshType": 0,
+						"Material": 0,
+						"Texture": 0
 					}
 				}
 			]
@@ -152,7 +170,13 @@
 				{
 					"Type": "MeshRendererComponent",
 					"Properties": {
-						"Visible": true
+						"Visible": true,
+						"ShadowReceive": false,
+						"ShadowCast": false,
+						"GlobalIlluminate": true,
+						"MeshType": 0,
+						"Material": 0,
+						"Texture": 0
 					}
 				}
 			]

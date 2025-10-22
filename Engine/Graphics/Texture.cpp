@@ -15,6 +15,8 @@
 #include "../Utility/Types.h"
 #include "../Utility/Logger.h"
 #include "../Graphics/Texture.h"
+
+#define STB_IMAGE_IMPLEMENTATION
 #include "../Graphics/stb_image.h"
 
 namespace Engine {

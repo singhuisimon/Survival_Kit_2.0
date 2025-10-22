@@ -36,6 +36,14 @@ file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
 file(GLOB_RECURSE SERIALIZATION_SOURCES "${ENGINE_ROOT}/Serialization/*.cpp")
 file(GLOB_RECURSE SERIALIZATION_HEADERS "${ENGINE_ROOT}/Serialization/*.h")
 
+# Transformation Module
+file(GLOB_RECURSE TRANSFORM_SOURCES "${ENGINE_ROOT}/Transform/*.cpp")
+file(GLOB_RECURSE TRANSFORM_HEADERS "${ENGINE_ROOT}/Transform/*.h")
+
+# Component Module
+file(GLOB_RECURSE COMPONENT_SOURCES "${ENGINE_ROOT}/Component/*.cpp")
+file(GLOB_RECURSE COMPONENT_HEADERS "${ENGINE_ROOT}/Component/*.h")
+
 # Prefabs Module
 file(GLOB_RECURSE PREFAB_SOURCES "${ENGINE_ROOT}/Prefab/*.cpp")
 file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
@@ -49,6 +57,8 @@ set(ENGINE_SOURCES
     ${UTILITY_SOURCES}
     ${EDITOR_SOURCES}
     ${SERIALIZATION_SOURCES}
+    ${TRANSFORM_SOURCES}
+    ${COMPONENT_SOURCES}
     ${PREFAB_SOURCES}
 )
 
@@ -60,6 +70,8 @@ set(ENGINE_HEADERS
     ${UTILITY_HEADERS}
     ${EDITOR_HEADERS}
     ${SERIALIZATION_HEADERS}
+    ${TRANSFORM_HEADERS}
+    ${COMPONENT_HEADERS}
     ${PREFAB_HEADERS}
 )
 
@@ -110,6 +122,14 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 # Serialization Module
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
+
+# Transform Module
+source_group("Transform\\Header" FILES ${TRANSFORM_HEADERS})
+source_group("Transform\\Source" FILES ${TRANSFORM_SOURCES})
+
+# Component Module
+source_group("Component\\Header" FILES ${COMPONENT_HEADERS})
+source_group("Component\\Source" FILES ${COMPONENT_SOURCES})
 
 # Prefab Module
 source_group("Prefab\\Header" FILES ${PREFAB_HEADERS})

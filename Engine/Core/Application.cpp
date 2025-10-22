@@ -25,7 +25,12 @@ namespace Engine {
     Application::Application(const std::string& name, int width, int height)
         : m_Name(name)
         , m_WindowWidth(width)
-        , m_WindowHeight(height) {
+        , m_WindowHeight(height)
+        , m_Editor_camera(ORBITING, glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.f, 0.f, 0.0f), 80.0f, 0.5f, 100.0f)
+        , m_Editor_light(glm::vec3(0.0f, 8.0f, 0.0f),
+                         glm::vec3(0.4f, 0.4f, 0.4f),
+                         glm::vec3(1.0f, 1.0f, 1.0f),
+                         glm::vec3(1.0f, 1.0f, 1.0f)) {
         Init();
     }
 
@@ -50,7 +55,7 @@ namespace Engine {
 
         // Create window
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
@@ -67,17 +72,10 @@ namespace Engine {
         glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
         glfwSwapInterval(1); // VSync
 
-        // Initialize GLAD
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-            LOG_CRITICAL("Failed to initialize GLAD!");
-            return;
-        }
-
-        LOG_INFO("OpenGL initialized");
-        LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
-        LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
-        LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
-        LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+        // Initialize Renderer
+        m_Renderer = std::make_unique<Renderer>(m_Editor_camera, m_Editor_light);
+        m_Renderer->setup();
+        LOG_INFO("Renderer setup initialized");
 
         glViewport(0, 0, m_WindowWidth, m_WindowHeight);
         glEnable(GL_DEPTH_TEST);

@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Application.h"
 #include "ECS/Scene.h"
+#include "Editor/Editor.h"
 #include "Utility/Logger.h"
 #include <memory>
 
@@ -36,6 +37,8 @@ protected:
 
 private:
     std::unique_ptr<Engine::Scene> m_Scene;
+    // Editor 
+    std::unique_ptr<Engine::Editor> m_Editor; 
     float m_ColorShift = 0.0f;
 
     /**

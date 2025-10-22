@@ -27,9 +27,9 @@ namespace Engine{
 	 */
 	struct DrawItem
 	{
-		u16       m_mesh_handle;
-		u16       m_texture_handle;
-		u16       m_material_handle;
+		u32       m_mesh_handle;
+		u32       m_material_handle;
+		u32       m_texture_handle;
 
 		glm::mat4 m_model_to_world_transform;
 	};

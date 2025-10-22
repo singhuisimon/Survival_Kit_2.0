@@ -150,6 +150,12 @@ namespace Engine {
 
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("Visible", mesh.Visible, allocator);
+                propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
+                propertiesObj.AddMember("ShadowCast", mesh.ShadowCast, allocator);
+                propertiesObj.AddMember("GlobalIlluminate", mesh.GlobalIlluminate, allocator);
+                propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
+                propertiesObj.AddMember("Material", mesh.Material, allocator);
+                propertiesObj.AddMember("Texture", mesh.Texture, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -227,6 +233,8 @@ namespace Engine {
 
         // Read scene name
         if (doc.HasMember("Scene")) {
+            std::string sceneName = doc["Scene"].GetString();
+            m_Scene->SetName(sceneName);  // Actually update the scene name
             LOG_INFO("Loading scene: ", doc["Scene"].GetString());
         }
 
@@ -317,6 +325,18 @@ namespace Engine {
 
                         if (properties.HasMember("Visible"))
                             mesh.Visible = properties["Visible"].GetBool();
+                        if (properties.HasMember("ShadowReceive"))
+                            mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
+                        if (properties.HasMember("ShadowCast"))
+                            mesh.ShadowCast = properties["ShadowCast"].GetBool();
+                        if (properties.HasMember("GlobalIlluminate"))
+                            mesh.GlobalIlluminate = properties["GlobalIlluminate"].GetBool();
+                        if (properties.HasMember("MeshType"))
+                            mesh.MeshType= properties["MeshType"].GetUint();
+                        if (properties.HasMember("Material"))
+                            mesh.Material = properties["Material"].GetUint();
+                        if (properties.HasMember("Texture"))
+                            mesh.Texture = properties["Texture"].GetUint();
                     }
                     else if (componentType == "RigidbodyComponent") {
                         auto& rb = entity.AddComponent<RigidbodyComponent>();
