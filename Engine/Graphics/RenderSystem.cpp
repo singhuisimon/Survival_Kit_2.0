@@ -5,7 +5,9 @@
 
 namespace Engine {
 
-	RenderSystem::RenderSystem(Renderer& renderer_ref) : System(), renderer(renderer_ref) { m_drawitems.reserve(1000); }
+	RenderSystem::RenderSystem(Renderer& renderer_ref) : System(), renderer(renderer_ref) {
+		m_drawitems.reserve(1000);
+	}
 
 	void RenderSystem::OnUpdate(Scene* scene, Timestep ts) {
 
@@ -23,9 +25,9 @@ namespace Engine {
 			if (renderable.Visible)
 			{
 				m_drawitems.push_back({
-					0,  // m_mesh_handle - placeholder
-					0,  // m_material_handle - placeholder
-					0,  // m_texture_handle - placeholder
+					renderable.MeshType,
+					renderable.Material,
+					renderable.Texture,
 					transform.WorldTransform
 					});
 			}

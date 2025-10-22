@@ -160,6 +160,9 @@ namespace Engine {
 
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("Visible", mesh.Visible, allocator);
+                propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
+                propertiesObj.AddMember("Material", mesh.Material, allocator);
+                propertiesObj.AddMember("Texture", mesh.Texture, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -327,6 +330,9 @@ namespace Engine {
                     else if (componentType == "MeshRendererComponent") {
                         auto& mesh = entity.AddComponent<MeshRendererComponent>();
                         if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
+                        if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
+                        if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
+                        if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
                     }
                     else if (componentType == "RigidbodyComponent") {
                         auto& rb = entity.AddComponent<RigidbodyComponent>();

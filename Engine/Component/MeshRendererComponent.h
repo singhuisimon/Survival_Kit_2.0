@@ -11,14 +11,12 @@
 #pragma once
 
 #include "../Asset/ResourceTypes.h"
+#include "../Utility/Types.h"
 
 namespace Engine {
 
     /**
      * @brief Mesh renderer component - controls rendering of 3D meshes
-     * @details Contains properties that control how an entity's mesh is rendered,
-     *          including visibility flags and future rendering settings.
-     *          This component will be expanded as the rendering system is developed.
      */
     struct MeshRendererComponent {
         /// Unique identifier for this component instance
@@ -27,19 +25,24 @@ namespace Engine {
         /// Whether this mesh should be rendered
         bool Visible;
 
-        // Future fields (planned):
-        // xresource::instance_guid MeshGUID;      // Reference to mesh asset
-        // xresource::instance_guid MaterialGUID;  // Reference to material asset
-        // bool CastsShadows;                      // Shadow casting flag
-        // bool ReceivesShadows;                   // Shadow receiving flag
-        // int RenderLayer;                        // Sorting/culling layer
+        /// Mesh type/handle
+        u32 MeshType;
+
+        /// Material handle
+        u32 Material;
+
+        /// Texture handle
+        u32 Texture;
 
         /**
          * @brief Default constructor - creates visible mesh renderer
          */
         MeshRendererComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , Visible(true) {
+            , Visible(true)
+            , MeshType(0)
+            , Material(0)
+            , Texture(0) {
         }
 
         /**
@@ -48,7 +51,10 @@ namespace Engine {
          */
         explicit MeshRendererComponent(bool visible)
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , Visible(visible) {
+            , Visible(visible)
+            , MeshType(0)
+            , Material(0)
+            , Texture(0) {
         }
 
         /**
