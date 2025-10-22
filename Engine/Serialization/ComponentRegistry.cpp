@@ -1,7 +1,27 @@
+/**
+ * @file ComponentRegistry.cpp
+ * @brief Implementation of component registration for serialization
+ * @author
+ * @date 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "ComponentRegistry.h"
 #include "ReflectionRegistry.h"
-#include "../ECS/Components.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
+#include "../Component/PrefabComponent.h"
 #include "../Utility/Logger.h"
+
+ // Required for quaternion to Euler conversion
+#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Engine {
 
@@ -26,19 +46,25 @@ namespace Engine {
                 "Position",
                 PropertyType::Vec3,
                 [](const TransformComponent& c) { return c.Position; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Position = v; }
+                [](TransformComponent& c, const glm::vec3& v) { c.SetPosition(v); }
             );
-            meta.AddProperty<TransformComponent, glm::quat>(
+            meta.AddProperty<TransformComponent, glm::vec3>(
                 "Rotation",
-                PropertyType::Quat,
-                [](const TransformComponent& c) { return c.Rotation; },
-                [](TransformComponent& c, const glm::quat& v) { c.Rotation = v; }
+                PropertyType::Vec3,
+                [](const TransformComponent& c) {
+                    // Convert quaternion to Euler angles (in degrees) for serialization
+                    return glm::degrees(glm::eulerAngles(c.Rotation));
+                },
+                [](TransformComponent& c, const glm::vec3& v) {
+                    // Convert Euler angles to quaternion
+                    c.SetRotation(v);
+                }
             );
             meta.AddProperty<TransformComponent, glm::vec3>(
                 "Scale",
                 PropertyType::Vec3,
                 [](const TransformComponent& c) { return c.Scale; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Scale = v; }
+                [](TransformComponent& c, const glm::vec3& v) { c.SetScale(v); }
             );
         }
 
@@ -79,48 +105,6 @@ namespace Engine {
                 PropertyType::Bool,
                 [](const MeshRendererComponent& c) { return c.Visible; },
                 [](MeshRendererComponent& c, const bool& v) { c.Visible = v; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, bool>(
-                "ShadowReceive",
-                PropertyType::Bool,
-                [](const MeshRendererComponent& c) { return c.ShadowReceive; },
-                [](MeshRendererComponent& c, const bool& v) { c.ShadowReceive = v; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, bool>(
-                "ShadowCast",
-                PropertyType::Bool,
-                [](const MeshRendererComponent& c) { return c.ShadowCast; },
-                [](MeshRendererComponent& c, const bool& v) { c.ShadowCast = v; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, bool>(
-                "GlobalIlluminate",
-                PropertyType::Bool,
-                [](const MeshRendererComponent& c) { return c.GlobalIlluminate; },
-                [](MeshRendererComponent& c, const bool& v) { c.GlobalIlluminate = v; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, u32>(
-                "MeshType",
-                PropertyType::U32,
-                [](const MeshRendererComponent& c) { return c.MeshType; },
-                [](MeshRendererComponent& c, const bool& v) { c.MeshType = v; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, u32>(
-                "Material",
-                PropertyType::U32,
-                [](const MeshRendererComponent& c) { return c.Material; },
-                [](MeshRendererComponent& c, const bool& v) { c.Material = v; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, u32>(
-                "Texture",
-                PropertyType::U32,
-                [](const MeshRendererComponent& c) { return c.Texture; },
-                [](MeshRendererComponent& c, const bool& v) { c.Texture = v; }
             );
         }
 

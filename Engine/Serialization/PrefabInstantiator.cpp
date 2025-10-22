@@ -10,7 +10,12 @@
 
 #include "PrefabInstantiator.h"
 #include "../Prefab/PrefabRegistry.h"
-#include "../ECS/Components.h"
+#include "../Component/PrefabComponent.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -216,17 +221,14 @@ namespace Engine {
         else if (componentType == "TransformComponent") {
             auto& comp = entity.AddComponent<TransformComponent>();
 
-            if (properties.HasMember("ComponentGUID")) {
-                uint64_t guidValue = std::stoull(properties["ComponentGUID"].GetString());
-                comp.ComponentGUID = xresource::instance_guid{ guidValue };
-            }
             if (properties.HasMember("Position") && properties["Position"].IsArray()) {
                 const auto& pos = properties["Position"];
                 comp.Position = glm::vec3(pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat());
             }
             if (properties.HasMember("Rotation") && properties["Rotation"].IsArray()) {
                 const auto& rot = properties["Rotation"];
-                comp.Rotation = glm::vec3(rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat());
+                // Rotation is stored as quaternion (x, y, z, w)
+                comp.Rotation = glm::quat(rot[3].GetFloat(), rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat());
             }
             if (properties.HasMember("Scale") && properties["Scale"].IsArray()) {
                 const auto& scale = properties["Scale"];

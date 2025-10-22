@@ -1,25 +1,35 @@
 #include "Scene.h"
-#include "../Serialization/SceneSerializer.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/PrefabComponent.h"
 #include "../Serialization/PrefabInstantiator.h"
-#include "../Prefab/PrefabRegistry.h"
+#include "../Serialization/SceneSerializer.h"
 #include "../Utility/Logger.h"
-#include "Components.h"
 
 namespace Engine {
 
     Scene::Scene(const std::string& name)
         : m_Name(name) {
-        LOG_INFO("Scene created: ", name);
     }
 
     Entity Scene::CreateEntity(const std::string& name) {
-        Entity entity(m_Registry.create(), &m_Registry);
-        LOG_DEBUG("Entity created: ", name, " (ID: ", (uint32_t)entity, ")");
+        Entity entity = Entity(m_Registry.create(), &m_Registry);
+
+        // Add default components
+        entity.AddComponent<TagComponent>(name);
+        entity.AddComponent<TransformComponent>();
+
+        LOG_TRACE("Scene: Created entity '", name, "' (ID: ", static_cast<uint32_t>(entity), ")");
         return entity;
     }
 
     void Scene::DestroyEntity(Entity entity) {
-        LOG_DEBUG("Entity destroyed (ID: ", (uint32_t)entity, ")");
+        if (!entity) {
+            LOG_WARNING("Scene: Attempted to destroy invalid entity");
+            return;
+        }
+
+        LOG_TRACE("Scene: Destroying entity (ID: ", static_cast<uint32_t>(entity), ")");
         m_Registry.destroy(entity);
     }
 

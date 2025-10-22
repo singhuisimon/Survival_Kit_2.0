@@ -10,6 +10,12 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
+#include "Component/TagComponent.h"
+#include "Component/TransformComponent.h"
+#include "Component/CameraComponent.h"
+#include "Component/MeshRendererComponent.h"
+#include "Component/RigidbodyComponent.h"
+
 // Adding systems
 #include "Graphics/RenderSystem.h"
 #include "Transform/TransformSystem.h"
@@ -368,7 +374,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     m_Editor->OnUpdate(ts);
-    m_Editor->RenderEditor();
 }
 
 void Game::OnShutdown() {

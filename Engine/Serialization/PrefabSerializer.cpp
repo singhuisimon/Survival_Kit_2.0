@@ -9,7 +9,11 @@
  */
 
 #include "PrefabSerializer.h"
-#include "../ECS/Components.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -228,8 +232,6 @@ namespace Engine {
             componentObj.AddMember("Type", "TransformComponent", allocator);
 
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
-            propertiesObj.AddMember("ComponentGUID",
-                rapidjson::Value(std::to_string(transform.ComponentGUID.m_Value).c_str(), allocator), allocator);
 
             rapidjson::Value posArray(rapidjson::kArrayType);
             posArray.PushBack(transform.Position.x, allocator);
@@ -241,6 +243,7 @@ namespace Engine {
             rotArray.PushBack(transform.Rotation.x, allocator);
             rotArray.PushBack(transform.Rotation.y, allocator);
             rotArray.PushBack(transform.Rotation.z, allocator);
+            rotArray.PushBack(transform.Rotation.w, allocator);
             propertiesObj.AddMember("Rotation", rotArray, allocator);
 
             rapidjson::Value scaleArray(rapidjson::kArrayType);

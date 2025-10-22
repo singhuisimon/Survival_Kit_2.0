@@ -12,7 +12,7 @@
 #ifndef SK_IMGUI_MANAGER_H
 #define SK_IMGUI_MANAGER_H
 
-// Include Editor Header Files
+ // Include Editor Header Files
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -47,7 +47,7 @@ namespace Engine
 		Entity m_SelectedEntity{};
 
 		// ImGui Window functionality
-		bool inspectorWindow = true; 
+		bool inspectorWindow = true;
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
@@ -63,7 +63,7 @@ namespace Engine
 
 	public:
 		// Default contructor 
-		Editor(GLFWwindow* window): m_Window(window), io(nullptr), m_Scene(nullptr) {};
+		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
 		// Deconstuctor
 		~Editor() = default;
@@ -108,12 +108,16 @@ namespace Engine
 
 		// Helper function for searching and return the files
 		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
+
 		// ========================= Helper Function ======================================
 		// helper function to open scene files from top menu
 		void sceneOpenPanel();
 
 		// open save as panel after select from top menu
 		void saveAsScenePanel();
+
+		// Complete the ImGui frame
+		void CompleteFrame();
 	};
 
 
