@@ -166,15 +166,15 @@ namespace Engine
 				{
 					//Display and Edit Entity Name
 					auto& tag = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-					char nameBuffer[128];
-					strcpy_s(nameBuffer, sizeof(nameBuffer), tag.c_str());
+					char entityNameBuffer[128];
+					strcpy_s(entityNameBuffer, sizeof(entityNameBuffer), tag.c_str());
 					
 					// Add ImGuiInputTextFlags_EnterReturnsTrue to ensure only change name after user press enter
 					// Game crash if delete the last alphabet since it keep updating the frame and cause a empty ID 
 					// TODO: Check the above
-					if (ImGui::InputText("Entity Name", nameBuffer, sizeof(nameBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+					if (ImGui::InputText("Entity Name", entityNameBuffer, sizeof(entityNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
 						
-						std::string newName = nameBuffer;
+						std::string newName = entityNameBuffer;
 						if (newName.empty()) {
 							newName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
 						}
@@ -182,7 +182,12 @@ namespace Engine
 					}
 				}
 				
-				// TODO: Display Entity ID (Need to make getter for m_EntityHandle)
+				// Display entity ID
+				ImGui::Text("Entity ID: %u", static_cast<uint32_t>(m_SelectedEntity));
+				
+				// Display component information
+				ImGui::Separator();
+				ImGui::Text("Components:");
 
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
 				{
@@ -210,7 +215,23 @@ namespace Engine
 		{
 			if (m_Scene) {
 
-				//List of entities
+				// Get name of Scene
+				// TODO: Check when Serialization is fixed
+				auto& sceneName = m_Scene->GetName();
+				char sceneNameBuffer[128];
+				strcpy_s(sceneNameBuffer, sizeof(sceneNameBuffer), sceneName.c_str());
+
+				// Add ImGuiInputTextFlags_EnterReturnsTrue to ensure only change name after user press enter
+				if (ImGui::InputText("Scene Name", sceneNameBuffer, sizeof(sceneNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+
+					std::string newSceneName = sceneNameBuffer;
+					if (newSceneName.empty()) {
+						newSceneName = m_Scene->GetName();
+					}
+					m_Scene->SetName(newSceneName);
+				}
+
+				// List of entities
 				auto& registry = m_Scene->GetRegistry();
 				auto view = registry.view<TagComponent>();
 
@@ -218,7 +239,7 @@ namespace Engine
 
 					Entity entity(entityHandle, &registry);
 
-					//Get entity name
+					// Get entity name
 					std::string name = "Unnamed Entity";
 					if (entity.HasComponent<TagComponent>())
 					{
