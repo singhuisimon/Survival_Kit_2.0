@@ -347,7 +347,10 @@ namespace Engine
 				// to get the files in the selected folder
 				auto assetsList = getAssetsInFolder(selectedFolder); 
 				// display the selected folder name
-				ImGui::Text(("Assets > " + selectedFolder).c_str());
+				std::filesystem::path folderPath(selectedFolder);
+				std::string folderName = folderPath.filename().string();
+				ImGui::Text(("Assets > " + folderName).c_str());
+
 				ImGui::Separator();
 
 				const float padding = 10.0f;
