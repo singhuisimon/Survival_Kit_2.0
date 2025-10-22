@@ -57,10 +57,13 @@ namespace Engine
 		bool saveAsPanel = false; // pop up save as panel
 		bool openScript = false; // pop up open script option
 		bool createScript = false; // pop up panel to create new script
+		bool isNewScene = false;  // to check if is new scene
 
+		// ImGui other helper variable
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+
 
 		// Helper struct to get resources folder/files 
 		struct AssetEntry

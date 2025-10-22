@@ -98,7 +98,12 @@ namespace Engine
 				// ------------- Create New Scene -------------
 				if (ImGui::MenuItem("New"))
 				{
-
+					if (m_Scene)
+					{
+						m_Scene->GetRegistry().clear();
+						currScenePath = "";
+						isNewScene = true;
+					}
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -118,11 +123,17 @@ namespace Engine
 				{
 					if (!currScenePath.empty())
 					{
+						m_Scene->SaveToFile(currScenePath);
 						LOG_INFO("Current scene path: ", currScenePath);
 					}
 					else
 					{
-						LOG_INFO("Current scene has not been saved yet (no file path).");
+						saveAsPanel = true; // redirect to Save as if the current scene is empty
+						if (isNewScene)
+						{
+							saveAsPanel = true;
+						}
+						//LOG_INFO("Current scene has not been saved yet (no file path).");
 					}
 				}
 				if (ImGui::IsItemHovered())
@@ -734,6 +745,7 @@ namespace Engine
 				{
 					// default new scene path 
 					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
+					
 					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
 
 						defaultNewScenePath += ".json"; // ensure .json extension
@@ -750,6 +762,7 @@ namespace Engine
 						//LOG_DEBUG("Scene save as: ", defaultNewScenePath);
 						currScenePath = defaultNewScenePath; // update current scene path
 						saveAsPanel = false; // to close pop up
+						isNewScene = false;
 						ImGui::CloseCurrentPopup();
 
 					}
@@ -783,6 +796,7 @@ namespace Engine
 					currScenePath = defaultNewScenePath;
 
 					saveAsPanel = false;
+					isNewScene = false;
 					ImGui::CloseCurrentPopup(); // close save as panel
 				}
 
