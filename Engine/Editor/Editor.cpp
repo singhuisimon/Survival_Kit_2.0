@@ -373,7 +373,7 @@ namespace Engine
 	void Editor::sceneOpenPanel()
 	{
 		// get all files inside scene
-		auto sceneFiles = getFilesInFolder("Scenes");
+		auto sceneFiles = getFilesInFolder("Sources/Scenes");
 
 		if (openScenePanel)
 		{
@@ -388,19 +388,20 @@ namespace Engine
 			// list all scene files
 			for (auto& [fileName, fullPath] : sceneFiles)
 			{
+				
 				if (ImGui::Selectable(fileName.c_str()))
 				{
-
+					
 					if (!m_Scene)
 					{
 						LOG_ERROR("No active scene exists to load into!");
 						continue;
 					}
-
+					LOG_DEBUG("This is in", fullPath);
 					// clear current scene
 					auto& registry = m_Scene->GetRegistry();
 					registry.clear();
-
+					
 					// load the selected scene file
 					if (!m_Scene->LoadFromFile(fullPath))
 					{
@@ -426,7 +427,9 @@ namespace Engine
 	std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
 	{
 		std::string folderPath = Engine::getAssetFilePath(folderName);
-
+		//LOG_DEBUG("Scene search path: ", folderPath);
+		//std::filesystem::path exeDir = std::filesystem::current_path();
+		//LOG_DEBUG("This is in", exeDir);
 		assert(!folderPath.empty() && "Folder path is empty!");
 		assert(std::filesystem::exists(folderPath) && std::filesystem::is_directory(folderPath) && "Folder does not exist!");
 
@@ -465,7 +468,7 @@ namespace Engine
 				else
 				{
 					// default new scene path 
-					std::string defaultNewScenePath = getAssetFilePath("Scene/") + saveAsDefaultSceneName;
+					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
 					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
 
 						defaultNewScenePath += ".json"; // ensure .json extension
@@ -477,37 +480,9 @@ namespace Engine
 					}
 					else
 					{
-						//// Ensure the Scene directory exists
-						//std::string sceneDir = getAssetFilePath("Scene/");
-						//if (!std::filesystem::exists(sceneDir))
-						//	std::filesystem::create_directories(sceneDir);
-
-						//std::string defaultNewScenePath = sceneDir + saveAsDefaultSceneName;
-						//if (!std::filesystem::path(defaultNewScenePath).has_extension())
-						//	defaultNewScenePath += ".json"; // ensure .json extension
-						//if (std::filesystem::exists(defaultNewScenePath))
-						//{
-						//	ImGui::OpenPopup("Confirm Overwrite");
-						//}
-						//else
-						//{
-						//	// Try saving and check if it succeeds
-						//	try
-						//	{
-						//		m_Scene->SaveToFile(defaultNewScenePath);
-						//		LOG_DEBUG("Scene save as: ", defaultNewScenePath);
-						//		currScenePath = defaultNewScenePath;
-						//		saveAsPanel = false;
-						//		ImGui::CloseCurrentPopup();
-						//	}
-						//	catch (const std::exception& e)
-						//	{
-						//		LOG_ERROR("Failed to save scene: ", e.what());
-						//		ImGui::OpenPopup("Save Error");
-						//	}
-						//}
+						
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
-						LOG_DEBUG("Scene save as: ", defaultNewScenePath);
+						//LOG_DEBUG("Scene save as: ", defaultNewScenePath);
 						currScenePath = defaultNewScenePath; // update current scene path
 						saveAsPanel = false; // to close pop up
 						ImGui::CloseCurrentPopup();
@@ -535,7 +510,7 @@ namespace Engine
 				if (ImGui::Button("Yes", ImVec2(120, 0)))
 				{
 					// default new scene path 
-					std::string defaultNewScenePath = getAssetFilePath("Scene/") + saveAsDefaultSceneName;
+					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
 					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
 						defaultNewScenePath += ".json"; // ensure .json extension
 					}
