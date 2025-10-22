@@ -66,14 +66,19 @@ namespace Engine {
 			if (!listener.Active)
 				continue;
 
-			TransformComponent* transform = entity.HasComponent<TransformComponent>()
-				? &entity.GetComponent<TransformComponent>() : nullptr;
 			RigidbodyComponent* rb = entity.HasComponent<RigidbodyComponent>()
 				? &entity.GetComponent<RigidbodyComponent>() : nullptr;
 
-			glm::vec3 position = transform ? transform->Position : glm::vec3(0.0f);
-			glm::vec3 rotation = transform ? transform->Rotation : glm::vec3(0.0f);
+			glm::vec3 position = glm::vec3(0.0f);
+			glm::vec3 rotation = glm::vec3(0.0f);
 			glm::vec3 velocity = rb ? rb->Velocity : glm::vec3(0.0f);
+
+			if (entity.HasComponent<TransformComponent>())
+			{
+				auto& transform = entity.GetComponent<TransformComponent>();
+				position = transform.Position;
+				rotation = { transform.Rotation.x, transform.Rotation.y, transform.Rotation.z };
+			}
 
 			glm::vec3 forward(0, 0, -1);
 			glm::vec3 up(0, 1, 0);
