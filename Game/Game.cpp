@@ -4,6 +4,7 @@
 #include "Utility/Logger.h"
 #include "ECS/Components.h"
 #include "Serialization/ComponentRegistry.h"
+#include "Asset/AssetManager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -17,6 +18,40 @@ Game::Game()
 
 void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
+
+    //==========INITIALIZING ASSET ==============
+
+    
+
+    LOG_INFO("Initializing Asset...");
+
+    auto config = AM.createDefaultConfig();
+
+    //debug 
+    LOG_INFO("Asset Manager Configuration:");
+    LOG_INFO("  Source Roots:");
+    for (const auto& root : config.sourceRoots) {
+        LOG_INFO("    - ", root);
+    }
+    LOG_INFO("  Descriptor Root: ", config.descriptorRoot);
+    LOG_INFO("  Database File: ", config.databaseFile);
+
+    AM.setConfig(config);
+
+    if (AM.startUp() != 0) {
+        LOG_ERROR("Failed to initialize Asset Manager!");
+        return;
+    }
+    else {
+
+    LOG_INFO("Performing initial asset scan...");
+    AM.scanAndProcess();
+
+    LOG_INFO("Initial asset scan complete - found ",
+        AM.db().Count(), " assets");
+    }
+
+
 
     // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
@@ -75,7 +110,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -282,7 +317,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Serialization controls
     if (input.IsKeyJustPressed(GLFW_KEY_F5)) {
         LOG_INFO("=== SAVING SCENE ===");
-        bool success = m_Scene->SaveToFile("Resources/Scenes/SavedScene.json");
+        bool success = m_Scene->SaveToFile("Resources/Sources/Scenes/SavedScene.json");
         LOG_INFO(success ? "Scene saved!" : "Save failed!");
     }
 
@@ -292,7 +327,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
         // Shutdown systems before loading new scene
         m_Scene->ShutdownSystems();
 
-        bool success = m_Scene->LoadFromFile("Resources/Scenes/ExampleScene.json");
+        bool success = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
         // Reinitialize systems after loading
         if (success) {
@@ -323,6 +358,10 @@ void Game::OnShutdown() {
         // Shutdown all systems before destroying scene
         m_Scene->ShutdownSystems();
     }
+
+    //============= Asset =============
+    LOG_INFO("Shutting Down Asset");
+    AM.shutDown();
 
     m_Scene.reset();
     LOG_INFO("Game shutdown complete");

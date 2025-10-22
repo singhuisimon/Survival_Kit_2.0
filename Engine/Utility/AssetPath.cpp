@@ -9,32 +9,92 @@
  */
 
 #include "../Utility/AssetPath.h"
+
+#include "../Utility/Logger.h"
 #include <filesystem>
 #include <iostream>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#include <limits.h>
+#endif
 
 namespace fs = std::filesystem;
 
 namespace Engine {
 
     // Base path to the assets directory - modify this to match your project structure
-    const std::string BASE_ASSETS_PATH = std::filesystem::current_path().string() + "\\Assets\\";
+    const std::string BASE_ASSETS_PATH = std::filesystem::current_path().string() + "\\Resources\\";
+
+
+    // Get the directory where the executable is located
+    static fs::path GetExecutableDirectory() {
+#ifdef _WIN32
+        // Windows: Get the full path to the .exe
+        char buffer[MAX_PATH];
+        GetModuleFileNameA(NULL, buffer, MAX_PATH);
+        fs::path exePath(buffer);
+        return exePath.parent_path();
+#else
+        // Linux/Mac: Read /proc/self/exe or use readlink
+        char buffer[PATH_MAX];
+        ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+        if (len != -1) {
+            buffer[len] = '\0';
+            fs::path exePath(buffer);
+            return exePath.parent_path();
+        }
+        return fs::current_path();
+#endif
+    }
 
     // Format the filepath for the assets directory
     std::string getAssetsPath() {
-        std::string formattedBasePath = BASE_ASSETS_PATH;
 
-        for (char& c : formattedBasePath) {
-            if (c == '\\') c = '/';
+        // Get the directory where the executable is running from
+        fs::path exeDir = GetExecutableDirectory();
+        LOG_INFO("Executable directory: ", exeDir.string());
+
+
+        // Resources should be next to the executable
+        fs::path resourcesPath = exeDir / "Resources";
+        LOG_INFO("Looking for Resources at: ", resourcesPath.string());
+
+        if (fs::exists(resourcesPath) && fs::is_directory(resourcesPath)) {
+            // Verify it has the expected structure
+            fs::path sourcesPath = resourcesPath / "Sources";
+
+            if (fs::exists(sourcesPath)) {
+                std::string result = resourcesPath.generic_string();
+                if (!result.empty() && result.back() != '/') {
+                    result += '/';
+                }
+                LOG_INFO("Assets path: ", result);  // Only show this in normal operation
+                return result;
+            }
+            else {
+                LOG_WARNING("Resources folder exists but missing Sources/ subfolder");
+            }
+        }
+        else {
+            LOG_ERROR("Resources folder not found at: ", resourcesPath.string());
         }
 
-        if (!formattedBasePath.empty() && (formattedBasePath[0] == '/' || formattedBasePath[0] == '\\')) {
-            formattedBasePath = formattedBasePath.substr(1);
+        // Fallback
+        std::string fallback = resourcesPath.generic_string();
+        if (!fallback.empty() && fallback.back() != '/') {
+            fallback += '/';
         }
 
-        return formattedBasePath;
+        LOG_ERROR("Using fallback path: ", fallback);
+        LOG_ERROR("Assets may not load correctly!");
+
+        return fallback;
     }
 
-    // Get thee filepath for file in assets directory
+    // Get the absolute filepath for file in assets directory
     std::string getAssetFilePath(const std::string& relativePath) {
 
         std::string formattedPath = relativePath;
@@ -136,8 +196,8 @@ namespace Engine {
         }
 
         // Extract Dir1 (last 2 chars) and Dir2 (second-to-last 2 chars)
-        std::string dir1 = guid.substr(14, 2);
-        std::string dir2 = guid.substr(12, 2);
+        std::string dir1 = guid.substr(12, 2);
+        std::string dir2 = guid.substr(14, 2);
 
         // Get the base Assets path
         fs::path assetsPath = getAssetsPath();
@@ -217,16 +277,16 @@ namespace Engine {
         // normalize slashes
         std::replace(norm.begin(), norm.end(), '/', '\\');
 
-        // look for "\Assets\" to strip everything before it
-        size_t pos = norm.find("\\Assets\\");
+        // look for "\Resources\" to strip everything before it
+        size_t pos = norm.find("\\Resources\\");
         if (pos != std::string::npos)
         {
-            // keep everything after "\Assets"
-            return norm.substr(pos + std::string("\\Assets").length());
+            // keep everything from "\Resources" onwards
+            return norm.substr(pos);
         }
 
         // fallback: just filename
-        return "\\" + full.filename().string();
+        return "\\Resources\\" + full.filename().string();
     }
 
     std::string escapeBackslashesForJSON(const std::string& input)

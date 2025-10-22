@@ -176,9 +176,10 @@ External/openFBX/build/
 # ==================================
 # Asset Processing (Future)
 # ==================================
-Assets/Cache/
-Assets/Temp/
-*.meta
+# Generated metadata and compiled assets (auto-generated, don't commit)
+Resources/DB/              
+Resources/Descriptors/     
+Resources/Compiled/       
 
 # ==================================
 # Documentation Build
