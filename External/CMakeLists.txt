@@ -190,6 +190,21 @@ target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
 target_link_libraries(imgui PUBLIC glfw glad)
 set_target_properties(imgui PROPERTIES FOLDER "External")
 
+# xresource_guid - Asset library (header-only)
+message(STATUS "Configuring xresource_guid...")
+add_library(xresource_guid INTERFACE)
+target_include_directories(xresource_guid INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/xresource_guid/include
+)
+
+# xresource_mgr - Asset library (header-only)
+message(STATUS "Configuring xresource_mgr...")
+add_library(xresource_mgr INTERFACE)
+target_include_directories(xresource_mgr INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/xresource_mgr/include
+)
+
+
 # External Interface Library
 add_library(External INTERFACE)
 target_link_libraries(External INTERFACE
@@ -204,6 +219,8 @@ target_link_libraries(External INTERFACE
     Jolt
     fmod
     imgui
+    xresource_guid
+    xresource_mgr
 )
 
 message(STATUS "External libraries configured successfully")
