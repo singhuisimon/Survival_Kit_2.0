@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+#include <fmod.hpp>
 
 namespace Engine {
 
@@ -135,6 +136,82 @@ namespace Engine {
             , UseGravity(true)
             , Velocity(0.0f, 0.0f, 0.0f) {
         }
+    };
+
+    enum class AudioType {SFX, BGM, UI};
+    enum class PlayState {PLAY, PAUSE, STOP};
+    enum class ReverbPreset {Custom, Generic, Bathroom, Room, Cave, Arena};
+
+    struct AudioComponent {
+		std::string AudioFilePath;  // Path to the audio asset
+        AudioType Type;             // SFX or BGM
+        PlayState State;            // Play, Pause, Stop
+        float Volume;               // Volume (0-1.0)
+        float Pitch;                // Pitch ()
+        bool Loop;                  // Indicate if audio should be in loop
+        bool Mute;                  // Mute flag
+        bool Reverb;                // Affected by Reverb
+        bool Is3D;                  // Enable 3D Spatialization
+        float MinDistance;          // 3D attentuation min
+        float MaxDistance;          // 3D attentuation max
+
+        FMOD::Channel* Channel;
+		std::string PreviousPath;   // To track changes in audio file
+        PlayState PreviousState;    // To track changes in state
+
+        AudioComponent()
+            : AudioFilePath("")
+            , Type(AudioType::SFX)
+            , State(PlayState::STOP)
+            , Volume(1.0f)
+            , Pitch(1.0f)
+            , Loop(false)
+            , Mute(false)
+            , Reverb(false)
+            , Is3D(true)
+            , MinDistance(1.0f)
+            , MaxDistance(100.0f)
+            , Channel (nullptr)
+            , PreviousPath("") 
+            , PreviousState(PlayState::STOP){
+		}
+
+        
+    };
+
+    struct ReverbComponent{
+        ReverbPreset Preset;
+        float MinDistance;
+        float MaxDistance;
+        float DecayTime;
+		float HfDecayRatio;
+        float Diffusion;
+        float Density;
+        float WetLevel;
+
+        FMOD::Reverb3D* ReverbZone;
+
+        ReverbComponent()
+            : Preset(ReverbPreset::Generic),
+			MinDistance(1.0f),
+            MaxDistance(20.0f),
+			DecayTime(1.5f),
+            HfDecayRatio(50.0f),
+            Diffusion(50.0f),
+            Density(100.0f),
+            WetLevel(-6.0f),
+            ReverbZone(nullptr){
+		}
+
+		
+	};
+
+    struct ListenerComponent {
+        bool Active;
+
+        ListenerComponent()
+            : Active(true) {
+		}
     };
 
 } // namespace Engine

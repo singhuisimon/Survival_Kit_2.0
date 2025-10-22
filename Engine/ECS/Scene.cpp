@@ -23,7 +23,8 @@ namespace Engine {
     void Scene::OnUpdate(float deltaTime) {
         // Systems will be called here in the future
         // For now, just a placeholder
-        (void)deltaTime; // Suppress unused parameter warning
+        //(void)deltaTime; // Suppress unused parameter warning
+        m_SystemRegistry.OnUpdate(this, deltaTime);
     }
 
     bool Scene::SaveToFile(const std::string& filepath) {

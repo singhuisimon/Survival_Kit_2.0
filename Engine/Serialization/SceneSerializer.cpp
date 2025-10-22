@@ -177,6 +177,66 @@ namespace Engine {
                 componentsArray.PushBack(componentObj, allocator);
             }
 
+            // Serialize AudioComponent
+            if (entity.HasComponent<AudioComponent>()) {
+                LOG_TRACE("  - Serializing AudioComponent");
+                auto& audio = entity.GetComponent<AudioComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "AudioComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("FilePath", Value(audio.AudioFilePath.c_str(), allocator), allocator);
+                propertiesObj.AddMember("Type", static_cast<int>(audio.Type), allocator);
+                propertiesObj.AddMember("State", static_cast<int>(audio.State), allocator);
+                propertiesObj.AddMember("Volume", audio.Volume, allocator);
+                propertiesObj.AddMember("Pitch", audio.Pitch, allocator);
+                propertiesObj.AddMember("Loop", audio.Loop, allocator);
+                propertiesObj.AddMember("Mute", audio.Mute, allocator);
+                propertiesObj.AddMember("Reverb", audio.Reverb, allocator);
+                propertiesObj.AddMember("Is3D", audio.Is3D, allocator);
+                propertiesObj.AddMember("MinDistance", audio.MinDistance, allocator);
+                propertiesObj.AddMember("MaxDistance", audio.MaxDistance, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
+            // Serialize ReverbComponent
+            if (entity.HasComponent<ReverbComponent>()) {
+                LOG_TRACE("  - Serializing ReverbComponent");
+
+                auto& reverb = entity.GetComponent<ReverbComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ReverbComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Preset", static_cast<int>(reverb.Preset), allocator);
+                propertiesObj.AddMember("MinDistance", reverb.MinDistance, allocator);
+                propertiesObj.AddMember("MaxDistance", reverb.MaxDistance, allocator);
+                propertiesObj.AddMember("DecayTime", reverb.DecayTime, allocator);
+                propertiesObj.AddMember("HfDecayRatio", reverb.HfDecayRatio, allocator);
+                propertiesObj.AddMember("Diffusion", reverb.Diffusion, allocator);
+                propertiesObj.AddMember("Density", reverb.Density, allocator);
+                propertiesObj.AddMember("WetLevel", reverb.WetLevel, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
+            // Serialize ListenerComponent
+            if (entity.HasComponent<ListenerComponent>()) {
+                LOG_TRACE("  - Serializing ListenerComponent");
+                auto& listener = entity.GetComponent<ListenerComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ListenerComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Active", listener.Active, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
             entityObj.AddMember("Components", componentsArray, allocator);
             entitiesArray.PushBack(entityObj, allocator);
         }
@@ -336,6 +396,58 @@ namespace Engine {
                                 vel[2].GetFloat()
                             );
                         }
+                    }
+                    else if (componentType == "AudioComponent") {
+						auto& audio = entity.AddComponent<AudioComponent>();
+
+                        if(properties.HasMember("FilePath"))
+							audio.AudioFilePath = properties["FilePath"].GetString();
+						if (properties.HasMember("Type"))
+							audio.Type = static_cast<AudioType>(properties["Type"].GetInt());
+						if (properties.HasMember("State"))
+							audio.State = static_cast<PlayState>(properties["State"].GetInt());
+						if (properties.HasMember("Volume"))
+							audio.Volume = properties["Volume"].GetFloat();
+						if (properties.HasMember("Pitch"))
+							audio.Pitch = properties["Pitch"].GetFloat();
+						if (properties.HasMember("Loop"))
+							audio.Loop = properties["Loop"].GetBool();
+						if (properties.HasMember("Mute"))
+							audio.Mute = properties["Mute"].GetBool();
+						if (properties.HasMember("Reverb"))
+							audio.Reverb = properties["Reverb"].GetBool();
+						if (properties.HasMember("Is3D"))
+							audio.Is3D = properties["Is3D"].GetBool();
+						if (properties.HasMember("MinDistance"))
+							audio.MinDistance = properties["MinDistance"].GetFloat();
+						if (properties.HasMember("MaxDistance"))
+							audio.MaxDistance = properties["MaxDistance"].GetFloat();
+                    }
+                    else if (componentType == "ReverbComponent") {
+						auto& reverb = entity.AddComponent<ReverbComponent>();
+
+						if (properties.HasMember("Preset"))
+							reverb.Preset = static_cast<ReverbPreset>(properties["Preset"].GetInt());
+						if (properties.HasMember("MinDistance"))
+							reverb.MinDistance = properties["MinDistance"].GetFloat();
+						if (properties.HasMember("MaxDistance"))
+							reverb.MaxDistance = properties["MaxDistance"].GetFloat();
+						if (properties.HasMember("DecayTime"))
+							reverb.DecayTime = properties["DecayTime"].GetFloat();
+						if (properties.HasMember("HfDecayRatio"))
+							reverb.HfDecayRatio = properties["HfDecayRatio"].GetFloat();
+                        if (properties.HasMember("Diffusion"))
+							reverb.Diffusion = properties["Diffusion"].GetFloat();
+						if (properties.HasMember("Density"))
+							reverb.Density = properties["Density"].GetFloat();
+						if (properties.HasMember("WetLevel"))
+							reverb.WetLevel = properties["WetLevel"].GetFloat();
+                    }
+                    else if (componentType == "ListenerComponent") {
+                        auto& listener = entity.AddComponent<ListenerComponent>();
+
+                        if (properties.HasMember("Active"))
+                            listener.Active = properties["Active"].GetBool();
                     }
                 }
             }

@@ -20,6 +20,10 @@ file(GLOB_RECURSE ECS_HEADERS "${ENGINE_ROOT}/ECS/*.h")
 file(GLOB_RECURSE GRAPHICS_SOURCES "${ENGINE_ROOT}/Graphics/*.cpp")
 file(GLOB_RECURSE GRAPHICS_HEADERS "${ENGINE_ROOT}/Graphics/*.h")
 
+# Audio Module
+file(GLOB_RECURSE AUDIO_SOURCES "${ENGINE_ROOT}/Audio/*.cpp")
+file(GLOB_RECURSE AUDIO_HEADERS "${ENGINE_ROOT}/Audio/*.h")
+
 # Utility Module
 file(GLOB_RECURSE UTILITY_SOURCES "${ENGINE_ROOT}/Utility/*.cpp")
 file(GLOB_RECURSE UTILITY_HEADERS "${ENGINE_ROOT}/Utility/*.h")
@@ -37,6 +41,7 @@ set(ENGINE_SOURCES
     ${CORE_SOURCES}
     ${ECS_SOURCES}
     ${GRAPHICS_SOURCES}
+    ${AUDIO_SOURCES}
     ${UTILITY_SOURCES}
     ${EDITOR_SOURCES}
     ${SERIALIZATION_SOURCES}
@@ -46,6 +51,7 @@ set(ENGINE_HEADERS
     ${CORE_HEADERS}
     ${ECS_HEADERS}
     ${GRAPHICS_HEADERS}
+    ${AUDIO_HEADERS}
     ${UTILITY_HEADERS}
     ${EDITOR_HEADERS}
     ${SERIALIZATION_HEADERS}
@@ -82,6 +88,10 @@ source_group("ECS\\Source" FILES ${ECS_SOURCES})
 # Graphics Module
 source_group("Graphics\\Header" FILES ${GRAPHICS_HEADERS})
 source_group("Graphics\\Source" FILES ${GRAPHICS_SOURCES})
+
+# Audio Module
+source_group("Audio\\Header" FILES ${AUDIO_HEADERS})
+source_group("Audio\\Source" FILES ${AUDIO_SOURCES})
 
 # Utility Module
 source_group("Utility\\Header" FILES ${UTILITY_HEADERS})

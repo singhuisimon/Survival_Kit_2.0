@@ -142,7 +142,7 @@ if(WIN32)
             $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodstudioL_vc.lib>
         )
         
-        set(FMOD_FOUND TRUE)
+        set(FMOD_FOUND TRUE PARENT_SCOPE)
         
     else()
         message(WARNING "  FMOD .lib files not found at: ${FMOD_LIB_DIR}")
