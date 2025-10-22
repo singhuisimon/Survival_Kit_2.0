@@ -25,6 +25,8 @@
 #include <algorithm>
 
 // Include other necessary headers
+#include "../ECS/Scene.h"
+#include "../ECS/Components.h"
 #include "../Utility/Timestep.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
@@ -41,6 +43,7 @@ namespace Engine
 		GLFWwindow* m_Window = nullptr;
 		bool m_Initialized = false;
 		ImGuiIO* io;
+		Scene* m_Scene;
 
 		// ImGui Window functionality
 		bool inspectorWindow = true; 
@@ -56,7 +59,7 @@ namespace Engine
 
 	public:
 		// Default contructor 
-		Editor(GLFWwindow* window): m_Window(window), io(nullptr) {};
+		Editor(GLFWwindow* window): m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
 		// Deconstuctor
 		~Editor() = default;
@@ -66,6 +69,9 @@ namespace Engine
 
 		// Deleted copy assignment operator
 		Editor& operator=(const Editor&) = delete;
+
+		// Set scene for editor
+		void SetScene(Engine::Scene* scene);
 
 		// Initialise Imgui
 		void OnInit();
