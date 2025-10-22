@@ -69,8 +69,8 @@ namespace Engine
 
 		displayTopMenu();
 
-		// Enable Docking Function
-		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		//// Enable Docking Function
+		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
 		renderViewport();
 
@@ -348,6 +348,8 @@ namespace Engine
 		ImGui::End();
 		
 		
+		// Logic here 
+
 	}
 
 	// Render after Render System

@@ -20,14 +20,12 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <GLFW/glfw3.h>
 
-#include <filesystem>
-
 #pragma region NAMESPACE
 
 namespace {
 
 	// Testing values
-	constexpr int width = 640, height = 480;
+	constexpr int width = 1280, height = 720;
 
 	inline std::vector<Engine::ShaderProgram> loadShaderPrograms(std::vector<std::pair<std::string, std::string>> shaders) {
 
@@ -56,11 +54,15 @@ namespace {
 
 	inline void test_load_shaders(std::vector<Engine::ShaderProgram>& shd) {
 
-		std::string vertex_obj_path{ "..//Resources//Shaders//survival_kit_obj.vert"};
-		std::string fragment_obj_path{ "..//Resources//Shaders//survival_kit_obj.frag" };
 
-		std::string vertex_debug_path{ "..//Resources//Shaders//debug.vert" };
-		std::string fragment_debug_path{ "..//Resources//Shaders//debug.frag" };
+		
+		std::string vertex_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.vert") };
+		std::string fragment_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.frag") };
+
+		std::string vertex_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.vert")};
+		std::string fragment_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.frag")};
+
+		
 
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
@@ -190,7 +192,7 @@ namespace Engine {
 
 			};
 
-			m_passes.push_back(stub_pass);
+			//m_passes.push_back(stub_pass);
 		}
 
 #pragma endregion
@@ -211,7 +213,7 @@ namespace Engine {
 			.passtype = PassType::DEBUGGING
 		};
 
-		m_passes.push_back(debug_pass);
+		//m_passes.push_back(debug_pass);
 
 #if 0
 #pragma region TEXTURE_LOAD_TEMP
@@ -250,7 +252,7 @@ namespace Engine {
 	void Renderer::beginFrame(RenderPass const& pass) {
 
 		auto& fbo = m_framebuffers[pass.fbo_handle];
-		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle()));
+		//glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle()));
 
 		auto& viewport = pass.view_port;
 		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y), 
@@ -398,6 +400,6 @@ namespace Engine {
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 		prog.programFree();
 		glBindTextureUnit(0, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
