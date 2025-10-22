@@ -3,6 +3,7 @@
 #include "Core/Input.h"
 #include "Utility/Logger.h"
 #include "ECS/Components.h"
+#include "Editor/Editor.h"
 #include "Serialization/ComponentRegistry.h"
 #include "Audio/AudioSystem.h"
 #include "Asset/AssetManager.h"
@@ -10,9 +11,14 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
+// Adding systems
+#include "Graphics/RenderSystem.h"
+#include "Transform/TransformSystem.h"
+
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
     , m_Scene(nullptr)
+    , m_Editor(nullptr)
     , m_ColorShift(0.0f) {
     LOG_INFO("Game constructor body executing");
 }
@@ -85,9 +91,20 @@ void Game::OnInit() {
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
+       
         if (!m_Scene) {
             LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
             return;
+        }
+
+        // Editor get scene
+        if (!m_Editor)
+        {
+            m_Editor = std::make_unique<Engine::Editor>(GetWindow());
+            m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->OnInit();
+            LOG_INFO("Editor initialized successfully.");
+
         }
 
         LOG_INFO("  -> Scene created at address: ", (void*)m_Scene.get());
@@ -105,6 +122,9 @@ void Game::OnInit() {
         // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
         m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
 
+        m_Scene->AddSystem<Engine::TransformSystem>();
+        m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+       
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {
@@ -160,6 +180,7 @@ void Game::OnInit() {
         return;
     }
 
+
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
     LOG_INFO("");
@@ -190,9 +211,10 @@ void Game::CreateDefaultScene() {
     player.AddComponent<Engine::TagComponent>("Player");
 
     auto& transform = player.AddComponent<Engine::TransformComponent>();
-    transform.Position = glm::vec3(0, 5, -5);  // Start above ground
-    transform.Rotation = glm::vec3(0, 0, 0);
-    transform.Scale = glm::vec3(1.0f);
+    transform.Position = glm::vec3(1, 2, 0);  // Start above ground
+    transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+
+    auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
 
     auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     rb.Mass = 1.0f;
@@ -242,8 +264,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Rotation = glm::vec3(0, 0, 0);
-    groundTransform.Scale = glm::vec3(10, 0.1f, 10);
+    groundTransform.Scale = glm::vec3(1, 0.1f, 1);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -371,6 +392,8 @@ void Game::OnUpdate(Engine::Timestep ts) {
         dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
         LOG_INFO("LowPass cutoff currently: ", cutoff);
     }
+    
+
 
     // === Test Input System ===
 
@@ -470,16 +493,12 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
     }
 
-    // === Render ===
-    m_ColorShift += ts * 0.5f;
-    if (m_ColorShift > 6.28318f) m_ColorShift -= 6.28318f;
+    //m_Editor->StartImguiFrame();
 
-    float r = 0.2f + 0.1f * std::sin(m_ColorShift);
-    float g = 0.3f + 0.1f * std::sin(m_ColorShift + 2.0f);
-    float b = 0.4f + 0.1f * std::sin(m_ColorShift + 4.0f);
-
-    glClearColor(r, g, b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Update Editor To Do
+    //m_Editor->OnUpdate(Engine::Timestep ts);
+    m_Editor->OnUpdate(ts);
+    m_Editor->RenderEditor();
 }
 
 void Game::OnShutdown() {
@@ -505,5 +524,6 @@ void Game::OnShutdown() {
     AM.shutDown();
 
     m_Scene.reset();
+    m_Editor.reset();
     LOG_INFO("Game shutdown complete");
 }

@@ -1,8 +1,14 @@
 #pragma once
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <string>
 #include <fmod.hpp>
+#include "Utility/Types.h"
+
+// Components
+#include "../Component/TransformComponent.h"
 
 namespace Engine {
 
@@ -49,44 +55,9 @@ namespace Engine {
         }
     };
 
-    /**
-     * @brief Transform component - position, rotation, scale
-     */
-    struct TransformComponent {
-        glm::vec3 Position;
-        glm::vec3 Rotation; // Euler angles in degrees
-        glm::vec3 Scale;
-
-        // Default constructor
-        TransformComponent()
-            : Position(0.0f, 0.0f, 0.0f)
-            , Rotation(0.0f, 0.0f, 0.0f)
-            , Scale(1.0f, 1.0f, 1.0f) {
-        }
-
-        // Constructor with position
-        TransformComponent(const glm::vec3& position)
-            : Position(position)
-            , Rotation(0.0f, 0.0f, 0.0f)
-            , Scale(1.0f, 1.0f, 1.0f) {
-        }
-
-        /**
-         * @brief Calculate transformation matrix
-         * @note This is OK - it's just a calculation, not game logic
-         */
-        glm::mat4 GetTransform() const {
-            glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1, 0, 0))
-                * glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0, 1, 0))
-                * glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0, 0, 1));
-
-            return glm::translate(glm::mat4(1.0f), Position)
-                * rotation
-                * glm::scale(glm::mat4(1.0f), Scale);
-        }
-    };
-
-    /**
+    // Kenny: Don't think we need a camera component, just need primary camera for the game, 
+    //        and additional secondary camera(s) if needed in the game
+    /** 
      * @brief Camera component
      */
     struct CameraComponent {
@@ -112,11 +83,23 @@ namespace Engine {
      * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
-        bool Visible;
+        bool Visible;           // Determine if sent to draw call
+        bool ShadowReceive;     // For future expansion (WIP)
+        bool ShadowCast;        // For future expansion (WIP)
+        bool GlobalIlluminate;  // Require further expansion; for now true means it receives light from a light object
+        u32 MeshType;           // Mesh that the object uses (primitive/custom)
+        u32 Material;           // Material handle
+        u32 Texture;            // Texture handle (0 means no texture, actual textures start from 1)
 
         // Default constructor
         MeshRendererComponent()
-            : Visible(true) {
+            : Visible(true), 
+              ShadowReceive(false), 
+              ShadowCast(false), 
+              GlobalIlluminate(true), 
+              MeshType(0), 
+              Material(0),
+              Texture(0)  {
         }
     };
 
