@@ -52,7 +52,7 @@ namespace Engine
 		ImGui_ImplOpenGL3_Init();
 
 		m_Initialized = true;
-		
+
 	}
 
 	void Editor::OnUpdate(Timestep ts)
@@ -66,7 +66,7 @@ namespace Engine
 
 		// Enable Docking Function
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
-		
+
 		// Panel Logic
 		displayPropertiesPanel();
 
@@ -85,22 +85,66 @@ namespace Engine
 			ImGui::Separator();
 			// First item in top menu
 			if (ImGui::BeginMenu("File"))
-			{	
+			{
+				// ======================== Scene Section ===========================
 				// Under file menu list
-				if(ImGui::MenuItem("New"))
+				// ------------- Create New Scene -------------
+				if (ImGui::MenuItem("New"))
 				{
 
 				}
-				if (ImGui::IsAnyItemHovered())
+				if (ImGui::IsItemHovered())
 				{
 					ImGui::SetTooltip("Create new scene.");
 				}
+				// --------------- Open Scene -------------------
+				if (ImGui::MenuItem("Open Scene"))
+				{
+					openScenePanel = true;
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Open Scene from file.");
+				}
+				// ------------------ Save as Scene -----------------------
+				if (ImGui::MenuItem("Save as"))
+				{
+					saveAsPanel = true;
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Save scene as new file.");
+				}
+
+				ImGui::Separator();
+
+				// ====================== Script Section ==========================
+				// ---------------------- Open Script -------------------------
+				if (ImGui::MenuItem("Open Script"))
+				{
+
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Open Script from file.");
+				}
+				// ---------------------- Create new script -------------------
+				if (ImGui::MenuItem("New Script"))
+				{
+					createScript = true;
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Create new script.");
+				}
 				// close File menu
 				ImGui::EndMenu();
+				ImGui::Separator();
 			}
+
 			// close main menu bar
 			ImGui::EndMainMenuBar();
-			
+
 		}
 	}
 
@@ -111,7 +155,7 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Properties/ Inspector", &inspectorWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
-
+			
 		}
 
 		ImGui::End(); // End of the properties window
@@ -124,7 +168,7 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Hierarchy", &hierachyWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
-			
+
 		}
 
 		ImGui::End(); // End of the properties window
@@ -181,5 +225,56 @@ namespace Engine
 			glfwMakeContextCurrent(backup_current_context);
 		}
 
+	}
+
+	// Helper function for top menu 
+	void Editor::sceneOpenPanel()
+	{
+		// get all files inside scene
+		auto sceneFiles = getFilesInFolder("Scene");
+
+		if (openScenePanel)
+		{
+			ImGui::OpenPopup("Scene Level Selection");
+		}
+
+		// pop up panel to open scene file
+		if (ImGui::BeginPopupModal("Scene Level Selection", nullptr, ImGuiWindowFlags_NoDocking))
+		{
+			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+
+			// list all scene files
+			for (auto& [fileName, fullPath] : sceneFiles)
+			{
+				if (ImGui::Selectable(fileName.c_str()))
+				{
+					
+				}
+			}
+
+
+			ImGui::EndPopup(); // end pop up panel for scene level selection
+		}
+	}
+
+	std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
+	{
+		std::string folderPath = Engine::getAssetFilePath(folderName);
+
+		assert(!folderPath.empty() && "Folder path is empty!");
+		assert(std::filesystem::exists(folderPath) && std::filesystem::is_directory(folderPath) && "Folder does not exist!");
+
+		std::vector<std::pair<std::string, std::string>> files;
+
+		for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+		{
+			if (std::filesystem::is_regular_file(entry.path()))
+			{
+				// .first = filename, .second = full path
+				files.emplace_back(entry.path().filename().string(), entry.path().generic_string());
+			}
+		}
+
+		return files;
 	}
 } // end of namespace Engine

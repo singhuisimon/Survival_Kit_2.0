@@ -27,6 +27,7 @@
 // Include other necessary headers
 #include "../Utility/Timestep.h"
 #include "../Utility/Logger.h"
+#include "../Utility/AssetPath.h"
 
 namespace Engine
 {
@@ -46,6 +47,12 @@ namespace Engine
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
+
+		// ImGui Top Menu Panel
+		bool openScenePanel = false; // for top menu open file 
+		bool saveAsPanel = false; // pop up save as panel
+		bool openScript = false; // pop up open script option
+		bool createScript = false; // pop up panel to create new script
 
 	public:
 		// Default contructor 
@@ -83,11 +90,17 @@ namespace Engine
 		// display performance profile
 		void displayPerformanceProfilePanel();
 
+		// helper function to open scene files from top menu
+		void sceneOpenPanel();
+
 		// Render Viewport
 		void renderViewport();
 
 		// Render IMGUI UI
 		void RenderEditor();
+
+		// Helper function for searching and return the files
+		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
 
 
 	};
