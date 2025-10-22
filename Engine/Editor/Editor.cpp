@@ -16,6 +16,11 @@
 
 namespace Engine
 {
+	void Editor::SetScene(Engine::Scene* scene)
+	{
+		m_Scene = scene;
+	}
+
 	void Editor::OnInit()
 	{
 		if (m_Initialized)
@@ -124,7 +129,28 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Hierarchy", &hierachyWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
-			
+			if (m_Scene) {
+				auto& registry = m_Scene->GetRegistry();
+				auto view = registry.view<TagComponent>();
+
+				for (auto entityHandle : view) {
+
+					Entity entity(entityHandle, &registry);
+
+					std::string name = "Unnamed Entity";
+					if (entity.HasComponent<TagComponent>())
+					{
+						name = entity.GetComponent<TagComponent>().Tag;
+					}
+
+					// TODO: Add Selection logic
+					if (ImGui::Selectable(name.c_str()))
+					{
+
+						
+					}
+				}
+			}
 		}
 
 		ImGui::End(); // End of the properties window

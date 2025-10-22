@@ -77,17 +77,16 @@ void Game::OnInit() {
             return;
         }
 
+        // Editor get scene
         if (!m_Editor)
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
-            // TODO:: Add Set Scene 
-            // m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->SetScene(m_Scene.get()); 
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
         }
 
-        // Editor get scene
         LOG_INFO("  -> Scene created at address: ", (void*)m_Scene.get());
     }
     catch (const std::exception& e) {
