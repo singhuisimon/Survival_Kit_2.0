@@ -20,8 +20,6 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <GLFW/glfw3.h>
 
-#include <filesystem>
-
 #pragma region NAMESPACE
 
 namespace {
@@ -56,11 +54,15 @@ namespace {
 
 	inline void test_load_shaders(std::vector<Engine::ShaderProgram>& shd) {
 
-		std::string vertex_obj_path{ "..//Resources//Shaders//survival_kit_obj.vert"};
-		std::string fragment_obj_path{ "..//Resources//Shaders//survival_kit_obj.frag" };
 
-		std::string vertex_debug_path{ "..//Resources//Shaders//debug.vert" };
-		std::string fragment_debug_path{ "..//Resources//Shaders//debug.frag" };
+		
+		std::string vertex_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.vert") };
+		std::string fragment_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.frag") };
+
+		std::string vertex_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.vert")};
+		std::string fragment_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.frag")};
+
+		
 
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
