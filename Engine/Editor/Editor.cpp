@@ -149,7 +149,18 @@ namespace Engine
 
 			// close main menu bar
 			ImGui::EndMainMenuBar();
+		} //  end of begin main menu bar
 
+		//  =========================== Open Scene pop up panel =====================================
+		if (openScenePanel)
+		{
+			sceneOpenPanel();
+		}
+
+		// ========================== Save as Scene panel ============================
+		if (saveAsPanel)
+		{
+			saveAsScenePanel();
 		}
 	}
 
@@ -315,7 +326,7 @@ namespace Engine
 	void Editor::sceneOpenPanel()
 	{
 		// get all files inside scene
-		auto sceneFiles = getFilesInFolder("Scene");
+		auto sceneFiles = getFilesInFolder("Scenes");
 
 		if (openScenePanel)
 		{
@@ -332,8 +343,32 @@ namespace Engine
 			{
 				if (ImGui::Selectable(fileName.c_str()))
 				{
+
+					if (!m_Scene)
+					{
+						LOG_ERROR("No active scene exists to load into!");
+						continue;
+					}
+
+					// clear current scene
+					auto& registry = m_Scene->GetRegistry();
+					registry.clear();
+
+					// load the selected scene file
+					if (!m_Scene->LoadFromFile(fullPath))
+					{
+						//LOG_ERROR("Failed to load scene %s", sceneFiles);
+					}
+					openScenePanel = false; //  reset after select scene
+					ImGui::CloseCurrentPopup();
 					
 				}
+			}
+			// --------------- Cancel Selection for Open Scene -----------------------
+			if (ImGui::Button("Cancel"))
+			{
+				openScenePanel = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
 			}
 
 
@@ -361,4 +396,132 @@ namespace Engine
 
 		return files;
 	}
+	void Editor::saveAsScenePanel()
+	{
+
+		if (saveAsPanel)
+		{
+			ImGui::OpenPopup("Save As Panel");
+		}
+		if (ImGui::BeginPopupModal("Save As Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+
+			ImGui::InputText("File name", saveAsDefaultSceneName, IM_ARRAYSIZE(saveAsDefaultSceneName));
+
+			// ------------------ Select save button to save new scene --------------------
+			if (ImGui::Button("Save", ImVec2(120, 0)))
+			{
+				if (strlen(saveAsDefaultSceneName) == 0) // validate that file name is not empty
+				{
+					ImGui::OpenPopup("Empty Filename");
+				}
+				else
+				{
+					// default new scene path 
+					std::string defaultNewScenePath = getAssetFilePath("Scene/") + saveAsDefaultSceneName;
+					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
+
+						defaultNewScenePath += ".json"; // ensure .json extension
+					}
+
+					if (std::filesystem::exists(defaultNewScenePath))
+					{
+						ImGui::OpenPopup("Confirm Overwrite"); // if save as name repeat, open confirmation panel for overwrite it
+					}
+					else
+					{
+						//// Ensure the Scene directory exists
+						//std::string sceneDir = getAssetFilePath("Scene/");
+						//if (!std::filesystem::exists(sceneDir))
+						//	std::filesystem::create_directories(sceneDir);
+
+						//std::string defaultNewScenePath = sceneDir + saveAsDefaultSceneName;
+						//if (!std::filesystem::path(defaultNewScenePath).has_extension())
+						//	defaultNewScenePath += ".json"; // ensure .json extension
+						//if (std::filesystem::exists(defaultNewScenePath))
+						//{
+						//	ImGui::OpenPopup("Confirm Overwrite");
+						//}
+						//else
+						//{
+						//	// Try saving and check if it succeeds
+						//	try
+						//	{
+						//		m_Scene->SaveToFile(defaultNewScenePath);
+						//		LOG_DEBUG("Scene save as: ", defaultNewScenePath);
+						//		currScenePath = defaultNewScenePath;
+						//		saveAsPanel = false;
+						//		ImGui::CloseCurrentPopup();
+						//	}
+						//	catch (const std::exception& e)
+						//	{
+						//		LOG_ERROR("Failed to save scene: ", e.what());
+						//		ImGui::OpenPopup("Save Error");
+						//	}
+						//}
+						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
+						LOG_DEBUG("Scene save as: ", defaultNewScenePath);
+						currScenePath = defaultNewScenePath; // update current scene path
+						saveAsPanel = false; // to close pop up
+						ImGui::CloseCurrentPopup();
+
+					}
+				}
+
+			}
+
+			// ------------------- Cancel save as button ---------------------
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				saveAsPanel = false; // reset to close pop up
+				ImGui::CloseCurrentPopup();
+			}
+
+			// ----------------------- Overwrite Existing Save as Scene File -------------------
+			if (ImGui::BeginPopupModal("Confirm Overwrite", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("File %s already exists.\nDo you want to replace it?", saveAsDefaultSceneName);
+
+				ImGui::Separator();
+
+				if (ImGui::Button("Yes", ImVec2(120, 0)))
+				{
+					// default new scene path 
+					std::string defaultNewScenePath = getAssetFilePath("Scene/") + saveAsDefaultSceneName;
+					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
+						defaultNewScenePath += ".json"; // ensure .json extension
+					}
+					std::cout << defaultNewScenePath << "json file test\n";
+					m_Scene->SaveToFile(defaultNewScenePath);
+					currScenePath = defaultNewScenePath;
+
+					saveAsPanel = false;
+					ImGui::CloseCurrentPopup(); // close save as panel
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("No", ImVec2(120, 0)))
+				{
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup(); // end pop up confirm overwrite panel
+			}
+
+			// ---------------- If is Emty Filename Warning -------------------
+			if (ImGui::BeginPopupModal("Empty Filename", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("Please enter a file name.");
+
+				if (ImGui::Button("OK", ImVec2(120, 0)))
+				{
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::EndPopup(); // end pop up for save as scene panel
+		}
+	}
+
 } // end of namespace Engine

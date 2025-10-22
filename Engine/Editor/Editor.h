@@ -58,6 +58,9 @@ namespace Engine
 		bool openScript = false; // pop up open script option
 		bool createScript = false; // pop up panel to create new script
 
+		std::string currScenePath{}; // to store current scene path 
+		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+
 	public:
 		// Default contructor 
 		Editor(GLFWwindow* window): m_Window(window), io(nullptr), m_Scene(nullptr) {};
@@ -97,9 +100,6 @@ namespace Engine
 		// display performance profile
 		void displayPerformanceProfilePanel();
 
-		// helper function to open scene files from top menu
-		void sceneOpenPanel();
-
 		// Render Viewport
 		void renderViewport();
 
@@ -108,8 +108,12 @@ namespace Engine
 
 		// Helper function for searching and return the files
 		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
+		// ========================= Helper Function ======================================
+		// helper function to open scene files from top menu
+		void sceneOpenPanel();
 
-
+		// open save as panel after select from top menu
+		void saveAsScenePanel();
 	};
 
 
