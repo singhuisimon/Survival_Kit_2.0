@@ -60,6 +60,16 @@ namespace Engine
 
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+
+		// Helper struct to get resources folder/files 
+		struct AssetEntry
+		{
+			std::string name;
+			std::string fullPath;
+		};
+
+		
 
 	public:
 		// Default contructor 
@@ -106,14 +116,16 @@ namespace Engine
 		// Render IMGUI UI
 		void RenderEditor();
 
-		// Helper function for searching and return the files
-		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
 		// ========================= Helper Function ======================================
 		// helper function to open scene files from top menu
 		void sceneOpenPanel();
 
 		// open save as panel after select from top menu
 		void saveAsScenePanel();
+
+		// Helper function for searching and return the files/folder
+		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
+
 	};
 
 

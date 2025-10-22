@@ -163,6 +163,16 @@ namespace Engine
 				// close File menu
 				ImGui::EndMenu();
 				ImGui::Separator();
+
+			}
+			// ---------------- Display Current Scene Name ---------------------
+			if (!currScenePath.empty())
+			{
+				std::filesystem::path filePath(currScenePath);
+				std::string fileName = filePath.filename().string();
+
+				ImGui::SameLine(ImGui::GetContentRegionAvail().x - 80.0f);
+				ImGui::TextUnformatted(fileName.c_str());
 			}
 
 			// close main menu bar
@@ -294,9 +304,108 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			
+			ImGui::Columns(2, nullptr, true);
+			static std::string selectedFolder = "";
+			// ================= Left column panel display all the resources folder ========================
+			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			ImGui::Text("Projects:");
+			if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
 
+				for (auto& folder : folders)
+				{
+					bool isSelected = (selectedFolder == folder.fullPath);
+					if (ImGui::Selectable(folder.name.c_str(), isSelected))
+					{
+						selectedFolder = folder.fullPath;
+						selectedResourcesIndex = -1; // reset asset selection
+					}
+				}
+			}
+			ImGui::EndChild(); // end the left column 
+
+			// ===================== Right column panel display the resources files =======================
+
+			ImGui::NextColumn();
+			ImGui::BeginChild("Assets Panel", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			// if folder is selected, display the files
+			if (!selectedFolder.empty())
+			{
+				// to get the files in the selected folder
+				auto assetsList = getAssetsInFolder(selectedFolder); 
+				// display the selected folder name
+				ImGui::Text(("Assets > " + selectedFolder).c_str());
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
+
+				int textureCount = -1;
+				ImGui::Columns(itemsPerRow, nullptr, false);
+
+				// loop through files in selected folder
+				for (size_t i = 0; i < assetsList.size(); i++)
+				{
+					const auto& asset = assetsList[i];
+					std::string fileName = asset.name;
+					std::string filePath = asset.fullPath;
+
+					/*if (asset.name.ends_with(".png") || asset.name.ends_with(".jpeg"))
+					{
+						++textureCount;
+					}*/
+
+					ImGui::PushID(fileName.c_str());
+
+					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+					{
+						selectedResourcesIndex = static_cast<int>(i);
+						//currScenePath = filePath;
+
+						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
+						if (extension == ".json") // if it is scene
+						{
+							if (m_Scene)
+							{
+								m_Scene->GetRegistry().clear();
+								m_Scene->LoadFromFile(filePath);
+								currScenePath = filePath; // update curr file path
+							}
+						}
+					}
+
+					// ==================== Display info detail ==========================
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						ImGui::Text("Name: %s", fileName.c_str());
+						//ImGui::Text("Type: %s", filePath.c_str();
+						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
+						ImGui::Text("Type: %s", extension.c_str());
+						ImGui::EndTooltip();
+					}
+
+					// ==================== To center text under thumbnail ================
+					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
+					float textX = (thumbnailSize - textSize.x) * 0.5f;
+					if (textX < 0) textX = 0;
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+					ImGui::TextWrapped("%s", fileName.c_str());
+
+					ImGui::PopID();
+					ImGui::NextColumn();
+					
+				}
+			}
+
+			ImGui::EndChild(); // end of the right column
+			ImGui::Columns(1);
 		}
-
 		ImGui::End(); // End of the assets browser window
 	}
 
@@ -552,8 +661,7 @@ namespace Engine
 	void Editor::sceneOpenPanel()
 	{
 		// get all files inside scene
-		auto sceneFiles = getFilesInFolder("Sources/Scenes");
-
+		auto sceneFiles = getAssetsInFolder(getAssetFilePath("Sources/Scenes"));
 		if (openScenePanel)
 		{
 			ImGui::OpenPopup("Scene Level Selection");
@@ -565,12 +673,11 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
 			// list all scene files
-			for (auto& [fileName, fullPath] : sceneFiles)
+			for (auto& scenesAsset: sceneFiles)
 			{
 				
-				if (ImGui::Selectable(fileName.c_str()))
+				if (ImGui::Selectable(scenesAsset.name.c_str()))
 				{
-					
 					if (!m_Scene)
 					{
 						LOG_ERROR("No active scene exists to load into!");
@@ -582,10 +689,10 @@ namespace Engine
 					registry.clear();
 					
 					// load the selected scene file
-					if (m_Scene->LoadFromFile(fullPath))
+					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
 					{
 						//LOG_ERROR("Failed to load scene %s", sceneFiles);
-						currScenePath = fullPath;
+						currScenePath = scenesAsset.fullPath;
 						LOG_INFO("Scene loaded successfully: ", currScenePath);
 						openScenePanel = false; //  reset after select scene
 						ImGui::CloseCurrentPopup();
@@ -604,28 +711,6 @@ namespace Engine
 		}
 	}
 
-	std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
-	{
-		std::string folderPath = Engine::getAssetFilePath(folderName);
-		//LOG_DEBUG("Scene search path: ", folderPath);
-		//std::filesystem::path exeDir = std::filesystem::current_path();
-		//LOG_DEBUG("This is in", exeDir);
-		assert(!folderPath.empty() && "Folder path is empty!");
-		assert(std::filesystem::exists(folderPath) && std::filesystem::is_directory(folderPath) && "Folder does not exist!");
-
-		std::vector<std::pair<std::string, std::string>> files;
-
-		for (const auto& entry : std::filesystem::directory_iterator(folderPath))
-		{
-			if (std::filesystem::is_regular_file(entry.path()))
-			{
-				// .first = filename, .second = full path
-				files.emplace_back(entry.path().filename().string(), entry.path().generic_string());
-			}
-		}
-
-		return files;
-	}
 	void Editor::saveAsScenePanel()
 	{
 
@@ -724,5 +809,26 @@ namespace Engine
 			ImGui::EndPopup(); // end pop up for save as scene panel
 		}
 	}
+
+	std::vector<Editor::AssetEntry> Editor::getAssetsInFolder(const std::string& folderPath)
+	{
+		std::vector<AssetEntry> entries;
+
+		if (!std::filesystem::exists(folderPath) || !std::filesystem::is_directory(folderPath))
+			return entries;
+
+		for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+		{
+			entries.push_back({
+				entry.path().filename().string(),
+				entry.path().generic_string(),
+				});
+		}
+
+		return entries;
+	}
+
+	
+
 
 } // end of namespace Engine
