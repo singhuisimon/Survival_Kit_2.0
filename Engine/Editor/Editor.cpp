@@ -316,7 +316,7 @@ namespace Engine
 		ImGui::PopStyleVar();
 
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+		//ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
 		// Display menu bar
 		displayTopMenu();
