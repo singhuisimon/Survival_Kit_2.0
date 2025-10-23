@@ -16,6 +16,8 @@
 #include "../Component/MeshRendererComponent.h"
 #include "../Component/RigidbodyComponent.h"
 #include "../Component/PrefabComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
 #include "../Utility/Logger.h"
 
  // Required for quaternion to Euler conversion

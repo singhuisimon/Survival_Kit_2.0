@@ -16,6 +16,8 @@
 #include "../Component/CameraComponent.h"
 #include "../Component/MeshRendererComponent.h"
 #include "../Component/RigidbodyComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -285,6 +287,53 @@ namespace Engine {
             if (properties.HasMember("Velocity") && properties["Velocity"].IsArray()) {
                 const auto& vel = properties["Velocity"];
                 comp.Velocity = glm::vec3(vel[0].GetFloat(), vel[1].GetFloat(), vel[2].GetFloat());
+            }
+        }
+        else if (componentType == "AudioComponent") {
+            auto& comp = entity.AddComponent<AudioComponent>();
+
+            if (properties.HasMember("AudioFilePath")) {
+                comp.AudioFilePath = properties["AudioFilePath"].GetString();
+            }
+            if (properties.HasMember("Type")) {
+                comp.Type = static_cast<AudioType>(properties["Type"].GetInt());
+            }
+            if (properties.HasMember("State")) {
+                comp.State = static_cast<PlayState>(properties["State"].GetInt());
+            }
+            if (properties.HasMember("Volume")) {
+                comp.Volume = properties["Volume"].GetFloat();
+            }
+            if (properties.HasMember("Pitch")) {
+                comp.Pitch = properties["Pitch"].GetFloat();
+            }
+            if (properties.HasMember("Loop")) {
+                comp.Loop = properties["Loop"].GetBool();
+            }
+            if (properties.HasMember("Mute")) {
+                comp.Mute = properties["Mute"].GetBool();
+            }
+            if (properties.HasMember("Is3D")) {
+                comp.Is3D = properties["Is3D"].GetBool();
+            }
+            if (properties.HasMember("MinDistance")) {
+                comp.MinDistance = properties["MinDistance"].GetFloat();
+            }
+            if (properties.HasMember("MaxDistance")) {
+                comp.MaxDistance = properties["MaxDistance"].GetFloat();
+            }
+            if (properties.HasMember("ReverbProperties")) {
+                comp.ReverbProperties = properties["ReverbProperties"].GetFloat();
+            }
+
+            // Runtime fields are NOT deserialized (Channel, IsDirty, PreviousPath)
+            // They will be initialized to their default values
+        }
+        else if (componentType == "ListenerComponent") {
+            auto& comp = entity.AddComponent<ListenerComponent>();
+
+            if (properties.HasMember("Active")) {
+                comp.Active = properties["Active"].GetBool();
             }
         }
     }

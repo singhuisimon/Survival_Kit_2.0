@@ -14,6 +14,8 @@
 #include "../Component/CameraComponent.h"
 #include "../Component/MeshRendererComponent.h"
 #include "../Component/RigidbodyComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -307,6 +309,43 @@ namespace Engine {
             velArray.PushBack(rb.Velocity.y, allocator);
             velArray.PushBack(rb.Velocity.z, allocator);
             propertiesObj.AddMember("Velocity", velArray, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize AudioComponent
+        if (entity.HasComponent<AudioComponent>()) {
+            const auto& audio = entity.GetComponent<AudioComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "AudioComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("AudioFilePath",
+                rapidjson::Value(audio.AudioFilePath.c_str(), allocator), allocator);
+            propertiesObj.AddMember("Type", static_cast<int>(audio.Type), allocator);
+            propertiesObj.AddMember("State", static_cast<int>(audio.State), allocator);
+            propertiesObj.AddMember("Volume", audio.Volume, allocator);
+            propertiesObj.AddMember("Pitch", audio.Pitch, allocator);
+            propertiesObj.AddMember("Loop", audio.Loop, allocator);
+            propertiesObj.AddMember("Mute", audio.Mute, allocator);
+            propertiesObj.AddMember("Is3D", audio.Is3D, allocator);
+            propertiesObj.AddMember("MinDistance", audio.MinDistance, allocator);
+            propertiesObj.AddMember("MaxDistance", audio.MaxDistance, allocator);
+            propertiesObj.AddMember("ReverbProperties", audio.ReverbProperties, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize ListenerComponent
+        if (entity.HasComponent<ListenerComponent>()) {
+            const auto& listener = entity.GetComponent<ListenerComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ListenerComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Active", listener.Active, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
