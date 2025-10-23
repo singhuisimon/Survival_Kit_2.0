@@ -10,88 +10,31 @@
 
 #pragma once
 
-#include "../Asset/ResourceTypes.h"
-#include "../Utility/Types.h"
+#include "Utility/Types.h"
 
 namespace Engine {
 
     /**
-     * @brief Mesh renderer component - controls rendering of 3D meshes
+     * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
-        /// Unique identifier for this component instance
-        xresource::instance_guid ComponentGUID;
+        bool Visible;           // Determine if sent to draw call
+        bool ShadowReceive;     // For future expansion (WIP)
+        bool ShadowCast;        // For future expansion (WIP)
+        bool GlobalIlluminate;  // Require further expansion; for now true means it receives light from a light object
+        u32 MeshType;           // Mesh that the object uses (primitive/custom)
+        u32 Material;           // Material handle
+        u32 Texture;            // Texture handle (0 means no texture, actual textures start from 1)
 
-        /// Whether this mesh should be rendered
-        bool Visible;
-
-        /// Mesh type/handle
-        u32 MeshType;
-
-        /// Material handle
-        u32 Material;
-
-        /// Texture handle
-        u32 Texture;
-
-        /**
-         * @brief Default constructor - creates visible mesh renderer
-         */
+        // Default constructor
         MeshRendererComponent()
-            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , Visible(true)
-            , MeshType(0)
-            , Material(0)
-            , Texture(0) {
-        }
-
-        /**
-         * @brief Constructor with visibility setting
-         * @param visible Initial visibility state
-         */
-        explicit MeshRendererComponent(bool visible)
-            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , Visible(visible)
-            , MeshType(0)
-            , Material(0)
-            , Texture(0) {
-        }
-
-        /**
-         * @brief Set visibility
-         * @param visible Whether the mesh should be visible
-         */
-        void SetVisible(bool visible) {
-            Visible = visible;
-        }
-
-        /**
-         * @brief Check if mesh is visible
-         * @return True if mesh should be rendered
-         */
-        bool IsVisible() const {
-            return Visible;
-        }
-
-        /**
-         * @brief Show the mesh
-         */
-        void Show() {
-            Visible = true;
-        }
-
-        /**
-         * @brief Hide the mesh
-         */
-        void Hide() {
-            Visible = false;
-        }
-
-        /**
-         * @brief Toggle visibility
-         */
-        void ToggleVisibility() {
-            Visible = !Visible;
+            : Visible(true),
+            ShadowReceive(false),
+            ShadowCast(false),
+            GlobalIlluminate(true),
+            MeshType(0),
+            Material(0),
+            Texture(0) {
         }
     };
 

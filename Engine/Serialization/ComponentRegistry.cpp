@@ -74,6 +74,36 @@ namespace Engine {
         // Register CameraComponent
         {
             auto& meta = REGISTER_COMPONENT(CameraComponent);
+            meta.AddProperty<CameraComponent, bool>(
+                "Enabled",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.Enabled; },
+                [](CameraComponent& c, const bool& v) { c.Enabled = v; }
+            );
+            meta.AddProperty<CameraComponent, bool>(
+                "autoAspect",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.autoAspect; },
+                [](CameraComponent& c, const bool& v) { c.autoAspect = v; }
+            );
+            meta.AddProperty<CameraComponent, bool>(
+                "isDirty",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.isDirty; },
+                [](CameraComponent& c, const bool& v) { c.isDirty = v; }
+            );
+            meta.AddProperty<CameraComponent, u32>(
+                "Depth",
+                PropertyType::U32,
+                [](const CameraComponent& c) { return c.Depth; },
+                [](CameraComponent& c, const u32& v) { c.Depth = v; }
+            );
+            meta.AddProperty<CameraComponent, float>(
+                "Aspect",
+                PropertyType::Float,
+                [](const CameraComponent& c) { return c.Aspect; },
+                [](CameraComponent& c, const float& v) { c.Aspect = v; }
+            );
             meta.AddProperty<CameraComponent, float>(
                 "FOV",
                 PropertyType::Float,
@@ -81,22 +111,22 @@ namespace Engine {
                 [](CameraComponent& c, const float& v) { c.FOV = v; }
             );
             meta.AddProperty<CameraComponent, float>(
-                "NearClip",
+                "NearPlane",
                 PropertyType::Float,
-                [](const CameraComponent& c) { return c.NearClip; },
-                [](CameraComponent& c, const float& v) { c.NearClip = v; }
+                [](const CameraComponent& c) { return c.NearPlane; },
+                [](CameraComponent& c, const float& v) { c.NearPlane = v; }
             );
             meta.AddProperty<CameraComponent, float>(
-                "FarClip",
+                "FarPlane",
                 PropertyType::Float,
-                [](const CameraComponent& c) { return c.FarClip; },
-                [](CameraComponent& c, const float& v) { c.FarClip = v; }
+                [](const CameraComponent& c) { return c.FarPlane; },
+                [](CameraComponent& c, const float& v) { c.FarPlane = v; }
             );
-            meta.AddProperty<CameraComponent, bool>(
-                "Primary",
-                PropertyType::Bool,
-                [](const CameraComponent& c) { return c.Primary; },
-                [](CameraComponent& c, const bool& v) { c.Primary = v; }
+            meta.AddProperty<CameraComponent, glm::vec3>(
+                "Target",
+                PropertyType::Vec3,
+                [](const CameraComponent& c) { return c.Target; },
+                [](CameraComponent& c, const glm::vec3& v) { c.Target = v; }
             );
         }
 
@@ -108,6 +138,48 @@ namespace Engine {
                 PropertyType::Bool,
                 [](const MeshRendererComponent& c) { return c.Visible; },
                 [](MeshRendererComponent& c, const bool& v) { c.Visible = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "ShadowReceive",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.ShadowReceive; },
+                [](MeshRendererComponent& c, const bool& v) { c.ShadowReceive = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "ShadowCast",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.ShadowCast; },
+                [](MeshRendererComponent& c, const bool& v) { c.ShadowCast = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "GlobalIlluminate",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.GlobalIlluminate; },
+                [](MeshRendererComponent& c, const bool& v) { c.GlobalIlluminate = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "MeshType",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.MeshType; },
+                [](MeshRendererComponent& c, const u32& v) { c.MeshType = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "Material",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.Material; },
+                [](MeshRendererComponent& c, const u32& v) { c.Material = v; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "Texture",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.Texture; },
+                [](MeshRendererComponent& c, const u32& v) { c.Texture = v; }
             );
         }
 
