@@ -11,6 +11,7 @@
 #include "../Component/TransformComponent.h"
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
 
 namespace Engine {
 
