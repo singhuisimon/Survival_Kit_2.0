@@ -21,7 +21,7 @@ namespace Engine
 		m_Scene = scene;
 	}
 
-	void Editor::OnInit()
+	void Editor::OnInit(GLuint texhandle)
 	{
 		if (m_Initialized)
 		{
@@ -56,6 +56,9 @@ namespace Engine
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 		ImGui_ImplOpenGL3_Init();
 
+		// Save created FBO texture handle
+		m_FBOTextureHandle = texhandle;
+
 		m_Initialized = true;
 
 	}
@@ -70,7 +73,9 @@ namespace Engine
 		displayTopMenu();
 
 		//// Enable Docking Function
-		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+		renderViewport();
 
 		// Panel Logic
 		displayPropertiesPanel();
@@ -302,8 +307,47 @@ namespace Engine
 
 	void Editor::renderViewport()
 	{
-		// Logic here 
 
+		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
+
+		// Hard-coded values just in case (Will change values later)
+		ImVec2 viewportSize =
+		{
+			 600,
+			 600
+		};
+
+		if (m_Window) {
+
+			int width = 0.f;
+			int height = 0.f;
+			glfwGetWindowSize(m_Window, &width, &height);
+
+			viewportSize =
+			{
+				 static_cast<float>(static_cast<float>(width)) / 2.0f,
+				 static_cast<float>(static_cast<float>(height)) / 2.0f
+			};
+
+		}
+
+		ImGui::Begin("Viewport");
+
+		// Uncomment this once the viewport texture has been obtained
+		if (m_FBOTextureHandle) {
+			ImVec2 imagePos = ImGui::GetCursorScreenPos();
+
+			ImGui::Image((ImTextureID)(intptr_t)m_FBOTextureHandle,
+				viewportSize,
+				ImVec2(0, 1), ImVec2(1, 0));
+
+			// TODO: Handle mouse in viewport
+			//handleViewPortClick(imagePos, viewportSize);
+		}
+
+		ImGui::End();
+		
+		
 	}
 
 	// Render after Render System

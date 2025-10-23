@@ -186,11 +186,11 @@ namespace Engine {
 			return;
 		}
 
-		if (!audio->PreviousPath.empty() && (audio->PreviousPath != audio->AudioFilePath)) {
-			// Stop previous sound if different
-			StopSound(audio);
-			LOG_INFO("AudioManager::PlaySound - Stopped previous sound: ", audio->PreviousPath);
-		}
+		//if (!audio->PreviousPath.empty() && (audio->PreviousPath != audio->AudioFilePath)) {
+		//	// Stop previous sound if different
+		//	StopSound(audio);
+		//	LOG_INFO("AudioManager::PlaySound - Stopped previous sound: ", audio->PreviousPath);
+		//}
 
 		FMOD::Channel* channel = nullptr;
 		FMOD::ChannelGroup* group = GetGroup(audio->Type);
@@ -208,7 +208,7 @@ namespace Engine {
 			channel->setVolume(audio->Volume);
 			channel->setPitch(audio->Pitch);
 			channel->setMute(audio->Mute);
-			channel->setReverbProperties(0, audio->Reverb ? 1.0f : 0.0f);
+			channel->setReverbProperties(0, audio->ReverbProperties);
 
 			FMOD_MODE mode = FMOD_DEFAULT;
 			mode |= audio->Is3D ? FMOD_3D : FMOD_2D;
@@ -349,12 +349,6 @@ namespace Engine {
 			float current_volume;
 			audio->Channel->getVolume(&current_volume);
 
-			/*const int ramp_step = 5;
-			for(int i = ramp_step; i >= 0; --i) {
-				float vol = current_volume * (static_cast<float>(i) / static_cast<float>(ramp_step));
-				audio->Channel->setVolume(vol);
-			}*/
-
 			unsigned long long dspClock;
 			audio->Channel->getDSPClock(nullptr, &dspClock);
 			audio->Channel->addFadePoint(dspClock, current_volume);
@@ -364,8 +358,7 @@ namespace Engine {
 			audio->Channel->stop();
 			LOG_INFO("AudioManager::StopSound - Stopped sound: ", audio->AudioFilePath);
 		}
-		//audio->PreviousState = audio->State;
-		//audio->State = PlayState::STOP;
+
 		audio->Channel = nullptr;
 		LOG_INFO("AudioManager::StopSound - Set State to STOP: ", audio->AudioFilePath);
 		audio->PreviousPath = "";
@@ -376,6 +369,7 @@ namespace Engine {
 			return;
 		}
 
+		//check if the audio has finish playing <guard>
 		FMOD::Channel* channel = audio->Channel;
 		bool isPlaying = false;
 		channel->isPlaying(&isPlaying);
@@ -383,30 +377,17 @@ namespace Engine {
 			return;
 		}
 
-		//Update playback parameters
-		channel->setVolume(audio->Volume);
-		channel->setPitch(audio->Pitch);
-		channel->setMute(audio->Mute);
-		channel->setReverbProperties(0, audio->Reverb ? 1.0f : 0.0f);
+		// If a script changed audio properties, apply them
+		if (audio->IsDirty) {
+			if (!audio->PreviousPath.empty() && (audio->PreviousPath != audio->AudioFilePath)) {
+				// Stop previous sound if different
+				StopSound(audio);
+				LOG_INFO("AudioManager::PlaySound - Stopped previous sound: ", audio->PreviousPath);
+				audio->IsDirty = false;
+				return;
+			}
 
-		//Looping mode
-		FMOD_MODE mode;
-		channel->getMode(&mode);
-		if (audio->Loop && !(mode & FMOD_LOOP_NORMAL)) {
-			channel->setMode((mode & ~FMOD_LOOP_OFF) | FMOD_LOOP_NORMAL);
-			channel->setLoopCount(-1);
-		}
-		else if (!audio->Loop && (mode & FMOD_LOOP_NORMAL)) {
-			channel->setMode((mode & ~FMOD_LOOP_NORMAL) | FMOD_LOOP_OFF);
-			channel->setLoopCount(0);
-		}
-
-		//3D mode update
-		if (audio->Is3D && !(mode & FMOD_3D)) {
-			channel->setMode((mode & ~FMOD_2D) | FMOD_3D);
-		}
-		else if (!audio->Is3D && (mode & FMOD_3D)) {
-			channel->setMode((mode & ~FMOD_3D) | FMOD_2D);
+			ApplyDirtySettings(audio);
 		}
 
 		//update 3d attributes
@@ -437,8 +418,6 @@ namespace Engine {
 
 			if (!(LogFMODError(result, "Checking Channel Play Status")) || !isPlaying) {
 				audio->Channel = nullptr;
-				//audio->PreviousState = audio->State;
-				//audio->State = PlayState::STOP;
 
 				LOG_INFO("AudioManager - Auto-Stop: {} finish playing", audio->AudioFilePath);
 			}
@@ -500,7 +479,7 @@ namespace Engine {
 
 
 		// Use AssetPath helper
-		std::string fullpath = getAssetFilePath("Audio/" + filepath);
+		std::string fullpath = getAssetFilePath("Sources/Audio/" + filepath);
 
 		FMOD::Sound* newSound = nullptr;
 
@@ -675,12 +654,28 @@ namespace Engine {
 		return true;
 	}
 
-	std::string AudioManager::GetFullPath(const std::string& filepath) {
-		// This function can be expanded to handle relative paths, asset directories, etc.
-		// Help Implement
-		// Path is: C:\Users\Admin\source\repos\Survival_Kit_2.0\Resources\Sources\Audio
-		return "C:/Users/Admin/source/repos/Survival_Kit_2.0/Resources/Audio/" + filepath;
+	// AudioManager.cpp — NEW HELPER
+	void AudioManager::ApplyDirtySettings(AudioComponent* audio) {
+		if (!audio || !audio->Channel) return;
+
+		// Volume / Pitch / Mute
+		audio->Channel->setVolume(audio->Volume);
+		audio->Channel->setPitch(audio->Pitch);
+		audio->Channel->setMute(audio->Mute);
+
+		// Loop settings
+		FMOD_MODE mode = FMOD_DEFAULT;
+		mode |= audio->Is3D ? FMOD_3D : FMOD_2D;
+		mode |= audio->Loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+		audio->Channel->setMode(mode);
+		audio->Channel->setLoopCount(audio->Loop ? -1 : 0);
+
+		// Reverb 
+		audio->Channel->setReverbProperties(0, audio->ReverbProperties);
+
+		audio->IsDirty = false; // synced
 	}
+
 
 	FMOD::DSP* AudioManager::CreateDSP(DSPEffectType effect, AudioType group) {
 		if (!initialized || !coresystem) {

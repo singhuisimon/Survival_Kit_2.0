@@ -252,7 +252,7 @@ namespace Engine {
 	void Renderer::beginFrame(RenderPass const& pass) {
 
 		auto& fbo = m_framebuffers[pass.fbo_handle];
-		//glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle()));
+		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle()));
 
 		auto& viewport = pass.view_port;
 		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y), 
@@ -307,25 +307,46 @@ namespace Engine {
 		prog.programUse();
 	}
 
-	void Renderer::render_frame(std::span<const DrawItem> draw_items) {
+	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list) {
 
+		//// For rendering all enabled camera displays
+		//for (const auto& cam : camera_list) {
+		//	
+		//	for (const auto& pass : m_passes) {
+
+		//		if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+
+		//		// Begin drawing frame
+		//		beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
+		//		draw(pass, draw_items, cam.View, cam.Persp);
+		//		endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
+		//	}
+		//}
+
+		// For rendering from editor's camera
+		glm::mat4 v = editor_camera.getLookAt(); // Editor camera view transform
 		for (const auto& pass : m_passes) {
 
 			if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
-			beginFrame(pass);
-			draw(pass, draw_items);
-			endFrame(pass);
+			// Get camera perspective transform
+			glm::mat4 p = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+
+			// Begin drawing frame
+			beginFrame(pass); 
+			draw(pass, draw_items, v, p);
+			endFrame(pass); 
 		}
+
 	}
 
-	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items) {
+	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4 v, const glm::mat4 p) {
 
 
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
-		prog.setUniform("V", editor_camera.getLookAt());                // View transform
-		prog.setUniform("P", editor_camera.getPerspective());           // Perspective transform
+		prog.setUniform("V", v);					// View transform
+		prog.setUniform("P", p);					// Perspective transform
 
 		prog.setUniform("light.position", editor_light.getLightPos());      // Position
 		prog.setUniform("light.La", editor_light.getLightAmbient());        // Ambient
@@ -400,6 +421,6 @@ namespace Engine {
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 		prog.programFree();
 		glBindTextureUnit(0, 0);
-		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
