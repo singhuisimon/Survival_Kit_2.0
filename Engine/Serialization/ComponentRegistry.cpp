@@ -199,11 +199,11 @@ namespace Engine {
                 [](const AudioComponent& c) { return c.Mute; },
                 [](AudioComponent& c, const bool& v) { c.Mute = v; }
             );
-            meta.AddProperty<AudioComponent, bool>(
-                "Reverb",
-                PropertyType::Bool,
-                [](const AudioComponent& c) { return c.Reverb; },
-                [](AudioComponent& c, const bool& v) { c.Reverb = v; }
+            meta.AddProperty<AudioComponent, float>(
+                "ReverbProperties",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.ReverbProperties; },
+                [](AudioComponent& c, const float& v) { c.ReverbProperties = v; }
             );
             meta.AddProperty<AudioComponent, bool>(
                 "Is3D",

@@ -198,7 +198,7 @@ namespace Engine {
                 propertiesObj.AddMember("Pitch", audio.Pitch, allocator);
                 propertiesObj.AddMember("Loop", audio.Loop, allocator);
                 propertiesObj.AddMember("Mute", audio.Mute, allocator);
-                propertiesObj.AddMember("Reverb", audio.Reverb, allocator);
+                propertiesObj.AddMember("ReverbProperties", audio.ReverbProperties, allocator);
                 propertiesObj.AddMember("Is3D", audio.Is3D, allocator);
                 propertiesObj.AddMember("MinDistance", audio.MinDistance, allocator);
                 propertiesObj.AddMember("MaxDistance", audio.MaxDistance, allocator);
@@ -413,7 +413,7 @@ namespace Engine {
 						if (properties.HasMember("Mute"))
 							audio.Mute = properties["Mute"].GetBool();
 						if (properties.HasMember("Reverb"))
-							audio.Reverb = properties["Reverb"].GetBool();
+							audio.ReverbProperties = properties["ReverbProperties"].GetFloat();
 						if (properties.HasMember("Is3D"))
 							audio.Is3D = properties["Is3D"].GetBool();
 						if (properties.HasMember("MinDistance"))
