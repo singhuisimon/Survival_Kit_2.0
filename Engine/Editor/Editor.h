@@ -108,7 +108,6 @@ namespace Engine
 
 		// Helper function for searching and return the files
 		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
-
 		// ========================= Helper Function ======================================
 		// helper function to open scene files from top menu
 		void sceneOpenPanel();
@@ -116,8 +115,6 @@ namespace Engine
 		// open save as panel after select from top menu
 		void saveAsScenePanel();
 
-		// Complete the ImGui frame
-		void CompleteFrame();
 	};
 
 
