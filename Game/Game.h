@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Application.h"
 #include "ECS/Scene.h"
+#include "Audio/AudioManager.h"
 #include "Editor/Editor.h"
 #include "Utility/Logger.h"
 #include <memory>
@@ -40,6 +41,8 @@ private:
     // Editor 
     std::unique_ptr<Engine::Editor> m_Editor; 
     float m_ColorShift = 0.0f;
+
+	std::unique_ptr<Engine::AudioManager> m_AudioManager;
 
     /**
      * @brief Create a default scene if loading from file fails
