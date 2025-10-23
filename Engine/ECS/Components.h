@@ -4,10 +4,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
+#include <fmod.hpp>
 #include "Utility/Types.h"
 
 // Components
 #include "../Component/TransformComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
 
 namespace Engine {
 

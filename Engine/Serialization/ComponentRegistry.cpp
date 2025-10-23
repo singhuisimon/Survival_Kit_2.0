@@ -153,8 +153,92 @@ namespace Engine {
             );
         }
 
+        //Register AudioComponent
+        {
+            auto& meta = REGISTER_COMPONENT(AudioComponent);
+
+            meta.AddProperty<AudioComponent, std::string>(
+                "Filepath",
+                PropertyType::String,
+                [](const AudioComponent& c) { return c.AudioFilePath; },
+                [](AudioComponent& c, const std::string& v) { c.AudioFilePath = v; }
+            );
+            meta.AddProperty<AudioComponent, AudioType>(
+                "Type",
+                PropertyType::Int,
+                [](const AudioComponent& c) { return c.Type; },
+                [](AudioComponent& c, const AudioType& v) { c.Type = v; }
+            );
+            meta.AddProperty<AudioComponent, PlayState>(
+                "State",
+                PropertyType::Int,
+                [](const AudioComponent& c) { return c.State; },
+                [](AudioComponent& c, const PlayState& v) { c.State = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "Volume",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.Volume; },
+                [](AudioComponent& c, const float& v) { c.Volume = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "Pitch",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.Pitch; },
+                [](AudioComponent& c, const float& v) { c.Pitch = v; }
+            );
+            meta.AddProperty<AudioComponent, bool>(
+                "Loop",
+                PropertyType::Bool,
+                [](const AudioComponent& c) { return c.Loop; },
+                [](AudioComponent& c, const bool& v) { c.Loop = v; }
+            );
+            meta.AddProperty<AudioComponent, bool>(
+                "Mute",
+                PropertyType::Bool,
+                [](const AudioComponent& c) { return c.Mute; },
+                [](AudioComponent& c, const bool& v) { c.Mute = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "ReverbProperties",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.ReverbProperties; },
+                [](AudioComponent& c, const float& v) { c.ReverbProperties = v; }
+            );
+            meta.AddProperty<AudioComponent, bool>(
+                "Is3D",
+                PropertyType::Bool,
+                [](const AudioComponent& c) { return c.Is3D; },
+                [](AudioComponent& c, const bool& v) { c.Is3D = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "MinDistance",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.MinDistance; },
+                [](AudioComponent& c, const float& v) { c.MinDistance = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "MaxDistance",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.MaxDistance; },
+                [](AudioComponent& c, const float& v) { c.MaxDistance = v; }
+            );
+        }
+
+        //Register ListenerComponenet
+        {
+            auto& meta = REGISTER_COMPONENT(ListenerComponent);
+
+            meta.AddProperty<ListenerComponent, bool>(
+                "Active",
+                PropertyType::Bool,
+                [](const ListenerComponent& c) { return c.Active; },
+                [](ListenerComponent& c, const bool& v) { c.Active = v; }
+            );
+        }
+
         LOG_INFO("Component reflection registration complete");
-        LOG_INFO("  - Registered 5 component types");
+        LOG_INFO("  - Registered 7 component types");
     }
 
 } // namespace Engine
