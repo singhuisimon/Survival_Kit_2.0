@@ -8,6 +8,8 @@
 #include "../Component/RigidbodyComponent.h"
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
+
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
 

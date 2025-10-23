@@ -18,6 +18,7 @@
 #include "../Component/RigidbodyComponent.h"
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -335,6 +336,37 @@ namespace Engine {
             if (properties.HasMember("Active")) {
                 comp.Active = properties["Active"].GetBool();
             }
+        }
+        else if (componentType == "ReverbComponent") {
+            auto& comp = entity.AddComponent<ReverbZoneComponent>();
+
+            if (properties.HasMember("Preset")) {
+                comp.Preset = static_cast<ReverbPreset>(properties["Preset"].GetInt());
+            }
+            if (properties.HasMember("MinDistance")) {
+                comp.MinDistance = properties["MinDistance"].GetFloat();
+            }
+            if (properties.HasMember("MaxDistance")) {
+                comp.MaxDistance = properties["MaxDistance"].GetFloat();
+            }
+            if (properties.HasMember("DecayTime")) {
+                comp.DecayTime = properties["DecayTime"].GetFloat();
+            }
+            if (properties.HasMember("HfDecayRatio")) {
+                comp.HfDecayRatio = properties["HfDecayRatio"].GetFloat();
+            }
+            if (properties.HasMember("Diffusion")) {
+                comp.Diffusion = properties["Diffusion"].GetFloat();
+            }
+            if (properties.HasMember("Density")) {
+                comp.Density = properties["Density"].GetFloat();
+            }
+            if (properties.HasMember("WetLevel")) {
+                comp.WetLevel = properties["WetLevel"].GetFloat();
+            }
+
+            // Runtime fields are NOT deserialized (ReverbZone, IsDirty)
+            // They will be initialized to their default values
         }
     }
 

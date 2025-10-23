@@ -16,6 +16,7 @@
 #include "../Component/RigidbodyComponent.h"
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -346,6 +347,26 @@ namespace Engine {
 
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
             propertiesObj.AddMember("Active", listener.Active, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize ReverbComponent
+        if (entity.HasComponent<ReverbZoneComponent>()) {
+            const auto& reverb = entity.GetComponent<ReverbZoneComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ReverbComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Preset", static_cast<int>(reverb.Preset), allocator);
+            propertiesObj.AddMember("MinDistance", reverb.MinDistance, allocator);
+            propertiesObj.AddMember("MaxDistance", reverb.MaxDistance, allocator);
+            propertiesObj.AddMember("DecayTime", reverb.DecayTime, allocator);
+            propertiesObj.AddMember("HfDecayRatio", reverb.HfDecayRatio, allocator);
+            propertiesObj.AddMember("Diffusion", reverb.Diffusion, allocator);
+            propertiesObj.AddMember("Density", reverb.Density, allocator);
+            propertiesObj.AddMember("WetLevel", reverb.WetLevel, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
