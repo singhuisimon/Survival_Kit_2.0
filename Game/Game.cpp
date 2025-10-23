@@ -146,7 +146,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExamplScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -229,7 +229,7 @@ void Game::CreateDefaultScene() {
     playerAudio.Pitch = 1.0f;
     playerAudio.Loop = false;
     playerAudio.Mute = false;
-    playerAudio.Reverb = true;
+    playerAudio.ReverbProperties = 1.0f;
     playerAudio.Is3D = true;
     playerAudio.MinDistance = 1.0f;
     playerAudio.MaxDistance = 50.0f;
@@ -313,7 +313,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
             if (audio.AudioFilePath.empty()) {
                 audio.AudioFilePath = "laserSmall_001.ogg";
             }
-            audio.PreviousState = audio.State;
+
             audio.State = Engine::PlayState::PLAY;
         }
     }
@@ -322,7 +322,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
         auto& registry = m_Scene->GetRegistry();
         for (auto entityHandle : registry.view<Engine::AudioComponent>()) {
             auto& audio = registry.get<Engine::AudioComponent>(entityHandle);
-            audio.PreviousState = audio.State;
             audio.State = Engine::PlayState::PAUSE;
         }
     }
@@ -330,7 +329,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
         auto& registry = m_Scene->GetRegistry();
         for (auto entityHandle : registry.view<Engine::AudioComponent>()) {
             auto& audio = registry.get<Engine::AudioComponent>(entityHandle);
-            audio.PreviousState = audio.State;
             audio.State = Engine::PlayState::STOP;
         }
     }

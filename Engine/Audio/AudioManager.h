@@ -82,7 +82,7 @@ namespace Engine {
 
 		static bool LogFMODError(FMOD_RESULT result, const char* context);
 
-		std::string GetFullPath(const std::string& filepath);
+		void ApplyDirtySettings(AudioComponent* audio);
 
 		FMOD::System* coresystem = nullptr;
 

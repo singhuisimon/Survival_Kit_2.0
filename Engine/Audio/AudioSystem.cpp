@@ -103,16 +103,14 @@ namespace Engine {
 			Entity entity(entityHandle, &registry);
 			auto& audio = entity.GetComponent<AudioComponent>();
 
-			if (audio.State == audio.PreviousState && audio.State != PlayState::PLAY) {
+			/*if (audio.State == audio.PreviousState && audio.State != PlayState::PLAY) {
 				continue;
-			}
+			}*/
 
 			TransformComponent* transform = entity.HasComponent<TransformComponent>() ? &entity.GetComponent<TransformComponent>() : nullptr;
 			RigidbodyComponent* rb = entity.HasComponent<RigidbodyComponent>() ? &entity.GetComponent<RigidbodyComponent>() : nullptr;
 
 			UpdateAudioComponentState(entity, audio, transform, rb);
-
-			audio.PreviousState = audio.State;
 
 			m_AudioManager->CheckChannelValid(&audio);
 
