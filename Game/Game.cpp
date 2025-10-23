@@ -148,7 +148,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
