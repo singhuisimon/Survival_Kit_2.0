@@ -6,98 +6,133 @@
 #include <any>
 #include <vector>
 
+#include <variant>
+#include <memory>
+
 namespace Engine {
 
 	//forward declarations
 	class BehaviourTree;
 	class BehaviourNode;
-	class Blackboard;
 
 	/**
-	* @brief Types of AI enemies in the game
+	* @brief Types that can be stored in the blackboard
 	*/
 
-	enum class AIType {
-		NONE,
-		LOVELETTER,
-		TROJAN,
-		ADWARE,
-		//adding more enemy types as needed
-	};
+	using BlackboardValue = std::variant<
+		bool,
+		int,
+		float,
+		glm::vec3,
+		std::string,
+		entt::entity //for storing target entities
+	>;
 
 	/**
-	* @brief Main AI component that drives behaviour
+	* @brief Blackboard - shared memory for AI to store and retrieve data
+	* @details - Each AI entity has its own blackboard instance
+	*/
+
+	using Blackboard = std::unordered_map<std::string, BlackboardValue>;
+
+	/**
+	* @brief AI Component - Holds Behaviour Tree and execution state
+	* @details - Attached to entities that need AI behaviour
 	*/
 
 	struct AIComponent {
 
-		//What type of AI is this?s
-		AIType Type = AIType::NONE;
+		//FOR BEHAVIOUR TREE
+		std::string TreeAssetPath;				//path to behaviour tree
+		BehaviourTree* Tree = nullptr;			//pointer to the loaded tree
+		BehaviourNode* CurrentNode = nullptr;	//currently executing node
 
-		BehaviourTree* Tree = nullptr;
+		//BLACKBOARD
+		Blackboard Data;						//shared memory for this AI
 
-		float TickInterval = 0.1f;
+		//STATE TRACKING
+		bool Active = true;
+		float TickRate = 0.0f;
+		float TimeSinceLastTick = 0.0f;
 
-		float TimeSinceLastTick = 0.01f;
+		//DEBUGGING
+		bool DebugDraw = false;
+		std::string CurrentState = "Idle";
 
-		//Is this AI Active?
-		bool IsActive = true;
-
-		//For debugging
-		std::string CurrentStateName = "Idle";
-
-	};
-
-	/**
-	* @brief Local memory storage for each AI entity
-	* Acts like the AI's "brain" that remembers everything
-	*/
-	struct BlackboardComponent {
-
-		entt::entity CurrentTarget = entt::null;
-
-		glm::vec3 LastKnownTargetPosition = glm::vec3(0.0f);
-
-		float TimeSinceTargetSeen = 0.0f;
-
-		std::vector<entt::entity> ChildPayLoads;
-		int ActivePayloadCount = 0;
-
-		std::unordered_map<std::string, std::any> DataMap;
-
-		template<typename T>
-		void SetValue(const std::string& key, const T& value) {
-			DataMap[key] = value;
+		//DEFAULT CONSTRUCTOR
+		AIComponent()
+			: TreeAssetPath("")
+			, Tree(nullptr)
+			, CurrentNode(nullptr)
+			, Active(true)
+			, TickRate(0.0f)
+			, TimeSinceLastTick(0.0f)
+			, DebugDraw(false)
+			, CurrentState("Idle") {
 		}
 
-		//helper function to get data
+		//CONSTRUCTOR WITH TREE PATH
+		explicit AIComponent(const std::string& treePath)
+			: TreeAssetPath(treePath)
+			, Tree(nullptr)
+			, CurrentNode(nullptr)
+			, Active(true)
+			, TickRate(0.0f)
+			, TimeSinceLastTick(0.0f)
+			, DebugDraw(false)
+			, CurrentState("Idle") {
+		}
+
+		/**
+		* @brief Helper to get blackboard value
+		*/
 		template<typename T>
-		T GetValue(const std::string& key, const T& defaultValue = T{}) {
-			auto it = DataMap.find(key);
-			if (it != DataMap.end()) {
-				try {
-					return std::any_cast<T>(it->second);
-				}
-				catch (...) {
-					return defaultValue;
-				}
+		void SetBlackBoardValue(const std::string& key, const T& value) {
+			Data[key] = value;
+		}
+
+		/**
+		* @brief Helper to get a  blackboard value
+		* @return Pointer to value if exists, else nullptr
+		*/
+
+		template<typename T>
+		T* GetBlackboardValue(const std::string& key) {
+			auto it = Data.find(key);
+			if (it != Data.end()) {
+				return std::_Get_difference_type<T>(&it->second);
 			}
-
-			return defaultValue;
+			return nullptr;
 		}
 
-		//check if there is a value
-		bool HasValue(const std::string& key) const {
-			return DataMap.find(key) != DataMap.end();
+		/**
+		* @brief Check if blackboard has a key
+		*/
+		bool HasBlackboardKey(const std::string& key) const {
+			return Data.find(key) != Data.end();
 		}
+
 	};
 
 	/**
-	* @brief For payload entities that belong to a parent (Like LoveLetter's payload
+	* @brief Payload Component - For enemies that can explode
+	* @details Used by enemies like "LoveLetter" that deal damage based on Payload
 	*/
+
 	struct PayloadComponent {
-		entt::entity ParentEntity = entt::null;
-		int PayLoadIndex = 0;
+		float CurrentPayload = 0.0f;
+		float MaxPayload = 100.0f;
+		float DamageMultiplier = 1.0f;
+		float ExplosionRadius = 5.0f;
+		bool WillExplodeOnCoreCollision = true;
+
+		PayloadComponent()
+			: CurrentPayload(0.0f)
+			, MaxPayload(100.0f)
+			, DamageMultiplier(1.0f)
+			, ExplosionRadius(5.0f)
+			, WillExplodeOnCoreCollision(true) {
+		}
 	};
 
 } //end of namespace Engine
