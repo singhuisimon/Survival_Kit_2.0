@@ -153,6 +153,10 @@ namespace Engine {
             }
         }
 
+        LOG_INFO("Calling OnShutdown()...");
+        OnShutdown();
+        LOG_INFO("OnShutdown() completed");
+
         LOG_INFO("Application loop ended");
     }
 
@@ -169,7 +173,7 @@ namespace Engine {
     void Application::Shutdown() {
         LOG_INFO("Shutting down application...");
 
-        OnShutdown();
+        //OnShutdown();
 
         // Cleanup Input system
         m_Input.reset();

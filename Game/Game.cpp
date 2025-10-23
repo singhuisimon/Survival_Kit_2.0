@@ -6,6 +6,7 @@
 #include "Editor/Editor.h"
 #include "Serialization/ComponentRegistry.h"
 #include "Audio/AudioSystem.h"
+#include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -121,6 +122,7 @@ void Game::OnInit() {
         // m_Scene->AddSystem<Engine::PhysicsSystem>();
         // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
         m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
+        m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
 
         m_Scene->AddSystem<Engine::TransformSystem>();
         m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
@@ -274,6 +276,24 @@ void Game::CreateDefaultScene() {
     ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
 
+    LOG_TRACE("  Creating ReverbZone entity...");
+    auto reverbZone = m_Scene->CreateEntity("CaveReverb");
+    reverbZone.AddComponent<Engine::TagComponent>("CaveReverb");
+
+    auto& rzTransform = reverbZone.AddComponent<Engine::TransformComponent>();
+    rzTransform.Position = glm::vec3(0, 0, 0); // center of world
+    rzTransform.Scale = glm::vec3(1, 1, 1);
+
+    auto& reverb = reverbZone.AddComponent<Engine::ReverbZoneComponent>();
+    reverb.Preset = Engine::ReverbPreset::Cave;
+    reverb.MinDistance = 1.0f;
+    reverb.MaxDistance = 50.0f;
+    reverb.DecayTime = 2500.0f; // long decay
+    reverb.HfDecayRatio = 80.0f;
+    reverb.WetLevel = 0.0f;
+    reverb.IsDirty = true;
+
+    LOG_TRACE("  -> Reverb zone created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -389,9 +409,14 @@ void Game::OnUpdate(Engine::Timestep ts) {
         dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
         LOG_INFO("LowPass cutoff currently: ", cutoff);
     }
+
+    // Move player in/out of the reverb radius with QE to feel falloff
+    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+        auto& tf = foundEntity.GetComponent<Engine::TransformComponent>();
+        if (input.IsKeyPressed(GLFW_KEY_Q)) tf.Position.y += 0.05f;
+        if (input.IsKeyPressed(GLFW_KEY_E)) tf.Position.y -= 0.05f;
+    }
     
-
-
     // === Test Input System ===
 
     // Movement keys - continuous input while held
@@ -502,18 +527,21 @@ void Game::OnShutdown() {
     LOG_INFO("Game shutting down...");
 
     if (m_Scene) {
+        LOG_DEBUG("SHUTTING DOWN SCENE");
         // Shutdown all systems before destroying scene
         m_Scene->ShutdownSystems();
     }
 
     //============= Audio =============
-    LOG_INFO("Shutting down Audio Manager...");
-    try {
-		m_AudioManager->Shutdown();
-        LOG_INFO("  -> Audio Manager shut down successfully");
-    }
-    catch (const std::exception& e) {
-        LOG_ERROR("  -> Exception while shutting down Audio Manager: ", e.what());
+    if (m_AudioManager) {
+        LOG_INFO("Shutting down Audio Manager...");
+        try {
+            m_AudioManager->Shutdown();
+            LOG_INFO("  -> Audio Manager shut down successfully");
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("  -> Exception while shutting down Audio Manager: ", e.what());
+        }
     }
 
     //============= Asset =============
@@ -521,6 +549,8 @@ void Game::OnShutdown() {
     AM.shutDown();
 
     m_Scene.reset();
+    m_AudioManager.reset();
     m_Editor.reset();
+
     LOG_INFO("Game shutdown complete");
 }
