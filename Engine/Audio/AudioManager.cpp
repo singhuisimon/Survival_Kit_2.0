@@ -186,11 +186,11 @@ namespace Engine {
 			return;
 		}
 
-		if (!audio->PreviousPath.empty() && (audio->PreviousPath != audio->AudioFilePath)) {
-			// Stop previous sound if different
-			StopSound(audio);
-			LOG_INFO("AudioManager::PlaySound - Stopped previous sound: ", audio->PreviousPath);
-		}
+		//if (!audio->PreviousPath.empty() && (audio->PreviousPath != audio->AudioFilePath)) {
+		//	// Stop previous sound if different
+		//	StopSound(audio);
+		//	LOG_INFO("AudioManager::PlaySound - Stopped previous sound: ", audio->PreviousPath);
+		//}
 
 		FMOD::Channel* channel = nullptr;
 		FMOD::ChannelGroup* group = GetGroup(audio->Type);
@@ -369,6 +369,7 @@ namespace Engine {
 			return;
 		}
 
+		//check if the audio has finish playing <guard>
 		FMOD::Channel* channel = audio->Channel;
 		bool isPlaying = false;
 		channel->isPlaying(&isPlaying);
@@ -376,30 +377,17 @@ namespace Engine {
 			return;
 		}
 
-		//Update playback parameters
-		channel->setVolume(audio->Volume);
-		channel->setPitch(audio->Pitch);
-		channel->setMute(audio->Mute);
-		channel->setReverbProperties(0, audio->ReverbProperties);
+		// If a script changed audio properties, apply them
+		if (audio->IsDirty) {
+			if (!audio->PreviousPath.empty() && (audio->PreviousPath != audio->AudioFilePath)) {
+				// Stop previous sound if different
+				StopSound(audio);
+				LOG_INFO("AudioManager::PlaySound - Stopped previous sound: ", audio->PreviousPath);
+				audio->IsDirty = false;
+				return;
+			}
 
-		//Looping mode
-		FMOD_MODE mode;
-		channel->getMode(&mode);
-		if (audio->Loop && !(mode & FMOD_LOOP_NORMAL)) {
-			channel->setMode((mode & ~FMOD_LOOP_OFF) | FMOD_LOOP_NORMAL);
-			channel->setLoopCount(-1);
-		}
-		else if (!audio->Loop && (mode & FMOD_LOOP_NORMAL)) {
-			channel->setMode((mode & ~FMOD_LOOP_NORMAL) | FMOD_LOOP_OFF);
-			channel->setLoopCount(0);
-		}
-
-		//3D mode update
-		if (audio->Is3D && !(mode & FMOD_3D)) {
-			channel->setMode((mode & ~FMOD_2D) | FMOD_3D);
-		}
-		else if (!audio->Is3D && (mode & FMOD_3D)) {
-			channel->setMode((mode & ~FMOD_3D) | FMOD_2D);
+			ApplyDirtySettings(audio);
 		}
 
 		//update 3d attributes
@@ -430,8 +418,6 @@ namespace Engine {
 
 			if (!(LogFMODError(result, "Checking Channel Play Status")) || !isPlaying) {
 				audio->Channel = nullptr;
-				//audio->PreviousState = audio->State;
-				//audio->State = PlayState::STOP;
 
 				LOG_INFO("AudioManager - Auto-Stop: {} finish playing", audio->AudioFilePath);
 			}
@@ -684,7 +670,7 @@ namespace Engine {
 		audio->Channel->setMode(mode);
 		audio->Channel->setLoopCount(audio->Loop ? -1 : 0);
 
-		// Reverb send (simple toggle)
+		// Reverb 
 		audio->Channel->setReverbProperties(0, audio->ReverbProperties);
 
 		audio->IsDirty = false; // synced

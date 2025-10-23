@@ -103,21 +103,20 @@ namespace Engine {
 			Entity entity(entityHandle, &registry);
 			auto& audio = entity.GetComponent<AudioComponent>();
 
-			/*if (audio.State == audio.PreviousState && audio.State != PlayState::PLAY) {
-				continue;
-			}*/
-
 			TransformComponent* transform = entity.HasComponent<TransformComponent>() ? &entity.GetComponent<TransformComponent>() : nullptr;
 			RigidbodyComponent* rb = entity.HasComponent<RigidbodyComponent>() ? &entity.GetComponent<RigidbodyComponent>() : nullptr;
 
 			UpdateAudioComponentState(entity, audio, transform, rb);
 
+			//check if the audio has already stop playing if so ensure the channel in the audiocomponet
+			//becomes a nullptr to prevent dangling.
 			m_AudioManager->CheckChannelValid(&audio);
 
 			if (audio.State == PlayState::PLAY && !audio.Channel) {
 				audio.State = PlayState::STOP;
 				LOG_INFO("AudioSystem - Auto Stop detected for finished sound: ", audio.AudioFilePath);
 			}
+
 		}
 
 	}
@@ -125,17 +124,23 @@ namespace Engine {
 	void AudioSystem::UpdateAudioComponentState(Entity entity, AudioComponent& audio, TransformComponent* transform, RigidbodyComponent* rb) {
 		switch (audio.State) {
 		case PlayState::PLAY:
+			//haven't play any sound as no channel assign
 			if (!audio.Channel) {
 				m_AudioManager->PlaySound(&audio, transform, rb);
+				audio.IsDirty = false;
 				LOG_INFO("Entity playing audio: ", audio.AudioFilePath);
 			}
 			else {
+				//sound is already playing
+				//check if the audio is previously pause
 				bool isPaused = false;
 				audio.Channel->getPaused(&isPaused);
 				if (isPaused) {
+					//if so resume it
 					m_AudioManager->PauseSound(&audio, false);
 					LOG_INFO("Entity resume audio: ", audio.AudioFilePath);
 				}
+				//update the sound as it is already playing
 				m_AudioManager->UpdateSound(&audio, transform, rb);
 			}
 			break;
@@ -149,6 +154,7 @@ namespace Engine {
 					LOG_INFO("Entity pause audio: ", audio.AudioFilePath);
 				}
 			}
+			audio.IsDirty = false;
 			break;
 
 		case PlayState::STOP:
@@ -156,6 +162,7 @@ namespace Engine {
 				m_AudioManager->StopSound(&audio);
 				LOG_INFO("Entity stop audio: ", audio.AudioFilePath);
 			}
+			audio.IsDirty = false;
 			break;
 
 		default: 
