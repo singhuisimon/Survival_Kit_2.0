@@ -72,6 +72,8 @@ namespace Engine
 		//// Enable Docking Function
 		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
+		renderViewport();
+
 		// Panel Logic
 		displayPropertiesPanel();
 
@@ -79,7 +81,7 @@ namespace Engine
 
 		displayAssetsBrowserPanel();
 
-		displayPerformanceProfilePanel();
+		displayPerformanceProfilePanel(ts);
 	}
 
 	void Editor::displayTopMenu()
@@ -96,7 +98,12 @@ namespace Engine
 				// ------------- Create New Scene -------------
 				if (ImGui::MenuItem("New"))
 				{
-
+					if (m_Scene)
+					{
+						m_Scene->GetRegistry().clear();
+						currScenePath = "";
+						isNewScene = true;
+					}
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -106,6 +113,28 @@ namespace Engine
 				if (ImGui::MenuItem("Open Scene"))
 				{
 					openScenePanel = true;
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Open Scene from file.");
+				}
+				// --------------- Save Scene -------------------
+				if (ImGui::MenuItem("Save"))
+				{
+					if (!currScenePath.empty())
+					{
+						m_Scene->SaveToFile(currScenePath);
+						LOG_INFO("Current scene path: ", currScenePath);
+					}
+					else
+					{
+						saveAsPanel = true; // redirect to Save as if the current scene is empty
+						if (isNewScene)
+						{
+							saveAsPanel = true;
+						}
+						//LOG_INFO("Current scene has not been saved yet (no file path).");
+					}
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -145,6 +174,16 @@ namespace Engine
 				// close File menu
 				ImGui::EndMenu();
 				ImGui::Separator();
+
+			}
+			// ---------------- Display Current Scene Name ---------------------
+			if (!currScenePath.empty())
+			{
+				std::filesystem::path filePath(currScenePath);
+				std::string fileName = filePath.filename().string();
+
+				ImGui::SameLine(ImGui::GetContentRegionAvail().x - 80.0f);
+				ImGui::TextUnformatted(fileName.c_str());
 			}
 
 			// close main menu bar
@@ -276,17 +315,282 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			
+			ImGui::Columns(2, nullptr, true);
+			static std::string selectedFolder = "";
+			// ================= Left column panel display all the resources folder ========================
+			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			ImGui::Text("Projects:");
+			if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
 
+				for (auto& folder : folders)
+				{
+					bool isSelected = (selectedFolder == folder.fullPath);
+					if (ImGui::Selectable(folder.name.c_str(), isSelected))
+					{
+						selectedFolder = folder.fullPath;
+						selectedResourcesIndex = -1; // reset asset selection
+					}
+				}
+			}
+			ImGui::EndChild(); // end the left column 
+
+			// ===================== Right column panel display the resources files =======================
+
+			ImGui::NextColumn();
+			ImGui::BeginChild("Assets Panel", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			// if folder is selected, display the files
+			if (!selectedFolder.empty())
+			{
+				// to get the files in the selected folder
+				auto assetsList = getAssetsInFolder(selectedFolder); 
+				// display the selected folder name
+				std::filesystem::path folderPath(selectedFolder);
+				std::string folderName = folderPath.filename().string();
+				ImGui::Text(("Assets > " + folderName).c_str());
+
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
+
+				int textureCount = -1;
+				ImGui::Columns(itemsPerRow, nullptr, false);
+
+				// loop through files in selected folder
+				for (size_t i = 0; i < assetsList.size(); i++)
+				{
+					const auto& asset = assetsList[i];
+					std::string fileName = asset.name;
+					std::string filePath = asset.fullPath;
+
+					/*if (asset.name.ends_with(".png") || asset.name.ends_with(".jpeg"))
+					{
+						++textureCount;
+					}*/
+
+					ImGui::PushID(fileName.c_str());
+
+					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+					{
+						selectedResourcesIndex = static_cast<int>(i);
+						//currScenePath = filePath;
+
+						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
+						if (extension == ".json") // if it is scene
+						{
+							if (m_Scene)
+							{
+								m_Scene->GetRegistry().clear();
+								m_Scene->LoadFromFile(filePath);
+								currScenePath = filePath; // update curr file path
+							}
+						}
+					}
+
+					// ==================== Display info detail ==========================
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						ImGui::Text("Name: %s", fileName.c_str());
+						//ImGui::Text("Type: %s", filePath.c_str();
+						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
+						ImGui::Text("Type: %s", extension.c_str());
+						ImGui::EndTooltip();
+					}
+
+					// ==================== To center text under thumbnail ================
+					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
+					float textX = (thumbnailSize - textSize.x) * 0.5f;
+					if (textX < 0) textX = 0;
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+					ImGui::TextWrapped("%s", fileName.c_str());
+
+					ImGui::PopID();
+					ImGui::NextColumn();
+					
+				}
+			}
+
+			ImGui::EndChild(); // end of the right column
+			ImGui::Columns(1);
 		}
-
 		ImGui::End(); // End of the assets browser window
 	}
 
-	void Editor::displayPerformanceProfilePanel()
+	void Editor::displayPerformanceProfilePanel(Timestep ts)
 	{
-		ImGui::SetNextWindowSize(ImVec2(200, 100));
+		ImGui::SetNextWindowSize(ImVec2(500, 300));
 		if (ImGui::Begin("Performance Profile", &performanceProfileWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			ImGui::Text("Tracy Window:");
+			if (ImGui::Button("Launch Tracy Window"))
+			{
+				// TO DO: Tracy Running 
+			}
+
+			ImGui::Separator();
+			// ========================= ImGui Graph Section =============================
+			float deltaTime = ts.GetSeconds();
+			float currFPS = (deltaTime > 0.0f) ? 1.0f / deltaTime : 0.0f;
+			float currFrameTime = ts.GetMilliseconds();
+
+			// ======================= history statistics variables ============================
+			static const int FPS_HISTORY_SIZE = 90;  //store up to 90 frames
+			static float fpsHistory[FPS_HISTORY_SIZE] = {};
+			static float frameTimeHistory[FPS_HISTORY_SIZE] = {}; //for frame time
+			static int fpsHistoryOffset = 0;
+			static int frameCount = 0;
+
+			fpsHistory[fpsHistoryOffset] = currFPS;
+			frameTimeHistory[fpsHistoryOffset] = currFrameTime;
+			fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
+			frameCount = std::min(frameCount + 1, FPS_HISTORY_SIZE);
+
+			//========================== update min/max statistics =============================
+			static float minFPS = FLT_MAX;
+			static float maxFPS = 0.0f;
+			static float minFrameTime = FLT_MAX;
+			static float maxFrameTime = 0.0f;
+
+			minFPS = std::min(minFPS, currFPS);
+			maxFPS = std::max(maxFPS, currFPS);
+			minFrameTime = std::min(minFrameTime, currFrameTime);
+			maxFrameTime = std::max(maxFrameTime, currFrameTime);
+
+			// ======================== Cal average ===================================
+			float avgFPS = 0.0f;
+			float avgFrameTime = 0.0f;
+
+			for (int i = 0; i < FPS_HISTORY_SIZE; i++)
+			{
+				avgFPS += fpsHistory[i];
+				avgFrameTime += frameTimeHistory[i];
+			}
+
+			avgFPS /= frameCount;
+			avgFrameTime /= frameCount;
+
+			// ======================= Showcase statistics ==============================
+			ImGui::Text("Frame Statistics:");
+			ImGui::Spacing();
+			//create a table to display statistics better
+			if (ImGui::BeginTable("StatsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+			{
+				ImGui::TableSetupColumn("Metric", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+				ImGui::TableSetupColumn("Unit", ImGuiTableColumnFlags_WidthFixed, 40.0f);
+				ImGui::TableHeadersRow();
+
+				// Average FPS
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Average FPS:");
+				ImGui::TableNextColumn();
+				ImGui::Text("%.1f", avgFPS);
+				ImGui::TableNextColumn();
+				ImGui::Text("fps");
+
+				// Average Frame Time
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Avg Frame Time:");
+				ImGui::TableNextColumn();
+				ImGui::Text("%.2f", avgFrameTime);
+				ImGui::TableNextColumn();
+				ImGui::Text("ms");
+
+				// Min Frame Time
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Min Frame Time:");
+				ImGui::TableNextColumn();
+				ImGui::Text("%.2f", minFrameTime);
+				ImGui::TableNextColumn();
+				ImGui::Text("ms");
+
+				// Max Frame Time
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Max Frame Time:");
+				ImGui::TableNextColumn();
+				ImGui::Text("%.2f", maxFrameTime);
+				ImGui::TableNextColumn();
+				ImGui::Text("ms");
+
+				ImGui::EndTable();
+			}
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Spacing();
+
+			// ============================= showcase performance graphs section ======================
+			ImGui::Text("Performance Graphs:");
+			ImGui::Spacing();
+			float graphWidth = ImGui::GetContentRegionAvail().x;
+
+			//----------------- FPS graph ---------------------
+			char fpsOverlay[64];
+			sprintf_s(fpsOverlay, sizeof(fpsOverlay), "FPS - avg %.1f", avgFPS);
+
+			float fpsMinScale = (avgFPS - 30.0f > 0.0f) ? (avgFPS - 30.0f) : 0.0f;
+			float fpsMaxScale = avgFPS + 30.0f;
+
+			ImGui::PlotLines(
+				"##FPS",
+				fpsHistory,
+				FPS_HISTORY_SIZE,
+				fpsHistoryOffset,
+				fpsOverlay,
+				fpsMinScale,
+				fpsMaxScale,
+				ImVec2(graphWidth, 100.0f),
+				sizeof(float)
+			);
+			// ----------- frame time graph -------------
+			char frameTimeOverlay[64];
+			sprintf_s(frameTimeOverlay, sizeof(frameTimeOverlay), "Frame Time (ms) - avg %.2f", avgFrameTime);
+
+			// ---------- dynamic scaling ------------  
+			float ftMinScale = std::max(avgFrameTime - 5.0f, 0.0f);
+			float ftMaxScale = avgFrameTime + 5.0f;
+
+			ImGui::PlotLines(
+				"##FrameTime",
+				frameTimeHistory,
+				FPS_HISTORY_SIZE,
+				fpsHistoryOffset,
+				frameTimeOverlay,
+				ftMinScale,
+				ftMaxScale,
+				ImVec2(graphWidth, 100.0f),
+				sizeof(float)
+			);
+
+			ImGui::Spacing();
+			ImGui::Separator();
+
+			// ========= different coloring to indicate performance status ======= 
+			ImGui::Spacing();
+			if (currFPS >= 60.0f)
+			{
+				ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Performance: Excellent");
+			}
+			else if (currFPS >= 30.0f)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Performance: Good");
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Performance: Poor");
+			}
+
+			ImGui::Spacing();
 
 		}
 		ImGui::End(); // end of performance profile panel
@@ -302,6 +606,50 @@ namespace Engine
 
 	void Editor::renderViewport()
 	{
+		// TODO: Get Texture from Graphics
+		// auto texture = GFXM.getImguiTex();
+
+		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
+
+		// Hard-coded values just in case (Will change values later)
+		ImVec2 viewportSize =
+		{
+			 600,
+			 600
+		};
+
+		if (m_Window) {
+
+			int width = 0.f;
+			int height = 0.f;
+			glfwGetWindowSize(m_Window, &width, &height);
+
+			viewportSize =
+			{
+				 static_cast<float>(static_cast<float>(width)) / 2.0f,
+				 static_cast<float>(static_cast<float>(height)) / 2.0f
+			};
+
+		}
+
+		ImGui::Begin("Viewport");
+
+		// Uncomment this once the viewport texture has been obtained
+		/*if (texture) {
+
+			ImVec2 imagePos = ImGui::GetCursorScreenPos();
+
+			ImGui::Image((ImTextureID)(intptr_t)GFXM.getImguiTex(),
+				viewportSize,
+				ImVec2(0, 1), ImVec2(1, 0));
+
+			// TODO: Handle mouse in viewport
+			//handleViewPortClick(imagePos, viewportSize);
+		}*/
+
+		ImGui::End();
+		
+		
 		// Logic here 
 
 	}
@@ -327,8 +675,7 @@ namespace Engine
 	void Editor::sceneOpenPanel()
 	{
 		// get all files inside scene
-		auto sceneFiles = getFilesInFolder("Scenes");
-
+		auto sceneFiles = getAssetsInFolder(getAssetFilePath("Sources/Scenes"));
 		if (openScenePanel)
 		{
 			ImGui::OpenPopup("Scene Level Selection");
@@ -340,29 +687,30 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
 			// list all scene files
-			for (auto& [fileName, fullPath] : sceneFiles)
+			for (auto& scenesAsset: sceneFiles)
 			{
-				if (ImGui::Selectable(fileName.c_str()))
+				
+				if (ImGui::Selectable(scenesAsset.name.c_str()))
 				{
-
 					if (!m_Scene)
 					{
 						LOG_ERROR("No active scene exists to load into!");
 						continue;
 					}
-
+					//LOG_DEBUG("This is in", fullPath);
 					// clear current scene
 					auto& registry = m_Scene->GetRegistry();
 					registry.clear();
-
+					
 					// load the selected scene file
-					if (!m_Scene->LoadFromFile(fullPath))
+					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
 					{
 						//LOG_ERROR("Failed to load scene %s", sceneFiles);
-					}
-					openScenePanel = false; //  reset after select scene
-					ImGui::CloseCurrentPopup();
-					
+						currScenePath = scenesAsset.fullPath;
+						LOG_INFO("Scene loaded successfully: ", currScenePath);
+						openScenePanel = false; //  reset after select scene
+						ImGui::CloseCurrentPopup();
+					}				
 				}
 			}
 			// --------------- Cancel Selection for Open Scene -----------------------
@@ -377,26 +725,6 @@ namespace Engine
 		}
 	}
 
-	std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
-	{
-		std::string folderPath = Engine::getAssetFilePath(folderName);
-
-		assert(!folderPath.empty() && "Folder path is empty!");
-		assert(std::filesystem::exists(folderPath) && std::filesystem::is_directory(folderPath) && "Folder does not exist!");
-
-		std::vector<std::pair<std::string, std::string>> files;
-
-		for (const auto& entry : std::filesystem::directory_iterator(folderPath))
-		{
-			if (std::filesystem::is_regular_file(entry.path()))
-			{
-				// .first = filename, .second = full path
-				files.emplace_back(entry.path().filename().string(), entry.path().generic_string());
-			}
-		}
-
-		return files;
-	}
 	void Editor::saveAsScenePanel()
 	{
 
@@ -419,7 +747,8 @@ namespace Engine
 				else
 				{
 					// default new scene path 
-					std::string defaultNewScenePath = getAssetFilePath("Scene/") + saveAsDefaultSceneName;
+					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
+					
 					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
 
 						defaultNewScenePath += ".json"; // ensure .json extension
@@ -431,44 +760,16 @@ namespace Engine
 					}
 					else
 					{
-						//// Ensure the Scene directory exists
-						//std::string sceneDir = getAssetFilePath("Scene/");
-						//if (!std::filesystem::exists(sceneDir))
-						//	std::filesystem::create_directories(sceneDir);
-
-						//std::string defaultNewScenePath = sceneDir + saveAsDefaultSceneName;
-						//if (!std::filesystem::path(defaultNewScenePath).has_extension())
-						//	defaultNewScenePath += ".json"; // ensure .json extension
-						//if (std::filesystem::exists(defaultNewScenePath))
-						//{
-						//	ImGui::OpenPopup("Confirm Overwrite");
-						//}
-						//else
-						//{
-						//	// Try saving and check if it succeeds
-						//	try
-						//	{
-						//		m_Scene->SaveToFile(defaultNewScenePath);
-						//		LOG_DEBUG("Scene save as: ", defaultNewScenePath);
-						//		currScenePath = defaultNewScenePath;
-						//		saveAsPanel = false;
-						//		ImGui::CloseCurrentPopup();
-						//	}
-						//	catch (const std::exception& e)
-						//	{
-						//		LOG_ERROR("Failed to save scene: ", e.what());
-						//		ImGui::OpenPopup("Save Error");
-						//	}
-						//}
+						
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
-						LOG_DEBUG("Scene save as: ", defaultNewScenePath);
+						//LOG_DEBUG("Scene save as: ", defaultNewScenePath);
 						currScenePath = defaultNewScenePath; // update current scene path
 						saveAsPanel = false; // to close pop up
+						isNewScene = false;
 						ImGui::CloseCurrentPopup();
 
 					}
 				}
-
 			}
 
 			// ------------------- Cancel save as button ---------------------
@@ -489,7 +790,7 @@ namespace Engine
 				if (ImGui::Button("Yes", ImVec2(120, 0)))
 				{
 					// default new scene path 
-					std::string defaultNewScenePath = getAssetFilePath("Scene/") + saveAsDefaultSceneName;
+					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
 					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
 						defaultNewScenePath += ".json"; // ensure .json extension
 					}
@@ -498,6 +799,7 @@ namespace Engine
 					currScenePath = defaultNewScenePath;
 
 					saveAsPanel = false;
+					isNewScene = false;
 					ImGui::CloseCurrentPopup(); // close save as panel
 				}
 
@@ -524,5 +826,26 @@ namespace Engine
 			ImGui::EndPopup(); // end pop up for save as scene panel
 		}
 	}
+
+	std::vector<Editor::AssetEntry> Editor::getAssetsInFolder(const std::string& folderPath)
+	{
+		std::vector<AssetEntry> entries;
+
+		if (!std::filesystem::exists(folderPath) || !std::filesystem::is_directory(folderPath))
+			return entries;
+
+		for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+		{
+			entries.push_back({
+				entry.path().filename().string(),
+				entry.path().generic_string(),
+				});
+		}
+
+		return entries;
+	}
+
+	
+
 
 } // end of namespace Engine
