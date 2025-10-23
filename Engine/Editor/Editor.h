@@ -45,6 +45,7 @@ namespace Engine
 		ImGuiIO* io;
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
+		GLuint m_FBOTextureHandle;
 
 		// ImGui Window functionality
 		bool inspectorWindow = true; 
@@ -78,7 +79,7 @@ namespace Engine
 		void SetScene(Engine::Scene* scene);
 
 		// Initialise Imgui
-		void OnInit();
+		void OnInit(GLuint texhandle);
 
 		// still figure out
 		void OnUpdate(Timestep ts);

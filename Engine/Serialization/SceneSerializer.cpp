@@ -132,10 +132,20 @@ namespace Engine {
                 componentObj.AddMember("Type", "CameraComponent", allocator);
 
                 Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Enabled", camera.Enabled, allocator);
+                propertiesObj.AddMember("autoAspect", camera.autoAspect, allocator);
+                propertiesObj.AddMember("isDirty", camera.isDirty, allocator);
+                propertiesObj.AddMember("Depth", camera.Depth, allocator);
+                propertiesObj.AddMember("Aspect", camera.Aspect, allocator);
                 propertiesObj.AddMember("FOV", camera.FOV, allocator);
-                propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-                propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
-                propertiesObj.AddMember("Primary", camera.Primary, allocator);
+                propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+                propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
+
+                Value targetArr(kArrayType);
+                targetArr.PushBack(camera.Target.x, allocator);
+                targetArr.PushBack(camera.Target.y, allocator);
+                targetArr.PushBack(camera.Target.z, allocator);
+                propertiesObj.AddMember("Target", targetArr, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -371,14 +381,31 @@ namespace Engine {
                     else if (componentType == "CameraComponent") {
                         auto& camera = entity.AddComponent<CameraComponent>();
 
+                        if (properties.HasMember("Enabled"))
+                            camera.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("autoAspect"))
+                            camera.autoAspect = properties["autoAspect"].GetBool();
+                        if (properties.HasMember("isDirty"))
+                            camera.isDirty = properties["isDirty"].GetBool();
+                        if (properties.HasMember("Depth"))
+                            camera.Depth = properties["Depth"].GetUint();
+                        if (properties.HasMember("Aspect"))
+                            camera.Aspect = properties["Aspect"].GetFloat();
                         if (properties.HasMember("FOV"))
                             camera.FOV = properties["FOV"].GetFloat();
-                        if (properties.HasMember("NearClip"))
-                            camera.NearClip = properties["NearClip"].GetFloat();
-                        if (properties.HasMember("FarClip"))
-                            camera.FarClip = properties["FarClip"].GetFloat();
-                        if (properties.HasMember("Primary"))
-                            camera.Primary = properties["Primary"].GetBool();
+                        if (properties.HasMember("NearPlane"))
+                            camera.NearPlane = properties["NearPlane"].GetFloat();
+                        if (properties.HasMember("FarPlane"))
+                            camera.FarPlane = properties["FarPlane"].GetFloat();
+
+                        if (properties.HasMember("Target")) {
+                            const Value& target = properties["Target"];
+                            camera.Target = glm::vec3(
+                                target[0].GetFloat(),
+                                target[1].GetFloat(),
+                                target[2].GetFloat()
+                            );
+                        }
                     }
                     else if (componentType == "MeshRendererComponent") {
                         auto& mesh = entity.AddComponent<MeshRendererComponent>();
