@@ -15,8 +15,11 @@
 #include <glm/common.hpp>               // glm::clamp
 #include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
-// Math Utility
+ // Math Utility
 #include "../Utility/MathUtils.h"
+
+// Types for u32
+#include "../Utility/Types.h"
 
 // Support setting of camera uniforms
 #include "../Graphics/ShaderProgram.h"
@@ -36,7 +39,7 @@ namespace Engine {
         // bool Projection;     // (Future): 0 = perspective, 1 = orthographic
         bool autoAspect;        // Toggle true allows resizing by system
         bool isDirty;           // Dirty if modified from outside
-        
+
         // Projection data
         // glm::vec2 Size;      // (Future): viewport size of Camera when projection is orthographic 
         u32 Depth;              // Camera draw order
@@ -53,21 +56,22 @@ namespace Engine {
         // Derived data
         glm::mat4 View = glm::mat4(1.0f);
         glm::mat4 Persp = glm::mat4(1.0f);
-    
+
         // Default constructor for a default 3D camera
-        CameraComponent() : 
-            Enabled { true },
-            autoAspect { true },
-            isDirty { true },
-            Depth { 0 },
-            Aspect {16.0f / 9.0f},
+        CameraComponent() :
+            Enabled{ true },
+            autoAspect{ true },
+            isDirty{ true },
+            Depth{ 0 },
+            Aspect{ 16.0f / 9.0f },
             FOV{ 45.0f },
             NearPlane{ 0.5f },
             FarPlane{ 100.0f },
             Target{ 0.0f, 0.0f, 0.0f },
-            View { glm::mat4{1.0f} },
-            Persp { glm::mat4{1.0f} }
-        {}
+            View{ glm::mat4{1.0f} },
+            Persp{ glm::mat4{1.0f} }
+        {
+        }
 
         // Constructor for a 3D camera with custom values
         CameraComponent(bool enabled,
@@ -82,18 +86,19 @@ namespace Engine {
             glm::mat4 v,
             glm::mat4 p) :
 
-            Enabled { enabled },
-            autoAspect { autoaspect },
-            isDirty { dirty },
-            Depth { depth },
-            Aspect { aspect },
+            Enabled{ enabled },
+            autoAspect{ autoaspect },
+            isDirty{ dirty },
+            Depth{ depth },
+            Aspect{ aspect },
             FOV{ fov },
             NearPlane{ near },
             FarPlane{ far },
             Target{ target },
             View{ v },
             Persp{ p }
-        {}
+        {
+        }
 
         //// Setters
         //void SetEnabled(bool enabled) { Enabled = enabled; isDirty = true; }
@@ -120,15 +125,6 @@ namespace Engine {
         //const glm::vec3& GetTarget() const { return Target; }
         //const glm::mat4& GetView() const { return View; }
         //const glm::mat4& GetPerspective() const { return Persp; }
-    };
-
-        /**
-         * @brief Check if this is the primary camera
-         * @return True if this is marked as primary
-         */
-        bool IsPrimary() const {
-            return Primary;
-}
     };
 
 } // namespace Engine

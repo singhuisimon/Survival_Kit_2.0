@@ -13,7 +13,7 @@
  */
 #pragma once
 
-// For dynamically allocated array
+ // For dynamically allocated array
 #include <vector> 
 
 // For OpenGL function pointers
@@ -21,6 +21,9 @@
 
 // For graphics related defines and functionality
 #include "Graphics/GraphicsLoader.h"
+
+// For Camera3D class
+#include "Graphics/Camera.h"
 
 // For Camera component
 #include "Component/CameraComponent.h"
@@ -69,13 +72,13 @@ namespace Engine {
 		 * @brief Provides read-only access to material storage
 		 * @return Const reference to the material container
 		 */
-		inline const std::vector<Material>& getMaterialStorage() { return m_gl.t_testing_material;  }
+		inline const std::vector<Material>& getMaterialStorage() { return m_gl.t_testing_material; }
 
 		/**
 		 * @brief Provides read-only access to texture storage
 		 * @return Const reference to the texture container
 		 */
-		inline const std::vector<Texture>& getTextureStorage()   { return m_gl.t_testing_textures; }
+		inline const std::vector<Texture>& getTextureStorage() { return m_gl.t_testing_textures; }
 
 		inline Camera3D& getEditorCamera() { return editor_camera; }
 
@@ -110,4 +113,3 @@ namespace Engine {
 	};
 
 }
-
