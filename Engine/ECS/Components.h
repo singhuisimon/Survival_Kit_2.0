@@ -9,6 +9,7 @@
 #include "../Component/PrefabComponent.h"
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
 
 namespace Engine {
     // All components are now defined in their respective headers

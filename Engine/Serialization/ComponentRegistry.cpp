@@ -230,6 +230,60 @@ namespace Engine {
             // No user-editable properties exposed in inspector by default
         }
 
+        //Register ReverbComponent
+        {
+            auto& meta = REGISTER_COMPONENT(ReverbZoneComponent);
+
+            meta.AddProperty<ReverbZoneComponent, ReverbPreset>(
+                "Preset",
+                PropertyType::Int,
+                [](const ReverbZoneComponent& c) { return c.Preset; },
+                [](ReverbZoneComponent& c, const ReverbPreset& v) { c.Preset = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "MinDistance",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.MinDistance; },
+                [](ReverbZoneComponent& c, const float& v) { c.MinDistance = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "MaxDistance",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.MaxDistance; },
+                [](ReverbZoneComponent& c, const float& v) { c.MaxDistance = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "DecayTime",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.DecayTime; },
+                [](ReverbZoneComponent& c, const float& v) { c.DecayTime = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "HfDecayRatio",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.HfDecayRatio; },
+                [](ReverbZoneComponent& c, const float& v) { c.HfDecayRatio = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "Diffusion",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.Diffusion; },
+                [](ReverbZoneComponent& c, const float& v) { c.Diffusion = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "Density",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.Density; },
+                [](ReverbZoneComponent& c, const float& v) { c.Density = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "WetLevel",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.WetLevel; },
+                [](ReverbZoneComponent& c, const float& v) { c.WetLevel = v; }
+            );
+        }
+
         LOG_INFO("Component reflection registration complete");
         LOG_INFO("  - Registered 7 component types");
     }
