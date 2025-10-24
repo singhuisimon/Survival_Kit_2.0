@@ -1,7 +1,30 @@
+/**
+ * @file ComponentRegistry.cpp
+ * @brief Implementation of component registration for serialization
+ * @author
+ * @date 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "ComponentRegistry.h"
 #include "ReflectionRegistry.h"
-#include "../ECS/Components.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
+#include "../Component/PrefabComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
 #include "../Utility/Logger.h"
+
+ // Required for quaternion to Euler conversion
+#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Engine {
 
@@ -26,25 +49,61 @@ namespace Engine {
                 "Position",
                 PropertyType::Vec3,
                 [](const TransformComponent& c) { return c.Position; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Position = v; }
+                [](TransformComponent& c, const glm::vec3& v) { c.SetPosition(v); }
             );
-            meta.AddProperty<TransformComponent, glm::quat>(
+            meta.AddProperty<TransformComponent, glm::vec3>(
                 "Rotation",
-                PropertyType::Quat,
-                [](const TransformComponent& c) { return c.Rotation; },
-                [](TransformComponent& c, const glm::quat& v) { c.Rotation = v; }
+                PropertyType::Vec3,
+                [](const TransformComponent& c) {
+                    // Convert quaternion to Euler angles (in degrees) for serialization
+                    return glm::degrees(glm::eulerAngles(c.Rotation));
+                },
+                [](TransformComponent& c, const glm::vec3& v) {
+                    // Convert Euler angles to quaternion
+                    c.SetRotation(v);
+                }
             );
             meta.AddProperty<TransformComponent, glm::vec3>(
                 "Scale",
                 PropertyType::Vec3,
                 [](const TransformComponent& c) { return c.Scale; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Scale = v; }
+                [](TransformComponent& c, const glm::vec3& v) { c.SetScale(v); }
             );
         }
 
         // Register CameraComponent
         {
             auto& meta = REGISTER_COMPONENT(CameraComponent);
+            meta.AddProperty<CameraComponent, bool>(
+                "Enabled",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.Enabled; },
+                [](CameraComponent& c, const bool& v) { c.Enabled = v; }
+            );
+            meta.AddProperty<CameraComponent, bool>(
+                "autoAspect",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.autoAspect; },
+                [](CameraComponent& c, const bool& v) { c.autoAspect = v; }
+            );
+            meta.AddProperty<CameraComponent, bool>(
+                "isDirty",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.isDirty; },
+                [](CameraComponent& c, const bool& v) { c.isDirty = v; }
+            );
+            meta.AddProperty<CameraComponent, u32>(
+                "Depth",
+                PropertyType::U32,
+                [](const CameraComponent& c) { return c.Depth; },
+                [](CameraComponent& c, const u32& v) { c.Depth = v; }
+            );
+            meta.AddProperty<CameraComponent, float>(
+                "Aspect",
+                PropertyType::Float,
+                [](const CameraComponent& c) { return c.Aspect; },
+                [](CameraComponent& c, const float& v) { c.Aspect = v; }
+            );
             meta.AddProperty<CameraComponent, float>(
                 "FOV",
                 PropertyType::Float,
@@ -52,22 +111,22 @@ namespace Engine {
                 [](CameraComponent& c, const float& v) { c.FOV = v; }
             );
             meta.AddProperty<CameraComponent, float>(
-                "NearClip",
+                "NearPlane",
                 PropertyType::Float,
-                [](const CameraComponent& c) { return c.NearClip; },
-                [](CameraComponent& c, const float& v) { c.NearClip = v; }
+                [](const CameraComponent& c) { return c.NearPlane; },
+                [](CameraComponent& c, const float& v) { c.NearPlane = v; }
             );
             meta.AddProperty<CameraComponent, float>(
-                "FarClip",
+                "FarPlane",
                 PropertyType::Float,
-                [](const CameraComponent& c) { return c.FarClip; },
-                [](CameraComponent& c, const float& v) { c.FarClip = v; }
+                [](const CameraComponent& c) { return c.FarPlane; },
+                [](CameraComponent& c, const float& v) { c.FarPlane = v; }
             );
-            meta.AddProperty<CameraComponent, bool>(
-                "Primary",
-                PropertyType::Bool,
-                [](const CameraComponent& c) { return c.Primary; },
-                [](CameraComponent& c, const bool& v) { c.Primary = v; }
+            meta.AddProperty<CameraComponent, glm::vec3>(
+                "Target",
+                PropertyType::Vec3,
+                [](const CameraComponent& c) { return c.Target; },
+                [](CameraComponent& c, const glm::vec3& v) { c.Target = v; }
             );
         }
 
@@ -106,21 +165,21 @@ namespace Engine {
                 "MeshType",
                 PropertyType::U32,
                 [](const MeshRendererComponent& c) { return c.MeshType; },
-                [](MeshRendererComponent& c, const bool& v) { c.MeshType = v; }
+                [](MeshRendererComponent& c, const u32& v) { c.MeshType = v; }
             );
 
             meta.AddProperty<MeshRendererComponent, u32>(
                 "Material",
                 PropertyType::U32,
                 [](const MeshRendererComponent& c) { return c.Material; },
-                [](MeshRendererComponent& c, const bool& v) { c.Material = v; }
+                [](MeshRendererComponent& c, const u32& v) { c.Material = v; }
             );
 
             meta.AddProperty<MeshRendererComponent, u32>(
                 "Texture",
                 PropertyType::U32,
                 [](const MeshRendererComponent& c) { return c.Texture; },
-                [](MeshRendererComponent& c, const bool& v) { c.Texture = v; }
+                [](MeshRendererComponent& c, const u32& v) { c.Texture = v; }
             );
         }
 
@@ -234,6 +293,67 @@ namespace Engine {
                 PropertyType::Bool,
                 [](const ListenerComponent& c) { return c.Active; },
                 [](ListenerComponent& c, const bool& v) { c.Active = v; }
+            );
+        }
+
+        // Register PrefabComponent
+        {
+            auto& meta = REGISTER_COMPONENT(PrefabComponent);
+            // PrefabComponent properties are managed internally
+            // No user-editable properties exposed in inspector by default
+        }
+
+        //Register ReverbComponent
+        {
+            auto& meta = REGISTER_COMPONENT(ReverbZoneComponent);
+
+            meta.AddProperty<ReverbZoneComponent, ReverbPreset>(
+                "Preset",
+                PropertyType::Int,
+                [](const ReverbZoneComponent& c) { return c.Preset; },
+                [](ReverbZoneComponent& c, const ReverbPreset& v) { c.Preset = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "MinDistance",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.MinDistance; },
+                [](ReverbZoneComponent& c, const float& v) { c.MinDistance = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "MaxDistance",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.MaxDistance; },
+                [](ReverbZoneComponent& c, const float& v) { c.MaxDistance = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "DecayTime",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.DecayTime; },
+                [](ReverbZoneComponent& c, const float& v) { c.DecayTime = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "HfDecayRatio",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.HfDecayRatio; },
+                [](ReverbZoneComponent& c, const float& v) { c.HfDecayRatio = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "Diffusion",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.Diffusion; },
+                [](ReverbZoneComponent& c, const float& v) { c.Diffusion = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "Density",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.Density; },
+                [](ReverbZoneComponent& c, const float& v) { c.Density = v; }
+            );
+            meta.AddProperty<ReverbZoneComponent, float>(
+                "WetLevel",
+                PropertyType::Float,
+                [](const ReverbZoneComponent& c) { return c.WetLevel; },
+                [](ReverbZoneComponent& c, const float& v) { c.WetLevel = v; }
             );
         }
 

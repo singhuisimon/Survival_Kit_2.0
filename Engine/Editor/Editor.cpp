@@ -10,9 +10,17 @@
 
 // Include Header Files
 #include "Editor.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Serialization/SceneSerializer.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
+
+// Required for quaternion to Euler conversion
+#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Engine
 {
@@ -21,7 +29,7 @@ namespace Engine
 		m_Scene = scene;
 	}
 
-	void Editor::OnInit()
+	void Editor::OnInit(GLuint texhandle)
 	{
 		if (m_Initialized)
 		{
@@ -42,35 +50,25 @@ namespace Engine
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 
-		// Setup scaling
-		ImGuiStyle& style = ImGui::GetStyle();
-
-		// Set WindowRounding and ImGuiCol_WindowBg when viewport is enabled
-		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			style.WindowRounding = 0.0f;
-			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-		}
-
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
-		ImGui_ImplOpenGL3_Init();
+		ImGui_ImplOpenGL3_Init("#version 410");
+
+		// Save created FBO texture handle
+		m_FBOTextureHandle = texhandle;
 
 		m_Initialized = true;
-
 	}
 
 	void Editor::OnUpdate(Timestep ts)
 	{
-		if (!m_Initialized) return;
-
-		// Start ImGui Frame
+		//Start the ImGui frame
 		StartImguiFrame();
 
-		displayTopMenu();
+		RenderEditor();
 
-		//// Enable Docking Function
-		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		//Complete Imgui rendering for the frame
+		CompleteFrame();
 
 		renderViewport();
 
@@ -86,17 +84,11 @@ namespace Engine
 
 	void Editor::displayTopMenu()
 	{
-		// To start top menu
-		if (ImGui::BeginMainMenuBar())
+		if (ImGui::BeginMenuBar())
 		{
-			ImGui::Separator();
-			// First item in top menu
 			if (ImGui::BeginMenu("File"))
 			{
-				// ======================== Scene Section ===========================
-				// Under file menu list
-				// ------------- Create New Scene -------------
-				if (ImGui::MenuItem("New"))
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
 				{
 					if (m_Scene)
 					{
@@ -110,13 +102,31 @@ namespace Engine
 					ImGui::SetTooltip("Create new scene.");
 				}
 				// --------------- Open Scene -------------------
-				if (ImGui::MenuItem("Open Scene"))
+				if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
 				{
 					openScenePanel = true;
 				}
-				if (ImGui::IsItemHovered())
+
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 				{
-					ImGui::SetTooltip("Open Scene from file.");
+					if (!currScenePath.empty())
+					{
+						// Save to current path
+						SceneSerializer serializer(m_Scene);
+						if (serializer.Serialize(currScenePath))
+						{
+							LOG_INFO("Scene saved successfully to: ", currScenePath);
+						}
+						else
+						{
+							LOG_ERROR("Failed to save scene to: ", currScenePath);
+						}
+					}
+					else
+					{
+						// No current path, open save dialog
+						saveAsPanel = true;
+					}
 				}
 				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save"))
@@ -141,37 +151,19 @@ namespace Engine
 					ImGui::SetTooltip("Open Scene from file.");
 				}
 				// ------------------ Save as Scene -----------------------
-				if (ImGui::MenuItem("Save as"))
+				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
 				{
 					saveAsPanel = true;
-				}
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::SetTooltip("Save scene as new file.");
 				}
 
 				ImGui::Separator();
 
-				// ====================== Script Section ==========================
-				// ---------------------- Open Script -------------------------
-				if (ImGui::MenuItem("Open Script"))
+				if (ImGui::MenuItem("Exit", "Alt+F4"))
 				{
+					// Signal the application to close
+					glfwSetWindowShouldClose(m_Window, GLFW_TRUE);
+				}
 
-				}
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::SetTooltip("Open Script from file.");
-				}
-				// ---------------------- Create new script -------------------
-				if (ImGui::MenuItem("New Script"))
-				{
-					createScript = true;
-				}
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::SetTooltip("Create new script.");
-				}
-				// close File menu
 				ImGui::EndMenu();
 				ImGui::Separator();
 
@@ -186,120 +178,145 @@ namespace Engine
 				ImGui::TextUnformatted(fileName.c_str());
 			}
 
-			// close main menu bar
-			ImGui::EndMainMenuBar();
-		} //  end of begin main menu bar
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
+				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
+				if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
+				if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
+				ImGui::EndMenu();
+			}
 
-		//  =========================== Open Scene pop up panel =====================================
-		if (openScenePanel)
-		{
-			sceneOpenPanel();
-		}
+			if (ImGui::BeginMenu("View"))
+			{
+				ImGui::MenuItem("Hierarchy", NULL, &hierachyWindow);
+				ImGui::MenuItem("Properties", NULL, &inspectorWindow);
+				ImGui::MenuItem("Performance Profile", NULL, &performanceProfileWindow);
+				ImGui::EndMenu();
+			}
 
-		// ========================== Save as Scene panel ============================
-		if (saveAsPanel)
-		{
-			saveAsScenePanel();
+			ImGui::EndMenuBar();
 		}
 	}
 
 	void Editor::displayPropertiesPanel()
 	{
-		ImGui::SetNextWindowSize(ImVec2(600, 400));
+		if (!inspectorWindow)
+			return;
 
-		// Begin properties dockable window
-		if (ImGui::Begin("Properties/ Inspector", &inspectorWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		if (ImGui::Begin("Properties", &inspectorWindow))
 		{
-			if (m_SelectedEntity) {
-
+			if (m_SelectedEntity)
+			{
+				// Display entity name (TagComponent)
 				if (m_SelectedEntity.HasComponent<TagComponent>())
 				{
-					//Display and Edit Entity Name
-					auto& tag = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-					char entityNameBuffer[128];
-					strcpy_s(entityNameBuffer, sizeof(entityNameBuffer), tag.c_str());
-					
-					// Add ImGuiInputTextFlags_EnterReturnsTrue to ensure only change name after user press enter
-					// Game crash if delete the last alphabet since it keep updating the frame and cause a empty ID 
-					// TODO: Check the above
-					if (ImGui::InputText("Entity Name", entityNameBuffer, sizeof(entityNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
-						
-						std::string newName = entityNameBuffer;
-						if (newName.empty()) {
-							newName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-						}
-						tag = newName;
+					auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
+					char buffer[256];
+					strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+					{
+						tag.Tag = std::string(buffer);
 					}
 				}
-				
-				// Display entity ID
-				ImGui::Text("Entity ID: %u", static_cast<uint32_t>(m_SelectedEntity));
-				
-				// Display component information
-				ImGui::Separator();
-				ImGui::Text("Components:");
 
+				ImGui::Separator();
+
+				// Display TransformComponent
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
 				{
-					// TODO: Make the functions for collapsing headers
-					if (ImGui::CollapsingHeader("Transform")) {
+					if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+					{
 						auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
-						ImGui::DragFloat3("Position", &transform.Position.x, 0.1f);
-						ImGui::DragFloat3("Rotation", &transform.Rotation.x, 0.1f);
-						ImGui::DragFloat3("Scale", &transform.Scale.x, 0.1f);
-					}
 
+						// Position
+						glm::vec3 position = transform.Position;
+						if (ImGui::DragFloat3("Position", &position.x, 0.1f))
+						{
+							transform.SetPosition(position);
+						}
+
+						// Rotation (in degrees)
+						glm::vec3 rotation = glm::degrees(glm::eulerAngles(transform.Rotation));
+						if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f))
+						{
+							// Convert back to quaternion
+							transform.SetRotation(rotation);
+						}
+
+						// Scale
+						glm::vec3 scale = transform.Scale;
+						if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.001f))
+						{
+							transform.SetScale(scale);
+						}
+					}
 				}
+
+				// Display other components...
+			}
+			else
+			{
+				ImGui::Text("No entity selected");
 			}
 		}
-
-		ImGui::End(); // End of the properties window
+		ImGui::End();
 	}
 
 	void Editor::displayHierarchyPanel()
 	{
-		ImGui::SetNextWindowSize(ImVec2(600, 400));
+		if (!hierachyWindow)
+			return;
 
-		// Begin properties dockable window
-		if (ImGui::Begin("Hierarchy", &hierachyWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		if (ImGui::Begin("Hierarchy", &hierachyWindow))
 		{
-			if (m_Scene) {
+			// Button to create new entity
+			if (ImGui::Button("Create Entity"))
+			{
+				auto entity = m_Scene->CreateEntity("New Entity");
+				entity.AddComponent<TagComponent>("New Entity");
+				entity.AddComponent<TransformComponent>();
+			}
 
-				// Get name of Scene
-				// TODO: Check when Serialization is fixed
-				auto& sceneName = m_Scene->GetName();
-				char sceneNameBuffer[128];
-				strcpy_s(sceneNameBuffer, sizeof(sceneNameBuffer), sceneName.c_str());
+			ImGui::Separator();
 
-				// Add ImGuiInputTextFlags_EnterReturnsTrue to ensure only change name after user press enter
-				if (ImGui::InputText("Scene Name", sceneNameBuffer, sizeof(sceneNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+			// List all entities
+			if (m_Scene)
+			{
+				auto view = m_Scene->GetRegistry().view<TagComponent>();
 
-					std::string newSceneName = sceneNameBuffer;
-					if (newSceneName.empty()) {
-						newSceneName = m_Scene->GetName();
-					}
-					m_Scene->SetName(newSceneName);
-				}
+				for (auto entityHandle : view)
+				{
+					Entity entity(entityHandle, &m_Scene->GetRegistry());
+					auto& tag = entity.GetComponent<TagComponent>();
 
-				// List of entities
-				auto& registry = m_Scene->GetRegistry();
-				auto view = registry.view<TagComponent>();
-
-				for (auto entityHandle : view) {
-
-					Entity entity(entityHandle, &registry);
-
-					// Get entity name
-					std::string name = "Unnamed Entity";
-					if (entity.HasComponent<TagComponent>())
+					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+					if (m_SelectedEntity == entity)
 					{
-						name = entity.GetComponent<TagComponent>().Tag;
+						flags |= ImGuiTreeNodeFlags_Selected;
 					}
 
-					if (ImGui::Selectable(name.c_str(), (m_SelectedEntity == entity)))
+					ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+
+					if (ImGui::IsItemClicked())
 					{
 						m_SelectedEntity = entity;
-						
+					}
+
+					// Right-click context menu
+					if (ImGui::BeginPopupContextItem())
+					{
+						if (ImGui::MenuItem("Delete Entity"))
+						{
+							m_Scene->DestroyEntity(entity);
+							if (m_SelectedEntity == entity)
+							{
+								m_SelectedEntity = Entity();
+							}
+						}
+						ImGui::EndPopup();
 					}
 				}
 			}
@@ -425,6 +442,9 @@ namespace Engine
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
 	{
+		if (!performanceProfileWindow)
+			return;
+		
 		ImGui::SetNextWindowSize(ImVec2(500, 300));
 		if (ImGui::Begin("Performance Profile", &performanceProfileWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
@@ -592,16 +612,20 @@ namespace Engine
 
 			ImGui::Spacing();
 
+			if (ImGui::Begin("Performance Profile", &performanceProfileWindow))
+			{
+				ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+				ImGui::Text("Frame Time: %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
+			}
+			ImGui::End();
 		}
-		ImGui::End(); // end of performance profile panel
 	}
 
-	void Editor::StartImguiFrame() {
-
+	void Editor::StartImguiFrame()
+	{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-
 	}
 
 	void Editor::renderViewport()
@@ -635,17 +659,16 @@ namespace Engine
 		ImGui::Begin("Viewport");
 
 		// Uncomment this once the viewport texture has been obtained
-		/*if (texture) {
-
+		if (m_FBOTextureHandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 
-			ImGui::Image((ImTextureID)(intptr_t)GFXM.getImguiTex(),
+			ImGui::Image((ImTextureID)(intptr_t)m_FBOTextureHandle,
 				viewportSize,
 				ImVec2(0, 1), ImVec2(1, 0));
 
 			// TODO: Handle mouse in viewport
 			//handleViewPortClick(imagePos, viewportSize);
-		}*/
+		}
 
 		ImGui::End();
 		
@@ -654,9 +677,93 @@ namespace Engine
 
 	}
 
-	// Render after Render System
-	void Editor::RenderEditor() {
+	void Editor::sceneOpenPanel()
+	{
+		if (!openScenePanel)
+			return;
 
+		ImGui::OpenPopup("Open Scene");
+
+		if (ImGui::BeginPopupModal("Open Scene", &openScenePanel))
+		{
+			static char scenePath[256] = "Resources/Scenes/";
+
+			ImGui::Text("Enter scene file path:");
+			ImGui::InputText("##scenepath", scenePath, sizeof(scenePath));
+
+			if (ImGui::Button("Open"))
+			{
+				SceneSerializer serializer(m_Scene);
+				if (serializer.Deserialize(scenePath))
+				{
+					currScenePath = scenePath;
+					LOG_INFO("Scene loaded successfully from: " + std::string(scenePath));
+				}
+				else
+				{
+					LOG_ERROR("Failed to load scene from: " + std::string(scenePath));
+				}
+				openScenePanel = false;
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel"))
+			{
+				openScenePanel = false;
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void Editor::saveAsScenePanel()
+	{
+		if (!saveAsPanel)
+			return;
+
+		ImGui::OpenPopup("Save Scene As");
+
+		if (ImGui::BeginPopupModal("Save Scene As", &saveAsPanel))
+		{
+			static char scenePath[256] = "Resources/Scenes/";
+
+			ImGui::Text("Enter scene file name:");
+			ImGui::InputText("##scenepath", scenePath, sizeof(scenePath));
+
+			// Add .json extension if not present
+			std::string pathStr(scenePath);
+			if (pathStr.find(".json") == std::string::npos)
+			{
+				pathStr += ".json";
+			}
+
+			if (ImGui::Button("Save"))
+			{
+				SceneSerializer serializer(m_Scene);
+				if (serializer.Serialize(pathStr))
+				{
+					currScenePath = pathStr;
+					LOG_INFO("Scene saved successfully to: " + pathStr);
+				}
+				else
+				{
+					LOG_ERROR("Failed to save scene to: " + pathStr);
+				}
+				saveAsPanel = false;
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel"))
+			{
+				saveAsPanel = false;
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void Editor::CompleteFrame()
+	{
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -845,7 +952,12 @@ namespace Engine
 		return entries;
 	}
 
-	
+	std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
+	{
+		std::vector<std::pair<std::string, std::string>> files;
+		// Implementation placeholder
+		return files;
+	}
 
 
 } // end of namespace Engine

@@ -92,7 +92,7 @@ namespace Engine {
         }
 
         // Handles cursor movement to adjust camera orientation
-        void cameraOnCursor(double xoffset, double yoffset, ShaderProgram* shader)
+        void cameraOnCursor(double xoffset, double yoffset/*, ShaderProgram* shader*/)
         {
 
             if (camType == CameraType::ORBITING)
@@ -157,11 +157,11 @@ namespace Engine {
             //shader->setUniform("camera.position", pos);
             //shader->programFree();
             // Unreferenced Parameter
-            shader;
+            //shader;
         }
 
         // Handles scroll input to adjust zoom or camera position
-        void cameraOnScroll(double yoffset, ShaderProgram* shader)
+        void cameraOnScroll(double yoffset/*, ShaderProgram* shader*/)
         {
             if (camType == CameraType::ORBITING)
             {
@@ -192,7 +192,7 @@ namespace Engine {
             //shader->programFree();
             
             // Unreferenced Parameter
-            shader;
+            //shader;
         }
 
         //// Getters for camera data

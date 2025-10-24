@@ -3,10 +3,11 @@
 #include "ECS/SystemRegistry.h"
 #include <entt/entt.hpp>
 #include <string>
+#include "../xresource_guid/include/xresource_guid.h"
 
 namespace Engine {
 
-    // Forward declaration
+    // Forward declarations
     class SceneSerializer;
 
     /**
@@ -66,6 +67,32 @@ namespace Engine {
          * @return True if successful
          */
         bool LoadFromFile(const std::string& filepath);
+
+        // ===== PREFAB SYSTEM =====
+
+        /**
+         * @brief Create entity from prefab
+         * @param prefabGUID GUID of the prefab to instantiate
+         * @param name Optional name for the entity (overrides prefab name)
+         * @return The created entity
+         */
+        Entity CreateEntityFromPrefab(
+            xresource::instance_guid prefabGUID,
+            const std::string& name = ""
+        );
+
+        /**
+         * @brief Instantiate scene prefab into this scene
+         * @param prefabGUID GUID of the scene prefab
+         * @return The root entity of the instantiated scene prefab
+         */
+        Entity InstantiateScenePrefab(xresource::instance_guid prefabGUID);
+
+        /**
+         * @brief Convert prefab instance to regular entity (unpack/break prefab link)
+         * @param entity Entity to unpack
+         */
+        void UnpackPrefabInstance(Entity entity);
 
         // ===== SYSTEM MANAGEMENT =====
 

@@ -38,6 +38,10 @@ namespace Engine {
         // Reset scroll delta at the START of update (before new events)
         m_ScrollDelta = glm::vec2(0.0f);
 
+        // Make sure glfwPollEvents() is called BEFORE processing state transitions
+        // This ensures all callbacks (including scroll) are processed before we transition states
+        glfwPollEvents();
+
         // Update keyboard states
         for (auto& [key, state] : m_KeyStates) {
             state.previous = state.current;
