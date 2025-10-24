@@ -132,10 +132,20 @@ namespace Engine {
                 componentObj.AddMember("Type", "CameraComponent", allocator);
 
                 Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Enabled", camera.Enabled, allocator);
+                propertiesObj.AddMember("autoAspect", camera.autoAspect, allocator);
+                propertiesObj.AddMember("isDirty", camera.isDirty, allocator);
+                propertiesObj.AddMember("Depth", camera.Depth, allocator);
+                propertiesObj.AddMember("Aspect", camera.Aspect, allocator);
                 propertiesObj.AddMember("FOV", camera.FOV, allocator);
-                propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-                propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
-                propertiesObj.AddMember("Primary", camera.Primary, allocator);
+                propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+                propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
+
+                Value targetArr(kArrayType);
+                targetArr.PushBack(camera.Target.x, allocator);
+                targetArr.PushBack(camera.Target.y, allocator);
+                targetArr.PushBack(camera.Target.z, allocator);
+                propertiesObj.AddMember("Target", targetArr, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -216,6 +226,28 @@ namespace Engine {
 
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("Active", listener.Active, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
+            // Serialize ReverbComponent
+            if (entity.HasComponent<ReverbZoneComponent>()) {
+                LOG_TRACE("  - Serializing ReverbComponent");
+
+                auto& reverb = entity.GetComponent<ReverbZoneComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ReverbComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Preset", static_cast<int>(reverb.Preset), allocator);
+                propertiesObj.AddMember("MinDistance", reverb.MinDistance, allocator);
+                propertiesObj.AddMember("MaxDistance", reverb.MaxDistance, allocator);
+                propertiesObj.AddMember("DecayTime", reverb.DecayTime, allocator);
+                propertiesObj.AddMember("HfDecayRatio", reverb.HfDecayRatio, allocator);
+                propertiesObj.AddMember("Diffusion", reverb.Diffusion, allocator);
+                propertiesObj.AddMember("Density", reverb.Density, allocator);
+                propertiesObj.AddMember("WetLevel", reverb.WetLevel, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -349,14 +381,31 @@ namespace Engine {
                     else if (componentType == "CameraComponent") {
                         auto& camera = entity.AddComponent<CameraComponent>();
 
+                        if (properties.HasMember("Enabled"))
+                            camera.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("autoAspect"))
+                            camera.autoAspect = properties["autoAspect"].GetBool();
+                        if (properties.HasMember("isDirty"))
+                            camera.isDirty = properties["isDirty"].GetBool();
+                        if (properties.HasMember("Depth"))
+                            camera.Depth = properties["Depth"].GetUint();
+                        if (properties.HasMember("Aspect"))
+                            camera.Aspect = properties["Aspect"].GetFloat();
                         if (properties.HasMember("FOV"))
                             camera.FOV = properties["FOV"].GetFloat();
-                        if (properties.HasMember("NearClip"))
-                            camera.NearClip = properties["NearClip"].GetFloat();
-                        if (properties.HasMember("FarClip"))
-                            camera.FarClip = properties["FarClip"].GetFloat();
-                        if (properties.HasMember("Primary"))
-                            camera.Primary = properties["Primary"].GetBool();
+                        if (properties.HasMember("NearPlane"))
+                            camera.NearPlane = properties["NearPlane"].GetFloat();
+                        if (properties.HasMember("FarPlane"))
+                            camera.FarPlane = properties["FarPlane"].GetFloat();
+
+                        if (properties.HasMember("Target")) {
+                            const Value& target = properties["Target"];
+                            camera.Target = glm::vec3(
+                                target[0].GetFloat(),
+                                target[1].GetFloat(),
+                                target[2].GetFloat()
+                            );
+                        }
                     }
                     else if (componentType == "MeshRendererComponent") {
                         auto& mesh = entity.AddComponent<MeshRendererComponent>();
@@ -427,6 +476,27 @@ namespace Engine {
                         if (properties.HasMember("Active"))
                             listener.Active = properties["Active"].GetBool();
                     }
+                    else if (componentType == "ReverbComponent") {
+                        auto& reverb = entity.AddComponent<ReverbZoneComponent>();
+
+                        if (properties.HasMember("Preset"))
+                            reverb.Preset = static_cast<ReverbPreset>(properties["Preset"].GetInt());
+                        if (properties.HasMember("MinDistance"))
+                            reverb.MinDistance = properties["MinDistance"].GetFloat();
+                        if (properties.HasMember("MaxDistance"))
+                            reverb.MaxDistance = properties["MaxDistance"].GetFloat();
+                        if (properties.HasMember("DecayTime"))
+                            reverb.DecayTime = properties["DecayTime"].GetFloat();
+                        if (properties.HasMember("HfDecayRatio"))
+                            reverb.HfDecayRatio = properties["HfDecayRatio"].GetFloat();
+                        if (properties.HasMember("Diffusion"))
+                            reverb.Diffusion = properties["Diffusion"].GetFloat();
+                        if (properties.HasMember("Density"))
+                            reverb.Density = properties["Density"].GetFloat();
+                        if (properties.HasMember("WetLevel"))
+                            reverb.WetLevel = properties["WetLevel"].GetFloat();
+                            }
+
                 }
             }
         }

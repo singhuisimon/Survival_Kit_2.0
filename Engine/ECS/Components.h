@@ -8,9 +8,12 @@
 #include "Utility/Types.h"
 
 // Components
-#include "../Component/TransformComponent.h"
-#include "../Component/AudioComponent.h"
-#include "../Component/ListenerComponent.h"
+#include "Component/TransformComponent.h"
+#include "Component/MeshRendererComponent.h"
+#include "Component/CameraComponent.h"
+#include "Component/AudioComponent.h"
+#include "Component/ListenerComponent.h"
+#include "Component/ReverbZoneComponent.h"
 
 namespace Engine {
 
@@ -54,54 +57,6 @@ namespace Engine {
                 Tag = std::move(other.Tag);
             }
             return *this;
-        }
-    };
-
-    // Kenny: Don't think we need a camera component, just need primary camera for the game, 
-    //        and additional secondary camera(s) if needed in the game
-    /** 
-     * @brief Camera component
-     */
-    struct CameraComponent {
-        float FOV;
-        float NearClip;
-        float FarClip;
-        bool Primary; // Is this the main camera?
-
-        // Default constructor
-        CameraComponent()
-            : FOV(45.0f)
-            , NearClip(0.1f)
-            , FarClip(1000.0f)
-            , Primary(true) {
-        }
-
-        glm::mat4 GetProjection(float aspectRatio) const {
-            return glm::perspective(glm::radians(FOV), aspectRatio, NearClip, FarClip);
-        }
-    };
-
-    /**
-     * @brief Mesh renderer component (for future rendering system)
-     */
-    struct MeshRendererComponent {
-        bool Visible;           // Determine if sent to draw call
-        bool ShadowReceive;     // For future expansion (WIP)
-        bool ShadowCast;        // For future expansion (WIP)
-        bool GlobalIlluminate;  // Require further expansion; for now true means it receives light from a light object
-        u32 MeshType;           // Mesh that the object uses (primitive/custom)
-        u32 Material;           // Material handle
-        u32 Texture;            // Texture handle (0 means no texture, actual textures start from 1)
-
-        // Default constructor
-        MeshRendererComponent()
-            : Visible(true), 
-              ShadowReceive(false), 
-              ShadowCast(false), 
-              GlobalIlluminate(true), 
-              MeshType(0), 
-              Material(0),
-              Texture(0)  {
         }
     };
 

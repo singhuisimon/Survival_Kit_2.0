@@ -21,7 +21,7 @@ namespace Engine
 		m_Scene = scene;
 	}
 
-	void Editor::OnInit()
+	void Editor::OnInit(GLuint texhandle)
 	{
 		if (m_Initialized)
 		{
@@ -56,6 +56,9 @@ namespace Engine
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 		ImGui_ImplOpenGL3_Init();
 
+		// Save created FBO texture handle
+		m_FBOTextureHandle = texhandle;
+
 		m_Initialized = true;
 
 	}
@@ -70,7 +73,7 @@ namespace Engine
 		displayTopMenu();
 
 		//// Enable Docking Function
-		//ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
 		renderViewport();
 
@@ -606,8 +609,6 @@ namespace Engine
 
 	void Editor::renderViewport()
 	{
-		// TODO: Get Texture from Graphics
-		// auto texture = GFXM.getImguiTex();
 
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
@@ -635,23 +636,20 @@ namespace Engine
 		ImGui::Begin("Viewport");
 
 		// Uncomment this once the viewport texture has been obtained
-		/*if (texture) {
-
+		if (m_FBOTextureHandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 
-			ImGui::Image((ImTextureID)(intptr_t)GFXM.getImguiTex(),
+			ImGui::Image((ImTextureID)(intptr_t)m_FBOTextureHandle,
 				viewportSize,
 				ImVec2(0, 1), ImVec2(1, 0));
 
 			// TODO: Handle mouse in viewport
 			//handleViewPortClick(imagePos, viewportSize);
-		}*/
+		}
 
 		ImGui::End();
 		
 		
-		// Logic here 
-
 	}
 
 	// Render after Render System
