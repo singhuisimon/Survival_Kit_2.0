@@ -117,9 +117,6 @@ namespace Engine
 		// Render Viewport
 		void renderViewport();
 
-		// Render IMGUI UI
-		void RenderEditor();
-
 		// Helper function for searching and return the files
 		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
 

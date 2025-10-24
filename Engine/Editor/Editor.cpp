@@ -50,6 +50,16 @@ namespace Engine
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 
+		// Setup scaling
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		// Set WindowRounding and ImGuiCol_WindowBg when viewport is enabled
+		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
@@ -62,13 +72,15 @@ namespace Engine
 
 	void Editor::OnUpdate(Timestep ts)
 	{
+		if (!m_Initialized) return;
+
 		//Start the ImGui frame
 		StartImguiFrame();
 
-		RenderEditor();
+		// Enable Docking Function
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-		//Complete Imgui rendering for the frame
-		CompleteFrame();
+		displayTopMenu();
 
 		renderViewport();
 
@@ -80,6 +92,9 @@ namespace Engine
 		displayAssetsBrowserPanel();
 
 		displayPerformanceProfilePanel(ts);
+
+		//Complete Imgui rendering for the frame
+		CompleteFrame();
 	}
 
 	void Editor::displayTopMenu()
@@ -619,6 +634,8 @@ namespace Engine
 			}
 			ImGui::End();
 		}
+
+		ImGui::End();
 	}
 
 	void Editor::StartImguiFrame()
@@ -677,9 +694,60 @@ namespace Engine
 
 	}
 
+	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
 	{
-		if (!openScenePanel)
+		// get all files inside scene
+		auto sceneFiles = getAssetsInFolder(getAssetFilePath("Sources/Scenes"));
+		if (openScenePanel)
+		{
+			ImGui::OpenPopup("Scene Level Selection");
+		}
+
+		// pop up panel to open scene file
+		if (ImGui::BeginPopupModal("Scene Level Selection", nullptr, ImGuiWindowFlags_NoDocking))
+		{
+			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+
+			// list all scene files
+			for (auto& scenesAsset : sceneFiles)
+			{
+
+				if (ImGui::Selectable(scenesAsset.name.c_str()))
+				{
+					if (!m_Scene)
+					{
+						LOG_ERROR("No active scene exists to load into!");
+						continue;
+					}
+					//LOG_DEBUG("This is in", fullPath);
+					// clear current scene
+					auto& registry = m_Scene->GetRegistry();
+					registry.clear();
+
+					// load the selected scene file
+					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
+					{
+						//LOG_ERROR("Failed to load scene %s", sceneFiles);
+						currScenePath = scenesAsset.fullPath;
+						LOG_INFO("Scene loaded successfully: ", currScenePath);
+						openScenePanel = false; //  reset after select scene
+						ImGui::CloseCurrentPopup();
+					}
+				}
+			}
+			// --------------- Cancel Selection for Open Scene -----------------------
+			if (ImGui::Button("Cancel"))
+			{
+				openScenePanel = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
+			}
+
+
+			ImGui::EndPopup(); // end pop up panel for scene level selection
+		}
+		
+		/*if (!openScenePanel)
 			return;
 
 		ImGui::OpenPopup("Open Scene");
@@ -713,128 +781,11 @@ namespace Engine
 			}
 
 			ImGui::EndPopup();
-		}
+		}*/
 	}
 
 	void Editor::saveAsScenePanel()
 	{
-		if (!saveAsPanel)
-			return;
-
-		ImGui::OpenPopup("Save Scene As");
-
-		if (ImGui::BeginPopupModal("Save Scene As", &saveAsPanel))
-		{
-			static char scenePath[256] = "Resources/Scenes/";
-
-			ImGui::Text("Enter scene file name:");
-			ImGui::InputText("##scenepath", scenePath, sizeof(scenePath));
-
-			// Add .json extension if not present
-			std::string pathStr(scenePath);
-			if (pathStr.find(".json") == std::string::npos)
-			{
-				pathStr += ".json";
-			}
-
-			if (ImGui::Button("Save"))
-			{
-				SceneSerializer serializer(m_Scene);
-				if (serializer.Serialize(pathStr))
-				{
-					currScenePath = pathStr;
-					LOG_INFO("Scene saved successfully to: " + pathStr);
-				}
-				else
-				{
-					LOG_ERROR("Failed to save scene to: " + pathStr);
-				}
-				saveAsPanel = false;
-			}
-
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel"))
-			{
-				saveAsPanel = false;
-			}
-
-			ImGui::EndPopup();
-		}
-	}
-
-	void Editor::CompleteFrame()
-	{
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		// Update and Render additional Platform Windows
-		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
-		}
-
-	}
-
-	// Helper function for top menu 
-	void Editor::sceneOpenPanel()
-	{
-		// get all files inside scene
-		auto sceneFiles = getAssetsInFolder(getAssetFilePath("Sources/Scenes"));
-		if (openScenePanel)
-		{
-			ImGui::OpenPopup("Scene Level Selection");
-		}
-
-		// pop up panel to open scene file
-		if (ImGui::BeginPopupModal("Scene Level Selection", nullptr, ImGuiWindowFlags_NoDocking))
-		{
-			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
-
-			// list all scene files
-			for (auto& scenesAsset: sceneFiles)
-			{
-				
-				if (ImGui::Selectable(scenesAsset.name.c_str()))
-				{
-					if (!m_Scene)
-					{
-						LOG_ERROR("No active scene exists to load into!");
-						continue;
-					}
-					//LOG_DEBUG("This is in", fullPath);
-					// clear current scene
-					auto& registry = m_Scene->GetRegistry();
-					registry.clear();
-					
-					// load the selected scene file
-					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
-					{
-						//LOG_ERROR("Failed to load scene %s", sceneFiles);
-						currScenePath = scenesAsset.fullPath;
-						LOG_INFO("Scene loaded successfully: ", currScenePath);
-						openScenePanel = false; //  reset after select scene
-						ImGui::CloseCurrentPopup();
-					}				
-				}
-			}
-			// --------------- Cancel Selection for Open Scene -----------------------
-			if (ImGui::Button("Cancel"))
-			{
-				openScenePanel = false; //  reset after click cancel button
-				ImGui::CloseCurrentPopup();
-			}
-
-
-			ImGui::EndPopup(); // end pop up panel for scene level selection
-		}
-	}
-
-	void Editor::saveAsScenePanel()
-	{
-
 		if (saveAsPanel)
 		{
 			ImGui::OpenPopup("Save As Panel");
@@ -855,7 +806,7 @@ namespace Engine
 				{
 					// default new scene path 
 					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
-					
+
 					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
 
 						defaultNewScenePath += ".json"; // ensure .json extension
@@ -867,7 +818,7 @@ namespace Engine
 					}
 					else
 					{
-						
+
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
 						//LOG_DEBUG("Scene save as: ", defaultNewScenePath);
 						currScenePath = defaultNewScenePath; // update current scene path
@@ -932,6 +883,65 @@ namespace Engine
 
 			ImGui::EndPopup(); // end pop up for save as scene panel
 		}
+
+		/*if (!saveAsPanel)
+			return;
+
+		ImGui::OpenPopup("Save Scene As");
+
+		if (ImGui::BeginPopupModal("Save Scene As", &saveAsPanel))
+		{
+			static char scenePath[256] = "Resources/Scenes/";
+
+			ImGui::Text("Enter scene file name:");
+			ImGui::InputText("##scenepath", scenePath, sizeof(scenePath));
+
+			// Add .json extension if not present
+			std::string pathStr(scenePath);
+			if (pathStr.find(".json") == std::string::npos)
+			{
+				pathStr += ".json";
+			}
+
+			if (ImGui::Button("Save"))
+			{
+				SceneSerializer serializer(m_Scene);
+				if (serializer.Serialize(pathStr))
+				{
+					currScenePath = pathStr;
+					LOG_INFO("Scene saved successfully to: " + pathStr);
+				}
+				else
+				{
+					LOG_ERROR("Failed to save scene to: " + pathStr);
+				}
+				saveAsPanel = false;
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel"))
+			{
+				saveAsPanel = false;
+			}
+
+			ImGui::EndPopup();
+		}*/
+	}
+
+	void Editor::CompleteFrame()
+	{
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		// Update and Render additional Platform Windows
+		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
+
 	}
 
 	std::vector<Editor::AssetEntry> Editor::getAssetsInFolder(const std::string& folderPath)
