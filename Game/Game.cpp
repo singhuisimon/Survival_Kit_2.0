@@ -551,6 +551,8 @@ void Game::OnUpdate(Engine::Timestep ts) {
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
     m_Editor->OnUpdate(ts);
+    //Complete Imgui rendering for the frame
+    m_Editor->CompleteFrame();
 }
 
 void Game::OnShutdown() {

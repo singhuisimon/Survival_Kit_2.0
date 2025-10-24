@@ -92,17 +92,17 @@ namespace Engine
 		displayAssetsBrowserPanel();
 
 		displayPerformanceProfilePanel(ts);
-
-		//Complete Imgui rendering for the frame
-		CompleteFrame();
 	}
 
 	void Editor::displayTopMenu()
 	{
-		if (ImGui::BeginMenuBar())
+		if (ImGui::BeginMainMenuBar())
 		{
+			ImGui::Separator();
+
 			if (ImGui::BeginMenu("File"))
 			{
+				// --------------- New Scene -------------------
 				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
 				{
 					if (m_Scene)
@@ -113,76 +113,71 @@ namespace Engine
 					}
 				}
 				if (ImGui::IsItemHovered())
-				{
 					ImGui::SetTooltip("Create new scene.");
-				}
+
 				// --------------- Open Scene -------------------
 				if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
 				{
 					openScenePanel = true;
 				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Open scene from file.");
 
+				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 				{
 					if (!currScenePath.empty())
 					{
-						// Save to current path
 						SceneSerializer serializer(m_Scene);
 						if (serializer.Serialize(currScenePath))
-						{
 							LOG_INFO("Scene saved successfully to: ", currScenePath);
-						}
 						else
-						{
 							LOG_ERROR("Failed to save scene to: ", currScenePath);
-						}
 					}
 					else
 					{
-						// No current path, open save dialog
 						saveAsPanel = true;
 					}
 				}
-				// --------------- Save Scene -------------------
-				if (ImGui::MenuItem("Save"))
-				{
-					if (!currScenePath.empty())
-					{
-						m_Scene->SaveToFile(currScenePath);
-						LOG_INFO("Current scene path: ", currScenePath);
-					}
-					else
-					{
-						saveAsPanel = true; // redirect to Save as if the current scene is empty
-						if (isNewScene)
-						{
-							saveAsPanel = true;
-						}
-						//LOG_INFO("Current scene has not been saved yet (no file path).");
-					}
-				}
 				if (ImGui::IsItemHovered())
-				{
-					ImGui::SetTooltip("Open Scene from file.");
-				}
-				// ------------------ Save as Scene -----------------------
+					ImGui::SetTooltip("Save current scene.");
+
+				// --------------- Save Scene As -------------------
 				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
 				{
 					saveAsPanel = true;
 				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Save scene as a new file.");
 
 				ImGui::Separator();
 
+				// ====================== Script Section ==========================
+				if (ImGui::MenuItem("Open Script"))
+				{
+					// open script logic
+				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Open script from file.");
+
+				if (ImGui::MenuItem("New Script"))
+				{
+					createScript = true;
+				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Create a new script.");
+
+				ImGui::Separator();
+
+				// --------------- Exit -------------------
 				if (ImGui::MenuItem("Exit", "Alt+F4"))
 				{
-					// Signal the application to close
 					glfwSetWindowShouldClose(m_Window, GLFW_TRUE);
 				}
 
 				ImGui::EndMenu();
-				ImGui::Separator();
-
 			}
+
 			// ---------------- Display Current Scene Name ---------------------
 			if (!currScenePath.empty())
 			{
@@ -212,7 +207,19 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			ImGui::EndMenuBar();
+			ImGui::EndMainMenuBar();
+		}
+
+		//  =========================== Open Scene pop up panel =====================================
+		if (openScenePanel)
+		{
+			sceneOpenPanel();
+		}
+
+		// ========================== Save as Scene panel ============================
+		if (saveAsPanel)
+		{
+			saveAsScenePanel();
 		}
 	}
 
