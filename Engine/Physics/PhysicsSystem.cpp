@@ -91,6 +91,8 @@ namespace Engine
 		}
 		mBodyOf.clear();
 
+		mShapeCache.clear();
+
 		delete mJobSystem;     mJobSystem = nullptr;
 		delete mTempAllocator; mTempAllocator = nullptr;
 
@@ -186,21 +188,88 @@ namespace Engine
 		}
 	}
 
+	JPH::Ref<JPH::Shape> PhysicsSystem::MakeShapeForEntity(Scene *scene, EntityID e, TransformComponent const &tc, RigidbodyComponent const &rb)
+	{
+		if (mMakeEntityShape)
+		{
+			if (auto s = mMakeEntityShape(scene, e, tc, rb)) return s;
+		}
+
+		if (mFetchMeshInfo)
+		{
+			MeshBuildInfo info;
+			if (mFetchMeshInfo(scene, e, info) && !info.vertices.empty() && info.indices.size() >= 3)
+			{
+				bool useConvex = info.preferConvex || !rb.IsKinematic;
+				std::uint8_t kind = useConvex ? 1u : 0u;
+				std::uint8_t ds = info.doubleSided ? 1u : 0u;
+
+				CacheKey key{ info.key, kind, ds };
+				if (auto it = mShapeCache.find(key); it != mShapeCache.end())
+				{
+					JPH::Ref<JPH::Shape> base = it->second;
+					if (info.scale != glm::vec3(1.0f))
+						return JPH::Ref<JPH::Shape>(new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
+					return base;
+				}
+
+				JPH::Ref<JPH::Shape> base;
+
+				if (useConvex)
+				{
+					JPH::Array<JPH::Vec3> pts; pts.resize(info.vertices.size());
+					for (size_t i = 0; i < info.vertices.size(); ++i)
+					{
+						auto const &v = info.vertices[i];
+						pts[i] = JPH::Vec3(v.x, v.y, v.z);
+					}
+					JPH::ConvexHullShapeSettings hull(pts);
+					hull.mMaxConvexRadius = 0.0f;
+					auto res = hull.Create();
+					if (!res.HasError()) base = res.Get();
+				}
+				else
+				{
+					JPH::Array<JPH::Float3> verts; verts.resize(info.vertices.size());
+					for (size_t i = 0; i < info.vertices.size(); ++i)
+					{
+						auto const &v = info.vertices[i];
+						verts[i] = JPH::Float3(v.x, v.y, v.z);
+					}
+					JPH::Array<JPH::IndexedTriangle> tris; tris.reserve(info.indices.size() / 3);
+					for (size_t i = 0; i + 2 < info.indices.size(); i += 3)
+					{
+						tris.push_back(JPH::IndexedTriangle(
+							(JPH::uint32)info.indices[i + 0],
+							(JPH::uint32)info.indices[i + 1],
+							(JPH::uint32)info.indices[i + 2]
+						));
+					}
+					JPH::MeshShapeSettings mss(verts, tris);
+					auto res = mss.Create();
+					if (!res.HasError()) base = res.Get();
+				}
+
+				if (base)
+				{
+					mShapeCache.emplace(key, base);
+					if (info.scale != glm::vec3(1.0f))
+						return JPH::Ref<JPH::Shape>(new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
+					return base;
+				}
+			}
+		}
+
+		return JPH::Ref<JPH::Shape>(new JPH::BoxShape(JPH::Vec3::sReplicate(DEFAULT_HALF_EXT)));
+	}
+
 	void PhysicsSystem::CreateBodyFor(Scene *scene, EntityID e)
 	{
 		auto &reg = scene->GetRegistry();
 		auto &tc = reg.get<TransformComponent>(e);
 		auto &rb = reg.get<RigidbodyComponent>(e);
 
-		JPH::Ref<JPH::Shape> shape;
-		if (mMakeEntityShape)
-		{
-			if (auto s = mMakeEntityShape(scene, e, tc, rb)) shape = s;
-		}
-		if (!shape)
-		{
-			shape = JPH::Ref<JPH::Shape>(new JPH::BoxShape(JPH::Vec3::sReplicate(DEFAULT_HALF_EXT)));
-		}
+		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
 
 		JPH::BodyCreationSettings settings(
 			shape,

@@ -24,6 +24,9 @@
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
 
@@ -47,17 +50,14 @@ namespace Engine
 			: mObjectToBroadPhase{ JPH::BroadPhaseLayer{ 0 }, JPH::BroadPhaseLayer{ 1 } },
 			mNumBroadPhaseLayers{ 2u }
 		{}
-
 		JPH::uint GetNumBroadPhaseLayers() const override { return mNumBroadPhaseLayers; }
 		JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer layer) const override { return mObjectToBroadPhase[layer]; }
-
 #if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
 		const char *GetBroadPhaseLayerName(JPH::BroadPhaseLayer layer) const override
 		{
 			switch (layer.GetValue()) { case 0: return "NON_MOVING"; case 1: return "MOVING"; default: return "UNKNOWN"; }
 		}
 #endif
-
 	private:
 		JPH::BroadPhaseLayer mObjectToBroadPhase[2];
 		JPH::uint            mNumBroadPhaseLayers{};
@@ -109,6 +109,18 @@ namespace Engine
 
 	using MakeEntityShapeFn = std::function<JPH::Ref<JPH::Shape>(Scene *, entt::entity, TransformComponent const &, RigidbodyComponent const &)>;
 
+	struct MeshBuildInfo
+	{
+		std::vector<glm::vec3>     vertices;
+		std::vector<std::uint32_t> indices;
+		glm::vec3                  scale{ 1.0f, 1.0f, 1.0f };
+		bool                       doubleSided{};
+		bool                       preferConvex{};
+		std::uint64_t              key{};
+	};
+
+	using FetchMeshInfoFn = std::function<bool(Scene *, entt::entity, MeshBuildInfo &)>;
+
 	class PhysicsSystem final : public System
 	{
 	public:
@@ -120,6 +132,7 @@ namespace Engine
 		void OnShutdown(Scene *scene) override;
 
 		void SetMakeEntityShapeCallback(MakeEntityShapeFn fn) { mMakeEntityShape = std::move(fn); }
+		void SetFetchMeshInfoCallback(FetchMeshInfoFn fn) { mFetchMeshInfo = std::move(fn); }
 
 	private:
 		using EntityID = entt::entity;
@@ -134,7 +147,28 @@ namespace Engine
 		ObjectLayerPairFilterImpl         mObjPairFilter;
 
 		std::unordered_map<EntityID, JPH::BodyID> mBodyOf;
+
+		struct CacheKey
+		{
+			std::uint64_t key{};
+			std::uint8_t  kind{};
+			std::uint8_t  ds{};
+			bool operator==(CacheKey const &o) const { return key == o.key && kind == o.kind && ds == o.ds; }
+		};
+		struct CacheKeyHash
+		{
+			std::size_t operator()(CacheKey const &k) const
+			{
+				std::size_t h = std::hash<std::uint64_t>{}(k.key);
+				h ^= (std::size_t)k.kind + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2);
+				h ^= (std::size_t)k.ds + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2);
+				return h;
+			}
+		};
+		std::unordered_map<CacheKey, JPH::Ref<JPH::Shape>, CacheKeyHash> mShapeCache;
+
 		MakeEntityShapeFn mMakeEntityShape;
+		FetchMeshInfoFn   mFetchMeshInfo;
 
 		static JPH::EMotionType ToMotionType(RigidbodyComponent const &rb) { return rb.IsKinematic ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic; }
 		static JPH::ObjectLayer ToObjectLayer(RigidbodyComponent const &rb) { return rb.IsKinematic ? Layers::NON_MOVING : Layers::MOVING; }
@@ -142,5 +176,7 @@ namespace Engine
 		void BuildOrRefreshBodies(Scene *scene);
 		void CreateBodyFor(Scene *scene, EntityID e);
 		void DestroyBodyFor(EntityID e);
+
+		JPH::Ref<JPH::Shape> MakeShapeForEntity(Scene *scene, EntityID e, TransformComponent const &tc, RigidbodyComponent const &rb);
 	};
 }
