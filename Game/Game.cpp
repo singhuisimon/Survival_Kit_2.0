@@ -12,8 +12,15 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
+#include "Component/TagComponent.h"
+#include "Component/TransformComponent.h"
+#include "Component/CameraComponent.h"
+#include "Component/MeshRendererComponent.h"
+#include "Component/RigidbodyComponent.h"
+
 // Adding systems
 #include "Graphics/RenderSystem.h"
+#include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 
 Game::Game()
@@ -103,7 +110,7 @@ void Game::OnInit() {
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
             m_Editor->SetScene(m_Scene.get()); 
-            m_Editor->OnInit();
+            m_Editor->OnInit(m_Renderer->get_imgui_texture());
             LOG_INFO("Editor initialized successfully.");
 
         }
@@ -125,6 +132,7 @@ void Game::OnInit() {
         m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
 
         m_Scene->AddSystem<Engine::TransformSystem>();
+        m_Scene->AddSystem<Engine::CameraSystem>();
         m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
        
         LOG_INFO("  -> Systems added successfully");
@@ -244,15 +252,19 @@ void Game::CreateDefaultScene() {
     camera.AddComponent<Engine::TagComponent>("MainCamera");
 
     auto& camTransform = camera.AddComponent<Engine::TransformComponent>();
-    camTransform.Position = glm::vec3(0, 2, 5);
+    camTransform.Position = glm::vec3(0, 5, 5);
     camTransform.Rotation = glm::vec3(-15, 0, 0);
     camTransform.Scale = glm::vec3(1, 1, 1);
 
     auto& camComponent = camera.AddComponent<Engine::CameraComponent>();
-    camComponent.Primary = true;
-    camComponent.FOV = 60.0f;
-    camComponent.NearClip = 0.1f;
-    camComponent.FarClip = 1000.0f;
+    camComponent.Enabled = true;
+    camComponent.autoAspect = true;
+    camComponent.Depth = 0; // 0 is the main camera
+    camComponent.Aspect = GetWidth() / GetHeight();
+    camComponent.FOV = 45.0f;
+    camComponent.NearPlane = 0.5f;
+    camComponent.FarPlane = 100.0f;
+    camComponent.Target = { 0.0f, 0.0f, 0.0f };
     LOG_TRACE("  -> Camera created");
 
     auto& listener = camera.AddComponent<Engine::ListenerComponent>();
@@ -388,6 +400,24 @@ void Game::OnUpdate(Engine::Timestep ts) {
         if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
     }
 
+    // Editor camera controls
+    if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+        
+        auto& editorCam = m_Renderer->getEditorCamera();
+
+        // Click-and-drag orbiting
+        if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y);
+        }
+
+        // Zooming in-and-out scrolling
+        double scrollY_offset = input.GetScrollDelta().y;
+        if (scrollY_offset != 0) {
+            editorCam.cameraOnScroll(scrollY_offset * 1000.0f);
+        }
+
+    }
+
     // Test the DSP Global Effects
 
     FMOD::DSP* dsp = nullptr;
@@ -519,8 +549,8 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
+    //m_Renderer->get_imgui_texture();
     m_Editor->OnUpdate(ts);
-    m_Editor->RenderEditor();
 }
 
 void Game::OnShutdown() {

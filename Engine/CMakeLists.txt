@@ -48,6 +48,10 @@ file(GLOB_RECURSE TRANSFORM_HEADERS "${ENGINE_ROOT}/Transform/*.h")
 file(GLOB_RECURSE COMPONENT_SOURCES "${ENGINE_ROOT}/Component/*.cpp")
 file(GLOB_RECURSE COMPONENT_HEADERS "${ENGINE_ROOT}/Component/*.h")
 
+# Prefabs Module
+file(GLOB_RECURSE PREFAB_SOURCES "${ENGINE_ROOT}/Prefab/*.cpp")
+file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
+
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
@@ -60,6 +64,7 @@ set(ENGINE_SOURCES
     ${SERIALIZATION_SOURCES}
     ${TRANSFORM_SOURCES}
     ${COMPONENT_SOURCES}
+    ${PREFAB_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -73,6 +78,7 @@ set(ENGINE_HEADERS
     ${SERIALIZATION_HEADERS}
     ${TRANSFORM_HEADERS}
     ${COMPONENT_HEADERS}
+    ${PREFAB_HEADERS}
 )
 
 # Create engine static library
@@ -134,6 +140,10 @@ source_group("Transform\\Source" FILES ${TRANSFORM_SOURCES})
 # Component Module
 source_group("Component\\Header" FILES ${COMPONENT_HEADERS})
 source_group("Component\\Source" FILES ${COMPONENT_SOURCES})
+
+# Prefab Module
+source_group("Prefab\\Header" FILES ${PREFAB_HEADERS})
+source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES

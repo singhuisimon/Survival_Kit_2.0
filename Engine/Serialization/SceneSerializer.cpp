@@ -1,7 +1,15 @@
 #include "SceneSerializer.h"
 #include "../ECS/Scene.h"
 #include "../ECS/Entity.h"
-#include "../ECS/Components.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
+
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
 
@@ -14,6 +22,11 @@
 // Standard library
 #include <fstream>
 #include <string>
+
+// Required for quaternion to Euler conversion
+#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Engine {
 
@@ -106,11 +119,12 @@ namespace Engine {
                 posArray.PushBack(transform.Position.z, allocator);
                 propertiesObj.AddMember("Position", posArray, allocator);
 
-                // Rotation
+                // Rotation - Convert quaternion to Euler angles
+                glm::vec3 eulerRotation = glm::degrees(glm::eulerAngles(transform.Rotation));
                 Value rotArray(kArrayType);
-                rotArray.PushBack(transform.Rotation.x, allocator);
-                rotArray.PushBack(transform.Rotation.y, allocator);
-                rotArray.PushBack(transform.Rotation.z, allocator);
+                rotArray.PushBack(eulerRotation.x, allocator);
+                rotArray.PushBack(eulerRotation.y, allocator);
+                rotArray.PushBack(eulerRotation.z, allocator);
                 propertiesObj.AddMember("Rotation", rotArray, allocator);
 
                 // Scale
@@ -132,10 +146,20 @@ namespace Engine {
                 componentObj.AddMember("Type", "CameraComponent", allocator);
 
                 Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Enabled", camera.Enabled, allocator);
+                propertiesObj.AddMember("autoAspect", camera.autoAspect, allocator);
+                propertiesObj.AddMember("isDirty", camera.isDirty, allocator);
+                propertiesObj.AddMember("Depth", camera.Depth, allocator);
+                propertiesObj.AddMember("Aspect", camera.Aspect, allocator);
                 propertiesObj.AddMember("FOV", camera.FOV, allocator);
-                propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-                propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
-                propertiesObj.AddMember("Primary", camera.Primary, allocator);
+                propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+                propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
+
+                Value targetArr(kArrayType);
+                targetArr.PushBack(camera.Target.x, allocator);
+                targetArr.PushBack(camera.Target.y, allocator);
+                targetArr.PushBack(camera.Target.z, allocator);
+                propertiesObj.AddMember("Target", targetArr, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -150,9 +174,6 @@ namespace Engine {
 
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("Visible", mesh.Visible, allocator);
-                propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
-                propertiesObj.AddMember("ShadowCast", mesh.ShadowCast, allocator);
-                propertiesObj.AddMember("GlobalIlluminate", mesh.GlobalIlluminate, allocator);
                 propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
                 propertiesObj.AddMember("Material", mesh.Material, allocator);
                 propertiesObj.AddMember("Texture", mesh.Texture, allocator);
@@ -249,13 +270,12 @@ namespace Engine {
 
         doc.AddMember("Entities", entitiesArray, allocator);
 
-        LOG_TRACE("Converting document to JSON string...");
         // Convert to string
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        LOG_TRACE("Serialization complete");
+        LOG_TRACE("Scene serialization complete");
         return buffer.GetString();
     }
 
@@ -278,6 +298,8 @@ namespace Engine {
 
     bool SceneSerializer::DeserializeFromString(const std::string& jsonString) {
         using namespace rapidjson;
+
+        LOG_TRACE("Parsing JSON...");
 
         Document doc;
         doc.Parse(jsonString.c_str());
@@ -341,79 +363,85 @@ namespace Engine {
                     else if (componentType == "TransformComponent") {
                         auto& transform = entity.AddComponent<TransformComponent>();
 
+                        // Position
                         if (properties.HasMember("Position")) {
-                            const Value& pos = properties["Position"];
+                            const Value& posArray = properties["Position"];
                             transform.Position = glm::vec3(
-                                pos[0].GetFloat(),
-                                pos[1].GetFloat(),
-                                pos[2].GetFloat()
+                                posArray[0].GetFloat(),
+                                posArray[1].GetFloat(),
+                                posArray[2].GetFloat()
                             );
                         }
 
+                        // Rotation - Convert Euler angles to quaternion
                         if (properties.HasMember("Rotation")) {
-                            const Value& rot = properties["Rotation"];
-                            transform.Rotation = glm::vec3(
-                                rot[0].GetFloat(),
-                                rot[1].GetFloat(),
-                                rot[2].GetFloat()
+                            const Value& rotArray = properties["Rotation"];
+                            glm::vec3 eulerRotation(
+                                rotArray[0].GetFloat(),
+                                rotArray[1].GetFloat(),
+                                rotArray[2].GetFloat()
                             );
+                            transform.Rotation = glm::quat(glm::radians(eulerRotation));
                         }
 
+                        // Scale
                         if (properties.HasMember("Scale")) {
-                            const Value& scale = properties["Scale"];
+                            const Value& scaleArray = properties["Scale"];
                             transform.Scale = glm::vec3(
-                                scale[0].GetFloat(),
-                                scale[1].GetFloat(),
-                                scale[2].GetFloat()
+                                scaleArray[0].GetFloat(),
+                                scaleArray[1].GetFloat(),
+                                scaleArray[2].GetFloat()
                             );
                         }
                     }
                     else if (componentType == "CameraComponent") {
                         auto& camera = entity.AddComponent<CameraComponent>();
 
+                        if (properties.HasMember("Enabled"))
+                            camera.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("autoAspect"))
+                            camera.autoAspect = properties["autoAspect"].GetBool();
+                        if (properties.HasMember("isDirty"))
+                            camera.isDirty = properties["isDirty"].GetBool();
+                        if (properties.HasMember("Depth"))
+                            camera.Depth = properties["Depth"].GetUint();
+                        if (properties.HasMember("Aspect"))
+                            camera.Aspect = properties["Aspect"].GetFloat();
                         if (properties.HasMember("FOV"))
                             camera.FOV = properties["FOV"].GetFloat();
-                        if (properties.HasMember("NearClip"))
-                            camera.NearClip = properties["NearClip"].GetFloat();
-                        if (properties.HasMember("FarClip"))
-                            camera.FarClip = properties["FarClip"].GetFloat();
-                        if (properties.HasMember("Primary"))
-                            camera.Primary = properties["Primary"].GetBool();
+                        if (properties.HasMember("NearPlane"))
+                            camera.NearPlane = properties["NearPlane"].GetFloat();
+                        if (properties.HasMember("FarPlane"))
+                            camera.FarPlane = properties["FarPlane"].GetFloat();
+
+                        if (properties.HasMember("Target")) {
+                            const Value& target = properties["Target"];
+                            camera.Target = glm::vec3(
+                                target[0].GetFloat(),
+                                target[1].GetFloat(),
+                                target[2].GetFloat()
+                            );
+                        }
                     }
                     else if (componentType == "MeshRendererComponent") {
                         auto& mesh = entity.AddComponent<MeshRendererComponent>();
-
-                        if (properties.HasMember("Visible"))
-                            mesh.Visible = properties["Visible"].GetBool();
-                        if (properties.HasMember("ShadowReceive"))
-                            mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
-                        if (properties.HasMember("ShadowCast"))
-                            mesh.ShadowCast = properties["ShadowCast"].GetBool();
-                        if (properties.HasMember("GlobalIlluminate"))
-                            mesh.GlobalIlluminate = properties["GlobalIlluminate"].GetBool();
-                        if (properties.HasMember("MeshType"))
-                            mesh.MeshType= properties["MeshType"].GetUint();
-                        if (properties.HasMember("Material"))
-                            mesh.Material = properties["Material"].GetUint();
-                        if (properties.HasMember("Texture"))
-                            mesh.Texture = properties["Texture"].GetUint();
+                        if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
+                        if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
+                        if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
+                        if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
                     }
                     else if (componentType == "RigidbodyComponent") {
                         auto& rb = entity.AddComponent<RigidbodyComponent>();
-
-                        if (properties.HasMember("Mass"))
-                            rb.Mass = properties["Mass"].GetFloat();
-                        if (properties.HasMember("IsKinematic"))
-                            rb.IsKinematic = properties["IsKinematic"].GetBool();
-                        if (properties.HasMember("UseGravity"))
-                            rb.UseGravity = properties["UseGravity"].GetBool();
+                        if (properties.HasMember("Mass")) rb.Mass = properties["Mass"].GetFloat();
+                        if (properties.HasMember("IsKinematic")) rb.IsKinematic = properties["IsKinematic"].GetBool();
+                        if (properties.HasMember("UseGravity")) rb.UseGravity = properties["UseGravity"].GetBool();
 
                         if (properties.HasMember("Velocity")) {
-                            const Value& vel = properties["Velocity"];
+                            const Value& velArray = properties["Velocity"];
                             rb.Velocity = glm::vec3(
-                                vel[0].GetFloat(),
-                                vel[1].GetFloat(),
-                                vel[2].GetFloat()
+                                velArray[0].GetFloat(),
+                                velArray[1].GetFloat(),
+                                velArray[2].GetFloat()
                             );
                         }
                     }
@@ -474,7 +502,7 @@ namespace Engine {
             }
         }
 
-        LOG_INFO("Scene deserialized successfully - loaded ", entities.Size(), " entities");
+        LOG_INFO("Scene deserialized successfully");
         return true;
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "../ECS/System.h"
 #include "../ECS/Components.h"
+#include <entt/entt.hpp>
 
 namespace Engine {
 

@@ -13,7 +13,7 @@
  */
 #pragma once
 
-// For dynamically allocated array
+ // For dynamically allocated array
 #include <vector> 
 
 // For OpenGL function pointers
@@ -21,6 +21,12 @@
 
 // For graphics related defines and functionality
 #include "Graphics/GraphicsLoader.h"
+
+// For Camera3D class
+#include "Graphics/Camera.h"
+
+// For Camera component
+#include "Component/CameraComponent.h"
 
 namespace Engine {
 
@@ -42,7 +48,7 @@ namespace Engine {
 		 * @brief Renders a complete frame with the given draw items
 		 * @param draw_items Collection of drawable objects to render
 		 */
-		void render_frame(std::span<const DrawItem> draw_items);
+		void render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list);
 
 		/**
 		 * @brief Retrieves the OpenGL texture handle for ImGui rendering
@@ -66,13 +72,15 @@ namespace Engine {
 		 * @brief Provides read-only access to material storage
 		 * @return Const reference to the material container
 		 */
-		inline const std::vector<Material>& getMaterialStorage() { return m_gl.t_testing_material;  }
+		inline const std::vector<Material>& getMaterialStorage() { return m_gl.t_testing_material; }
 
 		/**
 		 * @brief Provides read-only access to texture storage
 		 * @return Const reference to the texture container
 		 */
-		inline const std::vector<Texture>& getTextureStorage()   { return m_gl.t_testing_textures; }
+		inline const std::vector<Texture>& getTextureStorage() { return m_gl.t_testing_textures; }
+
+		inline Camera3D& getEditorCamera() { return editor_camera; }
 
 	private:
 		/**
@@ -86,7 +94,7 @@ namespace Engine {
 		 * @param pass The active render pass configuration
 		 * @param draw_items Collection of objects to draw
 		 */
-		void draw(RenderPass const& pass, std::span<const DrawItem> draw_items);
+		void draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4 v, const glm::mat4 p);
 
 		/**
 		 * @brief Finalizes the render pass and performs cleanup
@@ -105,4 +113,3 @@ namespace Engine {
 	};
 
 }
-
