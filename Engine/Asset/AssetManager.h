@@ -14,6 +14,7 @@
 #ifndef __ASSET_MANAGER_H__
 #define __ASSET_MANAGER_H__
 
+//c++ libraries
 #include <string>
 #include <vector>
 #include <ctime>
@@ -23,25 +24,21 @@
 #include <queue>
 #include <atomic>
 
-// // Manager base + logging
-//#include "Manager.h"
-//#include "LogManager.h"
 
-// Pipeline headers (In Pipeline folder)
+//Asset Files
 #include "AssetDatabase.h"
 #include "AssetScanner.h"
 #include "AssetDescriptorGenerator.h" 
 
 
-//asset path
+//Utilities 
 #include "../Utility/AssetPath.h"
+
+namespace Engine {
 
 
 //define acronym for easier access 
 #define AM AssetManager::getInstance()
-
-
-
 
 	/**
 	* @class AssetManager
@@ -153,9 +150,6 @@
 		AssetDescriptorGenerator& descriptorGenerator() { return m_descGen; }
 		const AssetDescriptorGenerator& descriptorGenerator() const { return m_descGen; }
 
-		//--------------Validating Descriptors ----------
-		//void validateExistingDescriptors();
-
 		/**
 		 * @brief Get the AssetId for a given source path.
 		 * @param sourcePath Path to the asset file (e.g., "Assets/Textures/rock.png")
@@ -184,37 +178,32 @@
 		 */
 		bool assetExists(const std::string& sourcePath) const;
 
-		//************************** COMPILER SYSTEM ***************************************** */
 
-#if 0
-/**
- * @brief Initialize the compiler system
- * @details Call this in startUp() after scanner is initialized
- */
-		void initializeCompilers();
+		//================== Resource loading Helper Functions ============================
+		/**
+		 * @brief Get the GUID for a resource by its filename.
+		 * @param filename The filename with extension (e.g., "cube.fbx")
+		 * @return instance_guid (0 if not found)
+		 *
+		 * @example
+		 *   auto guid = AM.getGuidFromName("cube.fbx");
+		 *   auto full_guid = convertToFullGuid(guid, ResourceType::MESH);
+		 *   MeshResource* mesh = RM.loadResource<MeshResource>(full_guid);
+		 */
+		xresource::instance_guid getGuidFromName(const std::string& filename) const; 
 
 		/**
-		 * @brief Queue an asset for compilation
-		 * @param rec Asset record to compile
+		 * @brief Get the filename (with extension) for a resource by its GUID.
+		 * @param guid The instance_guid of the resource
+		 * @return Filename with extension (e.g., "cube.fbx"), or empty string if not found
+		 *
+		 * @example
+		 *   std::string name = AM.getNameFromGuid(guid);
+		 *   // name = "cube.fbx"
 		 */
-		void queueCompilation(const AssetRecord* rec);
+		std::string getNameFromGuid(xresource::instance_guid guid) const;
 
-		/**
-		 * @brief Process compilation queue (call in scanAndProcess)
-		 */
-		void processCompilationQueue();
 
-		/**
-		 * @brief Get completed compilation results
-		 */
-		std::vector<CompileResult> getCompletedCompilations();
-
-		/**
-		 * @brief Shut down compiler thread safely
-		 */
-		void shutdownCompilers();
-
-#endif
 	private:
 
 		void handleAddedOrModified(const std::string& src);
@@ -229,5 +218,6 @@
 
 	};
 
+}//end of namespace Engine
 
 #endif // __ASSET_MANAGER_H__

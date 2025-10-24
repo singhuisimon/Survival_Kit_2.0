@@ -18,6 +18,8 @@
 //files
 #include "../xresource_guid/include/xresource_guid.h"
 #include "ResourceTypes.h"  // Use existing ResourceType enum
+ 
+namespace Engine {
 
 
     struct AssetRecord{
@@ -98,6 +100,7 @@
 
     };
 
+}// end of namespace Engine
 
 
 #endif

@@ -24,6 +24,8 @@
 #include <algorithm>
 
 
+namespace Engine {
+
 	/*
 	* @brief enum for resource types
 	*/
@@ -176,5 +178,9 @@
     //        return std::hash<uint64_t>{}(g.m_Value);
     //    }
     //};
+
+
+}//end of namespace Engine
+
 
 #endif // !_RESOURCE_TYPES_H

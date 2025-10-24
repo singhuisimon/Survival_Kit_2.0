@@ -11,10 +11,9 @@
 
 namespace fs = std::filesystem;
 
+namespace Engine {
 
-        // ==================== PUBLIC API ====================
-
-
+    // ==================== PUBLIC API ====================
 
     void AssetDescriptorGenerator::SetOutputRoot(const std::string& root) {
         m_outputRoot = root;
@@ -342,3 +341,6 @@ namespace fs = std::filesystem;
             return false;
         }
     }
+
+
+    }//end of namespace Engine

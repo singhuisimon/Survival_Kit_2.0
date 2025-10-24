@@ -10,6 +10,8 @@
 #include <ctime>
 #include <filesystem>
 
+namespace Engine {
+
 
 	/**
 	* @brief Change description for a scanned source file.
@@ -114,5 +116,6 @@
 		bool m_include_hidden = false; //  Include dotfiles
 	};
 
+}//end of namespace Engine
 
 #endif // __ASSET_SCANNER_H__
