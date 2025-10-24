@@ -8,7 +8,7 @@ add_executable(GameEngine
     Main.cpp
     Game.cpp
     Game.h
-)
+  )
 
 # Set target properties
 set_target_properties(GameEngine PROPERTIES

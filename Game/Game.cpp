@@ -23,6 +23,7 @@
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "Core/ScriptingBridge.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -135,7 +136,7 @@ void Game::OnInit() {
         m_Scene->AddSystem<Engine::TransformSystem>();
         m_Scene->AddSystem<Engine::CameraSystem>();
         m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
-       
+
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {

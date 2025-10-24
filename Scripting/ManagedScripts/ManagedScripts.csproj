@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+
+	<!-- Decoupled build for hot reload: reference the built ScriptAPI.dll (Part 7) -->
+	<ItemGroup>
+		<Reference Include="ScriptAPI">
+			<HintPath>..\..\build\ScriptAPI\Debug\ScriptAPI.dll</HintPath>
+			<HintPath>..\..\build\ScriptAPI\Release\ScriptAPI.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+</Project>
