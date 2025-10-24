@@ -14,6 +14,7 @@
 #include "Component/AudioComponent.h"
 #include "Component/ListenerComponent.h"
 #include "Component/ReverbZoneComponent.h"
+#include "Component/AIComponent.h"
 
 namespace Engine {
 
