@@ -92,13 +92,15 @@ namespace Engine
 		displayAssetsBrowserPanel();
 
 		displayPerformanceProfilePanel(ts);
+
+		//Complete Imgui rendering for the frame
+		CompleteFrame();
 	}
 
 	void Editor::displayTopMenu()
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
-			ImGui::Separator();
 
 			if (ImGui::BeginMenu("File"))
 			{
