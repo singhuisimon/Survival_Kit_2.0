@@ -70,16 +70,6 @@ namespace Engine
 		//Complete Imgui rendering for the frame
 		CompleteFrame();
 
-		renderViewport();
-
-		// Panel Logic
-		displayPropertiesPanel();
-
-		displayHierarchyPanel();
-
-		displayAssetsBrowserPanel();
-
-		displayPerformanceProfilePanel();
 	}
 
 	void Editor::displayTopMenu()
@@ -367,10 +357,6 @@ namespace Engine
 		}
 
 		ImGui::End();
-		
-		
-	}
-
 		// Display menu bar
 		displayTopMenu();
 

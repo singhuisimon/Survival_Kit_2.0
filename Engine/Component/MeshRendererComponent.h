@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Utility/Types.h"
+#include "../Asset/ResourceTypes.h"
 
 namespace Engine {
 
@@ -18,6 +19,9 @@ namespace Engine {
      * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
+        /// Unique identifier for this component instance
+        xresource::instance_guid ComponentGUID;
+
         bool Visible;           // Determine if sent to draw call
         bool ShadowReceive;     // For future expansion (WIP)
         bool ShadowCast;        // For future expansion (WIP)
@@ -28,7 +32,8 @@ namespace Engine {
 
         // Default constructor
         MeshRendererComponent()
-            : Visible(true),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Visible(true),
             ShadowReceive(false),
             ShadowCast(false),
             GlobalIlluminate(true),
