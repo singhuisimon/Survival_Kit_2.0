@@ -37,6 +37,10 @@ file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
 file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
 
 # Serialization Module
+file(GLOB_RECURSE PHYSICS_SOURCES "${ENGINE_ROOT}/Physics/*.cpp")
+file(GLOB_RECURSE PHYSICS_HEADERS "${ENGINE_ROOT}/Physics/*.h")
+
+# Serialization Module
 file(GLOB_RECURSE SERIALIZATION_SOURCES "${ENGINE_ROOT}/Serialization/*.cpp")
 file(GLOB_RECURSE SERIALIZATION_HEADERS "${ENGINE_ROOT}/Serialization/*.h")
 
@@ -65,6 +69,7 @@ set(ENGINE_SOURCES
     ${TRANSFORM_SOURCES}
     ${COMPONENT_SOURCES}
     ${PREFAB_SOURCES}
+    ${PHYSICS_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -79,6 +84,7 @@ set(ENGINE_HEADERS
     ${TRANSFORM_HEADERS}
     ${COMPONENT_HEADERS}
     ${PREFAB_HEADERS}
+    ${PHYSICS_HEADERS}
 )
 
 # Create engine static library
@@ -132,6 +138,10 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 # Serialization Module
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
+
+# Serialization Module
+source_group("Physics\\Header" FILES ${Physics_HEADERS})
+source_group("Physics\\Source" FILES ${Physics_SOURCES})
 
 # Transform Module
 source_group("Transform\\Header" FILES ${TRANSFORM_HEADERS})

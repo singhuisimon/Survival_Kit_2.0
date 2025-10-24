@@ -22,6 +22,7 @@
 #include "Graphics/RenderSystem.h"
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
+#include "Physics/PhysicsSystem.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -130,7 +131,7 @@ void Game::OnInit() {
         // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
         m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
         m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-
+        m_Scene->AddSystem<Engine::PhysicsSystem>();
         m_Scene->AddSystem<Engine::TransformSystem>();
         m_Scene->AddSystem<Engine::CameraSystem>();
         m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);

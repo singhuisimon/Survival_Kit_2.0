@@ -1,266 +1,146 @@
-/*****************************************************************************/
-/*!
-\file       PhysicsSystem.h
-\author     Low Yue Jun (yuejun.low)
-\par        email: yuejun.low@digipen.edu
-\date       2025/10/23
-\brief      Jolt physics system with broadphase layers/filters and mesh collider
-            support (triangle mesh / convex hull), shape cache, and mesh fetch
-            callback.
-
-            Provides:
-            - Initialize/Shutdown Jolt world
-            - Create static triangle-mesh colliders and dynamic convex-hull bodies
-            - Broadphase layer interface and object layer filters
-            - Step simulation and sync transforms to ECS
-            - Gravity / material control
-            - Shape caching per MeshType (+ scale)
-
-            Usage notes:
-            - Provide a MeshFetchCallback that fills vertices/indices for a
-              given MeshType handle. This allows PhysicsSystem to build Jolt
-              MeshShape or ConvexHullShape.
-            - Call Step(registry, dt) each frame to advance simulation and
-              write back positions/rotations to TransformComponent.
-
-(C) 2025 DigiPen Institute of Technology.
-Reproduction or disclosure of this i've comfile or its contents without the prior
-written consent of DigiPen Institute of Technology is prohibited.
-*/
-/*****************************************************************************/
 #pragma once
 
-// --- STL (alphabetical) ---
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <functional>
-#include <memory>
 #include <thread>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
-// --- entt / glm (alphabetical) ---
-#include <entt/entt.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-// --- Jolt (alphabetical) ---
+#include <Jolt/Jolt.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
+#include <Jolt/Physics/Body/MotionProperties.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
-#include <Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilter.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
-#include <Jolt/Physics/Collision/PhysicsMaterial.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
-#include <Jolt/Physics/Collision/Shape/MeshShape.h>
-#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/RegisterTypes.h>
 
-// --- Your components ---
-#include "../ECS/Components.h"                        // MeshRendererComponent
-#include "../Component/TransformComponent.h"      // Engine::TransformComponent
+#include "../ECS/Components.h"
+#include "../ECS/Scene.h"
+#include "../ECS/System.h"
 
 namespace Engine
 {
-    /**************************************************************************
-     * @brief
-     * Physics system using Jolt. Owns the world, shapes, bodies, and filters.
-     **************************************************************************/
-    class PhysicsSystem final
-    {
-    public:
-        // --- Types ----------------------------------------------------------
+	namespace Layers
+	{
+		static constexpr JPH::ObjectLayer NON_MOVING{ 0 };
+		static constexpr JPH::ObjectLayer MOVING{ 1 };
+		static constexpr JPH::ObjectLayer NUM_LAYERS{ 2 };
+	}
 
-        using u32 = std::uint32_t;
+	class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
+	{
+	public:
+		BPLayerInterfaceImpl()
+			: mObjectToBroadPhase{ JPH::BroadPhaseLayer{ 0 }, JPH::BroadPhaseLayer{ 1 } },
+			mNumBroadPhaseLayers{ 2u }
+		{}
 
-        /**************************************************************************
-         * @brief
-         * Mesh data container for building shapes.
-         * @param Positions
-         * Vertex positions in local/model space.
-         * @param Indices
-         * Triangle indices (triples).
-         **************************************************************************/
-        struct MeshData
-        {
-            std::vector<glm::vec3> Positions;
-            std::vector<u32>       Indices;    // 3 per triangle
-        };
+		JPH::uint GetNumBroadPhaseLayers() const override { return mNumBroadPhaseLayers; }
+		JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer layer) const override { return mObjectToBroadPhase[layer]; }
 
-        /**************************************************************************
-         * @brief
-         * Callback signature to fetch mesh data given MeshType handle.
-         * @param meshType
-         * Mesh handle from MeshRendererComponent::MeshType.
-         * @param out
-         * Filled with vertices/indices on success.
-         * @return
-         * True on success, false if the mesh cannot be provided.
-         **************************************************************************/
-        using MeshFetchCallback = std::function<bool(u32 meshType, MeshData &out)>;
+#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
+		const char *GetBroadPhaseLayerName(JPH::BroadPhaseLayer layer) const override
+		{
+			switch (layer.GetValue()) { case 0: return "NON_MOVING"; case 1: return "MOVING"; default: return "UNKNOWN"; }
+		}
+#endif
 
-        /**************************************************************************
-         * @brief
-         * Basic physics material values for created bodies.
-         **************************************************************************/
-        struct Material
-        {
-            float Friction;      // [0..inf), typical 0.2..1.0
-            float Restitution;   // [0..1], bounciness
-        };
+	private:
+		JPH::BroadPhaseLayer mObjectToBroadPhase[2];
+		JPH::uint            mNumBroadPhaseLayers{};
+	};
 
-        /**************************************************************************
-         * @brief
-         * Body creation options for dynamic bodies built from a convex hull.
-         **************************************************************************/
-        struct DynamicBodyDesc
-        {
-            float Mass;                // > 0
-            bool  StartActive;         // wake on create
-            bool  ContinuousDetection; // CCD
-            float LinearDamping;
-            float AngularDamping;
-            Material Mat;
-        };
+	class ObjectLayerPairFilterImpl final : public JPH::ObjectLayerPairFilter
+	{
+	public:
+		bool ShouldCollide(JPH::ObjectLayer a, JPH::ObjectLayer b) const override
+		{
+			if (a == Layers::NON_MOVING && b == Layers::NON_MOVING) return false;
+			return true;
+		}
+	};
 
-        /**************************************************************************
-         * @brief
-         * Global settings used to initialize Jolt.
-         **************************************************************************/
-        struct Settings
-        {
-            // Limits: tune to your project scale
-            u32   MaxBodies = 65536;
-            u32   NumBodyMutexes = 0;       // 0 -> Jolt picks
-            u32   MaxBodyPairs = 65536;
-            u32   MaxContactConstraints = 65536;
+	class ObjectVsBroadPhaseLayerFilterImpl final : public JPH::ObjectVsBroadPhaseLayerFilter
+	{
+	public:
+		bool ShouldCollide(JPH::ObjectLayer layer, JPH::BroadPhaseLayer broad) const override
+		{
+			JPH::uint b = broad.GetValue();
+			switch (layer)
+			{
+			case Layers::NON_MOVING: return b == 1u;
+			case Layers::MOVING:     return (b == 0u) || (b == 1u);
+			default:                 return false;
+			}
+		}
+	};
 
-            // Threads: 0 -> use hardware concurrency - 1
-            u32   WorkerThreadCount = 0;
+	inline JPH::Vec3  ToJPHVec3(glm::vec3 const &v) { return JPH::Vec3(v.x, v.y, v.z); }
+	inline JPH::RVec3 ToJPHRVec3(glm::vec3 const &v) { return JPH::RVec3(v.x, v.y, v.z); }
+	inline JPH::Quat  ToJPHQuat(glm::quat const &q) { return JPH::Quat(q.x, q.y, q.z, q.w); }
+	inline glm::vec3  ToGLM(JPH::Vec3 const &v) { return glm::vec3{ v.GetX(), v.GetY(), v.GetZ() }; }
+	inline glm::quat  ToGLM(JPH::Quat const &q) { return glm::quat{ q.GetW(), q.GetX(), q.GetY(), q.GetZ() }; }
 
-            // Gravity
-            glm::vec3 Gravity = glm::vec3{ 0.0f, -9.81f, 0.0f };
+	inline glm::quat EulerDegToQuat(glm::vec3 const &eulerDeg) { return glm::quat(glm::radians(eulerDeg)); }
+	inline glm::vec3 QuatToEulerDeg(glm::quat const &qIn)
+	{
+		double w = qIn.w, x = qIn.x, y = qIn.y, z = qIn.z;
+		double sr = 2.0 * (w * x + y * z), cr = 1.0 - 2.0 * (x * x + y * y);
+		double roll = std::atan2(sr, cr);
+		double sp = 2.0 * (w * y - z * x);
+		double pitch = (std::abs(sp) >= 1.0) ? std::copysign(glm::half_pi<double>(), sp) : std::asin(sp);
+		double sy = 2.0 * (w * z + x * y), cy = 1.0 - 2.0 * (y * y + z * z);
+		double yaw = std::atan2(sy, cy);
+		return glm::degrees(glm::vec3{ (float)roll, (float)pitch, (float)yaw });
+	}
 
-            // Default material for created bodies
-            Material DefaultMaterial = Material{ 0.6f, 0.0f };
+	using MakeEntityShapeFn = std::function<JPH::Ref<JPH::Shape>(Scene *, entt::entity, TransformComponent const &, RigidbodyComponent const &)>;
 
-            // Mesh provider
-            MeshFetchCallback MeshFetch = {};
-        };
+	class PhysicsSystem final : public System
+	{
+	public:
+		char const *GetName() const override { return "PhysicsSystem"; }
+		int GetPriority() const override { return 10; }
 
-        // --- Ctors / Dtors ---------------------------------------------------
+		void OnInit(Scene *scene) override;
+		void OnUpdate(Scene *scene, Timestep dt) override;
+		void OnShutdown(Scene *scene) override;
 
-        PhysicsSystem() = default;
-        ~PhysicsSystem();
+		void SetMakeEntityShapeCallback(MakeEntityShapeFn fn) { mMakeEntityShape = std::move(fn); }
 
-        PhysicsSystem(PhysicsSystem const &) = delete;
-        PhysicsSystem &operator=(PhysicsSystem const &) = delete;
+	private:
+		using EntityID = entt::entity;
 
-        // --- Init / Shutdown -------------------------------------------------
+		JPH::TempAllocator *mTempAllocator{};
+		JPH::JobSystemThreadPool *mJobSystem{};
+		JPH::PhysicsSystem        mPhysics;
+		JPH::BodyInterface *mBodyInterface{};
 
-        /**************************************************************************
-         * @brief
-         * Initializes Jolt, broadphase layers, filters, and world.
-         * @param cfg
-         * Settings including gravity and mesh callback.
-         **************************************************************************/
-        void Initialize(Settings const &cfg);
+		BPLayerInterfaceImpl              mBPLayers;
+		ObjectVsBroadPhaseLayerFilterImpl mObjVsBPLayerFilter;
+		ObjectLayerPairFilterImpl         mObjPairFilter;
 
-        /**************************************************************************
-         * @brief
-         * Destroys all bodies and shuts down Jolt world and allocators.
-         **************************************************************************/
-        void Shutdown();
+		std::unordered_map<EntityID, JPH::BodyID> mBodyOf;
+		MakeEntityShapeFn mMakeEntityShape;
 
-        // --- World control ---------------------------------------------------
+		static JPH::EMotionType ToMotionType(RigidbodyComponent const &rb) { return rb.IsKinematic ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic; }
+		static JPH::ObjectLayer ToObjectLayer(RigidbodyComponent const &rb) { return rb.IsKinematic ? Layers::NON_MOVING : Layers::MOVING; }
 
-        /**************************************************************************
-         * @brief
-         * Steps physics and syncs transforms back to ECS for dynamic bodies.
-         * @param registry
-         * entt registry to write positions/rotations into TransformComponent.
-         * @param dt
-         * Delta time in seconds.
-         * @param collisionSteps
-         * Number of collision substeps (typ. 1).
-         * @param integrationSubSteps
-         * Number of integration substeps (typ. 1..4).
-         **************************************************************************/
-        void Step(entt::registry &registry, float dt,
-            int collisionSteps = 1, int integrationSubSteps = 1);
-
-        /**************************************************************************
-         * @brief
-         * Adjust gravity at runtime.
-         **************************************************************************/
-        void SetGravity(glm::vec3 const &g);
-
-        // --- Body creation / destruction -------------------------------------
-
-        /**************************************************************************
-         * @brief
-         * Creates a STATIC triangle-mesh body from MeshType.
-         * @param e
-         * Entity id (used for bookkeeping and transform sync during rebuild).
-         * @param tr
-         * Transform (position/rotation/scale).
-         * @param mr
-         * MeshRendererComponent providing MeshType handle.
-         * @return
-         * Jolt BodyID of the created body (invalid if failed).
-         **************************************************************************/
-        JPH::BodyID CreateStaticMesh(entt::entity e,
-            TransformComponent const &tr,
-            MeshRendererComponent const &mr);
-
-        /**************************************************************************
-         * @brief
-         * Creates a DYNAMIC body by building a convex hull from MeshType.
-         * @param e
-         * Entity id to track.
-         * @param tr
-         * Transform (position/rotation/scale).
-         * @param mr
-         * MeshRendererComponent providing MeshType handle.
-         * @param desc
-         * Dynamic creation parameters (mass, damping, material).
-         * @return
-         * Jolt BodyID of the created body (invalid if failed).
-         **************************************************************************/
-        JPH::BodyID CreateDynamicConvex(entt::entity e,
-            TransformComponent const &tr,
-            MeshRendererComponent const &mr,
-            DynamicBodyDesc const &desc);
-
-        /**************************************************************************
-         * @brief
-         * Destroys a body associated with entity if present.
-         **************************************************************************/
-        void DestroyBody(entt::entity e);
-
-        // --- Queries ---------------------------------------------------------
-
-        /**************************************************************************
-         * @brief
-         * Returns true if an entity has a body registered in the physics world.
-         **************************************************************************/
-        bool HasBody(entt::entity e) const;
-
-        /**************************************************************************
-         * @brief
-         * Fetch current body transform (COM) into glm types.
-         * @return
-         * True on success.
-         **************************************************************************/
-        bool GetBodyTransform(entt::entity e, glm::vec3 &outPos, glm::quat &outRot) const;
-
-    private:
-        // --- Broadphase / layers --------------------------------------------
-
-        enum class O
+		void BuildOrRefreshBodies(Scene *scene);
+		void CreateBodyFor(Scene *scene, EntityID e);
+		void DestroyBodyFor(EntityID e);
+	};
+}
