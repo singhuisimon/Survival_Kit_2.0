@@ -59,6 +59,8 @@ namespace Engine {
 		bool DebugDraw = false;
 		std::string CurrentState = "Idle";
 
+		bool TreeDirty = false;
+
 		//DEFAULT CONSTRUCTOR
 		AIComponent()
 			: TreeAssetPath("")
@@ -68,7 +70,8 @@ namespace Engine {
 			, TickRate(0.0f)
 			, TimeSinceLastTick(0.0f)
 			, DebugDraw(false)
-			, CurrentState("Idle") {
+			, CurrentState("Idle") 
+			, TreeDirty(false){
 		}
 
 		//CONSTRUCTOR WITH TREE PATH
@@ -80,14 +83,15 @@ namespace Engine {
 			, TickRate(0.0f)
 			, TimeSinceLastTick(0.0f)
 			, DebugDraw(false)
-			, CurrentState("Idle") {
+			, CurrentState("Idle") 
+			, TreeDirty(false) {
 		}
 
 		/**
 		* @brief Helper to get blackboard value
 		*/
 		template<typename T>
-		void SetBlackBoardValue(const std::string& key, const T& value) {
+		void SetBlackboardValue(const std::string& key, const T& value) {
 			Data[key] = value;
 		}
 
@@ -100,9 +104,26 @@ namespace Engine {
 		T* GetBlackboardValue(const std::string& key) {
 			auto it = Data.find(key);
 			if (it != Data.end()) {
-				return std::_Get_difference_type<T>(&it->second);
+				return std::get_if<T>(&it->second);
 			}
 			return nullptr;
+		}
+
+		/**
+		 * @brief Get blackboard value with default fallback
+		 * @tparam T Type of value
+		 * @param key Blackboard key
+		 * @param defaultValue Default value if key doesn't exist
+		 * @return Value from blackboard or default
+		 */
+		template<typename T>
+		T GetBlackboardValueOr(const std::string& key, const T& defaultValue) const {
+			auto it = Data.find(key);
+			if (it != Data.end()) {
+				const T* val = std::get_if<T>(&it->second);
+				if (val) return *val;
+			}
+			return defaultValue;
 		}
 
 		/**
@@ -111,6 +132,13 @@ namespace Engine {
 		bool HasBlackboardKey(const std::string& key) const {
 			return Data.find(key) != Data.end();
 		}
+
+		// Validation
+		bool HasValidTree() const { return Tree != nullptr && !TreeAssetPath.empty(); }
+
+		// Editor support
+		void MarkTreeDirty() { TreeDirty = true; }
+		void ClearTreeDirty() { TreeDirty = false; }
 
 	};
 

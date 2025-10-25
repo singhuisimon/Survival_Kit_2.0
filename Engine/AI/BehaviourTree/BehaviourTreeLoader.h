@@ -8,7 +8,31 @@
 namespace Engine {
 
     /**
-     * @brief Loads and builds BehaviourTree objects from JSON using RapidJSON.
+     * @class BehaviourTreeLoader
+     * @brief Loads and builds BehaviourTree objects from JSON using RapidJSON
+     *
+     * @details Supports loading composite nodes (Sequence, Selector, Parallel),
+     *          decorator nodes (Inverter, Repeater, Succeeder), and custom leaf nodes.
+     *
+     * JSON Format Example:
+     * {
+     *   "name": "EnemyAI",
+     *   "description": "Basic enemy behavior",
+     *   "root": {
+     *     "type": "Sequence",
+     *     "name": "MainSequence",
+     *     "params": {
+     *       "key": "value"
+     *     },
+     *     "children": [
+     *       {
+     *         "type": "Selector",
+     *         "name": "ActionSelector",
+     *         "children": [...]
+     *       }
+     *     ]
+     *   }
+     * }
      */
     class BehaviourTreeLoader {
     public:

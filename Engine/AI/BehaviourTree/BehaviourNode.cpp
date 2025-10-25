@@ -23,44 +23,57 @@ namespace Engine {
     void BehaviourNode::Reset() {
         m_Status = NodeStatus::IDLE;
         m_Result = NodeResult::IN_PROGRESS;
-        for (auto& child : m_Children)
-            child->Reset();
+
+        //recursively reset all children
+        for (auto& child : m_Children) {
+            if (child) {
+                child->Reset();
+            }
+        }
     }
 
     void BehaviourNode::OnEnter(Blackboard& blackboard) {
         (void)blackboard;
-        m_Status = NodeStatus::ENTERING;
+        m_Status = NodeStatus::READY;
         LOG_TRACE("[BT] OnEnter: ", m_Name);
     }
 
     void BehaviourNode::OnUpdate(Blackboard& blackboard, float deltaTime) {
         (void)blackboard;
         (void)deltaTime;
+
+        // Base implementation: instantly succeed
+        // Derived classes should override this with actual logic
         m_Status = NodeStatus::RUNNING;
-        // Default node instantly succeeds
-        m_Result = NodeResult::SUCCESS;
     }
 
     void BehaviourNode::OnExit(Blackboard& blackboard) {
         (void)blackboard;
         m_Status = NodeStatus::EXITING;
-        LOG_TRACE("[BT] OnExit: ", m_Name);
-        m_Status = NodeStatus::COMPLETED;
+        LOG_TRACE("[BT] OnExit: ", m_Name, " with result: ",
+            (m_Result == NodeResult::SUCCESS ? "SUCCESS" :
+                m_Result == NodeResult::FAILURE ? "FAILURE" : "IN_PROGRESS"));
     }
 
     NodeResult BehaviourNode::Step(Blackboard& blackboard, float deltaTime,
         std::size_t& childIndex,
         std::vector<NodeFrame>& stack) {
-        (void)childIndex;
-        (void)stack;
+        
+        (void)childIndex; // Base nodes don't use children
+        (void)stack;      // Base nodes don't push to stack
 
-        if (m_Status == NodeStatus::IDLE || m_Status == NodeStatus::ENTERING)
+        // Enter node if not yet started
+        if (m_Status == NodeStatus::IDLE) {
             OnEnter(blackboard);
+        }
 
-        if (m_Status == NodeStatus::ENTERING || m_Status == NodeStatus::RUNNING)
+        // Update node if still running
+        if (m_Status == NodeStatus::RUNNING && m_Result == NodeResult::IN_PROGRESS) {
             OnUpdate(blackboard, deltaTime);
+        }
 
-        if (m_Result != NodeResult::IN_PROGRESS) {
+        // Exit node if completed
+        if (m_Result != NodeResult::IN_PROGRESS && m_Status != NodeStatus::EXITING) {
             OnExit(blackboard);
         }
 

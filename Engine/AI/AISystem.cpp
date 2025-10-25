@@ -6,24 +6,28 @@
 
 namespace Engine {
 
-    AISystem::AISystem(AIManager* aiManager)
-        : m_AIManager(aiManager)
+    AISystem::AISystem(BehaviourTreeSerializer* treeSerializer)
+        : m_TreeSerializer(treeSerializer)
         , m_Initialized(false)
         , m_GlobalTickRate(0.0f)
         , m_DebugDrawAll(false) {
+
+        if (!m_TreeSerializer) {
+            LOG_ERROR("[AISystem] Constructor received null BehaviourTreeSerializer!");
+        }
     }
 
     AISystem::~AISystem() {
-        onShutdown(nullptr);
+        OnShutdown(nullptr);
     }
 
-    void AISystem::onInit(Scene* scene) {
-        if (!scene || !m_AIManager) {
+    void AISystem::OnInit(Scene* scene) {
+        if (!scene || !m_TreeSerializer) {
             LOG_ERROR("AISystem::OnInit - Invalid scene or AIManager");
             return;
         }
 
-        if (!m_AIManager->IsInitialized()) {
+        if (!m_TreeSerializer->IsInitialized()) {
             LOG_ERROR("AISystem::OnInit - AIManager not initialized");
             return;
         }
@@ -34,11 +38,12 @@ namespace Engine {
         registry.on_destroy<AIComponent>().connect<&AISystem::OnAIComponentRemoved>(*this);
 
         m_Initialized = true;
+        m_ActiveTreePaths.clear();
         LOG_INFO("AISystem initialized successfully");
     }
 
-    void AISystem::onUpdate(Scene* scene, Timestep ts) {
-        if (!m_Initialized || !scene || !m_AIManager) {
+    void AISystem::OnUpdate(Scene* scene, Timestep ts) {
+        if (!m_Initialized || !scene || !m_TreeSerializer) {
             return;
         }
 
@@ -48,7 +53,7 @@ namespace Engine {
         ProcessAIEntities(scene, deltaTime);
     }
 
-    void AISystem::onShutdown(Scene* scene) {
+    void AISystem::OnShutdown(Scene* scene) {
         if (!m_Initialized) {
             return;
         }
@@ -58,8 +63,56 @@ namespace Engine {
             registry.on_destroy<AIComponent>().disconnect<&AISystem::OnAIComponentRemoved>(*this);
         }
 
+        m_ActiveTreePaths.clear();
+
         LOG_INFO("AISystem shutting down.");
         m_Initialized = false;
+    }
+
+    bool AISystem::ReloadTreeForEntity(Entity entity) {
+        if (!entity.HasComponent<AIComponent>()) {
+            return false;
+        }
+
+        auto& ai = entity.GetComponent<AIComponent>();
+        if (ai.TreeAssetPath.empty()) {
+            LOG_WARNING("[AISystem] Entity AIComponent has no tree path");
+            return false;
+        }
+
+        LOG_INFO("[AISystem] Reloading tree for entity ", (uint32_t)entity);
+
+        // Mark dirty and reload
+        ai.MarkTreeDirty();
+        
+        // Reload in serializer
+        bool success = m_TreeSerializer->ReloadTree(ai.TreeAssetPath);
+
+        if (success) {
+            // Clear current tree reference - will be reloaded on next tick
+            ai.Tree = nullptr;
+            ai.CurrentNode = nullptr;
+            LOG_INFO("[AISystem] Tree reload successful");
+        }
+        else {
+            LOG_ERROR("[AISystem] Tree reload failed");
+        }
+
+        return success;
+    }
+
+    void AISystem::ReloadAllTrees() {
+        LOG_INFO("[AISystem] Reloading all active trees (count: ", m_ActiveTreePaths.size(), ")");
+
+        for (const auto& path : m_ActiveTreePaths) {
+            m_TreeSerializer->ReloadTree(path);
+        }
+
+        LOG_INFO("[AISystem] All trees reloaded");
+    }
+
+    std::vector<std::string> AISystem::GetActiveTreePaths() const {
+        return std::vector<std::string>(m_ActiveTreePaths.begin(), m_ActiveTreePaths.end());
     }
 
     void AISystem::ProcessAIEntities(Scene* scene, float deltaTime) {
@@ -76,104 +129,112 @@ namespace Engine {
             }
 
             // Ensure behaviour tree is loaded
-            //if (!EnsureBehaviourTreeLoaded(entity, ai)) {
-            //    continue;
-            //}
+            if (!EnsureBehaviourTreeLoaded(entity, ai)) {
+                continue;
+            }
 
             // Check if should tick this frame
             if (!ShouldTick(ai, deltaTime)) {
                 continue;
             }
 
-            // Get optional components
-            TransformComponent* transform = entity.HasComponent<TransformComponent>()
-                ? &entity.GetComponent<TransformComponent>()
-                : nullptr;
-
             // Tick the behaviour tree
-            //TickBehaviourTree(entity, ai, transform);
+            TickBehaviourTree(entity, ai, deltaTime);
         }
     }
 
     //COMMENTED BECAUSE BEHAVIOUR TREE FILES NOT CODED YET
 
-    //bool AISystem::EnsureBehaviourTreeLoaded(Entity entity, AIComponent& ai) {
-    //    // Already has a tree
-    //    if (ai.Tree != nullptr) {
-    //        return true;
-    //    }
+    bool AISystem::EnsureBehaviourTreeLoaded(Entity entity, AIComponent& ai) {
+        // Already has a tree
+        if (ai.Tree != nullptr && !ai.TreeDirty) {
+            return true;
+        }
 
-    //    // No tree path specified
-    //    if (ai.TreeAssetPath.empty()) {
-    //        LOG_WARNING("AISystem - Entity ", (uint32_t)entity, " has no behaviour tree path");
-    //        return false;
-    //    }
+        // No tree path specified
+        if (ai.TreeAssetPath.empty()) {
+            LOG_WARNING("AISystem - Entity ", (uint32_t)entity, " has no behaviour tree path");
+            return false;
+        }
 
-    //    // Try to load/get the tree
-    //    BehaviourTree* tree = m_AIManager->GetTree(ai.TreeAssetPath);
-    //    if (!tree) {
-    //        // Not in cache, try loading it
-    //        tree = m_AIManager->LoadTree(ai.TreeAssetPath);
-    //    }
+        // Try to load/get the tree
+        BehaviourTree* tree = m_TreeSerializer->GetTree(ai.TreeAssetPath);
+        
+        if (!tree) {
+            // Not in cache, try loading it
+            tree = m_TreeSerializer->LoadTree(ai.TreeAssetPath);
+        }
 
-    //    if (!tree) {
-    //        LOG_ERROR("AISystem - Failed to load behaviour tree: ", ai.TreeAssetPath);
-    //        return false;
-    //    }
+        if (!tree) {
+            LOG_ERROR("AISystem - Failed to load behaviour tree: ", ai.TreeAssetPath);
+            return false;
+        }
 
-    //    // Assign tree to AI component
-    //    ai.Tree = tree;
+        // Assign tree to AI component
+        ai.Tree = tree;
+        ai.TreeDirty = false;
 
-    //    // Initialize blackboard with common values
-    //    InitializeBlackboard(entity, ai);
+        m_ActiveTreePaths.insert(ai.TreeAssetPath);
 
-    //    LOG_INFO("AISystem - Loaded behaviour tree '", ai.TreeAssetPath, "' for entity ", (uint32_t)entity);
-    //    return true;
-    //}
+        // Initialize blackboard with common values
+        InitializeBlackboard(entity, ai);
 
-    //void AISystem::TickBehaviourTree(Entity entity, AIComponent& ai, TransformComponent* transform) {
-    //    if (!ai.Tree) {
-    //        return;
-    //    }
+        LOG_INFO("AISystem - Loaded behaviour tree '", ai.TreeAssetPath, "' for entity ", (uint32_t)entity);
+        return true;
+    }
 
-    //    // Update blackboard with current entity info
-    //    ai.SetBlackboardValue("self", (entt::entity)entity);
+    void AISystem::TickBehaviourTree(Entity entity, AIComponent& ai, float deltaTime){//TransformComponent* transform) {
+        if (!ai.Tree) {
+            return;
+        }
 
-    //    if (transform) {
-    //        ai.SetBlackboardValue("position", transform->Position);
-    //        ai.SetBlackboardValue("rotation", glm::vec3(transform->Rotation.x, transform->Rotation.y, transform->Rotation.z));
-    //    }
+        // Update blackboard with current entity info
+        ai.SetBlackboardValue("self", (entt::entity)entity);
+        ai.SetBlackboardValue("deltaTime", deltaTime);
 
-    //    // Tick the root node
-    //    NodeStatus status = ai.Tree->Tick(ai.Data);
+        // Update transform data if available
+        if (entity.HasComponent<TransformComponent>()) {
+            auto& transform = entity.GetComponent<TransformComponent>();
+            ai.SetBlackboardValue("position", transform.Position);
 
-    //    // Update AI state based on result
-    //    switch (status) {
-    //    case NodeStatus::SUCCESS:
-    //        ai.CurrentState = "Success";
-    //        LOG_TRACE("AISystem - Entity ", (uint32_t)entity, " behaviour tree: SUCCESS");
-    //        break;
+            // Convert quaternion to euler for easier use in BT
+            glm::vec3 euler = glm::degrees(glm::eulerAngles(transform.Rotation));
+            ai.SetBlackboardValue("rotation", euler);
+        }
 
-    //    case NodeStatus::FAILURE:
-    //        ai.CurrentState = "Failure";
-    //        LOG_TRACE("AISystem - Entity ", (uint32_t)entity, " behaviour tree: FAILURE");
-    //        break;
+        // Tick the root node
+        NodeResult result = ai.Tree->Tick(ai.Data, deltaTime);
 
-    //    case NodeStatus::RUNNING:
-    //        ai.CurrentState = "Running";
-    //        // Tree is still executing
-    //        break;
+        // Update AI state based on result
+        switch (result) {
+        case NodeResult::SUCCESS:
+            ai.CurrentState = "Success";
+            ai.Tree->Reset(); // Reset for next cycle
+            LOG_TRACE("[AISystem] Entity ", (uint32_t)entity, " tree: SUCCESS");
+            break;
 
-    //    case NodeStatus::IDLE:
-    //        ai.CurrentState = "Idle";
-    //        break;
-    //    }
+        case NodeResult::FAILURE:
+            ai.CurrentState = "Failure";
+            ai.Tree->Reset(); // Reset for next cycle
+            LOG_TRACE("[AISystem] Entity ", (uint32_t)entity, " tree: FAILURE");
+            break;
 
-    //    // Debug drawing
-    //    if (ai.DebugDraw || m_DebugDrawAll) {
-    //        LOG_TRACE("AISystem - Entity ", (uint32_t)entity, " State: ", ai.CurrentState);
-    //    }
-    //}
+        case NodeResult::IN_PROGRESS:
+            ai.CurrentState = "Running";
+            // Tree continues executing
+            break;
+        }
+
+        // Store current executing node for debugging
+        ai.CurrentNode = ai.Tree->GetCurrentNode();
+
+        // Debug drawing
+        if (ai.DebugDraw || m_DebugDrawAll) {
+            LOG_TRACE("[AISystem] Entity ", (uint32_t)entity,
+                " | State: ", ai.CurrentState,
+                " | Trace: ", ai.Tree->GetExecutionTrace());
+        }
+    }
 
     bool AISystem::ShouldTick(AIComponent& ai, float deltaTime) {
         // Determine tick rate (use component's rate if set, otherwise use global)
@@ -205,10 +266,11 @@ namespace Engine {
 
         auto& ai = e.GetComponent<AIComponent>();
 
-        LOG_INFO("AISystem - Cleanup for entity ", (uint32_t)entity, " (Tree: ", ai.TreeAssetPath, ")");
+        LOG_INFO("[AISystem] Cleaning up AI component for entity ", (uint32_t)entity,
+            " (Tree: ", ai.TreeAssetPath, ")");
 
         // Note: We don't delete the tree itself - it's owned by AIManager
-        // Just clear the pointer
+        // Clear references (tree itself is owned by serializer)
         ai.Tree = nullptr;
         ai.CurrentNode = nullptr;
         ai.Data.clear();
@@ -216,11 +278,15 @@ namespace Engine {
 
     void AISystem::InitializeBlackboard(Entity entity, AIComponent& ai) {
         // Set up common blackboard values
-        //ai.SetBlackboardValue("self", (entt::entity)entity);
-        //ai.SetBlackboardValue("isAlerted", false);
-        //ai.SetBlackboardValue("target", entt::null);
+        ai.SetBlackboardValue("self", (entt::entity)entity);
+        ai.SetBlackboardValue("deltaTime", 0.0f);
+        
+        // Optional: Initialize common gameplay values
+        // ai.SetBlackboardValue("isAlerted", false);
+        // ai.SetBlackboardValue("target", entt::null);
+        // ai.SetBlackboardValue("health", 100.0f);
 
-        LOG_TRACE("AISystem - Initialized blackboard for entity ", (uint32_t)entity);
+        LOG_TRACE("[AISystem] Initialized blackboard for entity ", (uint32_t)entity);
     }
 
 }

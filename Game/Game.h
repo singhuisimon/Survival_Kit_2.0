@@ -2,6 +2,7 @@
 #include "Core/Application.h"
 #include "ECS/Scene.h"
 #include "Audio/AudioManager.h"
+#include "Serialization/BehaviourTreeSerializer.h"
 #include "Editor/Editor.h"
 #include "Utility/Logger.h"
 #include <memory>
@@ -43,6 +44,7 @@ private:
     float m_ColorShift = 0.0f;
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
+	std::unique_ptr<Engine::BehaviourTreeSerializer> m_BTSerializer;
 
     /**
      * @brief Create a default scene if loading from file fails

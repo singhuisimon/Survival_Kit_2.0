@@ -3,7 +3,7 @@
 #include "ECS/Scene.h"
 #include "ECS/System.h"
 #include "ECS/Entity.h"
-#include "AIManager.h"
+#include "Serialization/BehaviourTreeSerializer.h"
 #include "Component/AIComponent.h"
 
 namespace Engine
@@ -17,17 +17,17 @@ namespace Engine
 		* @brief constructor
 		* @param aiManager Pointer to the global AI Manager
 		*/
-		explicit AISystem(AIManager* aiManager);
+		explicit AISystem(BehaviourTreeSerializer* treeSerializer);
 		~AISystem();
 
 		//SYSTEM INTERFACE
 
-		void onInit(Scene* scene);
-		void onUpdate(Scene* scene, Timestep ts);
-		void onShutdown(Scene* scene);
+		void OnInit(Scene* scene) override;      // Fixed: was onInit
+		void OnUpdate(Scene* scene, Timestep ts) override;  // Fixed: was onUpdate
+		void OnShutdown(Scene* scene) override;  // Fixed: was onShutdown
 
-		int getPriority() const { return 50; }
-		const char* getName() const { return "AISystem"; }
+		int GetPriority() const override { return 50; }
+		const char* GetName() const override { return "AISystem"; }
 
 		//CONFIGURATION
 
@@ -47,14 +47,27 @@ namespace Engine
 		*/
 		void SetDebugDrawAll(bool enable) { m_DebugDrawAll = enable; }
 
+		/**
+		 * @brief Check if debug drawing is enabled for all AI
+		 */
+		bool IsDebugDrawAllEnabled() const { return m_DebugDrawAll; }
+
+		// Editor Support
+		bool ReloadTreeForEntity(Entity entity);
+		void ReloadAllTrees();
+		std::vector<std::string> GetActiveTreePaths() const;
+
 	private:
 
-		AIManager* m_AIManager;
+		BehaviourTreeSerializer* m_TreeSerializer;
 		bool m_Initialized = false;
 
 		//performance settings
 		float m_GlobalTickRate = 0.0f;  // 0 = tick every frame
 		bool m_DebugDrawAll = false;
+
+		// Track trees used in this scene
+		std::unordered_set<std::string> m_ActiveTreePaths;
 
 		/**
 		* @brief Process all AI Entities
@@ -67,7 +80,7 @@ namespace Engine
 		 * @param ai The AI component
 		 * @return True if tree is ready to tick
 		 */
-		//bool EnsureBehaviourTreeLoaded(Entity entity, AIComponent& ai);
+		bool EnsureBehaviourTreeLoaded(Entity entity, AIComponent& ai);
 
 		/**
 		  * @brief Tick an AI's behaviour tree
@@ -75,7 +88,7 @@ namespace Engine
 		  * @param ai The AI component
 		  * @param transform Optional transform component
 		  */
-		//void TickBehaviourTree(Entity entity, AIComponent& ai, TransformComponent* transform);
+		void TickBehaviourTree(Entity entity, AIComponent& ai, float deltaTime);// , TransformComponent* transform);
 
 		/**
 		  * @brief Check if AI should tick this frame

@@ -8,6 +8,7 @@
 
 namespace Engine
 {
+
     /**
      * @brief One frame of execution on the stack
      */
@@ -39,12 +40,20 @@ namespace Engine
         // --- Metadata (for editor) ---
         const std::string& GetName() const { return m_Name; }
         void SetName(const std::string& n) { m_Name = n; }
-        const std::string& GetDescription() const { return m_Description; }
-        void SetDescription(const std::string& d) { m_Description = d; }
+        
+        // Editor/Debug support
+        const std::vector<NodeFrame>& GetStack() const { return m_Stack; }
+        size_t GetStackDepth() const { return m_Stack.size(); }
+
+        // Get currently executing node
+        BehaviourNode* GetCurrentNode() const {
+            return m_Stack.empty() ? nullptr : m_Stack.back().node;
+        }
+
+        std::string GetExecutionTrace() const;
 
     private:
         std::string m_Name;
-        std::string m_Description;
         std::unique_ptr<BehaviourNode> m_Root;
 
         std::vector<NodeFrame> m_Stack; // execution stack

@@ -23,6 +23,7 @@
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "AI/AISystem.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -36,8 +37,6 @@ void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
 
     //==========INITIALIZING ASSET ==============
-
-    
 
     LOG_INFO("Initializing Asset...");
 
@@ -116,6 +115,11 @@ void Game::OnInit() {
 
         }
 
+        if (!m_BTSerializer) {
+            m_BTSerializer = std::make_unique<Engine::BehaviourTreeSerializer>();
+            m_BTSerializer->Init();
+        }
+
         LOG_INFO("  -> Scene created at address: ", (void*)m_Scene.get());
     }
     catch (const std::exception& e) {
@@ -135,6 +139,7 @@ void Game::OnInit() {
         m_Scene->AddSystem<Engine::TransformSystem>();
         m_Scene->AddSystem<Engine::CameraSystem>();
         m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+        m_Scene->AddSystem<Engine::AISystem>(m_BTSerializer.get());
        
         LOG_INFO("  -> Systems added successfully");
     }
@@ -557,6 +562,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
 void Game::OnShutdown() {
     LOG_INFO("Game shutting down...");
 
+    if (m_BTSerializer) {
+        LOG_TRACE("Shutting down behaviour tree serializer");
+        m_BTSerializer->Shutdown();
+    }
+
     if (m_Scene) {
         LOG_DEBUG("SHUTTING DOWN SCENE");
         // Shutdown all systems before destroying scene
@@ -579,6 +589,7 @@ void Game::OnShutdown() {
     LOG_INFO("Shutting Down Asset");
     AM.shutDown();
 
+    m_BTSerializer.reset();
     m_Scene.reset();
     m_AudioManager.reset();
     m_Editor.reset();
