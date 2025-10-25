@@ -19,6 +19,8 @@
 //include heaader files
 #include "../Utility/DescriptorParser.h"
 #include "../CompilerCore/MeshCompiler.h"
+#include "../CompilerCore/TextureCompiler.h"
+
 
 
 namespace fs = std::filesystem;
@@ -233,13 +235,13 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
     }
 
     else if (descriptor.resourceType == "Texture") {
-        // TODO: Implement TextureCompiler
-        if (config.verbose) {
-            std::cout << "    TODO: Texture compilation not yet implemented\n";
-        }
-        // Simulate work for now
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        success = true;
+        // Texture Compiler
+        AssetCompiler::TextureCompiler compiler; 
+
+        //generate output path: Resources/Compiled/Texture/GUID.tex
+        std::string output = config.outputPath + "Texture/" + descriptor.guid + ".tex";
+
+        success = compiler.compile(descriptor.descriptorFile, output, config.verbose);
     }
     else if (descriptor.resourceType == "Audio") {
         // TODO: Implement AudioCompiler

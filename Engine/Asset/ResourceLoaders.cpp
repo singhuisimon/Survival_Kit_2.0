@@ -72,26 +72,12 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::TEXTURE);
 
     if (!Engine::fileExists(compiled_path)) {
-      //  LM.writeLog("TextureLoader - Compiled file not found: %s", compiled_path.c_str());
         return nullptr;
     }
 
     // Open compiled binary file
     std::ifstream file(compiled_path, std::ios::binary);
     if (!file.is_open()) {
-     //   LM.writeLog("TextureLoader - Failed to open compiled file: %s", compiled_path.c_str());
-        return nullptr;
-    }
-
-    // Read and validate header
-    Engine::CompiledResourceHeader header;
-    if (!Engine::readCompiledHeader(file, header)) {
-        return nullptr;
-    }
-
-    // Verify resource type
-    if (header.resourceType != static_cast<uint32_t>(Engine::ResourceType::TEXTURE)) {
-     //   LM.writeLog("TextureLoader - Resource type mismatch");
         return nullptr;
     }
 
@@ -100,9 +86,11 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     file.read(reinterpret_cast<char*>(&texHeader), sizeof(Engine::CompiledTextureData));
 
     if (!file) {
-      //  LM.writeLog("TextureLoader - Failed to read texture header");
         return nullptr;
     }
+
+    //validate magic number
+    if (strncmp(texHeader.magic, "TEX", 3) != 0) return nullptr;
 
     // Create texture resource
     auto texture = std::make_unique<data_type>();
@@ -145,7 +133,6 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
         file.read(reinterpret_cast<char*>(mipData.data()), mipSize);
 
         if (!file) {
-     //       LM.writeLog("TextureLoader - Failed to read mip level %u", mipLevel);
             glDeleteTextures(1, &texture->textureID);
             return nullptr;
         }
@@ -162,7 +149,6 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     // Check for OpenGL errors
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-    //    LM.writeLog("TextureLoader - OpenGL error: 0x%X", error);
         glDeleteTextures(1, &texture->textureID);
         return nullptr;
     }
@@ -170,11 +156,6 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     glBindTexture(GL_TEXTURE_2D, 0);
 
     texture->format = texHeader.srgb ? "sRGB" : "RGB";
-
-   // LM.writeLog("TextureLoader - Loaded texture GUID: %llX, OpenGL ID: %u, Size: %dx%d, Mips: %u",
-  //      guid.m_Instance.m_Value, texture->textureID,
-    //    texture->width, texture->height, texHeader.mipLevels);
-
     return texture.release();
 }
 
@@ -184,8 +165,6 @@ void xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Destroy(
     // Delete OpenGL texture
     if (data.textureID != 0) {
         glDeleteTextures(1, &data.textureID);
-   //     LM.writeLog("TextureLoader - Destroyed texture GUID: %llX, OpenGL ID: %u",
-        //    guid.m_Instance.m_Value, data.textureID);
     }
 
     delete& data;
@@ -205,26 +184,12 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
     if (!Engine::fileExists(compiled_path)) {
-   //     LM.writeLog("MeshLoader - Compiled file not found: %s", compiled_path.c_str());
         return nullptr;
     }
 
     // Open compiled binary file
     std::ifstream file(compiled_path, std::ios::binary);
     if (!file.is_open()) {
-     //   LM.writeLog("MeshLoader - Failed to open: %s", compiled_path.c_str());
-        return nullptr;
-    }
-
-    // Read compiled resource header
-    Engine::CompiledResourceHeader header;
-    if (!Engine::readCompiledHeader(file, header)) {
-        return nullptr;
-    }
-
-    // Verify resource type
-    if (header.resourceType != static_cast<uint32_t>(Engine::ResourceType::MESH)) {
-      //  LM.writeLog("MeshLoader - Resource type mismatch");
         return nullptr;
     }
 
@@ -232,51 +197,97 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     Engine::CompiledMeshData meshHeader;
     file.read(reinterpret_cast<char*>(&meshHeader), sizeof(meshHeader));
     if (!file) {
-     //   LM.writeLog("MeshLoader - Failed to read mesh header");
         return nullptr;
     }
 
+    //validate magic number
+    if (strncmp(meshHeader.magic, "MSH", 3) != 0) return nullptr;
+
     // Create mesh resource
     auto mesh = std::make_unique<data_type>();
+    // Prepare interleaved vertex data
+      // Format: pos(3) + normal(3) + color(3) + uv(2) = 11 floats per vertex
+    mesh->vertices.resize(meshHeader.vertexCount * 11);
 
-    // Read separate arrays (matching MeshCompiler output)
-    std::vector<glm::vec3> positions(meshHeader.vertexCount);
-    std::vector<glm::vec3> normals(meshHeader.vertexCount);
-    std::vector<glm::vec3> colors(meshHeader.vertexCount);
-    std::vector<glm::vec2> texcoords(meshHeader.vertexCount);
+    // Read interleaved vertex data
+    for (uint32_t i = 0; i < meshHeader.vertexCount; ++i) {
+        size_t offset = i * 11;
 
-    // Read positions
-    file.read(reinterpret_cast<char*>(positions.data()),
-        meshHeader.vertexCount * sizeof(glm::vec3));
+        // Read position (always present)
+        if (meshHeader.hasPositions) {
+            glm::vec3 pos;
+            file.read(reinterpret_cast<char*>(&pos), sizeof(glm::vec3));
+            mesh->vertices[offset + 0] = pos.x;
+            mesh->vertices[offset + 1] = pos.y;
+            mesh->vertices[offset + 2] = pos.z;
+        }
 
-    // Read normals
-    if (meshHeader.hasNormals) {
-        file.read(reinterpret_cast<char*>(normals.data()),
-            meshHeader.vertexCount * sizeof(glm::vec3));
+        // Read normal (if present)
+        if (meshHeader.hasNormals) {
+            glm::vec3 normal;
+            file.read(reinterpret_cast<char*>(&normal), sizeof(glm::vec3));
+            mesh->vertices[offset + 3] = normal.x;
+            mesh->vertices[offset + 4] = normal.y;
+            mesh->vertices[offset + 5] = normal.z;
+        }
+        else {
+            mesh->vertices[offset + 3] = 0.0f;
+            mesh->vertices[offset + 4] = 0.0f;
+            mesh->vertices[offset + 5] = 0.0f;
+        }
+
+        // Read color (if present)
+        if (meshHeader.hasColors) {
+            glm::vec3 color;
+            file.read(reinterpret_cast<char*>(&color), sizeof(glm::vec3));
+            mesh->vertices[offset + 6] = color.x;
+            mesh->vertices[offset + 7] = color.y;
+            mesh->vertices[offset + 8] = color.z;
+        }
+        else {
+            mesh->vertices[offset + 6] = 1.0f;
+            mesh->vertices[offset + 7] = 1.0f;
+            mesh->vertices[offset + 8] = 1.0f;
+        }
+
+        // Read texcoord (if present)
+        if (meshHeader.hasTexCoords) {
+            glm::vec2 uv;
+            file.read(reinterpret_cast<char*>(&uv), sizeof(glm::vec2));
+            mesh->vertices[offset + 9] = uv.x;
+            mesh->vertices[offset + 10] = uv.y;
+        }
+        else {
+            mesh->vertices[offset + 9] = 0.0f;
+            mesh->vertices[offset + 10] = 0.0f;
+        }
     }
 
-    // Read colors
-    if (meshHeader.hasColors) {
-        file.read(reinterpret_cast<char*>(colors.data()),
-            meshHeader.vertexCount * sizeof(glm::vec3));
-    }
-
-    // Read texcoords
-    if (meshHeader.hasTexCoords) {
-        file.read(reinterpret_cast<char*>(texcoords.data()),
-            meshHeader.vertexCount * sizeof(glm::vec2));
-    }
 
     // Read indices
     mesh->indices.resize(meshHeader.indexCount);
-    file.read(reinterpret_cast<char*>(mesh->indices.data()),
-        meshHeader.indexCount * sizeof(unsigned int));
+    if (meshHeader.indexSize == 2) {
+        // Read UINT16 indices
+        std::vector<uint16_t> indices16(meshHeader.indexCount);
+        file.read(reinterpret_cast<char*>(indices16.data()),
+            meshHeader.indexCount * sizeof(uint16_t));
 
+        // Convert to uint32
+        for (uint32_t i = 0; i < meshHeader.indexCount; ++i) {
+            mesh->indices[i] = static_cast<uint32_t>(indices16[i]);
+        }
+    }
+    else {
+        // Read UINT32 indices directly
+        file.read(reinterpret_cast<char*>(mesh->indices.data()),
+            meshHeader.indexCount * sizeof(uint32_t));
+    }
     if (!file) {
       //  LM.writeLog("MeshLoader - Failed to read mesh data");
         return nullptr;
     }
 
+#if 0
     // Convert to interleaved format for OpenGL
     // Format: pos(3) + normal(3) + color(3) + uv(2) = 11 floats per vertex
     mesh->vertices.resize(meshHeader.vertexCount * 11);
@@ -303,7 +314,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
         mesh->vertices[offset + 9] = texcoords[i].x;
         mesh->vertices[offset + 10] = texcoords[i].y;
     }
-
+#endif
     // Create OpenGL buffers
     glGenVertexArrays(1, &mesh->VAO);
     glGenBuffers(1, &mesh->VBO);
@@ -354,9 +365,6 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
         return nullptr;
     }
 
-//    LM.writeLog("MeshLoader - Loaded mesh GUID: %llX, VAO: %u, Vertices: %u, Indices: %u",
-  //      guid.m_Instance.m_Value, mesh->VAO, meshHeader.vertexCount, meshHeader.indexCount);
-
     return mesh.release();
 }
 
@@ -375,8 +383,6 @@ void xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Destroy(
     if (data.EBO != 0) {
         glDeleteBuffers(1, &data.EBO);
     }
-
-   // LM.writeLog("MeshLoader - Destroyed mesh GUID: %llX", guid.m_Instance.m_Value);
 
     delete& data;
 }
