@@ -154,18 +154,16 @@ namespace Engine {
 		}
 
 		// Allocate extra attachments to the framebuffer
-
-		// Testing
 		GLuint rboDepth;
 		glCreateRenderbuffers(1, &rboDepth);
 		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
-		// end testing
 
 		auto& fpfbo_ = m_framebuffers[0];
 		auto& fptex_ = m_gl.m_textures[0];
 
+		// Use depth renderbuffer for attaching to editor
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
-		fpfbo_.attach_depth(GL_DEPTH_ATTACHMENT, rboDepth);
+		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
 		// Create a render pass for that framebuffer
 		RenderPass first_pass
@@ -252,7 +250,7 @@ namespace Engine {
 	void Renderer::beginFrame(RenderPass const& pass) {
 
 		auto& fbo = m_framebuffers[pass.fbo_handle];
-		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle()));
+		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle())); // Draw to ImGui FBO
 
 		auto& viewport = pass.view_port;
 		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y), 
