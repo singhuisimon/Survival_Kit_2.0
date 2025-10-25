@@ -268,6 +268,15 @@ namespace Engine {
             if (properties.HasMember("Visible")) {
                 comp.Visible = properties["Visible"].GetBool();
             }
+            if (properties.HasMember("MeshType")) {
+                comp.MeshType = properties["MeshType"].GetUint();
+            }
+            if (properties.HasMember("Material")) {
+                comp.Material = properties["Material"].GetUint();
+            }
+            if (properties.HasMember("Texture")) {
+                comp.Texture = properties["Texture"].GetUint();
+            }
         }
         else if (componentType == "RigidbodyComponent") {
             auto& comp = entity.AddComponent<RigidbodyComponent>();
