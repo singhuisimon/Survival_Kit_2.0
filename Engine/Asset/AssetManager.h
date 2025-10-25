@@ -150,6 +150,22 @@ namespace Engine {
 		AssetDescriptorGenerator& descriptorGenerator() { return m_descGen; }
 		const AssetDescriptorGenerator& descriptorGenerator() const { return m_descGen; }
 
+/**
+ * @brief Get the compiled resources path
+ * @return Reference to cached compiled path from config
+ */
+		const std::string& getCompiledPath() const {
+			return m_cfg.compiledPath;
+		}
+
+		/**
+		 * @brief Get the descriptor root path
+		 * @return Reference to cached descriptor path from config
+		 */
+		const std::string& getDescriptorRoot() const {
+			return m_cfg.descriptorRoot;
+		}
+
 		/**
 		 * @brief Get the AssetId for a given source path.
 		 * @param sourcePath Path to the asset file (e.g., "Assets/Textures/rock.png")

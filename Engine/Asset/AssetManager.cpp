@@ -22,10 +22,6 @@ namespace fs = std::filesystem;
 namespace Engine {
 
 
-	// Singleton plumbing
-	//AssetManager::AssetManager() {
-	//	setType("AssetManager");
-	//}
 
 	AssetManager& AssetManager::getInstance() {
 		static AssetManager instance;
@@ -42,10 +38,6 @@ namespace Engine {
 
 	// startup
 	int AssetManager::startUp() {
-	/*	if (Manager::startUp())
-			return -1;*/
-
-		//LM.writeLog("AssetManager::startUp() - Initializing");
 
 		//set up the configuration
 		if (m_cfg.sourceRoots.empty()) {

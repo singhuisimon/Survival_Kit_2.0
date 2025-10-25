@@ -105,7 +105,7 @@ namespace Engine {
 
 
         // Get repository root and build Compiled path
-        std::filesystem::path compiledRoot = AM.config().compiledPath; 
+        std::filesystem::path compiledRoot = AM.getCompiledPath(); 
 
 
         // Get type folder
