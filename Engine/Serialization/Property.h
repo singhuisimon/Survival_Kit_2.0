@@ -20,12 +20,14 @@ namespace Engine {
      */
     enum class PropertyType {
         Bool,
+        U32,
         Int,
         Float,
         String,
         Vec2,
         Vec3,
         Vec4,
+        Quat,
         Entity
     };
 

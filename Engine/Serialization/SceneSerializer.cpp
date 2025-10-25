@@ -1,7 +1,15 @@
 #include "SceneSerializer.h"
 #include "../ECS/Scene.h"
 #include "../ECS/Entity.h"
-#include "../ECS/Components.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
+
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
 
@@ -14,6 +22,11 @@
 // Standard library
 #include <fstream>
 #include <string>
+
+// Required for quaternion to Euler conversion
+#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Engine {
 
@@ -106,11 +119,12 @@ namespace Engine {
                 posArray.PushBack(transform.Position.z, allocator);
                 propertiesObj.AddMember("Position", posArray, allocator);
 
-                // Rotation
+                // Rotation - Convert quaternion to Euler angles
+                glm::vec3 eulerRotation = glm::degrees(glm::eulerAngles(transform.Rotation));
                 Value rotArray(kArrayType);
-                rotArray.PushBack(transform.Rotation.x, allocator);
-                rotArray.PushBack(transform.Rotation.y, allocator);
-                rotArray.PushBack(transform.Rotation.z, allocator);
+                rotArray.PushBack(eulerRotation.x, allocator);
+                rotArray.PushBack(eulerRotation.y, allocator);
+                rotArray.PushBack(eulerRotation.z, allocator);
                 propertiesObj.AddMember("Rotation", rotArray, allocator);
 
                 // Scale
@@ -132,10 +146,20 @@ namespace Engine {
                 componentObj.AddMember("Type", "CameraComponent", allocator);
 
                 Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Enabled", camera.Enabled, allocator);
+                propertiesObj.AddMember("autoAspect", camera.autoAspect, allocator);
+                propertiesObj.AddMember("isDirty", camera.isDirty, allocator);
+                propertiesObj.AddMember("Depth", camera.Depth, allocator);
+                propertiesObj.AddMember("Aspect", camera.Aspect, allocator);
                 propertiesObj.AddMember("FOV", camera.FOV, allocator);
-                propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-                propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
-                propertiesObj.AddMember("Primary", camera.Primary, allocator);
+                propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+                propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
+
+                Value targetArr(kArrayType);
+                targetArr.PushBack(camera.Target.x, allocator);
+                targetArr.PushBack(camera.Target.y, allocator);
+                targetArr.PushBack(camera.Target.z, allocator);
+                propertiesObj.AddMember("Target", targetArr, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -150,6 +174,9 @@ namespace Engine {
 
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("Visible", mesh.Visible, allocator);
+                propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
+                propertiesObj.AddMember("Material", mesh.Material, allocator);
+                propertiesObj.AddMember("Texture", mesh.Texture, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -177,19 +204,78 @@ namespace Engine {
                 componentsArray.PushBack(componentObj, allocator);
             }
 
+            // Serialize AudioComponent
+            if (entity.HasComponent<AudioComponent>()) {
+                LOG_TRACE("  - Serializing AudioComponent");
+                auto& audio = entity.GetComponent<AudioComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "AudioComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("FilePath", Value(audio.AudioFilePath.c_str(), allocator), allocator);
+                propertiesObj.AddMember("Type", static_cast<int>(audio.Type), allocator);
+                propertiesObj.AddMember("State", static_cast<int>(audio.State), allocator);
+                propertiesObj.AddMember("Volume", audio.Volume, allocator);
+                propertiesObj.AddMember("Pitch", audio.Pitch, allocator);
+                propertiesObj.AddMember("Loop", audio.Loop, allocator);
+                propertiesObj.AddMember("Mute", audio.Mute, allocator);
+                propertiesObj.AddMember("ReverbProperties", audio.ReverbProperties, allocator);
+                propertiesObj.AddMember("Is3D", audio.Is3D, allocator);
+                propertiesObj.AddMember("MinDistance", audio.MinDistance, allocator);
+                propertiesObj.AddMember("MaxDistance", audio.MaxDistance, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
+            // Serialize ListenerComponent
+            if (entity.HasComponent<ListenerComponent>()) {
+                LOG_TRACE("  - Serializing ListenerComponent");
+                auto& listener = entity.GetComponent<ListenerComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ListenerComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Active", listener.Active, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
+            // Serialize ReverbComponent
+            if (entity.HasComponent<ReverbZoneComponent>()) {
+                LOG_TRACE("  - Serializing ReverbComponent");
+
+                auto& reverb = entity.GetComponent<ReverbZoneComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ReverbComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Preset", static_cast<int>(reverb.Preset), allocator);
+                propertiesObj.AddMember("MinDistance", reverb.MinDistance, allocator);
+                propertiesObj.AddMember("MaxDistance", reverb.MaxDistance, allocator);
+                propertiesObj.AddMember("DecayTime", reverb.DecayTime, allocator);
+                propertiesObj.AddMember("HfDecayRatio", reverb.HfDecayRatio, allocator);
+                propertiesObj.AddMember("Diffusion", reverb.Diffusion, allocator);
+                propertiesObj.AddMember("Density", reverb.Density, allocator);
+                propertiesObj.AddMember("WetLevel", reverb.WetLevel, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
             entityObj.AddMember("Components", componentsArray, allocator);
             entitiesArray.PushBack(entityObj, allocator);
         }
 
         doc.AddMember("Entities", entitiesArray, allocator);
 
-        LOG_TRACE("Converting document to JSON string...");
         // Convert to string
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        LOG_TRACE("Serialization complete");
+        LOG_TRACE("Scene serialization complete");
         return buffer.GetString();
     }
 
@@ -213,6 +299,8 @@ namespace Engine {
     bool SceneSerializer::DeserializeFromString(const std::string& jsonString) {
         using namespace rapidjson;
 
+        LOG_TRACE("Parsing JSON...");
+
         Document doc;
         doc.Parse(jsonString.c_str());
 
@@ -227,6 +315,8 @@ namespace Engine {
 
         // Read scene name
         if (doc.HasMember("Scene")) {
+            std::string sceneName = doc["Scene"].GetString();
+            m_Scene->SetName(sceneName);  // Actually update the scene name
             LOG_INFO("Loading scene: ", doc["Scene"].GetString());
         }
 
@@ -273,75 +363,146 @@ namespace Engine {
                     else if (componentType == "TransformComponent") {
                         auto& transform = entity.AddComponent<TransformComponent>();
 
+                        // Position
                         if (properties.HasMember("Position")) {
-                            const Value& pos = properties["Position"];
+                            const Value& posArray = properties["Position"];
                             transform.Position = glm::vec3(
-                                pos[0].GetFloat(),
-                                pos[1].GetFloat(),
-                                pos[2].GetFloat()
+                                posArray[0].GetFloat(),
+                                posArray[1].GetFloat(),
+                                posArray[2].GetFloat()
                             );
                         }
 
+                        // Rotation - Convert Euler angles to quaternion
                         if (properties.HasMember("Rotation")) {
-                            const Value& rot = properties["Rotation"];
-                            transform.Rotation = glm::vec3(
-                                rot[0].GetFloat(),
-                                rot[1].GetFloat(),
-                                rot[2].GetFloat()
+                            const Value& rotArray = properties["Rotation"];
+                            glm::vec3 eulerRotation(
+                                rotArray[0].GetFloat(),
+                                rotArray[1].GetFloat(),
+                                rotArray[2].GetFloat()
                             );
+                            transform.Rotation = glm::quat(glm::radians(eulerRotation));
                         }
 
+                        // Scale
                         if (properties.HasMember("Scale")) {
-                            const Value& scale = properties["Scale"];
+                            const Value& scaleArray = properties["Scale"];
                             transform.Scale = glm::vec3(
-                                scale[0].GetFloat(),
-                                scale[1].GetFloat(),
-                                scale[2].GetFloat()
+                                scaleArray[0].GetFloat(),
+                                scaleArray[1].GetFloat(),
+                                scaleArray[2].GetFloat()
                             );
                         }
                     }
                     else if (componentType == "CameraComponent") {
                         auto& camera = entity.AddComponent<CameraComponent>();
 
+                        if (properties.HasMember("Enabled"))
+                            camera.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("autoAspect"))
+                            camera.autoAspect = properties["autoAspect"].GetBool();
+                        if (properties.HasMember("isDirty"))
+                            camera.isDirty = properties["isDirty"].GetBool();
+                        if (properties.HasMember("Depth"))
+                            camera.Depth = properties["Depth"].GetUint();
+                        if (properties.HasMember("Aspect"))
+                            camera.Aspect = properties["Aspect"].GetFloat();
                         if (properties.HasMember("FOV"))
                             camera.FOV = properties["FOV"].GetFloat();
-                        if (properties.HasMember("NearClip"))
-                            camera.NearClip = properties["NearClip"].GetFloat();
-                        if (properties.HasMember("FarClip"))
-                            camera.FarClip = properties["FarClip"].GetFloat();
-                        if (properties.HasMember("Primary"))
-                            camera.Primary = properties["Primary"].GetBool();
-                    }
-                    else if (componentType == "MeshRendererComponent") {
-                        auto& mesh = entity.AddComponent<MeshRendererComponent>();
+                        if (properties.HasMember("NearPlane"))
+                            camera.NearPlane = properties["NearPlane"].GetFloat();
+                        if (properties.HasMember("FarPlane"))
+                            camera.FarPlane = properties["FarPlane"].GetFloat();
 
-                        if (properties.HasMember("Visible"))
-                            mesh.Visible = properties["Visible"].GetBool();
-                    }
-                    else if (componentType == "RigidbodyComponent") {
-                        auto& rb = entity.AddComponent<RigidbodyComponent>();
-
-                        if (properties.HasMember("Mass"))
-                            rb.Mass = properties["Mass"].GetFloat();
-                        if (properties.HasMember("IsKinematic"))
-                            rb.IsKinematic = properties["IsKinematic"].GetBool();
-                        if (properties.HasMember("UseGravity"))
-                            rb.UseGravity = properties["UseGravity"].GetBool();
-
-                        if (properties.HasMember("Velocity")) {
-                            const Value& vel = properties["Velocity"];
-                            rb.Velocity = glm::vec3(
-                                vel[0].GetFloat(),
-                                vel[1].GetFloat(),
-                                vel[2].GetFloat()
+                        if (properties.HasMember("Target")) {
+                            const Value& target = properties["Target"];
+                            camera.Target = glm::vec3(
+                                target[0].GetFloat(),
+                                target[1].GetFloat(),
+                                target[2].GetFloat()
                             );
                         }
                     }
+                    else if (componentType == "MeshRendererComponent") {
+                        auto& mesh = entity.AddComponent<MeshRendererComponent>();
+                        if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
+                        if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
+                        if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
+                        if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
+                    }
+                    else if (componentType == "RigidbodyComponent") {
+                        auto& rb = entity.AddComponent<RigidbodyComponent>();
+                        if (properties.HasMember("Mass")) rb.Mass = properties["Mass"].GetFloat();
+                        if (properties.HasMember("IsKinematic")) rb.IsKinematic = properties["IsKinematic"].GetBool();
+                        if (properties.HasMember("UseGravity")) rb.UseGravity = properties["UseGravity"].GetBool();
+
+                        if (properties.HasMember("Velocity")) {
+                            const Value& velArray = properties["Velocity"];
+                            rb.Velocity = glm::vec3(
+                                velArray[0].GetFloat(),
+                                velArray[1].GetFloat(),
+                                velArray[2].GetFloat()
+                            );
+                        }
+                    }
+                    else if (componentType == "AudioComponent") {
+						auto& audio = entity.AddComponent<AudioComponent>();
+
+                        if(properties.HasMember("FilePath"))
+							audio.AudioFilePath = properties["FilePath"].GetString();
+						if (properties.HasMember("Type"))
+							audio.Type = static_cast<AudioType>(properties["Type"].GetInt());
+						if (properties.HasMember("State"))
+							audio.State = static_cast<PlayState>(properties["State"].GetInt());
+						if (properties.HasMember("Volume"))
+							audio.Volume = properties["Volume"].GetFloat();
+						if (properties.HasMember("Pitch"))
+							audio.Pitch = properties["Pitch"].GetFloat();
+						if (properties.HasMember("Loop"))
+							audio.Loop = properties["Loop"].GetBool();
+						if (properties.HasMember("Mute"))
+							audio.Mute = properties["Mute"].GetBool();
+						if (properties.HasMember("Reverb"))
+							audio.ReverbProperties = properties["ReverbProperties"].GetFloat();
+						if (properties.HasMember("Is3D"))
+							audio.Is3D = properties["Is3D"].GetBool();
+						if (properties.HasMember("MinDistance"))
+							audio.MinDistance = properties["MinDistance"].GetFloat();
+						if (properties.HasMember("MaxDistance"))
+							audio.MaxDistance = properties["MaxDistance"].GetFloat();
+                    }
+                    else if (componentType == "ListenerComponent") {
+                        auto& listener = entity.AddComponent<ListenerComponent>();
+
+                        if (properties.HasMember("Active"))
+                            listener.Active = properties["Active"].GetBool();
+                    }
+                    else if (componentType == "ReverbComponent") {
+                        auto& reverb = entity.AddComponent<ReverbZoneComponent>();
+
+                        if (properties.HasMember("Preset"))
+                            reverb.Preset = static_cast<ReverbPreset>(properties["Preset"].GetInt());
+                        if (properties.HasMember("MinDistance"))
+                            reverb.MinDistance = properties["MinDistance"].GetFloat();
+                        if (properties.HasMember("MaxDistance"))
+                            reverb.MaxDistance = properties["MaxDistance"].GetFloat();
+                        if (properties.HasMember("DecayTime"))
+                            reverb.DecayTime = properties["DecayTime"].GetFloat();
+                        if (properties.HasMember("HfDecayRatio"))
+                            reverb.HfDecayRatio = properties["HfDecayRatio"].GetFloat();
+                        if (properties.HasMember("Diffusion"))
+                            reverb.Diffusion = properties["Diffusion"].GetFloat();
+                        if (properties.HasMember("Density"))
+                            reverb.Density = properties["Density"].GetFloat();
+                        if (properties.HasMember("WetLevel"))
+                            reverb.WetLevel = properties["WetLevel"].GetFloat();
+                            }
+
                 }
             }
         }
 
-        LOG_INFO("Scene deserialized successfully - loaded ", entities.Size(), " entities");
+        LOG_INFO("Scene deserialized successfully");
         return true;
     }
 

@@ -20,6 +20,10 @@ file(GLOB_RECURSE ECS_HEADERS "${ENGINE_ROOT}/ECS/*.h")
 file(GLOB_RECURSE GRAPHICS_SOURCES "${ENGINE_ROOT}/Graphics/*.cpp")
 file(GLOB_RECURSE GRAPHICS_HEADERS "${ENGINE_ROOT}/Graphics/*.h")
 
+# Audio Module
+file(GLOB_RECURSE AUDIO_SOURCES "${ENGINE_ROOT}/Audio/*.cpp")
+file(GLOB_RECURSE AUDIO_HEADERS "${ENGINE_ROOT}/Audio/*.h")
+
 # Asset Module
 file(GLOB_RECURSE ASSET_SOURCES "${ENGINE_ROOT}/Asset/*.cpp")
 file(GLOB_RECURSE ASSET_HEADERS "${ENGINE_ROOT}/Asset/*.h")
@@ -33,28 +37,54 @@ file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
 file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
 
 # Serialization Module
+file(GLOB_RECURSE PHYSICS_SOURCES "${ENGINE_ROOT}/Physics/*.cpp")
+file(GLOB_RECURSE PHYSICS_HEADERS "${ENGINE_ROOT}/Physics/*.h")
+
+# Serialization Module
 file(GLOB_RECURSE SERIALIZATION_SOURCES "${ENGINE_ROOT}/Serialization/*.cpp")
 file(GLOB_RECURSE SERIALIZATION_HEADERS "${ENGINE_ROOT}/Serialization/*.h")
+
+# Transformation Module
+file(GLOB_RECURSE TRANSFORM_SOURCES "${ENGINE_ROOT}/Transform/*.cpp")
+file(GLOB_RECURSE TRANSFORM_HEADERS "${ENGINE_ROOT}/Transform/*.h")
+
+# Component Module
+file(GLOB_RECURSE COMPONENT_SOURCES "${ENGINE_ROOT}/Component/*.cpp")
+file(GLOB_RECURSE COMPONENT_HEADERS "${ENGINE_ROOT}/Component/*.h")
+
+# Prefabs Module
+file(GLOB_RECURSE PREFAB_SOURCES "${ENGINE_ROOT}/Prefab/*.cpp")
+file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
     ${ECS_SOURCES}
     ${GRAPHICS_SOURCES}
+    ${AUDIO_SOURCES}
     ${ASSET_SOURCES}
     ${UTILITY_SOURCES}
     ${EDITOR_SOURCES}
     ${SERIALIZATION_SOURCES}
+    ${TRANSFORM_SOURCES}
+    ${COMPONENT_SOURCES}
+    ${PREFAB_SOURCES}
+    ${PHYSICS_SOURCES}
 )
 
 set(ENGINE_HEADERS
     ${CORE_HEADERS}
     ${ECS_HEADERS}
     ${GRAPHICS_HEADERS}
+    ${AUDIO_HEADERS}
     ${ASSET_HEADERS}
     ${UTILITY_HEADERS}
     ${EDITOR_HEADERS}
     ${SERIALIZATION_HEADERS}
+    ${TRANSFORM_HEADERS}
+    ${COMPONENT_HEADERS}
+    ${PREFAB_HEADERS}
+    ${PHYSICS_HEADERS}
 )
 
 # Create engine static library
@@ -89,6 +119,10 @@ source_group("ECS\\Source" FILES ${ECS_SOURCES})
 source_group("Graphics\\Header" FILES ${GRAPHICS_HEADERS})
 source_group("Graphics\\Source" FILES ${GRAPHICS_SOURCES})
 
+# Audio Module
+source_group("Audio\\Header" FILES ${AUDIO_HEADERS})
+source_group("Audio\\Source" FILES ${AUDIO_SOURCES})
+
 # Asset Module
 source_group("Asset\\Header" FILES ${ASSET_HEADERS})
 source_group("Asset\\Source" FILES ${ASSET_SOURCES})
@@ -104,6 +138,22 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 # Serialization Module
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
+
+# Serialization Module
+source_group("Physics\\Header" FILES ${Physics_HEADERS})
+source_group("Physics\\Source" FILES ${Physics_SOURCES})
+
+# Transform Module
+source_group("Transform\\Header" FILES ${TRANSFORM_HEADERS})
+source_group("Transform\\Source" FILES ${TRANSFORM_SOURCES})
+
+# Component Module
+source_group("Component\\Header" FILES ${COMPONENT_HEADERS})
+source_group("Component\\Source" FILES ${COMPONENT_SOURCES})
+
+# Prefab Module
+source_group("Prefab\\Header" FILES ${PREFAB_HEADERS})
+source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES

@@ -3,15 +3,31 @@
 #include "Core/Input.h"
 #include "Utility/Logger.h"
 #include "ECS/Components.h"
+#include "Editor/Editor.h"
 #include "Serialization/ComponentRegistry.h"
+#include "Audio/AudioSystem.h"
+#include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
 
+#include "Component/TagComponent.h"
+#include "Component/TransformComponent.h"
+#include "Component/CameraComponent.h"
+#include "Component/MeshRendererComponent.h"
+#include "Component/RigidbodyComponent.h"
+
+// Adding systems
+#include "Graphics/RenderSystem.h"
+#include "Graphics/CameraSystem.h"
+#include "Transform/TransformSystem.h"
+#include "Physics/PhysicsSystem.h"
+
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
     , m_Scene(nullptr)
+    , m_Editor(nullptr)
     , m_ColorShift(0.0f) {
     LOG_INFO("Game constructor body executing");
 }
@@ -64,14 +80,40 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 2: Create scene
-    LOG_INFO("Step 2: Creating scene object...");
+	// Step 2: Create Audio Manager
+	LOG_INFO("Step 2: Initializing Audio Manager...");
+    try {
+		m_AudioManager = std::make_unique<Engine::AudioManager>();
+        if (!m_AudioManager->Init()) {
+			LOG_CRITICAL("  -> Audio Manager initialization failed!");
+            return;
+        }
+		LOG_INFO("  -> Audio Manager initialized successfully");
+    }
+    catch (const std::exception& e) {
+        LOG_CRITICAL("  -> Exception while initializing Audio Manager: ", e.what());
+        return;
+	}
+
+    // Step 3: Create scene
+    LOG_INFO("Step 3: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
+       
         if (!m_Scene) {
             LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
             return;
+        }
+
+        // Editor get scene
+        if (!m_Editor)
+        {
+            m_Editor = std::make_unique<Engine::Editor>(GetWindow());
+            m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->OnInit(m_Renderer->get_imgui_texture());
+            LOG_INFO("Editor initialized successfully.");
+
         }
 
         LOG_INFO("  -> Scene created at address: ", (void*)m_Scene.get());
@@ -81,22 +123,27 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 3: Add systems to the scene
-    LOG_INFO("Step 3: Adding systems to scene...");
+    // Step 4: Add systems to the scene
+    LOG_INFO("Step 4: Adding systems to scene...");
     try {
         // TODO: Add more systems here as they're created by team members:
         // m_Scene->AddSystem<Engine::PhysicsSystem>();
         // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
-        // m_Scene->AddSystem<Engine::AudioSystem>();
-
+        m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
+        m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
+        m_Scene->AddSystem<Engine::PhysicsSystem>();
+        m_Scene->AddSystem<Engine::TransformSystem>();
+        m_Scene->AddSystem<Engine::CameraSystem>();
+        m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+       
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {
         LOG_ERROR("  -> Exception while adding systems: ", e.what());
     }
 
-    // Step 4: Initialize all systems
-    LOG_INFO("Step 4: Initializing systems...");
+    // Step 5: Initialize all systems
+    LOG_INFO("Step 5: Initializing systems...");
     try {
         m_Scene->InitializeSystems();
         LOG_INFO("  -> Systems initialized successfully");
@@ -105,8 +152,8 @@ void Game::OnInit() {
         LOG_ERROR("  -> Exception while initializing systems: ", e.what());
     }
 
-    // Step 5: Load scene from file or create default
-    LOG_INFO("Step 5: Loading scene content...");
+    // Step 6: Load scene from file or create default
+    LOG_INFO("Step 6: Loading scene content...");
     bool loadedFromFile = false;
 
     try {
@@ -125,7 +172,7 @@ void Game::OnInit() {
     }
 
     if (!loadedFromFile) {
-        LOG_INFO("Step 6: Creating default scene...");
+        LOG_INFO("Step 7: Creating default scene...");
         try {
             CreateDefaultScene();
             LOG_INFO("  -> Default scene created successfully");
@@ -143,6 +190,7 @@ void Game::OnInit() {
         return;
     }
 
+
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
     LOG_INFO("");
@@ -155,6 +203,9 @@ void Game::OnInit() {
     LOG_INFO("  F2: Create test entity with velocity");
     LOG_INFO("  F5: Save scene to file");
     LOG_INFO("  F9: Load scene from file");
+    LOG_INFO("  P: Play Audio");
+    LOG_INFO("  O: Pause Audio");
+    LOG_INFO("  L: Stop Audio");
     LOG_INFO("  ESC: Exit");
     LOG_INFO("================");
     LOG_INFO("");
@@ -170,15 +221,29 @@ void Game::CreateDefaultScene() {
     player.AddComponent<Engine::TagComponent>("Player");
 
     auto& transform = player.AddComponent<Engine::TransformComponent>();
-    transform.Position = glm::vec3(0, 5, -5);  // Start above ground
-    transform.Rotation = glm::vec3(0, 0, 0);
-    transform.Scale = glm::vec3(1.0f);
+    transform.Position = glm::vec3(1, 2, 0);  // Start above ground
+    transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+
+    auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
 
     auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     rb.Mass = 1.0f;
     rb.UseGravity = true;
     rb.IsKinematic = false;
     rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+
+    auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
+    playerAudio.AudioFilePath = "laserSmall_001.ogg";
+    playerAudio.Type = Engine::AudioType::SFX;
+    playerAudio.State = Engine::PlayState::STOP;
+    playerAudio.Volume = 0.8f;
+    playerAudio.Pitch = 1.0f;
+    playerAudio.Loop = false;
+    playerAudio.Mute = false;
+    playerAudio.ReverbProperties = 1.0f;
+    playerAudio.Is3D = true;
+    playerAudio.MinDistance = 1.0f;
+    playerAudio.MaxDistance = 50.0f;
 
     player.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
@@ -188,16 +253,24 @@ void Game::CreateDefaultScene() {
     camera.AddComponent<Engine::TagComponent>("MainCamera");
 
     auto& camTransform = camera.AddComponent<Engine::TransformComponent>();
-    camTransform.Position = glm::vec3(0, 2, 5);
+    camTransform.Position = glm::vec3(0, 5, 5);
     camTransform.Rotation = glm::vec3(-15, 0, 0);
     camTransform.Scale = glm::vec3(1, 1, 1);
 
     auto& camComponent = camera.AddComponent<Engine::CameraComponent>();
-    camComponent.Primary = true;
-    camComponent.FOV = 60.0f;
-    camComponent.NearClip = 0.1f;
-    camComponent.FarClip = 1000.0f;
+    camComponent.Enabled = true;
+    camComponent.autoAspect = true;
+    camComponent.Depth = 0; // 0 is the main camera
+    camComponent.Aspect = GetWidth() / GetHeight();
+    camComponent.FOV = 45.0f;
+    camComponent.NearPlane = 0.5f;
+    camComponent.FarPlane = 100.0f;
+    camComponent.Target = { 0.0f, 0.0f, 0.0f };
     LOG_TRACE("  -> Camera created");
+
+    auto& listener = camera.AddComponent<Engine::ListenerComponent>();
+    listener.Active = true;
+    LOG_TRACE("  -> Camera created with listenerComponent");
 
     LOG_TRACE("  Creating Ground entity...");
     auto ground = m_Scene->CreateEntity("Ground");
@@ -205,8 +278,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Rotation = glm::vec3(0, 0, 0);
-    groundTransform.Scale = glm::vec3(10, 0.1f, 10);
+    groundTransform.Scale = glm::vec3(1, 0.1f, 1);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -216,6 +288,25 @@ void Game::CreateDefaultScene() {
 
     ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
+
+    LOG_TRACE("  Creating ReverbZone entity...");
+    auto reverbZone = m_Scene->CreateEntity("CaveReverb");
+    reverbZone.AddComponent<Engine::TagComponent>("CaveReverb");
+
+    auto& rzTransform = reverbZone.AddComponent<Engine::TransformComponent>();
+    rzTransform.Position = glm::vec3(0, 0, 0); // center of world
+    rzTransform.Scale = glm::vec3(1, 1, 1);
+
+    auto& reverb = reverbZone.AddComponent<Engine::ReverbZoneComponent>();
+    reverb.Preset = Engine::ReverbPreset::Cave;
+    reverb.MinDistance = 1.0f;
+    reverb.MaxDistance = 50.0f;
+    reverb.DecayTime = 2500.0f; // long decay
+    reverb.HfDecayRatio = 80.0f;
+    reverb.WetLevel = 0.0f;
+    reverb.IsDirty = true;
+
+    LOG_TRACE("  -> Reverb zone created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -241,6 +332,122 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update scene (this will call all systems in priority order)
     m_Scene->OnUpdate(ts);
 
+	// Update audio manager if exists
+	m_AudioManager->OnUpdate(ts);
+
+    if (input.IsKeyJustPressed(GLFW_KEY_P)) {
+        LOG_DEBUG("Testing Audio Playback");
+
+        auto& registry = m_Scene->GetRegistry();
+        auto view = registry.view<Engine::AudioComponent>();
+        for (auto entityHandle : view) {
+            auto& audio = view.get<Engine::AudioComponent>(entityHandle);
+
+            if (audio.AudioFilePath.empty()) {
+                audio.AudioFilePath = "laserSmall_001.ogg";
+            }
+
+            audio.State = Engine::PlayState::PLAY;
+        }
+    }
+
+    if (input.IsKeyJustPressed(GLFW_KEY_O)) {
+        auto& registry = m_Scene->GetRegistry();
+        for (auto entityHandle : registry.view<Engine::AudioComponent>()) {
+            auto& audio = registry.get<Engine::AudioComponent>(entityHandle);
+            audio.State = Engine::PlayState::PAUSE;
+        }
+    }
+    if (input.IsKeyJustPressed(GLFW_KEY_L)) {
+        auto& registry = m_Scene->GetRegistry();
+        for (auto entityHandle : registry.view<Engine::AudioComponent>()) {
+            auto& audio = registry.get<Engine::AudioComponent>(entityHandle);
+            audio.State = Engine::PlayState::STOP;
+        }
+    }
+    if (input.IsKeyJustPressed(GLFW_KEY_BACKSLASH)) {
+        float volume = 0.0f;
+        m_AudioManager->GetGroupVolume(Engine::AudioType::SFX, volume);
+        m_AudioManager->SetGroupVolume(Engine::AudioType::SFX, volume-0.1f);
+        LOG_TRACE("Reducing Audio SFX Group Volume by 0.1 Currently it is: ", volume);
+    }
+
+
+    // Audio Testing if Attentuation works
+    //LOG_INFO("[TEST] Searching for entity named 'Player'...");
+
+    auto& registry = m_Scene->GetRegistry();
+
+    Engine::Entity foundEntity;
+    bool found = false;
+
+    auto view = registry.view<Engine::TagComponent>();
+    for (auto entityHandle : view) {
+        auto& tag = view.get<Engine::TagComponent>(entityHandle);
+        if (tag.Tag == "Player") { // change to whatever name you want
+            foundEntity = Engine::Entity(entityHandle, &registry);
+            found = true;
+            break;
+        }
+    }
+
+    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+
+        auto& transform = foundEntity.GetComponent<Engine::TransformComponent>();
+
+        if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+        if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+        if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+        if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+    }
+
+    // Editor camera controls
+    if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+        
+        auto& editorCam = m_Renderer->getEditorCamera();
+
+        // Click-and-drag orbiting
+        if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y);
+        }
+
+        // Zooming in-and-out scrolling
+        double scrollY_offset = input.GetScrollDelta().y;
+        if (scrollY_offset != 0) {
+            editorCam.cameraOnScroll(scrollY_offset * 1000.0f);
+        }
+
+    }
+
+    // Test the DSP Global Effects
+
+    FMOD::DSP* dsp = nullptr;
+    if (input.IsKeyJustPressed(GLFW_KEY_ENTER)) {
+        dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
+        m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
+            FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
+    }    
+    
+    if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET)) {
+        m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
+    }
+    if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET)) {
+        m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
+    }
+
+    if (dsp) {
+        float cutoff;
+        dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
+        LOG_INFO("LowPass cutoff currently: ", cutoff);
+    }
+
+    // Move player in/out of the reverb radius with QE to feel falloff
+    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+        auto& tf = foundEntity.GetComponent<Engine::TransformComponent>();
+        if (input.IsKeyPressed(GLFW_KEY_Q)) tf.Position.y += 0.05f;
+        if (input.IsKeyPressed(GLFW_KEY_E)) tf.Position.y -= 0.05f;
+    }
+    
     // === Test Input System ===
 
     // Movement keys - continuous input while held
@@ -339,24 +546,33 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
     }
 
-    // === Render ===
-    m_ColorShift += ts * 0.5f;
-    if (m_ColorShift > 6.28318f) m_ColorShift -= 6.28318f;
+    //m_Editor->StartImguiFrame();
 
-    float r = 0.2f + 0.1f * std::sin(m_ColorShift);
-    float g = 0.3f + 0.1f * std::sin(m_ColorShift + 2.0f);
-    float b = 0.4f + 0.1f * std::sin(m_ColorShift + 4.0f);
-
-    glClearColor(r, g, b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Update Editor To Do
+    //m_Editor->OnUpdate(Engine::Timestep ts);
+    //m_Renderer->get_imgui_texture();
+    m_Editor->OnUpdate(ts);
 }
 
 void Game::OnShutdown() {
     LOG_INFO("Game shutting down...");
 
     if (m_Scene) {
+        LOG_DEBUG("SHUTTING DOWN SCENE");
         // Shutdown all systems before destroying scene
         m_Scene->ShutdownSystems();
+    }
+
+    //============= Audio =============
+    if (m_AudioManager) {
+        LOG_INFO("Shutting down Audio Manager...");
+        try {
+            m_AudioManager->Shutdown();
+            LOG_INFO("  -> Audio Manager shut down successfully");
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("  -> Exception while shutting down Audio Manager: ", e.what());
+        }
     }
 
     //============= Asset =============
@@ -364,5 +580,8 @@ void Game::OnShutdown() {
     AM.shutDown();
 
     m_Scene.reset();
+    m_AudioManager.reset();
+    m_Editor.reset();
+
     LOG_INFO("Game shutdown complete");
 }
