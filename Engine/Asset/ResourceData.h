@@ -97,7 +97,7 @@ namespace Engine {
         }
     };
 
-} // namespace gam300
+} // namespace Engine
 
 // ========== XRESOURCE_MGR LOADER SPECIALIZATIONS ==========
 
@@ -168,10 +168,10 @@ struct xresource::loader<Engine::ResourceGUID::shader_type_guid_v> {
 
 // ========== LOADER REGISTRATIONS ==========
 // These register the loaders with xresource_mgr
-extern xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
 
 #endif // __RESOURCE_DATA_H__

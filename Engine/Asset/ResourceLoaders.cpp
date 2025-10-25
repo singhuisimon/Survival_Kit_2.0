@@ -19,12 +19,12 @@
 #include <memory>
 
 
- // Loader registrations - defined once
-xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
-xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
-xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
-xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
-xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
+// // Loader registrations - defined once
+//xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
+//xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
+//xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
+//xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
+//xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
 
 namespace Engine {
 
