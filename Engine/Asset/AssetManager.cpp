@@ -19,11 +19,9 @@
 
 namespace fs = std::filesystem;
 
+namespace Engine {
 
-	// Singleton plumbing
-	//AssetManager::AssetManager() {
-	//	setType("AssetManager");
-	//}
+
 
 	AssetManager& AssetManager::getInstance() {
 		static AssetManager instance;
@@ -40,10 +38,6 @@ namespace fs = std::filesystem;
 
 	// startup
 	int AssetManager::startUp() {
-	/*	if (Manager::startUp())
-			return -1;*/
-
-		//LM.writeLog("AssetManager::startUp() - Initializing");
 
 		//set up the configuration
 		if (m_cfg.sourceRoots.empty()) {
@@ -391,3 +385,24 @@ namespace fs = std::filesystem;
 		return m_db.FindBySource(sourcePath) != nullptr;
 	}
 
+
+	// ========== RESOURCE LOADING HELPER FUNCTIONS ==========
+
+	xresource::instance_guid AssetManager::getGuidFromName(const std::string& filename) const {
+		// Use the existing getAssetIdByFilename function
+		return getAssetIdByFilename(filename);
+	}
+
+	std::string AssetManager::getNameFromGuid(xresource::instance_guid guid) const {
+		// Find the asset record
+		const AssetRecord* rec = m_db.Find(guid);
+		if (!rec) {
+			return ""; // Return empty string if not found
+		}
+
+		// Extract filename from source path
+		fs::path p(rec->sourcePath);
+		return p.filename().string();
+	}
+
+}// end of namespace Engine

@@ -41,7 +41,7 @@ void Game::OnInit() {
 
     LOG_INFO("Initializing Asset...");
 
-    auto config = AM.createDefaultConfig();
+    auto config = Engine::AM.createDefaultConfig();
 
     //debug 
     LOG_INFO("Asset Manager Configuration:");
@@ -52,19 +52,19 @@ void Game::OnInit() {
     LOG_INFO("  Descriptor Root: ", config.descriptorRoot);
     LOG_INFO("  Database File: ", config.databaseFile);
 
-    AM.setConfig(config);
+    Engine::AM.setConfig(config);
 
-    if (AM.startUp() != 0) {
+    if (Engine::AM.startUp() != 0) {
         LOG_ERROR("Failed to initialize Asset Manager!");
         return;
     }
     else {
 
     LOG_INFO("Performing initial asset scan...");
-    AM.scanAndProcess();
+    Engine::AM.scanAndProcess();
 
     LOG_INFO("Initial asset scan complete - found ",
-        AM.db().Count(), " assets");
+        Engine::AM.db().Count(), " assets");
     }
 
 
@@ -577,7 +577,7 @@ void Game::OnShutdown() {
 
     //============= Asset =============
     LOG_INFO("Shutting Down Asset");
-    AM.shutDown();
+    Engine::AM.shutDown();
 
     m_Scene.reset();
     m_AudioManager.reset();

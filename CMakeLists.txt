@@ -33,6 +33,7 @@ endif()
 add_subdirectory(External)
 add_subdirectory(Engine)
 add_subdirectory(Game)
+add_subdirectory(AssetCompiler)
 
 # Copy resources to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/Resources 

@@ -74,6 +74,8 @@ message(STATUS "Configuring OpenFBX...")
 add_library(openfbx STATIC
     openFBX/openFBX/src/ofbx.cpp
     openFBX/openFBX/src/ofbx.h
+    openFBX/openFBX/src/libdeflate.c 
+    openFBX/openFBX/src/libdeflate.h
 )
 target_include_directories(openfbx PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/openFBX/openFBX/src

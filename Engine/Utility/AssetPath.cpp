@@ -55,12 +55,10 @@ namespace Engine {
 
         // Get the directory where the executable is running from
         fs::path exeDir = GetExecutableDirectory();
-        LOG_INFO("Executable directory: ", exeDir.string());
 
 
         // Resources should be next to the executable
         fs::path resourcesPath = exeDir / "Resources";
-        LOG_INFO("Looking for Resources at: ", resourcesPath.string());
 
         if (fs::exists(resourcesPath) && fs::is_directory(resourcesPath)) {
             // Verify it has the expected structure
@@ -71,7 +69,6 @@ namespace Engine {
                 if (!result.empty() && result.back() != '/') {
                     result += '/';
                 }
-                LOG_INFO("Assets path: ", result);  // Only show this in normal operation
                 return result;
             }
             else {

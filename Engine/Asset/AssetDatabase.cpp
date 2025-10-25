@@ -21,6 +21,9 @@
 
 namespace fs = std::filesystem;
 
+namespace Engine {
+
+
 	//generate GUIDs using xresource_guid library
 	static xresource::instance_guid GenId()
 	{
@@ -220,3 +223,4 @@ namespace fs = std::filesystem;
 		bySourcePath.clear();
 	}
 
+}//end of namespace Engine

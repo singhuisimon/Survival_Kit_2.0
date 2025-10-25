@@ -24,6 +24,8 @@
 #include <algorithm>
 
 
+namespace Engine {
+
 	/*
 	* @brief enum for resource types
 	*/
@@ -190,5 +192,9 @@ namespace ResourceGUID {
 		}
 	}
 }
+
+
+}//end of namespace Engine
+
 
 #endif // !_RESOURCE_TYPES_H
