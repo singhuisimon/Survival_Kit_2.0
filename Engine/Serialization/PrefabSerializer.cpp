@@ -290,6 +290,13 @@ namespace Engine {
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
+
+            propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
+            propertiesObj.AddMember("Material", mesh.Material, allocator);
+            propertiesObj.AddMember("Texture", mesh.Texture, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
         }
 
         // Serialize RigidbodyComponent
