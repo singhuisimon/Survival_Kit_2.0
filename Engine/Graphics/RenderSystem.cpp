@@ -1,12 +1,16 @@
 #include "../Graphics/RenderSystem.h"
 #include "../ECS/Scene.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/MeshRendererComponent.h"
 
 namespace Engine {
 
-	RenderSystem::RenderSystem(Renderer& renderer_ref) : System(), renderer(renderer_ref) { m_drawitems.reserve(1000); }
+	RenderSystem::RenderSystem(Renderer& renderer_ref) : System(), renderer(renderer_ref) {
+		m_drawitems.reserve(1000);
+	}
 
 	void RenderSystem::OnUpdate(Scene* scene, Timestep ts) {
-		
+
 		(void)ts;
 
 		m_drawitems.clear();
@@ -18,12 +22,16 @@ namespace Engine {
 			auto& renderable = view.get<MeshRendererComponent>(entity);
 			auto& transform = view.get<TransformComponent>(entity);
 
-			m_drawitems.push_back({
-				renderable.MeshType,
-				renderable.Material,
-				renderable.Texture,
-				transform.WorldTransform
-				});
+			// Only render visible meshes
+			if (renderable.Visible)
+			{
+				m_drawitems.push_back({
+					renderable.MeshType,
+					renderable.Material,
+					renderable.Texture,
+					transform.WorldTransform
+					});
+			}
 		}
 
 		// Save all enabled cameras

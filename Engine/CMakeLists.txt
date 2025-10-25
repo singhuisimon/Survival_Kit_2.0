@@ -41,6 +41,10 @@ file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
 file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
 
 # Serialization Module
+file(GLOB_RECURSE PHYSICS_SOURCES "${ENGINE_ROOT}/Physics/*.cpp")
+file(GLOB_RECURSE PHYSICS_HEADERS "${ENGINE_ROOT}/Physics/*.h")
+
+# Serialization Module
 file(GLOB_RECURSE SERIALIZATION_SOURCES "${ENGINE_ROOT}/Serialization/*.cpp")
 file(GLOB_RECURSE SERIALIZATION_HEADERS "${ENGINE_ROOT}/Serialization/*.h")
 
@@ -51,6 +55,10 @@ file(GLOB_RECURSE TRANSFORM_HEADERS "${ENGINE_ROOT}/Transform/*.h")
 # Component Module
 file(GLOB_RECURSE COMPONENT_SOURCES "${ENGINE_ROOT}/Component/*.cpp")
 file(GLOB_RECURSE COMPONENT_HEADERS "${ENGINE_ROOT}/Component/*.h")
+
+# Prefabs Module
+file(GLOB_RECURSE PREFAB_SOURCES "${ENGINE_ROOT}/Prefab/*.cpp")
+file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 
 # Combine all files
 set(ENGINE_SOURCES
@@ -65,6 +73,8 @@ set(ENGINE_SOURCES
     ${TRANSFORM_SOURCES}
     ${COMPONENT_SOURCES}
     ${AI_SOURCES}
+    ${PREFAB_SOURCES}
+    ${PHYSICS_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -79,6 +89,8 @@ set(ENGINE_HEADERS
     ${TRANSFORM_HEADERS}
     ${COMPONENT_HEADERS}
     ${AI_HEADERS}
+    ${PREFAB_HEADERS}
+    ${PHYSICS_HEADERS}
 )
 
 # Create engine static library
@@ -137,6 +149,10 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
 
+# Serialization Module
+source_group("Physics\\Header" FILES ${Physics_HEADERS})
+source_group("Physics\\Source" FILES ${Physics_SOURCES})
+
 # Transform Module
 source_group("Transform\\Header" FILES ${TRANSFORM_HEADERS})
 source_group("Transform\\Source" FILES ${TRANSFORM_SOURCES})
@@ -144,6 +160,10 @@ source_group("Transform\\Source" FILES ${TRANSFORM_SOURCES})
 # Component Module
 source_group("Component\\Header" FILES ${COMPONENT_HEADERS})
 source_group("Component\\Source" FILES ${COMPONENT_SOURCES})
+
+# Prefab Module
+source_group("Prefab\\Header" FILES ${PREFAB_HEADERS})
+source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES

@@ -12,7 +12,7 @@
 #ifndef SK_IMGUI_MANAGER_H
 #define SK_IMGUI_MANAGER_H
 
-// Include Editor Header Files
+ // Include Editor Header Files
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -48,7 +48,7 @@ namespace Engine
 		GLuint m_FBOTextureHandle;
 
 		// ImGui Window functionality
-		bool inspectorWindow = true; 
+		bool inspectorWindow = true;
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
@@ -58,13 +58,26 @@ namespace Engine
 		bool saveAsPanel = false; // pop up save as panel
 		bool openScript = false; // pop up open script option
 		bool createScript = false; // pop up panel to create new script
+		bool isNewScene = false;  // to check if is new scene
 
+		// ImGui other helper variable
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+
+
+		// Helper struct to get resources folder/files 
+		struct AssetEntry
+		{
+			std::string name;
+			std::string fullPath;
+		};
+
+		
 
 	public:
 		// Default contructor 
-		Editor(GLFWwindow* window): m_Window(window), io(nullptr), m_Scene(nullptr) {};
+		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
 		// Deconstuctor
 		~Editor() = default;
@@ -99,22 +112,26 @@ namespace Engine
 		void displayAssetsBrowserPanel();
 
 		// display performance profile
-		void displayPerformanceProfilePanel();
+		void displayPerformanceProfilePanel(Timestep ts);
 
 		// Render Viewport
 		void renderViewport();
 
-		// Render IMGUI UI
-		void RenderEditor();
-
 		// Helper function for searching and return the files
 		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
+
 		// ========================= Helper Function ======================================
 		// helper function to open scene files from top menu
 		void sceneOpenPanel();
 
 		// open save as panel after select from top menu
 		void saveAsScenePanel();
+
+		// Helper function for searching and return the files/folder
+		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
+
+		// Complete the ImGui frame
+		void CompleteFrame();
 	};
 
 
