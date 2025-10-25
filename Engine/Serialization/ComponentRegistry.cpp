@@ -1,7 +1,30 @@
+/**
+ * @file ComponentRegistry.cpp
+ * @brief Implementation of component registration for serialization
+ * @author
+ * @date 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "ComponentRegistry.h"
 #include "ReflectionRegistry.h"
-#include "../ECS/Components.h"
+#include "../Component/TagComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Component/CameraComponent.h"
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/RigidbodyComponent.h"
+#include "../Component/PrefabComponent.h"
+#include "../Component/AudioComponent.h"
+#include "../Component/ListenerComponent.h"
+#include "../Component/ReverbZoneComponent.h"
 #include "../Utility/Logger.h"
+
+ // Required for quaternion to Euler conversion
+#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Engine {
 
@@ -26,19 +49,25 @@ namespace Engine {
                 "Position",
                 PropertyType::Vec3,
                 [](const TransformComponent& c) { return c.Position; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Position = v; }
+                [](TransformComponent& c, const glm::vec3& v) { c.SetPosition(v); }
             );
-            meta.AddProperty<TransformComponent, glm::quat>(
+            meta.AddProperty<TransformComponent, glm::vec3>(
                 "Rotation",
-                PropertyType::Quat,
-                [](const TransformComponent& c) { return c.Rotation; },
-                [](TransformComponent& c, const glm::quat& v) { c.Rotation = v; }
+                PropertyType::Vec3,
+                [](const TransformComponent& c) {
+                    // Convert quaternion to Euler angles (in degrees) for serialization
+                    return glm::degrees(glm::eulerAngles(c.Rotation));
+                },
+                [](TransformComponent& c, const glm::vec3& v) {
+                    // Convert Euler angles to quaternion
+                    c.SetRotation(v);
+                }
             );
             meta.AddProperty<TransformComponent, glm::vec3>(
                 "Scale",
                 PropertyType::Vec3,
                 [](const TransformComponent& c) { return c.Scale; },
-                [](TransformComponent& c, const glm::vec3& v) { c.Scale = v; }
+                [](TransformComponent& c, const glm::vec3& v) { c.SetScale(v); }
             );
         }
 
@@ -265,6 +294,13 @@ namespace Engine {
                 [](const ListenerComponent& c) { return c.Active; },
                 [](ListenerComponent& c, const bool& v) { c.Active = v; }
             );
+        }
+
+        // Register PrefabComponent
+        {
+            auto& meta = REGISTER_COMPONENT(PrefabComponent);
+            // PrefabComponent properties are managed internally
+            // No user-editable properties exposed in inspector by default
         }
 
         //Register ReverbComponent

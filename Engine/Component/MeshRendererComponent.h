@@ -1,6 +1,17 @@
+/**
+ * @file MeshRendererComponent.h
+ * @brief Mesh renderer component - rendering properties for 3D meshes
+ * @author
+ * @date 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 
 #include "Utility/Types.h"
+#include "../Asset/ResourceTypes.h"
 
 namespace Engine {
 
@@ -8,6 +19,9 @@ namespace Engine {
      * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
+        /// Unique identifier for this component instance
+        xresource::instance_guid ComponentGUID;
+
         bool Visible;           // Determine if sent to draw call
         bool ShadowReceive;     // For future expansion (WIP)
         bool ShadowCast;        // For future expansion (WIP)
@@ -18,7 +32,8 @@ namespace Engine {
 
         // Default constructor
         MeshRendererComponent()
-            : Visible(true),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Visible(true),
             ShadowReceive(false),
             ShadowCast(false),
             GlobalIlluminate(true),
@@ -28,4 +43,4 @@ namespace Engine {
         }
     };
 
-}
+} // namespace Engine

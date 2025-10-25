@@ -1,3 +1,13 @@
+/**
+ * @file CameraComponent.h
+ * @brief Camera component - camera properties and projection
+ * @author
+ * @date 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 
 #include <glm/glm.hpp>                  // Core types: vec, mat
@@ -5,8 +15,14 @@
 #include <glm/common.hpp>               // glm::clamp
 #include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
 
-// Math Utility
+ // Math Utility
 #include "../Utility/MathUtils.h"
+
+// Types for u32
+#include "../Utility/Types.h"
+
+// Resource types for xresource::instance_guid
+#include "../Asset/ResourceTypes.h"
 
 // Support setting of camera uniforms
 #include "../Graphics/ShaderProgram.h"
@@ -18,13 +34,16 @@ namespace Engine {
      * @brief Camera component
      */
     struct CameraComponent {
+        /// Unique identifier for this component instance
+        xresource::instance_guid ComponentGUID;
 
         // Toggles and flags
         bool Enabled;           // Enable/disable a camera    
+        bool Primary;           // Is this the primary/main camera?
         // bool Projection;     // (Future): 0 = perspective, 1 = orthographic
         bool autoAspect;        // Toggle true allows resizing by system
         bool isDirty;           // Dirty if modified from outside
-        
+
         // Projection data
         // glm::vec2 Size;      // (Future): viewport size of Camera when projection is orthographic 
         u32 Depth;              // Camera draw order
@@ -32,6 +51,10 @@ namespace Engine {
         float FOV;              // Field of view angle of camera in degrees
         float NearPlane;        // Near clipping plane
         float FarPlane;         // Far clipping plane
+
+        // Compatibility aliases - these are the same values
+        float NearClip;         // Alias for NearPlane
+        float FarClip;          // Alias for FarPlane
 
         // Output targets
         // u32 TargetTexture       // (Future): Reference to texture where camera output will be drawn
@@ -41,24 +64,30 @@ namespace Engine {
         // Derived data
         glm::mat4 View = glm::mat4(1.0f);
         glm::mat4 Persp = glm::mat4(1.0f);
-    
+
         // Default constructor for a default 3D camera
-        CameraComponent() : 
-            Enabled { true },
-            autoAspect { true },
-            isDirty { true },
-            Depth { 0 },
-            Aspect {16.0f / 9.0f},
+        CameraComponent() :
+            ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Enabled{ true },
+            Primary{ false },
+            autoAspect{ true },
+            isDirty{ true },
+            Depth{ 0 },
+            Aspect{ 16.0f / 9.0f },
             FOV{ 45.0f },
             NearPlane{ 0.5f },
             FarPlane{ 100.0f },
+            NearClip{ 0.5f },
+            FarClip{ 100.0f },
             Target{ 0.0f, 0.0f, 0.0f },
-            View { glm::mat4{1.0f} },
-            Persp { glm::mat4{1.0f} }
-        {}
+            View{ glm::mat4{1.0f} },
+            Persp{ glm::mat4{1.0f} }
+        {
+        }
 
         // Constructor for a 3D camera with custom values
         CameraComponent(bool enabled,
+            bool primary,
             bool autoaspect,
             bool dirty,
             u32 depth,
@@ -70,18 +99,29 @@ namespace Engine {
             glm::mat4 v,
             glm::mat4 p) :
 
-            Enabled { enabled },
-            autoAspect { autoaspect },
-            isDirty { dirty },
-            Depth { depth },
-            Aspect { aspect },
+            ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Enabled{ enabled },
+            Primary{ primary },
+            autoAspect{ autoaspect },
+            isDirty{ dirty },
+            Depth{ depth },
+            Aspect{ aspect },
             FOV{ fov },
             NearPlane{ near },
             FarPlane{ far },
+            NearClip{ near },
+            FarClip{ far },
             Target{ target },
             View{ v },
             Persp{ p }
-        {}
+        {
+        }
+
+        // Helper to sync NearClip/FarClip with NearPlane/FarPlane
+        void SyncClipPlanes() {
+            NearClip = NearPlane;
+            FarClip = FarPlane;
+        }
 
         //// Setters
         //void SetEnabled(bool enabled) { Enabled = enabled; isDirty = true; }
@@ -110,5 +150,4 @@ namespace Engine {
         //const glm::mat4& GetPerspective() const { return Persp; }
     };
 
-}
-
+} // namespace Engine

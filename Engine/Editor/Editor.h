@@ -12,7 +12,7 @@
 #ifndef SK_IMGUI_MANAGER_H
 #define SK_IMGUI_MANAGER_H
 
-// Include Editor Header Files
+ // Include Editor Header Files
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -48,7 +48,7 @@ namespace Engine
 		GLuint m_FBOTextureHandle;
 
 		// ImGui Window functionality
-		bool inspectorWindow = true; 
+		bool inspectorWindow = true;
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
@@ -77,7 +77,7 @@ namespace Engine
 
 	public:
 		// Default contructor 
-		Editor(GLFWwindow* window): m_Window(window), io(nullptr), m_Scene(nullptr) {};
+		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
 		// Deconstuctor
 		~Editor() = default;
@@ -117,8 +117,8 @@ namespace Engine
 		// Render Viewport
 		void renderViewport();
 
-		// Render IMGUI UI
-		void RenderEditor();
+		// Helper function for searching and return the files
+		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
 
 		// ========================= Helper Function ======================================
 		// helper function to open scene files from top menu
@@ -130,6 +130,8 @@ namespace Engine
 		// Helper function for searching and return the files/folder
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 
+		// Complete the ImGui frame
+		void CompleteFrame();
 	};
 
 

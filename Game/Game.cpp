@@ -12,10 +12,17 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
+#include "Component/TagComponent.h"
+#include "Component/TransformComponent.h"
+#include "Component/CameraComponent.h"
+#include "Component/MeshRendererComponent.h"
+#include "Component/RigidbodyComponent.h"
+
 // Adding systems
 #include "Graphics/RenderSystem.h"
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
+#include "Physics/PhysicsSystem.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -124,7 +131,7 @@ void Game::OnInit() {
         // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
         m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
         m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-
+        m_Scene->AddSystem<Engine::PhysicsSystem>();
         m_Scene->AddSystem<Engine::TransformSystem>();
         m_Scene->AddSystem<Engine::CameraSystem>();
         m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
@@ -545,7 +552,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
     m_Editor->OnUpdate(ts);
-    m_Editor->RenderEditor();
 }
 
 void Game::OnShutdown() {
