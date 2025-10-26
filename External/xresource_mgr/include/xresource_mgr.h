@@ -5,7 +5,7 @@
 #include <cassert>
 #include <unordered_map>
 #include <array>
-#include "../xresource_guid-main/source/xresource_guid.h"
+#include "../xresource_guid/include/xresource_guid.h"
 
 //----------------------------------------------------------------------------------
 // Example on registering a resource type

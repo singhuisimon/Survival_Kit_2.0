@@ -97,7 +97,7 @@ namespace Engine {
 		 */
 		inline void attach_depth(GLuint texOrRb, bool isTexture, GLint level = 0) const {
 			if (isTexture) glNamedFramebufferTexture(gl_id(), GL_DEPTH_ATTACHMENT, texOrRb, level);
-			else glNamedFramebufferTexture(gl_id(), GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, texOrRb);
+			else glNamedFramebufferRenderbuffer(gl_id(), GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, texOrRb);
 		}
 
 		/**
@@ -108,7 +108,7 @@ namespace Engine {
 		 */
 		inline void attach_depth_stencil(GLuint texOrRb, bool isTexture, GLint level = 0) const {
 			if (isTexture) glNamedFramebufferTexture(gl_id(), GL_DEPTH_STENCIL_ATTACHMENT, texOrRb, level);
-			else glNamedFramebufferRenderbuffer(gl_id(), GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, level);
+			else glNamedFramebufferRenderbuffer(gl_id(), GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, texOrRb);
 		}
 
 		/**
