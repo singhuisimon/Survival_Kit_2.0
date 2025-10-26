@@ -8,6 +8,7 @@
 #include "Audio/AudioSystem.h"
 #include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
+#include "Asset/ResourceManager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -66,6 +67,8 @@ void Game::OnInit() {
     LOG_INFO("Initial asset scan complete - found ",
         Engine::AM.db().Count(), " assets");
     }
+
+    Engine::RM.startUp(); 
 
 
 
@@ -576,6 +579,8 @@ void Game::OnShutdown() {
     }
 
     //============= Asset =============
+    Engine::RM.shutDown(); 
+
     LOG_INFO("Shutting Down Asset");
     Engine::AM.shutDown();
 

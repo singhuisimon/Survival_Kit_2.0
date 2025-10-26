@@ -28,6 +28,15 @@
 
 namespace Engine {
 
+    //void InitializeResourceLoaders() {
+    //    //force the linker to include these symbols 
+    //    (void)&texture_loader;
+    //    (void)&mesh_loader;
+    //    (void)&material_loader;
+    //    (void)&audio_loader;
+    //    (void)&shader_loader;
+    //}
+
     // Helper to get ResourceManager from xresource::mgr
     ResourceManager* getResourceManager(xresource::mgr& mgr) {
         return &mgr.getUserData<ResourceManager>();

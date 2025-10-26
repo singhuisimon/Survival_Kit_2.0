@@ -15,10 +15,10 @@
 #include <vector>
 #include <fstream>
 
-//define acronym for easier access
-#define RM Engine::ResourceManager::getInstance()
 
 namespace Engine {
+    //define acronym for easier access
+#define RM ResourceManager::getInstance()
 
     //forward declarations for resource data structures
     struct TextureResource;
