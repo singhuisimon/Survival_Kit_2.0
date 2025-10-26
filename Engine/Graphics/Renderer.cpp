@@ -15,10 +15,14 @@
 #include "../Graphics/Renderer.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
+#include "../Asset/ResourceHelpers.h"
+#include "../Asset/ResourceManager.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 #include <GLFW/glfw3.h>
+
+#include "Asset/ResourceData.h"
 
 #pragma region NAMESPACE
 
@@ -404,14 +408,24 @@ namespace Engine {
 			prog.setUniform("material.shininess", test_material.getMaterialShininess());
 
 			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
-			m_gl.m_mesh_storage[mesh_handle].vao.bind();
+
+			xresource::full_guid mesh_fullguid = convertToMeshGuid(item.m_instance_guid);
+			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
 
 			GLenum  primitive  = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-			glDrawElements(primitive, draw_count, index_type, NULL);
-			glBindVertexArray(0);
+/*			if (mesh_rsc) {
+				glBindVertexArray(mesh_rsc->VAO);
+				glDrawElements(GL_TRIANGLES, mesh_rsc->indices.size(), GL_UNSIGNED_INT, NULL);
+				glBindVertexArray(0);
+			}
+			else*/ {
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, NULL);
+				glBindVertexArray(0);
+			}
 		}
 	}
 

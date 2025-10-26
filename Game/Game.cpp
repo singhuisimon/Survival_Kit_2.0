@@ -157,7 +157,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -225,6 +225,7 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
+    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E001_worm_host_v001.fbx");
 
     auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     rb.Mass = 1.0f;
@@ -245,7 +246,6 @@ void Game::CreateDefaultScene() {
     playerAudio.MinDistance = 1.0f;
     playerAudio.MaxDistance = 50.0f;
 
-    player.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
 
     LOG_TRACE("  Creating Camera entity...");
