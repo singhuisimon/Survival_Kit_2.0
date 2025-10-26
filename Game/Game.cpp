@@ -228,7 +228,7 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E001_worm_host_v001.fbx");
+    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E007_adware_popup_v001.fbx");
 
     auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     rb.Mass = 1.0f;

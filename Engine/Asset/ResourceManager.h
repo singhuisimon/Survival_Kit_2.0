@@ -29,7 +29,7 @@ namespace Engine {
 
 	class ResourceManager {
 	private: 
-		ResourceManager();
+		ResourceManager()=default;
 		ResourceManager(ResourceManager const&);
 		void operator=(ResourceManager const&) = delete;
 

@@ -114,7 +114,7 @@ namespace Engine {
 
 			//================= OUTPUT PATHS ===============
 			cfg.descriptorRoot = sourcesPath + "/Descriptors";
-			cfg.compiledPath = assetsPath + "/Compiled";
+			cfg.compiledPath = (std::filesystem::path(assetsPath) / "Compiled").string();
 
 			//================= INTERNAL PATHS ===================
 			cfg.databaseFile = sourcesPath + "/DB/assetdb.txt";

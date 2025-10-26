@@ -409,7 +409,16 @@ namespace Engine {
 
 			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
 
+			LOG_INFO(">>> RENDERER: Converting instance_guid to full_guid <<<");
+			LOG_INFO("Renderer - item.m_instance_guid.m_Value (decimal): ", item.m_instance_guid.m_Value);
+
 			xresource::full_guid mesh_fullguid = convertToMeshGuid(item.m_instance_guid);
+
+			LOG_INFO("Renderer - After convertToMeshGuid:");
+			LOG_INFO("  mesh_fullguid.m_Instance.m_Value (decimal): ", mesh_fullguid.m_Instance.m_Value);
+			LOG_INFO("  mesh_fullguid.m_Type.m_Value (decimal): ", mesh_fullguid.m_Type.m_Value);
+			LOG_INFO("Calling RM.loadResource...\n");
+
 			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
 
 			GLenum  primitive  = m_gl.m_mesh_storage[mesh_handle].primitive_type;

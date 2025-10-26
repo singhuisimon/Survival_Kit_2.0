@@ -102,10 +102,21 @@ namespace Engine {
      * @return Full path: Compiled/Meshes/1234567890ABCDEF.mesh
      */
     inline std::string getCompiledFilePath(const xresource::full_guid& guid, ResourceType type) {
+        LOG_INFO("=== getCompiledFilePath DEBUG ===");
+        LOG_INFO("Input full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
+        LOG_INFO("Input full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
+        LOG_INFO("=================================\n");
 
+        std::string compiledPathStr = AM.getCompiledPath(); 
+
+        //remove trailing slashes 
+        while (!compiledPathStr.empty() &&
+            (compiledPathStr.back() == '/' || compiledPathStr.back() == '\\')) {
+            compiledPathStr.pop_back();
+        }
 
         // Get repository root and build Compiled path
-        std::filesystem::path compiledRoot = AM.getCompiledPath(); 
+        std::filesystem::path compiledRoot(compiledPathStr);
 
 
         // Get type folder
@@ -115,7 +126,9 @@ namespace Engine {
         std::stringstream ss;
         ss << std::hex << std::uppercase << std::setfill('0')
             << std::setw(16) << guid.m_Instance.m_Value;
-
+        std::string hexGuid = ss.str();
+        LOG_INFO("Converted to hex: ", hexGuid);
+        LOG_INFO("Resource type: ", typeFolder);
         // Get extension
         std::string extension;
         switch (type) {
@@ -129,7 +142,10 @@ namespace Engine {
 
         // Build path: Compiled/Type/GUID.ext (flat structure)
         std::filesystem::path result = compiledRoot / typeFolder / (ss.str() + extension);
-        return result.string();
+
+        LOG_INFO("Final compiled path: ", result);
+        LOG_INFO("File exists: ", std::filesystem::exists(result) ? "YES" : "NO");
+        return result.lexically_normal().string();
     }
 
     /**
@@ -138,7 +154,32 @@ namespace Engine {
     inline bool fileExists(const std::string& path) {
         return std::filesystem::exists(path);
     }
+    /**
+     * @brief List all compiled files of a given type (for debugging)
+     */
+    inline void listCompiledFiles(ResourceType type) {
+        std::filesystem::path compiledRoot = AM.getCompiledPath();
+        std::string typeFolder = resourceTypeToString(type);
+        std::filesystem::path typeDir = compiledRoot / typeFolder;
 
+        LOG_INFO("=== Listing compiled ", typeFolder, " files ===");
+        LOG_INFO("Directory: ", typeDir.string());
+
+        if (!std::filesystem::exists(typeDir)) {
+            LOG_ERROR("Directory does not exist!");
+            return;
+        }
+
+        int count = 0;
+        for (const auto& entry : std::filesystem::directory_iterator(typeDir)) {
+            if (entry.is_regular_file()) {
+                LOG_INFO("  - ", entry.path().filename().string());
+                count++;
+            }
+        }
+        LOG_INFO("Total files: ", count);
+        LOG_INFO("=====================================\n");
+    }
 }// end of namespace Engine
 
 #endif

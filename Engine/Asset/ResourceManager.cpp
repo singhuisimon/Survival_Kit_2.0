@@ -9,11 +9,11 @@ namespace Engine {
     //forward declaration
    // extern void InitializeResourceLoaders();
 
-	ResourceManager::ResourceManager() {
+	//ResourceManager::ResourceManager() {
 
-		//setType("ResourceManager");
-		m_resource_mgr = std::make_unique<xresource::mgr>();
-	}
+	//	//setType("ResourceManager");
+	//	m_resource_mgr = std::make_unique<xresource::mgr>();
+	//}
 
 	//get 
 	ResourceManager& ResourceManager::getInstance() {
@@ -27,7 +27,7 @@ namespace Engine {
 
         try {
 
-            //InitializeResourceLoaders(); 
+            m_resource_mgr = std::make_unique<xresource::mgr>();
 
 
             // Initialize the xresource manager
