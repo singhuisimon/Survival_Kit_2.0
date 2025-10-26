@@ -30,7 +30,8 @@
 #include "../Utility/Timestep.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
-
+#include "../Prefab/Prefab.h"
+#include "../Prefab/PrefabRegistry.h"
 namespace Engine
 {
 	/**
@@ -46,6 +47,7 @@ namespace Engine
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
 		GLuint m_FBOTextureHandle;
+		std::shared_ptr<Prefab> m_Prefab; // for prefab
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -64,6 +66,7 @@ namespace Engine
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+		std::string currPrefabPath{};
 
 
 		// Helper struct to get resources folder/files 
@@ -118,7 +121,7 @@ namespace Engine
 		void renderViewport();
 
 		// Helper function for searching and return the files
-		std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
+		// std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
 
 		// ========================= Helper Function ======================================
 		// helper function to open scene files from top menu
