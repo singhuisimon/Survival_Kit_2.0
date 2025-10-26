@@ -190,6 +190,16 @@ void Game::OnInit() {
         return;
     }
 
+    // Step 7: Initialize Tracy Profiler
+    LOG_INFO("Step 7: Initializing Tracy Profiler...");
+    try {
+        m_TracyProfiler = std::make_unique<Engine::TracyProfiler>();
+        m_TracyProfiler->SetTracyPath("External/Tracy/Tracy.exe");
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
+    }
+
 
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
@@ -552,6 +562,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
     m_Editor->OnUpdate(ts);
+    m_TracyProfiler->OnUpdate();
 }
 
 void Game::OnShutdown() {
@@ -582,6 +593,7 @@ void Game::OnShutdown() {
     m_Scene.reset();
     m_AudioManager.reset();
     m_Editor.reset();
+    m_TracyProfiler.reset();
 
     LOG_INFO("Game shutdown complete");
 }
