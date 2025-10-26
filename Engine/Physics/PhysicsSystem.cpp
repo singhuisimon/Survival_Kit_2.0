@@ -149,7 +149,7 @@ namespace Engine
             mObjPairFilter
         );
 
-        mPhysics.SetGravity(JPH::Vec3(0.0f, -9.81f, 0.0f));
+        mPhysics.SetGravity(JPH::Vec3(0.0f, 0.0f, 0.0f));
         mBodyInterface = &mPhysics.GetBodyInterface();
 
         BuildOrRefreshBodies(scene);
@@ -253,6 +253,7 @@ namespace Engine
                     static_cast<float>(p.GetZ())
                 );
                 FromJPHRotation(q, tc.Rotation);
+                tc.IsDirty = true;
 
                 if (!rb.IsKinematic)
                 {
