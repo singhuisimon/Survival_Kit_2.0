@@ -25,6 +25,7 @@
 #include <algorithm>
 
 // Include other necessary headers
+#include "../Profiler/Profiler.h"
 #include "../ECS/Scene.h"
 #include "../ECS/Components.h"
 #include "../Utility/Timestep.h"
@@ -33,6 +34,7 @@
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
+
 namespace Engine
 {
 	/**
@@ -49,6 +51,8 @@ namespace Engine
 		Entity m_SelectedEntity{};
 		GLuint m_FBOTextureHandle;
 		//std::shared_ptr<Scene> m_Scene; // for prefab
+		//std::shared_ptr<Prefab> m_Prefab; // for prefab
+		std::weak_ptr<TracyProfiler> m_Profiler;
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -148,6 +152,9 @@ namespace Engine
 		// to clean unsave prefab
 		void CleanupTemporaryPrefabs();
 
+		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
+			m_Profiler = profiler; // still increases refcount, no extra copy on call
+		}
 
 	};
 

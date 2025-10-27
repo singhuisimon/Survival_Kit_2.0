@@ -2,6 +2,7 @@
 #include "Core/Application.h"
 #include "Core/Input.h"
 #include "Utility/Logger.h"
+#include "Utility/AssetPath.h"
 #include "ECS/Components.h"
 #include "Editor/Editor.h"
 #include "Serialization/ComponentRegistry.h"
@@ -188,6 +189,29 @@ void Game::OnInit() {
     if (!m_Scene) {
         LOG_CRITICAL("CRITICAL: Scene is null at end of OnInit()!");
         return;
+    }
+
+    // Step 7: Initialize Tracy Profiler
+    LOG_INFO("Step 7: Initializing Tracy Profiler...");
+    try {
+        m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
+        
+        // Get the directory where the executable is running from
+        std::filesystem::path exeDir = Engine::getAssetsPath();
+
+        // Move up one level (from 'resources/' to project root)
+        std::filesystem::path projectRoot = exeDir.parent_path().parent_path();
+
+        std::filesystem::path tracyExe = projectRoot / "tracy-profiler.exe";
+        std::string result = tracyExe.generic_string();
+        LOG_INFO("tracy-profiler path: %s", result.c_str());
+
+        m_TracyProfiler->SetTracyPath(result);
+
+        m_Editor->SetTracy(m_TracyProfiler);
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
     }
 
 
@@ -552,6 +576,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
     m_Editor->OnUpdate(ts);
+    m_TracyProfiler->OnUpdate();
 }
 
 void Game::OnShutdown() {
@@ -582,6 +607,7 @@ void Game::OnShutdown() {
     m_Scene.reset();
     m_AudioManager.reset();
     m_Editor.reset();
+    m_TracyProfiler.reset();
 
     LOG_INFO("Game shutdown complete");
 }

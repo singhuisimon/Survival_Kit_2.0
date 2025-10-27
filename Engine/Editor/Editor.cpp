@@ -860,7 +860,17 @@ namespace Engine
 			ImGui::Text("Tracy Window:");
 			if (ImGui::Button("Launch Tracy Window"))
 			{
-				// TO DO: Tracy Running 
+#ifdef TRACY_ENABLE
+				if (auto profiler = m_Profiler.lock()) {
+					profiler->LaunchTracy();
+					LOG_INFO("  -> Tracy profiler launched successfully");
+				}
+				else {
+					LOG_WARNING("  -> Tracy profiler reference expired.");
+				}
+#else
+				LOG_WARNING("  -> TRACY_ENABLE not defined. Skipping profiler launch.");
+#endif
 			}
 
 			ImGui::Separator();

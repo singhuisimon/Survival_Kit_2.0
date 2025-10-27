@@ -343,8 +343,25 @@ namespace Engine {
                 }
             }
 
+            // Read the saved entity ID
+            entt::entity entityId = entt::null;
+            if (entityObj.HasMember("ID")) {
+                entityId = static_cast<entt::entity>(entityObj["ID"].GetUint());
+                LOG_TRACE("Restoring entity with ID: ", (uint32_t)entityId);
+            }
+
             // Create entity
-            Entity entity = m_Scene->CreateEntity(entityName);
+            Entity entity;
+            if (entityId != entt::null) {
+                // Create entity with specific ID to preserve it across saves
+                entity = Entity(registry.create(entityId), &registry);
+                LOG_TRACE("Created entity '", entityName, "' with preserved ID: ", (uint32_t)entity);
+            }
+            else {
+                // Fallback to auto-generated ID (for old scene files)
+                entity = m_Scene->CreateEntity(entityName);
+                LOG_WARNING("Entity ID not found in scene file, auto-generating new ID");
+            }
 
             // Deserialize components
             if (entityObj.HasMember("Components")) {

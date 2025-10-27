@@ -56,6 +56,10 @@ file(GLOB_RECURSE COMPONENT_HEADERS "${ENGINE_ROOT}/Component/*.h")
 file(GLOB_RECURSE PREFAB_SOURCES "${ENGINE_ROOT}/Prefab/*.cpp")
 file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 
+# Profiler Module
+file(GLOB_RECURSE PROFILER_SOURCES "${ENGINE_ROOT}/Profiler/*.cpp")
+file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
+
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
@@ -70,6 +74,7 @@ set(ENGINE_SOURCES
     ${COMPONENT_SOURCES}
     ${PREFAB_SOURCES}
     ${PHYSICS_SOURCES}
+    ${PROFILER_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -85,6 +90,7 @@ set(ENGINE_HEADERS
     ${COMPONENT_HEADERS}
     ${PREFAB_HEADERS}
     ${PHYSICS_HEADERS}
+    ${PROFILER_HEADERS}
 )
 
 # Create engine static library
@@ -154,6 +160,10 @@ source_group("Component\\Source" FILES ${COMPONENT_SOURCES})
 # Prefab Module
 source_group("Prefab\\Header" FILES ${PREFAB_HEADERS})
 source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
+
+# Profiler Module
+source_group("Profiler\\Header" FILES ${PROFILER_HEADERS})
+source_group("Profiler\\Source" FILES ${PROFILER_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
