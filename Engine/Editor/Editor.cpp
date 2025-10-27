@@ -132,8 +132,28 @@ namespace Engine
 				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 				{
-					
-					if (!currScenePath.empty())
+					if (isPrefabEditor && !currPrefabPath.empty())
+					{
+						// Save the current prefab
+						auto view = m_Scene->GetRegistry().view<TagComponent>();
+						if (view.begin() != view.end())
+						{
+							Entity entity(*view.begin(), &m_Scene->GetRegistry());
+
+							// Create a new prefab from the current entity
+							std::string entityName = entity.GetComponent<TagComponent>().Tag;
+							auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
+
+							if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
+							{
+								LOG_INFO("Prefab saved: {}", currPrefabPath);
+
+								// Update the registry with the new prefab
+								PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							}
+						}
+					}
+					else if (!currScenePath.empty())
 					{
 						SceneSerializer serializer(m_Scene);
 
