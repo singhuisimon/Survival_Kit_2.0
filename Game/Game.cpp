@@ -228,13 +228,13 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E003_trojan_v001.fbx");
 
-    auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
-    rb.Mass = 1.0f;
-    rb.UseGravity = true;
-    rb.IsKinematic = false;
-    rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
+    //rb.Mass = 1.0f;
+    //rb.UseGravity = true;
+    //rb.IsKinematic = false;
+    //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";

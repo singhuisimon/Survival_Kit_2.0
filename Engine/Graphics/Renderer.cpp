@@ -432,10 +432,10 @@ namespace Engine {
 
 			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
 
-			if (!mesh_rsc) {
-				LOG_INFO("MESH FAILED TO LOAD WITH GUID ", mesh_fullguid.m_Instance.m_Value);
-				continue;  // or return, depending on your loop structure
-			}
+			//if (!mesh_rsc) {
+			//	LOG_INFO("MESH FAILED TO LOAD WITH GUID ", mesh_fullguid.m_Instance.m_Value);
+			//	continue;  // or return, depending on your loop structure
+			//}
 
 			LOG_INFO("================== END OF RENDERER ===============");
 
