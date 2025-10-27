@@ -12,7 +12,9 @@
 #include "Editor.h"
 #include "../Component/TagComponent.h"
 #include "../Component/TransformComponent.h"
+
 #include "../Serialization/SceneSerializer.h"
+#include "../Serialization/PrefabSerializer.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
@@ -201,6 +203,7 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
+			// to toggle show which panel
 			if (ImGui::BeginMenu("View"))
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &hierachyWindow);
@@ -245,12 +248,13 @@ namespace Engine
 						tag.Tag = std::string(buffer);
 					}
 				}
-
+				
 				ImGui::Separator();
 
-				// Display TransformComponent
+				// =========================== Display TransformComponent ===========================
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
 				{
+
 					if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 					{
 						auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
@@ -275,11 +279,275 @@ namespace Engine
 						if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.001f))
 						{
 							transform.SetScale(scale);
+							
 						}
 					}
 				}
+				// calculate ... button size
+				ImVec2 dotTextSize = ImGui::CalcTextSize("...");
+				ImVec2 dotButtonSize(dotTextSize.x + 8.0f, dotTextSize.y + 8.0f);
+				
+				// =========================== Display Rigid Body components ===========================
+				if (m_SelectedEntity.HasComponent<RigidbodyComponent>())
+				{
+					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
-				// Display other components...
+					// col 1: RigidBody component header
+					bool openRigidBody = ImGui::CollapsingHeader("Rigid Body", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeRigidBody = false; // for remove part
+
+					// col2: ...
+					ImGui::NextColumn();
+					//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
+					
+					if (ImGui::Button("...###RigidbodyBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("RigidBodyPopUp");
+					}
+					if (ImGui::BeginPopup("RigidBodyPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeRigidBody = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+					
+					ImGui::Columns(1);
+					//ImGui::Separator();
+					
+					if (openRigidBody)
+					{
+						// mass
+						auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
+						//ImGui::Separator();
+						float rigidMass = rigidBody.GetMass();
+						if (ImGui::DragFloat("Mass", &rigidMass))
+						{
+							rigidBody.SetMass(rigidMass);
+						}
+						ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
+						ImGui::Checkbox("Use Gravity", &rigidBody.UseGravity);
+
+						//bool isKinematic = rigidBody.
+						ImGui::Separator();
+						ImGui::Text("Display Runtime Value:");
+						glm::vec3 vel = rigidBody.GetVelocity();
+						float velocity[3]{ vel.x, vel.y, vel.z };
+						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
+						float speed = rigidBody.GetSpeed();
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+					}
+					// ---------------------- Remove Rigid Body Component by ... -------------------------
+					if (removeRigidBody)
+					{
+						m_SelectedEntity.RemoveComponent<RigidbodyComponent>();
+					}
+					
+					
+				}
+				// =========================== Display Mesh Render Component ===========================
+				if (m_SelectedEntity.HasComponent<MeshRendererComponent>())
+				{
+					ImGui::Separator();
+					
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openMeshComponent = ImGui::CollapsingHeader("Mesh Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeMesh = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+					
+					if (ImGui::Button("... ###MeshBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("MeshPopUp");
+					}
+					if (ImGui::BeginPopup("MeshPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeMesh = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+					//ImGui::Separator();
+
+
+					if (openMeshComponent)
+					{
+						//ImGui::Separator();
+						auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
+
+					}
+					// ---------------------- Remove Mesh Component by ... -------------------------
+					if (removeMesh)
+					{
+						m_SelectedEntity.RemoveComponent<MeshRendererComponent>();
+					}
+				}
+
+				// =========================== Display Audio Component ===========================
+				if (m_SelectedEntity.HasComponent<AudioComponent>())
+				{
+					ImGui::Separator();
+
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openAudioComponent = ImGui::CollapsingHeader("Audio Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeAudio = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###AudioBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("AudioPopUp");
+					}
+					if (ImGui::BeginPopup("AudioPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeAudio = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+					//ImGui::Separator();
+
+
+					if (openAudioComponent)
+					{
+						//ImGui::Separator();
+						auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
+
+					}
+					// ---------------------- Remove Audio Component by ... -------------------------
+					if (removeAudio)
+					{
+						m_SelectedEntity.RemoveComponent<AudioComponent>();
+					}
+				}
+
+
+				// ======================== Add Component Section ===============================
+				ImGui::Separator();
+				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
+				ImVec2  addComponetbtnSize(140, 40); // set button size
+
+				// Calculate centered position for x axis
+				ImGui::SetCursorPosX((windowSize.x - addComponetbtnSize.x) * 0.5f);
+
+				if (ImGui::Button("Add Component", addComponetbtnSize))
+				{
+					ImGui::OpenPopup("AddComponentPopup");
+				}
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetTooltip("Add new component.");
+				}
+				
+				if (ImGui::BeginPopup("AddComponentPopup")) 
+				{
+					//ImGui::SetWindowFontScale(1.3f);
+					// -------------------- Add Transform Component -------------------------
+					bool hasTransform = m_SelectedEntity.HasComponent<TransformComponent>();
+
+					ImGui::BeginDisabled(hasTransform);
+					
+					if (ImGui::MenuItem("Transform3D Component"))
+					{
+						if (!hasTransform)
+						{
+							m_SelectedEntity.AddComponent<TransformComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasTransform)
+						{
+							ImGui::SetTooltip("Position, rotation, and scale of the object.");
+						}
+					}
+					
+					ImGui::EndDisabled();
+
+					// ------------------------ Add RigidBody Component ----------------------------
+					bool hasRigidBody = m_SelectedEntity.HasComponent<RigidbodyComponent>();
+					ImGui::BeginDisabled(hasRigidBody);
+
+					if (ImGui::MenuItem("RigidBody Component"))
+					{
+						if (!hasRigidBody)
+						{
+							m_SelectedEntity.AddComponent<RigidbodyComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasRigidBody)
+						{
+							ImGui::SetTooltip("Simulates physical: movement, rotation, and collisions.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Mesh Component ----------------------------
+					bool hasMeshRenderComponent = m_SelectedEntity.HasComponent<MeshRendererComponent>();
+					ImGui::BeginDisabled(hasMeshRenderComponent);
+
+					if (ImGui::MenuItem("MeshRenderer Component"))
+					{
+						if (!hasMeshRenderComponent)
+						{
+							m_SelectedEntity.AddComponent<MeshRendererComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasMeshRenderComponent)
+						{
+							ImGui::SetTooltip("Defines the visual 3D model of the object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Audio Component ----------------------------
+					bool hasAudioComponent = m_SelectedEntity.HasComponent<AudioComponent>();
+					ImGui::BeginDisabled(hasAudioComponent);
+
+					if (ImGui::MenuItem("Audio Component"))
+					{
+						if (!hasAudioComponent)
+						{
+							m_SelectedEntity.AddComponent<AudioComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasAudioComponent)
+						{
+							ImGui::SetTooltip("Adds sound playback to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+
+					//ImGui::SetWindowFontScale(1.0f); // Reset
+
+					ImGui::EndPopup(); // end pop up for Add Component  
+				}
+
 			}
 			else
 			{
@@ -332,6 +600,7 @@ namespace Engine
 					// Right-click context menu
 					if (ImGui::BeginPopupContextItem())
 					{
+						// ==================== Selected Entity Section =======================
 						if (ImGui::MenuItem("Delete Entity"))
 						{
 							m_Scene->DestroyEntity(entity);
@@ -340,7 +609,24 @@ namespace Engine
 								m_SelectedEntity = Entity();
 							}
 						}
-						ImGui::EndPopup();
+
+						// ===================== Prefab Section ==========================
+						if (ImGui::MenuItem("Save as Prefab"))
+						{
+							if (m_SelectedEntity)
+							{
+								auto prefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, m_SelectedEntity.GetComponent<TagComponent>().Tag);
+								auto prefabFolder  = getAssetFilePath("Sources/Prefabs/") + m_SelectedEntity.GetComponent<TagComponent>().Tag + ".json";
+
+								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
+								{
+									LOG_INFO("Prefab saved to {}", prefabFolder);
+									PrefabRegistry::Get().RegisterPrefab(prefab);
+								}
+							}
+						}
+						ImGui::EndPopup(); // end of the pop up context item
+
 					}
 				}
 			}
@@ -390,7 +676,7 @@ namespace Engine
 				// display the selected folder name
 				std::filesystem::path folderPath(selectedFolder);
 				std::string folderName = folderPath.filename().string();
-				ImGui::Text(("Assets > " + folderName).c_str());
+				ImGui::Text(("Resources > " + folderName).c_str());
 
 				ImGui::Separator();
 
@@ -400,7 +686,7 @@ namespace Engine
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
 
-				int textureCount = -1;
+				// int textureCount = -1;
 				ImGui::Columns(itemsPerRow, nullptr, false);
 
 				// loop through files in selected folder
@@ -430,6 +716,16 @@ namespace Engine
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
 								currScenePath = filePath; // update curr file path
+							}
+
+							auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
+							if (prefab)
+							{
+								m_Prefab = prefab;
+								PrefabRegistry::Get().RegisterPrefab(prefab);
+							
+								//Scene::CreateEntityFromPrefab()
+								currPrefabPath = filePath;
 							}
 						}
 					}
@@ -475,7 +771,17 @@ namespace Engine
 			ImGui::Text("Tracy Window:");
 			if (ImGui::Button("Launch Tracy Window"))
 			{
-				// TO DO: Tracy Running 
+#ifdef TRACY_ENABLE
+				if (auto profiler = m_Profiler.lock()) {
+					profiler->LaunchTracy();
+					LOG_INFO("  -> Tracy profiler launched successfully");
+				}
+				else {
+					LOG_WARNING("  -> Tracy profiler reference expired.");
+				}
+#else
+				LOG_WARNING("  -> TRACY_ENABLE not defined. Skipping profiler launch.");
+#endif
 			}
 
 			ImGui::Separator();
@@ -756,41 +1062,6 @@ namespace Engine
 			ImGui::EndPopup(); // end pop up panel for scene level selection
 		}
 		
-		/*if (!openScenePanel)
-			return;
-
-		ImGui::OpenPopup("Open Scene");
-
-		if (ImGui::BeginPopupModal("Open Scene", &openScenePanel))
-		{
-			static char scenePath[256] = "Resources/Scenes/";
-
-			ImGui::Text("Enter scene file path:");
-			ImGui::InputText("##scenepath", scenePath, sizeof(scenePath));
-
-			if (ImGui::Button("Open"))
-			{
-				SceneSerializer serializer(m_Scene);
-				if (serializer.Deserialize(scenePath))
-				{
-					currScenePath = scenePath;
-					LOG_INFO("Scene loaded successfully from: " + std::string(scenePath));
-				}
-				else
-				{
-					LOG_ERROR("Failed to load scene from: " + std::string(scenePath));
-				}
-				openScenePanel = false;
-			}
-
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel"))
-			{
-				openScenePanel = false;
-			}
-
-			ImGui::EndPopup();
-		}*/
 	}
 
 	void Editor::saveAsScenePanel()
@@ -971,12 +1242,12 @@ namespace Engine
 		return entries;
 	}
 
-	std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
-	{
-		std::vector<std::pair<std::string, std::string>> files;
-		// Implementation placeholder
-		return files;
-	}
+	//std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
+	//{
+	//	std::vector<std::pair<std::string, std::string>> files;
+	//	// Implementation placeholder
+	//	return files;
+	//}
 
 
 } // end of namespace Engine
