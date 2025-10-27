@@ -6,7 +6,6 @@
 #include "../Utility/Logger.h"
 
 #ifdef _WIN32
-//#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
@@ -66,6 +65,8 @@ namespace Engine {
         * @brief Monitors the profiler process and resets state if the process closes.
         **************************************************************************/
         void OnUpdate();
+
+        void Shutdown();
 
         /**************************************************************************
         * @brief

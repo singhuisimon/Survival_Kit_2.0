@@ -41,7 +41,7 @@ private:
     std::unique_ptr<Engine::Scene> m_Scene;
     // Editor 
     std::unique_ptr<Engine::Editor> m_Editor; 
-    std::unique_ptr<Engine::TracyProfiler> m_TracyProfiler;
+    std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
     float m_ColorShift = 0.0f;
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
