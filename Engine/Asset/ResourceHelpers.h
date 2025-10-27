@@ -143,9 +143,14 @@ namespace Engine {
         // Build path: Compiled/Type/GUID.ext (flat structure)
         std::filesystem::path result = compiledRoot / typeFolder / (ss.str() + extension);
 
-        LOG_INFO("Final compiled path: ", result);
-        LOG_INFO("File exists: ", std::filesystem::exists(result) ? "YES" : "NO");
-        return result.lexically_normal().string();
+       result = result.lexically_normal();
+        result.make_preferred(); 
+
+        std::string finalPath = result.string(); 
+
+        LOG_INFO("Final compiled path: ", finalPath);
+        LOG_INFO("File exists: ", std::filesystem::exists(finalPath) ? "YES" : "NO");
+        return finalPath;
     }
 
     /**

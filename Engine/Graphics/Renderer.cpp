@@ -412,6 +412,17 @@ namespace Engine {
 			LOG_INFO(">>> RENDERER: Converting instance_guid to full_guid <<<");
 			LOG_INFO("Renderer - item.m_instance_guid.m_Value (decimal): ", item.m_instance_guid.m_Value);
 
+			// In your AssetManager or debug code:
+			auto* record = AM.getAssetRecord(item.m_instance_guid);
+			if (record) {
+				LOG_INFO("Entity mesh GUID ", item.m_instance_guid.m_Value, " -> ", record->sourcePath);
+			}
+			else {
+				LOG_ERROR("GUID ", item.m_instance_guid.m_Value, " not in asset database!");
+				LOG_ERROR("This entity has an invalid/outdated mesh GUID");
+				LOG_ERROR("Entity will not be rendered");
+			}
+
 			xresource::full_guid mesh_fullguid = convertToMeshGuid(item.m_instance_guid);
 
 			LOG_INFO("Renderer - After convertToMeshGuid:");
@@ -421,16 +432,23 @@ namespace Engine {
 
 			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
 
+			if (!mesh_rsc) {
+				LOG_INFO("MESH FAILED TO LOAD WITH GUID ", mesh_fullguid.m_Instance.m_Value);
+				continue;  // or return, depending on your loop structure
+			}
+
+			LOG_INFO("================== END OF RENDERER ===============");
+
 			GLenum  primitive  = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-/*			if (mesh_rsc) {
+		if (mesh_rsc) {
 				glBindVertexArray(mesh_rsc->VAO);
 				glDrawElements(GL_TRIANGLES, mesh_rsc->indices.size(), GL_UNSIGNED_INT, NULL);
 				glBindVertexArray(0);
 			}
-			else*/ {
+			else {
 				m_gl.m_mesh_storage[mesh_handle].vao.bind();
 				glDrawElements(primitive, draw_count, index_type, NULL);
 				glBindVertexArray(0);
