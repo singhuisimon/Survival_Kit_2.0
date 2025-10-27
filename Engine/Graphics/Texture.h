@@ -55,7 +55,7 @@ namespace Engine {
 		 * @param h Height of the texture in pixels
 		 * @return Optional containing the texture if successful, nullopt on failure
 		 */
-		static std::optional<Texture> alloc_storage_on_gpu(const int w, const int h);
+		static std::optional<Texture> alloc_storage_on_gpu(const int w, const int h, GLenum format = GL_RGB8);
 
 		Texture(Texture&& other) noexcept { move_from(other); }
 		Texture& operator=(Texture&& other) noexcept {

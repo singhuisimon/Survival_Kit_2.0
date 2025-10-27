@@ -55,19 +55,22 @@ namespace {
 	inline void test_load_shaders(std::vector<Engine::ShaderProgram>& shd) {
 
 
-		
+
 		std::string vertex_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.vert") };
 		std::string fragment_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.frag") };
 
-		std::string vertex_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.vert")};
-		std::string fragment_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.frag")};
+		std::string vertex_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.vert") };
+		std::string fragment_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.frag") };
 
-		
+		std::string vertex_obj_picking_path{ Engine::getAssetFilePath("Sources/Shaders/object_picking.vert") };
+		std::string fragment_obj_picking_path{ Engine::getAssetFilePath("Sources/Shaders/object_picking.frag") };
+
 
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
-			std::make_pair(vertex_debug_path, fragment_debug_path)
+			std::make_pair(vertex_debug_path, fragment_debug_path),
+			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
@@ -91,7 +94,7 @@ namespace {
 		ms.push_back(std::move(p));
 		ms.push_back(std::move(s));
 	}
-	
+
 }
 
 namespace Engine {
@@ -110,13 +113,13 @@ namespace Engine {
 
 namespace Engine {
 
-	Renderer::Renderer(Camera3D& cam, Light& light) : editor_camera(cam), editor_light(light) { }
+	Renderer::Renderer(Camera3D& cam, Light& light) : editor_camera(cam), editor_light(light) {}
 
 	// On first load, setup some simple stuff
 	void Renderer::setup() {
 
 		// Load OpenGL function pointers with GLAD
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 			LOG_ERROR("Renderer::setup() - Failed to load OpenGL, GLAD failed to initialized");
 		}
 		else {
@@ -135,7 +138,7 @@ namespace Engine {
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
 
-		// Create a framebuffer and configure it's settings
+		// Create a framebuffer for ImGui editor and configure it's settings
 		auto fp_fbo = FrameBuffer::create();
 		if (fp_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*fp_fbo));
@@ -157,6 +160,7 @@ namespace Engine {
 		GLuint rboDepth;
 		glCreateRenderbuffers(1, &rboDepth);
 		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
+		temp_rbo = rboDepth;
 
 		auto& fpfbo_ = m_framebuffers[0];
 		auto& fptex_ = m_gl.m_textures[0];
@@ -165,12 +169,50 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
+		// Create FBO for GPU ID
+		auto gpu_fbo = FrameBuffer::create();
+		if (gpu_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*gpu_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create GPU ID framebuffer!");
+		}
+
+		// Create a single channel integer texture to store entity IDs
+		auto gpu_tex = Texture::alloc_storage_on_gpu(width, height, GL_R32UI);
+		if (gpu_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*gpu_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate GPU ID storage on the GPU!");
+		}
+
+		// Use the same depth renderbuffer for render pass
+		auto& gpufbo_ = m_framebuffers[1];
+		auto& gputex_ = m_gl.m_textures[1];
+		gpufbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(gputex_.handle()));
+		gpufbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
+
+		// Make sure the GPU-ID FBO has correct draw/read buffers and is cleared
+		const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+		gpufbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
+		gpufbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
+
+		// Check if fbo is successfully created
+		if (gpufbo_.complete()) {
+			LOG_INFO("Renderer::setup() - Successfully created GPU ID framebuffer.");
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to created GPU ID framebuffer!");
+		}
+
 		// Create a render pass for that framebuffer
 		RenderPass first_pass
 		{
 			.pass_name = "First Pass",
 			.fbo_handle = 0,
-			.shdpgm_handle = 0
+			.shdpgm_handle = 0,
+			.auto_aspect = true
 
 			// Leave the rest as default settings
 		};
@@ -179,6 +221,29 @@ namespace Engine {
 		m_passes.push_back(first_pass);
 
 
+#pragma region GPU_ID_OBJECT_PICKING_PASS
+
+		{
+			RenderPass gpu_id_pass
+			{
+				.pass_name = "GPU ID",
+				.fbo_handle = 1,			// Render into the GPU-ID FBO
+				.shdpgm_handle = 2,         // Object_picking shader program
+				.auto_aspect = true,
+				.clear_color = false,		// Use integer clear below
+				.clear_depth = true,		
+				.depth_test = true,
+				.depth_write = true,		
+				.blending = false,
+				.culling = true,
+				.passtype = PassType::GEOMETRY
+			};
+
+			m_passes.push_back(gpu_id_pass);
+		}
+
+#pragma endregion
+
 #pragma region TEST_TO_SEE_TEXTURE_PASS_TEMP
 
 		{
@@ -186,7 +251,7 @@ namespace Engine {
 			{
 				.pass_name = "Stub Pass",
 				.fbo_handle = 0,
-				.shdpgm_handle = 0
+				.shdpgm_handle = 0,
 
 			};
 
@@ -253,8 +318,15 @@ namespace Engine {
 		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle())); // Draw to ImGui FBO
 
 		auto& viewport = pass.view_port;
-		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y), 
-				   static_cast<GLsizei>(viewport.z), static_cast<GLsizei>(viewport.w));
+		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y),
+			static_cast<GLsizei>(viewport.z), static_cast<GLsizei>(viewport.w));
+
+		// If this pass targets the GPU-ID FBO (Shader program 2, R32UI), clear with integer clear:
+		if (pass.shdpgm_handle == 2) {
+			//auto& fbo = m_framebuffers[pass.fbo_handle];
+			// 0 means "no hit" — reserve ID=0 as empty
+			fbo.clear_colori(/*drawbuf index*/0, 0, 0, 0, 0);
+		}
 
 		pass.depth_test ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -262,7 +334,7 @@ namespace Engine {
 
 		if (pass.culling) {
 			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);      
+			glCullFace(GL_BACK);
 			glFrontFace(GL_CCW);
 		}
 		else {
@@ -307,34 +379,76 @@ namespace Engine {
 
 	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list) {
 
-		//// For rendering all enabled camera displays
-		//for (const auto& cam : camera_list) {
-		//	
-		//	for (const auto& pass : m_passes) {
-
-		//		if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
-
-		//		// Begin drawing frame
-		//		beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
-		//		draw(pass, draw_items, cam.View, cam.Persp);
-		//		endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
-		//	}
-		//}
-
 		// For rendering from editor's camera
 		glm::mat4 v = editor_camera.getLookAt(); // Editor camera view transform
-		for (const auto& pass : m_passes) {
+		for (/*const */auto& pass : m_passes) {
 
 			if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+
+			// Update pass viewport if allowed
+			int vp_w, vp_h;
+			glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
+			if (pass.auto_aspect) {
+
+				// Check if viewport needs update
+				if (pass.view_port.z != vp_w || pass.view_port.w != vp_h) {
+					pass.view_port.z = vp_w;
+					pass.view_port.w = vp_h;
+
+					// Resize FBO according to changes
+					resizeFBO(pass.fbo_handle, vp_w, vp_h);
+				}
+
+			}
 
 			// Get camera perspective transform
 			glm::mat4 p = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
 
 			// Begin drawing frame
-			beginFrame(pass); 
+			beginFrame(pass);
 			draw(pass, draw_items, v, p);
-			endFrame(pass); 
+			endFrame(pass);
+
+			// Read ID at mouse position for GPU ID pass
+			if (pass.shdpgm_handle == 2) {
+
+				// Get mouse position WRT window client
+				double mx, my;
+				glfwGetCursorPos(glfwGetCurrentContext(), &mx, &my);
+				//LOG_INFO("MX and MY: ", mx, " ", my);
+
+				// Check mouse pos if inside viewport panel
+				if (mx >= renderEditorVP.tl.x && mx <= (renderEditorVP.tl.x + renderEditorVP.size.x) 
+				 && my >= renderEditorVP.tl.y && my <= (renderEditorVP.tl.y + renderEditorVP.size.y)) {
+
+					// Normalize mouse position to viewport panel's top left position 
+					//LOG_INFO("u Calculation ", mx, " - ", renderEditorVP.tl.x, " / ", renderEditorVP.size.x);
+					//LOG_INFO("v Calculation ", my, " - ", renderEditorVP.tl.y, " / ", renderEditorVP.size.y);
+					float u = float(mx - renderEditorVP.tl.x) / renderEditorVP.size.x;
+					float v = float(my - renderEditorVP.tl.y) / renderEditorVP.size.y;
+
+					// Map to FBO pixel coords (flip Y because OpenGL images are bottom-up)
+					int px = int(u * pass.view_port.z);
+					int py = int((1.0f - v) * pass.view_port.w);
+
+					// Read the ID
+					uint32_t id = 0;
+					auto& idFbo = m_framebuffers[1];
+					idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+					glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
+					glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
+					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+					//LOG_INFO("Px Py = ", px," ", py);
+					LOG_INFO("GPU id = ", id);
+
+					// TODO: Save Picked ID to somewhere (0 will be used as NO-HIT, need to prevent use of 0)
+					
+				}
+
+			}
 		}
+
 
 	}
 
@@ -364,7 +478,7 @@ namespace Engine {
 			else {
 				prog.setUniform("isGamma", false);
 			}
-			
+
 		}
 		else {
 			prog.setUniform("isTexture", false);
@@ -380,7 +494,7 @@ namespace Engine {
 #pragma endregion
 
 		for (const auto& item : draw_items) {
-			
+
 			if (pass.passtype == PassType::DEBUGGING) {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				glEnable(GL_POLYGON_OFFSET_LINE);
@@ -396,6 +510,12 @@ namespace Engine {
 			Material& test_material = m_gl.t_testing_material[material_handle];
 #pragma endregion
 
+			// Set GPU ID for object picking
+			if (pass.shdpgm_handle == 2) {
+				u32 pickId = item.m_id;   
+				prog.setUniform("u_ObjectID", pickId);
+			}
+
 			// Temporary transformations
 			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
 			prog.setUniform("material.Ka", test_material.getMaterialAmbient());
@@ -406,7 +526,7 @@ namespace Engine {
 			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
 			m_gl.m_mesh_storage[mesh_handle].vao.bind();
 
-			GLenum  primitive  = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
@@ -420,5 +540,46 @@ namespace Engine {
 		prog.programFree();
 		glBindTextureUnit(0, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void Renderer::resizeFBO(u32 handle, int w, int h) {
+
+		// Check if fbo is valid
+		if (!m_framebuffers[handle].complete()) return;
+
+		// For all other FBOs
+		if (handle != 1) {
+			// Allocate storage for a new texture on the GPU
+			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h);
+			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate RGBA8 ", w, " ", h, " storage on the GPU!"); }
+			else { m_gl.m_textures[handle] = std::move(*fp_tex_new); }
+		}
+		else { // For GPU ID FBO
+			// Allocate storage for a new texture on the GPU
+			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h, GL_R32UI);
+			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate GL_R32UI ", w, " ", h, " storage on the GPU!"); }
+			else { m_gl.m_textures[handle] = std::move(*fp_tex_new); }
+		}
+
+		// Update renderbuffer attachement 
+		if (!temp_rbo) {
+			glCreateRenderbuffers(1, &temp_rbo);
+		}
+		glNamedRenderbufferStorage(temp_rbo, GL_DEPTH_COMPONENT24, w, h);
+
+		// Get FBO and Texture objects
+		auto& fpfbo_ = m_framebuffers[handle];
+		auto& fptex_ = m_gl.m_textures[handle];
+
+		// Replace texture and RBO
+		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
+		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, temp_rbo);
+
+		if (handle == 1) {
+			// Make sure the GPU-ID FBO has correct draw/read buffers and is cleared
+			const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+			fpfbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
+			fpfbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
+		}
 	}
 }

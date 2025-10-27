@@ -41,6 +41,7 @@ namespace Engine {
 		u32             shdpgm_handle;
 		glm::vec4       clear_color_value = { 1, 1, 1, 1 };
 		glm::vec4       view_port = { 0, 0, 1280, 720 };
+		bool			auto_aspect = false; // Enables changing of viewport
 		bool            clear_color = true;
 		bool            clear_depth = true;
 		bool            depth_test  = true;

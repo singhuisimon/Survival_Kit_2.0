@@ -26,6 +26,7 @@ namespace Engine {
 			if (renderable.Visible)
 			{
 				m_drawitems.push_back({
+					u32(entity),
 					renderable.MeshType,
 					renderable.Material,
 					renderable.Texture,

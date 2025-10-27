@@ -130,17 +130,17 @@ namespace Engine {
 		return Texture{ handle, static_cast<u32>(w), static_cast<u32>(h), mip_levels, desc.srgb };
 	}
 
-	std::optional<Texture> Texture::alloc_storage_on_gpu(const int w, const int h) {
+	std::optional<Texture> Texture::alloc_storage_on_gpu(const int w, const int h, GLenum format) {
 
 		GLuint tex = 0;
 		glCreateTextures(GL_TEXTURE_2D, 1, &tex);
-		glTextureStorage2D(tex, 1, GL_RGB8, w, h);
+		glTextureStorage2D(tex, 1, format, w, h);
 
 		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		return Texture{ tex, static_cast<u32>(w), static_cast<u32>(h), static_cast<u32>(1), true};
+		return Texture{ tex, static_cast<u32>(w), static_cast<u32>(h), static_cast<u32>(1), true };
 	}
 }

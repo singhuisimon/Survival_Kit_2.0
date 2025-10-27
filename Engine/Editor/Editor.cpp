@@ -31,7 +31,7 @@ namespace Engine
 		m_Scene = scene;
 	}
 
-	void Editor::OnInit(GLuint texhandle)
+	void Editor::OnInit()
 	{
 		if (m_Initialized)
 		{
@@ -66,13 +66,10 @@ namespace Engine
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
-		// Save created FBO texture handle
-		m_FBOTextureHandle = texhandle;
-
 		m_Initialized = true;
 	}
 
-	void Editor::OnUpdate(Timestep ts)
+	void Editor::OnUpdate(Timestep ts, GLuint texhandle)
 	{
 		if (!m_Initialized) return;
 
@@ -84,7 +81,7 @@ namespace Engine
 
 		displayTopMenu();
 
-		renderViewport();
+		renderViewport(texhandle);
 
 		// Panel Logic
 		displayPropertiesPanel();
@@ -1083,7 +1080,7 @@ namespace Engine
 		ImGui::NewFrame();
 	}
 
-	void Editor::renderViewport()
+	void Editor::renderViewport(GLuint texhandle)
 	{
 		// TODO: Get Texture from Graphics
 		// auto texture = GFXM.getImguiTex();
@@ -1114,12 +1111,33 @@ namespace Engine
 		ImGui::Begin("Viewport");
 
 		// Uncomment this once the viewport texture has been obtained
-		if (m_FBOTextureHandle) {
+		if (texhandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 
-			ImGui::Image((ImTextureID)(intptr_t)m_FBOTextureHandle,
+			ImGui::Image((ImTextureID)(intptr_t)texhandle,
 				viewportSize,
 				ImVec2(0, 1), ImVec2(1, 0));
+
+			// Get editor viewport data
+			ImVec2 tl_screen = ImGui::GetItemRectMin();	// Top left of image wrt SCREEN space
+
+			// Which OS window is ImGui viewport in?
+			ImGuiViewport* vp = ImGui::GetWindowViewport(); 
+
+			// Convert to CLIENT-WINDOW coords (origin = top-left of that GLFW window's content area)
+			ImVec2 tl_client, br_client;
+			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+				tl_client = { tl_screen.x - vp->Pos.x, tl_screen.y - vp->Pos.y }; // subtract OS window's top-left in screen coords
+			}
+			else {
+				// Single viewport: ImGui "screen" origin coincides with your main client window
+				tl_client = tl_screen;
+			}
+
+			// Save editor viewport data
+			editorViewportData.tl = tl_client;
+			editorViewportData.size = viewportSize;
+
 
 			// TODO: Handle mouse in viewport
 			//handleViewPortClick(imagePos, viewportSize);

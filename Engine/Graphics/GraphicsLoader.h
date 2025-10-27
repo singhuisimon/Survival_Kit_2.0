@@ -10,7 +10,16 @@
 #include "Graphics/Texture.h"
 #include "Graphics/Material.h"
 
+// KENNY TESTING
+#include "imgui.h"
+
+
 namespace Engine {
+
+	struct EditorViewport {
+		ImVec2 tl;	// Top Left
+		ImVec2 size;
+	};
 
 	struct GraphicsLoader {
 		std::vector<MeshGL>                      m_mesh_storage;
