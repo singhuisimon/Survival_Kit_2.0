@@ -95,6 +95,8 @@ namespace Engine
 
 		displayPerformanceProfilePanel(ts);
 
+		//DrawPrefabInspector();
+
 		//Complete Imgui rendering for the frame
 		CompleteFrame();
 	}
@@ -130,13 +132,17 @@ namespace Engine
 				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 				{
+					
 					if (!currScenePath.empty())
 					{
 						SceneSerializer serializer(m_Scene);
+
 						if (serializer.Serialize(currScenePath))
-							LOG_INFO("Scene saved successfully to: ", currScenePath);
-						else
-							LOG_ERROR("Failed to save scene to: ", currScenePath);
+						{
+							m_TemporaryPrefabPaths.clear(); // remove from temporary list
+						
+						}
+						LOG_DEBUG("current scene is ", currScenePath);
 					}
 					else
 					{
@@ -564,16 +570,18 @@ namespace Engine
 
 		if (ImGui::Begin("Hierarchy", &hierachyWindow))
 		{
-			// Button to create new entity
-			if (ImGui::Button("Create Entity"))
+			if (!isPrefabEditor)
 			{
-				auto entity = m_Scene->CreateEntity("New Entity");
-				entity.AddComponent<TagComponent>("New Entity");
-				entity.AddComponent<TransformComponent>();
+				// Button to create new entity
+				if (ImGui::Button("Create Entity"))
+				{
+					auto entity = m_Scene->CreateEntity("New Entity");
+					entity.AddComponent<TagComponent>("New Entity");
+					entity.AddComponent<TransformComponent>();
+					ImGui::Separator();
+				}
 			}
-
-			ImGui::Separator();
-
+			
 			// List all entities
 			if (m_Scene)
 			{
@@ -611,28 +619,102 @@ namespace Engine
 						}
 
 						// ===================== Prefab Section ==========================
-						if (ImGui::MenuItem("Save as Prefab"))
+						if (ImGui::BeginMenu("Prefabs"))
 						{
-							if (m_SelectedEntity)
+							if (ImGui::MenuItem("Create Prefab"))
 							{
-								auto prefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, m_SelectedEntity.GetComponent<TagComponent>().Tag);
-								auto prefabFolder  = getAssetFilePath("Sources/Prefabs/") + m_SelectedEntity.GetComponent<TagComponent>().Tag + ".json";
-
-								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
+								if (m_SelectedEntity)
 								{
-									LOG_INFO("Prefab saved to {}", prefabFolder);
-									PrefabRegistry::Get().RegisterPrefab(prefab);
+									std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+									auto prefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+
+									if (!prefab)
+									{
+										//LOG_ERROR("Failed to create prefab from entity: {}", entityName);
+										return;
+									}
+
+									auto prefabFolder = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
+
+									if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
+									{
+										//LOG_INFO("Prefab saved to {}", prefabFolder);
+										PrefabRegistry::Get().RegisterPrefab(prefab);
+										m_TemporaryPrefabPaths.insert(prefabFolder);
+
+									}
 								}
 							}
+							if (ImGui::MenuItem("Replace Prefab"))
+							{
+								//if (m_SelectedEntity)
+								//{
+									
+									replacePrefabPending = true;
+									selectedPrefabPath = "";
+									//ImGui::OpenPopup("Select Prefab");
+								//}
+							}
+
+							ImGui::EndMenu(); // end prefab menu
 						}
+						
 						ImGui::EndPopup(); // end of the pop up context item
 
 					}
 				}
 			}
+
 		}
 
 		ImGui::End(); // End of the properties window
+
+		// ================= Modal Popup for Replacing Prefab ===================================
+		if (replacePrefabPending)
+		{
+			
+			ImGui::OpenPopup("Select Prefab");
+			replacePrefabPending = false;
+		}
+		
+		if (ImGui::BeginPopupModal("Select Prefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			//LOG_DEBUG("TEST POP up replace is called ?");
+			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+			for (auto& file : prefabFiles)
+			{
+				if (ImGui::Selectable(file.name.c_str()))
+				{
+					selectedPrefabPath = file.fullPath;
+					replacePrefabPending = false;
+
+					auto prefab = PrefabSerializer::LoadPrefabFromFile(selectedPrefabPath);
+					if (!prefab || !m_SelectedEntity)
+					{
+						ImGui::CloseCurrentPopup();
+						return;
+					}
+					PrefabRegistry::Get().RegisterPrefab(prefab);
+
+					m_Scene->DestroyEntity(m_SelectedEntity);
+
+					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+						m_Scene,
+						prefab->GetGUID()
+					);
+
+					m_SelectedEntity = newEntity;
+				}
+			}
+
+			if (ImGui::Button("Cancel"))
+			{
+				replacePrefabPending = false;
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
 	}
 
 	void Editor::displayAssetsBrowserPanel()
@@ -696,11 +778,6 @@ namespace Engine
 					std::string fileName = asset.name;
 					std::string filePath = asset.fullPath;
 
-					/*if (asset.name.ends_with(".png") || asset.name.ends_with(".jpeg"))
-					{
-						++textureCount;
-					}*/
-
 					ImGui::PushID(fileName.c_str());
 
 					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
@@ -711,21 +788,33 @@ namespace Engine
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
 						if (extension == ".json") // if it is scene
 						{
+							
 							if (m_Scene)
 							{
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
 								currScenePath = filePath; // update curr file path
+								isPrefabEditor = false;
+								//m_CurrentPrefab = nullptr;
 							}
-
-							auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
-							if (prefab)
+							else
 							{
-								m_Prefab = prefab;
+								m_Scene = new Scene();
+							}
+						}
+						else if (extension == ".prefab")
+						{
+							auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
+						
+							if (m_Scene)
+							{
+								m_Scene->GetRegistry().clear();
 								PrefabRegistry::Get().RegisterPrefab(prefab);
-							
-								//Scene::CreateEntityFromPrefab()
+								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
 								currPrefabPath = filePath;
+								//currScenePath = "";
+								isPrefabEditor = true;
+								//m_CurrentPrefab = prefab;
 							}
 						}
 					}
@@ -1231,6 +1320,21 @@ namespace Engine
 
 		return entries;
 	}
+
+	
+	void Editor::CleanupTemporaryPrefabs()
+	{
+		for (const auto& prefabPath : m_TemporaryPrefabPaths)
+		{
+			if (std::filesystem::exists(prefabPath))
+			{
+				std::filesystem::remove(prefabPath);
+				LOG_INFO("Deleted unsaved prefab: {}", prefabPath);
+			}
+		}
+		m_TemporaryPrefabPaths.clear();
+	}
+
 
 	//std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
 	//{

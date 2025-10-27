@@ -32,6 +32,7 @@
 #include "../Utility/AssetPath.h"
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
+#include "../Serialization/PrefabInstantiator.h"
 namespace Engine
 {
 	/**
@@ -47,7 +48,7 @@ namespace Engine
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
 		GLuint m_FBOTextureHandle;
-		std::shared_ptr<Prefab> m_Prefab; // for prefab
+		//std::shared_ptr<Scene> m_Scene; // for prefab
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -66,9 +67,15 @@ namespace Engine
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+
+		// Prefab helper variables
+		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
 		std::string currPrefabPath{};
+		bool isPrefabEditor = false;
+		bool replacePrefabPending = false;
+		std::string selectedPrefabPath{};
 
-
+	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
 		{
@@ -83,7 +90,9 @@ namespace Engine
 		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
 		// Deconstuctor
-		~Editor() = default;
+		~Editor() {
+			CleanupTemporaryPrefabs();
+		};
 
 		// Delected copy constructor
 		Editor(const Editor&) = delete;
@@ -93,7 +102,7 @@ namespace Engine
 
 		// Set scene for editor
 		void SetScene(Engine::Scene* scene);
-
+		
 		// Initialise Imgui
 		void OnInit(GLuint texhandle);
 
@@ -135,6 +144,11 @@ namespace Engine
 
 		// Complete the ImGui frame
 		void CompleteFrame();
+
+		// to clean unsave prefab
+		void CleanupTemporaryPrefabs();
+
+
 	};
 
 
