@@ -140,6 +140,7 @@ namespace Engine
 						if (serializer.Serialize(currScenePath))
 						{
 							m_TemporaryPrefabPaths.clear(); // remove from temporary list
+							//PrefabInstantiator::InstantiateScenePrefab()
 						
 						}
 						LOG_DEBUG("current scene is ", currScenePath);
@@ -702,6 +703,7 @@ namespace Engine
 						m_Scene,
 						prefab->GetGUID()
 					);
+					//newEntity.AddComponent<PrefabComponent>({ prefabFilePath, prefab->GetGUID() });
 
 					m_SelectedEntity = newEntity;
 				}
@@ -780,10 +782,19 @@ namespace Engine
 
 					ImGui::PushID(fileName.c_str());
 
+					bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+					if (isSelected)
+					{
+						// Change the button background color
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+					}
+
 					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
 					{
 						selectedResourcesIndex = static_cast<int>(i);
-						//currScenePath = filePath;
 
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
 						if (extension == ".json") // if it is scene
@@ -797,10 +808,7 @@ namespace Engine
 								isPrefabEditor = false;
 								//m_CurrentPrefab = nullptr;
 							}
-							else
-							{
-								m_Scene = new Scene();
-							}
+							
 						}
 						else if (extension == ".prefab")
 						{
@@ -811,12 +819,18 @@ namespace Engine
 								m_Scene->GetRegistry().clear();
 								PrefabRegistry::Get().RegisterPrefab(prefab);
 								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+								
 								currPrefabPath = filePath;
 								//currScenePath = "";
 								isPrefabEditor = true;
 								//m_CurrentPrefab = prefab;
 							}
 						}
+					}
+					// to change the color of the selected
+					if (isSelected)
+					{
+						ImGui::PopStyleColor(3);
 					}
 
 					// ==================== Display info detail ==========================
