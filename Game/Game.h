@@ -4,6 +4,7 @@
 #include "Audio/AudioManager.h"
 #include "Editor/Editor.h"
 #include "Utility/Logger.h"
+#include "Profiler/Profiler.h"
 #include <memory>
 
 /**
@@ -40,6 +41,7 @@ private:
     std::unique_ptr<Engine::Scene> m_Scene;
     // Editor 
     std::unique_ptr<Engine::Editor> m_Editor; 
+    std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
     float m_ColorShift = 0.0f;
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
