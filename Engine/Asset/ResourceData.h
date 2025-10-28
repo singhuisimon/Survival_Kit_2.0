@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+
 namespace Engine {
 
     // Forward declaration
@@ -97,10 +98,9 @@ namespace Engine {
         }
     };
 
-} // namespace gam300
+} // namespace Engine
 
 // ========== XRESOURCE_MGR LOADER SPECIALIZATIONS ==========
-
 /**
  * @brief Texture loader specialization.
  */
@@ -173,5 +173,6 @@ inline xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> me
 inline xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
 inline xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
 inline xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
+
 
 #endif // __RESOURCE_DATA_H__

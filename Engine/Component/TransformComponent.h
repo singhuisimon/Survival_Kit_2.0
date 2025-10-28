@@ -58,8 +58,13 @@ namespace Engine {
         }
 
         void SetRotation(glm::vec3 const& eulerAngles) {
-            glm::vec3 eulerRadians = glm::radians(eulerAngles);
-            Rotation = glm::quat(eulerRadians);
+            // Build quaternion from individual axis rotations
+            glm::quat qX = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1, 0, 0));
+            glm::quat qY = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0, 1, 0));
+            glm::quat qZ = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0, 0, 1));
+
+            // Combine rotations (order matters: typically Z * Y * X)
+            Rotation = qY * qX * qZ;
             IsDirty = true;
         }
     };

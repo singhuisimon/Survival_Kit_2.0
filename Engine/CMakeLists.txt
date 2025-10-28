@@ -36,7 +36,7 @@ file(GLOB_RECURSE UTILITY_HEADERS "${ENGINE_ROOT}/Utility/*.h")
 file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
 file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
 
-# Serialization Module
+# Physics Module
 file(GLOB_RECURSE PHYSICS_SOURCES "${ENGINE_ROOT}/Physics/*.cpp")
 file(GLOB_RECURSE PHYSICS_HEADERS "${ENGINE_ROOT}/Physics/*.h")
 
@@ -145,9 +145,9 @@ source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})
 source_group("Serialization\\Source" FILES ${SERIALIZATION_SOURCES})
 
-# Serialization Module
-source_group("Physics\\Header" FILES ${Physics_HEADERS})
-source_group("Physics\\Source" FILES ${Physics_SOURCES})
+# Physics Module
+source_group("Physics\\Header" FILES ${PHYSICS_HEADERS})
+source_group("Physics\\Source" FILES ${PHYSICS_SOURCES})
 
 # Transform Module
 source_group("Transform\\Header" FILES ${TRANSFORM_HEADERS})

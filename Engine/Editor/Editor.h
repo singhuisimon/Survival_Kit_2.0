@@ -34,6 +34,10 @@
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
 
+// Temporary inclusion to access EditorViewport data struct
+#include "Graphics/GraphicsLoader.h"
+
+
 namespace Engine
 {
 	/**
@@ -48,9 +52,9 @@ namespace Engine
 		ImGuiIO* io;
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
-		GLuint m_FBOTextureHandle;
 		std::shared_ptr<Prefab> m_Prefab; // for prefab
 		std::weak_ptr<TracyProfiler> m_Profiler;
+		u32 m_PickedID;
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -79,7 +83,8 @@ namespace Engine
 			std::string fullPath;
 		};
 
-		
+		// Editor viewport's data storage
+		EditorViewport editorViewportData;
 
 	public:
 		// Default contructor 
@@ -98,10 +103,10 @@ namespace Engine
 		void SetScene(Engine::Scene* scene);
 
 		// Initialise Imgui
-		void OnInit(GLuint texhandle);
+		void OnInit();
 
 		// still figure out
-		void OnUpdate(Timestep ts);
+		void OnUpdate(Timestep ts, GLuint texhandle);
 
 		void StartImguiFrame();
 
@@ -120,8 +125,8 @@ namespace Engine
 		// display performance profile
 		void displayPerformanceProfilePanel(Timestep ts);
 
-		// Render Viewport
-		void renderViewport();
+		// Render Viewport with given texture handle
+		void renderViewport(GLuint texhandle);
 
 		// Helper function for searching and return the files
 		// std::vector <std::pair<std::string, std::string>> getFilesInFolder(const std::string& folderName);
@@ -143,6 +148,10 @@ namespace Engine
 			m_Profiler = profiler; // still increases refcount, no extra copy on call
 		}
 
+		// Set Editor viewport's data for object picking
+		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
+
+		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
 	};
 
 

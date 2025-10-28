@@ -14,6 +14,7 @@
 #pragma once
 
 #include "../Utility/Types.h"
+#include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
 
 namespace Engine{
@@ -27,6 +28,8 @@ namespace Engine{
 	 */
 	struct DrawItem
 	{
+		xresource::instance_guid m_instance_guid;
+		u32		  m_id;
 		u32       m_mesh_handle;
 		u32       m_material_handle;
 		u32       m_texture_handle;

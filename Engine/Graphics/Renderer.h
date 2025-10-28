@@ -80,7 +80,16 @@ namespace Engine {
 		 */
 		inline const std::vector<Texture>& getTextureStorage() { return m_gl.t_testing_textures; }
 
+		// Return editor camera
 		inline Camera3D& getEditorCamera() { return editor_camera; }
+
+		// Resizes FBO if auto aspect is allowed
+		inline void resizeFBO(u32 handle, int w, int h);
+
+		// Return editor viewport data (Temp solution)
+		inline EditorViewport& getEditorViewport() { return renderEditorVP; }
+
+		inline const u32 getPickedID() const { return pickedID; }
 
 	private:
 		/**
@@ -107,6 +116,11 @@ namespace Engine {
 
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
+
+		// Temp objects for object picking
+		GLuint temp_rbo;				// Used for scene and GPU ID FBO
+		EditorViewport renderEditorVP;	// Editor viewport data
+		u32 pickedID;
 
 		// Temporary object
 		GraphicsLoader m_gl;
