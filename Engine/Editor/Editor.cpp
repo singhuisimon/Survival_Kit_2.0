@@ -129,7 +129,8 @@ namespace Engine
 				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 				{
-					if (isPrefabEditor && !currPrefabPath.empty())
+					
+					if (isPrefabEditor && !currPrefabPath.empty() && m_Scene->GetName() == "Prefab")
 					{
 						// Save the current prefab
 						auto view = m_Scene->GetRegistry().view<TagComponent>();
@@ -152,14 +153,15 @@ namespace Engine
 					}
 					else if (!currScenePath.empty())
 					{
-						SceneSerializer serializer(m_Scene);
+						//SceneSerializer serializer(m_Scene);
 
-						if (serializer.Serialize(currScenePath))
-						{
-							m_TemporaryPrefabPaths.clear(); // remove from temporary list
-							//PrefabInstantiator::InstantiateScenePrefab()
-						
-						}
+						//if (serializer.Serialize(currScenePath))
+						//{
+						//	m_TemporaryPrefabPaths.clear(); // remove from temporary list
+						//	//PrefabInstantiator::InstantiateScenePrefab()
+						//
+						//}
+						m_Scene->SaveToFile(currScenePath);
 						LOG_DEBUG("current scene is ", currScenePath);
 					}
 					else
@@ -817,10 +819,12 @@ namespace Engine
 						if (extension == ".json") // if it is scene
 						{
 							
-							if (m_Scene)
+							if (m_Scene && m_Scene->GetName() != "Prefab")
 							{
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
+								m_Scene->SetName(fileName);
+								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
 								currScenePath = filePath; // update curr file path
 								isPrefabEditor = false;
 								//m_CurrentPrefab = nullptr;
@@ -833,7 +837,10 @@ namespace Engine
 						
 							if (m_Scene)
 							{
+								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
 								m_Scene->GetRegistry().clear();
+								m_Scene->SetName("Prefab");
+								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
 								PrefabRegistry::Get().RegisterPrefab(prefab);
 								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
 								

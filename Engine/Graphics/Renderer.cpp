@@ -440,7 +440,7 @@ namespace Engine {
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 					//LOG_INFO("Px Py = ", px," ", py);
-					LOG_INFO("GPU id = ", id);
+					//LOG_INFO("GPU id = ", id);
 
 					// TODO: Save Picked ID to somewhere (0 will be used as NO-HIT, need to prevent use of 0)
 					
