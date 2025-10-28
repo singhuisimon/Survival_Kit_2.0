@@ -115,7 +115,7 @@ void Game::OnInit() {
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
             m_Editor->SetScene(m_Scene.get()); 
-            m_Editor->OnInit(m_Renderer->get_imgui_texture());
+            m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
         }
@@ -578,7 +578,8 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
-    m_Editor->OnUpdate(ts);
+    m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+    m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
     m_TracyProfiler->OnUpdate();
 }
 
