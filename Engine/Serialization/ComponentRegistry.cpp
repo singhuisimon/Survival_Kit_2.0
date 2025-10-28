@@ -19,6 +19,7 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
 #include "../Utility/Logger.h"
 
  // Required for quaternion to Euler conversion
@@ -354,6 +355,35 @@ namespace Engine {
                 PropertyType::Float,
                 [](const ReverbZoneComponent& c) { return c.WetLevel; },
                 [](ReverbZoneComponent& c, const float& v) { c.WetLevel = v; }
+            );
+        }
+
+        {
+            auto& meta = REGISTER_COMPONENT(BehaviourTreeComponent);
+
+            meta.AddProperty<BehaviourTreeComponent, bool>(
+                "Active",
+                PropertyType::Bool,
+                [](const BehaviourTreeComponent& c) { return c.Active; },
+                [](BehaviourTreeComponent& c, const bool& v) { c.Active = v; }
+            );
+
+            meta.AddProperty<BehaviourTreeComponent, bool>(
+                "ResetOnComplete",
+                PropertyType::Bool,
+                [](const BehaviourTreeComponent& c) { return c.ResetOnComplete; },
+                [](BehaviourTreeComponent& c, const bool& v) { c.ResetOnComplete = v; }
+            );
+
+            meta.AddProperty<BehaviourTreeComponent, std::string>(
+                "TreeAssetGUID",
+                PropertyType::String,
+                [](const BehaviourTreeComponent& c) {
+                    return std::to_string(c.TreeAssetGUID.m_Value);
+                },
+                [](BehaviourTreeComponent& c, const std::string& v) {
+                    c.TreeAssetGUID = xresource::instance_guid{ std::stoull(v) };
+                }
             );
         }
 

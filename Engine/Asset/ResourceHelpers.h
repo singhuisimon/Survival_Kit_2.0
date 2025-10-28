@@ -102,10 +102,10 @@ namespace Engine {
      * @return Full path: Compiled/Meshes/1234567890ABCDEF.mesh
      */
     inline std::string getCompiledFilePath(const xresource::full_guid& guid, ResourceType type) {
-        LOG_INFO("=== getCompiledFilePath DEBUG ===");
-        LOG_INFO("Input full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
-        LOG_INFO("Input full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
-        LOG_INFO("=================================\n");
+        //LOG_INFO("=== getCompiledFilePath DEBUG ===");
+        //LOG_INFO("Input full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
+        //LOG_INFO("Input full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
+        //LOG_INFO("=================================\n");
 
         std::string compiledPathStr = AM.getCompiledPath(); 
 
@@ -127,8 +127,8 @@ namespace Engine {
         ss << std::hex << std::uppercase << std::setfill('0')
             << std::setw(16) << guid.m_Instance.m_Value;
         std::string hexGuid = ss.str();
-        LOG_INFO("Converted to hex: ", hexGuid);
-        LOG_INFO("Resource type: ", typeFolder);
+        //LOG_INFO("Converted to hex: ", hexGuid);
+        //LOG_INFO("Resource type: ", typeFolder);
         // Get extension
         std::string extension;
         switch (type) {
@@ -148,8 +148,8 @@ namespace Engine {
 
         std::string finalPath = result.string(); 
 
-        LOG_INFO("Final compiled path: ", finalPath);
-        LOG_INFO("File exists: ", std::filesystem::exists(finalPath) ? "YES" : "NO");
+        //LOG_INFO("Final compiled path: ", finalPath);
+        //LOG_INFO("File exists: ", std::filesystem::exists(finalPath) ? "YES" : "NO");
         return finalPath;
     }
 
@@ -167,23 +167,23 @@ namespace Engine {
         std::string typeFolder = resourceTypeToString(type);
         std::filesystem::path typeDir = compiledRoot / typeFolder;
 
-        LOG_INFO("=== Listing compiled ", typeFolder, " files ===");
-        LOG_INFO("Directory: ", typeDir.string());
+        //LOG_INFO("=== Listing compiled ", typeFolder, " files ===");
+        //LOG_INFO("Directory: ", typeDir.string());
 
         if (!std::filesystem::exists(typeDir)) {
-            LOG_ERROR("Directory does not exist!");
+            //LOG_ERROR("Directory does not exist!");
             return;
         }
 
         int count = 0;
         for (const auto& entry : std::filesystem::directory_iterator(typeDir)) {
             if (entry.is_regular_file()) {
-                LOG_INFO("  - ", entry.path().filename().string());
+                //LOG_INFO("  - ", entry.path().filename().string());
                 count++;
             }
         }
-        LOG_INFO("Total files: ", count);
-        LOG_INFO("=====================================\n");
+        //LOG_INFO("Total files: ", count);
+        //LOG_INFO("=====================================\n");
     }
 }// end of namespace Engine
 

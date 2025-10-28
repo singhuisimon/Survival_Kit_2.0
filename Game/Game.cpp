@@ -25,6 +25,10 @@
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "BehaviourTree/BehaviourTreeSystem.h"
+#include "BehaviourTree/BTNodeRegistry.h"
+#include "BehaviourTree/BehaviourTreeSerializer.h"
+#include "BehaviourTree/BehaviourTreePrefab.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -80,8 +84,20 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 2: Create Audio Manager
-    LOG_INFO("Step 2: Initializing Audio Manager...");
+    // Step 2: Register nodes for serialization
+    LOG_INFO("Step 2: Registering components...");
+    try {
+        // Register all built-in behavior tree node types
+        Engine::BTNodeRegistry::RegisterBuiltInNodes();
+        LOG_INFO("  -> Components registered successfully");
+    }
+    catch (const std::exception& e) {
+        LOG_CRITICAL("  -> FAILED to register components: ", e.what());
+        return;
+    }
+
+    // Step 3: Create Audio Manager
+    LOG_INFO("Step 3: Initializing Audio Manager...");
     try {
         m_AudioManager = std::make_unique<Engine::AudioManager>();
         if (!m_AudioManager->Init()) {
@@ -95,8 +111,8 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 3: Create scene
-    LOG_INFO("Step 3: Creating scene object...");
+    // Step 4: Create scene
+    LOG_INFO("Step 4: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
@@ -123,8 +139,8 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 4: Add systems to the scene
-    LOG_INFO("Step 4: Adding systems to scene...");
+    // Step 5: Add systems to the scene
+    LOG_INFO("Step 5: Adding systems to scene...");
     try {
         AddAllSystems();  // CHANGED: Replace all manual AddSystem calls with helper function
 
@@ -134,8 +150,8 @@ void Game::OnInit() {
         LOG_ERROR("  -> Exception while adding systems: ", e.what());
     }
 
-    // Step 5: Initialize all systems
-    LOG_INFO("Step 5: Initializing systems...");
+    // Step 6: Initialize all systems
+    LOG_INFO("Step 6: Initializing systems...");
     try {
         m_Scene->InitializeSystems();
         LOG_INFO("  -> Systems initialized successfully");
@@ -144,8 +160,8 @@ void Game::OnInit() {
         LOG_ERROR("  -> Exception while initializing systems: ", e.what());
     }
 
-    // Step 6: Load scene from file or create default
-    LOG_INFO("Step 6: Loading scene content...");
+    // Step 7: Load scene from file or create default
+    LOG_INFO("Step 7: Loading scene content...");
     bool loadedFromFile = false;
 
     try {
@@ -182,8 +198,8 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 7: Initialize Tracy Profiler
-    LOG_INFO("Step 7: Initializing Tracy Profiler...");
+    // Step 8: Initialize Tracy Profiler
+    LOG_INFO("Step 8: Initializing Tracy Profiler...");
     try {
         m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
 
@@ -233,6 +249,7 @@ void Game::AddAllSystems() {
     m_Scene->AddSystem<Engine::TransformSystem>();
     m_Scene->AddSystem<Engine::CameraSystem>();
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+    m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
 }
 
 void Game::CreateDefaultScene() {
@@ -572,6 +589,30 @@ void Game::OnUpdate(Engine::Timestep ts) {
         else {
             LOG_ERROR("Load failed!");
         }
+    }
+
+    if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
+        LOG_INFO("TEST TREE CREATION");
+
+        // Create tree
+        auto tree = std::make_shared<Engine::BehaviourTree>();
+        tree->SetName("TestTree");
+
+        // Create a wait node
+        auto wait = std::make_shared<Engine::BTWait>(2.0f);
+        tree->SetRootNode(wait);
+
+        // Attach to entity
+        auto entity = m_Scene->CreateEntity("TestAI");
+        entity.AddComponent<Engine::BehaviourTreeComponent>(tree);
+
+        Engine::BehaviourTreeSerializer::SerializeToFile(*tree, "Sources/BT/Test.json");
+
+        auto loadedTree = Engine::BehaviourTreeSerializer::DeserializeFromFile("Sources/BT/Test.json");
+
+        auto prefabGuid = Engine::BehaviourTreePrefab::SaveAsPrefab(*tree, "TestAI");
+
+        auto instance = Engine::BehaviourTreePrefab::Instantiate(prefabGuid);
     }
 
     //m_Editor->StartImguiFrame();
