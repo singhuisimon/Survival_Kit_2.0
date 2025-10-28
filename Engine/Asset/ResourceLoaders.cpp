@@ -458,6 +458,9 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     LOG_INFO("Mesh VAO: ", mesh->VAO, " VBO: ", mesh->VBO, " EBO: ", mesh->EBO);
     LOG_INFO("Returning mesh pointer...");
 
+    LOG_INFO("Vertex count: ", (mesh->vertices.size() / 11));
+    LOG_INFO("Index count: ", mesh->indices.size());
+
     auto* meshPtr = mesh.release();
     LOG_INFO("mesh.release() returned pointer: ", static_cast<void*>(meshPtr));
     return meshPtr; }
