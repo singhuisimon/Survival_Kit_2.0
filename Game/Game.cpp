@@ -39,8 +39,6 @@ void Game::OnInit() {
 
     //==========INITIALIZING ASSET ==============
 
-    
-
     LOG_INFO("Initializing Asset...");
 
     auto config = Engine::AM.createDefaultConfig();
@@ -62,16 +60,14 @@ void Game::OnInit() {
     }
     else {
 
-    LOG_INFO("Performing initial asset scan...");
-    Engine::AM.scanAndProcess();
+        LOG_INFO("Performing initial asset scan...");
+        Engine::AM.scanAndProcess();
 
-    LOG_INFO("Initial asset scan complete - found ",
-        Engine::AM.db().Count(), " assets");
+        LOG_INFO("Initial asset scan complete - found ",
+            Engine::AM.db().Count(), " assets");
     }
 
-    Engine::RM.startUp(); 
-
-
+    Engine::RM.startUp();
 
     // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
@@ -84,27 +80,27 @@ void Game::OnInit() {
         return;
     }
 
-	// Step 2: Create Audio Manager
-	LOG_INFO("Step 2: Initializing Audio Manager...");
+    // Step 2: Create Audio Manager
+    LOG_INFO("Step 2: Initializing Audio Manager...");
     try {
-		m_AudioManager = std::make_unique<Engine::AudioManager>();
+        m_AudioManager = std::make_unique<Engine::AudioManager>();
         if (!m_AudioManager->Init()) {
-			LOG_CRITICAL("  -> Audio Manager initialization failed!");
+            LOG_CRITICAL("  -> Audio Manager initialization failed!");
             return;
         }
-		LOG_INFO("  -> Audio Manager initialized successfully");
+        LOG_INFO("  -> Audio Manager initialized successfully");
     }
     catch (const std::exception& e) {
         LOG_CRITICAL("  -> Exception while initializing Audio Manager: ", e.what());
         return;
-	}
+    }
 
     // Step 3: Create scene
     LOG_INFO("Step 3: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
-       
+
         if (!m_Scene) {
             LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
             return;
@@ -114,7 +110,7 @@ void Game::OnInit() {
         if (!m_Editor)
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
-            m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->SetScene(m_Scene.get());
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
@@ -130,16 +126,8 @@ void Game::OnInit() {
     // Step 4: Add systems to the scene
     LOG_INFO("Step 4: Adding systems to scene...");
     try {
-        // TODO: Add more systems here as they're created by team members:
-        // m_Scene->AddSystem<Engine::PhysicsSystem>();
-        // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
-        m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
-        m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-        m_Scene->AddSystem<Engine::PhysicsSystem>();
-        m_Scene->AddSystem<Engine::TransformSystem>();
-        m_Scene->AddSystem<Engine::CameraSystem>();
-        m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
-       
+        AddAllSystems();  // CHANGED: Replace all manual AddSystem calls with helper function
+
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {
@@ -198,7 +186,7 @@ void Game::OnInit() {
     LOG_INFO("Step 7: Initializing Tracy Profiler...");
     try {
         m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
-        
+
         // Get the directory where the executable is running from
         std::filesystem::path exeDir = Engine::getAssetsPath();
 
@@ -236,6 +224,15 @@ void Game::OnInit() {
     LOG_INFO("  ESC: Exit");
     LOG_INFO("================");
     LOG_INFO("");
+}
+
+void Game::AddAllSystems() {
+    m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
+    m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
+    m_Scene->AddSystem<Engine::PhysicsSystem>();
+    m_Scene->AddSystem<Engine::TransformSystem>();
+    m_Scene->AddSystem<Engine::CameraSystem>();
+    m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
 }
 
 void Game::CreateDefaultScene() {
@@ -568,6 +565,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
         // Reinitialize systems after loading
         if (success) {
+            AddAllSystems();
             m_Scene->InitializeSystems();
             LOG_INFO("Scene loaded and systems reinitialized!");
         }
