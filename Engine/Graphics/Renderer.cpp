@@ -26,6 +26,7 @@ namespace {
 
 	// Testing values
 	constexpr int width = 1280, height = 720;
+	constexpr Engine::u32 NO_HIT = 0xFFFFFFFFu;
 
 	inline std::vector<Engine::ShaderProgram> loadShaderPrograms(std::vector<std::pair<std::string, std::string>> shaders) {
 
@@ -137,6 +138,9 @@ namespace Engine {
 
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
+
+		// Set default picked ID 
+		pickedID = NO_HIT;
 
 		// Create a framebuffer for ImGui editor and configure it's settings
 		auto fp_fbo = FrameBuffer::create();
@@ -325,7 +329,8 @@ namespace Engine {
 		if (pass.shdpgm_handle == 2) {
 			//auto& fbo = m_framebuffers[pass.fbo_handle];
 			// 0 means "no hit" — reserve ID=0 as empty
-			fbo.clear_colori(/*drawbuf index*/0, 0, 0, 0, 0);
+			//fbo.clear_colori(/*drawbuf index*/169, 0, 0, 0, 0);
+			fbo.clear_colorui(/*drawbuf index*/0, NO_HIT, 0, 0, 0);
 		}
 
 		pass.depth_test ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
@@ -432,7 +437,7 @@ namespace Engine {
 					int py = int((1.0f - v) * pass.view_port.w);
 
 					// Read the ID
-					uint32_t id = 0;
+					u32 id = 0; // (entt::null value)
 					auto& idFbo = m_framebuffers[1];
 					idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
@@ -440,10 +445,15 @@ namespace Engine {
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 					//LOG_INFO("Px Py = ", px," ", py);
-					LOG_INFO("GPU id = ", id);
+					if (id == NO_HIT) {
+						LOG_INFO("GPU id = No Object");
+					}
+					else {
+						LOG_INFO("GPU id = ", id);
+					}
 
-					// TODO: Save Picked ID to somewhere (0 will be used as NO-HIT, need to prevent use of 0)
-					
+					// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
+					pickedID = id;
 				}
 
 			}

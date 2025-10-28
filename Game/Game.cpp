@@ -497,6 +497,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
     if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT)) {
         auto mousePos = input.GetMousePosition();
         LOG_DEBUG("Left mouse clicked at: (", mousePos.x, ", ", mousePos.y, ")");
+
+        // Retrieve picked ID and send it to editor
+        m_Editor->RetrievePickedID(m_Renderer->getPickedID());
     }
     if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         auto mousePos = input.GetMousePosition();

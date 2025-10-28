@@ -89,6 +89,8 @@ namespace Engine {
 		// Return editor viewport data (Temp solution)
 		inline EditorViewport& getEditorViewport() { return renderEditorVP; }
 
+		inline const u32 getPickedID() const { return pickedID; }
+
 	private:
 		/**
 		 * @brief Prepares the rendering context for a specific render pass
@@ -118,6 +120,7 @@ namespace Engine {
 		// Temp objects for object picking
 		GLuint temp_rbo;				// Used for scene and GPU ID FBO
 		EditorViewport renderEditorVP;	// Editor viewport data
+		u32 pickedID;
 
 		// Temporary object
 		GraphicsLoader m_gl;

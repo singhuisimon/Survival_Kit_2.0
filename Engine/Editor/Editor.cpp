@@ -66,6 +66,9 @@ namespace Engine
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
+		// Set default pickedID (entt::null (0xFFFFFFFFu) is no hit)
+		m_PickedID = 0xFFFFFFFFu;
+		
 		m_Initialized = true;
 	}
 
