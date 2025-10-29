@@ -15,6 +15,7 @@
 
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
+#include "../Asset/AssetManager.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
@@ -745,6 +746,267 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			ImGui::Columns(2, nullptr, true);
+			static std::string selectedFolder = "";
+			static ResourceType selectedType = ResourceType::UNKNOWN;
+
+			// ================= Left column panel display all the resources folder ========================
+			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			ImGui::Text("Projects:");
+
+			// For resources handled by Asset Browser
+			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				std::set<ResourceType> availableTypes;
+				for (const auto* record : allAssets)
+				{
+					if (record && record->valid && record->type != ResourceType::UNKNOWN)
+					{
+						availableTypes.insert(record->type);
+					}
+				}
+
+				for (const auto& type : availableTypes) {
+					std::string typeName = resourceTypeToString(type);
+					bool isSelected = (selectedType == type);
+
+					if (ImGui::Selectable(typeName.c_str(), isSelected)) {
+
+						raw_asset = true;
+						selectedType = type;
+						selectedFolder = typeName;
+						selectedResourcesIndex = -1;
+					}
+				}
+			}
+
+			// For resources handled by filepath
+			if (ImGui::CollapsingHeader("Composed Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
+
+				for (auto& folder : folders)
+				{
+					if (folder.name == "Scenes" || folder.name == "Prefabs") {
+						bool isSelected = (selectedFolder == folder.fullPath);
+						if (ImGui::Selectable(folder.name.c_str(), isSelected))
+						{
+							raw_asset = false;
+							selectedFolder = folder.fullPath;
+							selectedResourcesIndex = -1; // reset asset selection
+						}
+					}
+				}
+			}
+
+			ImGui::EndChild();
+
+			// ================= Right column panel - display assets of selected type ========================
+			ImGui::NextColumn();
+			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
+
+			// For resources handled by Asset Browser
+			if (!selectedFolder.empty() && raw_asset) {
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				std::vector<const AssetRecord*> filteredAssets;
+				filteredAssets.reserve(allAssets.size());
+
+				for (const auto* record : allAssets) {
+					if (!record || !record->valid) continue;
+					if (record->type == selectedType) {
+						filteredAssets.push_back(record);
+					}
+				}
+
+				// Display filtered assets
+				/*resourceTypeToString(selectedType);
+				ImGui::Text("Assets: %zu", filteredAssets.size());*/
+				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
+
+				if (ImGui::BeginTable("AssetGrid", itemsPerRow)) {
+					for (size_t i = 0; i < filteredAssets.size(); ++i) {
+						const auto* record = filteredAssets[i];
+						std::filesystem::path assetPath(record->sourcePath);
+						std::string filename = assetPath.filename().string();
+
+						ImGui::TableNextColumn();
+
+						bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+						// Optional background color for selected
+						if (isSelected) {
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+						}
+
+						// Unique ID per button so ImGui doesn’t confuse them
+						ImGui::PushID(static_cast<int>(i));
+
+						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
+							selectedResourcesIndex = static_cast<int>(i);
+							// Handle click event (e.g. open asset, show preview, etc.)
+						}
+
+						if (isSelected)
+							ImGui::PopStyleColor(3);
+
+						// ==================== Display info detail ==========================
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("Name: %s", filename.c_str());
+							std::string extension = filename.substr(filename.find_last_of('.') + 1);
+							ImGui::Text("Type: %s", extension.c_str());
+							ImGui::EndTooltip();
+						}
+
+						// ==================== To center text under thumbnail ================
+						ImVec2 textSize = ImGui::CalcTextSize(filename.c_str());
+						float textX = (thumbnailSize - textSize.x) * 0.5f;
+						if (textX < 0) textX = 0;
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+						ImGui::TextWrapped("%s", filename.c_str());
+
+						ImGui::PopID();
+						ImGui::NextColumn();
+					}
+					ImGui::EndTable();
+				}
+			}
+
+			// For resources handled by filepath
+			if (!selectedFolder.empty() && !raw_asset)
+			{
+				// to get the files in the selected folder
+				auto assetsList = getAssetsInFolder(selectedFolder);
+				// display the selected folder name
+				std::filesystem::path folderPath(selectedFolder);
+				std::string folderName = folderPath.filename().string();
+				ImGui::Text(("Resources > " + folderName).c_str());
+
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
+
+				// int textureCount = -1;
+				ImGui::Columns(itemsPerRow, nullptr, false);
+
+				// loop through files in selected folder
+				for (size_t i = 0; i < assetsList.size(); i++)
+				{
+					const auto& asset = assetsList[i];
+					std::string fileName = asset.name;
+					std::string filePath = asset.fullPath;
+
+					ImGui::PushID(fileName.c_str());
+
+					bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+					if (isSelected)
+					{
+						// Change the button background color
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+					}
+
+					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+					{
+						selectedResourcesIndex = static_cast<int>(i);
+
+						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
+						if (extension == ".json") // if it is scene
+						{
+
+							if (m_Scene && m_Scene->GetName() != "Prefab")
+							{
+								m_Scene->GetRegistry().clear();
+								m_Scene->LoadFromFile(filePath);
+								m_Scene->SetName(fileName);
+								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
+								currScenePath = filePath; // update curr file path
+								isPrefabEditor = false;
+								//m_CurrentPrefab = nullptr;
+							}
+
+						}
+						else if (extension == ".prefab")
+						{
+							auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
+
+							if (m_Scene)
+							{
+								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
+								m_Scene->GetRegistry().clear();
+								m_Scene->SetName("Prefab");
+								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
+								PrefabRegistry::Get().RegisterPrefab(prefab);
+								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+
+								currPrefabPath = filePath;
+								//currScenePath = "";
+								isPrefabEditor = true;
+								//m_CurrentPrefab = prefab;
+							}
+						}
+					}
+					// to change the color of the selected
+					if (isSelected)
+					{
+						ImGui::PopStyleColor(3);
+					}
+
+					// ==================== Display info detail ==========================
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						ImGui::Text("Name: %s", fileName.c_str());
+						//ImGui::Text("Type: %s", filePath.c_str();
+						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
+						ImGui::Text("Type: %s", extension.c_str());
+						ImGui::EndTooltip();
+					}
+
+					// ==================== To center text under thumbnail ================
+					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
+					float textX = (thumbnailSize - textSize.x) * 0.5f;
+					if (textX < 0) textX = 0;
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+					ImGui::TextWrapped("%s", fileName.c_str());
+
+					ImGui::PopID();
+					ImGui::NextColumn();
+
+				}
+			}
+
+			ImGui::EndChild();
+			ImGui::Columns(1);
+
+		}
+
+		ImGui::End();
+
+		// Begin properties dockable window
+		/*if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		{
 			
 			ImGui::Columns(2, nullptr, true);
 			static std::string selectedFolder = "";
@@ -884,7 +1146,7 @@ namespace Engine
 			ImGui::EndChild(); // end of the right column
 			ImGui::Columns(1);
 		}
-		ImGui::End(); // End of the assets browser window
+		ImGui::End();*/ // End of the assets browser window
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)

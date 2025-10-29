@@ -89,6 +89,8 @@ namespace Engine
 			std::string fullPath;
 		};
 
+		bool raw_asset = false;
+
 		// Editor viewport's data storage
 		EditorViewport editorViewportData;
 
