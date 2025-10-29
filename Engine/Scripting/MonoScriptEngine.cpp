@@ -22,31 +22,44 @@ namespace Engine {
 
     void MonoScriptEngine::Initialize(const std::string& assemblyPath) {
         LOG_INFO("Initializing Mono Script Engine...");
-        
+
         m_AssemblyPath = assemblyPath;
 
         // Set Mono directories
         mono_set_assemblies_path("mono/lib");
-        
+
         // Initialize Mono JIT
         m_RootDomain = mono_jit_init("EngineRuntime");
         if (!m_RootDomain) {
             LOG_ERROR("Failed to initialize Mono JIT");
+            LOG_ERROR("Make sure mono/lib directory exists with .NET assemblies");
             return;
         }
 
         // Create app domain
         m_AppDomain = mono_domain_create_appdomain(const_cast<char*>("EngineAppDomain"), nullptr);
+        if (!m_AppDomain) {
+            LOG_ERROR("Failed to create Mono app domain");
+            return;
+        }
         mono_domain_set(m_AppDomain, true);
 
-        // Load assembly
-        LoadAssembly(m_AssemblyPath);
+        // Load assembly (only if it exists)
+        if (!assemblyPath.empty() && std::filesystem::exists(assemblyPath)) {
+            LoadAssembly(assemblyPath);
+        }
+        else {
+            LOG_WARNING("Assembly not found: ", assemblyPath);
+            LOG_WARNING("Mono initialized but no scripts will be loaded");
+            LOG_WARNING("ScriptComponents will be ignored");
+        }
 
         // Register internal calls (C++ functions callable from C#)
         RegisterInternalCalls();
 
-        LOG_INFO("Mono Script Engine initialized successfully");
+        LOG_INFO("Mono Script Engine initialized");
     }
+
 
     void MonoScriptEngine::Shutdown() {
         LOG_INFO("Shutting down Mono Script Engine...");
@@ -112,6 +125,12 @@ namespace Engine {
     }
 
     MonoClass* MonoScriptEngine::GetScriptClass(const std::string& className) {
+        // Check if app image is loaded
+        if (!m_AppImage) {
+            LOG_ERROR("Cannot get script class '", className, "': Assembly not loaded");
+            return nullptr;
+        }
+
         // Check cache first
         auto it = m_ClassCache.find(className);
         if (it != m_ClassCache.end()) {
@@ -140,7 +159,13 @@ namespace Engine {
         return klass;
     }
 
+
     MonoObject* MonoScriptEngine::CreateScriptInstance(const std::string& className) {
+        if (!m_AppImage) {
+            // Assembly not loaded - silently skip
+            return nullptr;
+        }
+
         MonoClass* klass = GetScriptClass(className);
         if (!klass) {
             return nullptr;
@@ -158,6 +183,7 @@ namespace Engine {
 
         return instance;
     }
+
 
     void MonoScriptEngine::DestroyScriptInstance(MonoObject* instance) {
         // Mono uses garbage collection, so we just need to clear references

@@ -14,9 +14,8 @@ namespace Engine {
         m_Scene = scene;  // Store it in member variable too
         LOG_INFO("[ScriptSystem] Initialized");
     }
-
-    void ScriptSystem::OnUpdate(Scene* scene, Timestep ts) {  // Changed signature
-        float deltaTime = ts.GetSeconds();  // Extract float from Timestep
+    void ScriptSystem::OnUpdate(Scene* scene, Timestep ts) {
+        float deltaTime = ts.GetSeconds();
 
         auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
@@ -24,17 +23,25 @@ namespace Engine {
         for (auto entity : view) {
             auto& script = view.get<ScriptComponent>(entity);
 
+            // Skip if no script class name
+            if (script.ScriptClassName.empty()) {
+                continue;
+            }
+
             // Create instance if needed
-            if (!script.ScriptInstance && !script.ScriptClassName.empty()) {
+            if (!script.ScriptInstance) {
                 script.ScriptInstance = MonoScriptEngine::GetInstance()
                     .CreateScriptInstance(script.ScriptClassName);
 
-                if (script.ScriptInstance) {
-                    // Set entity ID
-                    MonoScriptEngine::GetInstance().SetFieldValue(
-                        (MonoObject*)script.ScriptInstance, "EntityID",
-                        &entity);
+                // If creation failed (assembly not loaded), skip this entity
+                if (!script.ScriptInstance) {
+                    continue;
                 }
+
+                // Set entity ID
+                MonoScriptEngine::GetInstance().SetFieldValue(
+                    (MonoObject*)script.ScriptInstance, "EntityID",
+                    &entity);
             }
 
             if (script.ScriptInstance) {
@@ -53,6 +60,7 @@ namespace Engine {
             }
         }
     }
+
 
     void ScriptSystem::OnShutdown(Scene* scene) {  // Added Scene* parameter
         auto& registry = scene->GetRegistry();  // Use parameter instead of s_CurrentScene
