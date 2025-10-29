@@ -19,12 +19,17 @@
 #include "Component/CameraComponent.h"
 #include "Component/MeshRendererComponent.h"
 #include "Component/RigidbodyComponent.h"
+#include "Component/ScriptComponent.h"  // ADD THIS
+
 
 // Adding systems
 #include "Graphics/RenderSystem.h"
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "Scripting/ScriptSystem.h"        // ADD THIS
+#include "Scripting/MonoScriptEngine.h"    // ADD THIS
+
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -227,11 +232,15 @@ void Game::OnInit() {
 }
 
 void Game::AddAllSystems() {
+
+
     m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
     m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
     m_Scene->AddSystem<Engine::PhysicsSystem>();
     m_Scene->AddSystem<Engine::TransformSystem>();
     m_Scene->AddSystem<Engine::CameraSystem>();
+    m_Scene->AddSystem<Engine::ScriptSystem>();    
+
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
 }
 
@@ -250,6 +259,10 @@ void Game::CreateDefaultScene() {
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
     mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+
+    auto& script = player.AddComponent<Engine::ScriptComponent>();
+    script.ScriptClassName = "Game.TestScript";
+
 
     //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     //rb.Mass = 1.0f;
@@ -604,6 +617,9 @@ void Game::OnShutdown() {
             LOG_ERROR("  -> Exception while shutting down Audio Manager: ", e.what());
         }
     }
+
+    Engine::MonoScriptEngine::GetInstance().Shutdown();
+    LOG_INFO("[Game] Mono shutdown");
 
     //============= Asset =============
     Engine::RM.shutDown(); 

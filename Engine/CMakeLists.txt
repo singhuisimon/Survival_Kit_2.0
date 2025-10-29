@@ -60,6 +60,13 @@ file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 file(GLOB_RECURSE PROFILER_SOURCES "${ENGINE_ROOT}/Profiler/*.cpp")
 file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
 
+
+
+# ADD THIS NEW SECTION:
+# Scripting Module
+file(GLOB_RECURSE SCRIPTING_SOURCES "${ENGINE_ROOT}/Scripting/*.cpp")
+file(GLOB_RECURSE SCRIPTING_HEADERS "${ENGINE_ROOT}/Scripting/*.h")
+
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
