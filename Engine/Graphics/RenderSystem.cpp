@@ -26,7 +26,7 @@ namespace Engine {
 			if (renderable.Visible)
 			{
 				m_drawitems.push_back({
-					renderable.ComponentGUID,
+					renderable.MeshResource,
 					u32(entity),
 					renderable.MeshType,
 					renderable.Material,

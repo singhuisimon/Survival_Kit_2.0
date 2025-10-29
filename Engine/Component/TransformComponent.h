@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entt.hpp>
+#include "../Utility/Types.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -24,6 +25,8 @@ namespace Engine {
         // Parent-Child
         entt::entity Parent;
         std::vector<entt::entity> Children;
+
+        
 
         // Default constructor
         TransformComponent()

@@ -17,6 +17,8 @@
 #include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
 
+#include "Asset/ResourceData.h"
+
 namespace Engine{
 
 	/**
@@ -28,7 +30,7 @@ namespace Engine{
 	 */
 	struct DrawItem
 	{
-		xresource::instance_guid m_instance_guid;
+		MeshResource* m_mesh_resource;
 		u32		  m_id;
 		u32       m_mesh_handle;
 		u32       m_material_handle;

@@ -539,17 +539,26 @@ namespace Engine {
 
 			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
 
-			xresource::full_guid mesh_fullguid = convertToMeshGuid(item.m_instance_guid);
-
-			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
-
 			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-		if (mesh_rsc) {
-				glBindVertexArray(mesh_rsc->VAO);
-				glDrawElements(GL_TRIANGLES, mesh_rsc->indices.size(), GL_UNSIGNED_INT, NULL);
+		if (item.m_mesh_resource) {
+				glBindVertexArray(item.m_mesh_resource->VAO);
+
+				for (const auto& submesh : item.m_mesh_resource->subMeshes) {
+
+					// Calculate byte offset into the index buffer
+					const void* indexOffset = reinterpret_cast<const void*>(
+						submesh.startIndex * sizeof(unsigned int)
+						);
+
+					glDrawElements(GL_TRIANGLES,
+						submesh.indexCount,
+						GL_UNSIGNED_INT,
+						indexOffset);
+				}
+				
 				glBindVertexArray(0);
 			}
 			else {

@@ -12,6 +12,7 @@
 
 #include "Utility/Types.h"
 #include "../Asset/ResourceTypes.h"
+#include "Asset/ResourceData.h"
 
 namespace Engine {
 
@@ -21,6 +22,7 @@ namespace Engine {
     struct MeshRendererComponent {
         /// Unique identifier for this component instance
         xresource::instance_guid ComponentGUID;
+        MeshResource* MeshResource;
 
         bool Visible;           // Determine if sent to draw call
         bool ShadowReceive;     // For future expansion (WIP)
@@ -33,6 +35,7 @@ namespace Engine {
         // Default constructor
         MeshRendererComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+    		MeshResource(nullptr),
             Visible(true),
             ShadowReceive(false),
             ShadowCast(false),
