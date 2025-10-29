@@ -169,7 +169,7 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
-		// Create FBO for GPU ID
+		// Create FBO for F
 		auto gpu_fbo = FrameBuffer::create();
 		if (gpu_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*gpu_fbo));
@@ -440,7 +440,7 @@ namespace Engine {
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 					//LOG_INFO("Px Py = ", px," ", py);
-					LOG_INFO("GPU id = ", id);
+					//LOG_INFO("GPU id = ", id);
 
 					// TODO: Save Picked ID to somewhere (0 will be used as NO-HIT, need to prevent use of 0)
 					

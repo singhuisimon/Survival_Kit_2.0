@@ -80,6 +80,9 @@ namespace Engine
 		bool isPrefabEditor = false;
 		bool replacePrefabPending = false;
 		std::string selectedPrefabPath{};
+		std::string currFileName{};
+		Prefab* m_CurrentPrefab = nullptr;
+		std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
 
 	
 		// Helper struct to get resources folder/files 
@@ -102,7 +105,7 @@ namespace Engine
 		};
 
 		// Delected copy constructor
-		Editor(const Editor&) = delete;
+		//Editor(const Editor&) = delete;
 
 		// Deleted copy assignment operator
 		Editor& operator=(const Editor&) = delete;
