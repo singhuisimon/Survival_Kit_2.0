@@ -452,17 +452,147 @@ namespace Engine
 					ImGui::Columns(1);
 					//ImGui::Separator();
 
-
 					if (openAudioComponent)
 					{
 						//ImGui::Separator();
 						auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
+
+						ImGui::Separator();
+						ImGui::Text("Audio Type:");
+						AudioType type = audio.Type;
+
+						if (ImGui::RadioButton("SFX", type == AudioType::SFX)) {
+							audio.SetAudioType(AudioType::SFX);
+						}
+						if (ImGui::RadioButton("BGM", type == AudioType::BGM)) {
+							audio.SetAudioType(AudioType::BGM);
+						}
+						if (ImGui::RadioButton("UI", type == AudioType::UI)) {
+							audio.SetAudioType(AudioType::UI);
+						}
+
+						ImGui::Separator();
+						ImGui::Text("Play State:");
+						PlayState playState = audio.State;
+						if (ImGui::RadioButton("Play", playState == PlayState::PLAY)) {
+							audio.SetState(PlayState::PLAY);
+						}
+						if (ImGui::RadioButton("Pause", playState == PlayState::PAUSE)) {
+							audio.SetState(PlayState::PAUSE);
+						}
+						if (ImGui::RadioButton("Stop", playState == PlayState::STOP)) {
+							audio.SetState(PlayState::STOP);
+						}
+
+						ImGui::Separator();
+
+						float volume = audio.Volume;
+						if (ImGui::SliderFloat("Volume", &volume, 0.f, 1.f)) {
+							audio.SetVolume(volume);
+						}
+
+						float pitch = audio.Pitch;
+						if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 1.f)) {
+							audio.SetPitch(pitch);
+						}
+
+						ImGui::Separator();
+						bool looping = audio.Loop;
+						if (ImGui::Checkbox("Looping", &looping)) {
+							audio.SetLoop(looping);
+						}
+						bool mute = audio.Mute;
+						if (ImGui::Checkbox("Mute", &mute)) {
+							audio.SetMute(mute);
+						}
+						bool is_3d = audio.Is3D;
+						if (ImGui::Checkbox("3D", &is_3d)) {
+							audio.Set3D(is_3d);
+						}
+
+						ImGui::Separator();
+						float reverb = audio.ReverbProperties;
+						if (ImGui::SliderFloat("Reverb", &reverb, 0.0f, 1.0f)) {
+							audio.SetReverbProperties(reverb);
+						}
+
+						ImGui::Separator();
+
+						std::string advice = "Max Distance needs to be higher than Min Distance to have attenuation";
+						ImGui::TextDisabled("(i)");
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+							ImGui::TextUnformatted(advice.c_str());
+							ImGui::PopTextWrapPos();
+							ImGui::EndTooltip();
+						}
+
+						// Disable only if not 3D
+						ImGui::BeginDisabled(!is_3d);
+
+						float min_distance = audio.MinDistance;
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+							if (is_3d) {
+								audio.SetMinDistance(min_distance);
+							}
+							else {
+								audio.SetMinDistance(1.f);
+							}
+						}
+
+						float max_distance = audio.MaxDistance;
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+							if (is_3d) {
+								audio.SetMaxDistance(max_distance);
+							}
+							else {
+								audio.SetMaxDistance(10.f);
+							}
+						}
+
+						ImGui::EndDisabled();
 
 					}
 					// ---------------------- Remove Audio Component by ... -------------------------
 					if (removeAudio)
 					{
 						m_SelectedEntity.RemoveComponent<AudioComponent>();
+					}
+				}
+				if (m_SelectedEntity.HasComponent<ReverbZoneComponent>())
+				{
+					ImGui::Separator();
+
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeReverb = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###ReverbBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ReverbPopUp");
+					}
+					if (ImGui::BeginPopup("ReverbPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeReverb = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (removeReverb)
+					{
+						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
 					}
 				}
 
@@ -565,6 +695,26 @@ namespace Engine
 						if (!hasAudioComponent)
 						{
 							ImGui::SetTooltip("Adds sound playback to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Reverb Component ----------------------------
+					bool hasReverbComponent = m_SelectedEntity.HasComponent<ReverbZoneComponent>();
+					ImGui::BeginDisabled(hasReverbComponent);
+
+					if (ImGui::MenuItem("Reverb Zone Component"))
+					{
+						if (!hasReverbComponent)
+						{
+							m_SelectedEntity.AddComponent<ReverbZoneComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasReverbComponent)
+						{
+							ImGui::SetTooltip("Adds reverb zone to this object.");
 						}
 					}
 					ImGui::EndDisabled();
