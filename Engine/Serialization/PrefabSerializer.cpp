@@ -17,6 +17,7 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -378,6 +379,23 @@ namespace Engine {
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }
+
+        // Serialize BehaviourTreeComponent
+        if (entity.HasComponent<BehaviourTreeComponent>()) {
+            const auto& bt = entity.GetComponent<BehaviourTreeComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "BehaviourTreeComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Active", bt.Active, allocator);
+            propertiesObj.AddMember("ResetOnComplete", bt.ResetOnComplete, allocator);
+            propertiesObj.AddMember("TreeAssetPath",
+                rapidjson::Value(bt.TreeAssetPath.c_str(), allocator), allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
 
         doc.AddMember("Components", componentsArray, allocator);
 

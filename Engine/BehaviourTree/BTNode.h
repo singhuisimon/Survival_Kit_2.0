@@ -12,6 +12,7 @@
 
 #include "../Asset/ResourceTypes.h"
 #include "../Serialization/Property.h"
+#include "BTBlackboard.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -41,7 +42,8 @@ namespace Engine {
         float DeltaTime = 0.0f;             ///< Time since last frame
         
         // Blackboard - shared data storage for the tree
-        std::unordered_map<std::string, std::string> Blackboard;
+        BTBlackboard Blackboard;
+        //std::unordered_map<std::string, std::string> Blackboard;
     };
 
     /**

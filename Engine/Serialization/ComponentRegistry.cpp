@@ -359,8 +359,10 @@ namespace Engine {
         }
 
         {
+            // Register BehaviourTreeComponent
             auto& meta = REGISTER_COMPONENT(BehaviourTreeComponent);
 
+            // Active property
             meta.AddProperty<BehaviourTreeComponent, bool>(
                 "Active",
                 PropertyType::Bool,
@@ -368,6 +370,7 @@ namespace Engine {
                 [](BehaviourTreeComponent& c, const bool& v) { c.Active = v; }
             );
 
+            // ResetOnComplete property
             meta.AddProperty<BehaviourTreeComponent, bool>(
                 "ResetOnComplete",
                 PropertyType::Bool,
@@ -376,13 +379,13 @@ namespace Engine {
             );
 
             meta.AddProperty<BehaviourTreeComponent, std::string>(
-                "TreeAssetGUID",
+                "TreeAssetPath",
                 PropertyType::String,
                 [](const BehaviourTreeComponent& c) {
-                    return std::to_string(c.TreeAssetGUID.m_Value);
+                    return c.TreeAssetPath;
                 },
                 [](BehaviourTreeComponent& c, const std::string& v) {
-                    c.TreeAssetGUID = xresource::instance_guid{ std::stoull(v) };
+                    c.TreeAssetPath = v;
                 }
             );
         }

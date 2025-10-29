@@ -21,7 +21,8 @@ namespace Engine {
         xresource::instance_guid ComponentGUID;
 
         /// Reference to the behavior tree prefab/asset
-        xresource::instance_guid TreeAssetGUID;
+        //xresource::instance_guid TreeAssetGUID;
+        std::string TreeAssetPath;
 
         /// Runtime instance of the behavior tree
         std::shared_ptr<BehaviourTree> TreeInstance;
@@ -40,16 +41,18 @@ namespace Engine {
          */
         BehaviourTreeComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , TreeAssetGUID(xresource::instance_guid{})
+            //, TreeAssetGUID(xresource::instance_guid{})
+            , TreeAssetPath("")
             , TreeInstance(nullptr) {
         }
 
         /**
          * @brief Constructor with tree asset
          */
-        explicit BehaviourTreeComponent(xresource::instance_guid treeAssetGuid)
+        explicit BehaviourTreeComponent(const std::string& treeAssetPath)//xresource::instance_guid treeAssetGuid)
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , TreeAssetGUID(treeAssetGuid)
+            //, TreeAssetGUID(treeAssetGuid)
+            , TreeAssetPath(treeAssetPath)
             , TreeInstance(nullptr) {
         }
 
@@ -58,7 +61,8 @@ namespace Engine {
          */
         explicit BehaviourTreeComponent(std::shared_ptr<BehaviourTree> tree)
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , TreeAssetGUID(xresource::instance_guid{})
+            //, TreeAssetGUID(xresource::instance_guid{})
+            , TreeAssetPath("")
             , TreeInstance(tree) {
         }
 

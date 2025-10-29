@@ -10,6 +10,7 @@
 #include "BehaviourTree.h"
 #include "BTNodeRegistry.h"
 #include "../Utility/Logger.h"
+#include "../Utility/AssetPath.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
