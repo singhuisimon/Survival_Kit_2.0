@@ -597,7 +597,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // === TEST BEHAVIOUR TREE SYSTEM ===
 
-// F10 -> Create a BehaviourTree, attach to entity, and save to JSON
+    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
     // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
     if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
         LOG_INFO("=== [F10] Create Behaviour Tree and attach to entity ===");
@@ -635,108 +635,54 @@ void Game::OnUpdate(Engine::Timestep ts) {
         LOG_INFO("Tree path set to: ", btComp.TreeAssetPath);
     }
 
-
-
     // F11 -> Create a BehaviourTreePrefab from the tree file
     if (input.IsKeyJustPressed(GLFW_KEY_F11)) {
         LOG_INFO("=== [F11] Create BehaviourTreePrefab from file ===");
 
-        // 1. Load the behaviour tree
-        auto loadedTree = Engine::BehaviourTreeSerializer::DeserializeFromFile("Sources/BT/SimpleWaitTree.json");
-        if (!loadedTree) {
-            LOG_ERROR("Failed to load BehaviourTree file!");
+
+        Engine::Entity foundEntity;
+        bool found = false;
+
+        auto view = registry.view<Engine::TagComponent>();
+        for (auto entityHandle : view) {
+            auto& tag = view.get<Engine::TagComponent>(entityHandle);
+            if (tag.Tag == "TestAI") { // change to whatever name you want
+                foundEntity = Engine::Entity(entityHandle, &registry);
+                found = true;
+                break;
+            }
+        }
+
+        if (!foundEntity) {
+            LOG_ERROR("No entity named 'TestAI' found. Create one first with F10.");
             return;
         }
 
-        // 2. Save it as a prefab
-        auto prefabGUID = Engine::BehaviourTreePrefab::SaveAsPrefab(*loadedTree, "SimpleWaitTreePrefab");
+        // Make sure it has a valid BehaviourTreeComponent
+        if (!foundEntity.HasComponent<Engine::BehaviourTreeComponent>()) {
+            LOG_ERROR("Entity 'TestAI' does not have a BehaviourTreeComponent!");
+            return;
+        }
 
-        // 3. Register prefab
-        Engine::PrefabRegistry::Get().RegisterPrefab(
-            Engine::BehaviourTreePrefab::CreatePrefab(*loadedTree, "SimpleWaitTreePrefab")
-        );
+        // Save the entity itself as a prefab (not just the tree)
+        auto prefab = Engine::PrefabSerializer::CreateEntityPrefab(foundEntity, "AIPrefab_SimpleWaitTree");
+        Engine::PrefabRegistry::Get().RegisterPrefab(prefab);
 
-        LOG_INFO("BehaviourTreePrefab created and registered (GUID: 0x", std::hex, prefabGUID.m_Value, std::dec, ")");
+        LOG_INFO("Entity Prefab 'AIPrefab_SimpleWaitTree' created and registered.");
     }
 
 
     // F12 -> Instantiate entity from BehaviourTreePrefab
     if (input.IsKeyJustPressed(GLFW_KEY_K)) {
-        LOG_INFO("=== [F12] Instantiate entity from BehaviourTreePrefab ===");
-
-        // 1. Retrieve prefab by name
-        auto prefab = Engine::PrefabRegistry::Get().GetPrefabByName("SimpleWaitTreePrefab");
-        if (!prefab) {
-            LOG_ERROR("BehaviourTreePrefab not found! Did you create it with F11?");
-            return;
-        }
-
-        // 2. Instantiate entity prefab into scene
-        Engine::Entity aiEntity = Engine::PrefabInstantiator::InstantiateEntityPrefab(
-            m_Scene.get(), prefab->GetGUID()
-        );
-
-        if (aiEntity) {
-            LOG_INFO("Instantiated AI entity from BehaviourTreePrefab!");
+        auto prefab = Engine::PrefabRegistry::Get().GetPrefabByName("AIPrefab_SimpleWaitTree");
+        if (prefab) {
+            Engine::PrefabInstantiator::InstantiateEntityPrefab(m_Scene.get(), prefab->GetGUID());
+            LOG_INFO("Instantiated AI entity from prefab 'AIPrefab_SimpleWaitTree'");
         }
         else {
-            LOG_ERROR("Failed to instantiate AI entity from prefab!");
+            LOG_WARNING("Prefab 'AIPrefab_SimpleWaitTree' not found!");
         }
     }
-
-
-    //if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
-    //    LOG_INFO("TEST TREE CREATION");
-
-    //    //// Create tree
-    //    //auto tree = std::make_shared<Engine::BehaviourTree>();
-    //    //tree->SetName("TestTree");
-
-    //    //// Create a wait node
-    //    //auto wait = std::make_shared<Engine::BTWait>(2.0f);
-    //    //tree->SetRootNode(wait);
-
-    //    //// Attach to entity
-    //    //auto entity = m_Scene->CreateEntity("TestAI");
-    //    //entity.AddComponent<Engine::BehaviourTreeComponent>(tree);
-
-    //    //Engine::BehaviourTreeSerializer::SerializeToFile(*tree, "Sources/BT/Test.json");
-
-    //    //auto loadedTree = Engine::BehaviourTreeSerializer::DeserializeFromFile("Sources/BT/Test.json");
-
-    //    //auto prefabGuid = Engine::BehaviourTreePrefab::SaveAsPrefab(*tree, "TestAI");
-
-    //    //auto instance = Engine::BehaviourTreePrefab::Instantiate(prefabGuid);
-
-    //    // Create tree
-    //    auto tree = std::make_shared<Engine::BehaviourTree>();
-    //    tree->SetName("SimplePatrol");
-
-    //    // Create nodes
-    //    auto sequence = std::make_shared<Engine::BTSequence>();
-    //    auto wait = std::make_shared<Engine::BTWait>(2.0f);
-    //    auto action = std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
-    //        LOG_INFO("Performing action!");
-    //        return Engine::BTStatus::Success;
-    //        });
-
-    //    // Build tree
-    //    sequence->AddChild(wait);
-    //    sequence->AddChild(action);
-    //    tree->SetRootNode(sequence);
-
-    //    // Create entity
-    //    Engine::Entity aiEntity = m_Scene->CreateEntity("AICharacter");
-
-    //    // Attach behavior tree
-    //    auto& btComp = aiEntity.AddComponent<Engine::BehaviourTreeComponent>(tree);
-    //    btComp.Active = true;
-    //    btComp.ResetOnComplete = true;
-
-    //    // Tree will now execute every frame via BehaviorTreeSystem
-
-    //    Engine::BehaviourTreeSerializer::SerializeToFile(*tree, "Sources/BT/SimplePatrol.json");
-    //}
 
     //m_Editor->StartImguiFrame();
 

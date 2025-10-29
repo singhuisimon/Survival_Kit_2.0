@@ -386,10 +386,15 @@ namespace Engine {
                 comp.Active = properties["Active"].GetBool();
             if (properties.HasMember("ResetOnComplete"))
                 comp.ResetOnComplete = properties["ResetOnComplete"].GetBool();
-            if (properties.HasMember("TreeAssetGUID")) 
+            if (properties.HasMember("TreeAssetPath"))
                 comp.TreeAssetPath = properties["TreeAssetPath"].GetString();
-            comp.TreeInstance = nullptr;
-        }
+
+            LOG_INFO("[PrefabInstantiator] Added BehaviourTreeComponent from prefab with path: ", comp.TreeAssetPath);
+
+
+            comp.TreeInstance = nullptr; // runtime-only
+         }
+
 
     }
 

@@ -380,7 +380,6 @@ namespace Engine {
             componentsArray.PushBack(componentObj, allocator);
         }
 
-        // Serialize BehaviourTreeComponent
         if (entity.HasComponent<BehaviourTreeComponent>()) {
             const auto& bt = entity.GetComponent<BehaviourTreeComponent>();
             rapidjson::Value componentObj(rapidjson::kObjectType);
@@ -393,8 +392,12 @@ namespace Engine {
                 rapidjson::Value(bt.TreeAssetPath.c_str(), allocator), allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
+
+            LOG_INFO("[PrefabSerializer] Serializing BehaviourTreeComponent with path: ", bt.TreeAssetPath);
+
             componentsArray.PushBack(componentObj, allocator);
         }
+
 
 
         doc.AddMember("Components", componentsArray, allocator);
