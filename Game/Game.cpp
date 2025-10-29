@@ -29,6 +29,7 @@
 #include "BehaviourTree/BTNodeRegistry.h"
 #include "BehaviourTree/BehaviourTreeSerializer.h"
 #include "BehaviourTree/BehaviourTreePrefab.h"
+#include "BehaviourTree/BTNode.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -594,25 +595,54 @@ void Game::OnUpdate(Engine::Timestep ts) {
     if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
         LOG_INFO("TEST TREE CREATION");
 
+        //// Create tree
+        //auto tree = std::make_shared<Engine::BehaviourTree>();
+        //tree->SetName("TestTree");
+
+        //// Create a wait node
+        //auto wait = std::make_shared<Engine::BTWait>(2.0f);
+        //tree->SetRootNode(wait);
+
+        //// Attach to entity
+        //auto entity = m_Scene->CreateEntity("TestAI");
+        //entity.AddComponent<Engine::BehaviourTreeComponent>(tree);
+
+        //Engine::BehaviourTreeSerializer::SerializeToFile(*tree, "Sources/BT/Test.json");
+
+        //auto loadedTree = Engine::BehaviourTreeSerializer::DeserializeFromFile("Sources/BT/Test.json");
+
+        //auto prefabGuid = Engine::BehaviourTreePrefab::SaveAsPrefab(*tree, "TestAI");
+
+        //auto instance = Engine::BehaviourTreePrefab::Instantiate(prefabGuid);
+
         // Create tree
         auto tree = std::make_shared<Engine::BehaviourTree>();
-        tree->SetName("TestTree");
+        tree->SetName("SimplePatrol");
 
-        // Create a wait node
+        // Create nodes
+        auto sequence = std::make_shared<Engine::BTSequence>();
         auto wait = std::make_shared<Engine::BTWait>(2.0f);
-        tree->SetRootNode(wait);
+        auto action = std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
+            LOG_INFO("Performing action!");
+            return Engine::BTStatus::Success;
+            });
 
-        // Attach to entity
-        auto entity = m_Scene->CreateEntity("TestAI");
-        entity.AddComponent<Engine::BehaviourTreeComponent>(tree);
+        // Build tree
+        sequence->AddChild(wait);
+        sequence->AddChild(action);
+        tree->SetRootNode(sequence);
 
-        Engine::BehaviourTreeSerializer::SerializeToFile(*tree, "Sources/BT/Test.json");
+        // Create entity
+        Engine::Entity aiEntity = m_Scene->CreateEntity("AICharacter");
 
-        auto loadedTree = Engine::BehaviourTreeSerializer::DeserializeFromFile("Sources/BT/Test.json");
+        // Attach behavior tree
+        auto& btComp = aiEntity.AddComponent<Engine::BehaviourTreeComponent>(tree);
+        btComp.Active = true;
+        btComp.ResetOnComplete = true;
 
-        auto prefabGuid = Engine::BehaviourTreePrefab::SaveAsPrefab(*tree, "TestAI");
+        // Tree will now execute every frame via BehaviorTreeSystem
 
-        auto instance = Engine::BehaviourTreePrefab::Instantiate(prefabGuid);
+        Engine::BehaviourTreeSerializer::SerializeToFile(*tree, "Sources/BT/SimplePatrol.json");
     }
 
     //m_Editor->StartImguiFrame();
