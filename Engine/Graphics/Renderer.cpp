@@ -448,13 +448,13 @@ namespace Engine {
 					glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
-					//LOG_INFO("Px Py = ", px," ", py);
-					if (id == NO_HIT) {
-						LOG_INFO("GPU id = No Object");
-					}
-					else {
-						LOG_INFO("GPU id = ", id);
-					}
+					////LOG_INFO("Px Py = ", px," ", py);
+					//if (id == NO_HIT) {
+					//	LOG_INFO("GPU id = No Object");
+					//}
+					//else {
+					//	LOG_INFO("GPU id = ", id);
+					//}
 
 					// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
 					pickedID = id;
