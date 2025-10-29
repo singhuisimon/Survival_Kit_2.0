@@ -131,11 +131,48 @@ namespace Engine
 				{
 					if (isPrefabEditor)
 					{
-						if (m_CurrentPrefab && !currPrefabPath.empty())
+						if (!currPrefabPath.empty())
 						{
-							PrefabSerializer::SavePrefabToFile(*m_CurrentPrefab, currPrefabPath);
-							//LOG_INFO("Prefab saved:", currPrefabPath);
-							m_TemporaryPrefabPaths.erase(currPrefabPath);
+							//// Save the current prefab directly from the scene
+							//auto view = m_Scene->GetRegistry().view<TagComponent>();
+							//if (view.begin() != view.end())
+							//{
+							//	Entity entity(*view.begin(), &m_Scene->GetRegistry());
+
+							//	// Create a new prefab from the current entity
+							//	std::string entityName = entity.GetComponent<TagComponent>().Tag;
+							//	auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
+
+							//	if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
+							//	{
+							//		LOG_INFO("Prefab saved: {}", currPrefabPath);
+
+							//		// Update the registry with the new prefab
+							//		PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							//		m_TemporaryPrefabPaths.erase(currPrefabPath);
+							//	}
+							//}
+
+							if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
+							{
+								auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+								std::string prefabPath = currPrefabPath;
+
+								if (!prefabPath.empty())
+								{
+									// Create updated prefab from current entity state
+									std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+									auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+
+									if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+									{
+										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+										prefabComp.ClearModifications(); // Reset overrides 
+										LOG_INFO("Prefab updated: {}", prefabPath);
+									}
+								}
+							}
 						}
 					}
 					else
@@ -649,6 +686,7 @@ namespace Engine
 										m_TemporaryPrefabPaths.insert(prefabFolder);
 
 									}
+									//m_SelectedEntity = entity;
 								}
 							}
 							if (ImGui::MenuItem("Replace Prefab"))
@@ -804,16 +842,47 @@ namespace Engine
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
 						if (extension == ".json") // if it is scene
 						{
+							if (isPrefabEditor)
+							{
+								if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
+								{
+									auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+									std::string prefabPath = currPrefabPath;
+
+									if (!prefabPath.empty())
+									{
+										// Create updated prefab from current entity state
+										std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+										auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+
+										if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+										{
+											PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+											prefabComp.ClearModifications(); // Reset overrides 
+											LOG_INFO("Prefab updated: {}", prefabPath);
+											isPrefabEditor = false;
+										}
+									}
+								}
+								
+							}
+							
+							currScenePath = filePath; // update curr file path
 							currFileName = fileName; // store file name
-							m_Scene->SetName(fileName); 
+							m_Scene->SetName(fileName);
 							if (m_Scene)
 							{
+
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
-								currScenePath = filePath; // update curr file path
+									
 								isPrefabEditor = false;
 								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
 							}
+							
+							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
+
 						}
 						else if (extension == ".prefab")
 						{
@@ -825,33 +894,26 @@ namespace Engine
 									m_Scene->SaveToFile(currScenePath);
 									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
 								}
-								//else
-								//{
-								//	saveAsPanel = true; // prompt Save As if the scene was never saved
-								//	//LOG_WARN("Scene has no file path. Prompting 'Save As' before switching to prefab.");
-								//	loadPrefabNextFrame = filePath;
-								//
-								//}
 							}
-							if (!saveAsPanel)
+							//if (!saveAsPanel)
+							//{
+							currPrefabPath = filePath;
+							m_Scene->SetName("Prefab");
+							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+							if (prefab)
 							{
-								currPrefabPath = filePath;
-								m_Scene->SetName("Prefab");
-								auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-								if (prefab)
+								m_Scene->GetRegistry().clear();
+								PrefabRegistry::Get().RegisterPrefab(prefab);
+								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+								if (!currScenePath.empty())
 								{
-									m_Scene->GetRegistry().clear();
-									PrefabRegistry::Get().RegisterPrefab(prefab);
-									Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-									if (!currScenePath.empty())
-									{
-										currScenePath.clear();
-									}
-									isPrefabEditor = true;
-
-									LOG_INFO("Now editing prefab:", currPrefabPath);
+									currScenePath.clear();
 								}
+								isPrefabEditor = true;
+
+								LOG_INFO("Now editing prefab:", currPrefabPath);
 							}
+							//}
 							
 						}
 					}
@@ -890,23 +952,6 @@ namespace Engine
 		}
 		ImGui::End(); // End of the assets browser window
 
-		//if (!loadPrefabNextFrame.empty() && !saveAsPanel)
-		//{
-		//	auto prefab = PrefabSerializer::LoadPrefabFromFile(loadPrefabNextFrame);
-		//	if (prefab)
-		//	{
-		//		m_Scene->GetRegistry().clear();
-		//		PrefabRegistry::Get().RegisterPrefab(prefab);
-		//		Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-
-		//		currPrefabPath = loadPrefabNextFrame;
-		//		currScenePath.clear();
-		//		isPrefabEditor = true;
-
-		//		//LOG_INFO("Now editing prefab (deferred):", currPrefabPath);
-		//	}
-		//	loadPrefabNextFrame.clear();
-		//}
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)

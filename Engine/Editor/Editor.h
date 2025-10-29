@@ -82,7 +82,8 @@ namespace Engine
 		std::string selectedPrefabPath{};
 		std::string currFileName{};
 		Prefab* m_CurrentPrefab = nullptr;
-		std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
+		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
+		//bool prefabModified = false;
 
 	
 		// Helper struct to get resources folder/files 
