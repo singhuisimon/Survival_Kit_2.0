@@ -169,14 +169,14 @@ namespace ResourceGUID {
 	inline static constexpr auto entity_prefab_type_guid_v = xresource::type_guid("entity_prefab");
 	inline static constexpr auto scene_prefab_type_guid_v = xresource::type_guid("scene_prefab");
 
-	//type safe guid alias 
-	using texture_guid = xresource::def_guid<texture_type_guid_v>;
-	using mesh_guid = xresource::def_guid<mesh_type_guid_v>;
-	using material_guid = xresource::def_guid<material_type_guid_v>;
-	using audio_guid = xresource::def_guid<audio_type_guid_v>;
-	using shader_guid = xresource::def_guid<shader_type_guid_v>;
-	using entity_prefab_guid = xresource::def_guid<entity_prefab_type_guid_v>;
-	using scene_prefab_guid = xresource::def_guid<scene_prefab_type_guid_v>;
+	////type safe guid alias 
+	//using texture_guid = xresource::def_guid<texture_type_guid_v>;
+	//using mesh_guid = xresource::def_guid<mesh_type_guid_v>;
+	//using material_guid = xresource::def_guid<material_type_guid_v>;
+	//using audio_guid = xresource::def_guid<audio_type_guid_v>;
+	//using shader_guid = xresource::def_guid<shader_type_guid_v>;
+	//using entity_prefab_guid = xresource::def_guid<entity_prefab_type_guid_v>;
+	//using scene_prefab_guid = xresource::def_guid<scene_prefab_type_guid_v>;
 
 	//get the type guid for a resource type
 	inline xresource::type_guid getTypeGUID(ResourceType type) {

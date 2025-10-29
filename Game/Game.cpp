@@ -9,6 +9,7 @@
 #include "Audio/AudioSystem.h"
 #include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
+#include "Asset/ResourceManager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -38,8 +39,6 @@ void Game::OnInit() {
 
     //==========INITIALIZING ASSET ==============
 
-    
-
     LOG_INFO("Initializing Asset...");
 
     auto config = Engine::AM.createDefaultConfig();
@@ -61,14 +60,14 @@ void Game::OnInit() {
     }
     else {
 
-    LOG_INFO("Performing initial asset scan...");
-    Engine::AM.scanAndProcess();
+        LOG_INFO("Performing initial asset scan...");
+        Engine::AM.scanAndProcess();
 
-    LOG_INFO("Initial asset scan complete - found ",
-        Engine::AM.db().Count(), " assets");
+        LOG_INFO("Initial asset scan complete - found ",
+            Engine::AM.db().Count(), " assets");
     }
 
-
+    Engine::RM.startUp();
 
     // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
@@ -81,27 +80,27 @@ void Game::OnInit() {
         return;
     }
 
-	// Step 2: Create Audio Manager
-	LOG_INFO("Step 2: Initializing Audio Manager...");
+    // Step 2: Create Audio Manager
+    LOG_INFO("Step 2: Initializing Audio Manager...");
     try {
-		m_AudioManager = std::make_unique<Engine::AudioManager>();
+        m_AudioManager = std::make_unique<Engine::AudioManager>();
         if (!m_AudioManager->Init()) {
-			LOG_CRITICAL("  -> Audio Manager initialization failed!");
+            LOG_CRITICAL("  -> Audio Manager initialization failed!");
             return;
         }
-		LOG_INFO("  -> Audio Manager initialized successfully");
+        LOG_INFO("  -> Audio Manager initialized successfully");
     }
     catch (const std::exception& e) {
         LOG_CRITICAL("  -> Exception while initializing Audio Manager: ", e.what());
         return;
-	}
+    }
 
     // Step 3: Create scene
     LOG_INFO("Step 3: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
-       
+
         if (!m_Scene) {
             LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
             return;
@@ -111,7 +110,7 @@ void Game::OnInit() {
         if (!m_Editor)
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
-            m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->SetScene(m_Scene.get());
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
@@ -127,16 +126,8 @@ void Game::OnInit() {
     // Step 4: Add systems to the scene
     LOG_INFO("Step 4: Adding systems to scene...");
     try {
-        // TODO: Add more systems here as they're created by team members:
-        // m_Scene->AddSystem<Engine::PhysicsSystem>();
-        // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
-        m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
-        m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-        m_Scene->AddSystem<Engine::PhysicsSystem>();
-        m_Scene->AddSystem<Engine::TransformSystem>();
-        m_Scene->AddSystem<Engine::CameraSystem>();
-        m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
-       
+        AddAllSystems();  // CHANGED: Replace all manual AddSystem calls with helper function
+
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {
@@ -158,7 +149,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -195,7 +186,7 @@ void Game::OnInit() {
     LOG_INFO("Step 7: Initializing Tracy Profiler...");
     try {
         m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
-        
+
         // Get the directory where the executable is running from
         std::filesystem::path exeDir = Engine::getAssetsPath();
 
@@ -235,6 +226,15 @@ void Game::OnInit() {
     LOG_INFO("");
 }
 
+void Game::AddAllSystems() {
+    m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
+    m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
+    m_Scene->AddSystem<Engine::PhysicsSystem>();
+    m_Scene->AddSystem<Engine::TransformSystem>();
+    m_Scene->AddSystem<Engine::CameraSystem>();
+    m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+}
+
 void Game::CreateDefaultScene() {
     if (!m_Scene) {
         throw std::runtime_error("Scene is null in CreateDefaultScene");
@@ -249,12 +249,13 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
+    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
 
-    auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
-    rb.Mass = 1.0f;
-    rb.UseGravity = true;
-    rb.IsKinematic = false;
-    rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
+    //rb.Mass = 1.0f;
+    //rb.UseGravity = true;
+    //rb.IsKinematic = false;
+    //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";
@@ -269,7 +270,6 @@ void Game::CreateDefaultScene() {
     playerAudio.MinDistance = 1.0f;
     playerAudio.MaxDistance = 50.0f;
 
-    player.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
 
     LOG_TRACE("  Creating Camera entity...");
@@ -497,6 +497,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
     if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT)) {
         auto mousePos = input.GetMousePosition();
         LOG_DEBUG("Left mouse clicked at: (", mousePos.x, ", ", mousePos.y, ")");
+
+        // Retrieve picked ID and send it to editor
+        m_Editor->RetrievePickedID(m_Renderer->getPickedID());
     }
     if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         auto mousePos = input.GetMousePosition();
@@ -562,6 +565,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
         // Reinitialize systems after loading
         if (success) {
+            AddAllSystems();
             m_Scene->InitializeSystems();
             LOG_INFO("Scene loaded and systems reinitialized!");
         }
@@ -602,6 +606,8 @@ void Game::OnShutdown() {
     }
 
     //============= Asset =============
+    Engine::RM.shutDown(); 
+
     LOG_INFO("Shutting Down Asset");
     Engine::AM.shutDown();
 

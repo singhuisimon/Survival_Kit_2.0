@@ -15,10 +15,14 @@
 #include "../Graphics/Renderer.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
+#include "../Asset/ResourceHelpers.h"
+#include "../Asset/ResourceManager.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 #include <GLFW/glfw3.h>
+
+#include "Asset/ResourceData.h"
 
 #pragma region NAMESPACE
 
@@ -26,6 +30,7 @@ namespace {
 
 	// Testing values
 	constexpr int width = 1280, height = 720;
+	constexpr Engine::u32 NO_HIT = 0xFFFFFFFFu;
 
 	inline std::vector<Engine::ShaderProgram> loadShaderPrograms(std::vector<std::pair<std::string, std::string>> shaders) {
 
@@ -138,6 +143,9 @@ namespace Engine {
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
 
+		// Set default picked ID 
+		pickedID = NO_HIT;
+
 		// Create a framebuffer for ImGui editor and configure it's settings
 		auto fp_fbo = FrameBuffer::create();
 		if (fp_fbo.has_value()) {
@@ -212,8 +220,8 @@ namespace Engine {
 			.pass_name = "First Pass",
 			.fbo_handle = 0,
 			.shdpgm_handle = 0,
-			.auto_aspect = true
-
+			.auto_aspect = true,
+			.culling = false
 			// Leave the rest as default settings
 		};
 
@@ -324,8 +332,9 @@ namespace Engine {
 		// If this pass targets the GPU-ID FBO (Shader program 2, R32UI), clear with integer clear:
 		if (pass.shdpgm_handle == 2) {
 			//auto& fbo = m_framebuffers[pass.fbo_handle];
-			// 0 means "no hit" — reserve ID=0 as empty
-			fbo.clear_colori(/*drawbuf index*/0, 0, 0, 0, 0);
+			// 0 means "no hit" ï¿½ reserve ID=0 as empty
+			//fbo.clear_colori(/*drawbuf index*/169, 0, 0, 0, 0);
+			fbo.clear_colorui(/*drawbuf index*/0, NO_HIT, 0, 0, 0);
 		}
 
 		pass.depth_test ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
@@ -432,7 +441,7 @@ namespace Engine {
 					int py = int((1.0f - v) * pass.view_port.w);
 
 					// Read the ID
-					uint32_t id = 0;
+					u32 id = 0; // (entt::null value)
 					auto& idFbo = m_framebuffers[1];
 					idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
@@ -440,10 +449,15 @@ namespace Engine {
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 					//LOG_INFO("Px Py = ", px," ", py);
-					//LOG_INFO("GPU id = ", id);
+					if (id == NO_HIT) {
+						//LOG_INFO("GPU id = No Object");
+					}
+					else {
+						//LOG_INFO("GPU id = ", id);
+					}
 
-					// TODO: Save Picked ID to somewhere (0 will be used as NO-HIT, need to prevent use of 0)
-					
+					// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
+					pickedID = id;
 				}
 
 			}
@@ -524,14 +538,25 @@ namespace Engine {
 			prog.setUniform("material.shininess", test_material.getMaterialShininess());
 
 			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
-			m_gl.m_mesh_storage[mesh_handle].vao.bind();
+
+			xresource::full_guid mesh_fullguid = convertToMeshGuid(item.m_instance_guid);
+
+			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
 
 			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-			glDrawElements(primitive, draw_count, index_type, NULL);
-			glBindVertexArray(0);
+		if (mesh_rsc) {
+				glBindVertexArray(mesh_rsc->VAO);
+				glDrawElements(GL_TRIANGLES, mesh_rsc->indices.size(), GL_UNSIGNED_INT, NULL);
+				glBindVertexArray(0);
+			}
+			else {
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, NULL);
+				glBindVertexArray(0);
+			}
 		}
 	}
 
