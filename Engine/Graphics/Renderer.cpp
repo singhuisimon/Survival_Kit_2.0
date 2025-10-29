@@ -169,7 +169,7 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
-		// Create FBO for GPU ID
+		// Create FBO for F
 		auto gpu_fbo = FrameBuffer::create();
 		if (gpu_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*gpu_fbo));
