@@ -164,7 +164,7 @@ target_link_libraries(GameEngine PUBLIC ${MONO_LIBRARIES})
 # ====================================
 
 file(COPY ${CMAKE_SOURCE_DIR}/Resources 
-     DESTINATION ${CMAKE_BINARY_DIR})
+     DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
 # ====================================
 # Build Information

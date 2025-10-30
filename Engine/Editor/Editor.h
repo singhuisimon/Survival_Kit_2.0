@@ -33,6 +33,7 @@
 #include "../Utility/AssetPath.h"
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
+#include "../Serialization/PrefabInstantiator.h"
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
@@ -52,7 +53,7 @@ namespace Engine
 		ImGuiIO* io;
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
-		std::shared_ptr<Prefab> m_Prefab; // for prefab
+		GLuint m_FBOTextureHandle;
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID;
 
@@ -73,15 +74,27 @@ namespace Engine
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+
+		// Prefab helper variables
+		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
 		std::string currPrefabPath{};
+		bool isPrefabEditor = false;
+		bool replacePrefabPending = false;
+		std::string selectedPrefabPath{};
+		std::string currFileName{};
+		Prefab* m_CurrentPrefab = nullptr;
+		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
+		//bool prefabModified = false;
 
-
+	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
 		{
 			std::string name;
 			std::string fullPath;
 		};
+
+		bool raw_asset = false;
 
 		// Editor viewport's data storage
 		EditorViewport editorViewportData;
@@ -91,17 +104,19 @@ namespace Engine
 		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
 		// Deconstuctor
-		~Editor() = default;
+		~Editor() {
+			CleanupTemporaryPrefabs();
+		};
 
 		// Delected copy constructor
-		Editor(const Editor&) = delete;
+		//Editor(const Editor&) = delete;
 
 		// Deleted copy assignment operator
 		Editor& operator=(const Editor&) = delete;
 
 		// Set scene for editor
 		void SetScene(Engine::Scene* scene);
-
+		
 		// Initialise Imgui
 		void OnInit();
 
@@ -143,6 +158,9 @@ namespace Engine
 
 		// Complete the ImGui frame
 		void CompleteFrame();
+
+		// to clean unsave prefab
+		void CleanupTemporaryPrefabs();
 
 		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
 			m_Profiler = profiler; // still increases refcount, no extra copy on call
