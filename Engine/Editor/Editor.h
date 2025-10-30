@@ -55,6 +55,7 @@ namespace Engine
 		Entity m_SelectedEntity{};
 		GLuint m_FBOTextureHandle;
 		std::weak_ptr<TracyProfiler> m_Profiler;
+		u32 m_PickedID;
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -168,6 +169,7 @@ namespace Engine
 		// Set Editor viewport's data for object picking
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
+		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
 	};
 
 

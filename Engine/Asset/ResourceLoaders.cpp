@@ -11,6 +11,7 @@
 #include "ResourceManager.h"
 #include "CompiledResourceFormat.h"
 #include "ResourceHelpers.h"
+#include "../Utility/Logger.h"
 
 #include "../include/glad/glad.h" // OpenGL functions
 #include "../glm/glm/glm.hpp"
@@ -19,14 +20,16 @@
 #include <memory>
 
 
- // Loader registrations - defined once
-xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
-xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
-xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
-xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
-xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
-
 namespace Engine {
+
+    //void InitializeResourceLoaders() {
+    //    //force the linker to include these symbols 
+    //    (void)&texture_loader;
+    //    (void)&mesh_loader;
+    //    (void)&material_loader;
+    //    (void)&audio_loader;
+    //    (void)&shader_loader;
+    //}
 
     // Helper to get ResourceManager from xresource::mgr
     ResourceManager* getResourceManager(xresource::mgr& mgr) {
@@ -180,28 +183,59 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 {
     Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
+    //LOG_INFO(">>> MESH LOADER CALLED <<<");
+    //LOG_INFO("Mesh Loader - full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
+    //LOG_INFO("Mesh Loader - full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
+    // CRITICAL: Verify OpenGL context is active
+    GLint currentFBO = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
+    GLenum contextError = glGetError();
+    if (contextError != GL_NO_ERROR) {
+        LOG_ERROR("!!! NO OPENGL CONTEXT ACTIVE !!!");
+        LOG_ERROR("Cannot create mesh buffers without active OpenGL context");
+        LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
+        return nullptr;
+    }
+    //LOG_INFO("OpenGL context is active and ready");
     // Get compiled file path
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
+    //LOG_INFO("MESHFILE PATH : ", compiled_path);
+
     if (!Engine::fileExists(compiled_path)) {
+        //LOG_ERROR(">>> COMPILED MESH FILE NOT FOUND <<<");
+        //LOG_ERROR("Looking for: ", compiled_path);
+        //LOG_INFO("Listing all available compiled mesh files:");
+        Engine::listCompiledFiles(Engine::ResourceType::MESH);  // <-- ADD THIS LINE
         return nullptr;
     }
 
     // Open compiled binary file
     std::ifstream file(compiled_path, std::ios::binary);
     if (!file.is_open()) {
+        LOG_ERROR("File cannot be opened ", compiled_path);
+
         return nullptr;
     }
+
+    LOG_INFO("File Opened Successfully"); 
 
     // Read compiled mesh data header
     Engine::CompiledMeshData meshHeader;
     file.read(reinterpret_cast<char*>(&meshHeader), sizeof(meshHeader));
     if (!file) {
+        LOG_ERROR("Failed to read mesh header from file");
         return nullptr;
     }
+    LOG_INFO("Mesh header read successfully");
 
     //validate magic number
-    if (strncmp(meshHeader.magic, "MSH", 3) != 0) return nullptr;
+    if (strncmp(meshHeader.magic, "MSH", 3) != 0) {
+        LOG_ERROR("Invalid magic number in mesh file. Expected 'MSH', got: ",
+            meshHeader.magic[0], meshHeader.magic[1], meshHeader.magic[2]);
+        return nullptr;
+    }
+    LOG_INFO("Magic number validated");
 
     // Create mesh resource
     auto mesh = std::make_unique<data_type>();
@@ -283,9 +317,13 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
             meshHeader.indexCount * sizeof(uint32_t));
     }
     if (!file) {
-      //  LM.writeLog("MeshLoader - Failed to read mesh data");
+        LOG_ERROR("Failed to read mesh indices from file");
         return nullptr;
     }
+    LOG_INFO("Mesh data loaded - Vertices: ", meshHeader.vertexCount, " Indices: ", meshHeader.indexCount);
+    LOG_INFO("Starting OpenGL buffer creation...");
+
+
 
 #if 0
     // Convert to interleaved format for OpenGL
@@ -317,22 +355,74 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 #endif
     // Create OpenGL buffers
     glGenVertexArrays(1, &mesh->VAO);
+
+    GLenum err1 = glGetError();
+    if (err1 != GL_NO_ERROR) {
+        LOG_ERROR("glGenVertexArrays failed: 0x", std::hex, err1);
+        return nullptr;
+    }
+
     glGenBuffers(1, &mesh->VBO);
+    GLenum err2 = glGetError();
+    if (err2 != GL_NO_ERROR) {
+        LOG_ERROR("glGenBuffers(VBO) failed: 0x", std::hex, err2);
+        glDeleteVertexArrays(1, &mesh->VAO);
+        return nullptr;
+    }
+
     glGenBuffers(1, &mesh->EBO);
+    GLenum err3 = glGetError();
+    if (err3 != GL_NO_ERROR) {
+        LOG_ERROR("glGenBuffers(EBO) failed: 0x", std::hex, err3);
+        glDeleteVertexArrays(1, &mesh->VAO);
+        glDeleteBuffers(1, &mesh->VBO);
+        return nullptr;
+    }
+    LOG_INFO("OpenGL buffers generated: VAO=", mesh->VAO, " VBO=", mesh->VBO, " EBO=", mesh->EBO);
 
     glBindVertexArray(mesh->VAO);
+    GLenum err4 = glGetError();
+    if (err4 != GL_NO_ERROR) {
+        LOG_ERROR("glBindVertexArray failed: 0x", std::hex, err4);
+        glDeleteVertexArrays(1, &mesh->VAO);
+        glDeleteBuffers(1, &mesh->VBO);
+        glDeleteBuffers(1, &mesh->EBO);
+        return nullptr;
+    }
+    LOG_INFO("VAO bound successfully");
 
     // Upload interleaved vertex data
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
     glBufferData(GL_ARRAY_BUFFER,
         mesh->vertices.size() * sizeof(float),
         mesh->vertices.data(), GL_STATIC_DRAW);
+    GLenum err5 = glGetError();
+    if (err5 != GL_NO_ERROR) {
+        LOG_ERROR("glBufferData(VBO) failed: 0x", std::hex, err5);
+        LOG_ERROR("Attempted to upload ", mesh->vertices.size() * sizeof(float), " bytes");
+        glDeleteVertexArrays(1, &mesh->VAO);
+        glDeleteBuffers(1, &mesh->VBO);
+        glDeleteBuffers(1, &mesh->EBO);
+        return nullptr;
+    }
+    LOG_INFO("VBO data uploaded: ", mesh->vertices.size() * sizeof(float), " bytes");
 
     // Upload index data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
         mesh->indices.size() * sizeof(unsigned int),
         mesh->indices.data(), GL_STATIC_DRAW);
+    GLenum err6 = glGetError();
+    if (err6 != GL_NO_ERROR) {
+        LOG_ERROR("glBufferData(EBO) failed: 0x", std::hex, err6);
+        LOG_ERROR("Attempted to upload ", mesh->indices.size() * sizeof(unsigned int), " bytes");
+        glDeleteVertexArrays(1, &mesh->VAO);
+        glDeleteBuffers(1, &mesh->VBO);
+        glDeleteBuffers(1, &mesh->EBO);
+        return nullptr;
+    }
+    LOG_INFO("EBO data uploaded: ", mesh->indices.size() * sizeof(unsigned int), " bytes");
+
 
     // Setup vertex attributes - interleaved format
     size_t stride = 11 * sizeof(float);
@@ -358,15 +448,22 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     // Check for OpenGL errors
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-     //   LM.writeLog("MeshLoader - OpenGL error: 0x%X", error);
+        LOG_ERROR("OpenGL error during mesh creation: 0x", std::hex, error);
         glDeleteVertexArrays(1, &mesh->VAO);
         glDeleteBuffers(1, &mesh->VBO);
         glDeleteBuffers(1, &mesh->EBO);
         return nullptr;
     }
+    LOG_INFO("OpenGL buffers created successfully");
+    LOG_INFO("Mesh VAO: ", mesh->VAO, " VBO: ", mesh->VBO, " EBO: ", mesh->EBO);
+    LOG_INFO("Returning mesh pointer...");
 
-    return mesh.release();
-}
+    LOG_INFO("Vertex count: ", (mesh->vertices.size() / 11));
+    LOG_INFO("Index count: ", mesh->indices.size());
+
+    auto* meshPtr = mesh.release();
+    LOG_INFO("mesh.release() returned pointer: ", static_cast<void*>(meshPtr));
+    return meshPtr; }
 
 
 
