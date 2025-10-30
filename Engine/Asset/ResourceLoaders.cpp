@@ -185,9 +185,9 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 {
     Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
-    LOG_INFO(">>> MESH LOADER CALLED <<<");
-    LOG_INFO("Mesh Loader - full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
-    LOG_INFO("Mesh Loader - full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
+    //LOG_INFO(">>> MESH LOADER CALLED <<<");
+    //LOG_INFO("Mesh Loader - full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
+    //LOG_INFO("Mesh Loader - full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
     // CRITICAL: Verify OpenGL context is active
     //GLint currentFBO = 0;
     //glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
@@ -202,12 +202,12 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     // Get compiled file path
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
-    LOG_INFO("MESHFILE PATH : ", compiled_path);
+    //LOG_INFO("MESHFILE PATH : ", compiled_path);
 
     if (!Engine::fileExists(compiled_path)) {
-        LOG_ERROR(">>> COMPILED MESH FILE NOT FOUND <<<");
-        LOG_ERROR("Looking for: ", compiled_path);
-        LOG_INFO("Listing all available compiled mesh files:");
+        //LOG_ERROR(">>> COMPILED MESH FILE NOT FOUND <<<");
+        //LOG_ERROR("Looking for: ", compiled_path);
+        //LOG_INFO("Listing all available compiled mesh files:");
         Engine::listCompiledFiles(Engine::ResourceType::MESH);  // <-- ADD THIS LINE
         return nullptr;
     }
