@@ -29,7 +29,7 @@
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/ScriptSystem.h"        // ADD THIS
 #include "Scripting/MonoScriptEngine.h"    // ADD THIS
-
+#include "Scripting/ScriptReloader.h" 
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -217,17 +217,19 @@ void Game::OnInit() {
   // ====================================
     LOG_INFO("Step 8: Initializing Mono Scripting Engine...");
     try {
-        std::string assemblyPath = "GameScripts.dll"; // relative path from build/bin/Debug/
-        LOG_INFO("Current working directory: ", std::filesystem::current_path().string());
+        std::string assemblyPath = "GameScripts.dll";
 
         if (std::filesystem::exists(assemblyPath)) {
             Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
             LOG_INFO("  -> Mono Scripting Engine initialized successfully");
         }
-        else {
-            LOG_WARNING("  -> GameScripts.dll not found at: ", assemblyPath);
-            LOG_WARNING("  -> ScriptComponents will be ignored");
-        }
+
+        // NEW: Initialize hot-reload system
+        Engine::ScriptReloader::GetInstance().Initialize(
+            "../../../../Scripts",                      // 
+            "../../../../Scripts/GameScripts.csproj",   // 
+            "GameScripts.dll"                                 // Output DLL path
+        );
     }
     catch (const std::exception& e) {
         LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
@@ -391,9 +393,10 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Get input reference
     auto& input = GetInput();
+    Engine::ScriptReloader::GetInstance().Update();
 
     // Update scene (this will call all systems in priority order)
-    m_Scene->OnUpdate(ts.GetSeconds());  // Convert Timestep to float
+    m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
 	// Update audio manager if exists
 	m_AudioManager->OnUpdate(ts);

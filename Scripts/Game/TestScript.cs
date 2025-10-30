@@ -18,12 +18,12 @@ namespace Game
         public void OnUpdate(float deltaTime)  //  MUST be exactly this signature
         {
             frameCount++;
-            Engine.InternalCalls.Log("OnUpdate called from C#!");
+            Engine.InternalCalls.Log("dobule hell");
 
             if (frameCount % 60 == 0)
             {
-                Console.WriteLine("[C#] OnUpdate frame: " + frameCount);
-                Engine.InternalCalls.Log("OnUpdate called from C#!");
+                //Console.WriteLine("[C#] OnUpdate frame: " + frameCount);
+                //Engine.InternalCalls.Log("OnUpdate called from C#!");
             }
         }
 
