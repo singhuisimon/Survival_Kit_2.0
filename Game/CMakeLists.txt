@@ -73,16 +73,17 @@ if(WIN32)
             endif()
         endforeach()
         
-        # Copy Mono library directory for .NET assemblies
-        if(EXISTS "${MONO_ROOT}/lib/mono/4.5")
-            add_custom_command(TARGET GameEngine POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E make_directory
-                    "$<TARGET_FILE_DIR:GameEngine>/mono/lib/4.5"
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    "${MONO_ROOT}/lib/mono/4.5"
-                    "$<TARGET_FILE_DIR:GameEngine>/mono/lib/4.5"
-                COMMENT "Copying Mono .NET assemblies to executable directory"
-            )
+ # Copy Mono .NET assemblies for scripting (.NET runtime)
+    set(MONO_ROOT "C:/Program Files/Mono")
+    if(EXISTS "${MONO_ROOT}/lib/mono/4.5")
+        add_custom_command(TARGET GameEngine POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:GameEngine>/../../lib/mono/4.5"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${MONO_ROOT}/lib/mono/4.5"
+                "$<TARGET_FILE_DIR:GameEngine>/../../lib/mono/4.5"
+            COMMENT "Copying Mono .NET core assemblies to lib/mono/4.5"
+        )
         else()
             message(WARNING "Mono lib directory not found: ${MONO_ROOT}/lib/mono/4.5")
         endif()
@@ -92,6 +93,30 @@ if(WIN32)
         message(WARNING "  Mono installation not found at: ${MONO_ROOT}")
         message(WARNING "  Please install Mono or set MONO_ROOT to correct path")
     endif()
+    
+    # ====================================
+    # Copy C# Scripts DLL (NEW!)
+    # ====================================
+    # Check common locations for GameScripts.dll
+    set(GAMESCRIPTS_SEARCH_PATHS
+        "${CMAKE_BINARY_DIR}/bin/GameScripts.dll"
+        "${CMAKE_SOURCE_DIR}/Scripts/bin/Debug/net48/GameScripts.dll"
+        "${CMAKE_SOURCE_DIR}/Scripts/bin/Release/net48/GameScripts.dll"
+        "${CMAKE_SOURCE_DIR}/GameScripts.dll"
+    )
+    
+    foreach(SCRIPT_PATH ${GAMESCRIPTS_SEARCH_PATHS})
+        if(EXISTS "${SCRIPT_PATH}")
+            add_custom_command(TARGET GameEngine POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${SCRIPT_PATH}"
+                    "$<TARGET_FILE_DIR:GameEngine>/GameScripts.dll"
+                COMMENT "Copying GameScripts.dll from ${SCRIPT_PATH}"
+            )
+            message(STATUS "  GameScripts.dll will be copied from: ${SCRIPT_PATH}")
+            break()
+        endif()
+    endforeach()
 endif()
 
 # ====================================

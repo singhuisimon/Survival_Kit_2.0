@@ -20,46 +20,58 @@ namespace Engine {
         auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
 
+        static int totalUpdates = 0;
+        totalUpdates++;
+
         for (auto entity : view) {
             auto& script = view.get<ScriptComponent>(entity);
 
-            // Skip if no script class name
             if (script.ScriptClassName.empty()) {
                 continue;
             }
 
             // Create instance if needed
             if (!script.ScriptInstance) {
+                LOG_INFO("[ScriptSystem] Creating script instance: ", script.ScriptClassName);
+
                 script.ScriptInstance = MonoScriptEngine::GetInstance()
                     .CreateScriptInstance(script.ScriptClassName);
 
-                // If creation failed (assembly not loaded), skip this entity
                 if (!script.ScriptInstance) {
+                    LOG_ERROR("[ScriptSystem] Failed to create script instance");
                     continue;
                 }
 
-                // Set entity ID
                 MonoScriptEngine::GetInstance().SetFieldValue(
-                    (MonoObject*)script.ScriptInstance, "EntityID",
-                    &entity);
+                    (MonoObject*)script.ScriptInstance, "EntityID", &entity);
             }
 
             if (script.ScriptInstance) {
-                // Call OnStart if not started
+                // Call OnStart
                 if (!script.Started) {
+                    LOG_INFO("[ScriptSystem] Calling OnStart");
                     MonoScriptEngine::GetInstance().CallMethod(
                         (MonoObject*)script.ScriptInstance, "OnStart");
                     script.Started = true;
                 }
 
-                // Call OnUpdate
+                // Call OnUpdate - ADD DETAILED LOGS HERE
+                if (totalUpdates % 60 == 0) {  // Log every 60 frames
+                    LOG_INFO("[ScriptSystem] *** Calling C# OnUpdate (update #", totalUpdates, ") ***");
+                }
+
                 void* params[1] = { &deltaTime };
                 MonoScriptEngine::GetInstance().CallMethod(
                     (MonoObject*)script.ScriptInstance, "OnUpdate",
                     params, 1);
+
+                if (totalUpdates % 60 == 0) {
+                    LOG_INFO("[ScriptSystem] *** C# OnUpdate returned successfully ***");
+                }
             }
         }
     }
+
 
 
     void ScriptSystem::OnShutdown(Scene* scene) {  // Added Scene* parameter

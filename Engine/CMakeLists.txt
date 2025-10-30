@@ -60,10 +60,7 @@ file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 file(GLOB_RECURSE PROFILER_SOURCES "${ENGINE_ROOT}/Profiler/*.cpp")
 file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
 
-
-
-# ADD THIS NEW SECTION:
-# Scripting Module
+# Scripting Module (NEW!)
 file(GLOB_RECURSE SCRIPTING_SOURCES "${ENGINE_ROOT}/Scripting/*.cpp")
 file(GLOB_RECURSE SCRIPTING_HEADERS "${ENGINE_ROOT}/Scripting/*.h")
 
@@ -82,6 +79,7 @@ set(ENGINE_SOURCES
     ${PREFAB_SOURCES}
     ${PHYSICS_SOURCES}
     ${PROFILER_SOURCES}
+    ${SCRIPTING_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -98,6 +96,7 @@ set(ENGINE_HEADERS
     ${PREFAB_HEADERS}
     ${PHYSICS_HEADERS}
     ${PROFILER_HEADERS}
+    ${SCRIPTING_HEADERS}
 )
 
 # Create engine static library
@@ -172,6 +171,10 @@ source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 source_group("Profiler\\Header" FILES ${PROFILER_HEADERS})
 source_group("Profiler\\Source" FILES ${PROFILER_SOURCES})
 
+# Scripting Module (NEW!)
+source_group("Scripting\\Header" FILES ${SCRIPTING_HEADERS})
+source_group("Scripting\\Source" FILES ${SCRIPTING_SOURCES})
+
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
     FOLDER "Engine"
@@ -183,6 +186,21 @@ target_include_directories(EngineLib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# ====================================
+# MONO INTEGRATION (NEW!)
+# ====================================
+# Include Mono support
+include(${CMAKE_SOURCE_DIR}/MonoIntegration.cmake)
+
+# Link Mono to EngineLib
+target_link_libraries(EngineLib PUBLIC ${MONO_LIBRARIES})
+target_include_directories(EngineLib PUBLIC ${MONO_INCLUDE_DIR})
+
+message(STATUS "Mono integrated into EngineLib")
+
+# ====================================
+# Link Dependencies
+# ====================================
 # Link external dependencies
 target_link_libraries(EngineLib PUBLIC External)
 
