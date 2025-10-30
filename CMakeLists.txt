@@ -142,7 +142,7 @@ add_subdirectory(AssetCompiler)
 # ====================================
 
 file(COPY ${CMAKE_SOURCE_DIR}/Resources 
-     DESTINATION ${CMAKE_BINARY_DIR})
+     DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
 # ====================================
 # Build Information

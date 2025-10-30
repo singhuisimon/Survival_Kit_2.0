@@ -9,6 +9,9 @@
  */
 
 #include "AssetDatabase.h"
+#include "AssetManager.h"
+#include "../Utility/AssetPath.h"
+
 #include <filesystem>
 #include <fstream>
 #include <random>
@@ -87,7 +90,30 @@ namespace Engine {
 				AssetRecord rec;
 				rec.guid.m_Value = std::stoull(guidStr, nullptr, 16);
 				rec.type = static_cast<ResourceType>(std::stoi(typeStr));
-				rec.sourcePath = sourcePath;
+				
+				//since the files are stored in relative path, get the absolute path
+				if (sourcePath.find("\\Resources\\") == 0 || sourcePath.find("/Resources/") == 0) {
+					// Remove the leading \Resources\ or /Resources/ part
+					std::string pathWithoutResources = sourcePath;
+					if (pathWithoutResources.find("\\Resources\\") == 0) {
+						pathWithoutResources = pathWithoutResources.substr(11); // Length of "\Resources\"
+					}
+					else if (pathWithoutResources.find("/Resources/") == 0) {
+						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
+					}
+					std::string sourceRoot = AssetManager::GetSourceResourcesPath();
+					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
+
+					//normalize here
+					std::string result = fullPath.string(); 
+					std::replace(result.begin(), result.end(), '\\', '/');
+
+					rec.sourcePath = fullPath.string();
+				}
+				else {
+					rec.sourcePath = sourcePath;
+				}
+
 				rec.ext = ext;
 				rec.contentHash = contentHash;
 				rec.lastWriteTime = static_cast<std::time_t>(std::stoll(timeStr));
@@ -128,9 +154,12 @@ namespace Engine {
 
 		// Write records
 		for (const auto& [guid, rec] : byId) {
+			//convert absolute path to relative path before writing
+			std::string pathToWrite = getRelativeAssetPath(rec.sourcePath);
+
 			out << std::hex << guid.m_Value << std::dec << '|'
 				<< static_cast<int>(rec.type) << '|'
-				<< rec.sourcePath << '|'
+				<< pathToWrite << '|'
 				<< rec.ext << '|'
 				<< rec.contentHash << '|'
 				<< rec.lastWriteTime << '|'
