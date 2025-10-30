@@ -16,6 +16,7 @@
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Asset/AssetManager.h"
+#include "../Graphics/Camera.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
@@ -385,15 +386,69 @@ namespace Engine
 					
 					if (openRigidBody)
 					{
-						// mass
 						auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
-						//ImGui::Separator();
+						
+						// mass
 						float rigidMass = rigidBody.GetMass();
 						if (ImGui::DragFloat("Mass", &rigidMass))
 						{
 							rigidBody.SetMass(rigidMass);
 						}
-						ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
+
+						ImGui::Separator();
+
+						// kinematic
+						ImGui::Text("Boolean to check if body is moved by code (not Physics)");
+						bool& isKinematic = rigidBody.IsKinematic;
+						if (ImGui::Checkbox("Is Kinematic", &isKinematic)) {
+							rigidBody.SetKinematic(isKinematic);
+						}
+
+						ImGui::Separator();
+
+						// gravity
+						ImGui::Text("Boolean to check if gravity affects the body");
+						bool isGravity = rigidBody.IsGravityEnabled();
+						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+							rigidBody.SetGravityEnabled(isGravity);
+						}
+
+						ImGui::Separator();
+
+						// velocity
+						glm::vec3 vel = rigidBody.GetVelocity();
+						if (ImGui::DragFloat3("Velocity", &vel.x, 1.0f))
+						{
+							rigidBody.SetVelocity(vel);
+						}
+
+						if (ImGui::Button("Stop")) {
+							rigidBody.Stop();
+						}
+
+						ImGui::Separator();
+
+						ImGui::Text("Display Runtime Value:");
+						
+						ImGui::BeginDisabled();
+
+						/*glm::vec3 vel = rigidBody.GetVelocity();
+						float velocity[3]{ vel.x, vel.y, vel.z };
+						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);*/
+						
+						float speed = rigidBody.GetSpeed();
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+
+						bool isMoving = rigidBody.IsMoving();
+						ImGui::Checkbox("Is Moving", &isMoving);
+
+						bool isStatic = rigidBody.IsStatic();
+						ImGui::Checkbox("Is Static", &isStatic);
+
+						ImGui::EndDisabled();
+								
+						//ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
+						/*ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
 						ImGui::Checkbox("Use Gravity", &rigidBody.UseGravity);
 
 						//bool isKinematic = rigidBody.
@@ -403,7 +458,7 @@ namespace Engine
 						float velocity[3]{ vel.x, vel.y, vel.z };
 						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
 						float speed = rigidBody.GetSpeed();
-						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);*/
 					}
 					// ---------------------- Remove Rigid Body Component by ... -------------------------
 					if (removeRigidBody)
@@ -1691,8 +1746,8 @@ namespace Engine
 		}
 
 		ImGui::End();
-		
-		
+
+
 		// Logic here 
 
 	}
