@@ -425,20 +425,55 @@ void Game::OnUpdate(Engine::Timestep ts) {
         if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
     }
 
+    // Change Camera type
+    if (input.IsKeyJustPressed(GLFW_KEY_TAB)) {
+
+        auto& editorCam = m_Renderer->getEditorCamera();
+        if (editorCam.getCamType() == Engine::CameraType::ORBITING) {
+            editorCam.setCamType(Engine::CameraType::WALKING);
+        }
+        else {
+            editorCam.setCamType(Engine::CameraType::ORBITING);
+        }
+
+    }
+
     // Editor camera controls
     if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
         
         auto& editorCam = m_Renderer->getEditorCamera();
 
-        // Click-and-drag orbiting
+        // Check for left or right mouse click
+        uint32_t mouse = 2;
         if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y);
+            mouse = GLFW_MOUSE_BUTTON_LEFT;
         }
+        else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            mouse = GLFW_MOUSE_BUTTON_RIGHT;
+        }
+
+        // Cursor orbiting
+        editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
 
         // Zooming in-and-out scrolling
         double scrollY_offset = input.GetScrollDelta().y;
         if (scrollY_offset != 0) {
-            editorCam.cameraOnScroll(scrollY_offset * 1000.0f);
+            editorCam.cameraOnScroll(scrollY_offset);
+        }
+
+        // Check moving input
+        auto& camPos = editorCam.getCamPos();
+        if (input.IsKeyPressed(GLFW_KEY_W)) {
+            editorCam.moveCamForward();
+        }
+        if (input.IsKeyPressed(GLFW_KEY_A)) {
+            editorCam.moveCamLeft();
+        }
+        if (input.IsKeyPressed(GLFW_KEY_S)) {
+            editorCam.moveCamBack();
+        }
+        if (input.IsKeyPressed(GLFW_KEY_D)) {
+            editorCam.moveCamRight();
         }
 
     }
