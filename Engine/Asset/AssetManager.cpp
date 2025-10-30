@@ -44,13 +44,19 @@ namespace Engine {
 			m_cfg = createDefaultConfig();
 		}
 
-		//get assetpath (with the utility fun)
-		std::string assetsPath = Engine::getAssetsPath();
-
 		//create directories 
 		try {
-			fs::create_directories(assetsPath + "Descriptors");
-			fs::create_directories(assetsPath + "DB");
+			
+			if (!m_cfg.descriptorRoot.empty()) {
+				fs::create_directories(m_cfg.descriptorRoot);
+			}
+
+			// Create database directory from config
+			if (!m_cfg.databaseFile.empty()) {
+				fs::path dbPath(m_cfg.databaseFile);
+				fs::create_directories(dbPath.parent_path());  // FROM CONFIG!
+			}
+
 
 			//LM.writeLog("AssetManager::startUp() - Created working directories");
 		}
@@ -241,8 +247,8 @@ namespace Engine {
 		const AssetRecord* rec = m_db.FindBySource(src);
 
 		if (!rec) {
-			//LM.writeLog("AssetManager - WARNING: No record found for removed file: %s", src.c_str());
-			//return;
+			LOG_WARNING("No record found for removed file: ", src);
+			return;
 		}
 
 
@@ -255,36 +261,57 @@ namespace Engine {
 				std::string descriptorPath = m_descGen.GetDescriptorFolderPath(*rec);
 
 				if (fs::exists(descriptorPath)) {
-					fs::remove(descriptorPath);
-					//LM.writeLog("AssetManager - Deleted descriptor file: %s", descriptorPath.c_str());
+					try {
+						fs::remove_all(descriptorPath);
+						LOG_DEBUG("Deleted descriptor folder: ", descriptorPath);
+
+					}
+					catch(const std::exception& e){
+						LOG_ERROR("Failed to delete descriptor folder: ", descriptorPath,
+							" Error: ", e.what());
+					}
 				}
 
 				// Clean up empty parent folders for descriptors
-				fs::path currentFolder = fs::path(descriptorPath).parent_path();
-				fs::path descriptorsRoot = fs::absolute(m_cfg.descriptorRoot);
+				try {
 
-				while (currentFolder.has_parent_path()) {
-					if (fs::equivalent(currentFolder, descriptorsRoot)) {
-						break;
+					fs::path currentFolder = fs::path(descriptorPath).parent_path();
+					fs::path descriptorsRoot = fs::absolute(m_cfg.descriptorRoot);
+
+					while (currentFolder.has_parent_path()) {
+						// Check if both paths exist before using equivalent
+						if (!fs::exists(currentFolder) || !fs::exists(descriptorsRoot)) {
+							break;
+						}
+
+						if (fs::equivalent(currentFolder, descriptorsRoot)) {
+							break;
+						}
+
+						if (fs::exists(currentFolder) && fs::is_empty(currentFolder)) {
+							fs::remove(currentFolder);
+							LOG_DEBUG("Deleted empty descriptor folder: ",
+								currentFolder.string());
+							currentFolder = currentFolder.parent_path();
+							currentFolder = currentFolder.parent_path();
+						}
+						else {
+							break;
+						}
 					}
 
-					if (fs::exists(currentFolder) && fs::is_empty(currentFolder)) {
-						fs::remove(currentFolder);
-						//LM.writeLog("AssetManager - Deleted empty descriptor folder: %s",
-						//	currentFolder.string().c_str());
-						currentFolder = currentFolder.parent_path();
-					}
-					else {
-						break;
-					}
 				}
+				catch (const std::exception& e) {
+					LOG_WARNING("Error cleaning up descriptor folders: ", e.what());
+				}
+
 			}
 		
 
 		// Remove from database
 		if (m_db.RemoveBySource(src)) {
-			//LM.writeLog("AssetManager - Removed from DB: %s (GUID: %016llx, Type: %s"
-			//	, src.c_str(), guid.m_Value, resourceTypeToString(type).c_str());
+			LOG_INFO("Removed from DB: ", src, " (GUID: ", std::hex, guid.m_Value,
+				std::dec, ", Type: ", resourceTypeToString(type), ")");
 
 			if (!m_cfg.databaseFile.empty()) {
 				//save the final databasefile
@@ -297,7 +324,7 @@ namespace Engine {
 			}
 		}
 		else {
-			//LM.writeLog("AssetManager - ERROR: Failed to remove from database: %s", src.c_str());
+			LOG_ERROR("Failed to remove from database: ", src);
 		}
 	}
 

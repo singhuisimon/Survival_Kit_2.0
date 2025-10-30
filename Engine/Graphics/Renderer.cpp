@@ -177,7 +177,7 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
-		// Create FBO for GPU ID
+		// Create FBO for F
 		auto gpu_fbo = FrameBuffer::create();
 		if (gpu_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*gpu_fbo));
@@ -332,7 +332,7 @@ namespace Engine {
 		// If this pass targets the GPU-ID FBO (Shader program 2, R32UI), clear with integer clear:
 		if (pass.shdpgm_handle == 2) {
 			//auto& fbo = m_framebuffers[pass.fbo_handle];
-			// 0 means "no hit" — reserve ID=0 as empty
+			// 0 means "no hit" ï¿½ reserve ID=0 as empty
 			//fbo.clear_colori(/*drawbuf index*/169, 0, 0, 0, 0);
 			fbo.clear_colorui(/*drawbuf index*/0, NO_HIT, 0, 0, 0);
 		}
@@ -448,13 +448,13 @@ namespace Engine {
 					glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
 					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
-					//LOG_INFO("Px Py = ", px," ", py);
-					if (id == NO_HIT) {
-						LOG_INFO("GPU id = No Object");
-					}
-					else {
-						LOG_INFO("GPU id = ", id);
-					}
+					////LOG_INFO("Px Py = ", px," ", py);
+					//if (id == NO_HIT) {
+					//	LOG_INFO("GPU id = No Object");
+					//}
+					//else {
+					//	LOG_INFO("GPU id = ", id);
+					//}
 
 					// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
 					pickedID = id;

@@ -78,11 +78,16 @@ namespace Engine {
                  nearPlane{ near },
                  farPlane{ far } 
         {}
-        
+
         // Compute the view matrix (V) for the camera (Default up is 0.0f, 1.0f, 0.0f)
-        glm::mat4 getLookAt(glm::vec3 up = { 0.0f, 1.0f, 0.0f }) const
+        glm::mat4 getLookAt(bool lockOn = true, glm::vec3 up = {0.0f, 1.0f, 0.0f}) const
         {
-            return glm::lookAt(pos, target, up);
+            glm::vec3 finalTarget = target;
+            if (lockOn == false) {
+                finalTarget = pos + glm::normalize(target - pos);
+                //finalTarget = { 0.0f, 0.0f, -1.0f };
+            }
+            return glm::lookAt(pos, finalTarget, up);
         }
 
         // Compute the perspective projection matrix (P) based on the field of view and aspect ratio (Default aspect ratio is 1)
@@ -92,37 +97,61 @@ namespace Engine {
         }
 
         // Handles cursor movement to adjust camera orientation
-        void cameraOnCursor(double xoffset, double yoffset/*, ShaderProgram* shader*/)
+        void cameraOnCursor(double xoffset, double yoffset, uint32_t mouse/*, ShaderProgram* shader*/)
         {
 
-            if (camType == CameraType::ORBITING)
+            if (mouse == 0)
             {
+                //// Calculate spherical coordinates for orbiting movement
+                //const float r = glm::sqrt(pos.x * pos.x +
+                //    pos.y * pos.y + pos.z * pos.z);
+                //float alpha = glm::asin(pos.y / r); // Vertical angle
+                //float betta = std::atan2f(pos.x, pos.z); // Horizontal angle
+
+                //// Adjust angles based on cursor offset
+                //if (yoffset < 0.0)
+                //    alpha += -0.02f;
+                //else if (yoffset > 0.0)
+                //    alpha += 0.02f;
+
+                //if (xoffset < 0.0)
+                //    betta += 0.05f;
+                //else if (xoffset > 0.0)
+                //    betta += -0.05f;
+
+                //// Clamp vertical angle
+                //alpha = glm::clamp(alpha, -MathUtils::HALF_PI + 0.01f, MathUtils::HALF_PI - 0.01f);
+
+                //// Update position based on spherical coordinates
+                //pos.x = r * glm::cos(alpha) * glm::sin(betta);
+                //pos.y = r * glm::sin(alpha);
+                //pos.z = r * glm::cos(alpha) * glm::cos(betta);
+
+                
+                // Calcuate relative position of camera
+                glm::vec3 relativePos = pos - target;
+                float r = glm::length(relativePos);
+                if (r <= 0.0001f) { r = 0.0001f; relativePos = { 0,0,r }; }
+                
                 // Calculate spherical coordinates for orbiting movement
-                const float r = glm::sqrt(pos.x * pos.x +
-                    pos.y * pos.y + pos.z * pos.z);
-                float alpha = glm::asin(pos.y / r); // Vertical angle
-                float betta = std::atan2f(pos.x, pos.z); // Horizontal angle
+                float alpha = glm::asin(relativePos.y / r); // Vertical angle
+                float betta = std::atan2f(relativePos.x, relativePos.z); // Horizontal angle
 
                 // Adjust angles based on cursor offset
-                if (yoffset < 0.0)
-                    alpha += -0.02f;
-                else if (yoffset > 0.0)
-                    alpha += 0.02f;
-
-                if (xoffset < 0.0)
-                    betta += 0.05f;
-                else if (xoffset > 0.0)
-                    betta += -0.05f;
+                if (yoffset != 0.0f) alpha += yoffset > 0 ? 0.02f : -0.02f;
+                if (xoffset != 0.0f) betta += xoffset < 0 ? 0.05f : -0.05f;
 
                 // Clamp vertical angle
                 alpha = glm::clamp(alpha, -MathUtils::HALF_PI + 0.01f, MathUtils::HALF_PI - 0.01f);
 
                 // Update position based on spherical coordinates
-                pos.x = r * glm::cos(alpha) * glm::sin(betta);
-                pos.y = r * glm::sin(alpha);
-                pos.z = r * glm::cos(alpha) * glm::cos(betta);
+                relativePos.x = r * glm::cos(alpha) * glm::sin(betta);
+                relativePos.y = r * glm::sin(alpha);
+                relativePos.z = r * glm::cos(alpha) * glm::cos(betta);
+
+                pos = relativePos + target;
             }
-            else if (camType == CameraType::WALKING)
+            else if (mouse == 1)
             {
                 // Calculate spherical coordinates for walking movement
                 const float r = glm::sqrt(
@@ -133,14 +162,14 @@ namespace Engine {
                 float betta = std::atan2f((target.x - pos.x), (target.z - pos.z));
 
                 // Adjust angles based on cursor offset
-                if (yoffset < 0.0)
+                if (-yoffset < 0.0)
                     alpha += -0.02f;
-                else if (yoffset > 0.0)
+                else if (-yoffset > 0.0)
                     alpha += 0.02f;
 
-                if (xoffset < 0.0)
+                if (-xoffset < 0.0)
                     betta += -0.05f;
-                else if (xoffset > 0.0)
+                else if (-xoffset > 0.0)
                     betta += 0.05f;
 
                 // Clamp vertical angle
@@ -163,28 +192,28 @@ namespace Engine {
         // Handles scroll input to adjust zoom or camera position
         void cameraOnScroll(double yoffset/*, ShaderProgram* shader*/)
         {
-            if (camType == CameraType::ORBITING)
-            {
+            //if (camType == CameraType::ORBITING)
+            //{
                 // Calculate the distance from the origin and adjust it based on scroll input
                 float r = glm::sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
                 const float alpha = glm::asin(pos.y / r);
                 const float betta = std::atan2f(pos.x, pos.z);
 
-                r += yoffset > 0.0f ? -1.0f : 1.0f; // Zoom in or out
+                r += yoffset > 0.0f ? -100.0f : 100.0f; // Zoom in or out
                 if (r < 1.0f) r = 1.0f; // Clamp minimum distance
 
                 // Update position based on new distance
                 pos.x = r * glm::cos(alpha) * glm::sin(betta);
                 pos.y = r * glm::sin(alpha);
                 pos.z = r * glm::cos(alpha) * glm::cos(betta);
-            }
-            else if (camType == CameraType::WALKING)
-            {
-                // Adjust position and target based on scroll input for walking
-                const glm::vec3 velocity = glm::normalize(yoffset > 0.0f ? target - pos : pos - target);
-                pos += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
-                target += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
-            }
+            //}
+            //else if (camType == CameraType::WALKING)
+            //{
+            //    // Adjust position and target based on scroll input for walking
+            //    const glm::vec3 velocity = glm::normalize(yoffset > 0.0f ? target - pos : pos - target);
+            //    pos += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+            //    target += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+            //}
 
             //// Update shader program with the new camera settings
             //shader->programUse();
@@ -195,23 +224,48 @@ namespace Engine {
             //shader;
         }
 
+        void moveCamForward() {
+            glm::mat4 view = getLookAt(false);
+            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
+            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
+        }
+
+        void moveCamLeft() {
+            glm::mat4 view = getLookAt(false);
+            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
+            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
+        }
+
+        void moveCamBack() {
+            glm::mat4 view = getLookAt(false);
+            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
+            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
+
+        }
+
+        void moveCamRight() {
+            glm::mat4 view = getLookAt(false);
+            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
+            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
+        }
+
         //// Getters for camera data
-        //CameraType getCamType() { return camType; }
-        //glm::vec3& getCamPos() { return pos; }
+        CameraType getCamType() const { return camType; }
+        glm::vec3& getCamPos() { return pos; }
         //glm::vec3& getCamTarget() { return target; }
         //float& getCamFOV() { return FOV; }
         //float& getCamNear() { return nearPlane; }
         //float& getCamFar() { return farPlane; }
 
         //// Setters for camera data
-        //void setCamType(CameraType newType) {
-        //    camType = newType;
+        void setCamType(CameraType newType) {
+            camType = newType;
 
-        //    // Set default target if type changed to orbiting
-        //    if (camType == ORBITING) {
-        //        target = { 0.0f, 0.0f, 0.0f };
-        //    }
-        //}
+            // Set default target if type changed to orbiting
+            if (camType == ORBITING) {
+                target = { 0.0f, 0.0f, 0.0f };
+            }
+        }
         //void setCamPos(glm::vec3 newPos) { pos = newPos; }
         //void setCamTarget(glm::vec3 newTarget) { target = newTarget; }
         //void setCamFOV(float newFOV) { FOV = newFOV; }

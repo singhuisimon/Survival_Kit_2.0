@@ -289,9 +289,6 @@ namespace Engine {
                 rapidjson::Value(std::to_string(mesh.ComponentGUID.m_Value).c_str(), allocator), allocator);
             propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 
-            componentObj.AddMember("Properties", propertiesObj, allocator);
-            componentsArray.PushBack(componentObj, allocator);
-
             propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
             propertiesObj.AddMember("Material", mesh.Material, allocator);
             propertiesObj.AddMember("Texture", mesh.Texture, allocator);
