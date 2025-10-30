@@ -18,7 +18,7 @@ namespace Game
         public void OnUpdate(float deltaTime)  //  MUST be exactly this signature
         {
             frameCount++;
-            Engine.InternalCalls.Log("dobule hell");
+            Engine.InternalCalls.Log("super hero this should be working K");
 
             if (frameCount % 60 == 0)
             {

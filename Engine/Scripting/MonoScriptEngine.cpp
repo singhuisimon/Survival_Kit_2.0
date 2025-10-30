@@ -9,6 +9,7 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
+#include <windows.h>  // Add at top
 
 #include <filesystem>
 #include <iostream>
@@ -25,14 +26,28 @@ namespace Engine {
 
         m_AssemblyPath = assemblyPath;
 
-        // Set Mono directories
-        mono_set_assemblies_path("mono/lib");
+        // Get the exe directory on Windows
+        WCHAR exePath[MAX_PATH] = { 0 };
+        GetModuleFileNameW(NULL, exePath, MAX_PATH);
+
+        std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
+        std::filesystem::path monoLibPath = exeDir / "mono" / "lib";
+
+        std::string monoLibPathStr = monoLibPath.generic_string();
+        mono_set_assemblies_path(monoLibPathStr.c_str());
+
+        LOG_INFO("[Mono] Assembly path set to: ", monoLibPathStr);
+
+        // Verify mono/lib exists
+        if (!std::filesystem::exists(monoLibPath)) {
+            LOG_ERROR("[Mono] ERROR: mono/lib not found at: ", monoLibPathStr);
+            LOG_ERROR("[Mono] Make sure Mono runtime is in the build output directory");
+        }
 
         // Initialize Mono JIT
         m_RootDomain = mono_jit_init("EngineRuntime");
         if (!m_RootDomain) {
             LOG_ERROR("Failed to initialize Mono JIT");
-            LOG_ERROR("Make sure mono/lib directory exists with .NET assemblies");
             return;
         }
 

@@ -18,64 +18,79 @@ namespace Engine {
     }
     void ScriptSystem::OnUpdate(Scene* scene, Timestep ts) {
 
-        if (ScriptReloader::GetInstance().IsReloadRequested()) {
-            LOG_INFO("[Hot-Reload] Reloading scripts...");
+        LOG_INFO("[Hot-Reload] Reloading scripts...");
 
-            // Step 1: Destroy all script instances
-            auto& registry = scene->GetRegistry();
-            auto view = registry.view<ScriptComponent>();
-
-            for (auto entity : view) {
-                auto& script = view.get<ScriptComponent>(entity);
-                if (script.ScriptInstance) {
-                    MonoScriptEngine::GetInstance().DestroyScriptInstance(
-                        (MonoObject*)script.ScriptInstance);
-                    script.ScriptInstance = nullptr;
-                    script.Started = false;
-                }
-            }
-
-            // Step 2: Unload old assembly (this releases the DLL lock!)
-           // LOG_INFO("[Hot-Reload] Unloading old assembly...");
-            std::string tempDllPath = ScriptReloader::GetInstance().GetTempDllPath();
-            MonoScriptEngine::GetInstance().ReloadAssembly();
-
-
-            // Step 3: Swap temp DLL to real DLL
-            //std::string tempDllPath = ScriptReloader::GetInstance().GetTempDllPath();
-            if (!tempDllPath.empty()) {
-                try {
-                    std::string finalDllPath = "GameScripts.dll";
-
-                    // Delete old DLL (now safe since assembly is unloaded)
-                    if (std::filesystem::exists(finalDllPath)) {
-                        std::filesystem::remove(finalDllPath);
-                        LOG_INFO("[Hot-Reload] Deleted old DLL");
-                    }
-
-                    // Rename temp to final
-                    std::filesystem::rename(tempDllPath, finalDllPath);
-                    LOG_INFO("[Hot-Reload]  New DLL installed: ", finalDllPath);
-
-                    ScriptReloader::GetInstance().ClearTempDllPath();
-                }
-                catch (const std::exception& e) {
-                    LOG_ERROR("[Hot-Reload] Failed to swap DLL: ", e.what());
-                }
-            }
-
-            // Step 4: Reload assembly with new DLL
-            //MonoScriptEngine::GetInstance().ReloadAssembly();
-
-            // Clear reload request
-            ScriptReloader::GetInstance().ClearReloadRequest();
-
-            LOG_INFO("[Hot-Reload] Complete! Scripts will be recreated.");
-        }
-        float deltaTime = ts.GetSeconds();
-
+        // Step 1: Destroy all script instances
         auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
+
+        for (auto entity : view) {
+            auto& script = view.get<ScriptComponent>(entity);
+            if (script.ScriptInstance) {
+                MonoScriptEngine::GetInstance().DestroyScriptInstance(
+                    (MonoObject*)script.ScriptInstance);
+                script.ScriptInstance = nullptr;
+                script.Started = false;
+            }
+        }
+
+        // Step 2: Reload assembly (releases old DLL lock)
+        LOG_INFO("[Hot-Reload] Reloading assembly...");
+        MonoScriptEngine::GetInstance().ReloadAssembly();
+
+        // Step 3: NOW swap the DLL (wait a bit to ensure lock is released)
+        std::string tempDllPath = ScriptReloader::GetInstance().GetTempDllPath();
+        if (!tempDllPath.empty()) {
+            try {
+                std::string finalDllPath = "GameScripts.dll";
+
+                // Delete old DLL (retry if needed)
+                int retries = 3;
+                while (retries > 0 && std::filesystem::exists(finalDllPath)) {
+                    try {
+                        std::filesystem::remove(finalDllPath);
+                        LOG_INFO("[Hot-Reload] Old DLL deleted");
+                        break;
+                    }
+                    catch (const std::exception& e) {
+                        LOG_WARNING("[Hot-Reload] Delete failed, retry... (", retries - 1, " left)");
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                        retries--;
+                    }
+                }
+
+                // Rename temp to final (retry if needed)
+                retries = 3;
+                while (retries > 0) {
+                    try {
+                        std::filesystem::rename(tempDllPath, finalDllPath);
+                        LOG_INFO("[Hot-Reload]  New DLL installed successfully!");
+                        ScriptReloader::GetInstance().ClearTempDllPath();
+                        break;
+                    }
+                    catch (const std::exception& e) {
+                        LOG_WARNING("[Hot-Reload] Rename failed, retry... (", retries - 1, " left)");
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                        retries--;
+
+                        if (retries == 0) {
+                            LOG_ERROR("[Hot-Reload] Failed to swap DLL after retries: ", e.what());
+                        }
+                    }
+                }
+            }
+            catch (const std::exception& e) {
+                LOG_ERROR("[Hot-Reload] Unexpected error: ", e.what());
+            }
+        }
+
+        ScriptReloader::GetInstance().ClearReloadRequest();
+        LOG_INFO("[Hot-Reload] Complete!");
+    
+        float deltaTime = ts.GetSeconds();
+
+       // auto& registry = scene->GetRegistry();
+        //auto view = registry.view<ScriptComponent>();
 
         static int totalUpdates = 0;
         totalUpdates++;

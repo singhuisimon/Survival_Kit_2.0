@@ -260,21 +260,20 @@ namespace Engine {
     }
 
     void ScriptReloader::CopyDllToOutput() {
+        // Try multiple possible DLL locations
         std::vector<std::filesystem::path> possiblePaths = {
-            std::filesystem::path(m_ScriptProjectPath).parent_path() / ".." / "build" / "bin" / "GameScripts.dll",
+            std::filesystem::path(m_ScriptProjectPath).parent_path().parent_path() / "build" / "bin" / "GameScripts.dll",
             std::filesystem::path(m_ScriptProjectPath).parent_path() / "bin" / "Debug" / "net6.0" / "GameScripts.dll",
         };
 
         std::filesystem::path sourceDll;
         bool found = false;
 
-        LOG_INFO("[Hot-Reload] Searching for built DLL...");
-
         for (const auto& path : possiblePaths) {
             if (std::filesystem::exists(path)) {
                 sourceDll = path;
                 found = true;
-                LOG_INFO("   Found DLL at: ", path.string());
+                LOG_INFO("[Hot-Reload] Found DLL at: ", path.string());
                 break;
             }
         }
@@ -285,23 +284,22 @@ namespace Engine {
         }
 
         try {
-            // Copy to a TEMP file first (to avoid locking issues)
+            // Copy to TEMP file (avoid locking issues with Mono)
             std::string tempDllPath = m_OutputDllPath + ".tmp";
-
-            LOG_INFO("[Hot-Reload] Copying to temp file: ", tempDllPath);
             std::filesystem::copy_file(sourceDll, tempDllPath,
                 std::filesystem::copy_options::overwrite_existing);
 
-            LOG_INFO("[Hot-Reload]  Temp DLL ready");
+            LOG_INFO("[Hot-Reload] DLL copied to temp: ", tempDllPath);
 
-            // We'll swap it after assembly unload
+            // Store temp path for swapping AFTER assembly unload
             m_TempDllPath = tempDllPath;
-
         }
         catch (const std::exception& e) {
             LOG_ERROR("[Hot-Reload] Failed to copy DLL: ", e.what());
         }
     }
+
+
 
 
 
