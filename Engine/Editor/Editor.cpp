@@ -133,46 +133,47 @@ namespace Engine
 					{
 						if (!currPrefabPath.empty())
 						{
-							//// Save the current prefab directly from the scene
-							//auto view = m_Scene->GetRegistry().view<TagComponent>();
-							//if (view.begin() != view.end())
-							//{
-							//	Entity entity(*view.begin(), &m_Scene->GetRegistry());
-
-							//	// Create a new prefab from the current entity
-							//	std::string entityName = entity.GetComponent<TagComponent>().Tag;
-							//	auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
-
-							//	if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
-							//	{
-							//		LOG_INFO("Prefab saved: {}", currPrefabPath);
-
-							//		// Update the registry with the new prefab
-							//		PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-							//		m_TemporaryPrefabPaths.erase(currPrefabPath);
-							//	}
-							//}
-
-							if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
+							// Save the current prefab directly from the scene
+							auto view = m_Scene->GetRegistry().view<TagComponent>();
+							if (view.begin() != view.end())
 							{
-								auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+								Entity entity(*view.begin(), &m_Scene->GetRegistry());
 
-								std::string prefabPath = currPrefabPath;
+								// Create a new prefab from the current entity
+								std::string entityName = entity.GetComponent<TagComponent>().Tag;
+								auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
 
-								if (!prefabPath.empty())
+								if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
 								{
-									// Create updated prefab from current entity state
-									std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-									auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+									LOG_INFO("Prefab saved: {}", currPrefabPath);
 
-									if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-									{
-										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-										prefabComp.ClearModifications(); // Reset overrides 
-										LOG_INFO("Prefab updated: {}", prefabPath);
-									}
+									// Update the registry with the new prefab
+									PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+									m_TemporaryPrefabPaths.erase(currPrefabPath);
 								}
 							}
+
+							//if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
+							//{
+							//	auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+							//	std::string prefabPath = currPrefabPath;
+
+							//	if (!prefabPath.empty())
+							//	{
+							//		// Create updated prefab from current entity state
+							//		std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+							//		auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+
+							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+							//		{
+							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
+							//			prefabComp.ClearModifications(); // Reset overrides 
+							//			LOG_INFO("Prefab updated: {}", prefabPath);
+							//		}
+							//	}
+							//}
 						}
 					}
 					else
