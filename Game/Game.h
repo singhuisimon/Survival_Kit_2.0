@@ -46,6 +46,8 @@ private:
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
 
+    void AddAllSystems();
+
     /**
      * @brief Create a default scene if loading from file fails
      */
