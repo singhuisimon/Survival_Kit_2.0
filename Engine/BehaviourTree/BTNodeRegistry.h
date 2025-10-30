@@ -232,8 +232,10 @@ namespace Engine {
             registry.RegisterNodeType<BTSetBlackboard>("Action", "Sets a blackboard value",
                 [](BTNodeMetadata& metadata) {
                     BT_REGISTER_STRING_PROPERTY(BTSetBlackboard, "Key", m_Key);
+                    BT_REGISTER_STRING_PROPERTY(BTSetBlackboard, "Type", m_Type);
                     BT_REGISTER_STRING_PROPERTY(BTSetBlackboard, "Value", m_Value);
                 });
+
             
             // CheckBlackboard with properties
             registry.RegisterNodeType<BTCheckBlackboard>("Condition", "Checks a blackboard value",
@@ -241,6 +243,34 @@ namespace Engine {
                     BT_REGISTER_STRING_PROPERTY(BTCheckBlackboard, "Key", m_Key);
                     BT_REGISTER_STRING_PROPERTY(BTCheckBlackboard, "ExpectedValue", m_ExpectedValue);
                 });
+
+            // Blackboard convenience nodes
+            registry.RegisterNodeType<BTSetBlackboardInt>("Action", "Sets an integer blackboard value",
+                [](BTNodeMetadata& metadata) {
+                    BT_REGISTER_STRING_PROPERTY(BTSetBlackboardInt, "Key", m_Key);
+                    BT_REGISTER_INT_PROPERTY(BTSetBlackboardInt, "Value", m_Value);
+                });
+
+            registry.RegisterNodeType<BTSetBlackboardFloat>("Action", "Sets a float blackboard value",
+                [](BTNodeMetadata& metadata) {
+                    BT_REGISTER_STRING_PROPERTY(BTSetBlackboardFloat, "Key", m_Key);
+                    BT_REGISTER_FLOAT_PROPERTY(BTSetBlackboardFloat, "Value", m_Value);
+                });
+
+            registry.RegisterNodeType<BTSetBlackboardBool>("Action", "Sets a bool blackboard value",
+                [](BTNodeMetadata& metadata) {
+                    BT_REGISTER_STRING_PROPERTY(BTSetBlackboardBool, "Key", m_Key);
+                    BT_REGISTER_BOOL_PROPERTY(BTSetBlackboardBool, "Value", m_Value);
+                });
+
+            registry.RegisterNodeType<BTSetBlackboardVec3>("Action", "Sets a vec3 blackboard value",
+                [](BTNodeMetadata& metadata) {
+                    BT_REGISTER_STRING_PROPERTY(BTSetBlackboardVec3, "Key", m_Key);
+                    // optional: you could expose XYZ too, but usually Key+Vec3 is fine
+                });
+
+            LOG_INFO("BTNodeRegistry: Registered Blackboard Set node types (Int, Float, Bool, Vec3)");
+
 
             LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
         }
