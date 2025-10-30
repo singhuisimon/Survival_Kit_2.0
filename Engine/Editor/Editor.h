@@ -82,6 +82,7 @@ namespace Engine
 		std::string selectedPrefabPath{};
 		std::string currFileName{};
 		Prefab* m_CurrentPrefab = nullptr;
+		bool createEttFromPrfab = false;
 		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
 		//bool prefabModified = false;
 

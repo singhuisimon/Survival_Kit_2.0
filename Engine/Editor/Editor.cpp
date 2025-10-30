@@ -612,14 +612,32 @@ namespace Engine
 		{
 			if (!isPrefabEditor)
 			{
-				// Button to create new entity
+				
 				if (ImGui::Button("Create Entity"))
+				{
+					
+					ImGui::OpenPopup("CreateEntityPopup");
+				}
+			}
+			if (ImGui::BeginPopup("CreateEntityPopup"))
+			{
+				if (ImGui::MenuItem("Create Entity"))
 				{
 					auto entity = m_Scene->CreateEntity("New Entity");
 					entity.AddComponent<TagComponent>("New Entity");
 					entity.AddComponent<TransformComponent>();
 					ImGui::Separator();
 				}
+				auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+				ImGui::BeginDisabled(prefabFiles.empty());
+
+				if (ImGui::MenuItem("Create Entity From Prefab"))
+				{	
+					ImGui::CloseCurrentPopup();
+					createEttFromPrfab = true;
+				}
+				ImGui::EndDisabled();
+				ImGui::EndPopup(); // end pop up of the CreateEntityPopup
 			}
 			
 			// List all entities
@@ -682,7 +700,7 @@ namespace Engine
 										PrefabRegistry::Get().RegisterPrefab(prefab);
 										m_CurrentPrefab = prefab.get();
 										currPrefabPath = prefabFolder;
-										isPrefabEditor = true;
+										//isPrefabEditor = true;
 										//m_CurrentPrefab = PrefabSerializer::LoadPrefabFromFile(path);
 										m_TemporaryPrefabPaths.insert(prefabFolder);
 
@@ -758,6 +776,52 @@ namespace Engine
 				replacePrefabPending = false;
 				ImGui::CloseCurrentPopup();
 			}
+
+			ImGui::EndPopup();
+		}
+
+		// ================= Modal Popup for Create Entity from Prefab ===================================
+		if (createEttFromPrfab)
+		{
+			ImGui::OpenPopup("createEttPrefab");
+			createEttFromPrfab = false;
+		}
+
+		if (ImGui::BeginPopupModal("createEttPrefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			//LOG_DEBUG("TEST POP up replace is called ?");
+			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			for (auto& file : prefabFiles)
+			{
+				if (ImGui::Selectable(file.name.c_str()))
+				{
+					createEttFromPrfab = false;
+					auto prefab = PrefabSerializer::LoadPrefabFromFile(file.fullPath);
+					if (!prefab)
+					{
+						ImGui::CloseCurrentPopup();
+						break;
+					}
+
+					PrefabRegistry::Get().RegisterPrefab(prefab);
+					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+						m_Scene,
+						prefab->GetGUID()
+					);
+					
+					m_SelectedEntity = newEntity;
+					ImGui::CloseCurrentPopup();
+					break;
+				}
+			}
+		
+			if (ImGui::Button("Cancel"))
+			{
+				createEttFromPrfab = false;
+				ImGui::CloseCurrentPopup();
+			}
+		
 
 			ImGui::EndPopup();
 		}
