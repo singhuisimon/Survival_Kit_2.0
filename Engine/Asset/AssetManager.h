@@ -82,11 +82,14 @@ namespace Engine {
 
 			//get project root using existing function
 			std::string projectRoot = Engine::getRepository();
-
 			//add the Resources path
 			std::filesystem::path resourcesPath = std::filesystem::path(projectRoot) / "Resources";
 
-			return resourcesPath.string();
+			//Normalize to forward slashes for consistency
+			std::string result = resourcesPath.string(); 
+			std::replace(result.begin(), result.end(), '\\', '/'); 
+
+			return result;
 		}
 
 		/**
@@ -114,7 +117,7 @@ namespace Engine {
 
 			//================= OUTPUT PATHS ===============
 			cfg.descriptorRoot = sourcesPath + "/Descriptors";
-			cfg.compiledPath = (std::filesystem::path(assetsPath) / "Compiled").string();
+			cfg.compiledPath = assetsPath + "/Compiled";
 
 			//================= INTERNAL PATHS ===================
 			cfg.databaseFile = sourcesPath + "/DB/assetdb.txt";

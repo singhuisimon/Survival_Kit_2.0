@@ -68,6 +68,17 @@ namespace Engine {
         }
 
         // --- Setters that mark component dirty ---
+
+        void SetAudioType(AudioType type) {
+            Type = type;
+            IsDirty = true;
+        }
+
+        void Set3D(bool is3d) {
+            Is3D = is3d;
+            IsDirty = true;
+        }
+
         void SetState(PlayState state) {
             State = state;
             IsDirty = true;
@@ -100,6 +111,16 @@ namespace Engine {
 
         void SetAudioFile(const std::string& path) {
             AudioFilePath = path;
+            IsDirty = true;
+        }
+
+        void SetMinDistance(float min) {
+            MinDistance = min;
+            IsDirty = true;
+        }
+
+        void SetMaxDistance(float max){
+            MaxDistance = max;
             IsDirty = true;
         }
     };
