@@ -1,0 +1,27 @@
+{
+    "Name": "FileWorkflowAI",
+    "GUID": "17961560806742720609",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Selector",
+        "Name": "MainSelector",
+        "GUID": "15655717797529026659",
+        "Children": [
+            {
+                "Type": "Sequence",
+                "Name": "Branch1",
+                "GUID": "3550041999157133413",
+                "Children": [
+                    {
+                        "Type": "Log",
+                        "Name": "Node",
+                        "GUID": "14502796292922179687",
+                        "Properties": {
+                            "Message": "Branch 1 executing"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

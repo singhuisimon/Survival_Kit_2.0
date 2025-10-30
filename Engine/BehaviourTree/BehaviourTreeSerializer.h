@@ -18,6 +18,7 @@
 #include <rapidjson/prettywriter.h>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
 
 namespace Engine {
 
@@ -59,19 +60,35 @@ namespace Engine {
         static bool SerializeToFile(const BehaviourTree& tree, const std::string& filepath) {
             std::string json = SerializeToString(tree);
 
-            std::string fullpath = getAssetFilePath(filepath);
+            bool sourceSuccess = false;
+            bool outputSuccess = false;
 
-            std::ofstream file(fullpath);
-            if (!file.is_open()) {
-                LOG_ERROR("BehaviourTreeSerializer: Failed to open file for writing: ", fullpath);
-                return false;
+            // 1. Save to SOURCE folder (Resources/Sources/BT in project root)
+            std::string sourcePath = GetSourceFilePath(filepath);
+            if (!sourcePath.empty()) {
+                sourceSuccess = WriteToFile(json, sourcePath, "SOURCE");
+            }
+            else {
+                LOG_WARNING("BehaviourTreeSerializer: Could not determine source path");
             }
 
-            file << json;
-            file.close();
+            // 2. Save to OUTPUT folder (executable's Resources/Sources/BT)
+            std::string outputPath = getAssetFilePath(filepath);
+            outputSuccess = WriteToFile(json, outputPath, "OUTPUT");
 
-            LOG_INFO("BehaviourTreeSerializer: Saved tree '", tree.GetName(), "' to ", fullpath);
-            return true;
+            // Log results
+            if (sourceSuccess && outputSuccess) {
+                LOG_INFO("BehaviourTreeSerializer: Saved tree '", tree.GetName(), "' to BOTH locations");
+                return true;
+            }
+            else if (outputSuccess) {
+                LOG_WARNING("BehaviourTreeSerializer: Saved to OUTPUT only (source save failed)");
+                return true; // Still usable at runtime
+            }
+            else {
+                LOG_ERROR("BehaviourTreeSerializer: Failed to save tree");
+                return false;
+            }
         }
 
         /**
@@ -129,6 +146,71 @@ namespace Engine {
         }
 
     private:
+
+        /**
+ * @brief Get the source file path (project root Resources folder)
+ */
+        static std::string GetSourceFilePath(const std::string& relativePath) {
+            std::string formattedPath = relativePath;
+
+            for (char& c : formattedPath) {
+                if (c == '\\') c = '/';
+            }
+
+            // Remove leading slash if present to avoid double slash
+            if (!formattedPath.empty() && (formattedPath[0] == '/' || formattedPath[0] == '\\')) {
+                formattedPath = formattedPath.substr(1);
+            }
+
+            std::filesystem::path exeDir = std::filesystem::current_path();
+
+            //obtain this path:C:\Users\Admin\source\repos\Survival_Kit_2.0 <example>
+            //^this path is where engine, external, game, out, resources is
+            std::filesystem::path root = exeDir.parent_path().parent_path().parent_path().parent_path();
+
+            //obtain the root + resource
+            std::filesystem::path fullpath = root / "Resources" / formattedPath;
+
+            if (!std::filesystem::exists(fullpath)) {
+                LOG_WARNING("[ASSET PATH] RESOURCE NOT FOUND: ", fullpath.string());
+            }
+
+            LOG_INFO("PATH IS: ", fullpath.string());
+            return fullpath.string();
+        }
+
+
+        /**
+         * @brief Write JSON string to file with directory creation
+         */
+        static bool WriteToFile(const std::string& json, const std::string& fullPath, const std::string& location) {
+            // Create directory structure if it doesn't exist
+            std::filesystem::path path(fullPath);
+            std::filesystem::path directory = path.parent_path();
+
+            if (!std::filesystem::exists(directory)) {
+                std::error_code ec;
+                std::filesystem::create_directories(directory, ec);
+                if (ec) {
+                    LOG_ERROR("Failed to create directory (", location, "): ", directory.string());
+                    return false;
+                }
+            }
+
+            // Write to file
+            std::ofstream file(fullPath);
+            if (!file.is_open()) {
+                LOG_ERROR("Failed to open file for writing (", location, "): ", fullPath);
+                return false;
+            }
+
+            file << json;
+            file.close();
+
+            LOG_INFO("Saved to ", location, ": ", fullPath);
+            return true;
+        }
+
         /**
          * @brief Serialize a single node to JSON
          */
