@@ -191,9 +191,9 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
     GLenum contextError = glGetError();
     if (contextError != GL_NO_ERROR) {
-        LOG_ERROR("!!! NO OPENGL CONTEXT ACTIVE !!!");
-        LOG_ERROR("Cannot create mesh buffers without active OpenGL context");
-        LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
+        //LOG_ERROR("!!! NO OPENGL CONTEXT ACTIVE !!!");
+        //LOG_ERROR("Cannot create mesh buffers without active OpenGL context");
+        //LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
         return nullptr;
     }
     //LOG_INFO("OpenGL context is active and ready");

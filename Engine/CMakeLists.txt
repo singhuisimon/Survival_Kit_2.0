@@ -60,6 +60,10 @@ file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 file(GLOB_RECURSE PROFILER_SOURCES "${ENGINE_ROOT}/Profiler/*.cpp")
 file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
 
+# BehaviourTree Module
+file(GLOB_RECURSE BEHAVIOURTREE_SOURCES "${ENGINE_ROOT}/BehaviourTree/*.cpp")
+file(GLOB_RECURSE BEHAVIOURTREE_HEADERS "${ENGINE_ROOT}/BehaviourTree/*.h")
+
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
@@ -75,6 +79,7 @@ set(ENGINE_SOURCES
     ${PREFAB_SOURCES}
     ${PHYSICS_SOURCES}
     ${PROFILER_SOURCES}
+    ${BEHAVIOURTREE_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -91,6 +96,7 @@ set(ENGINE_HEADERS
     ${PREFAB_HEADERS}
     ${PHYSICS_HEADERS}
     ${PROFILER_HEADERS}
+    ${BEHAVIOURTREE_HEADERS}
 )
 
 # Create engine static library
@@ -164,6 +170,10 @@ source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 # Profiler Module
 source_group("Profiler\\Header" FILES ${PROFILER_HEADERS})
 source_group("Profiler\\Source" FILES ${PROFILER_SOURCES})
+
+# BehaviourTree Module
+source_group("BehaviourTree\\Header" FILES ${BEHAVIOURTREE_HEADERS})
+source_group("BehaviourTree\\Source" FILES ${BEHAVIOURTREE_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
