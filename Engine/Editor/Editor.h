@@ -137,6 +137,9 @@ namespace Engine
 		// display assets browser list
 		void displayAssetsBrowserPanel();
 
+		// display assets editor panel
+		void displayDescriptorEditorPanel();
+
 		// display performance profile
 		void displayPerformanceProfilePanel(Timestep ts);
 

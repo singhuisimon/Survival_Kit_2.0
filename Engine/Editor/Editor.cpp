@@ -1082,9 +1082,14 @@ namespace Engine
 
 				if (ImGui::BeginTable("AssetGrid", itemsPerRow)) {
 					for (size_t i = 0; i < filteredAssets.size(); ++i) {
+						
 						const auto* record = filteredAssets[i];
+
 						std::filesystem::path assetPath(record->sourcePath);
 						std::string filename = assetPath.filename().string();
+						std::string extension = record->ext;
+						std::string hash = record->contentHash;
+						std::time_t writeTime = record->lastWriteTime;
 
 						ImGui::TableNextColumn();
 
@@ -1113,8 +1118,14 @@ namespace Engine
 						{
 							ImGui::BeginTooltip();
 							ImGui::Text("Name: %s", filename.c_str());
-							std::string extension = filename.substr(filename.find_last_of('.') + 1);
 							ImGui::Text("Type: %s", extension.c_str());
+							ImGui::Text("Content Hash: %s", hash.c_str());
+							
+							char timeBuf[64];
+							std::tm* tm_local = std::localtime(&writeTime);
+							std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+							ImGui::Text("Last Write Time: %s", timeBuf);
+
 							ImGui::EndTooltip();
 						}
 
@@ -1291,195 +1302,10 @@ namespace Engine
 		}
 
 		ImGui::End();
+	}
 
-		// Begin properties dockable window
-		/*if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
-		{
-			
-			ImGui::Columns(2, nullptr, true);
-			static std::string selectedFolder = "";
-			// ================= Left column panel display all the resources folder ========================
-			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			ImGui::Text("Projects:");
-			if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
-
-				for (auto& folder : folders)
-				{
-					bool isSelected = (selectedFolder == folder.fullPath);
-					if (ImGui::Selectable(folder.name.c_str(), isSelected))
-					{
-						selectedFolder = folder.fullPath;
-						selectedResourcesIndex = -1; // reset asset selection
-					}
-				}
-			}
-			ImGui::EndChild(); // end the left column 
-
-			// ===================== Right column panel display the resources files =======================
-
-			ImGui::NextColumn();
-			ImGui::BeginChild("Assets Panel", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			// if folder is selected, display the files
-			if (!selectedFolder.empty())
-			{
-				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder); 
-				// display the selected folder name
-				std::filesystem::path folderPath(selectedFolder);
-				std::string folderName = folderPath.filename().string();
-				ImGui::Text(("Resources > " + folderName).c_str());
-
-				ImGui::Separator();
-
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
-				const float cellSize = thumbnailSize + padding;
-				float panelWidth = ImGui::GetContentRegionAvail().x;
-				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
-
-				// int textureCount = -1;
-				ImGui::Columns(itemsPerRow, nullptr, false);
-
-				// loop through files in selected folder
-				for (size_t i = 0; i < assetsList.size(); i++)
-				{
-					const auto& asset = assetsList[i];
-					std::string fileName = asset.name;
-					std::string filePath = asset.fullPath;
-
-					ImGui::PushID(fileName.c_str());
-
-					bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
-
-					if (isSelected)
-					{
-						// Change the button background color
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
-					}
-
-					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
-					{
-						selectedResourcesIndex = static_cast<int>(i);
-
-						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
-						if (extension == ".json") // if it is scene
-						{
-							if (isPrefabEditor)
-							{
-								if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-								{
-									auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
-									std::string prefabPath = currPrefabPath;
-
-									if (!prefabPath.empty())
-									{
-										// Create updated prefab from current entity state
-										std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-										auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-										if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-										{
-											PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-											prefabComp.ClearModifications(); // Reset overrides 
-											LOG_INFO("Prefab updated: {}", prefabPath);
-											isPrefabEditor = false;
-										}
-									}
-								}
-								
-							}
-							
-							currScenePath = filePath; // update curr file path
-							currFileName = fileName; // store file name
-							m_Scene->SetName(fileName);
-							if (m_Scene)
-							{
-
-								m_Scene->GetRegistry().clear();
-								m_Scene->LoadFromFile(filePath);
-									
-								isPrefabEditor = false;
-								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
-							}
-							
-							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
-
-						}
-						else if (extension == ".prefab")
-						{
-							//auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
-							if (!isPrefabEditor)
-							{
-								if (!currScenePath.empty())
-								{
-									m_Scene->SaveToFile(currScenePath);
-									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
-								}
-							}
-							//if (!saveAsPanel)
-							//{
-							currPrefabPath = filePath;
-							m_Scene->SetName("Prefab");
-							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-							if (prefab)
-							{
-								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
-								m_Scene->GetRegistry().clear();
-								m_Scene->SetName("Prefab");
-								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
-								PrefabRegistry::Get().RegisterPrefab(prefab);
-								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-								if (!currScenePath.empty())
-								{
-									currScenePath.clear();
-								}
-								isPrefabEditor = true;
-
-								LOG_INFO("Now editing prefab:", currPrefabPath);
-							}
-							//}
-							
-						}
-					}
-					// to change the color of the selected
-					if (isSelected)
-					{
-						ImGui::PopStyleColor(3);
-					}
-
-					// ==================== Display info detail ==========================
-					if (ImGui::IsItemHovered())
-					{
-						ImGui::BeginTooltip();
-						ImGui::Text("Name: %s", fileName.c_str());
-						//ImGui::Text("Type: %s", filePath.c_str();
-						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
-						ImGui::Text("Type: %s", extension.c_str());
-						ImGui::EndTooltip();
-					}
-
-					// ==================== To center text under thumbnail ================
-					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
-					float textX = (thumbnailSize - textSize.x) * 0.5f;
-					if (textX < 0) textX = 0;
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
-					ImGui::TextWrapped("%s", fileName.c_str());
-
-					ImGui::PopID();
-					ImGui::NextColumn();
-					
-				}
-			}
-
-			ImGui::EndChild(); // end of the right column
-			ImGui::Columns(1);
-		}
-		ImGui::End();*/ // End of the assets browser window
+	void Editor::displayDescriptorEditorPanel() {
+		;
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
