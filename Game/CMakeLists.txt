@@ -3,36 +3,29 @@
 # ====================================
 message(STATUS "Configuring Game executable...")
 
-# Create game executable
 add_executable(GameEngine
     Main.cpp
     Game.cpp
     Game.h
 )
 
-# Set target properties
 set_target_properties(GameEngine PROPERTIES
     FOLDER "Game"
     OUTPUT_NAME "GameEngine"
 )
 
-# Link engine library (which transitively links External and Mono)
 target_link_libraries(GameEngine PRIVATE 
     EngineLib
     ${MONO_LIBRARIES}
 )
 
-# Set as startup project in Visual Studio
-set_property(DIRECTORY ${CMAKE_SOURCE_DIR} 
-             PROPERTY VS_STARTUP_PROJECT GameEngine)
+set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GameEngine)
 
 # ====================================
 # Windows-specific Setup
 # ====================================
 if(WIN32)
-    # ====================================
     # Copy FMOD DLLs
-    # ====================================
     if(FMOD_FOUND)
         add_custom_command(TARGET GameEngine POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -57,14 +50,16 @@ if(WIN32)
     # ====================================
     # Copy Bundled Mono Runtime
     # ====================================
-    # Create mono directory structure
-    add_custom_command(TARGET GameEngine POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:GameEngine>/mono/bin"
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:GameEngine>/mono/lib/mono/4.5"
-        COMMENT "Creating Mono directories..."
-    )
+ # Place DLLs directly in the output folder (Debug/ or Release/)
+add_custom_command(TARGET GameEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${MONO_ROOT}/bin/mono-2.0-sgen.dll"
+        "$<TARGET_FILE_DIR:GameEngine>/mono-2.0-sgen.dll"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${MONO_ROOT}/bin/MonoPosixHelper.dll"
+        "$<TARGET_FILE_DIR:GameEngine>/MonoPosixHelper.dll"
+    COMMENT "Copying Mono runtime DLLs to build/bin/<Config>/"
+)
     
     # Copy Mono runtime DLLs (mono-2.0-sgen.dll, MonoPosixHelper.dll)
     add_custom_command(TARGET GameEngine POST_BUILD
@@ -90,11 +85,13 @@ if(WIN32)
     # ====================================
     # Copy C# GameScripts DLL
     # ====================================
+    # Configuration aware search paths
     set(GAMESCRIPTS_SEARCH_PATHS
-        "${CMAKE_BINARY_DIR}/bin/GameScripts.dll"
-        "${CMAKE_BINARY_DIR}/GameScripts.dll"
+        "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/GameScripts.dll"     # Preferred: built in correct config out dir
+        "${CMAKE_BINARY_DIR}/bin/GameScripts.dll"               # fallback legacy
         "${CMAKE_SOURCE_DIR}/Scripts/bin/Debug/net6.0/GameScripts.dll"
         "${CMAKE_SOURCE_DIR}/Scripts/bin/Release/net6.0/GameScripts.dll"
+        "${CMAKE_SOURCE_DIR}/build/bin/$<CONFIG>/GameScripts.dll" # catch custom builds
         "${CMAKE_SOURCE_DIR}/build/bin/GameScripts.dll"
     )
     
@@ -116,7 +113,6 @@ if(WIN32)
     if(NOT FOUND_GAMESCRIPTS)
         message(WARNING "  GameScripts.dll not found in search paths - build may fail at runtime")
     endif()
-
 endif()
 
 # ====================================

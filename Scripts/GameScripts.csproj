@@ -1,19 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <OutputPath>../build/bin/</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-    <RootNamespace>GameScripts</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<OutputType>Library</OutputType>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+		<RootNamespace>GameScripts</RootNamespace>
+	</PropertyGroup>
 
-  <!-- The SDK automatically includes all .cs files, so we don't need to specify them -->
-  <!-- If you need to exclude files, use:
-  <ItemGroup>
-    <Compile Remove="SomeFile.cs" />
-  </ItemGroup>
+	<!-- OutputPath for Debug configuration -->
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<OutputPath>../build/bin/Debug/</OutputPath>
+	</PropertyGroup>
+
+	<!-- OutputPath for Release configuration -->
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<OutputPath>../build/bin/Release/</OutputPath>
+	</PropertyGroup>
+
+	<!--
+    SDK includes .cs files by default.
+    If you want to exclude, use:
+    <ItemGroup>
+      <Compile Remove="SomeFile.cs" />
+    </ItemGroup>
   -->
 
 </Project>
