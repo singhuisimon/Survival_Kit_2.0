@@ -19,6 +19,7 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -377,6 +378,24 @@ namespace Engine {
             // Runtime fields are NOT deserialized (ReverbZone, IsDirty)
             // They will be initialized to their default values
         }
+
+        else if (componentType == "BehaviourTreeComponent") {
+            auto& comp = entity.AddComponent<BehaviourTreeComponent>();
+
+            if (properties.HasMember("Active"))
+                comp.Active = properties["Active"].GetBool();
+            if (properties.HasMember("ResetOnComplete"))
+                comp.ResetOnComplete = properties["ResetOnComplete"].GetBool();
+            if (properties.HasMember("TreeAssetPath"))
+                comp.TreeAssetPath = properties["TreeAssetPath"].GetString();
+
+            LOG_INFO("[PrefabInstantiator] Added BehaviourTreeComponent from prefab with path: ", comp.TreeAssetPath);
+
+
+            comp.TreeInstance = nullptr; // runtime-only
+         }
+
+
     }
 
     // Explicit template instantiation for rapidjson::Value

@@ -1,0 +1,36 @@
+{
+    "Name": "ComplexAI",
+    "GUID": "14036357072147024513",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "RootSequence",
+        "GUID": "5389445787595672195",
+        "Children": [
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "10001131806023060101",
+                "Properties": {
+                    "Duration": "2.000000"
+                }
+            },
+            {
+                "Type": "Log",
+                "Name": "Node",
+                "GUID": "1930681273775131273",
+                "Properties": {
+                    "Message": "First edit"
+                }
+            },
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "4236524282988841627",
+                "Properties": {
+                    "Duration": "3.000000"
+                }
+            }
+        ]
+    }
+}

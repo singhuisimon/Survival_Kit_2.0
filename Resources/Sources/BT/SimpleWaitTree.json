@@ -1,0 +1,25 @@
+{
+    "Name": "SimpleWaitTree",
+    "GUID": "17458019667103727671",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Node",
+        "GUID": "16881558914800304185",
+        "Children": [
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "3622961611821563963",
+                "Properties": {
+                    "Duration": "2.000000"
+                }
+            },
+            {
+                "Type": "Action",
+                "Name": "Node",
+                "GUID": "11693412144069492797"
+            }
+        ]
+    }
+}

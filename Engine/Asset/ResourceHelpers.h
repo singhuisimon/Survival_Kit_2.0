@@ -171,7 +171,7 @@ namespace Engine {
         //LOG_INFO("Directory: ", typeDir.string());
 
         if (!std::filesystem::exists(typeDir)) {
-            LOG_ERROR("Directory does not exist!");
+            //LOG_ERROR("Directory does not exist!");
             return;
         }
 
