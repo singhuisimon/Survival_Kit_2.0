@@ -12,7 +12,7 @@
 #include "../ECS/Entity.h"
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/TransformComponent.h"
-#include "BehaviourTreePrefab.h"
+#include "../Prefab/BehaviourTreePrefab.h"
 #include "../Utility/Logger.h"
 
 namespace Engine {
@@ -25,56 +25,11 @@ namespace Engine {
     public:
         BehaviourTreeSystem() = default;
 
-        void OnInit(Scene* scene) override {
-            LOG_INFO("BehaviourTreeSystem: Initialized");
-            (void)scene;
-        }
+        void OnInit(Scene* scene) override;
 
-        void OnUpdate(Scene* scene, Timestep ts) override {
-            if (!scene) return;
+        void OnUpdate(Scene* scene, Timestep ts) override;
 
-            auto& registry = scene->GetRegistry();
-            auto view = registry.view<BehaviourTreeComponent>();
-
-            for (auto entity : view) {
-                Entity ent(entity, &registry);
-                auto& btComp = ent.GetComponent<BehaviourTreeComponent>();
-
-                if (btComp.TreeInstance == nullptr && !btComp.TreeAssetPath.empty()) {
-                    btComp.TreeInstance = Engine::BehaviourTreeSerializer::DeserializeFromFile(btComp.TreeAssetPath);
-                    if (btComp.TreeInstance)
-                        LOG_INFO("BehaviourTreeSystem: Loaded tree from file ", btComp.TreeAssetPath);
-                    else
-                        LOG_WARNING("BehaviourTreeSystem: Failed to load tree from ", btComp.TreeAssetPath);
-                }
-
-
-                // Skip if not active or invalid
-                if (!btComp.Active || !btComp.IsValid()) {
-                    continue;
-                }
-
-                // Setup execution context
-                BTContext context;
-                context.Entity = &ent;
-                context.Scene = scene;
-                context.DeltaTime = ts;
-
-                // Execute the behaviour tree
-                BTStatus status = btComp.TreeInstance->Execute(context);
-                btComp.LastStatus = status;
-
-                // Reset on completion if configured
-                if (status != BTStatus::Running && btComp.ResetOnComplete) {
-                    btComp.TreeInstance->Reset();
-                }
-            }
-        }
-
-        void OnShutdown(Scene* scene) override {
-            LOG_INFO("BehaviourTreeSystem: Shutdown");
-            (void)scene;
-        }
+        void OnShutdown(Scene* scene) override;
 
         int GetPriority() const override {
             return 60; // Run after physics (10-19) and transforms (30-49), before rendering

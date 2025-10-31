@@ -11,7 +11,7 @@
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
 
-#include "../BehaviourTree/BehaviourTreePrefab.h"
+#include "../Prefab/BehaviourTreePrefab.h"
 
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"

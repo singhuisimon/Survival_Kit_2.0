@@ -16,39 +16,17 @@ namespace Engine {
      */
     class BTDecorator : public BTNode {
     public:
-        bool CanHaveChildren() const override { return true; }
+        bool CanHaveChildren() const override;
 
-        void AddChild(std::shared_ptr<BTNode> child) override {
-            m_Child = child;
-        }
+        void AddChild(std::shared_ptr<BTNode> child);
 
-        void RemoveChild(size_t index) override {
-            if (index == 0) {
-                m_Child.reset();
-            }
-        }
+        void RemoveChild(size_t index) override;
 
-        std::vector<std::shared_ptr<BTNode>>& GetChildren() override {
-            m_ChildVector.clear();
-            if (m_Child) {
-                m_ChildVector.push_back(m_Child);
-            }
-            return m_ChildVector;
-        }
+        std::vector<std::shared_ptr<BTNode>>& GetChildren() override;
 
-        const std::vector<std::shared_ptr<BTNode>>& GetChildren() const override {
-            m_ChildVector.clear();
-            if (m_Child) {
-                m_ChildVector.push_back(m_Child);
-            }
-            return m_ChildVector;
-        }
+        const std::vector<std::shared_ptr<BTNode>>& GetChildren() const override;
 
-        void Reset() override {
-            if (m_Child) {
-                m_Child->Reset();
-            }
-        }
+        void Reset() override;
 
     protected:
         std::shared_ptr<BTNode> m_Child;
@@ -60,24 +38,9 @@ namespace Engine {
      */
     class BTInverter : public BTDecorator {
     public:
-        const char* GetTypeName() const override { return "Inverter"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Child) {
-                return BTStatus::Failure;
-            }
-
-            BTStatus status = m_Child->Execute(context);
-
-            if (status == BTStatus::Success) {
-                return BTStatus::Failure;
-            }
-            else if (status == BTStatus::Failure) {
-                return BTStatus::Success;
-            }
-
-            return BTStatus::Running;
-        }
+        BTStatus Execute(BTContext& context) override;
     };
 
     /**
@@ -85,16 +48,9 @@ namespace Engine {
      */
     class BTSucceeder : public BTDecorator {
     public:
-        const char* GetTypeName() const override { return "Succeeder"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Child) {
-                return BTStatus::Success;
-            }
-
-            BTStatus status = m_Child->Execute(context);
-            return (status == BTStatus::Running) ? BTStatus::Running : BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
     };
 
     /**
@@ -102,16 +58,9 @@ namespace Engine {
      */
     class BTFailer : public BTDecorator {
     public:
-        const char* GetTypeName() const override { return "Failer"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Child) {
-                return BTStatus::Failure;
-            }
-
-            BTStatus status = m_Child->Execute(context);
-            return (status == BTStatus::Running) ? BTStatus::Running : BTStatus::Failure;
-        }
+        BTStatus Execute(BTContext& context) override;
     };
 
     /**
@@ -119,56 +68,17 @@ namespace Engine {
      */
     class BTRepeater : public BTDecorator {
     public:
-        BTRepeater(int repeatCount = -1) // -1 = infinite
-            : m_RepeatCount(repeatCount), m_CurrentCount(0) {}
+        BTRepeater(int repeatCount = -1); // -1 = infinite
 
-        const char* GetTypeName() const override { return "Repeater"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Child) {
-                return BTStatus::Failure;
-            }
+        BTStatus Execute(BTContext& context) override;
 
-            // Infinite repeat
-            if (m_RepeatCount < 0) {
-                BTStatus status = m_Child->Execute(context);
-                if (status != BTStatus::Running) {
-                    m_Child->Reset(); // Reset child for next iteration
-                }
-                return BTStatus::Running; // Always running
-            }
+        void Reset() override;
 
-            // Limited repeat
-            while (m_CurrentCount < m_RepeatCount) {
-                BTStatus status = m_Child->Execute(context);
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-                if (status == BTStatus::Running) {
-                    return BTStatus::Running;
-                }
-
-                m_Child->Reset();
-                m_CurrentCount++;
-            }
-
-            // Completed all repeats
-            m_CurrentCount = 0;
-            return BTStatus::Success;
-        }
-
-        void Reset() override {
-            m_CurrentCount = 0;
-            BTDecorator::Reset();
-        }
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "RepeatCount", std::to_string(m_RepeatCount) });
-        }
-
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "RepeatCount") {
-                m_RepeatCount = std::stoi(value);
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         int m_RepeatCount;
@@ -180,25 +90,9 @@ namespace Engine {
      */
     class BTRepeatUntilFail : public BTDecorator {
     public:
-        const char* GetTypeName() const override { return "RepeatUntilFail"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Child) {
-                return BTStatus::Failure;
-            }
-
-            BTStatus status = m_Child->Execute(context);
-
-            if (status == BTStatus::Failure) {
-                m_Child->Reset();
-                return BTStatus::Success; // We succeed when child fails
-            }
-            else if (status == BTStatus::Success) {
-                m_Child->Reset(); // Reset for next iteration
-            }
-
-            return BTStatus::Running;
-        }
+        BTStatus Execute(BTContext& context) override;
     };
 
     /**
@@ -206,48 +100,17 @@ namespace Engine {
      */
     class BTCooldown : public BTDecorator {
     public:
-        BTCooldown(float cooldownTime = 1.0f)
-            : m_CooldownTime(cooldownTime), m_TimeSinceLastRun(cooldownTime) {}
+        BTCooldown(float cooldownTime = 1.0f);
 
-        const char* GetTypeName() const override { return "Cooldown"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Child) {
-                return BTStatus::Failure;
-            }
+        BTStatus Execute(BTContext& context) override;
 
-            m_TimeSinceLastRun += context.DeltaTime;
+        void Reset() override;
 
-            // Still in cooldown
-            if (m_TimeSinceLastRun < m_CooldownTime) {
-                return BTStatus::Failure;
-            }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-            // Execute child
-            BTStatus status = m_Child->Execute(context);
-
-            // Reset cooldown when child completes
-            if (status != BTStatus::Running) {
-                m_TimeSinceLastRun = 0.0f;
-            }
-
-            return status;
-        }
-
-        void Reset() override {
-            m_TimeSinceLastRun = m_CooldownTime; // Ready to execute
-            BTDecorator::Reset();
-        }
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "CooldownTime", std::to_string(m_CooldownTime) });
-        }
-
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "CooldownTime") {
-                m_CooldownTime = std::stof(value);
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         float m_CooldownTime;

@@ -26,9 +26,10 @@
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
 #include "BehaviourTree/BehaviourTreeSystem.h"
+
 #include "BehaviourTree/BTNodeRegistry.h"
-#include "BehaviourTree/BehaviourTreeSerializer.h"
-#include "BehaviourTree/BehaviourTreePrefab.h"
+#include "Serialization/BehaviourTreeSerializer.h"
+#include "Prefab/BehaviourTreePrefab.h"
 #include "Serialization/PrefabSerializer.h"
 #include "Serialization/PrefabInstantiator.h"
 #include "Prefab/PrefabRegistry.h"

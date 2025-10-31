@@ -16,34 +16,17 @@ namespace Engine {
      */
     class BTComposite : public BTNode {
     public:
-        std::vector<std::shared_ptr<BTNode>>& GetChildren() override {
-            return m_Children;
-        }
+        std::vector<std::shared_ptr<BTNode>>& GetChildren() override;
 
-        const std::vector<std::shared_ptr<BTNode>>& GetChildren() const override {
-            return m_Children;
-        }
+        const std::vector<std::shared_ptr<BTNode>>& GetChildren() const override;
 
-        bool CanHaveChildren() const override { return true; }
+        bool CanHaveChildren() const override;
 
-        void AddChild(std::shared_ptr<BTNode> child) override {
-            if (child) {
-                m_Children.push_back(child);
-            }
-        }
+        void AddChild(std::shared_ptr<BTNode> child) override;
 
-        void RemoveChild(size_t index) override {
-            if (index < m_Children.size()) {
-                m_Children.erase(m_Children.begin() + index);
-            }
-        }
+        void RemoveChild(size_t index) override;
 
-        void Reset() override {
-            m_CurrentChildIndex = 0;
-            for (auto& child : m_Children) {
-                child->Reset();
-            }
-        }
+        void Reset() override;
 
     protected:
         std::vector<std::shared_ptr<BTNode>> m_Children;
@@ -58,27 +41,7 @@ namespace Engine {
     public:
         const char* GetTypeName() const override { return "Sequence"; }
 
-        BTStatus Execute(BTContext& context) override {
-            // Execute children in sequence
-            while (m_CurrentChildIndex < m_Children.size()) {
-                BTStatus status = m_Children[m_CurrentChildIndex]->Execute(context);
-
-                if (status == BTStatus::Failure) {
-                    Reset();
-                    return BTStatus::Failure;
-                }
-                else if (status == BTStatus::Running) {
-                    return BTStatus::Running;
-                }
-
-                // Child succeeded, move to next
-                m_CurrentChildIndex++;
-            }
-
-            // All children succeeded
-            Reset();
-            return BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
     };
 
     /**
@@ -89,27 +52,7 @@ namespace Engine {
     public:
         const char* GetTypeName() const override { return "Selector"; }
 
-        BTStatus Execute(BTContext& context) override {
-            // Try children in sequence until one succeeds
-            while (m_CurrentChildIndex < m_Children.size()) {
-                BTStatus status = m_Children[m_CurrentChildIndex]->Execute(context);
-
-                if (status == BTStatus::Success) {
-                    Reset();
-                    return BTStatus::Success;
-                }
-                else if (status == BTStatus::Running) {
-                    return BTStatus::Running;
-                }
-
-                // Child failed, try next
-                m_CurrentChildIndex++;
-            }
-
-            // All children failed
-            Reset();
-            return BTStatus::Failure;
-        }
+        BTStatus Execute(BTContext& context) override;
     };
 
     /**
@@ -123,74 +66,15 @@ namespace Engine {
             RequireOne      ///< Succeed if at least one child succeeds
         };
 
-        BTParallel(Policy successPolicy = Policy::RequireAll, Policy failurePolicy = Policy::RequireOne)
-            : m_SuccessPolicy(successPolicy), m_FailurePolicy(failurePolicy) {}
+        BTParallel(Policy successPolicy = Policy::RequireAll, Policy failurePolicy = Policy::RequireOne);
 
         const char* GetTypeName() const override { return "Parallel"; }
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Children.empty()) {
-                return BTStatus::Success;
-            }
+        BTStatus Execute(BTContext& context) override;
 
-            size_t successCount = 0;
-            size_t failureCount = 0;
-            size_t runningCount = 0;
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-            // Execute all children
-            for (auto& child : m_Children) {
-                BTStatus status = child->Execute(context);
-
-                switch (status) {
-                case BTStatus::Success:
-                    successCount++;
-                    break;
-                case BTStatus::Failure:
-                    failureCount++;
-                    break;
-                case BTStatus::Running:
-                    runningCount++;
-                    break;
-                }
-            }
-
-            // Check failure condition
-            if (m_FailurePolicy == Policy::RequireOne && failureCount > 0) {
-                Reset();
-                return BTStatus::Failure;
-            }
-            if (m_FailurePolicy == Policy::RequireAll && failureCount == m_Children.size()) {
-                Reset();
-                return BTStatus::Failure;
-            }
-
-            // Check success condition
-            if (m_SuccessPolicy == Policy::RequireAll && successCount == m_Children.size()) {
-                Reset();
-                return BTStatus::Success;
-            }
-            if (m_SuccessPolicy == Policy::RequireOne && successCount > 0 && runningCount == 0) {
-                Reset();
-                return BTStatus::Success;
-            }
-
-            // Still running
-            return BTStatus::Running;
-        }
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "SuccessPolicy", m_SuccessPolicy == Policy::RequireAll ? "RequireAll" : "RequireOne" });
-            properties.push_back({ "FailurePolicy", m_FailurePolicy == Policy::RequireAll ? "RequireAll" : "RequireOne" });
-        }
-
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "SuccessPolicy") {
-                m_SuccessPolicy = (value == "RequireAll") ? Policy::RequireAll : Policy::RequireOne;
-            }
-            else if (name == "FailurePolicy") {
-                m_FailurePolicy = (value == "RequireAll") ? Policy::RequireAll : Policy::RequireOne;
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         Policy m_SuccessPolicy;

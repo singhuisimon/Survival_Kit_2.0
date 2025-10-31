@@ -20,19 +20,13 @@ namespace Engine {
     public:
         using ActionFunc = std::function<BTStatus(BTContext&)>;
 
-        BTAction(ActionFunc action = nullptr)
-            : m_Action(action) {}
+        BTAction(ActionFunc action = nullptr);
 
-        const char* GetTypeName() const override { return "Action"; }
+        const char* GetTypeName() const override;
 
-        void SetAction(ActionFunc action) { m_Action = action; }
+        void SetAction(ActionFunc action);
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Action) {
-                return BTStatus::Failure;
-            }
-            return m_Action(context);
-        }
+        BTStatus Execute(BTContext& context) override;
 
     private:
         ActionFunc m_Action;
@@ -45,19 +39,13 @@ namespace Engine {
     public:
         using ConditionFunc = std::function<bool(BTContext&)>;
 
-        BTCondition(ConditionFunc condition = nullptr)
-            : m_Condition(condition) {}
+        BTCondition(ConditionFunc condition = nullptr);
 
-        const char* GetTypeName() const override { return "Condition"; }
+        const char* GetTypeName() const override;
 
-        void SetCondition(ConditionFunc condition) { m_Condition = condition; }
+        void SetCondition(ConditionFunc condition);
 
-        BTStatus Execute(BTContext& context) override {
-            if (!m_Condition) {
-                return BTStatus::Failure;
-            }
-            return m_Condition(context) ? BTStatus::Success : BTStatus::Failure;
-        }
+        BTStatus Execute(BTContext& context) override;
 
     private:
         ConditionFunc m_Condition;
@@ -68,39 +56,19 @@ namespace Engine {
      */
     class BTWait : public BTNode {
     public:
-        BTWait(float duration = 1.0f)
-            : m_Duration(duration), m_ElapsedTime(0.0f) {}
+        BTWait(float duration = 1.0f);
 
-        const char* GetTypeName() const override { return "Wait"; }
+        const char* GetTypeName() const override;
 
-        void OnEnter(BTContext& context) override {
-            (void)context;
-            m_ElapsedTime = 0.0f;
-        }
+        void OnEnter(BTContext& context) override;
 
-        BTStatus Execute(BTContext& context) override {
-            m_ElapsedTime += context.DeltaTime;
+        BTStatus Execute(BTContext& context) override;
 
-            if (m_ElapsedTime >= m_Duration) {
-                return BTStatus::Success;
-            }
+        void Reset() override;
 
-            return BTStatus::Running;
-        }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-        void Reset() override {
-            m_ElapsedTime = 0.0f;
-        }
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Duration", std::to_string(m_Duration) });
-        }
-
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Duration") {
-                m_Duration = std::stof(value);
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         float m_Duration;
@@ -112,27 +80,15 @@ namespace Engine {
      */
     class BTLog : public BTNode {
     public:
-        BTLog(const std::string& message = "")
-            : m_Message(message) {}
+        BTLog(const std::string& message = "");
 
-        const char* GetTypeName() const override { return "Log"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            (void)context;
-            // In real implementation, use your Logger system
-            // LOG_INFO("BehaviourTree: ", m_Message);
-            return BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
 
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Message", m_Message });
-        }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Message") {
-                m_Message = value;
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         std::string m_Message;
@@ -143,42 +99,15 @@ namespace Engine {
      */
     class BTSetBlackboard : public BTNode {
     public:
-        BTSetBlackboard(const std::string& key = "", const std::string& value = "", const std::string& type = "string")
-            : m_Key(key), m_Value(value), m_Type(type) {
-        }
+        BTSetBlackboard(const std::string& key = "", const std::string& value = "", const std::string& type = "string");
 
-        const char* GetTypeName() const override { return "SetBlackboard"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Key.empty()) {
-                return BTStatus::Failure;
-            }
+        BTStatus Execute(BTContext& context) override;
 
-            // Use the blackboard's FromString method to set the value with proper type
-            if (context.Blackboard.FromString(m_Key, m_Type, m_Value)) {
-                return BTStatus::Success;
-            }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-            return BTStatus::Failure;
-        }
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Key", m_Key });
-            properties.push_back({ "Type", m_Type });
-            properties.push_back({ "Value", m_Value });
-        }
-
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Key") {
-                m_Key = value;
-            }
-            else if (name == "Type") {
-                m_Type = value;
-            }
-            else if (name == "Value") {
-                m_Value = value;
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         std::string m_Key;
@@ -191,39 +120,15 @@ namespace Engine {
      */
     class BTCheckBlackboard : public BTNode {
     public:
-        BTCheckBlackboard(const std::string& key = "", const std::string& expectedValue = "")
-            : m_Key(key), m_ExpectedValue(expectedValue) {
-        }
+        BTCheckBlackboard(const std::string& key = "", const std::string& expectedValue = "");
 
-        const char* GetTypeName() const override { return "CheckBlackboard"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Key.empty()) {
-                return BTStatus::Failure;
-            }
+        BTStatus Execute(BTContext& context) override;
 
-            if (!context.Blackboard.Has(m_Key)) {
-                return BTStatus::Failure;
-            }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-            // Convert to string and compare
-            std::string actualValue = context.Blackboard.ToString(m_Key);
-            return (actualValue == m_ExpectedValue) ? BTStatus::Success : BTStatus::Failure;
-        }
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Key", m_Key });
-            properties.push_back({ "ExpectedValue", m_ExpectedValue });
-        }
-
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Key") {
-                m_Key = value;
-            }
-            else if (name == "ExpectedValue") {
-                m_ExpectedValue = value;
-            }
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         // Allow direct property access for registration macros
         std::string m_Key;
@@ -235,27 +140,15 @@ namespace Engine {
      */
     class BTSetBlackboardInt : public BTNode {
     public:
-        BTSetBlackboardInt(const std::string& key = "", int value = 0)
-            : m_Key(key), m_Value(value) {
-        }
+        BTSetBlackboardInt(const std::string& key = "", int value = 0);
 
-        const char* GetTypeName() const override { return "SetBlackboardInt"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Key.empty()) return BTStatus::Failure;
-            context.Blackboard.Set(m_Key, m_Value);
-            return BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
 
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Key", m_Key });
-            properties.push_back({ "Value", std::to_string(m_Value) });
-        }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Key") m_Key = value;
-            else if (name == "Value") m_Value = std::stoi(value);
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         std::string m_Key;
         int m_Value;
@@ -266,27 +159,15 @@ namespace Engine {
      */
     class BTSetBlackboardFloat : public BTNode {
     public:
-        BTSetBlackboardFloat(const std::string& key = "", float value = 0.0f)
-            : m_Key(key), m_Value(value) {
-        }
+        BTSetBlackboardFloat(const std::string& key = "", float value = 0.0f);
 
-        const char* GetTypeName() const override { return "SetBlackboardFloat"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Key.empty()) return BTStatus::Failure;
-            context.Blackboard.Set(m_Key, m_Value);
-            return BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
 
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Key", m_Key });
-            properties.push_back({ "Value", std::to_string(m_Value) });
-        }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Key") m_Key = value;
-            else if (name == "Value") m_Value = std::stof(value);
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         std::string m_Key;
         float m_Value;
@@ -297,27 +178,15 @@ namespace Engine {
      */
     class BTSetBlackboardBool : public BTNode {
     public:
-        BTSetBlackboardBool(const std::string& key = "", bool value = false)
-            : m_Key(key), m_Value(value) {
-        }
+        BTSetBlackboardBool(const std::string& key = "", bool value = false);
 
-        const char* GetTypeName() const override { return "SetBlackboardBool"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Key.empty()) return BTStatus::Failure;
-            context.Blackboard.Set(m_Key, m_Value);
-            return BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
 
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Key", m_Key });
-            properties.push_back({ "Value", m_Value ? "true" : "false" });
-        }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Key") m_Key = value;
-            else if (name == "Value") m_Value = (value == "true" || value == "1");
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         std::string m_Key;
         bool m_Value;
@@ -328,31 +197,15 @@ namespace Engine {
      */
     class BTSetBlackboardVec3 : public BTNode {
     public:
-        BTSetBlackboardVec3(const std::string& key = "", const glm::vec3& value = glm::vec3(0.0f))
-            : m_Key(key), m_Value(value) {
-        }
+        BTSetBlackboardVec3(const std::string& key = "", const glm::vec3& value = glm::vec3(0.0f));
 
-        const char* GetTypeName() const override { return "SetBlackboardVec3"; }
+        const char* GetTypeName() const override;
 
-        BTStatus Execute(BTContext& context) override {
-            if (m_Key.empty()) return BTStatus::Failure;
-            context.Blackboard.Set(m_Key, m_Value);
-            return BTStatus::Success;
-        }
+        BTStatus Execute(BTContext& context) override;
 
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override {
-            properties.push_back({ "Key", m_Key });
-            properties.push_back({ "X", std::to_string(m_Value.x) });
-            properties.push_back({ "Y", std::to_string(m_Value.y) });
-            properties.push_back({ "Z", std::to_string(m_Value.z) });
-        }
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
 
-        void SetProperty(const std::string& name, const std::string& value) override {
-            if (name == "Key") m_Key = value;
-            else if (name == "X") m_Value.x = std::stof(value);
-            else if (name == "Y") m_Value.y = std::stof(value);
-            else if (name == "Z") m_Value.z = std::stof(value);
-        }
+        void SetProperty(const std::string& name, const std::string& value) override;
 
         std::string m_Key;
         glm::vec3 m_Value;
