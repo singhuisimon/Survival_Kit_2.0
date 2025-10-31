@@ -25,6 +25,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 #include <fstream>
+#include <filesystem> 
 
 namespace Engine {
 
@@ -83,6 +84,21 @@ namespace Engine {
 
     bool PrefabSerializer::SavePrefabToFile(const Prefab& prefab, const std::string& filepath) {
         LOG_INFO("PrefabSerializer: Saving prefab to ", filepath);
+
+        // Create parent directory if it doesn't exist
+        std::filesystem::path filePath(filepath);
+        std::filesystem::path parentDir = filePath.parent_path();
+
+        if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
+            try {
+                std::filesystem::create_directories(parentDir);
+                LOG_INFO("PrefabSerializer: Created directory ", parentDir.string());
+            }
+            catch (const std::filesystem::filesystem_error& e) {
+                LOG_ERROR("PrefabSerializer: Failed to create directory: ", e.what());
+                return false;
+            }
+        }
 
         std::string jsonString = SerializePrefabToString(prefab);
 
