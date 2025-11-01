@@ -2,6 +2,7 @@
 #include "../ECS/Scene.h"
 #include "../Component/TransformComponent.h"
 #include "../Component/MeshRendererComponent.h"
+#include "Asset/ResourceHelpers.h"
 
 namespace Engine {
 
@@ -22,11 +23,13 @@ namespace Engine {
 			auto& renderable = view.get<MeshRendererComponent>(entity);
 			auto& transform = view.get<TransformComponent>(entity);
 
+			xresource::full_guid guid = Engine::convertToMeshGuid(renderable.ComponentGUID);
+
 			// Only render visible meshes
 			if (renderable.Visible)
 			{
 				m_drawitems.push_back({
-					renderable.MeshResource,
+					guid,
 					u32(entity),
 					renderable.MeshType,
 					renderable.Material,

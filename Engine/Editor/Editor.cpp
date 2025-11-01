@@ -12,6 +12,7 @@
 #include "Editor.h"
 #include "../Component/TagComponent.h"
 #include "../Component/TransformComponent.h"
+#include "../Transform/TransformSystem.h"
 
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
@@ -280,6 +281,22 @@ namespace Engine
 						{
 							transform.SetScale(scale);
 							
+						}
+
+						u32 parent_id = transform.Parent;
+
+						if (ImGui::InputScalar("Parent", ImGuiDataType_U32, &parent_id))
+						{
+							TransformSystem::SetParent(m_Scene, m_SelectedEntity,  static_cast<entt::entity>(parent_id));
+						}
+
+						if (parent_id != u32_max)
+						{
+							ImGui::Text("Parent: %zu", parent_id);
+						}
+						else
+						{
+							ImGui::Text("Parent: None");
 						}
 					}
 				}

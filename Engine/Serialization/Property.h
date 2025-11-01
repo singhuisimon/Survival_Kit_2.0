@@ -22,6 +22,7 @@ namespace Engine {
     enum class PropertyType {
         Bool,
         U32,
+        U64,
         Int,
         Float,
         String,

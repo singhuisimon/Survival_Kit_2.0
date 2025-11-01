@@ -133,6 +133,14 @@ namespace Engine {
         // Register MeshRendererComponent
         {
             auto& meta = REGISTER_COMPONENT(MeshRendererComponent);
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"ComponentGUID",
+                PropertyType::U64,                
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.ComponentGUID); },
+				[](MeshRendererComponent& c, const u64& v) { c.ComponentGUID = xresource::instance_guid::FromU64(v); }
+            );
+
             meta.AddProperty<MeshRendererComponent, bool>(
                 "Visible",
                 PropertyType::Bool,
@@ -181,6 +189,14 @@ namespace Engine {
                 [](const MeshRendererComponent& c) { return c.Texture; },
                 [](MeshRendererComponent& c, const u32& v) { c.Texture = v; }
             );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "SubmeshIndex",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.submeshIndex; },
+				[](MeshRendererComponent& c, const u32& v) { c.submeshIndex = v; }
+            );
+
         }
 
         // Register RigidbodyComponent

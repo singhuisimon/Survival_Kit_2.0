@@ -30,7 +30,8 @@ namespace Engine{
 	 */
 	struct DrawItem
 	{
-		MeshResource* m_mesh_resource;
+		xresource::full_guid m_guid;
+
 		u32		  m_id;
 		u32       m_mesh_handle;
 		u32       m_material_handle;

@@ -537,16 +537,16 @@ namespace Engine {
 			prog.setUniform("material.Ks", test_material.getMaterialSpecular());
 			prog.setUniform("material.shininess", test_material.getMaterialShininess());
 
-			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
+			size_t  mesh_handle = static_cast<size_t>(item.m_mesh_handle);
 
 			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-		if (item.m_mesh_resource) {
-				glBindVertexArray(item.m_mesh_resource->VAO);
+			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(item.m_guid)) {
+				glBindVertexArray(mesh_resource->VAO);
 
-				for (const auto& submesh : item.m_mesh_resource->subMeshes) {
+				for (const auto& submesh : mesh_resource->subMeshes) {
 
 					// Calculate byte offset into the index buffer
 					const void* indexOffset = reinterpret_cast<const void*>(

@@ -20,10 +20,10 @@ namespace Engine {
      * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
+
         /// Unique identifier for this component instance
         xresource::instance_guid ComponentGUID;
-        MeshResource* MeshResource;
-
+ 
         bool Visible;           // Determine if sent to draw call
         bool ShadowReceive;     // For future expansion (WIP)
         bool ShadowCast;        // For future expansion (WIP)
@@ -31,18 +31,19 @@ namespace Engine {
         u32 MeshType;           // Mesh that the object uses (primitive/custom)
         u32 Material;           // Material handle
         u32 Texture;            // Texture handle (0 means no texture, actual textures start from 1)
+		u32 submeshIndex;       // Submesh index for multi mesh objects
 
         // Default constructor
         MeshRendererComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
-    		MeshResource(nullptr),
             Visible(true),
             ShadowReceive(false),
             ShadowCast(false),
             GlobalIlluminate(true),
             MeshType(0),
             Material(0),
-            Texture(0) {
+            Texture(0),
+			submeshIndex(0) {
         }
     };
 

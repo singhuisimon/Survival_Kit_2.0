@@ -198,7 +198,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     //    LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
     //    return nullptr;
     //}
-    LOG_INFO("OpenGL context is active and ready");
+    //LOG_INFO("OpenGL context is active and ready");
     // Get compiled file path
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
