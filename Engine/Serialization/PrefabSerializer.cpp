@@ -17,6 +17,7 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -24,6 +25,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 #include <fstream>
+#include <filesystem> 
 
 namespace Engine {
 
@@ -82,6 +84,21 @@ namespace Engine {
 
     bool PrefabSerializer::SavePrefabToFile(const Prefab& prefab, const std::string& filepath) {
         LOG_INFO("PrefabSerializer: Saving prefab to ", filepath);
+
+        // Create parent directory if it doesn't exist
+        std::filesystem::path filePath(filepath);
+        std::filesystem::path parentDir = filePath.parent_path();
+
+        if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
+            try {
+                std::filesystem::create_directories(parentDir);
+                LOG_INFO("PrefabSerializer: Created directory ", parentDir.string());
+            }
+            catch (const std::filesystem::filesystem_error& e) {
+                LOG_ERROR("PrefabSerializer: Failed to create directory: ", e.what());
+                return false;
+            }
+        }
 
         std::string jsonString = SerializePrefabToString(prefab);
 
@@ -375,6 +392,26 @@ namespace Engine {
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }
+
+        if (entity.HasComponent<BehaviourTreeComponent>()) {
+            const auto& bt = entity.GetComponent<BehaviourTreeComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "BehaviourTreeComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Active", bt.Active, allocator);
+            propertiesObj.AddMember("ResetOnComplete", bt.ResetOnComplete, allocator);
+            propertiesObj.AddMember("TreeAssetPath",
+                rapidjson::Value(bt.TreeAssetPath.c_str(), allocator), allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+
+            LOG_INFO("[PrefabSerializer] Serializing BehaviourTreeComponent with path: ", bt.TreeAssetPath);
+
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+
 
         doc.AddMember("Components", componentsArray, allocator);
 
