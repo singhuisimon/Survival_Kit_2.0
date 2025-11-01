@@ -10,8 +10,8 @@ namespace Engine {
     void Input::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
         (void)window;
         if (s_Instance) {
-            s_Instance->m_ScrollDelta.x += static_cast<float>(xoffset);
-            s_Instance->m_ScrollDelta.y += static_cast<float>(yoffset);
+            s_Instance->m_ScrollDelta.x = static_cast<float>(xoffset);
+            s_Instance->m_ScrollDelta.y = static_cast<float>(yoffset);
             LOG_TRACE("Scroll callback: ", yoffset, " (accumulated: ", s_Instance->m_ScrollDelta.y, ")");
         }
     }

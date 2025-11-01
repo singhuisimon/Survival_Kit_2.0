@@ -82,11 +82,14 @@ namespace Engine {
 
 			//get project root using existing function
 			std::string projectRoot = Engine::getRepository();
-
 			//add the Resources path
 			std::filesystem::path resourcesPath = std::filesystem::path(projectRoot) / "Resources";
 
-			return resourcesPath.string();
+			//Normalize to forward slashes for consistency
+			std::string result = resourcesPath.string(); 
+			std::replace(result.begin(), result.end(), '\\', '/'); 
+
+			return result;
 		}
 
 		/**

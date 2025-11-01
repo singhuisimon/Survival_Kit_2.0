@@ -9,6 +9,7 @@
 #include "Audio/AudioSystem.h"
 #include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
+#include "Asset/ResourceManager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -24,6 +25,16 @@
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "BehaviourTree/BehaviourTreeSystem.h"
+
+// KEPT FOR BT TEST <WILL REMOVE BY THIS WEEKEND PLS DUN TOUCH>
+#include "BehaviourTree/BTNodeRegistry.h"
+#include "Serialization/BehaviourTreeSerializer.h"
+#include "Prefab/BehaviourTreePrefab.h"
+#include "Serialization/PrefabSerializer.h"
+#include "Serialization/PrefabInstantiator.h"
+#include "Prefab/PrefabRegistry.h"
+#include "BehaviourTree/BTNode.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -37,8 +48,6 @@ void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
 
     //==========INITIALIZING ASSET ==============
-
-    
 
     LOG_INFO("Initializing Asset...");
 
@@ -61,14 +70,14 @@ void Game::OnInit() {
     }
     else {
 
-    LOG_INFO("Performing initial asset scan...");
-    Engine::AM.scanAndProcess();
+        LOG_INFO("Performing initial asset scan...");
+        Engine::AM.scanAndProcess();
 
-    LOG_INFO("Initial asset scan complete - found ",
-        Engine::AM.db().Count(), " assets");
+        LOG_INFO("Initial asset scan complete - found ",
+            Engine::AM.db().Count(), " assets");
     }
 
-
+    Engine::RM.startUp();
 
     // Step 1: Register components for serialization
     LOG_INFO("Step 1: Registering components...");
@@ -81,27 +90,39 @@ void Game::OnInit() {
         return;
     }
 
-	// Step 2: Create Audio Manager
-	LOG_INFO("Step 2: Initializing Audio Manager...");
+    // Step 2: Register nodes for serialization
+    LOG_INFO("Step 2: Registering components...");
     try {
-		m_AudioManager = std::make_unique<Engine::AudioManager>();
+        // Register all built-in behavior tree node types
+        Engine::BTNodeRegistry::RegisterBuiltInNodes();
+        LOG_INFO("  -> Components registered successfully");
+    }
+    catch (const std::exception& e) {
+        LOG_CRITICAL("  -> FAILED to register components: ", e.what());
+        return;
+    }
+
+    // Step 3: Create Audio Manager
+    LOG_INFO("Step 3: Initializing Audio Manager...");
+    try {
+        m_AudioManager = std::make_unique<Engine::AudioManager>();
         if (!m_AudioManager->Init()) {
-			LOG_CRITICAL("  -> Audio Manager initialization failed!");
+            LOG_CRITICAL("  -> Audio Manager initialization failed!");
             return;
         }
-		LOG_INFO("  -> Audio Manager initialized successfully");
+        LOG_INFO("  -> Audio Manager initialized successfully");
     }
     catch (const std::exception& e) {
         LOG_CRITICAL("  -> Exception while initializing Audio Manager: ", e.what());
         return;
-	}
+    }
 
-    // Step 3: Create scene
-    LOG_INFO("Step 3: Creating scene object...");
+    // Step 4: Create scene
+    LOG_INFO("Step 4: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
-       
+
         if (!m_Scene) {
             LOG_CRITICAL("  -> Scene pointer is null after make_unique!");
             return;
@@ -111,7 +132,7 @@ void Game::OnInit() {
         if (!m_Editor)
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
-            m_Editor->SetScene(m_Scene.get()); 
+            m_Editor->SetScene(m_Scene.get());
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
@@ -124,27 +145,19 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 4: Add systems to the scene
-    LOG_INFO("Step 4: Adding systems to scene...");
+    // Step 5: Add systems to the scene
+    LOG_INFO("Step 5: Adding systems to scene...");
     try {
-        // TODO: Add more systems here as they're created by team members:
-        // m_Scene->AddSystem<Engine::PhysicsSystem>();
-        // m_Scene->AddSystem<Engine::RenderSystem>(GetWidth(), GetHeight());
-        m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
-        m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-        m_Scene->AddSystem<Engine::PhysicsSystem>();
-        m_Scene->AddSystem<Engine::TransformSystem>();
-        m_Scene->AddSystem<Engine::CameraSystem>();
-        m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
-       
+        AddAllSystems();  // CHANGED: Replace all manual AddSystem calls with helper function
+
         LOG_INFO("  -> Systems added successfully");
     }
     catch (const std::exception& e) {
         LOG_ERROR("  -> Exception while adding systems: ", e.what());
     }
 
-    // Step 5: Initialize all systems
-    LOG_INFO("Step 5: Initializing systems...");
+    // Step 6: Initialize all systems
+    LOG_INFO("Step 6: Initializing systems...");
     try {
         m_Scene->InitializeSystems();
         LOG_INFO("  -> Systems initialized successfully");
@@ -153,12 +166,12 @@ void Game::OnInit() {
         LOG_ERROR("  -> Exception while initializing systems: ", e.what());
     }
 
-    // Step 6: Load scene from file or create default
-    LOG_INFO("Step 6: Loading scene content...");
+    // Step 7: Load scene from file or create default
+    LOG_INFO("Step 7: Loading scene content...");
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -191,11 +204,11 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 7: Initialize Tracy Profiler
-    LOG_INFO("Step 7: Initializing Tracy Profiler...");
+    // Step 8: Initialize Tracy Profiler
+    LOG_INFO("Step 8: Initializing Tracy Profiler...");
     try {
         m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
-        
+
         // Get the directory where the executable is running from
         std::filesystem::path exeDir = Engine::getAssetsPath();
 
@@ -235,6 +248,16 @@ void Game::OnInit() {
     LOG_INFO("");
 }
 
+void Game::AddAllSystems() {
+    m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
+    m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
+    m_Scene->AddSystem<Engine::PhysicsSystem>();
+    m_Scene->AddSystem<Engine::TransformSystem>();
+    m_Scene->AddSystem<Engine::CameraSystem>();
+    m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+    m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
+}
+
 void Game::CreateDefaultScene() {
     if (!m_Scene) {
         throw std::runtime_error("Scene is null in CreateDefaultScene");
@@ -249,12 +272,13 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
+    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
 
-    auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
-    rb.Mass = 1.0f;
-    rb.UseGravity = true;
-    rb.IsKinematic = false;
-    rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
+    //rb.Mass = 1.0f;
+    //rb.UseGravity = true;
+    //rb.IsKinematic = false;
+    //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";
@@ -269,7 +293,6 @@ void Game::CreateDefaultScene() {
     playerAudio.MinDistance = 1.0f;
     playerAudio.MaxDistance = 50.0f;
 
-    player.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
 
     LOG_TRACE("  Creating Camera entity...");
@@ -331,6 +354,20 @@ void Game::CreateDefaultScene() {
     reverb.IsDirty = true;
 
     LOG_TRACE("  -> Reverb zone created");
+
+    LOG_TRACE("  Creating AI entity...");
+    auto ai = m_Scene->CreateEntity("AI");
+
+    auto& aiTransform = reverbZone.GetComponent<Engine::TransformComponent>();
+    aiTransform.Position = glm::vec3(0, 0, 0); // center of world
+    aiTransform.Scale = glm::vec3(1, 1, 1);
+
+    auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
+    bt.Active = true;
+    bt.ResetOnComplete = false;
+    bt.TreeAssetPath = "SimpleWaitTree.json";
+
+    LOG_TRACE("  -> ai created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -425,20 +462,55 @@ void Game::OnUpdate(Engine::Timestep ts) {
         if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
     }
 
+    // Change Camera type
+    if (input.IsKeyJustPressed(GLFW_KEY_TAB)) {
+
+        auto& editorCam = m_Renderer->getEditorCamera();
+        if (editorCam.getCamType() == Engine::CameraType::ORBITING) {
+            editorCam.setCamType(Engine::CameraType::WALKING);
+        }
+        else {
+            editorCam.setCamType(Engine::CameraType::ORBITING);
+        }
+
+    }
+
     // Editor camera controls
     if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
         
         auto& editorCam = m_Renderer->getEditorCamera();
 
-        // Click-and-drag orbiting
+        // Check for left or right mouse click
+        uint32_t mouse = 2;
         if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y);
+            mouse = GLFW_MOUSE_BUTTON_LEFT;
         }
+        else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            mouse = GLFW_MOUSE_BUTTON_RIGHT;
+        }
+
+        // Cursor orbiting
+        editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
 
         // Zooming in-and-out scrolling
         double scrollY_offset = input.GetScrollDelta().y;
         if (scrollY_offset != 0) {
-            editorCam.cameraOnScroll(scrollY_offset * 1000.0f);
+            editorCam.cameraOnScroll(scrollY_offset);
+        }
+
+        // Check moving input
+        auto& camPos = editorCam.getCamPos();
+        if (input.IsKeyPressed(GLFW_KEY_W)) {
+            editorCam.moveCamForward();
+        }
+        if (input.IsKeyPressed(GLFW_KEY_A)) {
+            editorCam.moveCamLeft();
+        }
+        if (input.IsKeyPressed(GLFW_KEY_S)) {
+            editorCam.moveCamBack();
+        }
+        if (input.IsKeyPressed(GLFW_KEY_D)) {
+            editorCam.moveCamRight();
         }
 
     }
@@ -497,6 +569,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
     if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT)) {
         auto mousePos = input.GetMousePosition();
         LOG_DEBUG("Left mouse clicked at: (", mousePos.x, ", ", mousePos.y, ")");
+
+        // Retrieve picked ID and send it to editor
+        m_Editor->RetrievePickedID(m_Renderer->getPickedID());
     }
     if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         auto mousePos = input.GetMousePosition();
@@ -562,11 +637,102 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
         // Reinitialize systems after loading
         if (success) {
+            AddAllSystems();
             m_Scene->InitializeSystems();
             LOG_INFO("Scene loaded and systems reinitialized!");
         }
         else {
             LOG_ERROR("Load failed!");
+        }
+    }
+
+    // === TEST BEHAVIOUR TREE SYSTEM ===
+
+    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
+    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
+    if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
+        LOG_INFO("=== [F10] Create Behaviour Tree and attach to entity ===");
+
+        // 1. Create a simple behaviour tree
+        auto tree = std::make_shared<Engine::BehaviourTree>();
+        tree->SetName("SimpleWaitTree");
+
+        // Create nodes
+        auto root = std::make_shared<Engine::BTSequence>();
+        auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
+        auto logNode = std::make_shared<Engine::BTLog>("HELLO");
+            //= std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
+            //LOG_INFO("[AI Action] Hello from Behaviour Tree!");
+            //return Engine::BTStatus::Success;
+            //});
+
+        root->AddChild(waitNode);
+        root->AddChild(logNode);
+        tree->SetRootNode(root);
+
+        // 2. Serialize the tree to file
+        std::string btPath = "SimpleWaitTree.json";
+        Engine::BehaviourTreeSerializer::SerializeToFile(*tree, btPath);
+
+        // 3. Create entity & attach component
+        Engine::Entity aiEntity = m_Scene->CreateEntity("TestAI");
+        auto& btComp = aiEntity.AddComponent<Engine::BehaviourTreeComponent>(tree);
+        btComp.Active = true;
+        btComp.ResetOnComplete = true;
+
+        // Set the file path so it persists to SavedScene.json
+        btComp.TreeAssetPath = btPath;
+
+        LOG_INFO("Created AI Entity with BehaviourTreeComponent!");
+        LOG_INFO("Tree path set to: ", btComp.TreeAssetPath);
+    }
+
+    // F11 -> Create a BehaviourTreePrefab from the tree file
+    if (input.IsKeyJustPressed(GLFW_KEY_F11)) {
+        LOG_INFO("=== [F11] Create BehaviourTreePrefab from file ===");
+
+
+        Engine::Entity foundEntity;
+        bool found = false;
+
+        auto view = registry.view<Engine::TagComponent>();
+        for (auto entityHandle : view) {
+            auto& tag = view.get<Engine::TagComponent>(entityHandle);
+            if (tag.Tag == "TestAI") { // change to whatever name you want
+                foundEntity = Engine::Entity(entityHandle, &registry);
+                found = true;
+                break;
+            }
+        }
+
+        if (!foundEntity) {
+            LOG_ERROR("No entity named 'TestAI' found. Create one first with F10.");
+            return;
+        }
+
+        // Make sure it has a valid BehaviourTreeComponent
+        if (!foundEntity.HasComponent<Engine::BehaviourTreeComponent>()) {
+            LOG_ERROR("Entity 'TestAI' does not have a BehaviourTreeComponent!");
+            return;
+        }
+
+        // Save the entity itself as a prefab (not just the tree)
+        auto prefab = Engine::PrefabSerializer::CreateEntityPrefab(foundEntity, "AIPrefab_SimpleWaitTree");
+        Engine::PrefabRegistry::Get().RegisterPrefab(prefab);
+
+        LOG_INFO("Entity Prefab 'AIPrefab_SimpleWaitTree' created and registered.");
+    }
+
+
+    // F12 -> Instantiate entity from BehaviourTreePrefab
+    if (input.IsKeyJustPressed(GLFW_KEY_K)) {
+        auto prefab = Engine::PrefabRegistry::Get().GetPrefabByName("AIPrefab_SimpleWaitTree");
+        if (prefab) {
+            Engine::PrefabInstantiator::InstantiateEntityPrefab(m_Scene.get(), prefab->GetGUID());
+            LOG_INFO("Instantiated AI entity from prefab 'AIPrefab_SimpleWaitTree'");
+        }
+        else {
+            LOG_WARNING("Prefab 'AIPrefab_SimpleWaitTree' not found!");
         }
     }
 
@@ -602,6 +768,8 @@ void Game::OnShutdown() {
     }
 
     //============= Asset =============
+    Engine::RM.shutDown(); 
+
     LOG_INFO("Shutting Down Asset");
     Engine::AM.shutDown();
 

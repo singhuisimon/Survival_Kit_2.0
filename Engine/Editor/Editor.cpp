@@ -15,6 +15,8 @@
 
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
+#include "../Asset/AssetManager.h"
+#include "../Graphics/Camera.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
@@ -66,6 +68,9 @@ namespace Engine
 		ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
+		// Set default pickedID (entt::null (0xFFFFFFFFu) is no hit)
+		m_PickedID = 0xFFFFFFFFu;
+		
 		m_Initialized = true;
 	}
 
@@ -129,6 +134,8 @@ namespace Engine
 				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
 				{
+					
+					//if (isPrefabEditor && !currPrefabPath.empty() && m_Scene->GetName() == "Prefab")
 					if (isPrefabEditor)
 					{
 						if (!currPrefabPath.empty())
@@ -176,6 +183,19 @@ namespace Engine
 							//}
 						}
 					}
+					/*else if (!currScenePath.empty())
+					{
+						//SceneSerializer serializer(m_Scene);
+
+						//if (serializer.Serialize(currScenePath))
+						//{
+						//	m_TemporaryPrefabPaths.clear(); // remove from temporary list
+						//	//PrefabInstantiator::InstantiateScenePrefab()
+						//
+						//}
+						m_Scene->SaveToFile(currScenePath);
+						LOG_DEBUG("current scene is ", currScenePath);
+					}*/
 					else
 					{
 						if (!currScenePath.empty())
@@ -367,15 +387,69 @@ namespace Engine
 					
 					if (openRigidBody)
 					{
-						// mass
 						auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
-						//ImGui::Separator();
+						
+						// mass
 						float rigidMass = rigidBody.GetMass();
 						if (ImGui::DragFloat("Mass", &rigidMass))
 						{
 							rigidBody.SetMass(rigidMass);
 						}
-						ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
+
+						ImGui::Separator();
+
+						// kinematic
+						ImGui::Text("Boolean to check if body is moved by code (not Physics)");
+						bool& isKinematic = rigidBody.IsKinematic;
+						if (ImGui::Checkbox("Is Kinematic", &isKinematic)) {
+							rigidBody.SetKinematic(isKinematic);
+						}
+
+						ImGui::Separator();
+
+						// gravity
+						ImGui::Text("Boolean to check if gravity affects the body");
+						bool isGravity = rigidBody.IsGravityEnabled();
+						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+							rigidBody.SetGravityEnabled(isGravity);
+						}
+
+						ImGui::Separator();
+
+						// velocity
+						glm::vec3 vel = rigidBody.GetVelocity();
+						if (ImGui::DragFloat3("Velocity", &vel.x, 1.0f))
+						{
+							rigidBody.SetVelocity(vel);
+						}
+
+						if (ImGui::Button("Stop")) {
+							rigidBody.Stop();
+						}
+
+						ImGui::Separator();
+
+						ImGui::Text("Display Runtime Value:");
+						
+						ImGui::BeginDisabled();
+
+						/*glm::vec3 vel = rigidBody.GetVelocity();
+						float velocity[3]{ vel.x, vel.y, vel.z };
+						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);*/
+						
+						float speed = rigidBody.GetSpeed();
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+
+						bool isMoving = rigidBody.IsMoving();
+						ImGui::Checkbox("Is Moving", &isMoving);
+
+						bool isStatic = rigidBody.IsStatic();
+						ImGui::Checkbox("Is Static", &isStatic);
+
+						ImGui::EndDisabled();
+								
+						//ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
+						/*ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
 						ImGui::Checkbox("Use Gravity", &rigidBody.UseGravity);
 
 						//bool isKinematic = rigidBody.
@@ -385,7 +459,7 @@ namespace Engine
 						float velocity[3]{ vel.x, vel.y, vel.z };
 						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
 						float speed = rigidBody.GetSpeed();
-						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);*/
 					}
 					// ---------------------- Remove Rigid Body Component by ... -------------------------
 					if (removeRigidBody)
@@ -471,17 +545,147 @@ namespace Engine
 					ImGui::Columns(1);
 					//ImGui::Separator();
 
-
 					if (openAudioComponent)
 					{
 						//ImGui::Separator();
 						auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
+
+						ImGui::Separator();
+						ImGui::Text("Audio Type:");
+						AudioType type = audio.Type;
+
+						if (ImGui::RadioButton("SFX", type == AudioType::SFX)) {
+							audio.SetAudioType(AudioType::SFX);
+						}
+						if (ImGui::RadioButton("BGM", type == AudioType::BGM)) {
+							audio.SetAudioType(AudioType::BGM);
+						}
+						if (ImGui::RadioButton("UI", type == AudioType::UI)) {
+							audio.SetAudioType(AudioType::UI);
+						}
+
+						ImGui::Separator();
+						ImGui::Text("Play State:");
+						PlayState playState = audio.State;
+						if (ImGui::RadioButton("Play", playState == PlayState::PLAY)) {
+							audio.SetState(PlayState::PLAY);
+						}
+						if (ImGui::RadioButton("Pause", playState == PlayState::PAUSE)) {
+							audio.SetState(PlayState::PAUSE);
+						}
+						if (ImGui::RadioButton("Stop", playState == PlayState::STOP)) {
+							audio.SetState(PlayState::STOP);
+						}
+
+						ImGui::Separator();
+
+						float volume = audio.Volume;
+						if (ImGui::SliderFloat("Volume", &volume, 0.f, 1.f)) {
+							audio.SetVolume(volume);
+						}
+
+						float pitch = audio.Pitch;
+						if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 1.f)) {
+							audio.SetPitch(pitch);
+						}
+
+						ImGui::Separator();
+						bool looping = audio.Loop;
+						if (ImGui::Checkbox("Looping", &looping)) {
+							audio.SetLoop(looping);
+						}
+						bool mute = audio.Mute;
+						if (ImGui::Checkbox("Mute", &mute)) {
+							audio.SetMute(mute);
+						}
+						bool is_3d = audio.Is3D;
+						if (ImGui::Checkbox("3D", &is_3d)) {
+							audio.Set3D(is_3d);
+						}
+
+						ImGui::Separator();
+						float reverb = audio.ReverbProperties;
+						if (ImGui::SliderFloat("Reverb", &reverb, 0.0f, 1.0f)) {
+							audio.SetReverbProperties(reverb);
+						}
+
+						ImGui::Separator();
+
+						std::string advice = "Max Distance needs to be higher than Min Distance to have attenuation";
+						ImGui::TextDisabled("(i)");
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+							ImGui::TextUnformatted(advice.c_str());
+							ImGui::PopTextWrapPos();
+							ImGui::EndTooltip();
+						}
+
+						// Disable only if not 3D
+						ImGui::BeginDisabled(!is_3d);
+
+						float min_distance = audio.MinDistance;
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+							if (is_3d) {
+								audio.SetMinDistance(min_distance);
+							}
+							else {
+								audio.SetMinDistance(1.f);
+							}
+						}
+
+						float max_distance = audio.MaxDistance;
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+							if (is_3d) {
+								audio.SetMaxDistance(max_distance);
+							}
+							else {
+								audio.SetMaxDistance(10.f);
+							}
+						}
+
+						ImGui::EndDisabled();
 
 					}
 					// ---------------------- Remove Audio Component by ... -------------------------
 					if (removeAudio)
 					{
 						m_SelectedEntity.RemoveComponent<AudioComponent>();
+					}
+				}
+				if (m_SelectedEntity.HasComponent<ReverbZoneComponent>())
+				{
+					ImGui::Separator();
+
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeReverb = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###ReverbBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ReverbPopUp");
+					}
+					if (ImGui::BeginPopup("ReverbPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeReverb = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (removeReverb)
+					{
+						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
 					}
 				}
 
@@ -584,6 +788,26 @@ namespace Engine
 						if (!hasAudioComponent)
 						{
 							ImGui::SetTooltip("Adds sound playback to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Reverb Component ----------------------------
+					bool hasReverbComponent = m_SelectedEntity.HasComponent<ReverbZoneComponent>();
+					ImGui::BeginDisabled(hasReverbComponent);
+
+					if (ImGui::MenuItem("Reverb Zone Component"))
+					{
+						if (!hasReverbComponent)
+						{
+							m_SelectedEntity.AddComponent<ReverbZoneComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasReverbComponent)
+						{
+							ImGui::SetTooltip("Adds reverb zone to this object.");
 						}
 					}
 					ImGui::EndDisabled();
@@ -834,37 +1058,161 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
-			
 			ImGui::Columns(2, nullptr, true);
 			static std::string selectedFolder = "";
+			static ResourceType selectedType = ResourceType::UNKNOWN;
+
 			// ================= Left column panel display all the resources folder ========================
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Text("Projects:");
-			if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
+
+			// For resources handled by Asset Browser
+			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				std::set<ResourceType> availableTypes;
+				for (const auto* record : allAssets)
+				{
+					if (record && record->valid && record->type != ResourceType::UNKNOWN)
+					{
+						availableTypes.insert(record->type);
+					}
+				}
+
+				for (const auto& type : availableTypes) {
+					std::string typeName = resourceTypeToString(type);
+					bool isSelected = (selectedType == type);
+
+					if (ImGui::Selectable(typeName.c_str(), isSelected)) {
+
+						raw_asset = true;
+						selectedType = type;
+						selectedFolder = typeName;
+						selectedResourcesIndex = -1;
+					}
+				}
+			}
+
+			// For resources handled by filepath (Prefabs and Scenes)
+			if (ImGui::CollapsingHeader("Composed Resources", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
 
 				for (auto& folder : folders)
 				{
-					bool isSelected = (selectedFolder == folder.fullPath);
-					if (ImGui::Selectable(folder.name.c_str(), isSelected))
-					{
-						selectedFolder = folder.fullPath;
-						selectedResourcesIndex = -1; // reset asset selection
+					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" && folder.name != "Textures") {
+						bool isSelected = (selectedFolder == folder.fullPath);
+						if (ImGui::Selectable(folder.name.c_str(), isSelected))
+						{
+							raw_asset = false;
+							selectedFolder = folder.fullPath;
+							selectedResourcesIndex = -1; // reset asset selection
+						}
 					}
 				}
 			}
-			ImGui::EndChild(); // end the left column 
 
-			// ===================== Right column panel display the resources files =======================
+			ImGui::EndChild();
 
+			// ================= Right column panel - display assets of selected type ========================
 			ImGui::NextColumn();
-			ImGui::BeginChild("Assets Panel", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			// if folder is selected, display the files
-			if (!selectedFolder.empty())
+			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
+
+			// For resources handled by Asset Browser
+			if (!selectedFolder.empty() && raw_asset) {
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				std::vector<const AssetRecord*> filteredAssets;
+				filteredAssets.reserve(allAssets.size());
+
+				for (const auto* record : allAssets) {
+					if (!record || !record->valid) continue;
+					if (record->type == selectedType) {
+						filteredAssets.push_back(record);
+					}
+				}
+
+				// Display filtered assets
+				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
+
+				if (ImGui::BeginTable("AssetGrid", itemsPerRow)) {
+					for (size_t i = 0; i < filteredAssets.size(); ++i) {
+						
+						const auto* record = filteredAssets[i];
+
+						std::filesystem::path assetPath(record->sourcePath);
+						std::string filename = assetPath.filename().string();
+						std::string extension = record->ext;
+						std::string hash = record->contentHash;
+						std::time_t writeTime = record->lastWriteTime;
+
+						ImGui::TableNextColumn();
+
+						bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+						// Optional background color for selected
+						if (isSelected) {
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+						}
+
+						// Unique ID per button so ImGui doesn�t confuse them
+						ImGui::PushID(static_cast<int>(i));
+
+						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
+							selectedResourcesIndex = static_cast<int>(i);
+							// Handle click event (e.g. open asset, show preview, etc.)
+						}
+
+						if (isSelected)
+							ImGui::PopStyleColor(3);
+
+						// ==================== Display info detail ==========================
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("Name: %s", filename.c_str());
+							ImGui::Text("Type: %s", extension.c_str());
+							ImGui::Text("Content Hash: %s", hash.c_str());
+							
+							char timeBuf[64];
+							std::tm* tm_local = std::localtime(&writeTime);
+							std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+							ImGui::Text("Last Write Time: %s", timeBuf);
+
+							ImGui::EndTooltip();
+						}
+
+						// ==================== To center text under thumbnail ================
+						ImVec2 textSize = ImGui::CalcTextSize(filename.c_str());
+						float textX = (thumbnailSize - textSize.x) * 0.5f;
+						if (textX < 0) textX = 0;
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+						ImGui::TextWrapped("%s", filename.c_str());
+
+						ImGui::PopID();
+						ImGui::NextColumn();
+					}
+					ImGui::EndTable();
+				}
+			}
+
+			// For resources handled by filepath
+			if (!selectedFolder.empty() && !raw_asset)
 			{
 				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder); 
+				auto assetsList = getAssetsInFolder(selectedFolder);
 				// display the selected folder name
 				std::filesystem::path folderPath(selectedFolder);
 				std::string folderName = folderPath.filename().string();
@@ -930,9 +1278,9 @@ namespace Engine
 										}
 									}
 								}
-								
+
 							}
-							
+
 							currScenePath = filePath; // update curr file path
 							currFileName = fileName; // store file name
 							m_Scene->SetName(fileName);
@@ -941,11 +1289,11 @@ namespace Engine
 
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
-									
+
 								isPrefabEditor = false;
 								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
 							}
-							
+
 							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
 
 						}
@@ -979,7 +1327,7 @@ namespace Engine
 								LOG_INFO("Now editing prefab:", currPrefabPath);
 							}
 							//}
-							
+
 						}
 					}
 					// to change the color of the selected
@@ -1008,15 +1356,21 @@ namespace Engine
 
 					ImGui::PopID();
 					ImGui::NextColumn();
-					
+
 				}
+
 			}
 
-			ImGui::EndChild(); // end of the right column
+			ImGui::EndChild();
 			ImGui::Columns(1);
-		}
-		ImGui::End(); // End of the assets browser window
 
+		}
+
+		ImGui::End();
+	}
+
+	void Editor::displayDescriptorEditorPanel() {
+		;
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
@@ -1283,8 +1637,8 @@ namespace Engine
 		}
 
 		ImGui::End();
-		
-		
+
+
 		// Logic here 
 
 	}

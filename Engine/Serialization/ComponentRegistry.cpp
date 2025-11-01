@@ -19,6 +19,7 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
 #include "../Utility/Logger.h"
 
  // Required for quaternion to Euler conversion
@@ -354,6 +355,38 @@ namespace Engine {
                 PropertyType::Float,
                 [](const ReverbZoneComponent& c) { return c.WetLevel; },
                 [](ReverbZoneComponent& c, const float& v) { c.WetLevel = v; }
+            );
+        }
+
+        {
+            // Register BehaviourTreeComponent
+            auto& meta = REGISTER_COMPONENT(BehaviourTreeComponent);
+
+            // Active property
+            meta.AddProperty<BehaviourTreeComponent, bool>(
+                "Active",
+                PropertyType::Bool,
+                [](const BehaviourTreeComponent& c) { return c.Active; },
+                [](BehaviourTreeComponent& c, const bool& v) { c.Active = v; }
+            );
+
+            // ResetOnComplete property
+            meta.AddProperty<BehaviourTreeComponent, bool>(
+                "ResetOnComplete",
+                PropertyType::Bool,
+                [](const BehaviourTreeComponent& c) { return c.ResetOnComplete; },
+                [](BehaviourTreeComponent& c, const bool& v) { c.ResetOnComplete = v; }
+            );
+
+            meta.AddProperty<BehaviourTreeComponent, std::string>(
+                "TreeAssetPath",
+                PropertyType::String,
+                [](const BehaviourTreeComponent& c) {
+                    return c.TreeAssetPath;
+                },
+                [](BehaviourTreeComponent& c, const std::string& v) {
+                    c.TreeAssetPath = v;
+                }
             );
         }
 

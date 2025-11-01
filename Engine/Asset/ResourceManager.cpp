@@ -2,13 +2,18 @@
 #include "ResourceManager.h"
 #include "AssetManager.h"
 #include "ResourceData.h"
+//#include "ResourceLoaders.cpp"
 
 namespace Engine {
 
-	ResourceManager::ResourceManager() {
-		//setType("ResourceManager");
-		m_resource_mgr = std::make_unique<xresource::mgr>();
-	}
+    //forward declaration
+   // extern void InitializeResourceLoaders();
+
+	//ResourceManager::ResourceManager() {
+
+	//	//setType("ResourceManager");
+	//	m_resource_mgr = std::make_unique<xresource::mgr>();
+	//}
 
 	//get 
 	ResourceManager& ResourceManager::getInstance() {
@@ -19,7 +24,12 @@ namespace Engine {
 	//startUP
 	int ResourceManager::startUp() {
 
+
         try {
+
+            m_resource_mgr = std::make_unique<xresource::mgr>();
+
+
             // Initialize the xresource manager
             m_resource_mgr->Initiallize(10000); // Support up to 10,000 resources
 
@@ -28,7 +38,7 @@ namespace Engine {
             m_resource_mgr->setUserData(this, false);
 
             // Set the root path for xresource_mgr (convert to wide string)
-            std::string descriptor_root = AM.config().descriptorRoot;
+            std::string descriptor_root = AM.getDescriptorRoot();
             std::wstring wide_descriptor_path(descriptor_root.begin(), descriptor_root.end());
             m_resource_mgr->setRootPath(std::move(wide_descriptor_path));
 
