@@ -54,14 +54,24 @@ namespace Engine {
     /**
      * @brief Serialize a behaviour tree to file
      */
-    bool BehaviourTreeSerializer::SerializeToFile(const BehaviourTree& tree, const std::string& filepath) {
+    bool BehaviourTreeSerializer::SerializeToFile(const BehaviourTree& tree, const std::string& filepath, bool prefab) {
         std::string json = SerializeToString(tree);
     
         bool sourceSuccess = false;
         bool outputSuccess = false;
+
+        std::string fullpath;
+
+        if (prefab) {
+            fullpath = "Sources/Prefab/" + filepath;
+        }
+        else {
+            fullpath = "Sources/BT/" + filepath;
+        }
+
     
         // 1. Save to SOURCE folder (Resources/Sources/BT in project root)
-        std::string sourcePath = GetSourceFilePath(filepath);
+        std::string sourcePath = GetSourceFilePath(fullpath);
         if (!sourcePath.empty()) {
             sourceSuccess = WriteToFile(json, sourcePath, "SOURCE");
         }
@@ -70,7 +80,7 @@ namespace Engine {
         }
     
         // 2. Save to OUTPUT folder (executable's Resources/Sources/BT)
-        std::string outputPath = getAssetFilePath(filepath);
+        std::string outputPath = getAssetFilePath(fullpath);
         outputSuccess = WriteToFile(json, outputPath, "OUTPUT");
     
         // Log results
@@ -125,9 +135,18 @@ namespace Engine {
     /**
      * @brief Deserialize a behaviour tree from file
      */
-    std::shared_ptr<BehaviourTree> BehaviourTreeSerializer::DeserializeFromFile(const std::string& filepath) {
-        
-        std::string fullpath = getAssetFilePath(filepath);
+    std::shared_ptr<BehaviourTree> BehaviourTreeSerializer::DeserializeFromFile(const std::string& filepath, bool prefab) {
+
+        std::string fullpath;
+
+        if (prefab) {
+            fullpath = "Sources/Prefab/" + filepath;
+        }
+        else {
+            fullpath = "Sources/BT/" + filepath;
+        }
+
+        fullpath = getAssetFilePath(fullpath);
         
         std::ifstream file(fullpath);
         if (!file.is_open()) {
@@ -167,13 +186,23 @@ namespace Engine {
     
         //obtain the root + resource
         std::filesystem::path fullpath = root / "Resources" / formattedPath;
+        std::filesystem::path directory = fullpath.parent_path();
     
-        if (!std::filesystem::exists(fullpath)) {
-            LOG_WARNING("[ASSET PATH] RESOURCE NOT FOUND: ", fullpath.string());
+        if (!std::filesystem::exists(directory)) {
+            std::error_code ec;
+            std::filesystem::create_directories(directory, ec);
+            if (ec) {
+                LOG_ERROR("Failed to create directory: ", directory.string());
+                return "";
+            }
+        }
+
+        if (!std::filesystem::exists(fullpath.generic_string())) {
+            LOG_WARNING("[ASSET PATH] RESOURCE NOT FOUND: ", fullpath.generic_string());
         }
     
-        LOG_INFO("PATH IS: ", fullpath.string());
-        return fullpath.string();
+        LOG_INFO("PATH IS: ", fullpath.generic_string());
+        return fullpath.generic_string();
     }
     
     

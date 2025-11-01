@@ -656,7 +656,7 @@ void Game::OnUpdate(Engine::Timestep ts) {
         tree->SetRootNode(root);
 
         // 2. Serialize the tree to file
-        std::string btPath = "Sources/BT/SimpleWaitTree.json";
+        std::string btPath = "SimpleWaitTree.json";
         Engine::BehaviourTreeSerializer::SerializeToFile(*tree, btPath);
 
         // 3. Create entity & attach component
