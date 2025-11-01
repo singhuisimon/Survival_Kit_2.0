@@ -63,7 +63,9 @@ namespace Engine {
         }
     
         // All children succeeded
-        Reset();
+        if (!context.isroot) {
+            Reset();
+        }
         return BTStatus::Success;
     }
 
@@ -87,7 +89,9 @@ namespace Engine {
         }
     
         // All children failed
-        Reset();
+        if (!context.isroot) {
+            Reset();
+        }
         return BTStatus::Failure;
     }
 
@@ -135,11 +139,15 @@ namespace Engine {
     
         // Check success condition
         if (m_SuccessPolicy == Policy::RequireAll && successCount == m_Children.size()) {
-            Reset();
+            if (!context.isroot) {
+                Reset();
+            }
             return BTStatus::Success;
         }
         if (m_SuccessPolicy == Policy::RequireOne && successCount > 0 && runningCount == 0) {
-            Reset();
+            if (!context.isroot) {
+                Reset();
+            }
             return BTStatus::Success;
         }
     

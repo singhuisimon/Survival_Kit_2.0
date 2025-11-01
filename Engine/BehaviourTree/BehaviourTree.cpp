@@ -83,6 +83,10 @@ namespace Engine {
                 frame.HasEntered = true;
             }
 
+            if (frame.Node = m_RootNode) {
+                context.isroot = true;
+            }
+
             // Check if this is a composite/decorator with children
             auto& children = frame.Node->GetChildren();
 

@@ -354,6 +354,20 @@ void Game::CreateDefaultScene() {
     reverb.IsDirty = true;
 
     LOG_TRACE("  -> Reverb zone created");
+
+    LOG_TRACE("  Creating AI entity...");
+    auto ai = m_Scene->CreateEntity("AI");
+
+    auto& aiTransform = reverbZone.GetComponent<Engine::TransformComponent>();
+    aiTransform.Position = glm::vec3(0, 0, 0); // center of world
+    aiTransform.Scale = glm::vec3(1, 1, 1);
+
+    auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
+    bt.Active = true;
+    bt.ResetOnComplete = false;
+    bt.TreeAssetPath = "SimpleWaitTree.json";
+
+    LOG_TRACE("  -> ai created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -646,10 +660,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
         // Create nodes
         auto root = std::make_shared<Engine::BTSequence>();
         auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
-        auto logNode = std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
-            LOG_INFO("[AI Action] Hello from Behaviour Tree!");
-            return Engine::BTStatus::Success;
-            });
+        auto logNode = std::make_shared<Engine::BTLog>("HELLO");
+            //= std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
+            //LOG_INFO("[AI Action] Hello from Behaviour Tree!");
+            //return Engine::BTStatus::Success;
+            //});
 
         root->AddChild(waitNode);
         root->AddChild(logNode);

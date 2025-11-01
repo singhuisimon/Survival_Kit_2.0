@@ -92,6 +92,8 @@ namespace Engine {
 
         // Allow direct property access for registration macros
         std::string m_Message;
+        float accumulatedtime;
+        float time = 60.0f;
     };
 
     /**

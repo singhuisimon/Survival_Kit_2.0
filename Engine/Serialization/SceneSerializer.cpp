@@ -536,12 +536,11 @@ namespace Engine {
                     }
                     else if (componentType == "BehaviourTreeComponent") {
                         auto& bt = entity.AddComponent<BehaviourTreeComponent>();
-
                         if (properties.HasMember("Active"))
                             bt.Active = properties["Active"].GetBool();
                         if (properties.HasMember("ResetOnComplete"))
                             bt.ResetOnComplete = properties["ResetOnComplete"].GetBool();
-                        if (properties.HasMember("TreeAssetGUID")) {
+                        if (properties.HasMember("TreeAssetPath")) {
                             bt.TreeAssetPath = properties["TreeAssetPath"].GetString();    
                         }
 

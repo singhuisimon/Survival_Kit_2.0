@@ -121,6 +121,10 @@ namespace Engine {
             uint64_t guid = std::stoull(doc["GUID"].GetString());
             tree->SetGUID(xresource::instance_guid{ guid });
         }
+        else {
+            LOG_WARNING("BehaviourTreeSerializer: No GUID in file, generating new one");
+            tree->SetGUID(xresource::instance_guid::GenerateGUIDCopy());
+        }
     
         // Deserialize root node
         if (doc.HasMember("Root")) {
@@ -128,7 +132,8 @@ namespace Engine {
             tree->SetRootNode(rootNode);
         }
     
-        LOG_INFO("BehaviourTreeSerializer: Loaded tree '", tree->GetName(), "'");
+        LOG_INFO("BehaviourTreeSerializer: Loaded tree '", tree->GetName(), ", ",
+            std::hex, tree->GetGUID().m_Value, std::dec, "')");
         return tree;
     }
     
