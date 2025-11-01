@@ -40,6 +40,7 @@ namespace Engine {
         Entity* Entity = nullptr;           ///< The entity this tree is running on
         Scene* Scene = nullptr;              ///< The scene the entity belongs to
         float DeltaTime = 0.0f;             ///< Time since last frame
+        bool isroot = false;
         
         // Blackboard - shared data storage for the tree
         BTBlackboard Blackboard;

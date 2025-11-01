@@ -35,7 +35,7 @@ namespace Engine {
         /**
          * @brief Serialize a behaviour tree to file
          */
-        static bool SerializeToFile(const BehaviourTree& tree, const std::string& filepath);
+        static bool SerializeToFile(const BehaviourTree& tree, const std::string& filepath, bool prefab = false);
 
         /**
          * @brief Deserialize a behaviour tree from JSON string
@@ -45,7 +45,7 @@ namespace Engine {
         /**
          * @brief Deserialize a behaviour tree from file
          */
-        static std::shared_ptr<BehaviourTree> DeserializeFromFile(const std::string& filepath);
+        static std::shared_ptr<BehaviourTree> DeserializeFromFile(const std::string& filepath, bool prefab = false);
 
     private:
 
