@@ -16,6 +16,7 @@
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Asset/AssetManager.h"
+#include "../Graphics/Camera.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
@@ -174,6 +175,7 @@ namespace Engine
 							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
 							//		{
 							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
 							//			prefabComp.ClearModifications(); // Reset overrides 
 							//			LOG_INFO("Prefab updated: {}", prefabPath);
 							//		}
@@ -385,15 +387,69 @@ namespace Engine
 					
 					if (openRigidBody)
 					{
-						// mass
 						auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
-						//ImGui::Separator();
+						
+						// mass
 						float rigidMass = rigidBody.GetMass();
 						if (ImGui::DragFloat("Mass", &rigidMass))
 						{
 							rigidBody.SetMass(rigidMass);
 						}
-						ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
+
+						ImGui::Separator();
+
+						// kinematic
+						ImGui::Text("Boolean to check if body is moved by code (not Physics)");
+						bool& isKinematic = rigidBody.IsKinematic;
+						if (ImGui::Checkbox("Is Kinematic", &isKinematic)) {
+							rigidBody.SetKinematic(isKinematic);
+						}
+
+						ImGui::Separator();
+
+						// gravity
+						ImGui::Text("Boolean to check if gravity affects the body");
+						bool isGravity = rigidBody.IsGravityEnabled();
+						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+							rigidBody.SetGravityEnabled(isGravity);
+						}
+
+						ImGui::Separator();
+
+						// velocity
+						glm::vec3 vel = rigidBody.GetVelocity();
+						if (ImGui::DragFloat3("Velocity", &vel.x, 1.0f))
+						{
+							rigidBody.SetVelocity(vel);
+						}
+
+						if (ImGui::Button("Stop")) {
+							rigidBody.Stop();
+						}
+
+						ImGui::Separator();
+
+						ImGui::Text("Display Runtime Value:");
+						
+						ImGui::BeginDisabled();
+
+						/*glm::vec3 vel = rigidBody.GetVelocity();
+						float velocity[3]{ vel.x, vel.y, vel.z };
+						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);*/
+						
+						float speed = rigidBody.GetSpeed();
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+
+						bool isMoving = rigidBody.IsMoving();
+						ImGui::Checkbox("Is Moving", &isMoving);
+
+						bool isStatic = rigidBody.IsStatic();
+						ImGui::Checkbox("Is Static", &isStatic);
+
+						ImGui::EndDisabled();
+								
+						//ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
+						/*ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
 						ImGui::Checkbox("Use Gravity", &rigidBody.UseGravity);
 
 						//bool isKinematic = rigidBody.
@@ -403,7 +459,7 @@ namespace Engine
 						float velocity[3]{ vel.x, vel.y, vel.z };
 						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
 						float speed = rigidBody.GetSpeed();
-						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);*/
 					}
 					// ---------------------- Remove Rigid Body Component by ... -------------------------
 					if (removeRigidBody)
@@ -780,14 +836,32 @@ namespace Engine
 		{
 			if (!isPrefabEditor)
 			{
-				// Button to create new entity
+				
 				if (ImGui::Button("Create Entity"))
+				{
+					
+					ImGui::OpenPopup("CreateEntityPopup");
+				}
+			}
+			if (ImGui::BeginPopup("CreateEntityPopup"))
+			{
+				if (ImGui::MenuItem("Create Entity"))
 				{
 					auto entity = m_Scene->CreateEntity("New Entity");
 					entity.AddComponent<TagComponent>("New Entity");
 					entity.AddComponent<TransformComponent>();
 					ImGui::Separator();
 				}
+				auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+				ImGui::BeginDisabled(prefabFiles.empty());
+
+				if (ImGui::MenuItem("Create Entity From Prefab"))
+				{	
+					ImGui::CloseCurrentPopup();
+					createEttFromPrfab = true;
+				}
+				ImGui::EndDisabled();
+				ImGui::EndPopup(); // end pop up of the CreateEntityPopup
 			}
 			
 			// List all entities
@@ -850,7 +924,7 @@ namespace Engine
 										PrefabRegistry::Get().RegisterPrefab(prefab);
 										m_CurrentPrefab = prefab.get();
 										currPrefabPath = prefabFolder;
-										isPrefabEditor = true;
+										//isPrefabEditor = true;
 										//m_CurrentPrefab = PrefabSerializer::LoadPrefabFromFile(path);
 										m_TemporaryPrefabPaths.insert(prefabFolder);
 
@@ -926,6 +1000,52 @@ namespace Engine
 				replacePrefabPending = false;
 				ImGui::CloseCurrentPopup();
 			}
+
+			ImGui::EndPopup();
+		}
+
+		// ================= Modal Popup for Create Entity from Prefab ===================================
+		if (createEttFromPrfab)
+		{
+			ImGui::OpenPopup("createEttPrefab");
+			createEttFromPrfab = false;
+		}
+
+		if (ImGui::BeginPopupModal("createEttPrefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			//LOG_DEBUG("TEST POP up replace is called ?");
+			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			for (auto& file : prefabFiles)
+			{
+				if (ImGui::Selectable(file.name.c_str()))
+				{
+					createEttFromPrfab = false;
+					auto prefab = PrefabSerializer::LoadPrefabFromFile(file.fullPath);
+					if (!prefab)
+					{
+						ImGui::CloseCurrentPopup();
+						break;
+					}
+
+					PrefabRegistry::Get().RegisterPrefab(prefab);
+					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+						m_Scene,
+						prefab->GetGUID()
+					);
+					
+					m_SelectedEntity = newEntity;
+					ImGui::CloseCurrentPopup();
+					break;
+				}
+			}
+		
+			if (ImGui::Button("Cancel"))
+			{
+				createEttFromPrfab = false;
+				ImGui::CloseCurrentPopup();
+			}
+		
 
 			ImGui::EndPopup();
 		}
@@ -1027,9 +1147,14 @@ namespace Engine
 
 				if (ImGui::BeginTable("AssetGrid", itemsPerRow)) {
 					for (size_t i = 0; i < filteredAssets.size(); ++i) {
+						
 						const auto* record = filteredAssets[i];
+
 						std::filesystem::path assetPath(record->sourcePath);
 						std::string filename = assetPath.filename().string();
+						std::string extension = record->ext;
+						std::string hash = record->contentHash;
+						std::time_t writeTime = record->lastWriteTime;
 
 						ImGui::TableNextColumn();
 
@@ -1058,8 +1183,14 @@ namespace Engine
 						{
 							ImGui::BeginTooltip();
 							ImGui::Text("Name: %s", filename.c_str());
-							std::string extension = filename.substr(filename.find_last_of('.') + 1);
 							ImGui::Text("Type: %s", extension.c_str());
+							ImGui::Text("Content Hash: %s", hash.c_str());
+							
+							char timeBuf[64];
+							std::tm* tm_local = std::localtime(&writeTime);
+							std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+							ImGui::Text("Last Write Time: %s", timeBuf);
+
 							ImGui::EndTooltip();
 						}
 
@@ -1236,195 +1367,10 @@ namespace Engine
 		}
 
 		ImGui::End();
+	}
 
-		// Begin properties dockable window
-		/*if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
-		{
-			
-			ImGui::Columns(2, nullptr, true);
-			static std::string selectedFolder = "";
-			// ================= Left column panel display all the resources folder ========================
-			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			ImGui::Text("Projects:");
-			if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
-
-				for (auto& folder : folders)
-				{
-					bool isSelected = (selectedFolder == folder.fullPath);
-					if (ImGui::Selectable(folder.name.c_str(), isSelected))
-					{
-						selectedFolder = folder.fullPath;
-						selectedResourcesIndex = -1; // reset asset selection
-					}
-				}
-			}
-			ImGui::EndChild(); // end the left column 
-
-			// ===================== Right column panel display the resources files =======================
-
-			ImGui::NextColumn();
-			ImGui::BeginChild("Assets Panel", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			// if folder is selected, display the files
-			if (!selectedFolder.empty())
-			{
-				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder); 
-				// display the selected folder name
-				std::filesystem::path folderPath(selectedFolder);
-				std::string folderName = folderPath.filename().string();
-				ImGui::Text(("Resources > " + folderName).c_str());
-
-				ImGui::Separator();
-
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
-				const float cellSize = thumbnailSize + padding;
-				float panelWidth = ImGui::GetContentRegionAvail().x;
-				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
-
-				// int textureCount = -1;
-				ImGui::Columns(itemsPerRow, nullptr, false);
-
-				// loop through files in selected folder
-				for (size_t i = 0; i < assetsList.size(); i++)
-				{
-					const auto& asset = assetsList[i];
-					std::string fileName = asset.name;
-					std::string filePath = asset.fullPath;
-
-					ImGui::PushID(fileName.c_str());
-
-					bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
-
-					if (isSelected)
-					{
-						// Change the button background color
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
-					}
-
-					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
-					{
-						selectedResourcesIndex = static_cast<int>(i);
-
-						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
-						if (extension == ".json") // if it is scene
-						{
-							if (isPrefabEditor)
-							{
-								if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-								{
-									auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
-									std::string prefabPath = currPrefabPath;
-
-									if (!prefabPath.empty())
-									{
-										// Create updated prefab from current entity state
-										std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-										auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-										if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-										{
-											PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-											prefabComp.ClearModifications(); // Reset overrides 
-											LOG_INFO("Prefab updated: {}", prefabPath);
-											isPrefabEditor = false;
-										}
-									}
-								}
-								
-							}
-							
-							currScenePath = filePath; // update curr file path
-							currFileName = fileName; // store file name
-							m_Scene->SetName(fileName);
-							if (m_Scene)
-							{
-
-								m_Scene->GetRegistry().clear();
-								m_Scene->LoadFromFile(filePath);
-									
-								isPrefabEditor = false;
-								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
-							}
-							
-							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
-
-						}
-						else if (extension == ".prefab")
-						{
-							//auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
-							if (!isPrefabEditor)
-							{
-								if (!currScenePath.empty())
-								{
-									m_Scene->SaveToFile(currScenePath);
-									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
-								}
-							}
-							//if (!saveAsPanel)
-							//{
-							currPrefabPath = filePath;
-							m_Scene->SetName("Prefab");
-							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-							if (prefab)
-							{
-								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
-								m_Scene->GetRegistry().clear();
-								m_Scene->SetName("Prefab");
-								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
-								PrefabRegistry::Get().RegisterPrefab(prefab);
-								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-								if (!currScenePath.empty())
-								{
-									currScenePath.clear();
-								}
-								isPrefabEditor = true;
-
-								LOG_INFO("Now editing prefab:", currPrefabPath);
-							}
-							//}
-							
-						}
-					}
-					// to change the color of the selected
-					if (isSelected)
-					{
-						ImGui::PopStyleColor(3);
-					}
-
-					// ==================== Display info detail ==========================
-					if (ImGui::IsItemHovered())
-					{
-						ImGui::BeginTooltip();
-						ImGui::Text("Name: %s", fileName.c_str());
-						//ImGui::Text("Type: %s", filePath.c_str();
-						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
-						ImGui::Text("Type: %s", extension.c_str());
-						ImGui::EndTooltip();
-					}
-
-					// ==================== To center text under thumbnail ================
-					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
-					float textX = (thumbnailSize - textSize.x) * 0.5f;
-					if (textX < 0) textX = 0;
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
-					ImGui::TextWrapped("%s", fileName.c_str());
-
-					ImGui::PopID();
-					ImGui::NextColumn();
-					
-				}
-			}
-
-			ImGui::EndChild(); // end of the right column
-			ImGui::Columns(1);
-		}
-		ImGui::End();*/ // End of the assets browser window
+	void Editor::displayDescriptorEditorPanel() {
+		;
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
@@ -1691,8 +1637,8 @@ namespace Engine
 		}
 
 		ImGui::End();
-		
-		
+
+
 		// Logic here 
 
 	}

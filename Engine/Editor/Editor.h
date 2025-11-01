@@ -83,6 +83,7 @@ namespace Engine
 		std::string selectedPrefabPath{};
 		std::string currFileName{};
 		Prefab* m_CurrentPrefab = nullptr;
+		bool createEttFromPrfab = false;
 		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
 		//bool prefabModified = false;
 
@@ -136,6 +137,9 @@ namespace Engine
 
 		// display assets browser list
 		void displayAssetsBrowserPanel();
+
+		// display assets editor panel
+		void displayDescriptorEditorPanel();
 
 		// display performance profile
 		void displayPerformanceProfilePanel(Timestep ts);
