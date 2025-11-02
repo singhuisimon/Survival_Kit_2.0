@@ -54,10 +54,13 @@ namespace Engine {
             context.Entity = &ent;
             context.Scene = scene;
             context.DeltaTime = ts;
+            context.Blackboard = btComp.PersistantBlackboard;
 
             // Execute the behaviour tree
             BTStatus status = btComp.TreeInstance->Execute(context);
             btComp.LastStatus = status;
+
+            btComp.PersistantBlackboard = context.Blackboard;
 
             // Reset on completion if configured
             if (status != BTStatus::Running && btComp.ResetOnComplete) {

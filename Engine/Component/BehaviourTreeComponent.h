@@ -36,6 +36,8 @@ namespace Engine {
         /// Last execution status (for debugging)
         BTStatus LastStatus = BTStatus::Success;
 
+        BTBlackboard PersistantBlackboard;
+
         /**
          * @brief Default constructor
          */
