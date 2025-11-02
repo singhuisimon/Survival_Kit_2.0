@@ -294,8 +294,8 @@ namespace Engine {
             propertiesObj.AddMember("ComponentGUID",
                 rapidjson::Value(std::to_string(camera.ComponentGUID.m_Value).c_str(), allocator), allocator);
             propertiesObj.AddMember("FOV", camera.FOV, allocator);
-            propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-            propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
+            propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+            propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
             propertiesObj.AddMember("Primary", camera.Primary, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
