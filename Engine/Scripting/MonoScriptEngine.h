@@ -16,7 +16,11 @@ namespace Engine {
 
     class Scene;
     class Entity;
+    class Input;
 
+    // Functions to set context for internal calls
+    void SetScriptingCurrentScene(Scene* scene);
+    void SetScriptingInputSystem(Input* input);
     /**
      * @brief Manages the Mono runtime and C# script execution
      * @details Handles:

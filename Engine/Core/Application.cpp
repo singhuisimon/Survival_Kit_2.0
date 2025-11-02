@@ -6,6 +6,7 @@
 #include <tracy/Tracy.hpp>
 #include <sstream>
 #include <iomanip>
+#include"../Scripting/MonoScriptEngine.h"
 
 namespace Engine {
 
@@ -84,6 +85,17 @@ namespace Engine {
         m_Input = std::make_unique<Input>();
         m_Input->Init(m_Window);
         LOG_INFO("Input system initialized");
+
+        Engine::SetScriptingInputSystem(&GetInput());
+
+        // Initialize Mono scripting
+        Engine::MonoScriptEngine::GetInstance().Initialize("GameScripts.dll");
+
+        // Create your scene and systems
+       // m_Scene = std::make_shared<Engine::Scene>();
+
+        // Set scene for scripting
+       // Engine::SetScriptingCurrentScene(m_Scene.get());
 
         // DO NOT call OnInit() here - it will be called in Run() instead!
 
@@ -184,6 +196,7 @@ namespace Engine {
         }
 
         glfwTerminate();
+        Engine::MonoScriptEngine::GetInstance().Shutdown();
 
         LOG_INFO("Application shutdown complete");
     }

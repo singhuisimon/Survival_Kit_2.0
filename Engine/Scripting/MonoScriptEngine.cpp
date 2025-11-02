@@ -27,6 +27,13 @@ namespace Engine {
 
 
     void MonoScriptEngine::Initialize(const std::string& assemblyPath) {
+        // Guard against double initialization
+        static bool s_Initialized = false;
+        if (s_Initialized) {
+            LOG_WARNING("Mono Script Engine already initialized, skipping...");
+            return;
+        }
+
         LOG_INFO("Initializing Mono Script Engine...");
 
         m_AssemblyPath = assemblyPath;
@@ -77,9 +84,10 @@ namespace Engine {
         // Register internal calls (C++ functions callable from C#)
         RegisterInternalCalls();
 
+        s_Initialized = true;
         LOG_INFO("Mono Script Engine initialized");
-
     }
+
 
 
     void MonoScriptEngine::Shutdown() {
@@ -314,6 +322,8 @@ namespace Engine {
         static bool Input_IsKeyPressed(int keyCode);
         static bool Input_IsMouseButtonPressed(int button);
         static void Input_GetMousePosition(glm::vec2* outPosition);
+        //static Input* s_InputSystem = nullptr;  // Will be set later!
+
     }
 
     void MonoScriptEngine::RegisterInternalCalls() {
@@ -500,10 +510,11 @@ namespace Engine {
         }
     }
 
+    // Expose these functions for external use
     void SetScriptingInputSystem(Input* input) {
         InternalCalls::SetInputSystem(input);
     }
-    // Expose SetCurrentScene for ScriptSystem to call
+
     void SetScriptingCurrentScene(Scene* scene) {
         InternalCalls::SetCurrentScene(scene);
     }
