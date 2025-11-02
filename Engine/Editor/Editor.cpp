@@ -913,8 +913,111 @@ namespace Engine
 					{
 						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
 					}
-				}
 
+					if (openReverbComponent) {
+						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
+						
+						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
+						int currentIndex = static_cast<int>(reverbZone.Preset);
+
+						ImGui::Text("Select an option:");
+
+						// Dropdown menu
+						if (ImGui::BeginCombo("Reverb Preset", presets[currentIndex]))
+						{
+							for (int i = 0; i < IM_ARRAYSIZE(presets); i++)
+							{
+								bool isSelected = (i == currentIndex);
+								if (ImGui::Selectable(presets[i], isSelected))
+								{
+									// Update the enum when user picks a new item
+									reverbZone.Preset = static_cast<ReverbPreset>(i);
+								}
+
+								if (isSelected)
+									ImGui::SetItemDefaultFocus();
+							}
+							ImGui::EndCombo();
+						}
+
+						if (reverbZone.Preset == ReverbPreset::Custom) {
+							
+							float& decayTime = reverbZone.DecayTime;
+							if (ImGui::SliderFloat("Decay Time", &decayTime, 100.f, 20000.f)) {
+								reverbZone.SetDecayTime(decayTime);
+							}
+
+							float& hfDecayRatio = reverbZone.HfDecayRatio;
+							if (ImGui::SliderFloat("High-Frequency Decay Ratio", &hfDecayRatio, 0.f, 100.f)) {
+								reverbZone.SetHfDecayRatio(hfDecayRatio);
+							}
+
+							float& diffusion = reverbZone.Diffusion;
+							if (ImGui::SliderFloat("Diffusion", &diffusion, 0.f, 100.f)) {
+								reverbZone.SetDiffusion(diffusion);
+							}
+
+							float& density = reverbZone.Density;
+							if (ImGui::SliderFloat("Density", &density, 0.f, 100.f)) {
+								reverbZone.SetDensity(density);
+							}
+
+							float& wetLevel = reverbZone.WetLevel;
+							if (ImGui::SliderFloat("Wet Level", &wetLevel, -80.f, 20.f)) {
+								reverbZone.SetWetLevel(wetLevel);
+							}
+						}
+
+						float& minDistanceReverb = reverbZone.MinDistance;
+						if (ImGui::InputFloat("MinDistance###minreverb", &minDistanceReverb)) {
+							reverbZone.SetMinDistance(minDistanceReverb);
+						}
+
+						float& maxDistanceReverb = reverbZone.MaxDistance;
+						if (ImGui::InputFloat("MaxDistance###maxreverb", &maxDistanceReverb)) {
+							reverbZone.SetMaxDistance(maxDistanceReverb);
+						}	
+					}
+				}
+				if (m_SelectedEntity.HasComponent<ListenerComponent>())
+				{
+					ImGui::Separator();
+
+					bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeListener = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###ListenBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ListenPopUp");
+					}
+					if (ImGui::BeginPopup("ListenPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeListener = true;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (removeListener)
+					{
+						m_SelectedEntity.RemoveComponent<ListenerComponent>();
+					}
+
+					if (openListenerComponent) {
+						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
+						bool& active = listener.Active;
+
+						if (ImGui::Checkbox("Active", &active)) {
+							listener.Active = active;
+						}
+					}
+				}
 				if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
 				{
 					ImGui::Separator();
@@ -1254,6 +1357,26 @@ namespace Engine
 						if (!hasReverbComponent)
 						{
 							ImGui::SetTooltip("Adds reverb zone to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Listener Component ----------------------------
+					bool hasListenerComponent = m_SelectedEntity.HasComponent<ListenerComponent>();
+					ImGui::BeginDisabled(hasListenerComponent);
+
+					if (ImGui::MenuItem("Listener Component"))
+					{
+						if (!hasListenerComponent)
+						{
+							m_SelectedEntity.AddComponent<ListenerComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasListenerComponent)
+						{
+							ImGui::SetTooltip("Sets object as listener.");
 						}
 					}
 					ImGui::EndDisabled();
