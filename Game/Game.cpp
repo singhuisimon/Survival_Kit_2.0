@@ -150,7 +150,7 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
@@ -251,10 +251,10 @@ void Game::CreateDefaultScene() {
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
     
-    xresource::instance_guid guid = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
-    mesh.ComponentGUID = guid;
+    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    mesh.MeshGuid = inst_guid;
 
-    std::cout << guid.m_Value << "\n";
+    std::cout << inst_guid.m_Value << "\n";
 
 	//mesh.MeshResource = mesh_rsc;
 

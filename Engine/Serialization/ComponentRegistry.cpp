@@ -135,10 +135,24 @@ namespace Engine {
             auto& meta = REGISTER_COMPONENT(MeshRendererComponent);
 
             meta.AddProperty<MeshRendererComponent, u64>(
-				"ComponentGUID",
+				"MeshGuid",
                 PropertyType::U64,                
-                [](const MeshRendererComponent& c) { return static_cast<u64>(c.ComponentGUID); },
-				[](MeshRendererComponent& c, const u64& v) { c.ComponentGUID = xresource::instance_guid::FromU64(v); }
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.MeshGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.MeshGuid = xresource::instance_guid{v}; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"MaterialGuid",
+                PropertyType::U64,
+				[](const MeshRendererComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"TextureGuid",
+				PropertyType::U64,
+				[](const MeshRendererComponent& c) { return static_cast<u64>(c.TextureGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.TextureGuid = xresource::instance_guid{ v }; }
             );
 
             meta.AddProperty<MeshRendererComponent, bool>(
@@ -193,8 +207,8 @@ namespace Engine {
             meta.AddProperty<MeshRendererComponent, u32>(
                 "SubmeshIndex",
                 PropertyType::U32,
-                [](const MeshRendererComponent& c) { return c.submeshIndex; },
-				[](MeshRendererComponent& c, const u32& v) { c.submeshIndex = v; }
+                [](const MeshRendererComponent& c) { return c.SubmeshIndex; },
+				[](MeshRendererComponent& c, const u32& v) { c.SubmeshIndex = v; }
             );
 
         }

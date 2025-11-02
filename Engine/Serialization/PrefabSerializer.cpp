@@ -255,6 +255,14 @@ namespace Engine {
             scaleArray.PushBack(transform.Scale.z, allocator);
             propertiesObj.AddMember("Scale", scaleArray, allocator);
 
+            propertiesObj.AddMember("Parent", transform.Parent, allocator);
+
+			rapidjson::Value childrenArray(rapidjson::kArrayType);
+            for (const auto& child : transform.Children) {
+                childrenArray.PushBack(child, allocator);
+            }
+            propertiesObj.AddMember("Children", childrenArray, allocator);
+
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }
@@ -284,8 +292,18 @@ namespace Engine {
             componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
-            propertiesObj.AddMember("ComponentGUID",
-                rapidjson::Value(std::to_string(mesh.ComponentGUID.m_Value).c_str(), allocator), allocator);
+            propertiesObj.AddMember("MeshGuid",
+                rapidjson::Value(mesh.MeshGuid.m_Value), allocator);
+
+            propertiesObj.AddMember("MaterialGuid", 
+                rapidjson::Value(mesh.MaterialGuid.m_Value), allocator);
+
+            propertiesObj.AddMember("TextureGuid", 
+                rapidjson::Value(mesh.TextureGuid.m_Value), allocator);
+
+            //propertiesObj.AddMember("MeshGuid",
+            //    rapidjson::Value(std::to_string(mesh.MeshGuid.m_Value).c_str(), allocator), allocator);
+
             propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);

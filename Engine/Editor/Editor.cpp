@@ -620,6 +620,11 @@ namespace Engine
 						// ==================== Selected Entity Section =======================
 						if (ImGui::MenuItem("Delete Entity"))
 						{
+							// If this entity has a parent, unparent it first
+							if (entity.HasComponent<TransformComponent>()) {
+								TransformSystem::UnParent(m_Scene, entity);
+							}
+
 							m_Scene->DestroyEntity(entity);
 							if (m_SelectedEntity == entity)
 							{

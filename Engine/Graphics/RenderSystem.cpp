@@ -23,18 +23,19 @@ namespace Engine {
 			auto& renderable = view.get<MeshRendererComponent>(entity);
 			auto& transform = view.get<TransformComponent>(entity);
 
-			xresource::full_guid guid = Engine::convertToMeshGuid(renderable.ComponentGUID);
-
 			// Only render visible meshes
 			if (renderable.Visible)
 			{
 				m_drawitems.push_back({
-					guid,
-					u32(entity),
+					transform.WorldTransform,
+					static_cast<u32>(entity),
+					renderable.SubmeshIndex,
 					renderable.MeshType,
 					renderable.Material,
 					renderable.Texture,
-					transform.WorldTransform
+					renderable.MeshGuid,
+					renderable.MaterialGuid,
+					renderable.TextureGuid
 					});
 			}
 		}

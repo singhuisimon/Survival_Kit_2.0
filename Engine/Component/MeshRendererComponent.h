@@ -21,30 +21,39 @@ namespace Engine {
      */
     struct MeshRendererComponent {
 
-        /// Unique identifier for this component instance
-        xresource::instance_guid ComponentGUID;
- 
-        bool Visible;           // Determine if sent to draw call
-        bool ShadowReceive;     // For future expansion (WIP)
-        bool ShadowCast;        // For future expansion (WIP)
-        bool GlobalIlluminate;  // Require further expansion; for now true means it receives light from a light object
-        u32 MeshType;           // Mesh that the object uses (primitive/custom)
-        u32 Material;           // Material handle
-        u32 Texture;            // Texture handle (0 means no texture, actual textures start from 1)
-		u32 submeshIndex;       // Submesh index for multi mesh objects
+		// Guids for resources
+        xresource::instance_guid MeshGuid;
+		xresource::instance_guid MaterialGuid;
+		xresource::instance_guid TextureGuid;
+
+		// Lighting, shadows and visibility
+        bool Visible;               // Determine if sent to draw call
+        bool ShadowReceive;         // For future expansion (WIP)
+        bool ShadowCast;            // For future expansion (WIP)
+        bool GlobalIlluminate;      // Require further expansion; for now true means it receives light from a light object
+
+        // Defaults
+        u32 MeshType;          // Fallback to default mesh if custom mesh not found
+        u32 Material;          // Fallback to default material if custom material not found
+        u32 Texture;           // Fallback to default texture if no texture found (0 means no texture, actual textures start from 1)
+
+        // Submesh
+		u32 SubmeshIndex;           // Submesh index for multi mesh objects, assumes all custom meshes imported as a group of submeshes, even if its 1 mesh.
+									// If a single mesh is imported, it's treated as a group of 1 submesh.
 
         // Default constructor
         MeshRendererComponent()
-            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
-            Visible(true),
+            : MeshGuid(xresource::instance_guid::GenerateGUIDCopy()),
+			MaterialGuid(xresource::instance_guid::GenerateGUIDCopy()),
+			TextureGuid(xresource::instance_guid::GenerateGUIDCopy()),
+    		Visible(true),
             ShadowReceive(false),
             ShadowCast(false),
             GlobalIlluminate(true),
             MeshType(0),
             Material(0),
             Texture(0),
-			submeshIndex(0) {
-        }
+            SubmeshIndex(0) { }
     };
 
 } // namespace Engine
