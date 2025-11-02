@@ -259,11 +259,11 @@ namespace Engine {
             if (properties.HasMember("FOV")) {
                 comp.FOV = properties["FOV"].GetFloat();
             }
-            if (properties.HasMember("NearClip")) {
-                comp.NearClip = properties["NearClip"].GetFloat();
+            if (properties.HasMember("NearPlane")) {
+                comp.NearPlane = properties["NearPlane"].GetFloat();
             }
-            if (properties.HasMember("FarClip")) {
-                comp.FarClip = properties["FarClip"].GetFloat();
+            if (properties.HasMember("FarPlane")) {
+                comp.FarPlane = properties["FarPlane"].GetFloat();
             }
             if (properties.HasMember("Primary")) {
                 comp.Primary = properties["Primary"].GetBool();

@@ -52,10 +52,6 @@ namespace Engine {
         float NearPlane;        // Near clipping plane
         float FarPlane;         // Far clipping plane
 
-        // Compatibility aliases - these are the same values
-        float NearClip;         // Alias for NearPlane
-        float FarClip;          // Alias for FarPlane
-
         // Output targets
         // u32 TargetTexture       // (Future): Reference to texture where camera output will be drawn
         //enum class ClearFlags {Skybox, Color, DepthOnly, Nothing}; // Determine what to clear
@@ -76,9 +72,7 @@ namespace Engine {
             Aspect{ 16.0f / 9.0f },
             FOV{ 45.0f },
             NearPlane{ 0.5f },
-            FarPlane{ 100.0f },
-            NearClip{ 0.5f },
-            FarClip{ 100.0f },
+            FarPlane{ 1000.0f },
             Target{ 0.0f, 0.0f, 0.0f },
             View{ glm::mat4{1.0f} },
             Persp{ glm::mat4{1.0f} }
@@ -109,19 +103,12 @@ namespace Engine {
             FOV{ fov },
             NearPlane{ near },
             FarPlane{ far },
-            NearClip{ near },
-            FarClip{ far },
             Target{ target },
             View{ v },
             Persp{ p }
         {
         }
 
-        // Helper to sync NearClip/FarClip with NearPlane/FarPlane
-        void SyncClipPlanes() {
-            NearClip = NearPlane;
-            FarClip = FarPlane;
-        }
 
         //// Setters
         //void SetEnabled(bool enabled) { Enabled = enabled; isDirty = true; }
@@ -132,7 +119,7 @@ namespace Engine {
         //void SetFOV(float fov) { FOV = fov; isDirty = true; }
         //void SetNearPlane(float near) { NearPlane = near; isDirty = true; }
         //void SetFarPlane(float far) { FarPlane = far; isDirty = true; }
-        //void SetTarget(const glm::vec3& target) { Target = target; isDirty = true; }
+        void SetTarget(const glm::vec3& target) { Target = target; isDirty = true; }
         //void SetView(const glm::mat4& view) { View = view; isDirty = true; }
         //void SetPerspective(const glm::mat4& persp) { Persp = persp; isDirty = true; }
 

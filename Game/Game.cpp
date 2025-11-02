@@ -28,6 +28,13 @@
 #include "Physics/PhysicsSystem.h"
 #include "BehaviourTree/BehaviourTreeSystem.h"
 
+// KENNY TESTING: FOR MAINCAMERA "SCRIPT"
+#include <glm/common.hpp>               // glm::clamp
+#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
+// Math Utility
+#include "Utility/MathUtils.h"
+
+
 // KEPT FOR BT TEST <WILL REMOVE BY THIS WEEKEND PLS DUN TOUCH>
 #include "BehaviourTree/BTNodeRegistry.h"
 #include "Serialization/BehaviourTreeSerializer.h"
@@ -459,31 +466,148 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
     }
 
-    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
-
-        auto& transform = foundEntity.GetComponent<Engine::TransformComponent>();
-
-        if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
-        if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
-        if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
-        if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+    // Get MainCamera to follow Player from the back
+    Engine::Entity GameCam;
+    bool GameCamFound = false;
+    for (auto entityHandle : view) {
+        auto& camTag = view.get<Engine::TagComponent>(entityHandle);
+        if (camTag.Tag == "MainCamera") {
+            GameCam = Engine::Entity(entityHandle, &registry);
+            GameCamFound = true;
+            break;
+        }
     }
 
-    // Change Camera type
+    // Editor camera toggle
+    auto& editorCamToggle = m_Renderer->getEditorCamToggle();
     if (input.IsKeyJustPressed(GLFW_KEY_TAB)) {
-
-        auto& editorCam = m_Renderer->getEditorCamera();
-        if (editorCam.getCamType() == Engine::CameraType::ORBITING) {
-            editorCam.setCamType(Engine::CameraType::WALKING);
+        if (editorCamToggle == true) {
+            editorCamToggle = false;
         }
         else {
-            editorCam.setCamType(Engine::CameraType::ORBITING);
+            editorCamToggle = true;
         }
+    }
 
+    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+
+        // Get player transform to control its movement
+        auto& transform = foundEntity.GetComponent<Engine::TransformComponent>();
+
+        // Update main game camera on player if it exists
+        if (GameCamFound && GameCam.HasComponent<Engine::CameraComponent>()
+            && GameCam.HasComponent<Engine::TransformComponent>()
+            && !editorCamToggle) {
+
+            // Movement speed 
+            const float moveSpeed = 0.1f;
+
+            // Get player's facing direction (derived from rotation quaternion)
+            glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, +1.0f); // forward in local space
+            forward = glm::normalize(forward);
+
+            // Compute right vector from forward and world up
+            glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+            // Movement accumulator
+            glm::vec3 moveDir(0.0f);
+
+            if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+            if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+            if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+            if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+
+            // Normalize to prevent faster diagonal movement
+            if (glm::dot(moveDir, moveDir) > 0.0f)
+                moveDir = glm::normalize(moveDir);
+
+            // Apply movement to player
+            transform.Position += moveDir * moveSpeed;
+
+            // Get MainCamera transform and camera component
+            auto& camTransform = GameCam.GetComponent<Engine::TransformComponent>();
+            auto& camComp = GameCam.GetComponent<Engine::CameraComponent>();
+
+            // Player head/aim point (slightly above)
+            const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
+
+            // Persistent orbit state
+            static bool  initialized = false;
+            static float pitch = 0.25f; // alpha
+            static float yaw = 0.0f;    // betta
+            static float radius = 7.5f;
+
+            // Initialize yaw/pitch from current camera placement once
+            if (!initialized) {
+                const glm::vec3 rel = camTransform.Position - aimTarget;
+                const float r = glm::length(rel);
+                if (r > 1e-6f) {
+                    pitch = glm::asin(glm::clamp(rel.y / r, -1.0f, 1.0f));
+                    yaw = std::atan2(rel.x, rel.z);
+                    /* Radius is constant thru out the gameplay */
+                }
+                else {
+                    // fallback if camera starts at target: put it behind player
+                    pitch = 0.25f;
+                    yaw = 0.0f;
+                    radius = 7.5f;
+                }
+                initialized = true;
+            }
+
+            // Mouse deltas
+            const float xOffset = input.GetMouseDelta().x;
+            const float yOffset = input.GetMouseDelta().y;
+
+            // Update orbit angles only when mouse moves
+            if (xOffset != 0.0f || yOffset != 0.0f) {
+
+                // Adjust angles based on cursor offset
+                yaw += (xOffset < 0.0f) ? 0.05f : (xOffset > 0.0f ? -0.05f : 0.0f);
+                pitch += (yOffset > 0.0f) ? 0.02f : (yOffset < 0.0f ? -0.02f : 0.0f);
+
+                // Clamp pitch to avoid flipping
+                pitch = glm::clamp(pitch, -Engine::MathUtils::HALF_PI + 0.01f, Engine::MathUtils::HALF_PI - 0.01f);
+            }
+
+            // Rebuild direction from yaw/pitch EVERY FRAME
+            glm::vec3 dir;
+            dir.x = glm::cos(pitch) * glm::sin(yaw);
+            dir.y = glm::sin(pitch);
+            dir.z = glm::cos(pitch) * glm::cos(yaw);
+            dir = glm::normalize(dir);
+
+            // Keep constant distance from the player (orbit)
+            const glm::vec3 camPos = aimTarget + dir * radius;
+            camTransform.SetPosition(camPos);
+
+            // Always update camera target to the player's head/aim point
+            camComp.SetTarget(aimTarget);
+
+            // Player face same horizontal direction as the camera (camera behind player)
+            glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
+
+            // Calculate yaw (rotation around Y axis)
+            const float yawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+
+            // Calculate pitch (rotation around X axis)
+            // Pitch = angle between horizontal plane and forward vector
+            float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+
+            transform.SetRotation(glm::vec3(pitchDeg, yawDeg, 0.0f));
+
+        }
+        else {
+            // Default player movement w/o MainCamera
+            if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+            if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+            if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+            if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+        }
     }
 
     // Editor camera controls
-    if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+    if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle) {
         
         auto& editorCam = m_Renderer->getEditorCamera();
 
