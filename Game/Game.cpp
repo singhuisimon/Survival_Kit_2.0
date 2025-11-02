@@ -30,6 +30,16 @@
 #include "Scripting/ScriptSystem.h"        // ADD THIS
 #include "Scripting/MonoScriptEngine.h"    // ADD THIS
 #include "Scripting/ScriptReloader.h" 
+#include "BehaviourTree/BehaviourTreeSystem.h"
+
+// KEPT FOR BT TEST <WILL REMOVE BY THIS WEEKEND PLS DUN TOUCH>
+#include "BehaviourTree/BTNodeRegistry.h"
+#include "Serialization/BehaviourTreeSerializer.h"
+#include "Prefab/BehaviourTreePrefab.h"
+#include "Serialization/PrefabSerializer.h"
+#include "Serialization/PrefabInstantiator.h"
+#include "Prefab/PrefabRegistry.h"
+#include "BehaviourTree/BTNode.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -85,8 +95,20 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 2: Create Audio Manager
-    LOG_INFO("Step 2: Initializing Audio Manager...");
+    // Step 2: Register nodes for serialization
+    LOG_INFO("Step 2: Registering components...");
+    try {
+        // Register all built-in behavior tree node types
+        Engine::BTNodeRegistry::RegisterBuiltInNodes();
+        LOG_INFO("  -> Components registered successfully");
+    }
+    catch (const std::exception& e) {
+        LOG_CRITICAL("  -> FAILED to register components: ", e.what());
+        return;
+    }
+
+    // Step 3: Create Audio Manager
+    LOG_INFO("Step 3: Initializing Audio Manager...");
     try {
         m_AudioManager = std::make_unique<Engine::AudioManager>();
         if (!m_AudioManager->Init()) {
@@ -100,8 +122,8 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 3: Create scene
-    LOG_INFO("Step 3: Creating scene object...");
+    // Step 4: Create scene
+    LOG_INFO("Step 4: Creating scene object...");
     try {
         m_Scene = std::make_unique<Engine::Scene>("Main Scene");
 
@@ -128,8 +150,8 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 4: Add systems to the scene
-    LOG_INFO("Step 4: Adding systems to scene...");
+    // Step 5: Add systems to the scene
+    LOG_INFO("Step 5: Adding systems to scene...");
     try {
         AddAllSystems();  // CHANGED: Replace all manual AddSystem calls with helper function
 
@@ -139,8 +161,8 @@ void Game::OnInit() {
         LOG_ERROR("  -> Exception while adding systems: ", e.what());
     }
 
-    // Step 5: Initialize all systems
-    LOG_INFO("Step 5: Initializing systems...");
+    // Step 6: Initialize all systems
+    LOG_INFO("Step 6: Initializing systems...");
     try {
         m_Scene->InitializeSystems();
         LOG_INFO("  -> Systems initialized successfully");
@@ -149,8 +171,8 @@ void Game::OnInit() {
         LOG_ERROR("  -> Exception while initializing systems: ", e.what());
     }
 
-    // Step 6: Load scene from file or create default
-    LOG_INFO("Step 6: Loading scene content...");
+    // Step 7: Load scene from file or create default
+    LOG_INFO("Step 7: Loading scene content...");
     bool loadedFromFile = false;
 
     try {
@@ -187,8 +209,8 @@ void Game::OnInit() {
         return;
     }
 
-    // Step 7: Initialize Tracy Profiler
-    LOG_INFO("Step 7: Initializing Tracy Profiler...");
+    // Step 8: Initialize Tracy Profiler
+    LOG_INFO("Step 8: Initializing Tracy Profiler...");
     try {
         m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
 
@@ -269,6 +291,7 @@ void Game::AddAllSystems() {
     m_Scene->AddSystem<Engine::ScriptSystem>();    
 
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+    m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
 }
 
 void Game::CreateDefaultScene() {
@@ -372,6 +395,20 @@ void Game::CreateDefaultScene() {
     reverb.IsDirty = true;
 
     LOG_TRACE("  -> Reverb zone created");
+
+    LOG_TRACE("  Creating AI entity...");
+    auto ai = m_Scene->CreateEntity("AI");
+
+    auto& aiTransform = reverbZone.GetComponent<Engine::TransformComponent>();
+    aiTransform.Position = glm::vec3(0, 0, 0); // center of world
+    aiTransform.Scale = glm::vec3(1, 1, 1);
+
+    auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
+    bt.Active = true;
+    bt.ResetOnComplete = false;
+    bt.TreeAssetPath = "SimpleWaitTree.json";
+
+    LOG_TRACE("  -> ai created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -648,6 +685,96 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
         else {
             LOG_ERROR("Load failed!");
+        }
+    }
+
+    // === TEST BEHAVIOUR TREE SYSTEM ===
+
+    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
+    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
+    if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
+        LOG_INFO("=== [F10] Create Behaviour Tree and attach to entity ===");
+
+        // 1. Create a simple behaviour tree
+        auto tree = std::make_shared<Engine::BehaviourTree>();
+        tree->SetName("SimpleWaitTree");
+
+        // Create nodes
+        auto root = std::make_shared<Engine::BTSequence>();
+        auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
+        auto logNode = std::make_shared<Engine::BTLog>("HELLO");
+            //= std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
+            //LOG_INFO("[AI Action] Hello from Behaviour Tree!");
+            //return Engine::BTStatus::Success;
+            //});
+
+        root->AddChild(waitNode);
+        root->AddChild(logNode);
+        tree->SetRootNode(root);
+
+        // 2. Serialize the tree to file
+        std::string btPath = "SimpleWaitTree.json";
+        Engine::BehaviourTreeSerializer::SerializeToFile(*tree, btPath);
+
+        // 3. Create entity & attach component
+        Engine::Entity aiEntity = m_Scene->CreateEntity("TestAI");
+        auto& btComp = aiEntity.AddComponent<Engine::BehaviourTreeComponent>(tree);
+        btComp.Active = true;
+        btComp.ResetOnComplete = true;
+
+        // Set the file path so it persists to SavedScene.json
+        btComp.TreeAssetPath = btPath;
+
+        LOG_INFO("Created AI Entity with BehaviourTreeComponent!");
+        LOG_INFO("Tree path set to: ", btComp.TreeAssetPath);
+    }
+
+    // F11 -> Create a BehaviourTreePrefab from the tree file
+    if (input.IsKeyJustPressed(GLFW_KEY_F11)) {
+        LOG_INFO("=== [F11] Create BehaviourTreePrefab from file ===");
+
+
+        Engine::Entity foundEntity;
+        bool found = false;
+
+        auto view = registry.view<Engine::TagComponent>();
+        for (auto entityHandle : view) {
+            auto& tag = view.get<Engine::TagComponent>(entityHandle);
+            if (tag.Tag == "TestAI") { // change to whatever name you want
+                foundEntity = Engine::Entity(entityHandle, &registry);
+                found = true;
+                break;
+            }
+        }
+
+        if (!foundEntity) {
+            LOG_ERROR("No entity named 'TestAI' found. Create one first with F10.");
+            return;
+        }
+
+        // Make sure it has a valid BehaviourTreeComponent
+        if (!foundEntity.HasComponent<Engine::BehaviourTreeComponent>()) {
+            LOG_ERROR("Entity 'TestAI' does not have a BehaviourTreeComponent!");
+            return;
+        }
+
+        // Save the entity itself as a prefab (not just the tree)
+        auto prefab = Engine::PrefabSerializer::CreateEntityPrefab(foundEntity, "AIPrefab_SimpleWaitTree");
+        Engine::PrefabRegistry::Get().RegisterPrefab(prefab);
+
+        LOG_INFO("Entity Prefab 'AIPrefab_SimpleWaitTree' created and registered.");
+    }
+
+
+    // F12 -> Instantiate entity from BehaviourTreePrefab
+    if (input.IsKeyJustPressed(GLFW_KEY_K)) {
+        auto prefab = Engine::PrefabRegistry::Get().GetPrefabByName("AIPrefab_SimpleWaitTree");
+        if (prefab) {
+            Engine::PrefabInstantiator::InstantiateEntityPrefab(m_Scene.get(), prefab->GetGUID());
+            LOG_INFO("Instantiated AI entity from prefab 'AIPrefab_SimpleWaitTree'");
+        }
+        else {
+            LOG_WARNING("Prefab 'AIPrefab_SimpleWaitTree' not found!");
         }
     }
 

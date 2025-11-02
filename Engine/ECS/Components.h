@@ -12,6 +12,7 @@
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/ScriptComponent.h"
 
+#include "../Component/BehaviourTreeComponent.h"
 
 namespace Engine {
     // All components are now defined in their respective headers

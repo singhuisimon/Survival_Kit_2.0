@@ -63,6 +63,9 @@ file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
 # Scripting Module (NEW!)
 file(GLOB_RECURSE SCRIPTING_SOURCES "${ENGINE_ROOT}/Scripting/*.cpp")
 file(GLOB_RECURSE SCRIPTING_HEADERS "${ENGINE_ROOT}/Scripting/*.h")
+# BehaviourTree Module
+file(GLOB_RECURSE BEHAVIOURTREE_SOURCES "${ENGINE_ROOT}/BehaviourTree/*.cpp")
+file(GLOB_RECURSE BEHAVIOURTREE_HEADERS "${ENGINE_ROOT}/BehaviourTree/*.h")
 
 # Combine all files
 set(ENGINE_SOURCES
@@ -80,6 +83,7 @@ set(ENGINE_SOURCES
     ${PHYSICS_SOURCES}
     ${PROFILER_SOURCES}
     ${SCRIPTING_SOURCES}
+    ${BEHAVIOURTREE_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -97,6 +101,7 @@ set(ENGINE_HEADERS
     ${PHYSICS_HEADERS}
     ${PROFILER_HEADERS}
     ${SCRIPTING_HEADERS}
+    ${BEHAVIOURTREE_HEADERS}
 )
 
 # Create engine static library
@@ -174,6 +179,9 @@ source_group("Profiler\\Source" FILES ${PROFILER_SOURCES})
 # Scripting Module (NEW!)
 source_group("Scripting\\Header" FILES ${SCRIPTING_HEADERS})
 source_group("Scripting\\Source" FILES ${SCRIPTING_SOURCES})
+# BehaviourTree Module
+source_group("BehaviourTree\\Header" FILES ${BEHAVIOURTREE_HEADERS})
+source_group("BehaviourTree\\Source" FILES ${BEHAVIOURTREE_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
