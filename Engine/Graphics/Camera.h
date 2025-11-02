@@ -199,7 +199,7 @@ namespace Engine {
                 const float alpha = glm::asin(pos.y / r);
                 const float betta = std::atan2f(pos.x, pos.z);
 
-                r += yoffset > 0.0f ? -1.0f : 1.0f; // Zoom in or out
+                r += yoffset > 0.0f ? -100.0f : 100.0f; // Zoom in or out
                 if (r < 1.0f) r = 1.0f; // Clamp minimum distance
 
                 // Update position based on new distance
@@ -226,27 +226,27 @@ namespace Engine {
 
         void moveCamForward() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 0.1f;
-            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 0.1f;
+            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
+            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
         }
 
         void moveCamLeft() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 0.2f;
-            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 0.2f;
+            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
+            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
         }
 
         void moveCamBack() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 0.1f;
-            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 0.1f;
+            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
+            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 100.f;
 
         }
 
         void moveCamRight() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 0.2f;
-            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 0.2f;
+            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
+            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 100.f;
         }
 
         //// Getters for camera data

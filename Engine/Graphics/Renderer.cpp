@@ -177,7 +177,7 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
-		// Create FBO for GPU ID
+		// Create FBO for F
 		auto gpu_fbo = FrameBuffer::create();
 		if (gpu_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*gpu_fbo));
@@ -332,7 +332,7 @@ namespace Engine {
 		// If this pass targets the GPU-ID FBO (Shader program 2, R32UI), clear with integer clear:
 		if (pass.shdpgm_handle == 2) {
 			//auto& fbo = m_framebuffers[pass.fbo_handle];
-			// 0 means "no hit" — reserve ID=0 as empty
+			// 0 means "no hit" ï¿½ reserve ID=0 as empty
 			//fbo.clear_colori(/*drawbuf index*/169, 0, 0, 0, 0);
 			fbo.clear_colorui(/*drawbuf index*/0, NO_HIT, 0, 0, 0);
 		}

@@ -9,6 +9,9 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
+
+#include "../Prefab/BehaviourTreePrefab.h"
 
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
@@ -276,6 +279,23 @@ namespace Engine {
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
             }
+            // Serialize BehaviourTreeComponent
+            if (entity.HasComponent<BehaviourTreeComponent>()) {
+                LOG_TRACE("  - Serializing BehaviourTreeComponent");
+                auto& bt = entity.GetComponent<BehaviourTreeComponent>();
+                rapidjson::Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "BehaviourTreeComponent", allocator);
+
+                rapidjson::Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Active", bt.Active, allocator);
+                propertiesObj.AddMember("ResetOnComplete", bt.ResetOnComplete, allocator);
+                propertiesObj.AddMember("TreeAssetPath",
+                    rapidjson::Value(bt.TreeAssetPath.c_str(), allocator), allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
 
             entityObj.AddMember("Components", componentsArray, allocator);
             entitiesArray.PushBack(entityObj, allocator);
@@ -549,7 +569,22 @@ namespace Engine {
                             reverb.Density = properties["Density"].GetFloat();
                         if (properties.HasMember("WetLevel"))
                             reverb.WetLevel = properties["WetLevel"].GetFloat();
-                            }
+                    }
+                    else if (componentType == "BehaviourTreeComponent") {
+                        auto& bt = entity.AddComponent<BehaviourTreeComponent>();
+                        if (properties.HasMember("Active"))
+                            bt.Active = properties["Active"].GetBool();
+                        if (properties.HasMember("ResetOnComplete"))
+                            bt.ResetOnComplete = properties["ResetOnComplete"].GetBool();
+                        if (properties.HasMember("TreeAssetPath")) {
+                            bt.TreeAssetPath = properties["TreeAssetPath"].GetString();    
+                        }
+
+                        // Do NOT load the tree here — only store the reference
+                        bt.TreeInstance = nullptr;
+
+                    }
+
 
                 }
             }

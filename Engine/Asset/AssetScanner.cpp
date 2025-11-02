@@ -1,5 +1,8 @@
 
 #include "AssetScanner.h"
+#include "../Utility/AssetPath.h"
+#include "AssetManager.h"
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -113,7 +116,11 @@ namespace Engine {
 						continue;
 
                     //get the file path (metadata)
-					const std::string pathStr = path.string();
+					 std::string pathStr = path.string();
+
+					// Normalize path to forward slashes for consistent comparison
+					std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+
 					const std::time_t t = toTimeT(entry.last_write_time());
 					const std::uintmax_t sz = entry.file_size();
 
@@ -188,8 +195,11 @@ namespace Engine {
 		if (!out.is_open()) return false;
 		for (const auto& kv : m_snapshot)
 		{
+
+			//convert absolute path to relative path before writing 
+			std::string pathToWrite = getRelativeAssetPath(kv.first);
 			// Write one record per line: path|timestamp|size\n
-			out << kv.first << '|' << kv.second.lastWrite << '|' << kv.second.size << '\n';
+			out << pathToWrite << '|' << kv.second.lastWrite << '|' << kv.second.size << '\n';
 		}
 		return true;
 	}
@@ -198,7 +208,7 @@ namespace Engine {
 	{
 		std::ifstream in(file);
 		if (!in.is_open()) return false;
-
+		
 		m_snapshot.clear();
 
 		std::string line;
@@ -213,13 +223,36 @@ namespace Engine {
 			if (!std::getline(ss, ts, '|')) continue;
 			std::getline(ss, sz); // read the rest of the line as size
 
+			//convert the relative path back to absolute path for internal storage 
+			std::string absolutePath; 
+			if (path.find("\\Resources\\") == 0 || path.find("/Resources/") == 0) {
+				// Remove the leading \Resources\ or /Resources/ part
+				std::string pathWithoutResources = path;
+				if (pathWithoutResources.find("\\Resources\\") == 0) {
+					pathWithoutResources = pathWithoutResources.substr(11); // Length of "\Resources\"
+				}
+				else if (pathWithoutResources.find("/Resources/") == 0) {
+					pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
+				}
+				std::string sourceRoot = AssetManager::GetSourceResourcesPath();
+				fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
+
+				//normalize here as well for safety
+				std::string result = fullPath.string(); 
+				std::replace(result.begin(), result.end(), '\\', '/');
+				absolutePath = result;
+			}
+			else {
+				absolutePath = path;
+			}
+
 			FileStamp st{};
 			try { st.lastWrite = static_cast<std::time_t>(std::stoll(ts)); }
 			catch (...) { st.lastWrite = 0; }
 			try { st.size = static_cast<std::uintmax_t>(std::stoull(sz)); }
 			catch (...) { st.size = 0; }
 
-			m_snapshot[path] = st;
+			m_snapshot[absolutePath] = st;
 		}
 		return true;
 	}

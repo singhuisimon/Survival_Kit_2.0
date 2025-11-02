@@ -1,0 +1,28 @@
+{
+    "Name": "SimpleWaitTree",
+    "GUID": "15875145136386048067",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Node",
+        "GUID": "15875145136386048069",
+        "Children": [
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "8957616108744966215",
+                "Properties": {
+                    "Duration": "2.000000"
+                }
+            },
+            {
+                "Type": "Log",
+                "Name": "Node",
+                "GUID": "11839919870262083657",
+                "Properties": {
+                    "Message": "HELLO"
+                }
+            }
+        ]
+    }
+}
