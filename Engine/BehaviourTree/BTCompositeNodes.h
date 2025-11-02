@@ -28,6 +28,15 @@ namespace Engine {
 
         void Reset() override;
 
+        //new functions - amanda
+
+        size_t GetCurrentChildIndex() const;
+        void SetCurrentChildIndex(size_t index);
+
+        int FindChildIndex(const std::shared_ptr<BTNode>& child) const override;
+        int FindChildIndexByGUID(xresource::instance_guid guid) const override;
+
+        //end of new functions - amanda
     protected:
         std::vector<std::shared_ptr<BTNode>> m_Children;
         size_t m_CurrentChildIndex = 0;
