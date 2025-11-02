@@ -19,6 +19,8 @@
 #include <fstream>
 #include <memory>
 
+#include "../../AssetCompiler/CompilerCore/MeshCompiler.h"
+
 
 namespace Engine {
 
@@ -187,15 +189,15 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     //LOG_INFO("Mesh Loader - full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
     //LOG_INFO("Mesh Loader - full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
     // CRITICAL: Verify OpenGL context is active
-    GLint currentFBO = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
-    GLenum contextError = glGetError();
-    if (contextError != GL_NO_ERROR) {
-        //LOG_ERROR("!!! NO OPENGL CONTEXT ACTIVE !!!");
-        //LOG_ERROR("Cannot create mesh buffers without active OpenGL context");
-        //LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
-        return nullptr;
-    }
+    //GLint currentFBO = 0;
+    //glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
+    //GLenum contextError = glGetError();
+    //if (contextError != GL_NO_ERROR) {
+    //    LOG_ERROR("!!! NO OPENGL CONTEXT ACTIVE !!!");
+    //    LOG_ERROR("Cannot create mesh buffers without active OpenGL context");
+    //    LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
+    //    return nullptr;
+    //}
     //LOG_INFO("OpenGL context is active and ready");
     // Get compiled file path
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
@@ -222,6 +224,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     // Read compiled mesh data header
     Engine::CompiledMeshData meshHeader;
+	assert(sizeof(Engine::CompiledMeshData) == 68); // Ensure no padding issues
     file.read(reinterpret_cast<char*>(&meshHeader), sizeof(meshHeader));
     if (!file) {
         LOG_ERROR("Failed to read mesh header from file");
@@ -237,12 +240,38 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     }
     LOG_INFO("Magic number validated");
 
+    LOG_INFO("Mesh Header Info - Meshes: ", meshHeader.meshCount);
+
+    std::vector<Engine::SubMeshDescriptor> submeshes;
+
+    if (meshHeader.meshCount > 0) {
+        submeshes.resize(meshHeader.meshCount);
+        file.read(reinterpret_cast<char*>(submeshes.data()),
+			meshHeader.meshCount * sizeof(Engine::SubMeshDescriptor));
+
+		// Check for read errors
+        if (!file) {
+            LOG_ERROR("Failed to read submesh descriptors from file");
+			return nullptr;
+        }
+
+        LOG_INFO("Read ", meshHeader.meshCount, " submesh descriptors");
+
+        for (uint32_t i = 0; i < meshHeader.meshCount; ++i) {
+
+            LOG_INFO("  Submesh ", i, ": ", submeshes[i].name,
+                     " (indices: ", submeshes[i].startIndex, "-",
+                     (submeshes[i].startIndex + submeshes[i].indexCount - 1), ")");
+
+        }
+    }
+
     // Create mesh resource
     auto mesh = std::make_unique<data_type>();
     // Prepare interleaved vertex data
       // Format: pos(3) + normal(3) + color(3) + uv(2) = 11 floats per vertex
     mesh->vertices.resize(meshHeader.vertexCount * 11);
-
+    mesh->subMeshes = submeshes;
     // Read interleaved vertex data
     for (uint32_t i = 0; i < meshHeader.vertexCount; ++i) {
         size_t offset = i * 11;
@@ -356,39 +385,39 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     // Create OpenGL buffers
     glGenVertexArrays(1, &mesh->VAO);
 
-    GLenum err1 = glGetError();
-    if (err1 != GL_NO_ERROR) {
-        LOG_ERROR("glGenVertexArrays failed: 0x", std::hex, err1);
-        return nullptr;
-    }
+    //GLenum err1 = glGetError();
+    //if (err1 != GL_NO_ERROR) {
+    //    LOG_ERROR("glGenVertexArrays failed: 0x", std::hex, err1);
+    //    return nullptr;
+    //}
 
     glGenBuffers(1, &mesh->VBO);
-    GLenum err2 = glGetError();
-    if (err2 != GL_NO_ERROR) {
-        LOG_ERROR("glGenBuffers(VBO) failed: 0x", std::hex, err2);
-        glDeleteVertexArrays(1, &mesh->VAO);
-        return nullptr;
-    }
+    //GLenum err2 = glGetError();
+    //if (err2 != GL_NO_ERROR) {
+    //    LOG_ERROR("glGenBuffers(VBO) failed: 0x", std::hex, err2);
+    //    glDeleteVertexArrays(1, &mesh->VAO);
+    //    return nullptr;
+    //}
 
     glGenBuffers(1, &mesh->EBO);
     GLenum err3 = glGetError();
-    if (err3 != GL_NO_ERROR) {
-        LOG_ERROR("glGenBuffers(EBO) failed: 0x", std::hex, err3);
-        glDeleteVertexArrays(1, &mesh->VAO);
-        glDeleteBuffers(1, &mesh->VBO);
-        return nullptr;
-    }
+    //if (err3 != GL_NO_ERROR) {
+    //    LOG_ERROR("glGenBuffers(EBO) failed: 0x", std::hex, err3);
+    //    glDeleteVertexArrays(1, &mesh->VAO);
+    //    glDeleteBuffers(1, &mesh->VBO);
+    //    return nullptr;
+    //}
     LOG_INFO("OpenGL buffers generated: VAO=", mesh->VAO, " VBO=", mesh->VBO, " EBO=", mesh->EBO);
 
     glBindVertexArray(mesh->VAO);
     GLenum err4 = glGetError();
-    if (err4 != GL_NO_ERROR) {
-        LOG_ERROR("glBindVertexArray failed: 0x", std::hex, err4);
-        glDeleteVertexArrays(1, &mesh->VAO);
-        glDeleteBuffers(1, &mesh->VBO);
-        glDeleteBuffers(1, &mesh->EBO);
-        return nullptr;
-    }
+    //if (err4 != GL_NO_ERROR) {
+    //    LOG_ERROR("glBindVertexArray failed: 0x", std::hex, err4);
+    //    glDeleteVertexArrays(1, &mesh->VAO);
+    //    glDeleteBuffers(1, &mesh->VBO);
+    //    glDeleteBuffers(1, &mesh->EBO);
+    //    return nullptr;
+    //}
     LOG_INFO("VAO bound successfully");
 
     // Upload interleaved vertex data
@@ -397,14 +426,14 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
         mesh->vertices.size() * sizeof(float),
         mesh->vertices.data(), GL_STATIC_DRAW);
     GLenum err5 = glGetError();
-    if (err5 != GL_NO_ERROR) {
-        LOG_ERROR("glBufferData(VBO) failed: 0x", std::hex, err5);
-        LOG_ERROR("Attempted to upload ", mesh->vertices.size() * sizeof(float), " bytes");
-        glDeleteVertexArrays(1, &mesh->VAO);
-        glDeleteBuffers(1, &mesh->VBO);
-        glDeleteBuffers(1, &mesh->EBO);
-        return nullptr;
-    }
+    //if (err5 != GL_NO_ERROR) {
+    //    LOG_ERROR("glBufferData(VBO) failed: 0x", std::hex, err5);
+    //    LOG_ERROR("Attempted to upload ", mesh->vertices.size() * sizeof(float), " bytes");
+    //    glDeleteVertexArrays(1, &mesh->VAO);
+    //    glDeleteBuffers(1, &mesh->VBO);
+    //    glDeleteBuffers(1, &mesh->EBO);
+    //    return nullptr;
+    //}
     LOG_INFO("VBO data uploaded: ", mesh->vertices.size() * sizeof(float), " bytes");
 
     // Upload index data
@@ -413,14 +442,14 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
         mesh->indices.size() * sizeof(unsigned int),
         mesh->indices.data(), GL_STATIC_DRAW);
     GLenum err6 = glGetError();
-    if (err6 != GL_NO_ERROR) {
-        LOG_ERROR("glBufferData(EBO) failed: 0x", std::hex, err6);
-        LOG_ERROR("Attempted to upload ", mesh->indices.size() * sizeof(unsigned int), " bytes");
-        glDeleteVertexArrays(1, &mesh->VAO);
-        glDeleteBuffers(1, &mesh->VBO);
-        glDeleteBuffers(1, &mesh->EBO);
-        return nullptr;
-    }
+    //if (err6 != GL_NO_ERROR) {
+    //    LOG_ERROR("glBufferData(EBO) failed: 0x", std::hex, err6);
+    //    LOG_ERROR("Attempted to upload ", mesh->indices.size() * sizeof(unsigned int), " bytes");
+    //    glDeleteVertexArrays(1, &mesh->VAO);
+    //    glDeleteBuffers(1, &mesh->VBO);
+    //    glDeleteBuffers(1, &mesh->EBO);
+    //    return nullptr;
+    //}
     LOG_INFO("EBO data uploaded: ", mesh->indices.size() * sizeof(unsigned int), " bytes");
 
 
@@ -447,13 +476,13 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     // Check for OpenGL errors
     GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        LOG_ERROR("OpenGL error during mesh creation: 0x", std::hex, error);
-        glDeleteVertexArrays(1, &mesh->VAO);
-        glDeleteBuffers(1, &mesh->VBO);
-        glDeleteBuffers(1, &mesh->EBO);
-        return nullptr;
-    }
+    //if (error != GL_NO_ERROR) {
+    //    LOG_ERROR("OpenGL error during mesh creation: 0x", std::hex, error);
+    //    glDeleteVertexArrays(1, &mesh->VAO);
+    //    glDeleteBuffers(1, &mesh->VBO);
+    //    glDeleteBuffers(1, &mesh->EBO);
+    //    return nullptr;
+    //}
     LOG_INFO("OpenGL buffers created successfully");
     LOG_INFO("Mesh VAO: ", mesh->VAO, " VBO: ", mesh->VBO, " EBO: ", mesh->EBO);
     LOG_INFO("Returning mesh pointer...");
@@ -463,7 +492,8 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     auto* meshPtr = mesh.release();
     LOG_INFO("mesh.release() returned pointer: ", static_cast<void*>(meshPtr));
-    return meshPtr; }
+    return meshPtr;
+}
 
 
 

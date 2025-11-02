@@ -137,12 +137,15 @@ namespace AssetCompiler {
 
         // Step 5: Prepare binary header
         CompiledMeshHeader header;
+		header.meshCount = static_cast<uint32_t>(meshData.submeshes.size()); 
         header.vertexCount = static_cast<uint32_t>(meshData.getVertexCount());
         header.indexCount = static_cast<uint32_t>(meshData.getIndexCount());
         header.hasPositions = settings.includePos ? 1 : 0;
         header.hasNormals = (settings.includeNormals && !meshData.normals.empty()) ? 1 : 0;
         header.hasColors = (settings.includeColors && !meshData.colors.empty()) ? 1 : 0;
         header.hasTexCoords = (settings.includeTexCoords && !meshData.texCoords.empty()) ? 1 : 0;
+
+		log("Size of mesh header: %zu", sizeof(CompiledMeshHeader), " bytes");
 
         // Calculate vertex stride (bytes per vertex)
         header.vertexStride = 0;
@@ -166,6 +169,9 @@ namespace AssetCompiler {
         }
 
         log("Success! Compiled mesh: %s", outputPath.c_str());
+        log("  Submeshes: %u", header.meshCount); 
+        log("  Vertices: %u", header.vertexCount);
+        log("  Indices: %u", header.indexCount);
         log("Output size: %.2f KB", fs::file_size(outputPath) / 1024.0f);
 
         return true;
@@ -205,17 +211,20 @@ namespace AssetCompiler {
             return false;
         }
 
-        log("FBX loaded: %d meshes found", scene->getMeshCount());
-
         // Process all meshes in the scene
         int meshCount = scene->getMeshCount();
 
+        log("FBX loaded: %d meshes found", meshCount);
 
         for (int mesh_idx = 0; mesh_idx < meshCount; mesh_idx++) {
             const ofbx::Mesh* mesh = scene->getMesh(mesh_idx);
             const ofbx::GeometryData& geom = mesh->getGeometryData();
 
             log("Processing mesh %d: %s", mesh_idx, mesh->name);
+
+			// Track submesh info
+			uint32_t submeshStartIndex = static_cast<uint32_t>(meshData.indices.size());
+            uint32_t submeshIndexCount = 0;
 
             size_t vertex_offset = meshData.positions.size();
 
@@ -297,6 +306,7 @@ namespace AssetCompiler {
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 0));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 1));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 2));
+                        submeshIndexCount += 3;
                     }
                     else if (polygon.vertex_count == 4) {
                         // Quad - split into two triangles
@@ -307,6 +317,7 @@ namespace AssetCompiler {
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 0));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 2));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 3));
+                        submeshIndexCount += 6;
                     }
                     else if (polygon.vertex_count > 4) {
                         // N-gon - use OpenFBX triangulate function
@@ -316,11 +327,23 @@ namespace AssetCompiler {
                         for (ofbx::u32 t = 0; t < tri_count; ++t) {
                             meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + tri_indices[t]));
                         }
+						submeshIndexCount += tri_count;
                     }
                 }
             }
 
-            //vertex_offset = meshData.positions.size();
+            SubMeshDescriptor submesh;
+            submesh.startIndex = submeshStartIndex;
+			submesh.indexCount = submeshIndexCount;
+			submesh.materialId = 0; // TODO: Assign material ID based on partition
+            strncpy(submesh.name, mesh->name ? mesh->name : "Unnamed", sizeof(submesh.name) - 1);
+            submesh.name[63] = '\0';
+            memset(submesh.reserved, 0, sizeof(submesh.reserved));
+
+			meshData.submeshes.push_back(submesh);
+
+            log("Submesh %d: startIndex=%u, indexCount=%u", 
+                mesh_idx, submesh.startIndex, submesh.indexCount, submesh.name);
         }
 
         // Clean up
@@ -480,6 +503,14 @@ namespace AssetCompiler {
 
         // Write header
         file.write(reinterpret_cast<const char*>(&header), sizeof(CompiledMeshHeader));
+
+        // Write submesh descriptors
+        if (header.meshCount > 0 && !meshData.submeshes.empty()){
+
+            file.write(reinterpret_cast<const char*>(meshData.submeshes.data()), 
+                sizeof(SubMeshDescriptor) * header.meshCount);
+			log("Wrote %u submesh descriptors", header.meshCount);
+        }
 
         // Write vertex data (interleaved)
         for (size_t i = 0; i < meshData.positions.size(); ++i) {

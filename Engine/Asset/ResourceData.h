@@ -41,12 +41,26 @@ namespace Engine {
         }
     };
 
+
+    /**
+	 * @brief Sub-mesh descriptor for mesh resources.
+     */
+    struct SubMeshDescriptor {
+        uint32_t startIndex;
+        uint32_t indexCount;
+        uint32_t materialId;
+        char name[64];
+        uint32_t reserved[4];
+    };
+
     /**
      * @brief Runtime mesh resource data.
      */
     struct MeshResource {
         std::vector<float> vertices;
         std::vector<unsigned int> indices;
+		std::vector<SubMeshDescriptor> subMeshes;
+
         unsigned int VAO = 0;  // Vertex Array Object
         unsigned int VBO = 0;  // Vertex Buffer Object
         unsigned int EBO = 0;  // Element Buffer Object

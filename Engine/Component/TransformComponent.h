@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "../Utility/Types.h"
+
 namespace Engine {
 
     /**
@@ -22,8 +24,8 @@ namespace Engine {
         bool IsDirty;
 
         // Parent-Child
-        entt::entity Parent;
-        std::vector<entt::entity> Children;
+        u32 Parent;
+		std::vector<u32> Children;
 
         // Default constructor
         TransformComponent()
@@ -33,7 +35,7 @@ namespace Engine {
             , LocalTransform(1.0f)
             , WorldTransform(1.0f)
             , IsDirty(true)
-            , Parent(entt::null){
+            , Parent(u32_max){
         }
 
         // Constructor with position
@@ -44,7 +46,7 @@ namespace Engine {
             , LocalTransform(1.0f)
             , WorldTransform(1.0f)
             , IsDirty(true) 
-            , Parent(entt::null) {
+            , Parent(u32_max) {
         }
 
         void SetPosition(glm::vec3 const& pos) {
@@ -58,15 +60,20 @@ namespace Engine {
         }
 
         void SetRotation(glm::vec3 const& eulerAngles) {
-            // Build quaternion from individual axis rotations
-            glm::quat qX = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1, 0, 0));
-            glm::quat qY = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0, 1, 0));
-            glm::quat qZ = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0, 0, 1));
-
-            // Combine rotations (order matters: typically Z * Y * X)
-            Rotation = qY * qX * qZ;
+            Rotation = glm::quat(glm::radians(eulerAngles));
             IsDirty = true;
         }
+
+        void SetParent(entt::entity const& parent) {
+            Parent = static_cast<u32>(parent);
+			IsDirty = true;
+        }
+
+        void UnParent() {
+            SetParent(entt::null);
+        }
+
+
     };
 
 }

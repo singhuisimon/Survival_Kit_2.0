@@ -58,37 +58,38 @@ namespace Engine {
     public:
 
         // Default constructor for a default 3D camera
-        Camera3D() :    camType{ CameraType::WALKING },
-                        pos{ 0.0f, 5.0f, 5.0f },
-                        target{ 0.0f, 0.0f, 0.0f },
-                        FOV{ 45.0f },
-                        nearPlane{ 0.5f },
-                        farPlane{ 100.0f }
-        {}
+        Camera3D() : camType{ CameraType::WALKING },
+            pos{ 0.0f, 5.0f, 5.0f },
+            target{ 0.0f, 0.0f, 0.0f },
+            FOV{ 45.0f },
+            nearPlane{ 0.5f },
+            farPlane{ 100.0f }
+        {
+        }
 
         // Constructor for a 3D camera with custom values
         Camera3D(CameraType camType,
-                 glm::vec3 pos      ,
-                 glm::vec3 target   ,
-                 float FOV          ,
-                 float near         ,
-                 float far          ) :
-                 
-                 camType{ camType },
-                 pos{ pos },
-                 target{ target },
-                 FOV{ FOV },
-                 nearPlane{ near },
-                 farPlane{ far } 
-        {}
+            glm::vec3 pos,
+            glm::vec3 target,
+            float FOV,
+            float near,
+            float far) :
+
+            camType{ camType },
+            pos{ pos },
+            target{ target },
+            FOV{ FOV },
+            nearPlane{ near },
+            farPlane{ far }
+        {
+        }
 
         // Compute the view matrix (V) for the camera (Default up is 0.0f, 1.0f, 0.0f)
-        glm::mat4 getLookAt(bool lockOn = true, glm::vec3 up = {0.0f, 1.0f, 0.0f}) const
+        glm::mat4 getLookAt(bool lockOn = true, glm::vec3 up = { 0.0f, 1.0f, 0.0f }) const
         {
             glm::vec3 finalTarget = target;
             if (lockOn == false) {
                 finalTarget = pos + glm::normalize(target - pos);
-                //finalTarget = { 0.0f, 0.0f, -1.0f };
             }
             return glm::lookAt(pos, finalTarget, up);
         }
@@ -105,37 +106,11 @@ namespace Engine {
 
             if (mouse == 0)
             {
-                //// Calculate spherical coordinates for orbiting movement
-                //const float r = glm::sqrt(pos.x * pos.x +
-                //    pos.y * pos.y + pos.z * pos.z);
-                //float alpha = glm::asin(pos.y / r); // Vertical angle
-                //float betta = std::atan2f(pos.x, pos.z); // Horizontal angle
-
-                //// Adjust angles based on cursor offset
-                //if (yoffset < 0.0)
-                //    alpha += -0.02f;
-                //else if (yoffset > 0.0)
-                //    alpha += 0.02f;
-
-                //if (xoffset < 0.0)
-                //    betta += 0.05f;
-                //else if (xoffset > 0.0)
-                //    betta += -0.05f;
-
-                //// Clamp vertical angle
-                //alpha = glm::clamp(alpha, -MathUtils::HALF_PI + 0.01f, MathUtils::HALF_PI - 0.01f);
-
-                //// Update position based on spherical coordinates
-                //pos.x = r * glm::cos(alpha) * glm::sin(betta);
-                //pos.y = r * glm::sin(alpha);
-                //pos.z = r * glm::cos(alpha) * glm::cos(betta);
-
-                
                 // Calcuate relative position of camera
                 glm::vec3 relativePos = pos - target;
                 float r = glm::length(relativePos);
                 if (r <= 0.0001f) { r = 0.0001f; relativePos = { 0,0,r }; }
-                
+
                 // Calculate spherical coordinates for orbiting movement
                 float alpha = glm::asin(relativePos.y / r); // Vertical angle
                 float betta = std::atan2f(relativePos.x, relativePos.z); // Horizontal angle
@@ -182,6 +157,7 @@ namespace Engine {
                 target.x = pos.x + r * glm::cos(alpha) * glm::sin(betta);
                 target.y = pos.y + r * glm::sin(alpha);
                 target.z = pos.z + r * glm::cos(alpha) * glm::cos(betta);
+
             }
 
             //// Update shader program with the new camera settings
@@ -195,61 +171,82 @@ namespace Engine {
         // Handles scroll input to adjust zoom or camera position
         void cameraOnScroll(double yoffset/*, ShaderProgram* shader*/)
         {
-            //if (camType == CameraType::ORBITING)
-            //{
-                // Calculate the distance from the origin and adjust it based on scroll input
-                float r = glm::sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
-                const float alpha = glm::asin(pos.y / r);
-                const float betta = std::atan2f(pos.x, pos.z);
+            ////if (camType == CameraType::ORBITING)
+            ////{
+            //    // Calculate the distance from the origin and adjust it based on scroll input
+            //    float r = glm::sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+            //    const float alpha = glm::asin(pos.y / r);
+            //    const float betta = std::atan2f(pos.x, pos.z);
 
-                r += yoffset > 0.0f ? -(editorZoomSpeed) : editorZoomSpeed; // Zoom in or out
-                if (r < 1.0f) r = 1.0f; // Clamp minimum distance
+                // r += yoffset > 0.0f ? -(editorZoomSpeed) : editorZoomSpeed; // Zoom in or out
+                // if (r < 1.0f) r = 1.0f; // Clamp minimum distance
+            //    r += yoffset > 0.0f ? -1.0f : 1.0f; // Zoom in or out
+            //    if (r < 1.0f) r = 1.0f; // Clamp minimum distance
 
-                // Update position based on new distance
-                pos.x = r * glm::cos(alpha) * glm::sin(betta);
-                pos.y = r * glm::sin(alpha);
-                pos.z = r * glm::cos(alpha) * glm::cos(betta);
-            //}
-            //else if (camType == CameraType::WALKING)
-            //{
-            //    // Adjust position and target based on scroll input for walking
-            //    const glm::vec3 velocity = glm::normalize(yoffset > 0.0f ? target - pos : pos - target);
-            //    pos += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
-            //    target += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
-            //}
+            //    // Update position based on new distance
+            //    pos.x = r * glm::cos(alpha) * glm::sin(betta);
+            //    pos.y = r * glm::sin(alpha);
+            //    pos.z = r * glm::cos(alpha) * glm::cos(betta);
+            ////}
+            ////else if (camType == CameraType::WALKING)
+            ////{
+            ////    // Adjust position and target based on scroll input for walking
+            ////    const glm::vec3 velocity = glm::normalize(yoffset > 0.0f ? target - pos : pos - target);
+            ////    pos += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+            ////    target += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+            ////}
 
-            //// Update shader program with the new camera settings
-            //shader->programUse();
-            //shader->setUniform("camera.position", pos);
-            //shader->programFree();
-            
-            // Unreferenced Parameter
-            //shader;
+            ////// Update shader program with the new camera settings
+            ////shader->programUse();
+            ////shader->setUniform("camera.position", pos);
+            ////shader->programFree();
+            //
+            //// Unreferenced Parameter
+            ////shader;
+
+            glm::mat4 view = getLookAt(false);
+
+            if (yoffset > 0.0) {
+                pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+                target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+            }
+            else if (yoffset < 0.0) {
+                pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+                target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+            }
         }
 
         void moveCamForward() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
-            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            // pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            // target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
         }
 
         void moveCamLeft() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
-            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            // pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            // target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
+            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
         }
 
         void moveCamBack() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
-            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            // pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            // target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
 
         }
 
         void moveCamRight() {
             glm::mat4 view = getLookAt(false);
-            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
-            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            // pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            // target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
+            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
         }
 
         //// Getters for camera data
