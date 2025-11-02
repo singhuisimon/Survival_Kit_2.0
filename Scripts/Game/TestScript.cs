@@ -1,4 +1,5 @@
 using System;
+using Engine;
 
 namespace Game
 {
@@ -18,11 +19,21 @@ namespace Game
         public void OnUpdate(float deltaTime)  //  MUST be exactly this signature
         {
             frameCount++;
-            Engine.InternalCalls.Log("super hero this should be working K");
+                            Engine.InternalCalls.Log("stesting dotnet ading");
+
+            //Engine.InternalCalls.Log("su no hot reloading");
+            // if (Input.IsKeyPressed(KeyCode.W))
+            // {
+            //     //movement.Z += 1.0f;
+            //     Engine.InternalCalls.Log("stesting dotnet ading");
+
+
+            // }
+            Console.WriteLine("[C#] OnUpdate frame: " + frameCount);
 
             if (frameCount % 60 == 0)
             {
-                //Console.WriteLine("[C#] OnUpdate frame: " + frameCount);
+                Console.WriteLine("[C#] OnUpdate frame: " + frameCount);
                 //Engine.InternalCalls.Log("OnUpdate called from C#!");
             }
         }

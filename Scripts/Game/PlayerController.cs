@@ -16,14 +16,14 @@ namespace Game
         public override void OnStart()
         {
             Log("PlayerController started!");
-            Log($"Entity ID: {EntityID}");
-            Log($"Initial Position: {Transform.Position}");
+           // Log($"Entity ID: {EntityID}");
+            //Log($"Initial Position: {Transform.Position}");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             HandleMovement(deltaTime);
-            HandleRotation(deltaTime);
+           // HandleRotation(deltaTime);
         }
 
         private void HandleMovement(float deltaTime)
@@ -31,26 +31,31 @@ namespace Game
             Vector3 movement = Vector3.Zero;
 
             // WASD movement
-            if (Input.IsKeyPressed(KeyCode.W))
-                movement.Z += 1.0f;
+            if (Input.IsKeyPressed(KeyCode.W)) {
+                //movement.Z += 1.0f;
+                Engine.InternalCalls.Log("su no hot reloading");
+
+
+            }
+            //movement.Z += 1.0f;
             if (Input.IsKeyPressed(KeyCode.S))
-                movement.Z -= 1.0f;
+                //movement.Z -= 1.0f;
             if (Input.IsKeyPressed(KeyCode.A))
-                movement.X -= 1.0f;
+               // movement.X -= 1.0f;
             if (Input.IsKeyPressed(KeyCode.D))
-                movement.X += 1.0f;
+               // movement.X += 1.0f;
 
             // Vertical movement
-            if (Input.IsKeyPressed(KeyCode.Space))
-                movement.Y += 1.0f;
-            if (Input.IsKeyPressed(KeyCode.LeftShift))
-                movement.Y -= 1.0f;
+         //   if (Input.IsKeyPressed(KeyCode.Space))
+         //       movement.Y += 1.0f;
+         //   if (Input.IsKeyPressed(KeyCode.LeftShift))
+        //        movement.Y -= 1.0f;
 
             // Normalize and apply speed
             if (movement.SqrMagnitude > 0.01f)
             {
-                movement = movement.Normalized * MoveSpeed * deltaTime;
-                Transform.Translate(movement);
+     //           movement = movement.Normalized * MoveSpeed * deltaTime;
+      //          Transform.Translate(movement);
             }
         }
 

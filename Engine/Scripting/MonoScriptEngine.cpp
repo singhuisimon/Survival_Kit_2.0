@@ -3,6 +3,8 @@
 #include "../ECS/Scene.h"
 #include "../ECS/Entity.h"
 #include "../ECS/Components.h"
+#include "../Core/input.h"
+#include "Core/Application.h"
 
 // Mono headers
 #include <mono/jit/jit.h>
@@ -14,12 +16,15 @@
 #include <filesystem>
 #include <iostream>
 
+
 namespace Engine {
+
 
     MonoScriptEngine& MonoScriptEngine::GetInstance() {
         static MonoScriptEngine instance;
         return instance;
     }
+
 
     void MonoScriptEngine::Initialize(const std::string& assemblyPath) {
         LOG_INFO("Initializing Mono Script Engine...");
@@ -73,6 +78,7 @@ namespace Engine {
         RegisterInternalCalls();
 
         LOG_INFO("Mono Script Engine initialized");
+
     }
 
 
@@ -345,9 +351,16 @@ namespace Engine {
     namespace InternalCalls {
         // Global scene pointer (set by ScriptSystem)
         static Scene* s_CurrentScene = nullptr;
+        //auto& input = GetInput();
+        static Input* s_InputSystem = nullptr;
+
 
         void SetCurrentScene(Scene* scene) {
             s_CurrentScene = scene;
+        }
+
+        void SetInputSystem(Input* input) {
+            s_InputSystem = input;
         }
 
         void Log(MonoString* message) {
@@ -466,15 +479,19 @@ namespace Engine {
         }
 
         bool Input_IsKeyPressed(int keyCode) {
-            // Access your input system
-            // Example: return Input::IsKeyPressed(keyCode);
-            return false; // Implement based on your input system
+            return s_InputSystem->IsKeyPressed(keyCode);
         }
 
+
         bool Input_IsMouseButtonPressed(int button) {
-            // Access your input system
-            return false; // Implement based on your input system
+
+            if (!s_InputSystem) {
+                LOG_WARNING("[InternalCall] Input system not initialized");
+                return false;
+            }
+            return s_InputSystem->IsMouseButtonPressed(button);
         }
+
 
         void Input_GetMousePosition(glm::vec2* outPosition) {
             if (!outPosition) return;
@@ -483,7 +500,9 @@ namespace Engine {
         }
     }
 
-
+    void SetScriptingInputSystem(Input* input) {
+        InternalCalls::SetInputSystem(input);
+    }
     // Expose SetCurrentScene for ScriptSystem to call
     void SetScriptingCurrentScene(Scene* scene) {
         InternalCalls::SetCurrentScene(scene);

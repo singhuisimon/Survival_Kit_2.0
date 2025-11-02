@@ -10,3 +10,6 @@ C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.
 C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\Scripts\obj\Debug\refint\GameScripts.dll
 C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.pdb
 C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\Scripts\obj\Debug\ref\GameScripts.dll
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\build\bin\Debug\GameScripts.deps.json
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\build\bin\Debug\GameScripts.dll
+C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\build\bin\Debug\GameScripts.pdb
