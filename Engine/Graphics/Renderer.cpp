@@ -520,13 +520,13 @@ namespace Engine {
 			}
 
 #pragma region TESTING
-			size_t material_handle = static_cast<size_t>(item.m_material_handle);
+			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
 #pragma endregion
 
 			// Set GPU ID for object picking
 			if (pass.shdpgm_handle == 2) {
-				u32 pickId = item.m_id;   
+				u32 pickId = item.m_entity_id;   
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
@@ -537,19 +537,29 @@ namespace Engine {
 			prog.setUniform("material.Ks", test_material.getMaterialSpecular());
 			prog.setUniform("material.shininess", test_material.getMaterialShininess());
 
-			size_t mesh_handle = static_cast<size_t>(item.m_mesh_handle);
-
-			xresource::full_guid mesh_fullguid = convertToMeshGuid(item.m_instance_guid);
-
-			MeshResource* mesh_rsc = RM.loadResource<MeshResource>(mesh_fullguid);
+			size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
 
 			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-		if (mesh_rsc) {
-				glBindVertexArray(mesh_rsc->VAO);
-				glDrawElements(GL_TRIANGLES, mesh_rsc->indices.size(), GL_UNSIGNED_INT, NULL);
+			xresource::full_guid guid = convertToMeshGuid(item.m_mesh_guid);
+
+			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(guid)) {
+				glBindVertexArray(mesh_resource->VAO);
+
+				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
+
+				// Calculate byte offset into the index buffer
+				const void* indexOffset = reinterpret_cast<const void*>(
+					submesh.startIndex * sizeof(unsigned int)
+					);
+
+				glDrawElements(GL_TRIANGLES,
+					submesh.indexCount,
+					GL_UNSIGNED_INT,
+					indexOffset);
+
 				glBindVertexArray(0);
 			}
 			else {

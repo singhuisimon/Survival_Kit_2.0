@@ -2,6 +2,7 @@
 #include "../ECS/Scene.h"
 #include "../Component/TransformComponent.h"
 #include "../Component/MeshRendererComponent.h"
+#include "Asset/ResourceHelpers.h"
 
 namespace Engine {
 
@@ -26,12 +27,15 @@ namespace Engine {
 			if (renderable.Visible)
 			{
 				m_drawitems.push_back({
-					renderable.ComponentGUID,
-					u32(entity),
+					transform.WorldTransform,
+					static_cast<u32>(entity),
+					renderable.SubmeshIndex,
 					renderable.MeshType,
 					renderable.Material,
 					renderable.Texture,
-					transform.WorldTransform
+					renderable.MeshGuid,
+					renderable.MaterialGuid,
+					renderable.TextureGuid
 					});
 			}
 		}

@@ -10,6 +10,7 @@
 #include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
 #include "Asset/ResourceManager.h"
+#include "Asset/ResourceHelpers.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -272,7 +273,13 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    
+    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    mesh.MeshGuid = inst_guid;
+
+    std::cout << inst_guid.m_Value << "\n";
+
+	//mesh.MeshResource = mesh_rsc;
 
     //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     //rb.Mass = 1.0f;
