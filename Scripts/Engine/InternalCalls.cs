@@ -22,15 +22,26 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
-        // Transform
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_GetPosition(uint entityID, ref Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
-        // Add this line:
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_Move(uint entityID, float deltaX, float deltaY, float deltaZ);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Scene_CreateEntity(string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Scene_DestroyEntity(uint entity);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Entity_AddScript(uint entity, string managedClassFullName);
+
+        //[MethodImpl(MethodImplOptions.InternalCall)]
+        //public static extern void Rigidbody_SetVelocity(uint entity, float x, float y, float z);
     }
 
 }
