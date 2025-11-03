@@ -185,8 +185,6 @@ namespace Engine
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
 
-		static glm::mat4 BuildTransformMatrix(const TransformComponent& tc);
-
 		void ManipulateEntityTransform(Entity& entity);
 	};
 
