@@ -184,7 +184,7 @@ Resources/Compiled/
 # ==================================
 # Scripting (Future)
 # ==================================
-Scripts\obj
+Scripts/obj
 
 # ==================================
 # Documentation Build
