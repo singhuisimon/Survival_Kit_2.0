@@ -27,6 +27,7 @@
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
 #include "BehaviourTree/BehaviourTreeSystem.h"
+#include "ParticleSystem/ParticleSystem.h"
 
 // KENNY TESTING: FOR MAINCAMERA "SCRIPT"
 #include <glm/common.hpp>               // glm::clamp
@@ -265,6 +266,7 @@ void Game::AddAllSystems() {
     m_Scene->AddSystem<Engine::CameraSystem>();
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
     m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
+	m_Scene->AddSystem<Engine::ParticleSystem>();
 }
 
 void Game::CreateDefaultScene() {
@@ -297,6 +299,7 @@ void Game::CreateDefaultScene() {
     //rb.UseGravity = true;
     //rb.IsKinematic = false;
     //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    xresource::instance_guid tex_inst_guid = Engine::AM.getAssetIdByFilename("rabbit_kenny.png");
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";
@@ -351,8 +354,11 @@ void Game::CreateDefaultScene() {
     groundRb.UseGravity = false;
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
-    ground.AddComponent<Engine::MeshRendererComponent>();
+    auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
+
+    
+	groundmesh.TextureGuid = tex_inst_guid;
 
     LOG_TRACE("  Creating ReverbZone entity...");
     auto reverbZone = m_Scene->CreateEntity("CaveReverb");

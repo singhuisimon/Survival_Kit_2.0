@@ -14,11 +14,11 @@
 #include <filesystem>
 
 //external librarie 
-#include "../rapidjson/rapidjson/document.h"
-#include "../rapidjson/rapidjson/writer.h"
-#include "../rapidjson/rapidjson/stringbuffer.h"
-#include "../rapidjson/rapidjson/istreamwrapper.h"
-#include "../rapidjson/rapidjson/prettywriter.h"
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/prettywriter.h>
 
 namespace fs = std::filesystem; 
 
