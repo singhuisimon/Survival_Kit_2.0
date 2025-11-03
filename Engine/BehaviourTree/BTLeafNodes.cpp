@@ -8,9 +8,29 @@
 #pragma once
 
 #include "BTLeafNodes.h"
+#include "ECS/Entity.h" 
+#include "ECS/Components.h"
+#include "Utility/Logger.h"
+#include "ECS/Scene.h"
 #include <functional>
 
 namespace Engine {
+
+    //helper function- yet to test
+    /*Entity* FindEntityByTag(Scene* scene, const std::string& tag) {
+        if (!scene) return nullptr;
+
+        auto& registry = scene->GetRegistry();
+        auto view = registry.view<TagComponent>();
+
+        for (auto entity : view) {
+            auto& tagComp = view.get<TagComponent>(entity);
+            if (tagComp.Tag == tag) {
+                return &Entity(static_cast<entt::entity>(entity), &scene->GetRegistry());
+            }
+        }
+        return nullptr;
+    }*/
 
     //Action
 
@@ -281,6 +301,665 @@ namespace Engine {
         else if (name == "Y") m_Value.y = std::stof(value);
         else if (name == "Z") m_Value.z = std::stof(value);
     }
-    
+
+    //BTRotateEntity
+    BTRotateEntity::BTRotateEntity(float degreesPerSecond)
+        : m_RotationSpeed(degreesPerSecond) {
+    }
+
+    BTStatus BTRotateEntity::Execute(BTContext& context) {
+        if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        auto& transform = context.Entity->GetComponent<TransformComponent>();
+
+        // Rotate around Y-axis (yaw)
+        float rotationRadians = glm::radians(m_RotationSpeed * context.DeltaTime);
+        glm::quat rotationDelta = glm::angleAxis(rotationRadians, glm::vec3(0, 1, 0));
+        transform.Rotation = rotationDelta * transform.Rotation;
+        transform.IsDirty = true;
+
+        return BTStatus::Running;  // Continuous rotation
+    }
+
+    void BTRotateEntity::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "RotationSpeed", std::to_string(m_RotationSpeed) });
+    }
+
+    void BTRotateEntity::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "RotationSpeed") {
+            m_RotationSpeed = std::stof(value);
+        }
+    }
+
+    //BTMoveToTarget
+    BTMoveToTarget::BTMoveToTarget(float speed, float arrivalDistance)
+        : m_MoveSpeed(speed)
+        , m_ArrivalDistance(arrivalDistance)
+        , m_TargetPositionKey("TargetPosition") {
+    }
+
+    BTStatus BTMoveToTarget::Execute(BTContext& context) {
+        // Validate context
+        if (!context.Entity) {
+            LOG_WARNING("BTMoveToTarget: No entity in context");
+            return BTStatus::Failure;
+        }
+
+        if (!context.Entity->HasComponent<TransformComponent>()) {
+            LOG_WARNING("BTMoveToTarget: Entity missing TransformComponent");
+            return BTStatus::Failure;
+        }
+
+        // Get target position from blackboard
+        auto targetPosOpt = context.Blackboard.Get<glm::vec3>(m_TargetPositionKey);
+        if (!targetPosOpt) {
+            LOG_WARNING("BTMoveToTarget: Target position '", m_TargetPositionKey, "' not found in blackboard");
+            return BTStatus::Failure;
+        }
+
+        glm::vec3 targetPos = *targetPosOpt;
+        auto& transform = context.Entity->GetComponent<TransformComponent>();
+
+        // Calculate direction and distance
+        glm::vec3 direction = targetPos - transform.Position;
+        float distance = glm::length(direction);
+
+        // CRITICAL FIX: Check for NaN or infinite values
+        if (std::isnan(distance) || std::isinf(distance)) {
+            LOG_ERROR("BTMoveToTarget: Invalid distance calculation (NaN/Inf)");
+            return BTStatus::Failure;
+        }
+
+        // CRITICAL FIX: Validate DeltaTime
+        if (context.DeltaTime <= 0.0f || std::isnan(context.DeltaTime) || std::isinf(context.DeltaTime)) {
+            LOG_WARNING("BTMoveToTarget: Invalid DeltaTime (", context.DeltaTime, ")");
+            return BTStatus::Running;  // Keep running, wait for valid delta
+        }
+
+        // Check if arrived
+        if (distance <= m_ArrivalDistance) {
+            LOG_TRACE("BTMoveToTarget: Arrived at target");
+            return BTStatus::Success;
+        }
+
+        // CRITICAL FIX: Ensure direction is not zero length
+        if (distance < 0.0001f) {
+            LOG_WARNING("BTMoveToTarget: Target too close to current position");
+            return BTStatus::Success;  // Consider arrived
+        }
+
+        // Normalize direction
+        direction = glm::normalize(direction);
+
+        // Calculate movement with speed limit
+        float frameMovement = m_MoveSpeed * context.DeltaTime;
+
+        // CRITICAL FIX: Clamp movement to prevent overshooting
+        if (frameMovement > distance) {
+            // Arrived this frame
+            transform.Position = targetPos;
+        }
+        else {
+            // Move toward target
+            glm::vec3 movement = direction * frameMovement;
+            transform.Position += movement;
+        }
+
+        transform.IsDirty = true;
+
+        return BTStatus::Running;
+    }
+
+    void BTMoveToTarget::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "MoveSpeed", std::to_string(m_MoveSpeed) });
+        properties.push_back({ "ArrivalDistance", std::to_string(m_ArrivalDistance) });
+        properties.push_back({ "TargetPositionKey", m_TargetPositionKey });
+    }
+
+    void BTMoveToTarget::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "MoveSpeed") {
+            m_MoveSpeed = std::stof(value);
+        }
+        else if (name == "ArrivalDistance") {
+            m_ArrivalDistance = std::stof(value);
+        }
+        else if (name == "TargetPositionKey") {
+            m_TargetPositionKey = value;
+        }
+    }
+
+    //BTSetTargetPosition
+    BTSetTargetPosition::BTSetTargetPosition(const glm::vec3& position)
+        : m_TargetPosition(position)
+        , m_BlackboardKey("TargetPosition") {
+    }
+
+    BTStatus BTSetTargetPosition::Execute(BTContext& context) {
+        context.Blackboard.Set(m_BlackboardKey, m_TargetPosition);
+        return BTStatus::Success;
+    }
+
+    void BTSetTargetPosition::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "TargetX", std::to_string(m_TargetPosition.x) });
+        properties.push_back({ "TargetY", std::to_string(m_TargetPosition.y) });
+        properties.push_back({ "TargetZ", std::to_string(m_TargetPosition.z) });
+        properties.push_back({ "BlackboardKey", m_BlackboardKey });
+    }
+
+    void BTSetTargetPosition::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "TargetX") {
+            m_TargetPosition.x = std::stof(value);
+        }
+        else if (name == "TargetY") {
+            m_TargetPosition.y = std::stof(value);
+        }
+        else if (name == "TargetZ") {
+            m_TargetPosition.z = std::stof(value);
+        }
+        else if (name == "BlackboardKey") {
+            m_BlackboardKey = value;
+        }
+    }
+
+    //BTDestroySelf
+
+    BTStatus BTDestroySelf::Execute(BTContext& context) {
+        if (!context.Entity || !context.Scene) {
+            return BTStatus::Failure;
+        }
+
+        LOG_INFO("BTDestroySelf: Destroying entity");
+        context.Scene->DestroyEntity(*context.Entity);
+        return BTStatus::Success;
+    }
+
+    //BTDestroyEntityByTag
+
+    BTDestroyEntityByTag::BTDestroyEntityByTag(const std::string& tag)
+        : m_Tag(tag) {
+    }
+
+    BTStatus BTDestroyEntityByTag::Execute(BTContext& context) {
+        if (!context.Scene) {
+            return BTStatus::Failure;
+        }
+
+        try {
+            auto& registry = context.Scene->GetRegistry();
+            auto view = registry.view<TagComponent>();
+
+            // Store entity to destroy (don't destroy during iteration)
+            entt::entity entityToDestroy = entt::null;
+
+            for (auto entityHandle : view) {
+                Entity entity(entityHandle, &registry);
+
+                if (entity.HasComponent<TagComponent>()) {
+                    auto& tag = entity.GetComponent<TagComponent>();
+                    if (tag.Tag == m_Tag) {
+                        LOG_INFO("BTDestroyEntityByTag: Found entity with tag '", m_Tag, "'");
+                        // Store for destruction after loop
+                        entityToDestroy = entityHandle;
+                        break;
+                    }
+                }
+            }
+
+            // Destroy entity outside of iteration
+            if (entityToDestroy != entt::null) {
+                Entity entity(entityToDestroy, &registry);
+                context.Scene->DestroyEntity(entity);
+                LOG_INFO("BTDestroyEntityByTag: Successfully destroyed entity");
+                return BTStatus::Success;
+            }
+            else {
+                LOG_WARNING("BTDestroyEntityByTag: No entity found with tag '", m_Tag, "'");
+                return BTStatus::Failure;
+            }
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("BTDestroyEntityByTag: Exception - ", e.what());
+            return BTStatus::Failure;
+        }
+    }
+
+    void BTDestroyEntityByTag::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Tag", m_Tag });
+    }
+
+    void BTDestroyEntityByTag::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Tag") {
+            m_Tag = value;
+        }
+    }
+
+    //BTCheckHealth
+    BTCheckHealth::BTCheckHealth(float threshold, Comparison comp)
+        : m_Threshold(threshold)
+        , m_Comparison(comp)
+        , m_HealthKey("Health") {
+    }
+
+    BTStatus BTCheckHealth::Execute(BTContext& context) {
+        auto healthOpt = context.Blackboard.Get<float>(m_HealthKey);
+        if (!healthOpt) {
+            LOG_WARNING("BTCheckHealth: Health not found in blackboard");
+            return BTStatus::Failure;
+        }
+
+        float health = *healthOpt;
+        bool result = false;
+
+        switch (m_Comparison) {
+        case Comparison::Greater:
+            result = health > m_Threshold;
+            break;
+        case Comparison::Less:
+            result = health < m_Threshold;
+            break;
+        case Comparison::Equal:
+            result = std::abs(health - m_Threshold) < 0.001f;
+            break;
+        case Comparison::GreaterOrEqual:
+            result = health >= m_Threshold;
+            break;
+        case Comparison::LessOrEqual:
+            result = health <= m_Threshold;
+            break;
+        }
+
+        return result ? BTStatus::Success : BTStatus::Failure;
+    }
+
+    void BTCheckHealth::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Threshold", std::to_string(m_Threshold) });
+        properties.push_back({ "Comparison", std::to_string(static_cast<int>(m_Comparison)) });
+        properties.push_back({ "HealthKey", m_HealthKey });
+    }
+
+    void BTCheckHealth::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Threshold") {
+            m_Threshold = std::stof(value);
+        }
+        else if (name == "Comparison") {
+            m_Comparison = static_cast<Comparison>(std::stoi(value));
+        }
+        else if (name == "HealthKey") {
+            m_HealthKey = value;
+        }
+    }
+
+    //BTSetHealth
+    BTSetHealth::BTSetHealth(float health)
+        : m_Health(health)
+        , m_HealthKey("Health") {
+    }
+
+    BTStatus BTSetHealth::Execute(BTContext& context) {
+        context.Blackboard.Set(m_HealthKey, m_Health);
+        return BTStatus::Success;
+    }
+
+    void BTSetHealth::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Health", std::to_string(m_Health) });
+        properties.push_back({ "HealthKey", m_HealthKey });
+    }
+
+    void BTSetHealth::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Health") {
+            m_Health = std::stof(value);
+        }
+        else if (name == "HealthKey") {
+            m_HealthKey = value;
+        }
+    }
+
+    //BTModifyHealth
+    BTModifyHealth::BTModifyHealth(float amount)
+        : m_Amount(amount)
+        , m_HealthKey("Health") {
+    }
+
+    BTStatus BTModifyHealth::Execute(BTContext& context) {
+        auto healthOpt = context.Blackboard.Get<float>(m_HealthKey);
+        float currentHealth = healthOpt.value_or(100.0f);  // Default to 100 if not set
+
+        currentHealth += m_Amount;
+        context.Blackboard.Set(m_HealthKey, currentHealth);
+
+        return BTStatus::Success;
+    }
+
+    void BTModifyHealth::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Amount", std::to_string(m_Amount) });
+        properties.push_back({ "HealthKey", m_HealthKey });
+    }
+
+    void BTModifyHealth::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Amount") {
+            m_Amount = std::stof(value);
+        }
+        else if (name == "HealthKey") {
+            m_HealthKey = value;
+        }
+    }
+
+    //BTFaceMovementDirection
+    BTFaceMovementDirection::BTFaceMovementDirection(float rotationSpeed)
+        : m_RotationSpeed(rotationSpeed)
+        , m_TargetPositionKey("TargetPosition") {
+    }
+
+    BTStatus BTFaceMovementDirection::Execute(BTContext& context) {
+        if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        auto targetPosOpt = context.Blackboard.Get<glm::vec3>(m_TargetPositionKey);
+        if (!targetPosOpt) {
+            // Instead of returning Failure which can cause freeze in certain composite structures,
+            // return Success to allow the tree to continue
+            LOG_TRACE("BTFaceMovementDirection: Target position not found in blackboard, skipping");
+            return BTStatus::Success;  // Changed from Failure to Success
+        }
+
+        // Rest of the existing implementation...
+        glm::vec3 targetPos = *targetPosOpt;
+        auto& transform = context.Entity->GetComponent<TransformComponent>();
+
+        glm::vec3 direction = targetPos - transform.Position;
+        float distance = glm::length(direction);
+
+        // CRITICAL FIX: Validate distance
+        if (distance < 0.001f || std::isnan(distance) || std::isinf(distance)) {
+            return BTStatus::Success;  // Already at target or invalid
+        }
+
+        direction = glm::normalize(direction);
+
+        //if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
+        //    return BTStatus::Failure;
+        //}
+
+        //auto targetPosOpt = context.Blackboard.Get<glm::vec3>(m_TargetPositionKey);
+        //if (!targetPosOpt) {
+        //    return BTStatus::Failure;
+        //}
+
+        //glm::vec3 targetPos = *targetPosOpt;
+        //auto& transform = context.Entity->GetComponent<TransformComponent>();
+
+        //glm::vec3 direction = targetPos - transform.Position;
+        //float distance = glm::length(direction);
+
+        //// FIXED: Return Success when at arrival distance (matches BTMoveToTarget)
+        //// This allows Parallel nodes to complete properly when movement finishes
+        //if (distance < 0.5f) {
+        //    return BTStatus::Success;
+        //}
+
+        //// CRITICAL FIX: Validate distance
+        //if (distance < 0.001f || std::isnan(distance) || std::isinf(distance)) {
+        //    return BTStatus::Success;  // Already at target or invalid
+        //}
+
+        //direction = glm::normalize(direction);
+
+        // CRITICAL FIX: Validate normalized direction
+        if (std::isnan(direction.x) || std::isnan(direction.y) || std::isnan(direction.z)) {
+            LOG_WARNING("BTFaceMovementDirection: Invalid direction (NaN)");
+            return BTStatus::Failure;
+        }
+
+        try {
+            // Calculate target rotation to face direction
+            glm::quat targetRotation = glm::quatLookAt(direction, glm::vec3(0, 1, 0));
+
+            // CRITICAL FIX: Validate quaternion
+            if (std::isnan(targetRotation.w) || std::isnan(targetRotation.x) ||
+                std::isnan(targetRotation.y) || std::isnan(targetRotation.z)) {
+                LOG_WARNING("BTFaceMovementDirection: Invalid rotation (NaN)");
+                return BTStatus::Failure;
+            }
+
+            // Smooth interpolation
+            float t = std::min(1.0f, (m_RotationSpeed * context.DeltaTime) / 180.0f);
+
+            // CRITICAL FIX: Clamp t
+            t = std::clamp(t, 0.0f, 1.0f);
+
+            transform.Rotation = glm::slerp(transform.Rotation, targetRotation, t);
+            transform.IsDirty = true;
+
+            return BTStatus::Running;
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("BTFaceMovementDirection: Exception - ", e.what());
+            return BTStatus::Failure;
+        }
+    }
+
+    void BTFaceMovementDirection::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "RotationSpeed", std::to_string(m_RotationSpeed) });
+        properties.push_back({ "TargetPositionKey", m_TargetPositionKey });
+    }
+
+    void BTFaceMovementDirection::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "RotationSpeed") {
+            m_RotationSpeed = std::stof(value);
+        }
+        else if (name == "TargetPositionKey") {
+            m_TargetPositionKey = value;
+        }
+    }
+
+    //BTFaceTarget
+    BTFaceTarget::BTFaceTarget(float rotationSpeed)
+        : m_RotationSpeed(rotationSpeed)
+        , m_TargetEntityKey("TargetEntity") {
+    }
+
+    BTStatus BTFaceTarget::Execute(BTContext& context) {
+        if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        auto targetEntityOpt = context.Blackboard.Get<Entity*>(m_TargetEntityKey);
+        if (!targetEntityOpt || !(*targetEntityOpt)) {
+            return BTStatus::Failure;
+        }
+
+        Entity* targetEntity = *targetEntityOpt;
+        if (!targetEntity->HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        auto& transform = context.Entity->GetComponent<TransformComponent>();
+        auto& targetTransform = targetEntity->GetComponent<TransformComponent>();
+
+        glm::vec3 direction = targetTransform.Position - transform.Position;
+        float distance = glm::length(direction);
+
+        // FIXED: Return Success when very close (allows completion)
+        if (distance < 0.1f) {
+            return BTStatus::Success;
+        }
+
+        // Validate distance
+        if (std::isnan(distance) || std::isinf(distance)) {
+            LOG_WARNING("BTFaceTarget: Invalid distance");
+            return BTStatus::Failure;
+        }
+
+        try {
+            direction = glm::normalize(direction);
+
+            // Validate normalized direction
+            if (std::isnan(direction.x) || std::isnan(direction.y) || std::isnan(direction.z)) {
+                LOG_WARNING("BTFaceTarget: Invalid direction");
+                return BTStatus::Failure;
+            }
+        }
+        catch (...) {
+
+        }
+
+        glm::quat targetRotation = glm::quatLookAt(direction, glm::vec3(0, 1, 0));
+
+        float t = std::min(1.0f, (m_RotationSpeed * context.DeltaTime) / 180.0f);
+        transform.Rotation = glm::slerp(transform.Rotation, targetRotation, t);
+        transform.IsDirty = true;
+
+        return BTStatus::Running;
+    }
+
+    void BTFaceTarget::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "RotationSpeed", std::to_string(m_RotationSpeed) });
+        properties.push_back({ "TargetEntityKey", m_TargetEntityKey });
+    }
+
+    void BTFaceTarget::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "RotationSpeed") {
+            m_RotationSpeed = std::stof(value);
+        }
+        else if (name == "TargetEntityKey") {
+            m_TargetEntityKey = value;
+        }
+    }
+
+    //BTCheckEntityCount
+    BTCheckEntityCount::BTCheckEntityCount(const std::string& tag, int targetCount, Comparison comp)
+        : m_Tag(tag)
+        , m_TargetCount(targetCount)
+        , m_Comparison(comp) {
+    }
+
+    BTStatus BTCheckEntityCount::Execute(BTContext& context) {
+        if (!context.Scene) {
+            LOG_WARNING("BTCheckEntityCount: No scene context");
+            return BTStatus::Failure;
+        }
+
+        try {
+            auto& registry = context.Scene->GetRegistry();
+            auto view = registry.view<TagComponent>();
+
+            int count = 0;
+            for (auto entityHandle : view) {
+                Entity entity(entityHandle, &registry);
+
+                if (entity.HasComponent<TagComponent>()) {
+                    auto& tag = entity.GetComponent<TagComponent>();
+
+                    // CRITICAL FIX: Use partial match (contains) instead of exact match
+                    if (tag.Tag.find(m_Tag) != std::string::npos) {
+                        count++;
+                    }
+                }
+            }
+
+            LOG_TRACE("BTCheckEntityCount: Found ", count, " entities with tag containing '", m_Tag, "'");
+
+            bool result = false;
+            switch (m_Comparison) {
+            case Comparison::Greater:
+                result = count > m_TargetCount;
+                break;
+            case Comparison::Less:
+                result = count < m_TargetCount;
+                break;
+            case Comparison::Equal:
+                result = count == m_TargetCount;
+                break;
+            case Comparison::GreaterOrEqual:
+                result = count >= m_TargetCount;
+                break;
+            case Comparison::LessOrEqual:
+                result = count <= m_TargetCount;
+                break;
+            }
+
+            return result ? BTStatus::Success : BTStatus::Failure;
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("BTCheckEntityCount: Exception - ", e.what());
+            return BTStatus::Failure;
+        }
+    }
+
+    void BTCheckEntityCount::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Tag", m_Tag });
+        properties.push_back({ "TargetCount", std::to_string(m_TargetCount) });
+        properties.push_back({ "Comparison", std::to_string(static_cast<int>(m_Comparison)) });
+    }
+
+    void BTCheckEntityCount::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Tag") {
+            m_Tag = value;
+        }
+        else if (name == "TargetCount") {
+            m_TargetCount = std::stoi(value);
+        }
+        else if (name == "Comparison") {
+            m_Comparison = static_cast<Comparison>(std::stoi(value));
+        }
+    }
+
+    //BTStoreEntityCount
+    BTStoreEntityCount::BTStoreEntityCount(const std::string& tag, const std::string& countKey)
+        : m_Tag(tag)
+        , m_CountKey(countKey) {
+    }
+
+    BTStatus BTStoreEntityCount::Execute(BTContext& context) {
+        if (!context.Scene) {
+            LOG_WARNING("BTStoreEntityCount: No scene context");
+            return BTStatus::Failure;
+        }
+
+        try {
+            auto& registry = context.Scene->GetRegistry();
+            auto view = registry.view<TagComponent>();
+
+            int count = 0;
+            for (auto entityHandle : view) {
+                Entity entity(entityHandle, &registry);
+
+                if (entity.HasComponent<TagComponent>()) {
+                    auto& tag = entity.GetComponent<TagComponent>();
+
+                    // CRITICAL FIX: Use partial match (contains) instead of exact match
+                    if (tag.Tag.find(m_Tag) != std::string::npos) {
+                        count++;
+                    }
+                }
+            }
+
+            context.Blackboard.Set(m_CountKey, count);
+            LOG_TRACE("BTStoreEntityCount: Stored count ", count, " for tag containing '", m_Tag, "'");
+
+            return BTStatus::Success;
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("BTStoreEntityCount: Exception - ", e.what());
+            return BTStatus::Failure;
+        }
+    }
+
+    void BTStoreEntityCount::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Tag", m_Tag });
+        properties.push_back({ "CountKey", m_CountKey });
+    }
+
+    void BTStoreEntityCount::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Tag") {
+            m_Tag = value;
+        }
+        else if (name == "CountKey") {
+            m_CountKey = value;
+        }
+    }
 
 } // namespace Engine

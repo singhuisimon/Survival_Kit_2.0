@@ -106,12 +106,42 @@ namespace Engine {
         }
     
         // Infinite repeat
+        //if (m_RepeatCount < 0) {
+        //    // Execute child in a loop until it returns Running
+        //    while (true) {
+        //        BTStatus status = m_Child->Execute(context);
+
+        //        if (status == BTStatus::Running) {
+        //            return BTStatus::Running; // Child still processing
+        //        }
+
+        //        // Child completed (Success or Failure), reset and continue
+        //        m_Child->Reset();
+
+        //        // NOTE: We continue the loop immediately to execute again
+        //        // This ensures the repeater stays active in the execution stack
+        //    }
+        //    //BTStatus status = m_Child->Execute(context);
+        //    //if (status != BTStatus::Running) {
+        //    //    m_Child->Reset(); // Reset child for next iteration
+        //    //}
+        //    //return BTStatus::Running; // Always running
+        //}
+
+        // Infinite repeat with single execution per frame
         if (m_RepeatCount < 0) {
             BTStatus status = m_Child->Execute(context);
-            if (status != BTStatus::Running) {
-                m_Child->Reset(); // Reset child for next iteration
+
+            if (status == BTStatus::Running) {
+                return BTStatus::Running; // Child still processing
             }
-            return BTStatus::Running; // Always running
+
+            // Child completed, reset for next frame
+            m_Child->Reset();
+
+            // Return Running to keep the repeater active
+            // Next frame will execute the child again
+            return BTStatus::Running;
         }
     
         // Limited repeat
