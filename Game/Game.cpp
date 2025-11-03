@@ -284,7 +284,7 @@ void Game::CreateDefaultScene() {
     xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
     mesh.MeshGuid = inst_guid;
 
-    std::cout << inst_guid.m_Value << "\n";
+    std::cout << inst_guid.m_Value << "\n"; //this is the main value - amanda
 
 	//mesh.MeshResource = mesh_rsc;
 
