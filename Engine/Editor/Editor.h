@@ -36,6 +36,7 @@
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
+#include "../BehaviourTree/BehaviourTreeEditor.h"
 
 
 // Temporary inclusion to access EditorViewport data struct

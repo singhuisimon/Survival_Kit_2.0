@@ -41,7 +41,7 @@ namespace Engine {
         Scene* Scene = nullptr;              ///< The scene the entity belongs to
         float DeltaTime = 0.0f;             ///< Time since last frame
         bool isroot = false;
-        
+
         // Blackboard - shared data storage for the tree
         BTBlackboard Blackboard;
         //std::unordered_map<std::string, std::string> Blackboard;
@@ -168,6 +168,28 @@ namespace Engine {
             // Override in derived classes for full property support
         }
 
+        //NEW FUNCTIONS - AMANDA
+
+        /**
+         * @brief Find the index of a child node by pointer
+         * @return Index of child, or -1 if not found
+         */
+        virtual int FindChildIndex(const std::shared_ptr<BTNode>& child) const {
+            (void)child;
+            return -1;  // Default: no children
+        }
+
+        /**
+         * @brief Find the index of a child node by GUID
+         * @return Index of child, or -1 if not found
+         */
+        virtual int FindChildIndexByGUID(xresource::instance_guid guid) const {
+            (void)guid;
+            return -1;  // Default: no children
+        }
+
+        //END OF NEW FUNCTIONS - AMANDA
+
     protected:
         BTNode() : m_GUID(xresource::instance_guid::GenerateGUIDCopy()) {}
 
@@ -185,7 +207,8 @@ namespace Engine {
         bool HasEntered = false;        ///< Whether OnEnter was called
 
         BTStackFrame(std::shared_ptr<BTNode> node)
-            : Node(node) {}
+            : Node(node) {
+        }
     };
 
 } // namespace Engine

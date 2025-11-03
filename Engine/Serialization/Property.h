@@ -9,6 +9,7 @@
 
 // GLM Math Library
 #include <glm/glm.hpp>
+#include "glm/detail/type_quat.hpp"
 
 namespace Engine {
 
@@ -21,6 +22,7 @@ namespace Engine {
     enum class PropertyType {
         Bool,
         U32,
+        U64,
         Int,
         Float,
         String,
@@ -151,6 +153,10 @@ namespace Engine {
             return std::to_string(value.x) + "," + std::to_string(value.y) + "," +
                 std::to_string(value.z) + "," + std::to_string(value.w);
         }
+        else if constexpr (std::is_same_v<ValueType, glm::quat>) {
+	        return std::to_string(value.x) + "," + std::to_string(value.y) + "," +
+				std::to_string(value.z) + "," + std::to_string(value.w);
+        }
         return "";
     }
 
@@ -197,6 +203,19 @@ namespace Engine {
             vec.z = std::stof(value.substr(pos2 + 1, pos3 - pos2 - 1));
             vec.w = std::stof(value.substr(pos3 + 1));
             Set(*obj, vec);
+        }
+        else if constexpr(std::is_same_v<ValueType, glm::quat>) {
+			glm::quat quat;
+			size_t pos1 = value.find(',');
+            size_t pos2 = value.find(',', pos1 + 1);
+            size_t pos3 = value.find(',', pos2 + 1);
+			size_t pos4 = value.find(',', pos3 + 1);
+
+			quat.x = std::stof(value.substr(0, pos1));
+			quat.y = std::stof(value.substr(pos1 + 1, pos2 - pos1 - 1));
+			quat.z = std::stof(value.substr(pos2 + 1, pos3 - pos2 - 1));
+            quat.w = std::stof(value.substr(pos3 + 1, pos4 - pos3 - 1));
+			Set(*obj, quat);
         }
     }
 

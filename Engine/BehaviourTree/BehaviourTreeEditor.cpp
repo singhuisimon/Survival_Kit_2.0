@@ -231,4 +231,127 @@ namespace Engine {
         return valid;
     }
 
+
+    //FROM HERE ONWARDS ALL NEW!!! - AMANDA
+    bool BehaviourTreeEditor::RemoveChildNode(std::shared_ptr<BTNode> parent, std::shared_ptr<BTNode> child) {
+        if (!parent || !child) {
+            LOG_ERROR("BehaviourTreeEditor: Cannot remove child - null node");
+            return false;
+        }
+
+        int index = parent->FindChildIndex(child);
+        if (index < 0) {
+            LOG_ERROR("BehaviourTreeEditor: Child node not found in parent");
+            return false;
+        }
+
+        parent->RemoveChild(static_cast<size_t>(index));
+        LOG_TRACE("BehaviourTreeEditor: Removed child '", child->GetName(),
+            "' from parent '", parent->GetName(), "'");
+        return true;
+    }
+
+    bool BehaviourTreeEditor::RemoveChildNodeByGUID(std::shared_ptr<BTNode> parent, xresource::instance_guid childGUID) {
+        if (!parent) {
+            LOG_ERROR("BehaviourTreeEditor: Cannot remove child - null parent");
+            return false;
+        }
+
+        int index = parent->FindChildIndexByGUID(childGUID);
+        if (index < 0) {
+            LOG_ERROR("BehaviourTreeEditor: Child node with GUID not found in parent");
+            return false;
+        }
+
+        parent->RemoveChild(static_cast<size_t>(index));
+        LOG_TRACE("BehaviourTreeEditor: Removed child at index ", index,
+            " from parent '", parent->GetName(), "'");
+        return true;
+    }
+
+    int BehaviourTreeEditor::FindChildIndex(std::shared_ptr<BTNode> parent, std::shared_ptr<BTNode> child) {
+        if (!parent || !child) {
+            return -1;
+        }
+        return parent->FindChildIndex(child);
+    }
+
+    BTNodeMetadata* BehaviourTreeEditor::GetNodePropertyMetadata(const std::string& typeName) {
+        // Get the type metadata from registry
+        const BTNodeTypeMetadata* typeMetadata = BTNodeRegistry::Get().GetMetadata(typeName);
+        if (!typeMetadata) {
+            return nullptr;
+        }
+
+        // Return the property metadata (it's a shared_ptr, so we get the raw pointer)
+        return typeMetadata->PropertyMetadata.get();
+    }
+
+    std::vector<std::string> BehaviourTreeEditor::GetNodePropertyNames(const std::string& typeName) {
+        BTNodeMetadata* metadata = GetNodePropertyMetadata(typeName);
+        if (!metadata) {
+            return {};
+        }
+
+        std::vector<std::string> names;
+        for (const auto& prop : metadata->GetProperties()) {
+            names.push_back(prop.Name);
+        }
+        return names;
+    }
+
+    std::vector<std::pair<std::string, PropertyType>> BehaviourTreeEditor::GetNodePropertyInfo(const std::string& typeName) {
+        BTNodeMetadata* metadata = GetNodePropertyMetadata(typeName);
+        if (!metadata) {
+            return {};
+        }
+
+        std::vector<std::pair<std::string, PropertyType>> info;
+        for (const auto& prop : metadata->GetProperties()) {
+            info.push_back({ prop.Name, prop.Type });
+        }
+        return info;
+    }
+
+    std::string BehaviourTreeEditor::GetNodePropertyValue(std::shared_ptr<BTNode> node, const std::string& propertyName) {
+        if (!node) {
+            LOG_ERROR("BehaviourTreeEditor: Cannot get property - null node");
+            return "";
+        }
+
+        BTNodeMetadata* metadata = GetNodePropertyMetadata(node->GetTypeName());
+        if (!metadata) {
+            LOG_ERROR("BehaviourTreeEditor: No metadata found for node type: ", node->GetTypeName());
+            return "";
+        }
+
+        return metadata->GetPropertyValue(node.get(), propertyName);
+    }
+
+    bool BehaviourTreeEditor::SetNodePropertyValue(std::shared_ptr<BTNode> node,
+        const std::string& propertyName,
+        const std::string& value) {
+        if (!node) {
+            LOG_ERROR("BehaviourTreeEditor: Cannot set property - null node");
+            return false;
+        }
+
+        BTNodeMetadata* metadata = GetNodePropertyMetadata(node->GetTypeName());
+        if (!metadata) {
+            LOG_ERROR("BehaviourTreeEditor: No metadata found for node type: ", node->GetTypeName());
+            return false;
+        }
+
+        bool success = metadata->SetPropertyValue(node.get(), propertyName, value);
+        if (success) {
+            LOG_TRACE("BehaviourTreeEditor: Set property '", propertyName,
+                "' = '", value, "' on node '", node->GetName(), "' using metadata");
+        }
+        else {
+            LOG_ERROR("BehaviourTreeEditor: Failed to set property '", propertyName,
+                "' on node type ", node->GetTypeName());
+        }
+        return success;
+    }
+
 } // namespace Engine

@@ -134,6 +134,28 @@ namespace Engine {
         // Register MeshRendererComponent
         {
             auto& meta = REGISTER_COMPONENT(MeshRendererComponent);
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"MeshGuid",
+                PropertyType::U64,                
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.MeshGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.MeshGuid = xresource::instance_guid{v}; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"MaterialGuid",
+                PropertyType::U64,
+				[](const MeshRendererComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"TextureGuid",
+				PropertyType::U64,
+				[](const MeshRendererComponent& c) { return static_cast<u64>(c.TextureGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.TextureGuid = xresource::instance_guid{ v }; }
+            );
+
             meta.AddProperty<MeshRendererComponent, bool>(
                 "Visible",
                 PropertyType::Bool,
@@ -182,6 +204,14 @@ namespace Engine {
                 [](const MeshRendererComponent& c) { return c.Texture; },
                 [](MeshRendererComponent& c, const u32& v) { c.Texture = v; }
             );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "SubmeshIndex",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.SubmeshIndex; },
+				[](MeshRendererComponent& c, const u32& v) { c.SubmeshIndex = v; }
+            );
+
         }
 
         // Register RigidbodyComponent
