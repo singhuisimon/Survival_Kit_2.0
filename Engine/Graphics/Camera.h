@@ -63,7 +63,7 @@ namespace Engine {
             target{ 0.0f, 0.0f, 0.0f },
             FOV{ 45.0f },
             nearPlane{ 0.5f },
-            farPlane{ 100.0f }
+            farPlane{ 5000.0f }
         {
         }
 
