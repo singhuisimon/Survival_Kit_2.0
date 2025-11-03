@@ -683,8 +683,34 @@ namespace Engine
 
 					if (openMeshComponent)
 					{
-						//ImGui::Separator();
 						auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
+						
+						bool globalIlluminate = mesh.GlobalIlluminate;
+						if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
+							mesh.GlobalIlluminate = globalIlluminate;
+						}
+
+						bool shadowCast = mesh.ShadowCast;
+						if (ImGui::Checkbox("Shadow Cast", &shadowCast)) {
+							mesh.ShadowCast = shadowCast;
+						}
+
+						bool shadowReceive = mesh.ShadowReceive;
+						if (ImGui::Checkbox("Shadow Receive", &shadowReceive)) {
+							mesh.ShadowReceive = shadowReceive;
+						}
+
+						bool visible = mesh.Visible;
+						if (ImGui::Checkbox("Visible", &visible)) {
+							mesh.Visible = visible;
+						}
+
+						ImGui::SeparatorText("Values for Debugging:");
+
+						ImGui::Text("Material: %u", mesh.Material);
+						ImGui::Text("Mesh Type: %u", mesh.MeshType);
+						ImGui::Text("Submesh Index: %u", mesh.SubmeshIndex);
+						ImGui::Text("Texture: %u", mesh.Texture);
 
 					}
 					// ---------------------- Remove Mesh Component by ... -------------------------
@@ -1415,6 +1441,54 @@ namespace Engine
 		ImGui::End();
 	}
 
+	void Editor::DrawEntityRecursive(Entity entity, entt::registry& registry)
+	{
+		auto& tag = entity.GetComponent<TagComponent>();
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		// Check for selection
+		if (m_SelectedEntity == entity)
+			flags |= ImGuiTreeNodeFlags_Selected;
+
+		// Check if entity has children
+		bool hasChildren = false;
+		auto view = registry.view<TransformComponent>();
+		for (auto childHandle : view)
+		{
+			auto& childTransform = view.get<TransformComponent>(childHandle);
+			if (childTransform.Parent == (uint32_t)entity)
+			{
+				hasChildren = true;
+				break;
+			}
+		}
+
+		if (!hasChildren)
+			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+
+		if (ImGui::IsItemClicked())
+			m_SelectedEntity = entity;
+
+		// Your existing popup code goes here (unchanged)
+		// ----------------------------------------------------
+
+		if (opened && hasChildren)
+		{
+			for (auto childHandle : view)
+			{
+				auto& childTransform = view.get<TransformComponent>(childHandle);
+				if (childTransform.Parent == (uint32_t)entity)
+				{
+					Entity child(childHandle, &registry);
+					DrawEntityRecursive(child, registry);
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+
 	void Editor::displayHierarchyPanel()
 	{
 		if (!hierachyWindow)
@@ -1443,6 +1517,12 @@ namespace Engine
 				{
 					Entity entity(entityHandle, &m_Scene->GetRegistry());
 					auto& tag = entity.GetComponent<TagComponent>();
+					/*auto& transform = entity.GetComponent<TransformComponent>();
+
+					if (transform.Parent == u32_max)
+					{
+						DrawEntityRecursive(entity, m_Scene->GetRegistry());
+					}*/
 
 					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 					if (m_SelectedEntity == entity)

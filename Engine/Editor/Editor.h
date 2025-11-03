@@ -174,6 +174,8 @@ namespace Engine
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
+
+		void DrawEntityRecursive(Entity entity, entt::registry& registry);
 	};
 
 
