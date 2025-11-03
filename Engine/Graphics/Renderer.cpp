@@ -146,6 +146,9 @@ namespace Engine {
 		// Set default picked ID 
 		pickedID = NO_HIT;
 
+		// Set default editor camera toggle
+		isEditorCamOn = true;
+
 		// Create a framebuffer for ImGui editor and configure it's settings
 		auto fp_fbo = FrameBuffer::create();
 		if (fp_fbo.has_value()) {
@@ -389,80 +392,108 @@ namespace Engine {
 	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list) {
 
 		// For rendering from editor's camera
-		glm::mat4 v = editor_camera.getLookAt(); // Editor camera view transform
-		for (/*const */auto& pass : m_passes) {
+		if (isEditorCamOn) {
+			glm::mat4 v = editor_camera.getLookAt(); // Editor camera view transform
+			for (/*const */auto& pass : m_passes) {
 
-			if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
-			// Update pass viewport if allowed
-			int vp_w, vp_h;
-			glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
-			if (pass.auto_aspect) {
+				// Update pass viewport if allowed
+				if (pass.auto_aspect) {
+					int vp_w, vp_h;
+					glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
 
-				// Check if viewport needs update
-				if (pass.view_port.z != vp_w || pass.view_port.w != vp_h) {
-					pass.view_port.z = vp_w;
-					pass.view_port.w = vp_h;
+					// Check if viewport needs update
+					if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+						pass.view_port.z = vp_w;
+						pass.view_port.w = vp_h;
 
-					// Resize FBO according to changes
-					resizeFBO(pass.fbo_handle, vp_w, vp_h);
+						// Resize FBO according to changes
+						resizeFBO(pass.fbo_handle, vp_w, vp_h);
+					}
 				}
 
+				// Get camera perspective transform
+				glm::mat4 p = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+
+				// Begin drawing frame
+				beginFrame(pass);
+				draw(pass, draw_items, v, p);
+				endFrame(pass);
+
+				// Read ID at mouse position for GPU ID pass
+				if (pass.shdpgm_handle == 2) {
+
+					// Get mouse position WRT window client
+					double mx, my;
+					glfwGetCursorPos(glfwGetCurrentContext(), &mx, &my);
+					//LOG_INFO("MX and MY: ", mx, " ", my);
+
+					// Check mouse pos if inside viewport panel
+					if (mx >= renderEditorVP.tl.x && mx <= (renderEditorVP.tl.x + renderEditorVP.size.x)
+						&& my >= renderEditorVP.tl.y && my <= (renderEditorVP.tl.y + renderEditorVP.size.y)) {
+
+						// Normalize mouse position to viewport panel's top left position 
+						//LOG_INFO("u Calculation ", mx, " - ", renderEditorVP.tl.x, " / ", renderEditorVP.size.x);
+						//LOG_INFO("v Calculation ", my, " - ", renderEditorVP.tl.y, " / ", renderEditorVP.size.y);
+						float u = float(mx - renderEditorVP.tl.x) / renderEditorVP.size.x;
+						float v = float(my - renderEditorVP.tl.y) / renderEditorVP.size.y;
+
+						// Map to FBO pixel coords (flip Y because OpenGL images are bottom-up)
+						int px = int(u * pass.view_port.z);
+						int py = int((1.0f - v) * pass.view_port.w);
+
+						// Read the ID
+						u32 id = 0; // (entt::null value)
+						auto& idFbo = m_framebuffers[1];
+						idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
+						glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
+						glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
+						glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+						////LOG_INFO("Px Py = ", px," ", py);
+						//if (id == NO_HIT) {
+						//	LOG_INFO("GPU id = No Object");
+						//}
+						//else {
+						//	LOG_INFO("GPU id = ", id);
+						//}
+
+						// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
+						pickedID = id;
+					}
+				}
 			}
+		} else {
+			// For rendering all enabled camera displays
+			for (const auto& cam : camera_list) {
 
-			// Get camera perspective transform
-			glm::mat4 p = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+				for (/*const*/ auto& pass : m_passes) {
 
-			// Begin drawing frame
-			beginFrame(pass);
-			draw(pass, draw_items, v, p);
-			endFrame(pass);
+					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
-			// Read ID at mouse position for GPU ID pass
-			if (pass.shdpgm_handle == 2) {
+					// Update pass viewport if allowed
+					if (pass.auto_aspect) {
+						int vp_w, vp_h;
+						glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
 
-				// Get mouse position WRT window client
-				double mx, my;
-				glfwGetCursorPos(glfwGetCurrentContext(), &mx, &my);
-				//LOG_INFO("MX and MY: ", mx, " ", my);
+						// Check if viewport needs update
+						if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+							pass.view_port.z = vp_w;
+							pass.view_port.w = vp_h;
 
-				// Check mouse pos if inside viewport panel
-				if (mx >= renderEditorVP.tl.x && mx <= (renderEditorVP.tl.x + renderEditorVP.size.x) 
-				 && my >= renderEditorVP.tl.y && my <= (renderEditorVP.tl.y + renderEditorVP.size.y)) {
+							// Resize FBO according to changes
+							resizeFBO(pass.fbo_handle, vp_w, vp_h);
+						}
+					}
 
-					// Normalize mouse position to viewport panel's top left position 
-					//LOG_INFO("u Calculation ", mx, " - ", renderEditorVP.tl.x, " / ", renderEditorVP.size.x);
-					//LOG_INFO("v Calculation ", my, " - ", renderEditorVP.tl.y, " / ", renderEditorVP.size.y);
-					float u = float(mx - renderEditorVP.tl.x) / renderEditorVP.size.x;
-					float v = float(my - renderEditorVP.tl.y) / renderEditorVP.size.y;
-
-					// Map to FBO pixel coords (flip Y because OpenGL images are bottom-up)
-					int px = int(u * pass.view_port.z);
-					int py = int((1.0f - v) * pass.view_port.w);
-
-					// Read the ID
-					u32 id = 0; // (entt::null value)
-					auto& idFbo = m_framebuffers[1];
-					idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
-					glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
-					glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
-					glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-
-					////LOG_INFO("Px Py = ", px," ", py);
-					//if (id == NO_HIT) {
-					//	LOG_INFO("GPU id = No Object");
-					//}
-					//else {
-					//	LOG_INFO("GPU id = ", id);
-					//}
-
-					// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
-					pickedID = id;
+					// Begin drawing frame
+					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
+					draw(pass, draw_items, cam.View, cam.Persp);
+					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
-
 			}
 		}
-
 
 	}
 

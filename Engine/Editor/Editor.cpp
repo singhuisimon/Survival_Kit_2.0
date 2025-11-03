@@ -17,6 +17,7 @@
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Asset/AssetManager.h"
+#include "../Graphics/Camera.h"
 
 // Include other necessary headers
 #include <GLFW/glfw3.h>
@@ -293,6 +294,170 @@ namespace Engine
 		}
 	}
 
+	static std::shared_ptr<BTNode> nodeToDelete = nullptr;
+
+	void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr)
+	{
+		if (!node) return;
+
+		// Unique label for ImGui to avoid ID collisions
+		std::string labelID = node->GetName() + "##" + std::to_string(reinterpret_cast<uintptr_t>(node.get()));
+
+		// Determine flags for leaf/composite
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		if (!node->GetChildren().empty())
+			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+		bool nodeOpen = ImGui::TreeNodeEx(labelID.c_str(), flags, "%s [%s]", node->GetName().c_str(), node->GetTypeName());
+
+		// --- Right-click context menu ---
+		if (ImGui::BeginPopupContextItem())
+		{
+			static int selectedType = 0;
+			static bool addChildPending = false;
+
+			// Add Child - TODO: Leaf node that's child of decorator isn't deleting properly
+			if (node->CanHaveChildren()) {
+				// Show Add Child submenu
+				if (ImGui::BeginMenu("Add Child"))
+				{
+					auto allTypes = BehaviourTreeEditor::GetAllNodeTypes();
+
+					ImGui::Text("Select Node Type:");
+					ImGui::Separator();
+
+					for (int i = 0; i < (int)allTypes.size(); ++i)
+					{
+						bool isSelected = (selectedType == i);
+						if (ImGui::Selectable(allTypes[i].c_str(), isSelected))
+						{
+							selectedType = i;
+							addChildPending = true;
+						}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndMenu();
+				}
+
+				if (addChildPending)
+				{
+					addChildPending = false;
+					auto allTypes = BehaviourTreeEditor::GetAllNodeTypes();
+					auto newChild = BehaviourTreeEditor::CreateNode(allTypes[selectedType]);
+					BehaviourTreeEditor::AddChildNode(node, newChild);
+				}
+			}
+
+			if (parent)
+			{
+				if (ImGui::MenuItem("Remove Node"))
+				{
+					BehaviourTreeEditor::RemoveChildNode(parent, node);
+					ImGui::EndPopup();
+
+					// Pop the tree node BEFORE returning if it was opened
+					if (nodeOpen)
+						ImGui::TreePop();
+
+					return;
+				}
+			}
+
+			ImGui::EndPopup();
+		}
+
+		/*ImVec4 bgColor;
+		if (node->GetTypeName() == "Succeeder" || node->GetTypeName() == "Sequence" || node->GetTypeName() == "Selector")
+			bgColor = ImVec4(0.8f, 0.6f, 0.2f, 0.3f);
+		else if (node->GetTypeName() == "RepeatUntilFail" || node->GetTypeName() == "Inverter" || node->GetTypeName() == "Parallel" 
+				|| node->GetTypeName() == "Condition" || node->GetTypeName() == "Failer" || node->GetTypeName() == "Repeater")
+			bgColor = ImVec4(0.2f, 0.7f, 0.2f, 0.3f);
+		else if (node->GetTypeName() == "Cooldown" || node->GetTypeName() == "Action" || node->GetTypeName() == "Wait" 
+			   || node->GetTypeName() == "Log") 
+			bgColor = ImVec4(0.2f, 0.6f, 0.9f, 0.3f);
+		else                          
+			bgColor = ImVec4(1.0f, 1.0f, 0.7f, 0.3f);
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		ImVec2 min = ImGui::GetCursorScreenPos();
+		float width = ImGui::GetContentRegionAvail().x;
+		float height = ImGui::GetTextLineHeightWithSpacing();
+		ImVec2 max = ImVec2(min.x + width, min.y + height);
+		drawList->AddRectFilled(min, max, ImGui::GetColorU32(bgColor));*/
+
+		// --- Inline node editor ---
+		if (nodeOpen)
+		{
+			// Node name
+			static char nameBuffer[128];
+			strncpy_s(nameBuffer, node->GetName().c_str(), _TRUNCATE);
+			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer)))
+			{
+				node->SetName(nameBuffer);
+			}
+
+			// Node type selector
+			std::vector<std::string> allTypes = BehaviourTreeEditor::GetAllNodeTypes();
+			static int currentTypeIndex = 0;
+			for (size_t i = 0; i < allTypes.size(); ++i)
+			{
+				if (allTypes[i] == node->GetTypeName())
+				{
+					currentTypeIndex = (int)i;
+					break;
+				}
+			}
+
+			if (ImGui::Combo(("Type##" + labelID).c_str(), &currentTypeIndex,
+				[](void* data, int idx, const char** outText) {
+					auto& types = *static_cast<std::vector<std::string>*>(data);
+					*outText = types[idx].c_str();
+					return true;
+				},
+				static_cast<void*>(&allTypes), (int)allTypes.size()))
+			{
+				auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
+				for (auto& child : node->GetChildren())
+					newNode->AddChild(child);
+				*node = *newNode; // replace contents
+			}
+
+			// --- Node properties ---
+			std::vector<std::pair<std::string, std::string>> properties;
+			node->GetProperties(properties);
+
+			for (auto& [name, value] : properties)
+			{
+				char propNameBuffer[256];
+				char valueBuffer[256];
+
+				strncpy_s(propNameBuffer, name.c_str(), _TRUNCATE);
+				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
+
+				float fullWidth = ImGui::GetContentRegionAvail().x;
+				ImGui::PushItemWidth(fullWidth * 0.5f - ImGui::GetStyle().ItemSpacing.x * 0.5f);
+
+				// value box (left)
+				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer)))
+				{
+					node->SetProperty(name, valueBuffer);
+				}
+
+				ImGui::PopItemWidth();
+			}
+
+			// --- Draw children recursively ---
+			auto children = node->GetChildren(); // copy to avoid iterator invalidation if removed
+			for (auto& child : children)
+			{
+				DrawBTNodeEditor(child, node);
+			}
+			ImGui::TreePop();
+		}
+	}
+
 	void Editor::displayPropertiesPanel()
 	{
 		if (!inspectorWindow)
@@ -402,15 +567,69 @@ namespace Engine
 					
 					if (openRigidBody)
 					{
-						// mass
 						auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
-						//ImGui::Separator();
+						
+						// mass
 						float rigidMass = rigidBody.GetMass();
 						if (ImGui::DragFloat("Mass", &rigidMass))
 						{
 							rigidBody.SetMass(rigidMass);
 						}
-						ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
+
+						ImGui::Separator();
+
+						// kinematic
+						ImGui::Text("Boolean to check if body is moved by code (not Physics)");
+						bool& isKinematic = rigidBody.IsKinematic;
+						if (ImGui::Checkbox("Is Kinematic", &isKinematic)) {
+							rigidBody.SetKinematic(isKinematic);
+						}
+
+						ImGui::Separator();
+
+						// gravity
+						ImGui::Text("Boolean to check if gravity affects the body");
+						bool isGravity = rigidBody.IsGravityEnabled();
+						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+							rigidBody.SetGravityEnabled(isGravity);
+						}
+
+						ImGui::Separator();
+
+						// velocity
+						glm::vec3 vel = rigidBody.GetVelocity();
+						if (ImGui::DragFloat3("Velocity", &vel.x, 1.0f))
+						{
+							rigidBody.SetVelocity(vel);
+						}
+
+						if (ImGui::Button("Stop")) {
+							rigidBody.Stop();
+						}
+
+						ImGui::Separator();
+
+						ImGui::Text("Display Runtime Value:");
+						
+						ImGui::BeginDisabled();
+
+						/*glm::vec3 vel = rigidBody.GetVelocity();
+						float velocity[3]{ vel.x, vel.y, vel.z };
+						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);*/
+						
+						float speed = rigidBody.GetSpeed();
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+
+						bool isMoving = rigidBody.IsMoving();
+						ImGui::Checkbox("Is Moving", &isMoving);
+
+						bool isStatic = rigidBody.IsStatic();
+						ImGui::Checkbox("Is Static", &isStatic);
+
+						ImGui::EndDisabled();
+								
+						//ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
+						/*ImGui::Checkbox("Is Kinematic", &rigidBody.IsKinematic);
 						ImGui::Checkbox("Use Gravity", &rigidBody.UseGravity);
 
 						//bool isKinematic = rigidBody.
@@ -420,7 +639,7 @@ namespace Engine
 						float velocity[3]{ vel.x, vel.y, vel.z };
 						ImGui::InputFloat3("Velocity", velocity, "%.3f", ImGuiInputTextFlags_ReadOnly);
 						float speed = rigidBody.GetSpeed();
-						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
+						ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);*/
 					}
 					// ---------------------- Remove Rigid Body Component by ... -------------------------
 					if (removeRigidBody)
@@ -474,7 +693,6 @@ namespace Engine
 						m_SelectedEntity.RemoveComponent<MeshRendererComponent>();
 					}
 				}
-
 				// =========================== Display Audio Component ===========================
 				if (m_SelectedEntity.HasComponent<AudioComponent>())
 				{
@@ -512,6 +730,56 @@ namespace Engine
 						auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
 
 						ImGui::Separator();
+
+						auto& db = AM.db();
+						auto allAssets = db.AllMutable();
+						std::vector<const AssetRecord*> audioAssets;
+						audioAssets.reserve(allAssets.size());
+						for (const auto* record : allAssets) {
+							if (!record || !record->valid) continue;
+							if (record->type == ResourceType::AUDIO) {
+								audioAssets.push_back(record);
+							}
+						}
+
+						// Determine current selection index
+						int currentIndex = 0;
+						for (size_t i = 0; i < audioAssets.size(); ++i)
+						{
+							if (audioAssets[i]->sourcePath == audio.AudioFilePath)
+							{
+								currentIndex = (int)i;
+								break;
+							}
+						}
+
+						// Draw the combo box
+						ImGui::Text("Audio File Path:");
+						ImGui::SetNextItemWidth(400.0f);
+						if (ImGui::Combo("##AudioFilePath", &currentIndex,
+							[](void* data, int idx, const char** outText) -> bool
+							{
+								auto& assets = *static_cast<std::vector<const AssetRecord*>*>(data);
+								std::string path = assets[idx]->sourcePath;
+
+								// Extract filename from path
+								size_t lastSlash = path.find_last_of("/\\");
+								static std::string filename; // static to keep it alive for ImGui
+								filename = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
+
+								*outText = filename.c_str();
+								return true;
+							},
+							static_cast<void*>(&audioAssets), (int)audioAssets.size()))
+						{
+							// Extract and save just the filename
+							std::string fullPath = audioAssets[currentIndex]->sourcePath;
+							size_t lastSlash = fullPath.find_last_of("/\\");
+							std::string filename = (lastSlash != std::string::npos) ? fullPath.substr(lastSlash + 1) : fullPath;
+
+							audio.SetAudioFile(filename);
+						}
+
 						ImGui::Text("Audio Type:");
 						AudioType type = audio.Type;
 
@@ -619,9 +887,6 @@ namespace Engine
 				{
 					ImGui::Separator();
 
-					ImGui::Columns(2, nullptr, false);
-					ImGui::SetColumnWidth(0, 200.0f);
-
 					bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
 					bool removeReverb = false;
 
@@ -650,6 +915,226 @@ namespace Engine
 					}
 				}
 
+				if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
+				{
+					ImGui::Separator();
+
+					bool openBTComponent = ImGui::CollapsingHeader("Behaviour Tree Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+					if (openBTComponent) {
+
+						auto& ai_bt = m_SelectedEntity.GetComponent<BehaviourTreeComponent>();
+
+						// For actual BT
+						BehaviourTree& treeInstance = *(ai_bt.TreeInstance);
+						size_t stackDepth = treeInstance.GetStackDepth();
+						auto root = treeInstance.GetRootNode();
+
+						ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
+						ImGui::Text("Stack Depth: %zu", stackDepth);
+
+						// Draw a small "i" icon next to a label
+						/*ImGui::Text("Some setting");
+						ImGui::SameLine();
+
+						// Use a small colored "i" or unicode info character
+						ImGui::TextDisabled("(i)");
+
+						// Show tooltip when hovered
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::TextWrapped("This is some helpful info about this setting.");
+							ImGui::EndTooltip();
+						}*/
+
+						if (root)
+						{
+							ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
+							DrawBTNodeEditor(root);
+						}
+						else
+						{
+							ImGui::TextDisabled("No root node.");
+							if (ImGui::Button("Create Root Node"))
+							{
+								auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
+								treeInstance.SetRootNode(rootNode);
+							}
+						}
+
+						// --- Set Root Node ---
+						ImGui::Separator();
+						ImGui::Text("Root Node:");
+
+						// Dropdown to pick node type for new root
+						static int rootNodeTypeIndex = 0;
+						auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
+						ImGui::SetNextItemWidth(200.0f);
+						if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
+							[](void* data, int idx, const char** outText) -> bool {
+								auto& types = *static_cast<std::vector<std::string>*>(data);
+								*outText = types[idx].c_str();
+								return true;
+							},
+							static_cast<void*>(&allTypes), (int)allTypes.size()))
+						{
+							// Optional: nothing here, selection changes root only when button clicked
+						}
+
+						// Button to create/set the root node
+						if (ImGui::Button("Set Root Node"))
+						{
+							auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
+							treeInstance.SetRootNode(newRoot);
+						}
+
+						ImGui::Separator();
+
+						// Reset the tree to initial state
+						if (ImGui::Button("Reset")) {
+							ai_bt.Reset();
+						}
+
+						ImGui::BeginDisabled();
+
+						// Last execution status (for debugging)
+						BTStatus& lastStatus = ai_bt.LastStatus;
+						std::string lastStatusString{};
+						if (lastStatus == BTStatus::Success) {
+							lastStatusString = "Success";
+						}
+						else if (lastStatus == BTStatus::Failure) {
+							lastStatusString = "Failure";
+						}
+						else {
+							lastStatusString = "Running";
+						}
+						ImGui::Text("Execution Status: %s", lastStatusString.c_str());
+
+						ImGui::EndDisabled();
+
+						// Whether tree executes every frame
+						bool& active = ai_bt.Active;
+						if (ImGui::Checkbox("Active", &active)) {
+							ai_bt.Active = active;
+						}
+
+						// Reset the tree when it completes
+						bool& resetComplete = ai_bt.ResetOnComplete;
+						if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
+							ai_bt.ResetOnComplete = resetComplete;
+						}
+						
+						// Reference to current asset path
+						std::string& treeAssetPath = ai_bt.TreeAssetPath;
+
+						// Find BT folder
+
+						std::filesystem::path repoRoot = getRepository();
+						std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
+
+						auto folders = getAssetsInFolder(btPath.string());
+						std::string btFolderPath;
+						for (auto& folder : folders)
+						{
+							if (folder.name == "BT")
+							{
+								btFolderPath = folder.fullPath;
+								break;
+							}
+						}
+
+						// Collect all JSON assets in BT folder
+						std::vector<AssetEntry> btAssets;
+						if (!btFolderPath.empty())
+						{
+							auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
+							for (auto& f : files)
+							{
+								if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
+									btAssets.push_back(f);
+							}
+						}
+
+						// Determine current selection index
+						int currentIndex = 0;
+						for (size_t i = 0; i < btAssets.size(); ++i)
+						{
+							if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
+							{
+								currentIndex = (int)i;
+								break;
+							}
+						}
+
+						// Draw the combo box
+						ImGui::Text("Tree Asset Path:");
+						ImGui::SetNextItemWidth(400.0f);
+						if (ImGui::Combo("##TreeAssetPath", &currentIndex,
+							[](void* data, int idx, const char** outText) -> bool
+							{
+								auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
+								*outText = assets[idx].name.c_str(); // display name only
+								
+								return true;
+							},
+							static_cast<void*>(&btAssets), (int)btAssets.size()))
+						{
+							// Update treeAssetPath when selected
+							ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
+						}
+
+						if (ImGui::Button("Load Tree"))
+						{
+							if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+							{
+								std::string chosenPath = btAssets[currentIndex].name;
+								ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+							}
+						}
+
+
+						if (ImGui::Button("Save Tree")) {
+							BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
+						}
+
+						// BehaviourTreeEditor:
+						/*CreateNewTree //IN ASSET BROWSER
+						SetNodeProperty //
+						GetAllNodeTypes
+						GetAllCategories
+						ConvertToPrefab //LATER
+						LoadFromPrefab //LATER
+						ValidateTree - Button -> 
+						CloneTree
+						*/
+					}
+
+					bool removeBT = false;
+
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###BehaviorbBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("BehaviorPopUp");
+					}
+					if (ImGui::BeginPopup("BehaviorPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeBT = true;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (removeBT)
+					{
+						m_SelectedEntity.RemoveComponent<BehaviourTreeComponent>();
+					}
+				}
 
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
@@ -773,6 +1258,25 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Behavior Tree Component ----------------------------
+					bool hasBehaviorTree = m_SelectedEntity.HasComponent<BehaviourTreeComponent>();
+					ImGui::BeginDisabled(hasBehaviorTree);
+
+					if (ImGui::MenuItem("Behaviour Tree Component"))
+					{
+						if (!hasBehaviorTree)
+						{
+							m_SelectedEntity.AddComponent<BehaviourTreeComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasBehaviorTree)
+						{
+							ImGui::SetTooltip("Adds behaviour tree to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 
 					//ImGui::SetWindowFontScale(1.0f); // Reset
 
@@ -1049,9 +1553,14 @@ namespace Engine
 
 				if (ImGui::BeginTable("AssetGrid", itemsPerRow)) {
 					for (size_t i = 0; i < filteredAssets.size(); ++i) {
+						
 						const auto* record = filteredAssets[i];
+
 						std::filesystem::path assetPath(record->sourcePath);
 						std::string filename = assetPath.filename().string();
+						std::string extension = record->ext;
+						std::string hash = record->contentHash;
+						std::time_t writeTime = record->lastWriteTime;
 
 						ImGui::TableNextColumn();
 
@@ -1080,8 +1589,14 @@ namespace Engine
 						{
 							ImGui::BeginTooltip();
 							ImGui::Text("Name: %s", filename.c_str());
-							std::string extension = filename.substr(filename.find_last_of('.') + 1);
 							ImGui::Text("Type: %s", extension.c_str());
+							ImGui::Text("Content Hash: %s", hash.c_str());
+							
+							char timeBuf[64];
+							std::tm* tm_local = std::localtime(&writeTime);
+							std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+							ImGui::Text("Last Write Time: %s", timeBuf);
+
 							ImGui::EndTooltip();
 						}
 
@@ -1258,195 +1773,10 @@ namespace Engine
 		}
 
 		ImGui::End();
+	}
 
-		// Begin properties dockable window
-		/*if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
-		{
-			
-			ImGui::Columns(2, nullptr, true);
-			static std::string selectedFolder = "";
-			// ================= Left column panel display all the resources folder ========================
-			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			ImGui::Text("Projects:");
-			if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
-
-				for (auto& folder : folders)
-				{
-					bool isSelected = (selectedFolder == folder.fullPath);
-					if (ImGui::Selectable(folder.name.c_str(), isSelected))
-					{
-						selectedFolder = folder.fullPath;
-						selectedResourcesIndex = -1; // reset asset selection
-					}
-				}
-			}
-			ImGui::EndChild(); // end the left column 
-
-			// ===================== Right column panel display the resources files =======================
-
-			ImGui::NextColumn();
-			ImGui::BeginChild("Assets Panel", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-			// if folder is selected, display the files
-			if (!selectedFolder.empty())
-			{
-				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder); 
-				// display the selected folder name
-				std::filesystem::path folderPath(selectedFolder);
-				std::string folderName = folderPath.filename().string();
-				ImGui::Text(("Resources > " + folderName).c_str());
-
-				ImGui::Separator();
-
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
-				const float cellSize = thumbnailSize + padding;
-				float panelWidth = ImGui::GetContentRegionAvail().x;
-				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
-
-				// int textureCount = -1;
-				ImGui::Columns(itemsPerRow, nullptr, false);
-
-				// loop through files in selected folder
-				for (size_t i = 0; i < assetsList.size(); i++)
-				{
-					const auto& asset = assetsList[i];
-					std::string fileName = asset.name;
-					std::string filePath = asset.fullPath;
-
-					ImGui::PushID(fileName.c_str());
-
-					bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
-
-					if (isSelected)
-					{
-						// Change the button background color
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
-					}
-
-					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
-					{
-						selectedResourcesIndex = static_cast<int>(i);
-
-						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
-						if (extension == ".json") // if it is scene
-						{
-							if (isPrefabEditor)
-							{
-								if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-								{
-									auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
-									std::string prefabPath = currPrefabPath;
-
-									if (!prefabPath.empty())
-									{
-										// Create updated prefab from current entity state
-										std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-										auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-										if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-										{
-											PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-											prefabComp.ClearModifications(); // Reset overrides 
-											LOG_INFO("Prefab updated: {}", prefabPath);
-											isPrefabEditor = false;
-										}
-									}
-								}
-								
-							}
-							
-							currScenePath = filePath; // update curr file path
-							currFileName = fileName; // store file name
-							m_Scene->SetName(fileName);
-							if (m_Scene)
-							{
-
-								m_Scene->GetRegistry().clear();
-								m_Scene->LoadFromFile(filePath);
-									
-								isPrefabEditor = false;
-								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
-							}
-							
-							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
-
-						}
-						else if (extension == ".prefab")
-						{
-							//auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
-							if (!isPrefabEditor)
-							{
-								if (!currScenePath.empty())
-								{
-									m_Scene->SaveToFile(currScenePath);
-									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
-								}
-							}
-							//if (!saveAsPanel)
-							//{
-							currPrefabPath = filePath;
-							m_Scene->SetName("Prefab");
-							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-							if (prefab)
-							{
-								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
-								m_Scene->GetRegistry().clear();
-								m_Scene->SetName("Prefab");
-								LOG_DEBUG("m_Scene->GetName is ", m_Scene->GetName());
-								PrefabRegistry::Get().RegisterPrefab(prefab);
-								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-								if (!currScenePath.empty())
-								{
-									currScenePath.clear();
-								}
-								isPrefabEditor = true;
-
-								LOG_INFO("Now editing prefab:", currPrefabPath);
-							}
-							//}
-							
-						}
-					}
-					// to change the color of the selected
-					if (isSelected)
-					{
-						ImGui::PopStyleColor(3);
-					}
-
-					// ==================== Display info detail ==========================
-					if (ImGui::IsItemHovered())
-					{
-						ImGui::BeginTooltip();
-						ImGui::Text("Name: %s", fileName.c_str());
-						//ImGui::Text("Type: %s", filePath.c_str();
-						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
-						ImGui::Text("Type: %s", extension.c_str());
-						ImGui::EndTooltip();
-					}
-
-					// ==================== To center text under thumbnail ================
-					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
-					float textX = (thumbnailSize - textSize.x) * 0.5f;
-					if (textX < 0) textX = 0;
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
-					ImGui::TextWrapped("%s", fileName.c_str());
-
-					ImGui::PopID();
-					ImGui::NextColumn();
-					
-				}
-			}
-
-			ImGui::EndChild(); // end of the right column
-			ImGui::Columns(1);
-		}
-		ImGui::End();*/ // End of the assets browser window
+	void Editor::displayDescriptorEditorPanel() {
+		;
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
@@ -1713,8 +2043,8 @@ namespace Engine
 		}
 
 		ImGui::End();
-		
-		
+
+
 		// Logic here 
 
 	}

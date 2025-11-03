@@ -88,8 +88,11 @@ namespace Engine {
 
 		// Return editor viewport data (Temp solution)
 		inline EditorViewport& getEditorViewport() { return renderEditorVP; }
-
 		inline const u32 getPickedID() const { return pickedID; }
+
+		// Return editor camera toggle 
+		inline bool& getEditorCamToggle() { return isEditorCamOn; }
+
 
 	private:
 		/**
@@ -121,6 +124,9 @@ namespace Engine {
 		GLuint temp_rbo;				// Used for scene and GPU ID FBO
 		EditorViewport renderEditorVP;	// Editor viewport data
 		u32 pickedID;
+
+		// Temp toggle to check if editor camera is enabled
+		bool isEditorCamOn;
 
 		// Temporary object
 		GraphicsLoader m_gl;
