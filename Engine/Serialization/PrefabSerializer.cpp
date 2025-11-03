@@ -272,6 +272,14 @@ namespace Engine {
             scaleArray.PushBack(transform.Scale.z, allocator);
             propertiesObj.AddMember("Scale", scaleArray, allocator);
 
+            propertiesObj.AddMember("Parent", transform.Parent, allocator);
+
+			rapidjson::Value childrenArray(rapidjson::kArrayType);
+            for (const auto& child : transform.Children) {
+                childrenArray.PushBack(child, allocator);
+            }
+            propertiesObj.AddMember("Children", childrenArray, allocator);
+
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }
@@ -286,8 +294,8 @@ namespace Engine {
             propertiesObj.AddMember("ComponentGUID",
                 rapidjson::Value(std::to_string(camera.ComponentGUID.m_Value).c_str(), allocator), allocator);
             propertiesObj.AddMember("FOV", camera.FOV, allocator);
-            propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-            propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
+            propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+            propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
             propertiesObj.AddMember("Primary", camera.Primary, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
@@ -301,8 +309,18 @@ namespace Engine {
             componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
-            propertiesObj.AddMember("ComponentGUID",
-                rapidjson::Value(std::to_string(mesh.ComponentGUID.m_Value).c_str(), allocator), allocator);
+            propertiesObj.AddMember("MeshGuid",
+                rapidjson::Value(mesh.MeshGuid.m_Value), allocator);
+
+            propertiesObj.AddMember("MaterialGuid", 
+                rapidjson::Value(mesh.MaterialGuid.m_Value), allocator);
+
+            propertiesObj.AddMember("TextureGuid", 
+                rapidjson::Value(mesh.TextureGuid.m_Value), allocator);
+
+            //propertiesObj.AddMember("MeshGuid",
+            //    rapidjson::Value(std::to_string(mesh.MeshGuid.m_Value).c_str(), allocator), allocator);
+
             propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 
             propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);

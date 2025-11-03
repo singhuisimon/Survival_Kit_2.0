@@ -10,6 +10,10 @@ namespace Engine {
 		void OnUpdate(Scene* scene, Timestep ts) override;
 		int GetPriority() const override;
 		const char* GetName() const override;
+
+		static void SetParent(Scene* scene, entt::entity child, entt::entity new_parent);
+		static void UnParent(Scene* scene, entt::entity child);
+
 	private:
 
 		/**

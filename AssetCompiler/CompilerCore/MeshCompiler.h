@@ -14,12 +14,23 @@
 
 namespace AssetCompiler {
 
+	struct SubMeshDescriptor
+	{
+		uint32_t startIndex;
+		uint32_t indexCount;
+		uint32_t materialId;
+		char     name[64];
+		uint32_t reserved[4];
+	};
+
 	struct MeshData {
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> colors;
 		std::vector<glm::vec2> texCoords;
-		std::vector<uint32_t> indices;
+		std::vector<uint32_t>  indices;
+
+		std::vector<SubMeshDescriptor> submeshes;
 
 		bool isEmpty() const {
 			return positions.empty();
@@ -70,21 +81,22 @@ namespace AssetCompiler {
 	 * @brief Binary mesh file header
 	 */
 	struct CompiledMeshHeader {
-		char magic[4] = { 'M', 'S', 'H', '\0' };  // Magic number "MSH"
-		uint32_t version = 1;                    // Format version
+		char magic[4] = { 'M', 'S', 'H', '\0' };     // Magic number "MSH"
+		uint32_t version     = 1;                    // Format version
 
+		uint32_t meshCount   = 0;
 		uint32_t vertexCount = 0;
-		uint32_t indexCount = 0;
+		uint32_t indexCount  = 0;
 
-		uint32_t hasPositions = 0;    // Always 1
-		uint32_t hasNormals = 0;      // 1 if normals present
-		uint32_t hasColors = 0;       // 1 if colors present
-		uint32_t hasTexCoords = 0;    // 1 if UVs present
+		uint32_t hasPositions = 0;       // Always 1
+		uint32_t hasNormals   = 0;       // 1 if normals present
+		uint32_t hasColors    = 0;       // 1 if colors present
+		uint32_t hasTexCoords = 0;       // 1 if UVs present
 
-		uint32_t vertexStride = 0;    // Bytes per vertex
-		uint32_t indexSize = 4;       // 2 for UINT16, 4 for UINT32
+		uint32_t vertexStride = 0;       // Bytes per vertex
+		uint32_t indexSize    = 4;       // 2 for UINT16, 4 for UINT32
 
-		uint32_t reserved[6] = { 0 };   // For future use
+		uint32_t reserved[6] = { 0 };    // For future use
 	};
 
 	class MeshCompiler {

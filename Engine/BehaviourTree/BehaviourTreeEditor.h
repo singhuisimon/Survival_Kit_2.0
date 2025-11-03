@@ -93,6 +93,52 @@ namespace Engine {
          */
         static std::shared_ptr<BehaviourTree> CloneTree(const BehaviourTree& original);
 
+        //NEWLY ADDED - YET TO TEST THE FOLLOWING:
+
+        /**
+         * @brief Remove a child node by finding it automatically
+         */
+        static bool RemoveChildNode(std::shared_ptr<BTNode> parent, std::shared_ptr<BTNode> child);
+
+        /**
+         * @brief Remove a child node by GUID
+         */
+        static bool RemoveChildNodeByGUID(std::shared_ptr<BTNode> parent, xresource::instance_guid childGUID);
+
+        /**
+         * @brief Find the index of a child within its parent
+         */
+        static int FindChildIndex(std::shared_ptr<BTNode> parent, std::shared_ptr<BTNode> child);
+
+        /**
+         * @brief Get property metadata for a node type
+         */
+        static BTNodeMetadata* GetNodePropertyMetadata(const std::string& typeName);
+
+        /**
+         * @brief Get all property names for a node type
+         */
+        static std::vector<std::string> GetNodePropertyNames(const std::string& typeName);
+
+        /**
+         * @brief Get property info (name, type) for a node type
+         */
+        static std::vector<std::pair<std::string, PropertyType>> GetNodePropertyInfo(const std::string& typeName);
+
+        /**
+         * @brief Get property value from a node instance
+         */
+        static std::string GetNodePropertyValue(std::shared_ptr<BTNode> node, const std::string& propertyName);
+
+        /**
+         * @brief Set property value using metadata system
+         */
+        static bool SetNodePropertyValue(std::shared_ptr<BTNode> node,
+            const std::string& propertyName,
+            const std::string& value);
+
+        //END OF NEWLY ADDED - AMANDA
+
     private:
         /**
          * @brief Recursively validate a node and its children
