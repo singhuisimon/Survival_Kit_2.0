@@ -92,6 +92,7 @@ namespace Engine
 		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
 		//bool prefabModified = false;
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE;
+		bool m_PreviousEditorCamToggle = false;
 	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
@@ -183,8 +184,6 @@ namespace Engine
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
-
-		static glm::mat4 BuildTransformMatrix(const TransformComponent& tc);
 
 		void ManipulateEntityTransform(Entity& entity);
 	};

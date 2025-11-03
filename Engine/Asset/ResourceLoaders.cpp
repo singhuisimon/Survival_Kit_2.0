@@ -83,6 +83,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     // Open compiled binary file
     std::ifstream file(compiled_path, std::ios::binary);
     if (!file.is_open()) {
+        LOG_WARNING("Failed to open binary file");
         return nullptr;
     }
 
@@ -91,6 +92,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     file.read(reinterpret_cast<char*>(&texHeader), sizeof(Engine::CompiledTextureData));
 
     if (!file) {
+		LOG_WARNING("Failed to read texture header");
         return nullptr;
     }
 
@@ -139,6 +141,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
 
         if (!file) {
             glDeleteTextures(1, &texture->textureID);
+            LOG_WARNING("Failed to read texture");
             return nullptr;
         }
 
@@ -155,6 +158,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         glDeleteTextures(1, &texture->textureID);
+		LOG_WARNING("OpenGL error occurred while creating texture: 0x%X", error);
         return nullptr;
     }
 

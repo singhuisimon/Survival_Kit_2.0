@@ -2,6 +2,7 @@
 #include "../ECS/Scene.h"
 #include "../Component/TransformComponent.h"
 #include "../Component/MeshRendererComponent.h"
+#include "../Component/ParticleComponent.h"
 #include "Asset/ResourceHelpers.h"
 
 namespace Engine {
@@ -22,6 +23,7 @@ namespace Engine {
 		for (auto entity : view) {
 			auto& renderable = view.get<MeshRendererComponent>(entity);
 			auto& transform = view.get<TransformComponent>(entity);
+			
 
 			// Only render visible meshes
 			if (renderable.Visible)
@@ -38,6 +40,8 @@ namespace Engine {
 					renderable.TextureGuid
 					});
 			}
+
+			
 		}
 
 		// Save all enabled cameras
@@ -50,13 +54,41 @@ namespace Engine {
 			}
 
 		}
+
+		auto particleView = scene->GetRegistry().view<ParticleComponent>();
+
+		for (auto entity : particleView) {
+			auto& emitter = particleView.get<ParticleComponent>(entity);
+
+			if (!emitter.Particles.empty()) {
+
+				for (auto& particle : emitter.Particles) {
+
+					// Don't render dead particles
+					if (!particle.Alive)
+						continue;
+
+					m_drawitems.push_back({
+						particle.Transform,
+						u32_max, // Particles are not associated with an entity for rendering purposes
+						0,
+						emitter.ParticleType,
+						0,
+						0,
+						0,
+						0
+						});
+
+				}
+			}
+		}
 		
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());
 		std::span<CameraComponent> cameralist_span(m_cameralist.data(), m_cameralist.size());
 		renderer.render_frame(drawitem_span, cameralist_span);
 	}
 
-	int RenderSystem::GetPriority() const { return 101; }
+	int RenderSystem::GetPriority() const { return 151; }
 
 	const char* RenderSystem::GetName() const { return "RenderSystem"; }
 }

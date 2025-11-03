@@ -13,6 +13,7 @@
 #include "../Component/ScriptComponent.h"
 
 #include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ParticleComponent.h"
 
 namespace Engine {
     // All components are now defined in their respective headers

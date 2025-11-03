@@ -12,6 +12,7 @@
 #include "Editor.h"
 #include "../Component/TagComponent.h"
 #include "../Component/TransformComponent.h"
+#include "../Component/ParticleComponent.h"
 #include "../Transform/TransformSystem.h"
 
 #include "../Serialization/SceneSerializer.h"
@@ -1138,6 +1139,134 @@ namespace Engine
 					}
 				}
 
+				// ======================== Display Particle System Component ===============================
+				if (m_SelectedEntity.HasComponent<ParticleComponent>())
+				{
+					ImGui::Separator();
+					auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
+
+					if (ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						// Playback Controls
+						ImGui::Text("Playback");
+						ImGui::Checkbox("Active", &particleComp.Active);
+						ImGui::SameLine();
+						ImGui::Checkbox("Loop", &particleComp.Loop);
+
+						ImGui::Spacing();
+						ImGui::Separator();
+
+						// Emission Settings
+						if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000);
+							ImGui::DragFloat("Emission Rate", &particleComp.EmissionRate, 0.1f, 0.0f, 1000.0f, "%.1f particles/sec");
+							ImGui::DragFloat("Particle Lifetime", &particleComp.ParticleLifetime, 0.1f, 0.1f, 100.0f, "%.1f seconds");
+							ImGui::TreePop();
+						}
+
+						// Particle Appearance
+						if (ImGui::TreeNodeEx("Appearance", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							// Particle Type Dropdown
+							const char* particleTypes[] = { "Cube", "Plane", "Sphere" };
+							const char* currentType = particleTypes[particleComp.ParticleType];
+
+							if (ImGui::BeginCombo("Particle Type", currentType))
+							{
+								for (int i = 0; i < 3; i++)
+								{
+									bool isSelected = (particleComp.ParticleType == i);
+									if (ImGui::Selectable(particleTypes[i], isSelected))
+									{
+										particleComp.ParticleType = i;
+									}
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+
+							ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f");
+
+							ImGui::Spacing();
+							ImGui::Text("Color Range");
+							ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x);
+							ImGui::ColorEdit4("Color Max", &particleComp.ColorMax.x);
+
+							ImGui::TreePop();
+						}
+
+						// Particle Behavior
+						if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							ImGui::Text("Velocity");
+							ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f);
+							ImGui::DragFloat("Min Speed", &particleComp.MinSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
+							ImGui::DragFloat("Max Speed", &particleComp.MaxSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
+							ImGui::DragFloat("Spread Angle", &particleComp.SpreadAngle, 0.5f, 0.0f, 180.0f, "%.1f degrees");
+
+							ImGui::Spacing();
+							ImGui::Text("Rotation");
+							ImGui::Checkbox("Randomize Rotation", &particleComp.RandomizeRotation);
+							ImGui::DragFloat("Rotation Speed", &particleComp.RotationSpeed, 1.0f, -360.0f, 360.0f, "%.1f deg/sec");
+
+							ImGui::TreePop();
+						}
+
+						// Randomization
+						if (ImGui::TreeNodeEx("Randomization"))
+						{
+							ImGui::DragFloat("Velocity Randomness", &particleComp.VelocityRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+							ImGui::DragFloat("Lifetime Randomness", &particleComp.LifetimeRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+
+							// Optional: Add tooltips for clarity
+							if (ImGui::IsItemHovered())
+							{
+								ImGui::SetTooltip("0 = no variation, 1 = maximum variation");
+							}
+
+							ImGui::TreePop();
+						}
+
+						// Statistics
+						if (ImGui::TreeNode("Statistics"))
+						{
+							int aliveCount = 0;
+							for (const auto& particle : particleComp.Particles) {
+								if (particle.Alive) aliveCount++;
+							}
+
+							ImGui::Text("Alive: %d / %u", aliveCount, particleComp.MaxParticles);
+							ImGui::Text("Pool Size: %zu", particleComp.Particles.size());
+							ImGui::Text("Accumulator: %.2f", particleComp.EmissionAccumulator);
+							ImGui::ProgressBar((float)aliveCount / (float)particleComp.MaxParticles);
+							ImGui::TreePop();
+						}
+
+						ImGui::Spacing();
+						ImGui::Separator();
+
+						// Controls
+						if (ImGui::Button("Clear Particles", ImVec2(150, 0)))
+						{
+							for (auto& particle : particleComp.Particles) {
+								particle.Alive = false;
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Reset System", ImVec2(150, 0)))
+						{
+							particleComp.Particles.clear();
+							particleComp.EmissionAccumulator = 0.0f;
+						}
+					}
+				}
+
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -1276,6 +1405,25 @@ namespace Engine
 						if (!hasBehaviorTree)
 						{
 							ImGui::SetTooltip("Adds behaviour tree to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
+					ImGui::BeginDisabled(hasParticleSystem);
+
+					if (ImGui::MenuItem("Particle System Component"))
+					{
+						if (!hasParticleSystem)
+						{
+							m_SelectedEntity.AddComponent<ParticleComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasParticleSystem)
+						{
+							ImGui::SetTooltip("Adds particle system to this object.");
 						}
 					}
 					ImGui::EndDisabled();
@@ -1769,7 +1917,9 @@ namespace Engine
 
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
-
+								m_SelectedEntity = Entity{}; // resets
+								m_PickedID = 0xFFFFFFFFu;
+								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
 								isPrefabEditor = false;
 								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
 							}
@@ -1798,6 +1948,10 @@ namespace Engine
 								m_Scene->GetRegistry().clear();
 								PrefabRegistry::Get().RegisterPrefab(prefab);
 								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+
+								m_SelectedEntity = Entity{};
+								m_PickedID = 0xFFFFFFFFu;
+
 								if (!currScenePath.empty())
 								{
 									currScenePath.clear();
@@ -2054,7 +2208,6 @@ namespace Engine
 		ImGuizmo::BeginFrame();
 	}
 
-#if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
@@ -2078,7 +2231,9 @@ namespace Engine
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
 			// KEEP YOUR ORIGINAL WORKING CODE FOR OBJECT PICKING
-			ImVec2 tl_screen = ImGui::GetItemRectMin();	// Top left of image wrt SCREEN space
+			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
+			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
+
 			ImGuiViewport* vp = ImGui::GetWindowViewport();
 
 			// Convert to CLIENT-WINDOW coords (origin = top-left of that GLFW window's content area)
@@ -2100,95 +2255,94 @@ namespace Engine
 				m_Renderer->getEditorViewport() = editorViewportData;
 			}
 
-			std::cout << "[EDITOR VIEWPORT] Client Coords - TL: ("
-				<< editorViewportData.tl.x << ", " << editorViewportData.tl.y
-				<< "), Size: ("
-				<< editorViewportData.size.x << ", " << editorViewportData.size.y
-				<< ")" << std::endl;
 
-			std::cout << "[EDITOR VIEWPORT] Screen Coords - TL: ("
-				<< tl_screen.x << ", " << tl_screen.y
-				<< ")" << std::endl;
+			bool currentCamToggle = m_Renderer->getEditorCamToggle();
 
-			// Store screen coordinates separately for ImGuizmo
-			m_ImGuizmoViewportData.tl = tl_screen;
-			m_ImGuizmoViewportData.size = viewportSize;
-
-			if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
+			if (m_PreviousEditorCamToggle != currentCamToggle)
 			{
-				LOG_INFO("[DEBUG] Right-click popup opened!");
-
-				// Unity-style: No checkmarks, just menu items
-				if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
-				{
-					m_Operation = ImGuizmo::TRANSLATE;
-					std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
-				}
-
-				if (ImGui::MenuItem("Rotate", "E"))
-				{
-					m_Operation = ImGuizmo::ROTATE;
-					std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
-				}
-
-				if (ImGui::MenuItem("Scale", "R"))
-				{
-					m_Operation = ImGuizmo::SCALE;
-					std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
-				}
-
-				ImGui::Separator();
-
-				// Unity doesn't have a "None" option in the right-click menu
-				// You switch to "None" by clicking the tool handle button or pressing Q
-
-				ImGui::EndPopup();
-			}
-
-			// Handle keyboard shortcuts for switching modes (Unity-style)
-			// In Unity, these work globally, not just when window is focused
-			if (ImGui::IsKeyPressed(ImGuiKey_W)) {
-				m_Operation = ImGuizmo::TRANSLATE;
-				std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
-			}
-			if (ImGui::IsKeyPressed(ImGuiKey_E)) {
-				m_Operation = ImGuizmo::ROTATE;
-				std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
-			}
-			if (ImGui::IsKeyPressed(ImGuiKey_R)) {
-				m_Operation = ImGuizmo::SCALE;
-				std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
-			}
-
-
-			if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
+				// toggled camera
 				m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
-				std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
+				m_SelectedEntity = Entity{};
+				std::cout << "*** [GIZMO] Reset operation after camera toggle ***" << std::endl;
+				m_PreviousEditorCamToggle = currentCamToggle;
 			}
 
-			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-			{
-				if (m_PickedID != 0xFFFFFFFFu && m_Scene)
-				{
-					LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
-					m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
-				}
-				else
-				{
-					m_SelectedEntity = Entity{};
-					LOG_INFO("Deselected entity.");
-				}
-			}
+			if (m_Renderer->getEditorCamToggle()) {
+				// Store screen coordinates separately for ImGuizmo - use ACTUAL size
+				m_ImGuizmoViewportData.tl = tl_screen;
+				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
 
-			// ImGuizmo manipulation
-			if (m_SelectedEntity) {
-				ManipulateEntityTransform(m_SelectedEntity);
+				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
+				{
+					LOG_INFO("[DEBUG] Right-click popup opened!");
+
+					// Unity-style: No checkmarks, just menu items
+					if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+					{
+						m_Operation = ImGuizmo::TRANSLATE;
+						std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
+					}
+
+					if (ImGui::MenuItem("Rotate", "E"))
+					{
+						m_Operation = ImGuizmo::ROTATE;
+						std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
+					}
+
+					if (ImGui::MenuItem("Scale", "R"))
+					{
+						m_Operation = ImGuizmo::SCALE;
+						std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
+					}
+
+					ImGui::Separator();
+					ImGui::EndPopup();
+				}
+
+				// Only handle keyboard shortcuts when viewport is focused
+				if (ImGui::IsWindowFocused()) {
+					if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+						m_Operation = ImGuizmo::TRANSLATE;
+						std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
+					}
+					if (ImGui::IsKeyPressed(ImGuiKey_E)) {
+						m_Operation = ImGuizmo::ROTATE;
+						std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
+					}
+					if (ImGui::IsKeyPressed(ImGuiKey_R)) {
+						m_Operation = ImGuizmo::SCALE;
+						std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
+					}
+					if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
+						m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+						std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
+					}
+				}
+
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+				{
+					if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+					{
+						LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+						m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+					}
+					else
+					{
+						m_SelectedEntity = Entity{};
+						LOG_INFO("Deselected entity.");
+					}
+				}
+
+				// ImGuizmo manipulation
+				if (m_SelectedEntity) {
+					ManipulateEntityTransform(m_SelectedEntity);
+				}
 			}
 		}
 
 		ImGui::End();
 	}
-#endif
+
 
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
@@ -2444,37 +2598,23 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
-	glm::mat4 Editor::BuildTransformMatrix(const TransformComponent& tc)
-	{
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), tc.Position);
-		glm::mat4 rotation = glm::yawPitchRoll(tc.Rotation.y, tc.Rotation.x, tc.Rotation.z);
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), tc.Scale);
-		return translation * rotation * scale;
-	}
-
-#if 1
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
-		if (!entity) return;
+		//if (!entity) return;
+		if (!entity || !m_Scene) {
+			m_SelectedEntity = Entity{};
+			m_PickedID = 0xFFFFFFFFu;
+			return;
+		}
+
 
 		Camera3D& camera = m_Renderer->getEditorCamera();
 
-		// Debug both coordinate systems
-		std::cout << "=== GIZMO DEBUG ===" << std::endl;
-		std::cout << "Object Picking (Client) - TL: ("
-			<< editorViewportData.tl.x << ", " << editorViewportData.tl.y
-			<< "), Size: ("
-			<< editorViewportData.size.x << ", " << editorViewportData.size.y
-			<< ")" << std::endl;
-
-		std::cout << "ImGuizmo (Screen) - TL: ("
-			<< m_ImGuizmoViewportData.tl.x << ", " << m_ImGuizmoViewportData.tl.y
-			<< "), Size: ("
-			<< m_ImGuizmoViewportData.size.x << ", " << m_ImGuizmoViewportData.size.y
-			<< ")" << std::endl;
-
 		auto& tc = entity.GetComponent<TransformComponent>();
-		glm::mat4 transform = BuildTransformMatrix(tc);
+		//glm::mat4 transform = BuildTransformMatrix(tc);
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Position);
+		transform = transform * glm::mat4_cast(tc.Rotation); // Use quaternion directly
+		transform = glm::scale(transform, tc.Scale);
 
 		// Set up ImGuizmo with SCREEN coordinates
 		ImGuizmo::SetOrthographic(false);
@@ -2486,9 +2626,6 @@ namespace Engine
 		float width = m_ImGuizmoViewportData.size.x;
 		float height = m_ImGuizmoViewportData.size.y;
 
-		std::cout << "[GIZMO] Setting rect (SCREEN) - X: " << x << ", Y: " << y
-			<< ", Width: " << width << ", Height: " << height << std::endl;
-
 		ImGuizmo::SetRect(x, y, width, height);
 
 		// Calculate aspect ratio from actual viewport size
@@ -2496,15 +2633,9 @@ namespace Engine
 		glm::mat4 view = camera.getLookAt();
 		glm::mat4 proj = camera.getPerspective(aspect_ratio);
 
-		std::cout << "[GIZMO] Aspect ratio: " << aspect_ratio
-			<< ", Proj[0][0]: " << proj[0][0] << std::endl;
-
 		if (m_Operation != (ImGuizmo::OPERATION)-1) {
-			std::cout << "[GIZMO] Operation: "
-				<< (m_Operation == ImGuizmo::TRANSLATE ? "TRANSLATE" :
-					m_Operation == ImGuizmo::ROTATE ? "ROTATE" :
-					m_Operation == ImGuizmo::SCALE ? "SCALE" : "UNKNOWN")
-				<< std::endl;
+			
+			//ImGuizmo::MODE mode = (m_Operation == ImGuizmo::ROTATE) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
 			ImGuizmo::Manipulate(
 				glm::value_ptr(view),
@@ -2515,26 +2646,34 @@ namespace Engine
 			);
 
 			if (ImGuizmo::IsUsing()) {
-				tc.Position = glm::vec3(transform[3]);
+				if (m_Operation == ImGuizmo::TRANSLATE) {
+					// update position
+					glm::vec3 newPosition = glm::vec3(transform[3]);
+					tc.SetPosition(newPosition);
+				}
+				else if (m_Operation == ImGuizmo::ROTATE) {
+					glm::mat3 rotationMatrix;
+					rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
+					rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
+					rotationMatrix[2] = glm::normalize(glm::vec3(transform[2]));
 
-				tc.Scale.x = glm::length(glm::vec3(transform[0]));
-				tc.Scale.y = glm::length(glm::vec3(transform[1]));
-				tc.Scale.z = glm::length(glm::vec3(transform[2]));
+					// Convert to quaternion and set directly
+					glm::quat newRotation = glm::quat_cast(rotationMatrix);
+					tc.Rotation = newRotation;
+					tc.IsDirty = true; 
 
-				glm::mat3 rotMat;
-				rotMat[0] = glm::vec3(transform[0]) / tc.Scale.x;
-				rotMat[1] = glm::vec3(transform[1]) / tc.Scale.y;
-				rotMat[2] = glm::vec3(transform[2]) / tc.Scale.z;
+				}
+				else if (m_Operation == ImGuizmo::SCALE) {
+					
+					glm::vec3 newScale;
+					newScale.x = glm::length(glm::vec3(transform[0]));
+					newScale.y = glm::length(glm::vec3(transform[1]));
+					newScale.z = glm::length(glm::vec3(transform[2]));
 
-				tc.Rotation = glm::eulerAngles(glm::quat_cast(rotMat));
-
-				std::cout << "[GIZMO] Transform updated - Position: ("
-					<< tc.Position.x << ", " << tc.Position.y << ", " << tc.Position.z
-					<< ")" << std::endl;
+					tc.SetScale(newScale);
+				}
 			}
 		}
-
-		std::cout << "===================" << std::endl;
 
 		// Use screen coordinates for the mode label too
 		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
@@ -2546,5 +2685,5 @@ namespace Engine
 			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
 		);
 	}
-#endif
+
 } // end of namespace Engine
