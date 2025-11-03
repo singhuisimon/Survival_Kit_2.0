@@ -22,6 +22,7 @@
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Utility/Logger.h"
+#include "../Component/ScriptComponent.h"
 
  // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -73,6 +74,17 @@ namespace Engine {
             );
         }
 
+        //script 
+     // Register ScriptComponent
+        {
+            auto& meta = REGISTER_COMPONENT(ScriptComponent);
+            meta.AddProperty<ScriptComponent, std::string>(
+                "ScriptClassName",
+                PropertyType::String,
+                [](const ScriptComponent& c) -> std::string { return c.ScriptClassName; },
+                [](ScriptComponent& c, const std::string& v) { c.ScriptClassName = v; }
+            );
+        }
         // Register CameraComponent
         {
             auto& meta = REGISTER_COMPONENT(CameraComponent);

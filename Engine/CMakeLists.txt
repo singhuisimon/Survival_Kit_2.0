@@ -60,6 +60,9 @@ file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 file(GLOB_RECURSE PROFILER_SOURCES "${ENGINE_ROOT}/Profiler/*.cpp")
 file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
 
+# Scripting Module (NEW!)
+file(GLOB_RECURSE SCRIPTING_SOURCES "${ENGINE_ROOT}/Scripting/*.cpp")
+file(GLOB_RECURSE SCRIPTING_HEADERS "${ENGINE_ROOT}/Scripting/*.h")
 # BehaviourTree Module
 file(GLOB_RECURSE BEHAVIOURTREE_SOURCES "${ENGINE_ROOT}/BehaviourTree/*.cpp")
 file(GLOB_RECURSE BEHAVIOURTREE_HEADERS "${ENGINE_ROOT}/BehaviourTree/*.h")
@@ -83,6 +86,7 @@ set(ENGINE_SOURCES
     ${PREFAB_SOURCES}
     ${PHYSICS_SOURCES}
     ${PROFILER_SOURCES}
+    ${SCRIPTING_SOURCES}
     ${BEHAVIOURTREE_SOURCES}
     ${PARTICLESYSTEM_SOURCES}
 )
@@ -101,6 +105,7 @@ set(ENGINE_HEADERS
     ${PREFAB_HEADERS}
     ${PHYSICS_HEADERS}
     ${PROFILER_HEADERS}
+    ${SCRIPTING_HEADERS}
     ${BEHAVIOURTREE_HEADERS}
     ${PARTICLESYSTEM_HEADERS}
 )
@@ -110,7 +115,7 @@ if(ENGINE_SOURCES)
     add_library(EngineLib STATIC
         ${ENGINE_SOURCES}
         ${ENGINE_HEADERS}
-    )
+     "Scripting/ScriptReloader.cpp")
     message(STATUS "Engine sources found: ${ENGINE_SOURCES}")
 else()
     # Create dummy source file if no sources exist yet
@@ -177,6 +182,9 @@ source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 source_group("Profiler\\Header" FILES ${PROFILER_HEADERS})
 source_group("Profiler\\Source" FILES ${PROFILER_SOURCES})
 
+# Scripting Module (NEW!)
+source_group("Scripting\\Header" FILES ${SCRIPTING_HEADERS})
+source_group("Scripting\\Source" FILES ${SCRIPTING_SOURCES})
 # BehaviourTree Module
 source_group("BehaviourTree\\Header" FILES ${BEHAVIOURTREE_HEADERS})
 source_group("BehaviourTree\\Source" FILES ${BEHAVIOURTREE_SOURCES})
@@ -196,6 +204,21 @@ target_include_directories(EngineLib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# ====================================
+# MONO INTEGRATION (NEW!)
+# ====================================
+# Include Mono support
+include(${CMAKE_SOURCE_DIR}/MonoIntegration.cmake)
+
+# Link Mono to EngineLib
+target_link_libraries(EngineLib PUBLIC ${MONO_LIBRARIES})
+target_include_directories(EngineLib PUBLIC ${MONO_INCLUDE_DIR})
+
+message(STATUS "Mono integrated into EngineLib")
+
+# ====================================
+# Link Dependencies
+# ====================================
 # Link external dependencies
 target_link_libraries(EngineLib PUBLIC External)
 

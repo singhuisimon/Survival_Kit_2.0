@@ -12,6 +12,7 @@ namespace Engine {
 
     // Forward declarations
     class Input;
+    class Scene;  // <-- ADD THIS LINE (forward declare Scene)
 
     /**
      * @brief Base application class - provides the core framework
@@ -92,6 +93,7 @@ namespace Engine {
         void Init();
         void Shutdown();
         void UpdateWindowTitle(float fps);
+        std::shared_ptr<Scene> m_Scene;
 
         GLFWwindow* m_Window = nullptr;
         bool m_Running = true;
