@@ -28,8 +28,6 @@ namespace Engine {
 		return instance;
 	}
 
-	//============================== COMPILER ===================================
-
 	//=========================== ASSET MANAGER ===================================================
 	// Configuration
 	void AssetManager::setConfig(const Config& cfg) {
@@ -56,9 +54,6 @@ namespace Engine {
 				fs::path dbPath(m_cfg.databaseFile);
 				fs::create_directories(dbPath.parent_path());  // FROM CONFIG!
 			}
-
-
-			//LM.writeLog("AssetManager::startUp() - Created working directories");
 		}
 		catch (const std::exception& e) {
 			//LM.writeLog("AssetManager::startUp() - Failed to create directories: %s", e.what());
@@ -83,10 +78,6 @@ namespace Engine {
 		//set up the root for descriptor generator
 		m_descGen.SetOutputRoot(m_cfg.descriptorRoot);
 
-		// NEW: Initialize compiler system
-		//initializeCompilers();
-
-		//LM.writeLog("AssetManager::startUp() - complete");
 		return 0;
 	}
 
@@ -107,11 +98,8 @@ namespace Engine {
 				snapCount, success, m_cfg.snapshotFile.c_str());*/
 		}
 
-		//LM.writeLog("AssetManager::shutDown() - complete");
-		//Manager::shutDown();
+	
 	}
-
-	// ==================== COMPILER SYSTEM ====================
 
 	// ==================== CHANGE HANDLING ====================
 

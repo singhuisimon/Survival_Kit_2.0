@@ -391,35 +391,6 @@ namespace Engine {
 
 	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list) {
 
-		// For rendering all enabled camera displays
-		for (const auto& cam : camera_list) {
-
-			for (/*const*/ auto& pass : m_passes) {
-
-				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
-
-				// Update pass viewport if allowed
-				if (pass.auto_aspect) {
-					int vp_w, vp_h;
-					glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
-
-					// Check if viewport needs update
-					if (pass.view_port.z != vp_w || pass.view_port.w != vp_h) {
-						pass.view_port.z = vp_w;
-						pass.view_port.w = vp_h;
-
-						// Resize FBO according to changes
-						resizeFBO(pass.fbo_handle, vp_w, vp_h);
-					}
-				}
-
-				// Begin drawing frame
-				beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
-				draw(pass, draw_items, cam.View, cam.Persp);
-				endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
-			}
-		}
-
 		// For rendering from editor's camera
 		if (isEditorCamOn) {
 			glm::mat4 v = editor_camera.getLookAt(); // Editor camera view transform
@@ -433,7 +404,7 @@ namespace Engine {
 					glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
 
 					// Check if viewport needs update
-					if (pass.view_port.z != vp_w || pass.view_port.w != vp_h) {
+					if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
 						pass.view_port.z = vp_w;
 						pass.view_port.w = vp_h;
 
@@ -491,10 +462,39 @@ namespace Engine {
 						// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
 						pickedID = id;
 					}
+				}
+			}
+		} else {
+			// For rendering all enabled camera displays
+			for (const auto& cam : camera_list) {
 
+				for (/*const*/ auto& pass : m_passes) {
+
+					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+
+					// Update pass viewport if allowed
+					if (pass.auto_aspect) {
+						int vp_w, vp_h;
+						glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
+
+						// Check if viewport needs update
+						if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+							pass.view_port.z = vp_w;
+							pass.view_port.w = vp_h;
+
+							// Resize FBO according to changes
+							resizeFBO(pass.fbo_handle, vp_w, vp_h);
+						}
+					}
+
+					// Begin drawing frame
+					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
+					draw(pass, draw_items, cam.View, cam.Persp);
+					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
 			}
 		}
+
 	}
 
 	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4 v, const glm::mat4 p) {

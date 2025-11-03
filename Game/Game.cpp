@@ -141,6 +141,7 @@ void Game::OnInit() {
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
             m_Editor->SetScene(m_Scene.get());
+            m_Editor->SetRenderer(m_Renderer.get());
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
