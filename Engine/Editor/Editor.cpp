@@ -79,6 +79,7 @@ namespace Engine
 	{
 		if (!m_Initialized) return;
 
+
 		//Start the ImGui frame
 		StartImguiFrame();
 
@@ -176,6 +177,7 @@ namespace Engine
 							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
 							//		{
 							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
 							//			prefabComp.ClearModifications(); // Reset overrides 
 							//			LOG_INFO("Prefab updated: {}", prefabPath);
 							//		}
@@ -1301,14 +1303,32 @@ namespace Engine
 		{
 			if (!isPrefabEditor)
 			{
-				// Button to create new entity
+				
 				if (ImGui::Button("Create Entity"))
+				{
+					
+					ImGui::OpenPopup("CreateEntityPopup");
+				}
+			}
+			if (ImGui::BeginPopup("CreateEntityPopup"))
+			{
+				if (ImGui::MenuItem("Create Entity"))
 				{
 					auto entity = m_Scene->CreateEntity("New Entity");
 					entity.AddComponent<TagComponent>("New Entity");
 					entity.AddComponent<TransformComponent>();
 					ImGui::Separator();
 				}
+				auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+				ImGui::BeginDisabled(prefabFiles.empty());
+
+				if (ImGui::MenuItem("Create Entity From Prefab"))
+				{	
+					ImGui::CloseCurrentPopup();
+					createEttFromPrfab = true;
+				}
+				ImGui::EndDisabled();
+				ImGui::EndPopup(); // end pop up of the CreateEntityPopup
 			}
 			
 			// List all entities
@@ -1332,6 +1352,14 @@ namespace Engine
 					if (ImGui::IsItemClicked())
 					{
 						m_SelectedEntity = entity;
+
+						uint32_t newID = (uint32_t)entity; // uses your operator uint32_t()
+
+						LOG_DEBUG("Clicked entity ID = ", newID, " | old m_PickedID = ", m_PickedID);
+
+						m_PickedID = newID;
+
+						LOG_DEBUG("Updated m_PickedID to ", m_PickedID);
 					}
 
 					// Right-click context menu
@@ -1376,7 +1404,7 @@ namespace Engine
 										PrefabRegistry::Get().RegisterPrefab(prefab);
 										m_CurrentPrefab = prefab.get();
 										currPrefabPath = prefabFolder;
-										isPrefabEditor = true;
+										//isPrefabEditor = true;
 										//m_CurrentPrefab = PrefabSerializer::LoadPrefabFromFile(path);
 										m_TemporaryPrefabPaths.insert(prefabFolder);
 
@@ -1452,6 +1480,52 @@ namespace Engine
 				replacePrefabPending = false;
 				ImGui::CloseCurrentPopup();
 			}
+
+			ImGui::EndPopup();
+		}
+
+		// ================= Modal Popup for Create Entity from Prefab ===================================
+		if (createEttFromPrfab)
+		{
+			ImGui::OpenPopup("createEttPrefab");
+			createEttFromPrfab = false;
+		}
+
+		if (ImGui::BeginPopupModal("createEttPrefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			//LOG_DEBUG("TEST POP up replace is called ?");
+			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			for (auto& file : prefabFiles)
+			{
+				if (ImGui::Selectable(file.name.c_str()))
+				{
+					createEttFromPrfab = false;
+					auto prefab = PrefabSerializer::LoadPrefabFromFile(file.fullPath);
+					if (!prefab)
+					{
+						ImGui::CloseCurrentPopup();
+						break;
+					}
+
+					PrefabRegistry::Get().RegisterPrefab(prefab);
+					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+						m_Scene,
+						prefab->GetGUID()
+					);
+					
+					m_SelectedEntity = newEntity;
+					ImGui::CloseCurrentPopup();
+					break;
+				}
+			}
+		
+			if (ImGui::Button("Cancel"))
+			{
+				createEttFromPrfab = false;
+				ImGui::CloseCurrentPopup();
+			}
+			
 
 			ImGui::EndPopup();
 		}
@@ -1977,54 +2051,38 @@ namespace Engine
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
+#if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
-		// TODO: Get Texture from Graphics
-		// auto texture = GFXM.getImguiTex();
-
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
-		// Hard-coded values just in case (Will change values later)
-		ImVec2 viewportSize =
-		{
-			 600,
-			 600
-		};
-
+		// Your existing viewport size calculation...
+		ImVec2 viewportSize = { 600, 600 };
 		if (m_Window) {
-
 			int width = 0.f;
 			int height = 0.f;
 			glfwGetWindowSize(m_Window, &width, &height);
-
-			viewportSize =
-			{
-				 static_cast<float>(static_cast<float>(width)) / 2.0f,
-				 static_cast<float>(static_cast<float>(height)) / 2.0f
+			viewportSize = {
+				static_cast<float>(width) / 2.0f,
+				static_cast<float>(height) / 2.0f
 			};
-
 		}
 
 		ImGui::Begin("Viewport");
 
-		// Uncomment this once the viewport texture has been obtained
 		if (texhandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
+			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-			ImGui::Image((ImTextureID)(intptr_t)texhandle,
-				viewportSize,
-				ImVec2(0, 1), ImVec2(1, 0));
-
-			// Get editor viewport data
+			// KEEP YOUR ORIGINAL WORKING CODE FOR OBJECT PICKING
 			ImVec2 tl_screen = ImGui::GetItemRectMin();	// Top left of image wrt SCREEN space
-
-			// Which OS window is ImGui viewport in?
-			ImGuiViewport* vp = ImGui::GetWindowViewport(); 
+			ImGuiViewport* vp = ImGui::GetWindowViewport();
 
 			// Convert to CLIENT-WINDOW coords (origin = top-left of that GLFW window's content area)
-			ImVec2 tl_client, br_client;
+			ImVec2 tl_client;
 			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 				tl_client = { tl_screen.x - vp->Pos.x, tl_screen.y - vp->Pos.y }; // subtract OS window's top-left in screen coords
 			}
@@ -2033,21 +2091,104 @@ namespace Engine
 				tl_client = tl_screen;
 			}
 
-			// Save editor viewport data
+			// Save editor viewport data for OBJECT PICKING (client coordinates)
 			editorViewportData.tl = tl_client;
 			editorViewportData.size = viewportSize;
 
+			// Sync with renderer using the existing getEditorViewport() method
+			if (m_Renderer) {
+				m_Renderer->getEditorViewport() = editorViewportData;
+			}
 
-			// TODO: Handle mouse in viewport
-			//handleViewPortClick(imagePos, viewportSize);
+			std::cout << "[EDITOR VIEWPORT] Client Coords - TL: ("
+				<< editorViewportData.tl.x << ", " << editorViewportData.tl.y
+				<< "), Size: ("
+				<< editorViewportData.size.x << ", " << editorViewportData.size.y
+				<< ")" << std::endl;
+
+			std::cout << "[EDITOR VIEWPORT] Screen Coords - TL: ("
+				<< tl_screen.x << ", " << tl_screen.y
+				<< ")" << std::endl;
+
+			// Store screen coordinates separately for ImGuizmo
+			m_ImGuizmoViewportData.tl = tl_screen;
+			m_ImGuizmoViewportData.size = viewportSize;
+
+			if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
+			{
+				LOG_INFO("[DEBUG] Right-click popup opened!");
+
+				// Unity-style: No checkmarks, just menu items
+				if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+				{
+					m_Operation = ImGuizmo::TRANSLATE;
+					std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
+				}
+
+				if (ImGui::MenuItem("Rotate", "E"))
+				{
+					m_Operation = ImGuizmo::ROTATE;
+					std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
+				}
+
+				if (ImGui::MenuItem("Scale", "R"))
+				{
+					m_Operation = ImGuizmo::SCALE;
+					std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
+				}
+
+				ImGui::Separator();
+
+				// Unity doesn't have a "None" option in the right-click menu
+				// You switch to "None" by clicking the tool handle button or pressing Q
+
+				ImGui::EndPopup();
+			}
+
+			// Handle keyboard shortcuts for switching modes (Unity-style)
+			// In Unity, these work globally, not just when window is focused
+			if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+				m_Operation = ImGuizmo::TRANSLATE;
+				std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
+			}
+			if (ImGui::IsKeyPressed(ImGuiKey_E)) {
+				m_Operation = ImGuizmo::ROTATE;
+				std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
+			}
+			if (ImGui::IsKeyPressed(ImGuiKey_R)) {
+				m_Operation = ImGuizmo::SCALE;
+				std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
+			}
+
+
+			if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
+				m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+				std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
+			}
+
+			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			{
+				if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+				{
+					LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+					m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+				}
+				else
+				{
+					m_SelectedEntity = Entity{};
+					LOG_INFO("Deselected entity.");
+				}
+			}
+
+			// ImGuizmo manipulation
+			if (m_SelectedEntity) {
+				ManipulateEntityTransform(m_SelectedEntity);
+			}
 		}
 
 		ImGui::End();
-
-
-		// Logic here 
-
 	}
+#endif
 
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
@@ -2303,13 +2444,107 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
+	glm::mat4 Editor::BuildTransformMatrix(const TransformComponent& tc)
+	{
+		glm::mat4 translation = glm::translate(glm::mat4(1.0f), tc.Position);
+		glm::mat4 rotation = glm::yawPitchRoll(tc.Rotation.y, tc.Rotation.x, tc.Rotation.z);
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), tc.Scale);
+		return translation * rotation * scale;
+	}
 
-	//std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
-	//{
-	//	std::vector<std::pair<std::string, std::string>> files;
-	//	// Implementation placeholder
-	//	return files;
-	//}
+#if 1
+	void Editor::ManipulateEntityTransform(Entity& entity)
+	{
+		if (!entity) return;
 
+		Camera3D& camera = m_Renderer->getEditorCamera();
 
+		// Debug both coordinate systems
+		std::cout << "=== GIZMO DEBUG ===" << std::endl;
+		std::cout << "Object Picking (Client) - TL: ("
+			<< editorViewportData.tl.x << ", " << editorViewportData.tl.y
+			<< "), Size: ("
+			<< editorViewportData.size.x << ", " << editorViewportData.size.y
+			<< ")" << std::endl;
+
+		std::cout << "ImGuizmo (Screen) - TL: ("
+			<< m_ImGuizmoViewportData.tl.x << ", " << m_ImGuizmoViewportData.tl.y
+			<< "), Size: ("
+			<< m_ImGuizmoViewportData.size.x << ", " << m_ImGuizmoViewportData.size.y
+			<< ")" << std::endl;
+
+		auto& tc = entity.GetComponent<TransformComponent>();
+		glm::mat4 transform = BuildTransformMatrix(tc);
+
+		// Set up ImGuizmo with SCREEN coordinates
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+
+		// Use screen coordinates for ImGuizmo
+		float x = m_ImGuizmoViewportData.tl.x;
+		float y = m_ImGuizmoViewportData.tl.y;
+		float width = m_ImGuizmoViewportData.size.x;
+		float height = m_ImGuizmoViewportData.size.y;
+
+		std::cout << "[GIZMO] Setting rect (SCREEN) - X: " << x << ", Y: " << y
+			<< ", Width: " << width << ", Height: " << height << std::endl;
+
+		ImGuizmo::SetRect(x, y, width, height);
+
+		// Calculate aspect ratio from actual viewport size
+		float aspect_ratio = (height > 0) ? (width / height) : 1.0f;
+		glm::mat4 view = camera.getLookAt();
+		glm::mat4 proj = camera.getPerspective(aspect_ratio);
+
+		std::cout << "[GIZMO] Aspect ratio: " << aspect_ratio
+			<< ", Proj[0][0]: " << proj[0][0] << std::endl;
+
+		if (m_Operation != (ImGuizmo::OPERATION)-1) {
+			std::cout << "[GIZMO] Operation: "
+				<< (m_Operation == ImGuizmo::TRANSLATE ? "TRANSLATE" :
+					m_Operation == ImGuizmo::ROTATE ? "ROTATE" :
+					m_Operation == ImGuizmo::SCALE ? "SCALE" : "UNKNOWN")
+				<< std::endl;
+
+			ImGuizmo::Manipulate(
+				glm::value_ptr(view),
+				glm::value_ptr(proj),
+				m_Operation,
+				ImGuizmo::WORLD,
+				glm::value_ptr(transform)
+			);
+
+			if (ImGuizmo::IsUsing()) {
+				tc.Position = glm::vec3(transform[3]);
+
+				tc.Scale.x = glm::length(glm::vec3(transform[0]));
+				tc.Scale.y = glm::length(glm::vec3(transform[1]));
+				tc.Scale.z = glm::length(glm::vec3(transform[2]));
+
+				glm::mat3 rotMat;
+				rotMat[0] = glm::vec3(transform[0]) / tc.Scale.x;
+				rotMat[1] = glm::vec3(transform[1]) / tc.Scale.y;
+				rotMat[2] = glm::vec3(transform[2]) / tc.Scale.z;
+
+				tc.Rotation = glm::eulerAngles(glm::quat_cast(rotMat));
+
+				std::cout << "[GIZMO] Transform updated - Position: ("
+					<< tc.Position.x << ", " << tc.Position.y << ", " << tc.Position.z
+					<< ")" << std::endl;
+			}
+		}
+
+		std::cout << "===================" << std::endl;
+
+		// Use screen coordinates for the mode label too
+		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
+		ImGui::GetForegroundDrawList()->AddText(
+			modeLabelPos,
+			IM_COL32(255, 230, 100, 255),
+			m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
+			m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
+			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
+		);
+	}
+#endif
 } // end of namespace Engine

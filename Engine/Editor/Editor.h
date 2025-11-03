@@ -23,6 +23,8 @@
 #include <sstream>
 #include <filesystem>
 #include <algorithm>
+#include <ImGuizmo.h>
+
 
 // Include other necessary headers
 #include "../Profiler/Profiler.h"
@@ -36,9 +38,10 @@
 #include "../Serialization/PrefabInstantiator.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
 
+
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
-
+#include "Graphics/Renderer.h"
 
 namespace Engine
 {
@@ -56,7 +59,8 @@ namespace Engine
 		Entity m_SelectedEntity{};
 		GLuint m_FBOTextureHandle;
 		std::weak_ptr<TracyProfiler> m_Profiler;
-		u32 m_PickedID;
+		u32 m_PickedID = 0xFFFFFFFFu;
+		
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -84,9 +88,10 @@ namespace Engine
 		std::string selectedPrefabPath{};
 		std::string currFileName{};
 		Prefab* m_CurrentPrefab = nullptr;
+		bool createEttFromPrfab = false;
 		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
 		//bool prefabModified = false;
-
+		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE;
 	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
@@ -99,10 +104,14 @@ namespace Engine
 
 		// Editor viewport's data storage
 		EditorViewport editorViewportData;
+		Renderer* m_Renderer = nullptr;
+		EditorViewport m_ImGuizmoViewportData;
 
 	public:
 		// Default contructor 
 		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
+
+		void SetRenderer(Renderer* renderer) { m_Renderer = renderer; }
 
 		// Deconstuctor
 		~Editor() {
@@ -174,6 +183,10 @@ namespace Engine
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
+
+		static glm::mat4 BuildTransformMatrix(const TransformComponent& tc);
+
+		void ManipulateEntityTransform(Entity& entity);
 	};
 
 
