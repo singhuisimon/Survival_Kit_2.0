@@ -158,13 +158,28 @@ namespace Engine {
     /**
          * @brief Process a composite node's execution logic
          * @details This handles the node-specific logic for composites/decorators
+         * EDITED !!!!
          */
     BTStatus BehaviourTree::ProcessCompositeNode(BTStackFrame& frame, BTContext& context) {
         auto& children = frame.Node->GetChildren();
 
+        //NEW
+        // Sync frame's ChildIndex with composite's internal state
+        // For composites that use m_CurrentChildIndex
+        if (auto* composite = dynamic_cast<BTComposite*>(frame.Node.get())) {
+            frame.ChildIndex = composite->GetCurrentChildIndex();
+        }
+
+        //OLD
         // Execute the node's logic
         // Note: For composites, the Execute method handles child iteration
         BTStatus status = frame.Node->Execute(context);
+
+        //NEW
+        // Sync back after execution
+        if (auto* composite = dynamic_cast<BTComposite*>(frame.Node.get())) {
+            frame.ChildIndex = composite->GetCurrentChildIndex();
+        }
 
         return status;
     }

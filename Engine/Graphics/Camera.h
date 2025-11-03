@@ -52,6 +52,9 @@ namespace Engine {
         float nearPlane;         // Near clipping plane
         float farPlane;          // Far clipping plane
 
+        float editorCameraSpeed = 3.f;
+        float editorZoomSpeed = 3.f;
+
     public:
 
         // Default constructor for a default 3D camera
@@ -175,6 +178,8 @@ namespace Engine {
             //    const float alpha = glm::asin(pos.y / r);
             //    const float betta = std::atan2f(pos.x, pos.z);
 
+                // r += yoffset > 0.0f ? -(editorZoomSpeed) : editorZoomSpeed; // Zoom in or out
+                // if (r < 1.0f) r = 1.0f; // Clamp minimum distance
             //    r += yoffset > 0.0f ? -1.0f : 1.0f; // Zoom in or out
             //    if (r < 1.0f) r = 1.0f; // Clamp minimum distance
 
@@ -213,18 +218,24 @@ namespace Engine {
 
         void moveCamForward() {
             glm::mat4 view = getLookAt(false);
+            // pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            // target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
             pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
             target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
         }
 
         void moveCamLeft() {
             glm::mat4 view = getLookAt(false);
+            // pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            // target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
             pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
             target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
         }
 
         void moveCamBack() {
             glm::mat4 view = getLookAt(false);
+            // pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            // target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
             pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
             target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
 
@@ -232,6 +243,8 @@ namespace Engine {
 
         void moveCamRight() {
             glm::mat4 view = getLookAt(false);
+            // pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            // target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
             pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
             target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
         }
@@ -243,6 +256,9 @@ namespace Engine {
         //float& getCamFOV() { return FOV; }
         //float& getCamNear() { return nearPlane; }
         //float& getCamFar() { return farPlane; }
+
+        float& getEditorCamSpeed() { return editorCameraSpeed; }
+        float& getEditorZoomSpeed() { return editorZoomSpeed; }
 
         //// Setters for camera data
         void setCamType(CameraType newType) {
@@ -258,6 +274,9 @@ namespace Engine {
         //void setCamFOV(float newFOV) { FOV = newFOV; }
         //void setCamNear(float newNear) { nearPlane = newNear; }
         //void setCamFar(float newFar) { farPlane = newFar; }
+
+        void setEditorCamSpeed(float newCamSpeed) { editorCameraSpeed = newCamSpeed; }
+        void setEditorZoomSpeed(float newZoomSpeed) { editorZoomSpeed = newZoomSpeed; }
     };
 
 } // end of namespace gam300

@@ -34,6 +34,7 @@
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
+#include "../BehaviourTree/BehaviourTreeEditor.h"
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
@@ -136,6 +137,9 @@ namespace Engine
 
 		// display assets browser list
 		void displayAssetsBrowserPanel();
+
+		// display assets editor panel
+		void displayDescriptorEditorPanel();
 
 		// display performance profile
 		void displayPerformanceProfilePanel(Timestep ts);
