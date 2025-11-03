@@ -85,7 +85,7 @@ namespace Engine {
 			if (!std::getline(ss, ext, '|')) continue;
 			if (!std::getline(ss, contentHash, '|')) continue;
 			if (!std::getline(ss, timeStr, '|')) continue;
-			if (!std::getline(ss, validStr)) continue;
+			if (!std::getline(ss, validStr, '|')) continue;
 
 			// NEW: Try to read new fields (backwards compatible)
 			bool hasNewFields = false;
@@ -171,7 +171,8 @@ namespace Engine {
 
 		// Write header
 		out << "# Asset Database\n";
-		out << "# guid|type|sourcePath|ext|contentHash|lastWriteTime|valid|descriptorModifiedTime|lastCompiledTime|needsRecompile\n";		out << "# Version: 1.0\n\n";
+		out << "# guid|type|sourcePath|ext|contentHash|lastWriteTime|valid|descriptorModifiedTime|lastCompiledTime|needsRecompile\n";		
+		out << "# Version: 1.0\n\n";
 
 		// Write records
 		for (const auto& [guid, rec] : byId) {
