@@ -27,6 +27,7 @@
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
 #include "BehaviourTree/BehaviourTreeSystem.h"
+#include "ParticleSystem/ParticleSystem.h"
 
 // KENNY TESTING: FOR MAINCAMERA "SCRIPT"
 #include <glm/common.hpp>               // glm::clamp
@@ -265,6 +266,7 @@ void Game::AddAllSystems() {
     m_Scene->AddSystem<Engine::CameraSystem>();
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
     m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
+	m_Scene->AddSystem<Engine::ParticleSystem>();
 }
 
 void Game::CreateDefaultScene() {

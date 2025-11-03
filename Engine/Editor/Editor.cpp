@@ -12,6 +12,7 @@
 #include "Editor.h"
 #include "../Component/TagComponent.h"
 #include "../Component/TransformComponent.h"
+#include "../Component/ParticleComponent.h"
 #include "../Transform/TransformSystem.h"
 
 #include "../Serialization/SceneSerializer.h"
@@ -1138,6 +1139,134 @@ namespace Engine
 					}
 				}
 
+				// ======================== Display Particle System Component ===============================
+				if (m_SelectedEntity.HasComponent<ParticleComponent>())
+				{
+					ImGui::Separator();
+					auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
+
+					if (ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						// Playback Controls
+						ImGui::Text("Playback");
+						ImGui::Checkbox("Active", &particleComp.Active);
+						ImGui::SameLine();
+						ImGui::Checkbox("Loop", &particleComp.Loop);
+
+						ImGui::Spacing();
+						ImGui::Separator();
+
+						// Emission Settings
+						if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000);
+							ImGui::DragFloat("Emission Rate", &particleComp.EmissionRate, 0.1f, 0.0f, 1000.0f, "%.1f particles/sec");
+							ImGui::DragFloat("Particle Lifetime", &particleComp.ParticleLifetime, 0.1f, 0.1f, 100.0f, "%.1f seconds");
+							ImGui::TreePop();
+						}
+
+						// Particle Appearance
+						if (ImGui::TreeNodeEx("Appearance", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							// Particle Type Dropdown
+							const char* particleTypes[] = { "Cube", "Plane", "Sphere" };
+							const char* currentType = particleTypes[particleComp.ParticleType];
+
+							if (ImGui::BeginCombo("Particle Type", currentType))
+							{
+								for (int i = 0; i < 3; i++)
+								{
+									bool isSelected = (particleComp.ParticleType == i);
+									if (ImGui::Selectable(particleTypes[i], isSelected))
+									{
+										particleComp.ParticleType = i;
+									}
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+
+							ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f");
+
+							ImGui::Spacing();
+							ImGui::Text("Color Range");
+							ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x);
+							ImGui::ColorEdit4("Color Max", &particleComp.ColorMax.x);
+
+							ImGui::TreePop();
+						}
+
+						// Particle Behavior
+						if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							ImGui::Text("Velocity");
+							ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f);
+							ImGui::DragFloat("Min Speed", &particleComp.MinSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
+							ImGui::DragFloat("Max Speed", &particleComp.MaxSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
+							ImGui::DragFloat("Spread Angle", &particleComp.SpreadAngle, 0.5f, 0.0f, 180.0f, "%.1f degrees");
+
+							ImGui::Spacing();
+							ImGui::Text("Rotation");
+							ImGui::Checkbox("Randomize Rotation", &particleComp.RandomizeRotation);
+							ImGui::DragFloat("Rotation Speed", &particleComp.RotationSpeed, 1.0f, -360.0f, 360.0f, "%.1f deg/sec");
+
+							ImGui::TreePop();
+						}
+
+						// Randomization
+						if (ImGui::TreeNodeEx("Randomization"))
+						{
+							ImGui::DragFloat("Velocity Randomness", &particleComp.VelocityRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+							ImGui::DragFloat("Lifetime Randomness", &particleComp.LifetimeRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+
+							// Optional: Add tooltips for clarity
+							if (ImGui::IsItemHovered())
+							{
+								ImGui::SetTooltip("0 = no variation, 1 = maximum variation");
+							}
+
+							ImGui::TreePop();
+						}
+
+						// Statistics
+						if (ImGui::TreeNode("Statistics"))
+						{
+							int aliveCount = 0;
+							for (const auto& particle : particleComp.Particles) {
+								if (particle.Alive) aliveCount++;
+							}
+
+							ImGui::Text("Alive: %d / %u", aliveCount, particleComp.MaxParticles);
+							ImGui::Text("Pool Size: %zu", particleComp.Particles.size());
+							ImGui::Text("Accumulator: %.2f", particleComp.EmissionAccumulator);
+							ImGui::ProgressBar((float)aliveCount / (float)particleComp.MaxParticles);
+							ImGui::TreePop();
+						}
+
+						ImGui::Spacing();
+						ImGui::Separator();
+
+						// Controls
+						if (ImGui::Button("Clear Particles", ImVec2(150, 0)))
+						{
+							for (auto& particle : particleComp.Particles) {
+								particle.Alive = false;
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Reset System", ImVec2(150, 0)))
+						{
+							particleComp.Particles.clear();
+							particleComp.EmissionAccumulator = 0.0f;
+						}
+					}
+				}
+
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -1276,6 +1405,25 @@ namespace Engine
 						if (!hasBehaviorTree)
 						{
 							ImGui::SetTooltip("Adds behaviour tree to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
+					ImGui::BeginDisabled(hasParticleSystem);
+
+					if (ImGui::MenuItem("Particle System Component"))
+					{
+						if (!hasParticleSystem)
+						{
+							m_SelectedEntity.AddComponent<ParticleComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasParticleSystem)
+						{
+							ImGui::SetTooltip("Adds particle system to this object.");
 						}
 					}
 					ImGui::EndDisabled();

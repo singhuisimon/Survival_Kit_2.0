@@ -66,7 +66,7 @@ file(GLOB_RECURSE BEHAVIOURTREE_HEADERS "${ENGINE_ROOT}/BehaviourTree/*.h")
 
 # ParticleSystem Module
 file(GLOB_RECURSE PARTICLESYSTEM_SOURCES "${ENGINE_ROOT}/ParticleSystem/*.cpp")
-file(GLOB_RECURSE PARTICLESYSTEM_SOURCES "${ENGINE_ROOT}/ParticleSystem/*.h")
+file(GLOB_RECURSE PARTICLESYSTEM_HEADERS "${ENGINE_ROOT}/ParticleSystem/*.h")
 
 # Combine all files
 set(ENGINE_SOURCES
