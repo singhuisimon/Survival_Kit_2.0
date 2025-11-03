@@ -13,6 +13,8 @@ namespace Engine {
 
     void ScriptSystem::OnInit(Scene* scene) {
         s_CurrentScene = scene;
+        SetScriptingCurrentScene(scene);
+
         m_Scene = scene;  // Store it in member variable too
         LOG_INFO("[ScriptSystem] Initialized");
     }

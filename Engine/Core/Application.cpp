@@ -7,6 +7,8 @@
 #include <sstream>
 #include <iomanip>
 #include"../Scripting/MonoScriptEngine.h"
+#include "../ECS/Scene.h"  // <-- ADD THIS to get the full Scene definition
+
 
 namespace Engine {
 
@@ -86,12 +88,18 @@ namespace Engine {
         m_Input->Init(m_Window);
         LOG_INFO("Input system initialized");
 
+
+        //m_Scene = std::make_shared<Engine::Scene>("MainScene");
+        //Engine::SetScriptingCurrentScene(m_Scene.get());
+
         Engine::SetScriptingInputSystem(&GetInput());
 
         // Initialize Mono scripting
         Engine::MonoScriptEngine::GetInstance().Initialize("GameScripts.dll");
 
-        // Create your scene and systems
+        // Create your 
+        // 
+        // and systems
        // m_Scene = std::make_shared<Engine::Scene>();
 
         // Set scene for scripting

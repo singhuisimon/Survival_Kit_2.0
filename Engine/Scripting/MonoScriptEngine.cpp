@@ -310,6 +310,7 @@ namespace Engine {
         static void LogWarning(MonoString* message);
         
         static uint64_t Entity_GetEntityID(MonoObject* entityObj);
+        static uint64_t Scene_FindEntityByName(MonoString* nameString);
         static bool Entity_HasComponent(uint64_t entityID, MonoReflectionType* componentType);
         
         static void Transform_GetPosition(uint64_t entityID, glm::vec3* outPosition);
@@ -318,7 +319,8 @@ namespace Engine {
         static void Transform_SetRotation(uint64_t entityID, glm::vec3* rotation);
         static void Transform_GetScale(uint64_t entityID, glm::vec3* outScale);
         static void Transform_SetScale(uint64_t entityID, glm::vec3* scale);
-        
+        static void Transform_Move(uint64_t entityID, float deltaX, float deltaY, float deltaZ);
+
         static bool Input_IsKeyPressed(int keyCode);
         static bool Input_IsMouseButtonPressed(int button);
         static void Input_GetMousePosition(glm::vec2* outPosition);
@@ -345,11 +347,13 @@ namespace Engine {
         mono_add_internal_call("Engine.Transform::SetRotation_Native", (void*)InternalCalls::Transform_SetRotation);
         mono_add_internal_call("Engine.Transform::GetScale_Native", (void*)InternalCalls::Transform_GetScale);
         mono_add_internal_call("Engine.Transform::SetScale_Native", (void*)InternalCalls::Transform_SetScale);
+        mono_add_internal_call("Engine.InternalCalls::Transform_Move", (void*)InternalCalls::Transform_Move);
 
         // Input
         mono_add_internal_call("Engine.Input::IsKeyPressed_Native", (void*)InternalCalls::Input_IsKeyPressed);
         mono_add_internal_call("Engine.Input::IsMouseButtonPressed_Native", (void*)InternalCalls::Input_IsMouseButtonPressed);
         mono_add_internal_call("Engine.Input::GetMousePosition_Native", (void*)InternalCalls::Input_GetMousePosition);
+        mono_add_internal_call("Engine.InternalCalls::Scene_FindEntityByName", (void*)InternalCalls::Scene_FindEntityByName);
 
         LOG_INFO("Internal calls registered");
     }
@@ -364,6 +368,52 @@ namespace Engine {
         //auto& input = GetInput();
         static Input* s_InputSystem = nullptr;
 
+
+        void Transform_Move(uint64_t entityID, float deltaX, float deltaY, float deltaZ) {
+            if (!s_CurrentScene) return;
+
+            auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+            if (!entity || !entity.HasComponent<TransformComponent>()) return;
+
+            auto& transform = entity.GetComponent<TransformComponent>();
+            transform.Position.x += deltaX;
+            transform.Position.y += deltaY;
+            transform.Position.z += deltaZ;
+        }
+        uint64_t Scene_FindEntityByName(MonoString* nameString) {
+            if (!s_CurrentScene) {
+                LOG_ERROR("[InternalCall] Scene not set!");
+                return 0; // 0 = invalid entity (entt::null)
+            }
+
+            if (!nameString) {
+                LOG_ERROR("[InternalCall] Entity name string is null!");
+                return 0;
+            }
+
+            // Convert MonoString to C++ string
+            char* nameStr = mono_string_to_utf8(nameString);
+            if (!nameStr) {
+                LOG_ERROR("[InternalCall] Failed to convert entity name string!");
+                return 0;
+            }
+
+            std::string name(nameStr);
+            mono_free(nameStr);
+
+            if (name.empty()) {
+                LOG_WARNING("[InternalCall] Empty entity name provided!");
+                return 0;
+            }
+
+            // Find entity by name
+            Entity entity = s_CurrentScene->FindEntityByName(name);
+            LOG_INFO("player found heres");
+
+            // Convert Entity to uint32_t using the conversion operator
+            // If entity is invalid (entt::null), this will return 0
+            return static_cast<uint32_t>(entity);
+        }
 
         void SetCurrentScene(Scene* scene) {
             s_CurrentScene = scene;
@@ -410,29 +460,25 @@ namespace Engine {
             return false; // Implement based on your component system
         }
 
+
+
         void Transform_GetPosition(uint64_t entityID, glm::vec3* outPosition) {
             if (!s_CurrentScene || !outPosition) return;
 
-            auto& registry = s_CurrentScene->GetRegistry();
-            auto handle = static_cast<entt::entity>(entityID);
+            auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+            if (!entity || !entity.HasComponent<TransformComponent>()) return;
 
-            if (!registry.valid(handle)) return;
-            if (!registry.all_of<TransformComponent>(handle)) return;
-
-            auto& transform = registry.get<TransformComponent>(handle);
+            auto& transform = entity.GetComponent<TransformComponent>();
             *outPosition = transform.Position;
         }
 
         void Transform_SetPosition(uint64_t entityID, glm::vec3* position) {
             if (!s_CurrentScene || !position) return;
 
-            auto& registry = s_CurrentScene->GetRegistry();
-            auto handle = static_cast<entt::entity>(entityID);
+            auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+            if (!entity || !entity.HasComponent<TransformComponent>()) return;
 
-            if (!registry.valid(handle)) return;
-            if (!registry.all_of<TransformComponent>(handle)) return;
-
-            auto& transform = registry.get<TransformComponent>(handle);
+            auto& transform = entity.GetComponent<TransformComponent>();
             transform.Position = *position;
         }
 

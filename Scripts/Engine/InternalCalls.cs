@@ -18,5 +18,19 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LogWarning(string message);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Scene_FindEntityByName(string name);
+
+        // Transform
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_GetPosition(uint entityID, ref Vector3 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
+        // Add this line:
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_Move(uint entityID, float deltaX, float deltaY, float deltaZ);
     }
+
 }
