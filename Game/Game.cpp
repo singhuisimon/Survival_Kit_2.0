@@ -282,7 +282,8 @@ void Game::CreateDefaultScene() {
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
     
-    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename("E001_worm_host_v001.fbx");
+  
     mesh.MeshGuid = inst_guid;
 
     std::cout << inst_guid.m_Value << "\n";
@@ -294,6 +295,7 @@ void Game::CreateDefaultScene() {
     //rb.UseGravity = true;
     //rb.IsKinematic = false;
     //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    xresource::instance_guid tex_inst_guid = Engine::AM.getAssetIdByFilename("rabbit_kenny.png");
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";
@@ -348,8 +350,11 @@ void Game::CreateDefaultScene() {
     groundRb.UseGravity = false;
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
-    ground.AddComponent<Engine::MeshRendererComponent>();
+    auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
+
+    
+	groundmesh.TextureGuid = tex_inst_guid;
 
     LOG_TRACE("  Creating ReverbZone entity...");
     auto reverbZone = m_Scene->CreateEntity("CaveReverb");
