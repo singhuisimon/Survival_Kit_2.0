@@ -38,7 +38,15 @@ namespace Engine {
 
         //Status
         bool valid = false;
+
+		std::time_t descriptorModifiedTime = 0;  // When Descriptor.txt was last modified
+		std::time_t lastCompiledTime = 0;        // When asset was last compiled
+		bool needsRecompile = false;             // Flag: descriptor changed since last compile
         
+		// Helper method to check if recompilation is needed
+		bool IsDescriptorModified() const {
+			return descriptorModifiedTime > lastCompiledTime;
+		}
     };
 
 	/**
