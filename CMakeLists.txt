@@ -166,6 +166,11 @@ target_link_libraries(GameEngine PUBLIC ${MONO_LIBRARIES})
 file(COPY ${CMAKE_SOURCE_DIR}/Resources 
      DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
+file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Debug/GameScripts.dll"
+     DESTINATION "${CMAKE_BINARY_DIR}/bin/Debug")
+
+file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Release/GameScripts.dll"
+     DESTINATION "${CMAKE_BINARY_DIR}/bin/Release")
 # ====================================
 # Build Information
 # ====================================
