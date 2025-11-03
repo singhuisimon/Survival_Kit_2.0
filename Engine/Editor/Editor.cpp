@@ -2353,78 +2353,81 @@ namespace Engine
 				<< ")" << std::endl;
 
 			// Store screen coordinates separately for ImGuizmo
-			m_ImGuizmoViewportData.tl = tl_screen;
-			m_ImGuizmoViewportData.size = viewportSize;
+			if (m_Renderer->getEditorCamToggle()) {
+				// Store screen coordinates separately for ImGuizmo
+				m_ImGuizmoViewportData.tl = tl_screen;
+				m_ImGuizmoViewportData.size = viewportSize;
 
-			if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
-			{
-				LOG_INFO("[DEBUG] Right-click popup opened!");
-
-				// Unity-style: No checkmarks, just menu items
-				if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
 				{
+					LOG_INFO("[DEBUG] Right-click popup opened!");
+
+					// Unity-style: No checkmarks, just menu items
+					if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+					{
+						m_Operation = ImGuizmo::TRANSLATE;
+						std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
+					}
+
+					if (ImGui::MenuItem("Rotate", "E"))
+					{
+						m_Operation = ImGuizmo::ROTATE;
+						std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
+					}
+
+					if (ImGui::MenuItem("Scale", "R"))
+					{
+						m_Operation = ImGuizmo::SCALE;
+						std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
+					}
+
+					ImGui::Separator();
+
+					// Unity doesn't have a "None" option in the right-click menu
+					// You switch to "None" by clicking the tool handle button or pressing Q
+
+					ImGui::EndPopup();
+				}
+
+				// Handle keyboard shortcuts for switching modes (Unity-style)
+				// In Unity, these work globally, not just when window is focused
+				if (ImGui::IsKeyPressed(ImGuiKey_W)) {
 					m_Operation = ImGuizmo::TRANSLATE;
-					std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
+					std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
 				}
-
-				if (ImGui::MenuItem("Rotate", "E"))
-				{
+				if (ImGui::IsKeyPressed(ImGuiKey_E)) {
 					m_Operation = ImGuizmo::ROTATE;
-					std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
+					std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
 				}
-
-				if (ImGui::MenuItem("Scale", "R"))
-				{
+				if (ImGui::IsKeyPressed(ImGuiKey_R)) {
 					m_Operation = ImGuizmo::SCALE;
-					std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
+					std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
 				}
 
-				ImGui::Separator();
 
-				// Unity doesn't have a "None" option in the right-click menu
-				// You switch to "None" by clicking the tool handle button or pressing Q
+				if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
+					m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+					std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
+				}
 
-				ImGui::EndPopup();
-			}
-
-			// Handle keyboard shortcuts for switching modes (Unity-style)
-			// In Unity, these work globally, not just when window is focused
-			if (ImGui::IsKeyPressed(ImGuiKey_W)) {
-				m_Operation = ImGuizmo::TRANSLATE;
-				std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
-			}
-			if (ImGui::IsKeyPressed(ImGuiKey_E)) {
-				m_Operation = ImGuizmo::ROTATE;
-				std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
-			}
-			if (ImGui::IsKeyPressed(ImGuiKey_R)) {
-				m_Operation = ImGuizmo::SCALE;
-				std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
-			}
-
-
-			if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
-				m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
-				std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
-			}
-
-			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-			{
-				if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
-					LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
-					m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+					if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+					{
+						LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+						m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+					}
+					else
+					{
+						m_SelectedEntity = Entity{};
+						LOG_INFO("Deselected entity.");
+					}
 				}
-				else
-				{
-					m_SelectedEntity = Entity{};
-					LOG_INFO("Deselected entity.");
-				}
-			}
 
-			// ImGuizmo manipulation
-			if (m_SelectedEntity) {
-				ManipulateEntityTransform(m_SelectedEntity);
+				// ImGuizmo manipulation
+				if (m_SelectedEntity) {
+					ManipulateEntityTransform(m_SelectedEntity);
+				}
 			}
 		}
 

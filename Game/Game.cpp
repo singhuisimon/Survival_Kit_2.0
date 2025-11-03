@@ -282,7 +282,8 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(0.0005f, 0.0005f, 0.0005f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    
+    mesh.Material = 1;
+
     std::string meshName = "E004_botnet_v001.fbx";
     xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
     mesh.MeshGuid = inst_guid;
