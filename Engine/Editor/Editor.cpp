@@ -1056,178 +1056,184 @@ namespace Engine
 
 						// For actual BT
 						BehaviourTree& treeInstance = *(ai_bt.TreeInstance);
-						size_t stackDepth = treeInstance.GetStackDepth();
-						auto root = treeInstance.GetRootNode();
-
-						ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
-						ImGui::Text("Stack Depth: %zu", stackDepth);
-
-						// Draw a small "i" icon next to a label
-						/*ImGui::Text("Some setting");
-						ImGui::SameLine();
-
-						// Use a small colored "i" or unicode info character
-						ImGui::TextDisabled("(i)");
-
-						// Show tooltip when hovered
-						if (ImGui::IsItemHovered())
+						if (ai_bt.TreeInstance)
 						{
-							ImGui::BeginTooltip();
-							ImGui::TextWrapped("This is some helpful info about this setting.");
-							ImGui::EndTooltip();
-						}*/
+							size_t stackDepth = treeInstance.GetStackDepth();
+							auto root = treeInstance.GetRootNode();
 
-						if (root)
-						{
-							ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
-							DrawBTNodeEditor(root);
-						}
-						else
-						{
-							ImGui::TextDisabled("No root node.");
-							if (ImGui::Button("Create Root Node"))
+							ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
+							ImGui::Text("Stack Depth: %zu", stackDepth);
+
+							// Draw a small "i" icon next to a label
+							/*ImGui::Text("Some setting");
+							ImGui::SameLine();
+
+							// Use a small colored "i" or unicode info character
+							ImGui::TextDisabled("(i)");
+
+							// Show tooltip when hovered
+							if (ImGui::IsItemHovered())
 							{
-								auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
-								treeInstance.SetRootNode(rootNode);
+								ImGui::BeginTooltip();
+								ImGui::TextWrapped("This is some helpful info about this setting.");
+								ImGui::EndTooltip();
+							}*/
+
+							if (root)
+							{
+								ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
+								DrawBTNodeEditor(root);
 							}
-						}
+							else
+							{
+								ImGui::TextDisabled("No root node.");
+								if (ImGui::Button("Create Root Node"))
+								{
+									auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
+									treeInstance.SetRootNode(rootNode);
+								}
+							}
 
-						// --- Set Root Node ---
-						ImGui::Separator();
-						ImGui::Text("Root Node:");
+							// --- Set Root Node ---
+							ImGui::Separator();
+							ImGui::Text("Root Node:");
 
-						// Dropdown to pick node type for new root
-						static int rootNodeTypeIndex = 0;
-						auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
-						ImGui::SetNextItemWidth(200.0f);
-						if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
-							[](void* data, int idx, const char** outText) -> bool {
-								auto& types = *static_cast<std::vector<std::string>*>(data);
-								*outText = types[idx].c_str();
-								return true;
-							},
-							static_cast<void*>(&allTypes), (int)allTypes.size()))
-						{
-							// Optional: nothing here, selection changes root only when button clicked
-						}
+							// Dropdown to pick node type for new root
+							static int rootNodeTypeIndex = 0;
+							auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
+							ImGui::SetNextItemWidth(200.0f);
+							if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
+								[](void* data, int idx, const char** outText) -> bool {
+									auto& types = *static_cast<std::vector<std::string>*>(data);
+									*outText = types[idx].c_str();
+									return true;
+								},
+								static_cast<void*>(&allTypes), (int)allTypes.size()))
+							{
+								// Optional: nothing here, selection changes root only when button clicked
+							}
 
-						// Button to create/set the root node
-						if (ImGui::Button("Set Root Node"))
-						{
-							auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
-							treeInstance.SetRootNode(newRoot);
-						}
+							// Button to create/set the root node
+							if (ImGui::Button("Set Root Node"))
+							{
+								auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
+								treeInstance.SetRootNode(newRoot);
+							}
 
-						ImGui::Separator();
+							ImGui::Separator();
 
-						// Reset the tree to initial state
-						if (ImGui::Button("Reset")) {
-							ai_bt.Reset();
-						}
+							// Reset the tree to initial state
+							if (ImGui::Button("Reset")) {
+								ai_bt.Reset();
+							}
 
-						ImGui::BeginDisabled();
+							ImGui::BeginDisabled();
 
-						// Last execution status (for debugging)
-						BTStatus& lastStatus = ai_bt.LastStatus;
-						std::string lastStatusString{};
-						if (lastStatus == BTStatus::Success) {
-							lastStatusString = "Success";
-						}
-						else if (lastStatus == BTStatus::Failure) {
-							lastStatusString = "Failure";
+							// Last execution status (for debugging)
+							BTStatus& lastStatus = ai_bt.LastStatus;
+							std::string lastStatusString{};
+							if (lastStatus == BTStatus::Success) {
+								lastStatusString = "Success";
+							}
+							else if (lastStatus == BTStatus::Failure) {
+								lastStatusString = "Failure";
+							}
+							else {
+								lastStatusString = "Running";
+							}
+							ImGui::Text("Execution Status: %s", lastStatusString.c_str());
+
+							ImGui::EndDisabled();
+
+							// Whether tree executes every frame
+							bool& active = ai_bt.Active;
+							if (ImGui::Checkbox("Active", &active)) {
+								ai_bt.Active = active;
+							}
+
+							// Reset the tree when it completes
+							bool& resetComplete = ai_bt.ResetOnComplete;
+							if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
+								ai_bt.ResetOnComplete = resetComplete;
+							}
+
+							// Reference to current asset path
+							std::string& treeAssetPath = ai_bt.TreeAssetPath;
+
+							// Find BT folder
+
+							std::filesystem::path repoRoot = getRepository();
+							std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
+
+							auto folders = getAssetsInFolder(btPath.string());
+							std::string btFolderPath;
+							for (auto& folder : folders)
+							{
+								if (folder.name == "BT")
+								{
+									btFolderPath = folder.fullPath;
+									break;
+								}
+							}
+
+							// Collect all JSON assets in BT folder
+							std::vector<AssetEntry> btAssets;
+							if (!btFolderPath.empty())
+							{
+								auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
+								for (auto& f : files)
+								{
+									if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
+										btAssets.push_back(f);
+								}
+							}
+
+							// Determine current selection index
+							int currentIndex = 0;
+							for (size_t i = 0; i < btAssets.size(); ++i)
+							{
+								if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
+								{
+									currentIndex = (int)i;
+									break;
+								}
+							}
+
+							// Draw the combo box
+							ImGui::Text("Tree Asset Path:");
+							ImGui::SetNextItemWidth(400.0f);
+							if (ImGui::Combo("##TreeAssetPath", &currentIndex,
+								[](void* data, int idx, const char** outText) -> bool
+								{
+									auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
+									*outText = assets[idx].name.c_str(); // display name only
+
+									return true;
+								},
+								static_cast<void*>(&btAssets), (int)btAssets.size()))
+							{
+								// Update treeAssetPath when selected
+								ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
+							}
+
+							if (ImGui::Button("Load Tree"))
+							{
+								if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+								{
+									std::string chosenPath = btAssets[currentIndex].name;
+									ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+								}
+							}
+
+
+							if (ImGui::Button("Save Tree")) {
+								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
+							}
 						}
 						else {
-							lastStatusString = "Running";
-						}
-						ImGui::Text("Execution Status: %s", lastStatusString.c_str());
-
-						ImGui::EndDisabled();
-
-						// Whether tree executes every frame
-						bool& active = ai_bt.Active;
-						if (ImGui::Checkbox("Active", &active)) {
-							ai_bt.Active = active;
-						}
-
-						// Reset the tree when it completes
-						bool& resetComplete = ai_bt.ResetOnComplete;
-						if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
-							ai_bt.ResetOnComplete = resetComplete;
+							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("NewTree");
 						}
 						
-						// Reference to current asset path
-						std::string& treeAssetPath = ai_bt.TreeAssetPath;
-
-						// Find BT folder
-
-						std::filesystem::path repoRoot = getRepository();
-						std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
-
-						auto folders = getAssetsInFolder(btPath.string());
-						std::string btFolderPath;
-						for (auto& folder : folders)
-						{
-							if (folder.name == "BT")
-							{
-								btFolderPath = folder.fullPath;
-								break;
-							}
-						}
-
-						// Collect all JSON assets in BT folder
-						std::vector<AssetEntry> btAssets;
-						if (!btFolderPath.empty())
-						{
-							auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
-							for (auto& f : files)
-							{
-								if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
-									btAssets.push_back(f);
-							}
-						}
-
-						// Determine current selection index
-						int currentIndex = 0;
-						for (size_t i = 0; i < btAssets.size(); ++i)
-						{
-							if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
-							{
-								currentIndex = (int)i;
-								break;
-							}
-						}
-
-						// Draw the combo box
-						ImGui::Text("Tree Asset Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##TreeAssetPath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
-								*outText = assets[idx].name.c_str(); // display name only
-								
-								return true;
-							},
-							static_cast<void*>(&btAssets), (int)btAssets.size()))
-						{
-							// Update treeAssetPath when selected
-							ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
-						}
-
-						if (ImGui::Button("Load Tree"))
-						{
-							if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
-							{
-								std::string chosenPath = btAssets[currentIndex].name;
-								ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
-							}
-						}
-
-
-						if (ImGui::Button("Save Tree")) {
-							BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
-						}
-
 						// BehaviourTreeEditor:
 						/*CreateNewTree //IN ASSET BROWSER
 						SetNodeProperty //
@@ -1726,23 +1732,35 @@ namespace Engine
 			ImGui::EndChild();
 
 			// ================= Right column panel - display assets of selected type ========================
+
+			auto& db = AM.db();
+			auto allAssets = db.AllMutable();
+
+			std::vector<const AssetRecord*> filteredAssets;
+			filteredAssets.reserve(allAssets.size());
+
+			for (const auto* record : allAssets) {
+				if (!record || !record->valid) continue;
+				if (record->type == selectedType) {
+					filteredAssets.push_back(record);
+				}
+			}
+
+			// to get the files in the selected folder
+			auto assetsList = getAssetsInFolder(selectedFolder);
+
 			ImGui::NextColumn();
 			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
 
+
+			if (raw_asset && selectedResourcesIndex != -1) {
+				ImGui::Text("Asset Selected: %s", filteredAssets[selectedResourcesIndex]->sourcePath.c_str());
+			} else if(!raw_asset && selectedResourcesIndex != -1) {
+				ImGui::Text("Asset Selected: %s", assetsList[selectedResourcesIndex].fullPath.c_str());
+			}
+
 			// For resources handled by Asset Browser
 			if (!selectedFolder.empty() && raw_asset) {
-				auto& db = AM.db();
-				auto allAssets = db.AllMutable();
-
-				std::vector<const AssetRecord*> filteredAssets;
-				filteredAssets.reserve(allAssets.size());
-
-				for (const auto* record : allAssets) {
-					if (!record || !record->valid) continue;
-					if (record->type == selectedType) {
-						filteredAssets.push_back(record);
-					}
-				}
 
 				// Display filtered assets
 				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
@@ -1771,9 +1789,9 @@ namespace Engine
 
 						// Optional background color for selected
 						if (isSelected) {
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f));
-							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 						}
 
 						// Unique ID per button so ImGui doesn�t confuse them
@@ -1781,7 +1799,30 @@ namespace Engine
 
 						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
 							selectedResourcesIndex = static_cast<int>(i);
-							// Handle click event (e.g. open asset, show preview, etc.)
+							ImGui::OpenPopup("AssetContextMenu");
+						}
+
+						if (ImGui::BeginPopupContextItem("AssetContextMenu")) // right-click popup
+						{
+							ImGui::Text("%s", filename.c_str());
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Edit"))
+							{
+								// open asset editor or show rename dialog
+								LOG_INFO("Edit asset: ", filename);
+								displayDescriptorEditorPanel();
+							}
+
+							//TODO - Delete
+							if (ImGui::MenuItem("Delete"))
+							{
+								// confirmation dialog or delete function
+								LOG_WARNING("Deleted asset:", filename);
+								
+							}
+
+							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -1820,8 +1861,6 @@ namespace Engine
 			// For resources handled by filepath
 			if (!selectedFolder.empty() && !raw_asset)
 			{
-				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder);
 				// display the selected folder name
 				std::filesystem::path folderPath(selectedFolder);
 				std::string folderName = folderPath.filename().string();
@@ -1852,9 +1891,9 @@ namespace Engine
 					if (isSelected)
 					{
 						// Change the button background color
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 					}
 
 					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
