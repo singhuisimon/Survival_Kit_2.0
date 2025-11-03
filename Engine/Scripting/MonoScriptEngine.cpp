@@ -480,6 +480,7 @@ namespace Engine {
 
             auto& transform = entity.GetComponent<TransformComponent>();
             transform.Position = *position;
+            transform.IsDirty = true;
         }
 
         void Transform_GetRotation(uint64_t entityID, glm::vec3* outRotation) {
