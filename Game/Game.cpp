@@ -1,4 +1,4 @@
-#include "Game.h"
+﻿#include "Game.h"
 #include "Core/Application.h"
 #include "Core/Input.h"
 #include "Utility/Logger.h"
@@ -10,6 +10,7 @@
 #include "Audio/AudioEffectSystem.h"
 #include "Asset/AssetManager.h"
 #include "Asset/ResourceManager.h"
+#include "Asset/ResourceHelpers.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -26,6 +27,13 @@
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
 #include "BehaviourTree/BehaviourTreeSystem.h"
+
+// KENNY TESTING: FOR MAINCAMERA "SCRIPT"
+#include <glm/common.hpp>               // glm::clamp
+#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
+// Math Utility
+#include "Utility/MathUtils.h"
+
 
 // KEPT FOR BT TEST <WILL REMOVE BY THIS WEEKEND PLS DUN TOUCH>
 #include "BehaviourTree/BTNodeRegistry.h"
@@ -133,6 +141,7 @@ void Game::OnInit() {
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
             m_Editor->SetScene(m_Scene.get());
+            m_Editor->SetRenderer(m_Renderer.get());
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
@@ -269,10 +278,19 @@ void Game::CreateDefaultScene() {
 
     auto& transform = player.AddComponent<Engine::TransformComponent>();
     transform.Position = glm::vec3(1, 2, 0);  // Start above ground
-    transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+    //transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+    transform.Scale    = glm::vec3(0.0005f, 0.0005f, 0.0005f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    mesh.ComponentGUID = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    
+    std::string meshName = "E004_botnet_v001.fbx";
+    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
+    mesh.MeshGuid = inst_guid;
+    //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
+
+    std::cout << inst_guid.m_Value << "\n";
+
+	//mesh.MeshResource = mesh_rsc;
 
     //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     //rb.Mass = 1.0f;
@@ -296,7 +314,7 @@ void Game::CreateDefaultScene() {
     LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
 
     LOG_TRACE("  Creating Camera entity...");
-    auto camera = m_Scene->CreateEntity("Camera");
+    auto camera = m_Scene->CreateEntity("MainCamera");
     camera.AddComponent<Engine::TagComponent>("MainCamera");
 
     auto& camTransform = camera.AddComponent<Engine::TransformComponent>();
@@ -325,7 +343,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Scale = glm::vec3(1, 0.1f, 1);
+    groundTransform.Scale = glm::vec3(20, 0.1f, 20);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -354,6 +372,20 @@ void Game::CreateDefaultScene() {
     reverb.IsDirty = true;
 
     LOG_TRACE("  -> Reverb zone created");
+
+    LOG_TRACE("  Creating AI entity...");
+    auto ai = m_Scene->CreateEntity("AI");
+
+    auto& aiTransform = reverbZone.GetComponent<Engine::TransformComponent>();
+    aiTransform.Position = glm::vec3(0, 0, 0); // center of world
+    aiTransform.Scale = glm::vec3(1, 1, 1);
+
+    auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
+    bt.Active = true;
+    bt.ResetOnComplete = false;
+    bt.TreeAssetPath = "SimpleWaitTree.json";
+
+    LOG_TRACE("  -> ai created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {
@@ -438,31 +470,171 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
     }
 
-    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
-
-        auto& transform = foundEntity.GetComponent<Engine::TransformComponent>();
-
-        if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
-        if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
-        if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
-        if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+    // Get MainCamera to follow Player from the back
+    Engine::Entity GameCam;
+    bool GameCamFound = false;
+    for (auto entityHandle : view) {
+        auto& camTag = view.get<Engine::TagComponent>(entityHandle);
+        if (camTag.Tag == "MainCamera") {
+            GameCam = Engine::Entity(entityHandle, &registry);
+            GameCamFound = true;
+            break;
+        }
     }
 
-    // Change Camera type
+    // Editor camera toggle
+    auto& editorCamToggle = m_Renderer->getEditorCamToggle();
     if (input.IsKeyJustPressed(GLFW_KEY_TAB)) {
-
-        auto& editorCam = m_Renderer->getEditorCamera();
-        if (editorCam.getCamType() == Engine::CameraType::ORBITING) {
-            editorCam.setCamType(Engine::CameraType::WALKING);
+        if (editorCamToggle == true) {
+            editorCamToggle = false;
         }
         else {
-            editorCam.setCamType(Engine::CameraType::ORBITING);
+            editorCamToggle = true;
         }
+    }
 
+    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+
+        // Get player transform to control its movement
+        auto& transform = foundEntity.GetComponent<Engine::TransformComponent>();
+
+        // Update main game camera on player if it exists
+        if (GameCamFound && GameCam.HasComponent<Engine::CameraComponent>()
+            && GameCam.HasComponent<Engine::TransformComponent>()
+            && !editorCamToggle) {
+
+            // Get MainCamera transform and camera component
+            auto& camTransform = GameCam.GetComponent<Engine::TransformComponent>();
+            auto& camComp = GameCam.GetComponent<Engine::CameraComponent>();
+
+            // Player head/aim point (slightly above)
+            const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
+
+            // Persistent orbit state
+            static bool  initialized = false;
+            static float pitch = 0.25f; // alpha
+            static float yaw = 0.0f;    // betta
+            static float radius = 7.5f;
+
+            // Initialize yaw/pitch from current camera placement once
+            if (!initialized) {
+                const glm::vec3 rel = camTransform.Position - aimTarget;
+                const float r = glm::length(rel);
+                if (r > 1e-6f) {
+                    pitch = glm::asin(glm::clamp(rel.y / r, -1.0f, 1.0f));
+                    yaw = std::atan2(rel.x, rel.z);
+                    /* Radius is constant thru out the gameplay */
+                }
+                else {
+                    // fallback if camera starts at target: put it behind player
+                    pitch = 0.25f;
+                    yaw = 0.0f;
+                    radius = 7.5f;
+                }
+                initialized = true;
+            }
+
+            // Mouse deltas
+            const float xOffset = input.GetMouseDelta().x;
+            const float yOffset = input.GetMouseDelta().y;
+
+            // Update orbit angles only when mouse moves
+            if (xOffset != 0.0f || yOffset != 0.0f) {
+
+                // Adjust angles based on cursor offset
+                yaw += (xOffset < 0.0f) ? 0.05f : (xOffset > 0.0f ? -0.05f : 0.0f);
+                pitch += (yOffset > 0.0f) ? 0.02f : (yOffset < 0.0f ? -0.02f : 0.0f);
+
+                // Clamp pitch to avoid flipping
+                pitch = glm::clamp(pitch, -Engine::MathUtils::HALF_PI + 0.01f, Engine::MathUtils::HALF_PI - 0.01f);
+            }
+
+            // Rebuild direction from yaw/pitch EVERY FRAME
+            glm::vec3 dir;
+            dir.x = glm::cos(pitch) * glm::sin(yaw);
+            dir.y = glm::sin(pitch);
+            dir.z = glm::cos(pitch) * glm::cos(yaw);
+            dir = glm::normalize(dir);
+
+            // Keep constant distance from the player (orbit)
+            const glm::vec3 camPos = aimTarget + dir * radius;
+            camTransform.SetPosition(camPos);
+
+            // Always update camera target to the player's head/aim point
+            camComp.SetTarget(aimTarget);
+
+            /* Camera and Player rotations if all meshes face Z- as forward */
+            //// Player face same horizontal direction as the camera (camera behind player)
+            //glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
+
+            //// Calculate yaw (rotation around Y axis)
+            //const float yawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+
+            //// Calculate pitch (rotation around X axis)
+            //// Pitch = angle between horizontal plane and forward vector
+            //float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+
+            //transform.SetRotation(glm::vec3(pitchDeg, yawDeg/* - 90.0f*/, 0.0f));
+            /* Camera and Player rotations if all meshes face Z- as forward */
+
+            /* Temporary adjustments to Camera and Player rotations */
+            glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
+            glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camFwd));
+            glm::vec3 camUp = glm::normalize(glm::cross(camFwd, camRight));
+
+            // Build rotation from camera basis to match player orientation
+            glm::mat3 camBasis(camRight, camUp, camFwd);
+
+            // Your model’s forward = X+, so rotate 90° around Y to map +Z → +X
+            glm::quat modelOffset = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0, 1, 0));
+
+            // Convert basis to quaternion and apply offset
+            glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
+
+            transform.Rotation = q;
+            transform.IsDirty = true;
+            /* Temporary adjustments to Camera and Player rotations */
+
+            /* Player controls begin here */
+            // Movement speed 
+            const float moveSpeed = 0.1f;
+
+            // Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
+            //glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
+            glm::vec3 forward = transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f); // forward in local space (For botnet)
+            forward = glm::normalize(forward);
+
+            // Compute right vector from forward and world up
+            glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+            // Movement accumulator
+            glm::vec3 moveDir(0.0f);
+
+            if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+            if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+            if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+            if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+
+            // Normalize to prevent faster diagonal movement
+            if (glm::dot(moveDir, moveDir) > 0.0f)
+                moveDir = glm::normalize(moveDir);
+
+            // Apply movement to player
+            transform.Position += moveDir * moveSpeed;
+
+
+        }
+        else {
+            // Default player movement w/o MainCamera
+            if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+            if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+            if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+            if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+        }
     }
 
     // Editor camera controls
-    if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+    if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle) {
         
         auto& editorCam = m_Renderer->getEditorCamera();
 
@@ -646,17 +818,18 @@ void Game::OnUpdate(Engine::Timestep ts) {
         // Create nodes
         auto root = std::make_shared<Engine::BTSequence>();
         auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
-        auto logNode = std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
-            LOG_INFO("[AI Action] Hello from Behaviour Tree!");
-            return Engine::BTStatus::Success;
-            });
+        auto logNode = std::make_shared<Engine::BTLog>("HELLO");
+            //= std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
+            //LOG_INFO("[AI Action] Hello from Behaviour Tree!");
+            //return Engine::BTStatus::Success;
+            //});
 
         root->AddChild(waitNode);
         root->AddChild(logNode);
         tree->SetRootNode(root);
 
         // 2. Serialize the tree to file
-        std::string btPath = "Sources/BT/SimpleWaitTree.json";
+        std::string btPath = "SimpleWaitTree.json";
         Engine::BehaviourTreeSerializer::SerializeToFile(*tree, btPath);
 
         // 3. Create entity & attach component

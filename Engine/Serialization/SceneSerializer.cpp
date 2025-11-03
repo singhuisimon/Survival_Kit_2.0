@@ -137,6 +137,16 @@ namespace Engine {
                 scaleArray.PushBack(transform.Scale.z, allocator);
                 propertiesObj.AddMember("Scale", scaleArray, allocator);
 
+                // Parent 
+                propertiesObj.AddMember("Parent", transform.Parent, allocator);
+
+                // List of children 
+                Value childrenArray(kArrayType);
+                for (const auto& child : transform.Children) {
+                    childrenArray.PushBack(child, allocator);
+                }
+                propertiesObj.AddMember("Children", childrenArray, allocator);
+
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
             }
@@ -176,11 +186,14 @@ namespace Engine {
                 componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
                 Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("MeshGuid", mesh.MeshGuid.m_Value, allocator);
+				propertiesObj.AddMember("MaterialGuid", mesh.MaterialGuid.m_Value, allocator);
+				propertiesObj.AddMember("TextureGuid", mesh.TextureGuid.m_Value, allocator);
                 propertiesObj.AddMember("Visible", mesh.Visible, allocator);
                 propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
                 propertiesObj.AddMember("Material", mesh.Material, allocator);
                 propertiesObj.AddMember("Texture", mesh.Texture, allocator);
-
+                propertiesObj.AddMember("SubmeshIndex", mesh.SubmeshIndex, allocator);
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
             }
@@ -430,6 +443,20 @@ namespace Engine {
                                 scaleArray[2].GetFloat()
                             );
                         }
+
+                        if (properties.HasMember("Parent")) {
+							transform.Parent = properties["Parent"].GetUint();
+                        }
+
+                        if (properties.HasMember("Children") && properties["Children"].IsArray()) {
+
+                            transform.Children.clear();
+                            const Value& childrenArray = properties["Children"];
+
+                            for (rapidjson::SizeType i = 0; i < childrenArray.Size(); ++i) 
+                                transform.Children.push_back(childrenArray[i].GetUint());
+                            
+                        }
                     }
                     else if (componentType == "CameraComponent") {
                         auto& camera = entity.AddComponent<CameraComponent>();
@@ -462,10 +489,19 @@ namespace Engine {
                     }
                     else if (componentType == "MeshRendererComponent") {
                         auto& mesh = entity.AddComponent<MeshRendererComponent>();
+                        if (properties.HasMember("MeshGuid"))
+                            mesh.MeshGuid = xresource::instance_guid{ properties["MeshGuid"].GetUint64() };
+						if (properties.HasMember("MaterialGuid")) {
+                            mesh.MaterialGuid = xresource::instance_guid{ properties["MaterialGuid"].GetUint64() };
+						}
+                        if (properties.HasMember("TextureGuid")) {
+							mesh.TextureGuid = xresource::instance_guid{ properties["TextureGuid"].GetUint64() };
+                        }
                         if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
                         if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
                         if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
                         if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
+                        if (properties.HasMember("SubmeshIndex")) mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
                     }
                     else if (componentType == "RigidbodyComponent") {
                         auto& rb = entity.AddComponent<RigidbodyComponent>();
@@ -536,12 +572,11 @@ namespace Engine {
                     }
                     else if (componentType == "BehaviourTreeComponent") {
                         auto& bt = entity.AddComponent<BehaviourTreeComponent>();
-
                         if (properties.HasMember("Active"))
                             bt.Active = properties["Active"].GetBool();
                         if (properties.HasMember("ResetOnComplete"))
                             bt.ResetOnComplete = properties["ResetOnComplete"].GetBool();
-                        if (properties.HasMember("TreeAssetGUID")) {
+                        if (properties.HasMember("TreeAssetPath")) {
                             bt.TreeAssetPath = properties["TreeAssetPath"].GetString();    
                         }
 

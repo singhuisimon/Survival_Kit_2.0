@@ -63,8 +63,8 @@
 					"Type": "CameraComponent",
 					"Properties": {
 						"FOV": 60.0,
-						"NearClip": 0.1,
-						"FarClip": 1000.0,
+						"NearPlane": 0.1,
+						"FarPlane": 1000.0,
 						"Primary": true
 					}
 				}

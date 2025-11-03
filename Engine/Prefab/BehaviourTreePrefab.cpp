@@ -136,7 +136,7 @@ namespace Engine {
             return false;
         }
 
-        return BehaviourTreeSerializer::SerializeToFile(*tree, filepath);
+        return BehaviourTreeSerializer::SerializeToFile(*tree, filepath, true);
     }
 
     /**
@@ -146,7 +146,7 @@ namespace Engine {
      * @return GUID of the registered prefab
      */
     xresource::instance_guid BehaviourTreePrefab::LoadPrefabFromFile(const std::string& filepath, const std::string& name) {
-        auto tree = BehaviourTreeSerializer::DeserializeFromFile(filepath);
+        auto tree = BehaviourTreeSerializer::DeserializeFromFile(filepath, true);
         if (!tree) {
             return xresource::instance_guid{};
         }

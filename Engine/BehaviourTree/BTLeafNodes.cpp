@@ -87,7 +87,14 @@ namespace Engine {
         (void)context;
         // In real implementation, use your Logger system
         // LOG_INFO("BehaviourTree: ", m_Message);
-        return BTStatus::Success;
+        accumulatedtime += context.DeltaTime;
+        if (time > accumulatedtime) {
+            LOG_INFO("LogNode: ", m_Message);
+            accumulatedtime = 0.0f;
+            return BTStatus::Success;
+        }
+        
+        return BTStatus::Running;
     }
     
     void BTLog::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {

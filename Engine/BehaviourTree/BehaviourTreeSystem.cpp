@@ -45,6 +45,7 @@ namespace Engine {
 
             // Skip if not active or invalid
             if (!btComp.Active || !btComp.IsValid()) {
+                LOG_WARNING("NOT ACTIVE/VALID");
                 continue;
             }
 

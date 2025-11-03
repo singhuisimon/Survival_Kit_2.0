@@ -238,6 +238,16 @@ namespace Engine {
                 const auto& scale = properties["Scale"];
                 comp.Scale = glm::vec3(scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat());
             }
+            if (properties.HasMember("Parent")) {
+				comp.Parent = properties["Parent"].GetUint();
+            }
+            if (properties.HasMember("Children") && properties["Children"].IsArray()) {
+                comp.Children.clear();
+                const auto& childrenArray = properties["Children"];
+
+                for (rapidjson::SizeType i = 0; i < childrenArray.Size(); ++i)
+                    comp.Children.push_back(childrenArray[i].GetUint());
+            }
         }
         else if (componentType == "CameraComponent") {
             auto& comp = entity.AddComponent<CameraComponent>();
@@ -249,11 +259,11 @@ namespace Engine {
             if (properties.HasMember("FOV")) {
                 comp.FOV = properties["FOV"].GetFloat();
             }
-            if (properties.HasMember("NearClip")) {
-                comp.NearClip = properties["NearClip"].GetFloat();
+            if (properties.HasMember("NearPlane")) {
+                comp.NearPlane = properties["NearPlane"].GetFloat();
             }
-            if (properties.HasMember("FarClip")) {
-                comp.FarClip = properties["FarClip"].GetFloat();
+            if (properties.HasMember("FarPlane")) {
+                comp.FarPlane = properties["FarPlane"].GetFloat();
             }
             if (properties.HasMember("Primary")) {
                 comp.Primary = properties["Primary"].GetBool();
@@ -262,9 +272,17 @@ namespace Engine {
         else if (componentType == "MeshRendererComponent") {
             auto& comp = entity.AddComponent<MeshRendererComponent>();
 
-            if (properties.HasMember("ComponentGUID")) {
-                uint64_t guidValue = std::stoull(properties["ComponentGUID"].GetString());
-                comp.ComponentGUID = xresource::instance_guid{ guidValue };
+            if (properties.HasMember("MeshGuid")) {
+                uint64_t guidValue = properties["MeshGuid"].GetUint64();
+                comp.MeshGuid = xresource::instance_guid{ guidValue };
+            }
+            if (properties.HasMember("MaterialGuid")) {
+                uint64_t guidValue = properties["MaterialGuid"].GetUint64();
+                comp.MaterialGuid = xresource::instance_guid{ guidValue };
+            }
+            if (properties.HasMember("TextureGuid")) {
+                uint64_t guidValue = properties["TextureGuid"].GetUint64();
+				comp.TextureGuid = xresource::instance_guid{ guidValue };
             }
             if (properties.HasMember("Visible")) {
                 comp.Visible = properties["Visible"].GetBool();
