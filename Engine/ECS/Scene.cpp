@@ -63,6 +63,32 @@ namespace Engine {
         return entity;
     }
 
+    Entity Scene::GetEntity(entt::entity entityId) {
+        if (!m_Registry.valid(entityId)) {
+            LOG_WARNING("Scene: Attempted to get invalid entity ID: ", (uint32_t)entityId);
+            return Entity(); // Return invalid entity
+        }
+        return Entity(entityId, &m_Registry);
+    }
+
+    bool Scene::IsEntityValid(entt::entity entityId) const {
+        return m_Registry.valid(entityId);
+    }
+    Entity Scene::FindEntityByName(const std::string& name) {
+        auto view = m_Registry.view<TagComponent>();
+
+        for (auto entityHandle : view) {
+            Entity entity(entityHandle, &m_Registry);
+            const auto& tag = entity.GetComponent<TagComponent>();
+
+            if (tag.Tag == name) {
+                return entity;
+            }
+        }
+
+        LOG_WARNING("Scene: Entity with name '", name, "' not found");
+        return Entity(); // Invalid entity
+    }
     Entity Scene::InstantiateScenePrefab(xresource::instance_guid prefabGUID) {
         return PrefabInstantiator::InstantiateScenePrefab(this, prefabGUID);
     }

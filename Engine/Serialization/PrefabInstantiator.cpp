@@ -20,6 +20,7 @@
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ParticleComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -413,7 +414,78 @@ namespace Engine {
             comp.TreeInstance = nullptr; // runtime-only
          }
 
+        else if (componentType == "ParticleComponent") {
+            auto& emitter = entity.AddComponent<ParticleComponent>();
 
+            // Initial Velocity
+            if (properties.HasMember("Initial Velocity") && properties["Initial Velocity"].IsArray()) {
+                const auto& velArray = properties["Initial Velocity"].GetArray();
+                if (velArray.Size() >= 3) {
+                    emitter.InitialVelocity.x = velArray[0].GetFloat();
+                    emitter.InitialVelocity.y = velArray[1].GetFloat();
+                    emitter.InitialVelocity.z = velArray[2].GetFloat();
+                }
+            }
+
+            // Color Min
+            if (properties.HasMember("Color Min") && properties["Color Min"].IsArray()) {
+                const auto& minColorArray = properties["Color Min"].GetArray();
+                if (minColorArray.Size() >= 3) {
+                    emitter.ColorMin.x = minColorArray[0].GetFloat();
+                    emitter.ColorMin.y = minColorArray[1].GetFloat();
+                    emitter.ColorMin.z = minColorArray[2].GetFloat();
+                }
+            }
+
+            // Color Max
+            if (properties.HasMember("Color Max") && properties["Color Max"].IsArray()) {
+                const auto& maxColorArray = properties["Color Max"].GetArray();
+                if (maxColorArray.Size() >= 3) {
+                    emitter.ColorMax.x = maxColorArray[0].GetFloat();
+                    emitter.ColorMax.y = maxColorArray[1].GetFloat();
+                    emitter.ColorMax.z = maxColorArray[2].GetFloat();
+                }
+            }
+
+            // Numeric properties
+            if (properties.HasMember("Max Particles"))
+                emitter.MaxParticles = properties["Max Particles"].GetUint();
+            if (properties.HasMember("Particle Type"))
+                emitter.ParticleType = properties["Particle Type"].GetUint();
+            if (properties.HasMember("Emission Rate"))
+                emitter.EmissionRate = properties["Emission Rate"].GetFloat();
+            if (properties.HasMember("Particle Lifetime"))
+                emitter.ParticleLifetime = properties["Particle Lifetime"].GetFloat();
+            if (properties.HasMember("Emission Accumulator"))
+                emitter.EmissionAccumulator = properties["Emission Accumulator"].GetFloat();
+            if (properties.HasMember("Particle Size"))
+                emitter.ParticleSize = properties["Particle Size"].GetFloat();
+
+            // Randomization parameters
+            if (properties.HasMember("Velocity Randomness"))
+                emitter.VelocityRandomness = properties["Velocity Randomness"].GetFloat();
+            if (properties.HasMember("Lifetime Randomness"))
+                emitter.LifetimeRandomness = properties["Lifetime Randomness"].GetFloat();
+            if (properties.HasMember("Spread Angle"))
+                emitter.SpreadAngle = properties["Spread Angle"].GetFloat();
+            if (properties.HasMember("Min Speed"))
+                emitter.MinSpeed = properties["Min Speed"].GetFloat();
+            if (properties.HasMember("Max Speed"))
+                emitter.MaxSpeed = properties["Max Speed"].GetFloat();
+            if (properties.HasMember("Rotation Speed"))
+                emitter.RotationSpeed = properties["Rotation Speed"].GetFloat();
+
+            // Boolean parameters
+            if (properties.HasMember("Randomize Rotation"))
+                emitter.RandomizeRotation = properties["Randomize Rotation"].GetBool();
+            if (properties.HasMember("Loop"))
+                emitter.Loop = properties["Loop"].GetBool();
+            if (properties.HasMember("Active"))
+                emitter.Active = properties["Active"].GetBool();
+
+            emitter.Particles.clear();
+            emitter.EmissionAccumulator = 0.0f;
+            }
     }
 
     // Explicit template instantiation for rapidjson::Value

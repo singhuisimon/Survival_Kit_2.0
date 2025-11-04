@@ -18,6 +18,7 @@
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ParticleComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -429,7 +430,68 @@ namespace Engine {
             componentsArray.PushBack(componentObj, allocator);
         }
 
+        if (entity.HasComponent<ParticleComponent>()) {
+            const auto& emitter = entity.GetComponent<ParticleComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ParticleComponent", allocator);
 
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+
+            // Initial Velocity
+            rapidjson::Value velArray(rapidjson::kArrayType);
+            velArray.PushBack(emitter.InitialVelocity.x, allocator);
+            velArray.PushBack(emitter.InitialVelocity.y, allocator);
+            velArray.PushBack(emitter.InitialVelocity.z, allocator);
+            propertiesObj.AddMember("Initial Velocity", velArray, allocator);
+
+            // Min Color
+            rapidjson::Value minColorArray(rapidjson::kArrayType);
+            minColorArray.PushBack(emitter.ColorMin.x, allocator);
+            minColorArray.PushBack(emitter.ColorMin.y, allocator);
+            minColorArray.PushBack(emitter.ColorMin.z, allocator);
+            propertiesObj.AddMember("Color Min", minColorArray, allocator);
+
+            // Max Color
+            rapidjson::Value maxColorArray(rapidjson::kArrayType);
+            maxColorArray.PushBack(emitter.ColorMax.x, allocator);
+            maxColorArray.PushBack(emitter.ColorMax.y, allocator);
+            maxColorArray.PushBack(emitter.ColorMax.z, allocator);
+            propertiesObj.AddMember("Color Max", maxColorArray, allocator);
+
+            // Max Particles
+            propertiesObj.AddMember("Max Particles", emitter.MaxParticles, allocator);
+
+            // Particle Type
+            propertiesObj.AddMember("Particle Type", emitter.ParticleType, allocator);
+
+            // Emission Rate
+            propertiesObj.AddMember("Emission Rate", emitter.EmissionRate, allocator);
+
+            // Particle Lifetime
+            propertiesObj.AddMember("Particle Lifetime", emitter.ParticleLifetime, allocator);
+
+            // Emission Accumulator
+            propertiesObj.AddMember("Emission Accumulator", emitter.EmissionAccumulator, allocator);
+
+            // Particle Size
+            propertiesObj.AddMember("Particle Size", emitter.ParticleSize, allocator);
+
+            // Randomization parameters
+            propertiesObj.AddMember("Velocity Randomness", emitter.VelocityRandomness, allocator);
+            propertiesObj.AddMember("Lifetime Randomness", emitter.LifetimeRandomness, allocator);
+            propertiesObj.AddMember("Spread Angle", emitter.SpreadAngle, allocator);
+            propertiesObj.AddMember("Min Speed", emitter.MinSpeed, allocator);
+            propertiesObj.AddMember("Max Speed", emitter.MaxSpeed, allocator);
+            propertiesObj.AddMember("Rotation Speed", emitter.RotationSpeed, allocator);
+
+            // Boolean parameters
+            propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
+            propertiesObj.AddMember("Loop", emitter.Loop, allocator);
+            propertiesObj.AddMember("Active", emitter.Active, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
 
         doc.AddMember("Components", componentsArray, allocator);
 

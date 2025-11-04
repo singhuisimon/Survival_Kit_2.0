@@ -20,13 +20,19 @@
 #include "Component/CameraComponent.h"
 #include "Component/MeshRendererComponent.h"
 #include "Component/RigidbodyComponent.h"
+#include "Component/ScriptComponent.h"  // ADD THIS
+
 
 // Adding systems
 #include "Graphics/RenderSystem.h"
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "Scripting/ScriptSystem.h"        // ADD THIS
+#include "Scripting/MonoScriptEngine.h"    // ADD THIS
+#include "Scripting/ScriptReloader.h" 
 #include "BehaviourTree/BehaviourTreeSystem.h"
+#include "ParticleSystem/ParticleSystem.h"
 
 // KENNY TESTING: FOR MAINCAMERA "SCRIPT"
 #include <glm/common.hpp>               // glm::clamp
@@ -237,6 +243,33 @@ void Game::OnInit() {
     }
 
 
+    // ADD THIS NEW STEP 8:
+  // ====================================
+  // Step 8: Initialize Mono Scripting Engine
+  // ====================================
+    LOG_INFO("Step 8: Initializing Mono Scripting Engine...");
+    try {
+        std::string assemblyPath = "GameScripts.dll";
+
+        if (std::filesystem::exists(assemblyPath)) {
+            Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
+            LOG_INFO("  -> Mono Scripting Engine initialized successfully");
+        }
+
+        // NEW: Initialize hot-reload system
+        Engine::ScriptReloader::GetInstance().Initialize(
+            "../../../../Scripts",                      // 
+            "../../../../Scripts/GameScripts.csproj",   // 
+            "GameScripts.dll"                                 // Output DLL path
+        );
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
+    }
+
+    LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
+
+
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
     LOG_INFO("");
@@ -258,13 +291,18 @@ void Game::OnInit() {
 }
 
 void Game::AddAllSystems() {
+
+
     m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
     m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
     m_Scene->AddSystem<Engine::PhysicsSystem>();
     m_Scene->AddSystem<Engine::TransformSystem>();
     m_Scene->AddSystem<Engine::CameraSystem>();
+    m_Scene->AddSystem<Engine::ScriptSystem>();    
+
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
     m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
+	m_Scene->AddSystem<Engine::ParticleSystem>();
 }
 
 void Game::CreateDefaultScene() {
@@ -299,11 +337,17 @@ void Game::CreateDefaultScene() {
     std::cout << inst_guid_.m_Value << "\n";
 	//mesh.MeshResource = mesh_rsc;
 
+    auto& script = player.AddComponent<Engine::ScriptComponent>();
+    script.ScriptClassName = "Game.TestScript";
+    LOG_TRACE("  -> SCRIPT IS CREATED SCRIPT IS CREATED");
+
+
     //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     //rb.Mass = 1.0f;
     //rb.UseGravity = true;
     //rb.IsKinematic = false;
     //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    xresource::instance_guid tex_inst_guid = Engine::AM.getAssetIdByFilename("rabbit_kenny.png");
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";
@@ -358,8 +402,11 @@ void Game::CreateDefaultScene() {
     groundRb.UseGravity = false;
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
-    ground.AddComponent<Engine::MeshRendererComponent>();
+    auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
+
+    
+	groundmesh.TextureGuid = tex_inst_guid;
 
     LOG_TRACE("  Creating ReverbZone entity...");
     auto reverbZone = m_Scene->CreateEntity("CaveReverb");
@@ -414,9 +461,10 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Get input reference
     auto& input = GetInput();
+    Engine::ScriptReloader::GetInstance().Update();
 
     // Update scene (this will call all systems in priority order)
-    m_Scene->OnUpdate(ts);
+    m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
 	// Update audio manager if exists
 	m_AudioManager->OnUpdate(ts);
@@ -931,6 +979,9 @@ void Game::OnShutdown() {
             LOG_ERROR("  -> Exception while shutting down Audio Manager: ", e.what());
         }
     }
+
+    Engine::MonoScriptEngine::GetInstance().Shutdown();
+    LOG_INFO("[Game] Mono shutdown");
 
     //============= Asset =============
     Engine::RM.shutDown(); 
