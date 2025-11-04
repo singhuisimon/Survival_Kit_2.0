@@ -92,6 +92,8 @@ namespace Engine
 		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
 		//bool prefabModified = false;
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE;
+
+		bool m_PreviousEditorCamToggle = false;
 	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
