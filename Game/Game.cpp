@@ -320,7 +320,8 @@ void Game::CreateDefaultScene() {
     transform.Scale    = glm::vec3(0.0005f, 0.0005f, 0.0005f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    
+    mesh.Material = 1;
+
     std::string meshName = "E004_botnet_v001.fbx";
     xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
     mesh.MeshGuid = inst_guid;
@@ -334,7 +335,6 @@ void Game::CreateDefaultScene() {
     //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
 
     std::cout << inst_guid_.m_Value << "\n";
-    //mesh.MeshResource = mesh_rsc;
 	//mesh.MeshResource = mesh_rsc;
 
     auto& script = player.AddComponent<Engine::ScriptComponent>();
@@ -681,10 +681,10 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
         else {
             // Default player movement w/o MainCamera
-            if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
-            if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
-            if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
-            if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+            //if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+            //if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+            //if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+            //if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
         }
     }
 
@@ -751,11 +751,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
     }
 
     // Move player in/out of the reverb radius with QE to feel falloff
-    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+    /*if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
         auto& tf = foundEntity.GetComponent<Engine::TransformComponent>();
         if (input.IsKeyPressed(GLFW_KEY_Q)) tf.Position.y += 0.05f;
         if (input.IsKeyPressed(GLFW_KEY_E)) tf.Position.y -= 0.05f;
-    }
+    }*/
     
     // === Test Input System ===
 
