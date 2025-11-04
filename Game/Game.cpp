@@ -886,22 +886,20 @@ void Game::OnUpdate(Engine::Timestep ts) {
         auto tree = std::make_shared<Engine::BehaviourTree>();
         tree->SetName("RotationColorChange");
 
-        auto parallel = std::make_shared<Engine::BTParallel>();
-
-        auto repeater = std::make_shared<Engine::BTRepeater>(-1);
-
-        repeater->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0f));
-
-        parallel->AddChild(repeater);
-
         auto sequence = std::make_shared<Engine::BTSequence>();
-        sequence->AddChild(std::make_shared<Engine::BTChangeColor>(1));
-        sequence->AddChild(std::make_shared<Engine::BTWait>(1.0));
-        sequence->AddChild(std::make_shared<Engine::BTChangeColor>(0));
+        
+        auto parallel = std::make_shared<Engine::BTParallel>();
+        parallel->AddChild(std::make_shared<Engine::BTChangeColor>(0));
+        parallel->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0));
 
-        parallel->AddChild(sequence);
+        auto parallel1 = std::make_shared<Engine::BTParallel>();
+        parallel1->AddChild(std::make_shared<Engine::BTChangeColor>(1));
+        parallel1->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0));
 
-        tree->SetRootNode(parallel);
+        sequence->AddChild(parallel);
+        sequence->AddChild(parallel1);
+
+        tree->SetRootNode(sequence);
 
         // 2. Serialize the tree to file
         std::string btPath = "RotationColorChange.json";
