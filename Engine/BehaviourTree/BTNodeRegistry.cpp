@@ -208,9 +208,89 @@ namespace Engine {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboardVec3, "Key", m_Key);
                 // optional: you could expose XYZ too, but usually Key+Vec3 is fine
             });
-    
+
         LOG_INFO("BTNodeRegistry: Registered Blackboard Set node types (Int, Float, Bool, Vec3)");
-    
+
+        registry.RegisterNodeType<BTRotateEntity>("Action", "Rotates entity continously",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTRotateEntity, "RotationSpeed", m_RotationSpeed);
+            });
+
+        registry.RegisterNodeType<BTMoveToTarget>("Action", "Moves towards target position in blackboard",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTMoveToTarget, "MoveSpeed", m_MoveSpeed);
+                BT_REGISTER_FLOAT_PROPERTY(BTMoveToTarget, "ArrivalDistance", m_ArrivalDistance);
+                BT_REGISTER_STRING_PROPERTY(BTMoveToTarget, "TargetPositionKey", m_TargetPositionKey);
+            });
+
+        registry.RegisterNodeType<BTSetTargetPosition>("Action", "Sets target position in blackboard",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTSetTargetPosition, "BlackboardKey", m_BlackboardKey);
+                // Note: For vec3, you might want to add custom property handling
+            });
+
+        registry.RegisterNodeType<BTDestroySelf>("Action", "Destroys the current entity");
+
+        registry.RegisterNodeType<BTDestroyEntityByTag>("Action", "Destroys entity by tag",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_VEC3_PROPERTY(BTSetTargetPosition, "TargetPosition", m_TargetPosition);
+                BT_REGISTER_STRING_PROPERTY(BTDestroyEntityByTag, "Tag", m_Tag);
+            });
+
+        registry.RegisterNodeType<BTCheckHealth>("Condition", "Checks health against threshold",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTCheckHealth, "Threshold", m_Threshold);
+                BT_REGISTER_STRING_PROPERTY(BTCheckHealth, "HealthKey", m_HealthKey);
+                BT_REGISTER_ENUM_PROPERTY(BTCheckHealth, "Comparison", m_Comparison,
+                    ComparisonToString, StringToComparison);
+            });
+
+        registry.RegisterNodeType<BTSetHealth>("Action", "Sets health value",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTSetHealth, "Health", m_Health);
+                BT_REGISTER_STRING_PROPERTY(BTSetHealth, "HealthKey", m_HealthKey);
+            });
+
+        registry.RegisterNodeType<BTModifyHealth>("Action", "Modifies health (add/subtract)",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTModifyHealth, "Amount", m_Amount);
+                BT_REGISTER_STRING_PROPERTY(BTModifyHealth, "HealthKey", m_HealthKey);
+            });
+
+        registry.RegisterNodeType<BTFaceMovementDirection>("Action", "Faces movement direction",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTFaceMovementDirection, "RotationSpeed", m_RotationSpeed);
+                BT_REGISTER_STRING_PROPERTY(BTFaceMovementDirection, "TargetPositionKey", m_TargetPositionKey);
+            });
+
+        registry.RegisterNodeType<BTFaceTarget>("Action", "Faces target entity",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTFaceTarget, "RotationSpeed", m_RotationSpeed);
+                BT_REGISTER_STRING_PROPERTY(BTFaceTarget, "TargetEntityKey", m_TargetEntityKey);
+            });
+
+        registry.RegisterNodeType<BTCheckEntityCount>("Condition", "Checks entity count by tag",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckEntityCount, "Tag", m_Tag);
+                BT_REGISTER_INT_PROPERTY(BTCheckEntityCount, "TargetCount", m_TargetCount);
+            });
+
+        registry.RegisterNodeType<BTStoreEntityCount>("Action", "Stores entity count in blackboard",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTStoreEntityCount, "Tag", m_Tag);
+                BT_REGISTER_STRING_PROPERTY(BTStoreEntityCount, "CountKey", m_CountKey);
+            });
+
+        /*registry.RegisterNodeType<BTChangeColor>("Action", "Changes object color over time",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
+            });*/
+        registry.RegisterNodeType<BTChangeColor>("Action", "Changes object color over time",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
+                BT_REGISTER_FLOAT_PROPERTY(BTChangeColor, "ChangeInterval", m_ChangeInterval);
+            });
+
     
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }

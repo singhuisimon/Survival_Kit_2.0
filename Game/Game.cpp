@@ -327,7 +327,7 @@ void Game::CreateDefaultScene() {
     mesh.MeshGuid = inst_guid;
     //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
 
-    std::cout << inst_guid.m_Value << "\n";
+    std::cout << inst_guid.m_Value << "\n"; //this is the main value - amanda
 
     std::string meshName_ = "E005_loveletter_v001.fbx";
     xresource::instance_guid inst_guid_ = Engine::AM.getAssetIdByFilename(meshName_);
@@ -867,24 +867,42 @@ void Game::OnUpdate(Engine::Timestep ts) {
         LOG_INFO("=== [F10] Create Behaviour Tree and attach to entity ===");
 
         // 1. Create a simple behaviour tree
-        auto tree = std::make_shared<Engine::BehaviourTree>();
-        tree->SetName("SimpleWaitTree");
+        //auto tree = std::make_shared<Engine::BehaviourTree>();
+        //tree->SetName("SimpleWaitTree");
 
         // Create nodes
-        auto root = std::make_shared<Engine::BTSequence>();
-        auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
-        auto logNode = std::make_shared<Engine::BTLog>("HELLO");
+        //auto root = std::make_shared<Engine::BTSequence>();
+        //auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
+        //auto logNode = std::make_shared<Engine::BTLog>("HELLO");
             //= std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
             //LOG_INFO("[AI Action] Hello from Behaviour Tree!");
             //return Engine::BTStatus::Success;
             //});
 
-        root->AddChild(waitNode);
-        root->AddChild(logNode);
-        tree->SetRootNode(root);
+        //root->AddChild(waitNode);
+        //root->AddChild(logNode);
+        //tree->SetRootNode(root);
+
+        auto tree = std::make_shared<Engine::BehaviourTree>();
+        tree->SetName("RotationColorChange");
+
+        auto sequence = std::make_shared<Engine::BTSequence>();
+        
+        auto parallel = std::make_shared<Engine::BTParallel>();
+        parallel->AddChild(std::make_shared<Engine::BTChangeColor>(0));
+        parallel->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0));
+
+        auto parallel1 = std::make_shared<Engine::BTParallel>();
+        parallel1->AddChild(std::make_shared<Engine::BTChangeColor>(1));
+        parallel1->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0));
+
+        sequence->AddChild(parallel);
+        sequence->AddChild(parallel1);
+
+        tree->SetRootNode(sequence);
 
         // 2. Serialize the tree to file
-        std::string btPath = "SimpleWaitTree.json";
+        std::string btPath = "RotationColorChange.json";
         Engine::BehaviourTreeSerializer::SerializeToFile(*tree, btPath);
 
         // 3. Create entity & attach component

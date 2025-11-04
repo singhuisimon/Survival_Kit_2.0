@@ -30,10 +30,33 @@ namespace Engine {
         auto& registry = scene->GetRegistry();
         auto view = registry.view<BehaviourTreeComponent>();
 
+        // CRITICAL: Collect entities first to avoid iterator invalidation
+        std::vector<entt::entity> entitiesToProcess;
+        entitiesToProcess.reserve(view.size());
+
         for (auto entity : view) {
-            Entity ent(entity, &registry);
+            entitiesToProcess.push_back(entity);
+        }
+
+        // Now process each entity with validation
+        for (auto entityHandle : entitiesToProcess) {
+            // CRITICAL: Validate entity still exists
+            if (!registry.valid(entityHandle)) {
+                LOG_TRACE("BehaviourTreeSystem: Entity destroyed before processing");
+                continue;
+            }
+
+            Entity ent(entityHandle, &registry);
+
+            // Check if entity still has BehaviourTreeComponent
+            if (!ent.HasComponent<BehaviourTreeComponent>()) {
+                LOG_TRACE("BehaviourTreeSystem: Entity lost BehaviourTreeComponent");
+                continue;
+            }
+
             auto& btComp = ent.GetComponent<BehaviourTreeComponent>();
 
+            // Load tree from file if needed
             if (btComp.TreeInstance == nullptr && !btComp.TreeAssetPath.empty()) {
                 btComp.TreeInstance = Engine::BehaviourTreeSerializer::DeserializeFromFile(btComp.TreeAssetPath);
                 if (btComp.TreeInstance)
@@ -42,10 +65,8 @@ namespace Engine {
                     LOG_WARNING("BehaviourTreeSystem: Failed to load tree from ", btComp.TreeAssetPath);
             }
 
-
             // Skip if not active or invalid
             if (!btComp.Active || !btComp.IsValid()) {
-                LOG_WARNING("NOT ACTIVE/VALID");
                 continue;
             }
 
@@ -54,10 +75,21 @@ namespace Engine {
             context.Entity = &ent;
             context.Scene = scene;
             context.DeltaTime = ts;
+            context.Blackboard = btComp.PersistantBlackboard;
 
             // Execute the behaviour tree
             BTStatus status = btComp.TreeInstance->Execute(context);
+
+            // CRITICAL: Validate entity still exists after execution
+            if (!registry.valid(entityHandle)) {
+                LOG_TRACE("BehaviourTreeSystem: Entity destroyed during tree execution");
+                // Don't try to access btComp - it's gone!
+                continue;
+            }
+
+            // Safe to update component - entity still exists
             btComp.LastStatus = status;
+            btComp.PersistantBlackboard = context.Blackboard;
 
             // Reset on completion if configured
             if (status != BTStatus::Running && btComp.ResetOnComplete) {

@@ -35,6 +35,26 @@ namespace Engine {
         return BTParallel::Policy::RequireOne;  // default fallback
     }
 
+    inline std::string ComparisonToString(BTCheckHealth::Comparison comparison) {
+        switch (comparison) {
+        case BTCheckHealth::Comparison::Greater: return "Greater";
+        case BTCheckHealth::Comparison::Less: return "Less";
+        case BTCheckHealth::Comparison::Equal: return "Equal";
+        case BTCheckHealth::Comparison::GreaterOrEqual: return "GreaterOrEqual";
+        case BTCheckHealth::Comparison::LessOrEqual: return "LessOrEqual";
+        default: return "Unknown";
+        }
+    }
+
+    inline BTCheckHealth::Comparison StringToComparison(const std::string& s) {
+        if (s == "Greater") return BTCheckHealth::Comparison::Greater;
+        if (s == "Less") return BTCheckHealth::Comparison::Less;
+        if (s == "Equal") return BTCheckHealth::Comparison::Equal;
+        if (s == "GreaterOrEqual") return BTCheckHealth::Comparison::GreaterOrEqual;
+        if (s == "LessOrEqual") return BTCheckHealth::Comparison::LessOrEqual;
+        return BTCheckHealth::Comparison::Greater;  // default fallback
+    }
+
 
     /**
      * @brief Factory function type for creating nodes
