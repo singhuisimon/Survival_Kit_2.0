@@ -281,6 +281,16 @@ namespace Engine {
                 BT_REGISTER_STRING_PROPERTY(BTStoreEntityCount, "CountKey", m_CountKey);
             });
 
+        /*registry.RegisterNodeType<BTChangeColor>("Action", "Changes object color over time",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
+            });*/
+        registry.RegisterNodeType<BTChangeColor>("Action", "Changes object color over time",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
+                BT_REGISTER_FLOAT_PROPERTY(BTChangeColor, "ChangeInterval", m_ChangeInterval);
+            });
+
     
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }

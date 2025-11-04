@@ -1,0 +1,65 @@
+{
+    "Name": "RotationColorChange",
+    "GUID": "9420343383079354469",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Parallel",
+        "Name": "Node",
+        "GUID": "12879107896899895399",
+        "Properties": {
+            "SuccessPolicy": "RequireAll",
+            "FailurePolicy": "RequireOne"
+        },
+        "Children": [
+            {
+                "Type": "Repeater",
+                "Name": "Node",
+                "GUID": "8843882630775930985",
+                "Properties": {
+                    "RepeatCount": "-1"
+                },
+                "Children": [
+                    {
+                        "Type": "RotateEntity",
+                        "Name": "Node",
+                        "GUID": "1349892850831425643",
+                        "Properties": {
+                            "RotationSpeed": "30.000000"
+                        }
+                    }
+                ]
+            },
+            {
+                "Type": "Sequence",
+                "Name": "Node",
+                "GUID": "15184950906113589357",
+                "Children": [
+                    {
+                        "Type": "ChangeColor",
+                        "Name": "Node",
+                        "GUID": "8843882630775930991",
+                        "Properties": {
+                            "MaterialID": "1"
+                        }
+                    },
+                    {
+                        "Type": "Wait",
+                        "Name": "Node",
+                        "GUID": "11149725639989624945",
+                        "Properties": {
+                            "Duration": "1.000000"
+                        }
+                    },
+                    {
+                        "Type": "ChangeColor",
+                        "Name": "Node",
+                        "GUID": "196971346224578675",
+                        "Properties": {
+                            "MaterialID": "0"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

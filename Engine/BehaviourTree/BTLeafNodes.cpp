@@ -13,6 +13,8 @@
 #include "Utility/Logger.h"
 #include "ECS/Scene.h"
 #include <functional>
+#include "Core/Application.h"
+#include "Graphics/Material.h"
 
 namespace Engine {
 
@@ -223,8 +225,6 @@ namespace Engine {
         if (name == "Key") m_Key = value;
         else if (name == "Value") m_Value = std::stoi(value);
     }
-    
-
 
     //BTSetBlackboardFloat
     BTSetBlackboardFloat::BTSetBlackboardFloat(const std::string& key, float value)
@@ -248,8 +248,6 @@ namespace Engine {
         if (name == "Key") m_Key = value;
         else if (name == "Value") m_Value = std::stof(value);
     }
-
-
 
     //BTSetBlackboardBool
     BTSetBlackboardBool::BTSetBlackboardBool(const std::string& key, bool value)
@@ -320,7 +318,9 @@ namespace Engine {
         transform.Rotation = rotationDelta * transform.Rotation;
         transform.IsDirty = true;
 
-        return BTStatus::Running;  // Continuous rotation
+        LOG_TRACE("ROTATING ENTITY");
+
+        return BTStatus::Success;  // Continuous rotation
     }
 
     void BTRotateEntity::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
@@ -380,7 +380,7 @@ namespace Engine {
 
         // Check if arrived
         if (distance <= m_ArrivalDistance) {
-            LOG_TRACE("BTMoveToTarget: Arrived at target");
+            LOG_TRACE("BTMoveToTarget: Arrived at target: x", targetPos.x, " y: ", targetPos.y, " z: ", targetPos.z);
             return BTStatus::Success;
         }
 
@@ -392,6 +392,10 @@ namespace Engine {
 
         // Normalize direction
         direction = glm::normalize(direction);
+
+        // The closer you get, the slower you move (ease-out behavior)
+        float slowDownFactor = glm::clamp(distance / (m_ArrivalDistance * 5.0f), 0.1f, 1.0f);
+        float speed = m_MoveSpeed * slowDownFactor;
 
         // Calculate movement with speed limit
         float frameMovement = m_MoveSpeed * context.DeltaTime;
@@ -961,5 +965,112 @@ namespace Engine {
             m_CountKey = value;
         }
     }
+
+    //BTChangeColor
+    BTChangeColor::BTChangeColor(u32 materialID)
+        : m_MaterialID(materialID)
+        , m_ElapsedTime(0.0f)
+        , m_ChangeInterval(1.0f) {
+    }
+
+    const char* BTChangeColor::GetTypeName() const {
+        return "ChangeColor";
+    }
+
+    void BTChangeColor::OnEnter(BTContext& context) {
+        (void)context;
+        m_ElapsedTime = 0.0f;
+        LOG_INFO("BTChangeColor: OnEnter - Starting continuous color change");
+    }
+
+    BTStatus BTChangeColor::Execute(BTContext& context) {
+        // Validate entity exists
+        if (!context.Entity) {
+            LOG_WARNING("BTChangeColor: No entity in context");
+            return BTStatus::Failure;
+        }
+
+        // Check if entity has MeshRendererComponent
+        if (!context.Entity->HasComponent<MeshRendererComponent>()) {
+            LOG_WARNING("BTChangeColor: Entity does not have MeshRendererComponent");
+            return BTStatus::Failure;
+        }
+        
+        m_ElapsedTime += context.DeltaTime;
+
+        // Only change color when interval has passed
+        if (m_ElapsedTime < m_ChangeInterval) {
+            return BTStatus::Running;
+        }
+
+        // Get the MeshRendererComponent
+        auto& meshRenderer = context.Entity->GetComponent<MeshRendererComponent>();
+
+        // Toggle between materials (0 = blue, 1 = orange)
+        //u32 newMaterialID = (meshRenderer.Material == 0) ? 1 : 0;
+
+        LOG_INFO("BTChangeColor: Current Material = ", meshRenderer.Material,
+            ", Changing to = ", m_MaterialID);
+
+        if (m_MaterialID < 0) {
+            m_MaterialID = 0;
+        }
+        else if(m_MaterialID > 1) {
+            m_MaterialID = 1;
+        }
+
+        // Change the material
+        meshRenderer.Material = m_MaterialID;
+
+        LOG_INFO("BTChangeColor: Material after change = ", meshRenderer.Material,
+            " (", (meshRenderer.Material == 0 ? "Blue" : "Orange"), ")");
+
+        // Reset timer
+        m_ElapsedTime = 0.0f;
+
+        // CRITICAL: Return Running to keep executing every frame
+        return BTStatus::Success;
+    }
+
+    void BTChangeColor::Reset() {
+        m_ElapsedTime = 0.0f;
+        LOG_INFO("BTChangeColor: Reset called");
+    }
+
+    void BTChangeColor::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "MaterialID", std::to_string(m_MaterialID) });
+    }
+
+    void BTChangeColor::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "MaterialID") {
+            try {
+                m_MaterialID = static_cast<u32>(std::stoul(value));
+                // Clamp to valid range
+                if (m_MaterialID > 1) {
+                    m_MaterialID = 0;
+                    LOG_WARNING("BTChangeColor: MaterialID clamped to 0 (valid range is 0-1)");
+                }
+            }
+            catch (const std::exception& e) {
+                LOG_ERROR("BTChangeColor: Failed to parse MaterialID - ", e.what());
+                m_MaterialID = 0;
+            }
+        }
+        else if (name == "ChangeInterval") {
+            try {
+                m_ChangeInterval = std::stof(value);
+                if (m_ChangeInterval <= 0.0f) {
+                    m_ChangeInterval = 1.0f;
+                    LOG_WARNING("BTChangeColor: ChangeInterval must be > 0, set to 1.0");
+                }
+            }
+            catch (const std::exception& e) {
+                LOG_ERROR("BTChangeColor: Failed to parse ChangeInterval - ", e.what());
+                m_ChangeInterval = 1.0f;
+            }
+        }
+    }
+
+
 
 } // namespace Engine

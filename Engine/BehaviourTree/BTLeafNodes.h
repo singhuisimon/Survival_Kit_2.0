@@ -9,6 +9,7 @@
 
 #include "BTNode.h"
 #include <functional>
+#include "Utility/Types.h"
 
 namespace Engine {
 
@@ -434,4 +435,34 @@ namespace Engine {
         std::string m_Tag;
         std::string m_CountKey;
     };
+
+    /**
+     * @brief Changes the color/material of an object over time
+     * @details Cycles between materials at specified intervals
+     * Supports Changing material ID (for existing materials 0=blue, 1=orange)
+     */
+    class BTChangeColor : public BTNode {
+    public:
+        /**
+         * @brief Constructor
+         * @param materialID Material ID to set (0 = blue, 1 = orange)
+         */
+        BTChangeColor(u32 materialID = 0);
+
+        const char* GetTypeName() const override;
+
+        void OnEnter(BTContext& context) override;
+        BTStatus Execute(BTContext& context) override;
+        void Reset() override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        // Allow direct property access for registration macros
+        u32 m_MaterialID;
+        float m_ChangeInterval = 1.0f;  // Time between color changes
+        float m_ElapsedTime = 0.0f;     // Accumulated time
+    };
+
 } // namespace Engine

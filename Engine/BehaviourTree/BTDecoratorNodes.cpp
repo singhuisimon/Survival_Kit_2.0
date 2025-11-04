@@ -100,67 +100,60 @@ namespace Engine {
     
     const char* BTRepeater::GetTypeName() const { return "Repeater"; }
     
-    BTStatus BTRepeater::Execute(BTContext & context) {
+    BTStatus BTRepeater::Execute(BTContext& context) {
         if (!m_Child) {
             return BTStatus::Failure;
         }
-    
-        // Infinite repeat
-        //if (m_RepeatCount < 0) {
-        //    // Execute child in a loop until it returns Running
-        //    while (true) {
-        //        BTStatus status = m_Child->Execute(context);
 
-        //        if (status == BTStatus::Running) {
-        //            return BTStatus::Running; // Child still processing
-        //        }
-
-        //        // Child completed (Success or Failure), reset and continue
-        //        m_Child->Reset();
-
-        //        // NOTE: We continue the loop immediately to execute again
-        //        // This ensures the repeater stays active in the execution stack
-        //    }
-        //    //BTStatus status = m_Child->Execute(context);
-        //    //if (status != BTStatus::Running) {
-        //    //    m_Child->Reset(); // Reset child for next iteration
-        //    //}
-        //    //return BTStatus::Running; // Always running
-        //}
-
-        // Infinite repeat with single execution per frame
+        // Infinite repeat (-1 or negative values)
         if (m_RepeatCount < 0) {
+            LOG_INFO("REPEATER: INF REPEATING");
             BTStatus status = m_Child->Execute(context);
 
-            if (status == BTStatus::Running) {
-                return BTStatus::Running; // Child still processing
+            // If child completed (Success or Failure), reset it for next iteration
+            if (status != BTStatus::Running) {
+                m_Child->Reset();
             }
 
-            // Child completed, reset for next frame
-            m_Child->Reset();
-
-            // Return Running to keep the repeater active
-            // Next frame will execute the child again
+            // Always return Running to keep the infinite loop going
             return BTStatus::Running;
         }
-    
-        // Limited repeat
-        while (m_CurrentCount < m_RepeatCount) {
+
+        // Limited repeat - Execute ONE iteration per frame (not all at once!)
+        if (m_CurrentCount < m_RepeatCount) {
+            LOG_INFO("REPEATER: EXECUTING ONE ITERATION PER FRAME, CURRENT: ", m_CurrentCount, " ,REPEATCOUNT: ", m_RepeatCount);
+            // Execute the child node
             BTStatus status = m_Child->Execute(context);
-    
+
+            // If child is still running, keep this iteration going
             if (status == BTStatus::Running) {
                 return BTStatus::Running;
             }
-    
+
+            // Child completed this iteration (Success or Failure)
+            // Reset child for next iteration
             m_Child->Reset();
+
+            // Increment the counter
             m_CurrentCount++;
+
+            // Check if we've completed all requested repeats
+            if (m_CurrentCount >= m_RepeatCount) {
+                // All done - return Success
+                // NOTE: Do NOT reset m_CurrentCount to 0 here!
+                // It will be reset when Reset() is called externally
+                return BTStatus::Success;
+            }
+
+            // More iterations needed
+            // Return Running so we continue on the next frame
+            return BTStatus::Running;
         }
-    
-        // Completed all repeats
-        m_CurrentCount = 0;
+
+        // Already completed all repeats (shouldn't normally reach here)
         return BTStatus::Success;
     }
-    
+
     void BTRepeater::Reset() {
         m_CurrentCount = 0;
         BTDecorator::Reset();
