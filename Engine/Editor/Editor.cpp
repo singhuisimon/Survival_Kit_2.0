@@ -2373,7 +2373,8 @@ namespace Engine
 					//LOG_DEBUG("This is in", fullPath);
 					// clear current scene
 					m_Scene->GetRegistry().clear();
-				
+					m_SelectedEntity = Entity(); //reset
+					m_PickedID = 0xFFFFFFFFu;
 					// load the selected scene file
 					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
 					{

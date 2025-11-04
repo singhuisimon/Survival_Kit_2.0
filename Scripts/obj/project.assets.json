@@ -8,23 +8,23 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\kuekw\\.nuget\\packages\\": {},
+    "C:\\Users\\huish\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kuekw\\source\\repos\\here\\Survival_Kit_2.0\\Scripts\\GameScripts.csproj",
+      "projectUniqueName": "C:\\Users\\huish\\Downloads\\SIT_Y3_T1\\SEP5\\SepPrj\\Survival_Kit_2.0\\Scripts\\GameScripts.csproj",
       "projectName": "GameScripts",
-      "projectPath": "C:\\Users\\kuekw\\source\\repos\\here\\Survival_Kit_2.0\\Scripts\\GameScripts.csproj",
-      "packagesPath": "C:\\Users\\kuekw\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kuekw\\source\\repos\\here\\Survival_Kit_2.0\\Scripts\\obj\\",
+      "projectPath": "C:\\Users\\huish\\Downloads\\SIT_Y3_T1\\SEP5\\SepPrj\\Survival_Kit_2.0\\Scripts\\GameScripts.csproj",
+      "packagesPath": "C:\\Users\\huish\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\huish\\Downloads\\SIT_Y3_T1\\SEP5\\SepPrj\\Survival_Kit_2.0\\Scripts\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\kuekw\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\huish\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -33,6 +33,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -50,7 +51,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net6.0": {
@@ -85,7 +87,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\kuekw\\source\\repos\\here\\Survival_Kit_2.0\\External\\dotnet\\sdk\\8.0.413\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -13,3 +13,15 @@ C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\Scripts\obj\Debug\ref\GameScri
 C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\build\bin\Debug\GameScripts.deps.json
 C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\build\bin\Debug\GameScripts.dll
 C:\Users\kuekw\source\repos\here\Survival_Kit_2.0\build\bin\Debug\GameScripts.pdb
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\build\bin\Debug\GameScripts.deps.json
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\build\bin\Debug\GameScripts.dll
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\build\bin\Debug\GameScripts.pdb
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.AssemblyInfoInputs.cache
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.AssemblyInfo.cs
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.csproj.CoreCompileInputs.cache
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.sourcelink.json
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.dll
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\refint\GameScripts.dll
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\GameScripts.pdb
+C:\Users\huish\Downloads\SIT_Y3_T1\SEP5\SepPrj\Survival_Kit_2.0\Scripts\obj\Debug\ref\GameScripts.dll
