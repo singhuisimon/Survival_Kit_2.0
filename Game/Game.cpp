@@ -328,6 +328,13 @@ void Game::CreateDefaultScene() {
 
     std::cout << inst_guid.m_Value << "\n";
 
+    std::string meshName_ = "E005_loveletter_v001.fbx";
+    xresource::instance_guid inst_guid_ = Engine::AM.getAssetIdByFilename(meshName_);
+    //mesh.MeshGuid = inst_guid_;
+    //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
+
+    std::cout << inst_guid_.m_Value << "\n";
+    //mesh.MeshResource = mesh_rsc;
 	//mesh.MeshResource = mesh_rsc;
 
     auto& script = player.AddComponent<Engine::ScriptComponent>();

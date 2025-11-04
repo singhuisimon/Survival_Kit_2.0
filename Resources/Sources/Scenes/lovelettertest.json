@@ -35,16 +35,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 7760907655043285101,
-                        "TextureGuid": 10066750664256979055,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 10
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 7760907655043285101,
+                    "TextureGuid": 10066750664256979055,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 10
+                  }
                 }
             ]
         },
@@ -81,16 +81,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 14101975930380648549,
-                        "TextureGuid": 4878603893525872743,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 9
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 14101975930380648549,
+                    "TextureGuid": 4878603893525872743,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 9
+                  }
                 }
             ]
         },
@@ -127,16 +127,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 15254897434987364445,
-                        "TextureGuid": 3149221636615471199,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 8
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 15254897434987364445,
+                    "TextureGuid": 3149221636615471199,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 8
+                  }
                 }
             ]
         },
@@ -173,16 +173,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 16984279691897356373,
-                        "TextureGuid": 11219672168863121495,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 7
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 16984279691897356373,
+                    "TextureGuid": 11219672168863121495,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 7
+                  }
                 }
             ]
         },
@@ -219,16 +219,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 10066750664256176205,
-                        "TextureGuid": 8913829159649329231,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 6
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 10066750664256176205,
+                    "TextureGuid": 8913829159649329231,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 6
+                  }
                 }
             ]
         },
@@ -265,16 +265,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 4302143141221777477,
-                        "TextureGuid": 14101975930379976775,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 5
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 4302143141221777477,
+                    "TextureGuid": 14101975930379976775,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 5
+                  }
                 }
             ]
         },
@@ -311,16 +311,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 16984279691896897597,
-                        "TextureGuid": 8913829159648968767,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 4
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 16984279691896897597,
+                    "TextureGuid": 8913829159648968767,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 4
+                  }
                 }
             ]
         },
@@ -357,16 +357,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 16984279691896635445,
-                        "TextureGuid": 7184446902738436151,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 3
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 16984279691896635445,
+                    "TextureGuid": 7184446902738436151,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 3
+                  }
                 }
             ]
         },
@@ -403,16 +403,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 12949054425772425261,
-                        "TextureGuid": 11796132921165578287,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 2
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 12949054425772425261,
+                    "TextureGuid": 11796132921165578287,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 2
+                  }
                 }
             ]
         },
@@ -449,16 +449,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 18137201196503105573,
-                        "TextureGuid": 13525515178075717671,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 1
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 18137201196503105573,
+                    "TextureGuid": 13525515178075717671,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 1
+                  }
                 }
             ]
         },
@@ -495,16 +495,16 @@
                 },
                 {
                     "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 16160578357149597723,
-                        "MaterialGuid": 3149221636613570589,
-                        "TextureGuid": 11796132921164922911,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
+                  "Properties": {
+                    "MeshGuid": 2764199051267129369,
+                    "MaterialGuid": 3149221636613570589,
+                    "TextureGuid": 11796132921164922911,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 0
+                  }
                 }
             ]
         }
