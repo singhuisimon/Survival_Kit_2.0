@@ -1,4 +1,4 @@
-#include "Game.h"
+﻿#include "Game.h"
 #include "Core/Application.h"
 #include "Core/Input.h"
 #include "Utility/Logger.h"
@@ -20,13 +20,19 @@
 #include "Component/CameraComponent.h"
 #include "Component/MeshRendererComponent.h"
 #include "Component/RigidbodyComponent.h"
+#include "Component/ScriptComponent.h"  // ADD THIS
+
 
 // Adding systems
 #include "Graphics/RenderSystem.h"
 #include "Graphics/CameraSystem.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsSystem.h"
+#include "Scripting/ScriptSystem.h"        // ADD THIS
+#include "Scripting/MonoScriptEngine.h"    // ADD THIS
+#include "Scripting/ScriptReloader.h" 
 #include "BehaviourTree/BehaviourTreeSystem.h"
+#include "ParticleSystem/ParticleSystem.h"
 
 // KENNY TESTING: FOR MAINCAMERA "SCRIPT"
 #include <glm/common.hpp>               // glm::clamp
@@ -141,6 +147,7 @@ void Game::OnInit() {
         {
             m_Editor = std::make_unique<Engine::Editor>(GetWindow());
             m_Editor->SetScene(m_Scene.get());
+            m_Editor->SetRenderer(m_Renderer.get());
             m_Editor->OnInit();
             LOG_INFO("Editor initialized successfully.");
 
@@ -236,6 +243,33 @@ void Game::OnInit() {
     }
 
 
+    // ADD THIS NEW STEP 8:
+  // ====================================
+  // Step 8: Initialize Mono Scripting Engine
+  // ====================================
+    LOG_INFO("Step 8: Initializing Mono Scripting Engine...");
+    try {
+        std::string assemblyPath = "GameScripts.dll";
+
+        if (std::filesystem::exists(assemblyPath)) {
+            Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
+            LOG_INFO("  -> Mono Scripting Engine initialized successfully");
+        }
+
+        // NEW: Initialize hot-reload system
+        Engine::ScriptReloader::GetInstance().Initialize(
+            "../../../../Scripts",                      // 
+            "../../../../Scripts/GameScripts.csproj",   // 
+            "GameScripts.dll"                                 // Output DLL path
+        );
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
+    }
+
+    LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
+
+
     LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
     LOG_INFO("Scene status: VALID at ", (void*)m_Scene.get());
     LOG_INFO("");
@@ -257,13 +291,18 @@ void Game::OnInit() {
 }
 
 void Game::AddAllSystems() {
+
+
     m_Scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
     m_Scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
     m_Scene->AddSystem<Engine::PhysicsSystem>();
     m_Scene->AddSystem<Engine::TransformSystem>();
     m_Scene->AddSystem<Engine::CameraSystem>();
+    m_Scene->AddSystem<Engine::ScriptSystem>();    
+
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
     m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
+	m_Scene->AddSystem<Engine::ParticleSystem>();
 }
 
 void Game::CreateDefaultScene() {
@@ -277,22 +316,38 @@ void Game::CreateDefaultScene() {
 
     auto& transform = player.AddComponent<Engine::TransformComponent>();
     transform.Position = glm::vec3(1, 2, 0);  // Start above ground
-    transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+    //transform.Scale    = glm::vec3(1.f, 1.f, 1.f);
+    transform.Scale    = glm::vec3(0.0005f, 0.0005f, 0.0005f);
 
     auto& mesh = player.AddComponent<Engine::MeshRendererComponent>();
-    
-    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename("E005_loveletter_v001.fbx");
+    mesh.Material = 1;
+
+    std::string meshName = "E004_botnet_v001.fbx";
+    xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
     mesh.MeshGuid = inst_guid;
+    //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
 
     std::cout << inst_guid.m_Value << "\n"; //this is the main value - amanda
 
+    std::string meshName_ = "E005_loveletter_v001.fbx";
+    xresource::instance_guid inst_guid_ = Engine::AM.getAssetIdByFilename(meshName_);
+    //mesh.MeshGuid = inst_guid_;
+    //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
+
+    std::cout << inst_guid_.m_Value << "\n";
 	//mesh.MeshResource = mesh_rsc;
+
+    auto& script = player.AddComponent<Engine::ScriptComponent>();
+    script.ScriptClassName = "Game.TestScript";
+    LOG_TRACE("  -> SCRIPT IS CREATED SCRIPT IS CREATED");
+
 
     //auto& rb = player.AddComponent<Engine::RigidbodyComponent>();
     //rb.Mass = 1.0f;
     //rb.UseGravity = true;
     //rb.IsKinematic = false;
     //rb.Velocity = glm::vec3(0, 0, 0);  // Will fall due to gravity
+    xresource::instance_guid tex_inst_guid = Engine::AM.getAssetIdByFilename("rabbit_kenny.png");
 
     auto& playerAudio = player.AddComponent<Engine::AudioComponent>();
     playerAudio.AudioFilePath = "laserSmall_001.ogg";
@@ -310,7 +365,7 @@ void Game::CreateDefaultScene() {
     LOG_TRACE("  -> Player created (will fall and demonstrate MovementSystem)");
 
     LOG_TRACE("  Creating Camera entity...");
-    auto camera = m_Scene->CreateEntity("Camera");
+    auto camera = m_Scene->CreateEntity("MainCamera");
     camera.AddComponent<Engine::TagComponent>("MainCamera");
 
     auto& camTransform = camera.AddComponent<Engine::TransformComponent>();
@@ -339,7 +394,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Scale = glm::vec3(1, 0.1f, 1);
+    groundTransform.Scale = glm::vec3(20, 0.1f, 20);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -347,8 +402,11 @@ void Game::CreateDefaultScene() {
     groundRb.UseGravity = false;
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
-    ground.AddComponent<Engine::MeshRendererComponent>();
+    auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
+
+    
+	groundmesh.TextureGuid = tex_inst_guid;
 
     LOG_TRACE("  Creating ReverbZone entity...");
     auto reverbZone = m_Scene->CreateEntity("CaveReverb");
@@ -403,9 +461,10 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Get input reference
     auto& input = GetInput();
+    Engine::ScriptReloader::GetInstance().Update();
 
     // Update scene (this will call all systems in priority order)
-    m_Scene->OnUpdate(ts);
+    m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
 	// Update audio manager if exists
 	m_AudioManager->OnUpdate(ts);
@@ -499,31 +558,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
             && GameCam.HasComponent<Engine::TransformComponent>()
             && !editorCamToggle) {
 
-            // Movement speed 
-            const float moveSpeed = 0.1f;
-
-            // Get player's facing direction (derived from rotation quaternion)
-            glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, +1.0f); // forward in local space
-            forward = glm::normalize(forward);
-
-            // Compute right vector from forward and world up
-            glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
-
-            // Movement accumulator
-            glm::vec3 moveDir(0.0f);
-
-            if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
-            if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
-            if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
-            if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
-
-            // Normalize to prevent faster diagonal movement
-            if (glm::dot(moveDir, moveDir) > 0.0f)
-                moveDir = glm::normalize(moveDir);
-
-            // Apply movement to player
-            transform.Position += moveDir * moveSpeed;
-
             // Get MainCamera transform and camera component
             auto& camTransform = GameCam.GetComponent<Engine::TransformComponent>();
             auto& camComp = GameCam.GetComponent<Engine::CameraComponent>();
@@ -584,25 +618,73 @@ void Game::OnUpdate(Engine::Timestep ts) {
             // Always update camera target to the player's head/aim point
             camComp.SetTarget(aimTarget);
 
-            // Player face same horizontal direction as the camera (camera behind player)
-            glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
+            /* Camera and Player rotations if all meshes face Z- as forward */
+            //// Player face same horizontal direction as the camera (camera behind player)
+            //glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
 
-            // Calculate yaw (rotation around Y axis)
-            const float yawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+            //// Calculate yaw (rotation around Y axis)
+            //const float yawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
 
-            // Calculate pitch (rotation around X axis)
-            // Pitch = angle between horizontal plane and forward vector
-            float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+            //// Calculate pitch (rotation around X axis)
+            //// Pitch = angle between horizontal plane and forward vector
+            //float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
 
-            transform.SetRotation(glm::vec3(pitchDeg, yawDeg, 0.0f));
+            //transform.SetRotation(glm::vec3(pitchDeg, yawDeg/* - 90.0f*/, 0.0f));
+            /* Camera and Player rotations if all meshes face Z- as forward */
+
+            /* Temporary adjustments to Camera and Player rotations */
+            glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
+            glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camFwd));
+            glm::vec3 camUp = glm::normalize(glm::cross(camFwd, camRight));
+
+            // Build rotation from camera basis to match player orientation
+            glm::mat3 camBasis(camRight, camUp, camFwd);
+
+            // Your model’s forward = X+, so rotate 90° around Y to map +Z → +X
+            glm::quat modelOffset = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0, 1, 0));
+
+            // Convert basis to quaternion and apply offset
+            glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
+
+            transform.Rotation = q;
+            transform.IsDirty = true;
+            /* Temporary adjustments to Camera and Player rotations */
+
+            /* Player controls begin here */
+            // Movement speed 
+            const float moveSpeed = 0.1f;
+
+            // Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
+            //glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
+            glm::vec3 forward = transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f); // forward in local space (For botnet)
+            forward = glm::normalize(forward);
+
+            // Compute right vector from forward and world up
+            glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+            // Movement accumulator
+            glm::vec3 moveDir(0.0f);
+
+            if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+            if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+            if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+            if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+
+            // Normalize to prevent faster diagonal movement
+            if (glm::dot(moveDir, moveDir) > 0.0f)
+                moveDir = glm::normalize(moveDir);
+
+            // Apply movement to player
+            transform.Position += moveDir * moveSpeed;
+
 
         }
         else {
             // Default player movement w/o MainCamera
-            if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
-            if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
-            if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
-            if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+            //if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+            //if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+            //if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+            //if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
         }
     }
 
@@ -669,11 +751,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
     }
 
     // Move player in/out of the reverb radius with QE to feel falloff
-    if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
+    /*if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
         auto& tf = foundEntity.GetComponent<Engine::TransformComponent>();
         if (input.IsKeyPressed(GLFW_KEY_Q)) tf.Position.y += 0.05f;
         if (input.IsKeyPressed(GLFW_KEY_E)) tf.Position.y -= 0.05f;
-    }
+    }*/
     
     // === Test Input System ===
 
@@ -917,6 +999,9 @@ void Game::OnShutdown() {
             LOG_ERROR("  -> Exception while shutting down Audio Manager: ", e.what());
         }
     }
+
+    Engine::MonoScriptEngine::GetInstance().Shutdown();
+    LOG_INFO("[Game] Mono shutdown");
 
     //============= Asset =============
     Engine::RM.shutDown(); 

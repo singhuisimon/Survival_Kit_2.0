@@ -12,6 +12,7 @@
 #include "Editor.h"
 #include "../Component/TagComponent.h"
 #include "../Component/TransformComponent.h"
+#include "../Component/ParticleComponent.h"
 #include "../Transform/TransformSystem.h"
 
 #include "../Serialization/SceneSerializer.h"
@@ -78,6 +79,7 @@ namespace Engine
 	void Editor::OnUpdate(Timestep ts, GLuint texhandle)
 	{
 		if (!m_Initialized) return;
+
 
 		//Start the ImGui frame
 		StartImguiFrame();
@@ -176,6 +178,7 @@ namespace Engine
 							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
 							//		{
 							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
 							//			prefabComp.ClearModifications(); // Reset overrides 
 							//			LOG_INFO("Prefab updated: {}", prefabPath);
 							//		}
@@ -683,8 +686,34 @@ namespace Engine
 
 					if (openMeshComponent)
 					{
-						//ImGui::Separator();
 						auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
+						
+						bool globalIlluminate = mesh.GlobalIlluminate;
+						if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
+							mesh.GlobalIlluminate = globalIlluminate;
+						}
+
+						bool shadowCast = mesh.ShadowCast;
+						if (ImGui::Checkbox("Shadow Cast", &shadowCast)) {
+							mesh.ShadowCast = shadowCast;
+						}
+
+						bool shadowReceive = mesh.ShadowReceive;
+						if (ImGui::Checkbox("Shadow Receive", &shadowReceive)) {
+							mesh.ShadowReceive = shadowReceive;
+						}
+
+						bool visible = mesh.Visible;
+						if (ImGui::Checkbox("Visible", &visible)) {
+							mesh.Visible = visible;
+						}
+
+						ImGui::SeparatorText("Values for Debugging:");
+
+						ImGui::Text("Material: %u", mesh.Material);
+						ImGui::Text("Mesh Type: %u", mesh.MeshType);
+						ImGui::Text("Submesh Index: %u", mesh.SubmeshIndex);
+						ImGui::Text("Texture: %u", mesh.Texture);
 
 					}
 					// ---------------------- Remove Mesh Component by ... -------------------------
@@ -913,8 +942,111 @@ namespace Engine
 					{
 						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
 					}
-				}
 
+					if (openReverbComponent) {
+						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
+						
+						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
+						int currentIndex = static_cast<int>(reverbZone.Preset);
+
+						ImGui::Text("Select an option:");
+
+						// Dropdown menu
+						if (ImGui::BeginCombo("Reverb Preset", presets[currentIndex]))
+						{
+							for (int i = 0; i < IM_ARRAYSIZE(presets); i++)
+							{
+								bool isSelected = (i == currentIndex);
+								if (ImGui::Selectable(presets[i], isSelected))
+								{
+									// Update the enum when user picks a new item
+									reverbZone.Preset = static_cast<ReverbPreset>(i);
+								}
+
+								if (isSelected)
+									ImGui::SetItemDefaultFocus();
+							}
+							ImGui::EndCombo();
+						}
+
+						if (reverbZone.Preset == ReverbPreset::Custom) {
+							
+							float& decayTime = reverbZone.DecayTime;
+							if (ImGui::SliderFloat("Decay Time", &decayTime, 100.f, 20000.f)) {
+								reverbZone.SetDecayTime(decayTime);
+							}
+
+							float& hfDecayRatio = reverbZone.HfDecayRatio;
+							if (ImGui::SliderFloat("High-Frequency Decay Ratio", &hfDecayRatio, 0.f, 100.f)) {
+								reverbZone.SetHfDecayRatio(hfDecayRatio);
+							}
+
+							float& diffusion = reverbZone.Diffusion;
+							if (ImGui::SliderFloat("Diffusion", &diffusion, 0.f, 100.f)) {
+								reverbZone.SetDiffusion(diffusion);
+							}
+
+							float& density = reverbZone.Density;
+							if (ImGui::SliderFloat("Density", &density, 0.f, 100.f)) {
+								reverbZone.SetDensity(density);
+							}
+
+							float& wetLevel = reverbZone.WetLevel;
+							if (ImGui::SliderFloat("Wet Level", &wetLevel, -80.f, 20.f)) {
+								reverbZone.SetWetLevel(wetLevel);
+							}
+						}
+
+						float& minDistanceReverb = reverbZone.MinDistance;
+						if (ImGui::InputFloat("MinDistance###minreverb", &minDistanceReverb)) {
+							reverbZone.SetMinDistance(minDistanceReverb);
+						}
+
+						float& maxDistanceReverb = reverbZone.MaxDistance;
+						if (ImGui::InputFloat("MaxDistance###maxreverb", &maxDistanceReverb)) {
+							reverbZone.SetMaxDistance(maxDistanceReverb);
+						}	
+					}
+				}
+				if (m_SelectedEntity.HasComponent<ListenerComponent>())
+				{
+					ImGui::Separator();
+
+					bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeListener = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###ListenBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ListenPopUp");
+					}
+					if (ImGui::BeginPopup("ListenPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeListener = true;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (removeListener)
+					{
+						m_SelectedEntity.RemoveComponent<ListenerComponent>();
+					}
+
+					if (openListenerComponent) {
+						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
+						bool& active = listener.Active;
+
+						if (ImGui::Checkbox("Active", &active)) {
+							listener.Active = active;
+						}
+					}
+				}
 				if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
 				{
 					ImGui::Separator();
@@ -927,178 +1059,184 @@ namespace Engine
 
 						// For actual BT
 						BehaviourTree& treeInstance = *(ai_bt.TreeInstance);
-						size_t stackDepth = treeInstance.GetStackDepth();
-						auto root = treeInstance.GetRootNode();
-
-						ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
-						ImGui::Text("Stack Depth: %zu", stackDepth);
-
-						// Draw a small "i" icon next to a label
-						/*ImGui::Text("Some setting");
-						ImGui::SameLine();
-
-						// Use a small colored "i" or unicode info character
-						ImGui::TextDisabled("(i)");
-
-						// Show tooltip when hovered
-						if (ImGui::IsItemHovered())
+						if (ai_bt.TreeInstance)
 						{
-							ImGui::BeginTooltip();
-							ImGui::TextWrapped("This is some helpful info about this setting.");
-							ImGui::EndTooltip();
-						}*/
+							size_t stackDepth = treeInstance.GetStackDepth();
+							auto root = treeInstance.GetRootNode();
 
-						if (root)
-						{
-							ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
-							DrawBTNodeEditor(root);
-						}
-						else
-						{
-							ImGui::TextDisabled("No root node.");
-							if (ImGui::Button("Create Root Node"))
+							ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
+							ImGui::Text("Stack Depth: %zu", stackDepth);
+
+							// Draw a small "i" icon next to a label
+							/*ImGui::Text("Some setting");
+							ImGui::SameLine();
+
+							// Use a small colored "i" or unicode info character
+							ImGui::TextDisabled("(i)");
+
+							// Show tooltip when hovered
+							if (ImGui::IsItemHovered())
 							{
-								auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
-								treeInstance.SetRootNode(rootNode);
+								ImGui::BeginTooltip();
+								ImGui::TextWrapped("This is some helpful info about this setting.");
+								ImGui::EndTooltip();
+							}*/
+
+							if (root)
+							{
+								ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
+								DrawBTNodeEditor(root);
 							}
-						}
+							else
+							{
+								ImGui::TextDisabled("No root node.");
+								if (ImGui::Button("Create Root Node"))
+								{
+									auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
+									treeInstance.SetRootNode(rootNode);
+								}
+							}
 
-						// --- Set Root Node ---
-						ImGui::Separator();
-						ImGui::Text("Root Node:");
+							// --- Set Root Node ---
+							ImGui::Separator();
+							ImGui::Text("Root Node:");
 
-						// Dropdown to pick node type for new root
-						static int rootNodeTypeIndex = 0;
-						auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
-						ImGui::SetNextItemWidth(200.0f);
-						if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
-							[](void* data, int idx, const char** outText) -> bool {
-								auto& types = *static_cast<std::vector<std::string>*>(data);
-								*outText = types[idx].c_str();
-								return true;
-							},
-							static_cast<void*>(&allTypes), (int)allTypes.size()))
-						{
-							// Optional: nothing here, selection changes root only when button clicked
-						}
+							// Dropdown to pick node type for new root
+							static int rootNodeTypeIndex = 0;
+							auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
+							ImGui::SetNextItemWidth(200.0f);
+							if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
+								[](void* data, int idx, const char** outText) -> bool {
+									auto& types = *static_cast<std::vector<std::string>*>(data);
+									*outText = types[idx].c_str();
+									return true;
+								},
+								static_cast<void*>(&allTypes), (int)allTypes.size()))
+							{
+								// Optional: nothing here, selection changes root only when button clicked
+							}
 
-						// Button to create/set the root node
-						if (ImGui::Button("Set Root Node"))
-						{
-							auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
-							treeInstance.SetRootNode(newRoot);
-						}
+							// Button to create/set the root node
+							if (ImGui::Button("Set Root Node"))
+							{
+								auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
+								treeInstance.SetRootNode(newRoot);
+							}
 
-						ImGui::Separator();
+							ImGui::Separator();
 
-						// Reset the tree to initial state
-						if (ImGui::Button("Reset")) {
-							ai_bt.Reset();
-						}
+							// Reset the tree to initial state
+							if (ImGui::Button("Reset")) {
+								ai_bt.Reset();
+							}
 
-						ImGui::BeginDisabled();
+							ImGui::BeginDisabled();
 
-						// Last execution status (for debugging)
-						BTStatus& lastStatus = ai_bt.LastStatus;
-						std::string lastStatusString{};
-						if (lastStatus == BTStatus::Success) {
-							lastStatusString = "Success";
-						}
-						else if (lastStatus == BTStatus::Failure) {
-							lastStatusString = "Failure";
+							// Last execution status (for debugging)
+							BTStatus& lastStatus = ai_bt.LastStatus;
+							std::string lastStatusString{};
+							if (lastStatus == BTStatus::Success) {
+								lastStatusString = "Success";
+							}
+							else if (lastStatus == BTStatus::Failure) {
+								lastStatusString = "Failure";
+							}
+							else {
+								lastStatusString = "Running";
+							}
+							ImGui::Text("Execution Status: %s", lastStatusString.c_str());
+
+							ImGui::EndDisabled();
+
+							// Whether tree executes every frame
+							bool& active = ai_bt.Active;
+							if (ImGui::Checkbox("Active", &active)) {
+								ai_bt.Active = active;
+							}
+
+							// Reset the tree when it completes
+							bool& resetComplete = ai_bt.ResetOnComplete;
+							if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
+								ai_bt.ResetOnComplete = resetComplete;
+							}
+
+							// Reference to current asset path
+							std::string& treeAssetPath = ai_bt.TreeAssetPath;
+
+							// Find BT folder
+
+							std::filesystem::path repoRoot = getRepository();
+							std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
+
+							auto folders = getAssetsInFolder(btPath.string());
+							std::string btFolderPath;
+							for (auto& folder : folders)
+							{
+								if (folder.name == "BT")
+								{
+									btFolderPath = folder.fullPath;
+									break;
+								}
+							}
+
+							// Collect all JSON assets in BT folder
+							std::vector<AssetEntry> btAssets;
+							if (!btFolderPath.empty())
+							{
+								auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
+								for (auto& f : files)
+								{
+									if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
+										btAssets.push_back(f);
+								}
+							}
+
+							// Determine current selection index
+							int currentIndex = 0;
+							for (size_t i = 0; i < btAssets.size(); ++i)
+							{
+								if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
+								{
+									currentIndex = (int)i;
+									break;
+								}
+							}
+
+							// Draw the combo box
+							ImGui::Text("Tree Asset Path:");
+							ImGui::SetNextItemWidth(400.0f);
+							if (ImGui::Combo("##TreeAssetPath", &currentIndex,
+								[](void* data, int idx, const char** outText) -> bool
+								{
+									auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
+									*outText = assets[idx].name.c_str(); // display name only
+
+									return true;
+								},
+								static_cast<void*>(&btAssets), (int)btAssets.size()))
+							{
+								// Update treeAssetPath when selected
+								ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
+							}
+
+							if (ImGui::Button("Load Tree"))
+							{
+								if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+								{
+									std::string chosenPath = btAssets[currentIndex].name;
+									ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+								}
+							}
+
+
+							if (ImGui::Button("Save Tree")) {
+								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
+							}
 						}
 						else {
-							lastStatusString = "Running";
-						}
-						ImGui::Text("Execution Status: %s", lastStatusString.c_str());
-
-						ImGui::EndDisabled();
-
-						// Whether tree executes every frame
-						bool& active = ai_bt.Active;
-						if (ImGui::Checkbox("Active", &active)) {
-							ai_bt.Active = active;
-						}
-
-						// Reset the tree when it completes
-						bool& resetComplete = ai_bt.ResetOnComplete;
-						if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
-							ai_bt.ResetOnComplete = resetComplete;
+							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("NewTree");
 						}
 						
-						// Reference to current asset path
-						std::string& treeAssetPath = ai_bt.TreeAssetPath;
-
-						// Find BT folder
-
-						std::filesystem::path repoRoot = getRepository();
-						std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
-
-						auto folders = getAssetsInFolder(btPath.string());
-						std::string btFolderPath;
-						for (auto& folder : folders)
-						{
-							if (folder.name == "BT")
-							{
-								btFolderPath = folder.fullPath;
-								break;
-							}
-						}
-
-						// Collect all JSON assets in BT folder
-						std::vector<AssetEntry> btAssets;
-						if (!btFolderPath.empty())
-						{
-							auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
-							for (auto& f : files)
-							{
-								if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
-									btAssets.push_back(f);
-							}
-						}
-
-						// Determine current selection index
-						int currentIndex = 0;
-						for (size_t i = 0; i < btAssets.size(); ++i)
-						{
-							if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
-							{
-								currentIndex = (int)i;
-								break;
-							}
-						}
-
-						// Draw the combo box
-						ImGui::Text("Tree Asset Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##TreeAssetPath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
-								*outText = assets[idx].name.c_str(); // display name only
-								
-								return true;
-							},
-							static_cast<void*>(&btAssets), (int)btAssets.size()))
-						{
-							// Update treeAssetPath when selected
-							ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
-						}
-
-						if (ImGui::Button("Load Tree"))
-						{
-							if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
-							{
-								std::string chosenPath = btAssets[currentIndex].name;
-								ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
-							}
-						}
-
-
-						if (ImGui::Button("Save Tree")) {
-							BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
-						}
-
 						// BehaviourTreeEditor:
 						/*CreateNewTree //IN ASSET BROWSER
 						SetNodeProperty //
@@ -1133,6 +1271,134 @@ namespace Engine
 					if (removeBT)
 					{
 						m_SelectedEntity.RemoveComponent<BehaviourTreeComponent>();
+					}
+				}
+
+				// ======================== Display Particle System Component ===============================
+				if (m_SelectedEntity.HasComponent<ParticleComponent>())
+				{
+					ImGui::Separator();
+					auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
+
+					if (ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						// Playback Controls
+						ImGui::Text("Playback");
+						ImGui::Checkbox("Active", &particleComp.Active);
+						ImGui::SameLine();
+						ImGui::Checkbox("Loop", &particleComp.Loop);
+
+						ImGui::Spacing();
+						ImGui::Separator();
+
+						// Emission Settings
+						if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000);
+							ImGui::DragFloat("Emission Rate", &particleComp.EmissionRate, 0.1f, 0.0f, 1000.0f, "%.1f particles/sec");
+							ImGui::DragFloat("Particle Lifetime", &particleComp.ParticleLifetime, 0.1f, 0.1f, 100.0f, "%.1f seconds");
+							ImGui::TreePop();
+						}
+
+						// Particle Appearance
+						if (ImGui::TreeNodeEx("Appearance", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							// Particle Type Dropdown
+							const char* particleTypes[] = { "Cube", "Plane", "Sphere" };
+							const char* currentType = particleTypes[particleComp.ParticleType];
+
+							if (ImGui::BeginCombo("Particle Type", currentType))
+							{
+								for (int i = 0; i < 3; i++)
+								{
+									bool isSelected = (particleComp.ParticleType == i);
+									if (ImGui::Selectable(particleTypes[i], isSelected))
+									{
+										particleComp.ParticleType = i;
+									}
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+
+							ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f");
+
+							ImGui::Spacing();
+							ImGui::Text("Color Range");
+							ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x);
+							ImGui::ColorEdit4("Color Max", &particleComp.ColorMax.x);
+
+							ImGui::TreePop();
+						}
+
+						// Particle Behavior
+						if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							ImGui::Text("Velocity");
+							ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f);
+							ImGui::DragFloat("Min Speed", &particleComp.MinSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
+							ImGui::DragFloat("Max Speed", &particleComp.MaxSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
+							ImGui::DragFloat("Spread Angle", &particleComp.SpreadAngle, 0.5f, 0.0f, 180.0f, "%.1f degrees");
+
+							ImGui::Spacing();
+							ImGui::Text("Rotation");
+							ImGui::Checkbox("Randomize Rotation", &particleComp.RandomizeRotation);
+							ImGui::DragFloat("Rotation Speed", &particleComp.RotationSpeed, 1.0f, -360.0f, 360.0f, "%.1f deg/sec");
+
+							ImGui::TreePop();
+						}
+
+						// Randomization
+						if (ImGui::TreeNodeEx("Randomization"))
+						{
+							ImGui::DragFloat("Velocity Randomness", &particleComp.VelocityRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+							ImGui::DragFloat("Lifetime Randomness", &particleComp.LifetimeRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+
+							// Optional: Add tooltips for clarity
+							if (ImGui::IsItemHovered())
+							{
+								ImGui::SetTooltip("0 = no variation, 1 = maximum variation");
+							}
+
+							ImGui::TreePop();
+						}
+
+						// Statistics
+						if (ImGui::TreeNode("Statistics"))
+						{
+							int aliveCount = 0;
+							for (const auto& particle : particleComp.Particles) {
+								if (particle.Alive) aliveCount++;
+							}
+
+							ImGui::Text("Alive: %d / %u", aliveCount, particleComp.MaxParticles);
+							ImGui::Text("Pool Size: %zu", particleComp.Particles.size());
+							ImGui::Text("Accumulator: %.2f", particleComp.EmissionAccumulator);
+							ImGui::ProgressBar((float)aliveCount / (float)particleComp.MaxParticles);
+							ImGui::TreePop();
+						}
+
+						ImGui::Spacing();
+						ImGui::Separator();
+
+						// Controls
+						if (ImGui::Button("Clear Particles", ImVec2(150, 0)))
+						{
+							for (auto& particle : particleComp.Particles) {
+								particle.Alive = false;
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Reset System", ImVec2(150, 0)))
+						{
+							particleComp.Particles.clear();
+							particleComp.EmissionAccumulator = 0.0f;
+						}
 					}
 				}
 
@@ -1258,6 +1524,26 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Listener Component ----------------------------
+					bool hasListenerComponent = m_SelectedEntity.HasComponent<ListenerComponent>();
+					ImGui::BeginDisabled(hasListenerComponent);
+
+					if (ImGui::MenuItem("Listener Component"))
+					{
+						if (!hasListenerComponent)
+						{
+							m_SelectedEntity.AddComponent<ListenerComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasListenerComponent)
+						{
+							ImGui::SetTooltip("Sets object as listener.");
+						}
+					}
+					ImGui::EndDisabled();
+
 					// ------------------------ Add Behavior Tree Component ----------------------------
 					bool hasBehaviorTree = m_SelectedEntity.HasComponent<BehaviourTreeComponent>();
 					ImGui::BeginDisabled(hasBehaviorTree);
@@ -1278,6 +1564,25 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
+					ImGui::BeginDisabled(hasParticleSystem);
+
+					if (ImGui::MenuItem("Particle System Component"))
+					{
+						if (!hasParticleSystem)
+						{
+							m_SelectedEntity.AddComponent<ParticleComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasParticleSystem)
+						{
+							ImGui::SetTooltip("Adds particle system to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
 					//ImGui::SetWindowFontScale(1.0f); // Reset
 
 					ImGui::EndPopup(); // end pop up for Add Component  
@@ -1292,6 +1597,54 @@ namespace Engine
 		ImGui::End();
 	}
 
+	void Editor::DrawEntityRecursive(Entity entity, entt::registry& registry)
+	{
+		auto& tag = entity.GetComponent<TagComponent>();
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		// Check for selection
+		if (m_SelectedEntity == entity)
+			flags |= ImGuiTreeNodeFlags_Selected;
+
+		// Check if entity has children
+		bool hasChildren = false;
+		auto view = registry.view<TransformComponent>();
+		for (auto childHandle : view)
+		{
+			auto& childTransform = view.get<TransformComponent>(childHandle);
+			if (childTransform.Parent == (uint32_t)entity)
+			{
+				hasChildren = true;
+				break;
+			}
+		}
+
+		if (!hasChildren)
+			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+
+		if (ImGui::IsItemClicked())
+			m_SelectedEntity = entity;
+
+		// Your existing popup code goes here (unchanged)
+		// ----------------------------------------------------
+
+		if (opened && hasChildren)
+		{
+			for (auto childHandle : view)
+			{
+				auto& childTransform = view.get<TransformComponent>(childHandle);
+				if (childTransform.Parent == (uint32_t)entity)
+				{
+					Entity child(childHandle, &registry);
+					DrawEntityRecursive(child, registry);
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+
 	void Editor::displayHierarchyPanel()
 	{
 		if (!hierachyWindow)
@@ -1301,14 +1654,32 @@ namespace Engine
 		{
 			if (!isPrefabEditor)
 			{
-				// Button to create new entity
+				
 				if (ImGui::Button("Create Entity"))
+				{
+					
+					ImGui::OpenPopup("CreateEntityPopup");
+				}
+			}
+			if (ImGui::BeginPopup("CreateEntityPopup"))
+			{
+				if (ImGui::MenuItem("Create Entity"))
 				{
 					auto entity = m_Scene->CreateEntity("New Entity");
 					entity.AddComponent<TagComponent>("New Entity");
 					entity.AddComponent<TransformComponent>();
 					ImGui::Separator();
 				}
+				auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+				ImGui::BeginDisabled(prefabFiles.empty());
+
+				if (ImGui::MenuItem("Create Entity From Prefab"))
+				{	
+					ImGui::CloseCurrentPopup();
+					createEttFromPrfab = true;
+				}
+				ImGui::EndDisabled();
+				ImGui::EndPopup(); // end pop up of the CreateEntityPopup
 			}
 			
 			// List all entities
@@ -1320,6 +1691,12 @@ namespace Engine
 				{
 					Entity entity(entityHandle, &m_Scene->GetRegistry());
 					auto& tag = entity.GetComponent<TagComponent>();
+					/*auto& transform = entity.GetComponent<TransformComponent>();
+
+					if (transform.Parent == u32_max)
+					{
+						DrawEntityRecursive(entity, m_Scene->GetRegistry());
+					}*/
 
 					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 					if (m_SelectedEntity == entity)
@@ -1332,6 +1709,14 @@ namespace Engine
 					if (ImGui::IsItemClicked())
 					{
 						m_SelectedEntity = entity;
+
+						uint32_t newID = (uint32_t)entity; // uses your operator uint32_t()
+
+						LOG_DEBUG("Clicked entity ID = ", newID, " | old m_PickedID = ", m_PickedID);
+
+						m_PickedID = newID;
+
+						LOG_DEBUG("Updated m_PickedID to ", m_PickedID);
 					}
 
 					// Right-click context menu
@@ -1376,7 +1761,7 @@ namespace Engine
 										PrefabRegistry::Get().RegisterPrefab(prefab);
 										m_CurrentPrefab = prefab.get();
 										currPrefabPath = prefabFolder;
-										isPrefabEditor = true;
+										//isPrefabEditor = true;
 										//m_CurrentPrefab = PrefabSerializer::LoadPrefabFromFile(path);
 										m_TemporaryPrefabPaths.insert(prefabFolder);
 
@@ -1455,6 +1840,52 @@ namespace Engine
 
 			ImGui::EndPopup();
 		}
+
+		// ================= Modal Popup for Create Entity from Prefab ===================================
+		if (createEttFromPrfab)
+		{
+			ImGui::OpenPopup("createEttPrefab");
+			createEttFromPrfab = false;
+		}
+
+		if (ImGui::BeginPopupModal("createEttPrefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			//LOG_DEBUG("TEST POP up replace is called ?");
+			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			for (auto& file : prefabFiles)
+			{
+				if (ImGui::Selectable(file.name.c_str()))
+				{
+					createEttFromPrfab = false;
+					auto prefab = PrefabSerializer::LoadPrefabFromFile(file.fullPath);
+					if (!prefab)
+					{
+						ImGui::CloseCurrentPopup();
+						break;
+					}
+
+					PrefabRegistry::Get().RegisterPrefab(prefab);
+					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+						m_Scene,
+						prefab->GetGUID()
+					);
+					
+					m_SelectedEntity = newEntity;
+					ImGui::CloseCurrentPopup();
+					break;
+				}
+			}
+		
+			if (ImGui::Button("Cancel"))
+			{
+				createEttFromPrfab = false;
+				ImGui::CloseCurrentPopup();
+			}
+			
+
+			ImGui::EndPopup();
+		}
 	}
 
 	void Editor::displayAssetsBrowserPanel()
@@ -1523,23 +1954,35 @@ namespace Engine
 			ImGui::EndChild();
 
 			// ================= Right column panel - display assets of selected type ========================
+
+			auto& db = AM.db();
+			auto allAssets = db.AllMutable();
+
+			std::vector<const AssetRecord*> filteredAssets;
+			filteredAssets.reserve(allAssets.size());
+
+			for (const auto* record : allAssets) {
+				if (!record || !record->valid) continue;
+				if (record->type == selectedType) {
+					filteredAssets.push_back(record);
+				}
+			}
+
+			// to get the files in the selected folder
+			auto assetsList = getAssetsInFolder(selectedFolder);
+
 			ImGui::NextColumn();
 			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
 
+
+			if (raw_asset && selectedResourcesIndex != -1) {
+				ImGui::Text("Asset Selected: %s", filteredAssets[selectedResourcesIndex]->sourcePath.c_str());
+			} else if(!raw_asset && selectedResourcesIndex != -1) {
+				ImGui::Text("Asset Selected: %s", assetsList[selectedResourcesIndex].fullPath.c_str());
+			}
+
 			// For resources handled by Asset Browser
 			if (!selectedFolder.empty() && raw_asset) {
-				auto& db = AM.db();
-				auto allAssets = db.AllMutable();
-
-				std::vector<const AssetRecord*> filteredAssets;
-				filteredAssets.reserve(allAssets.size());
-
-				for (const auto* record : allAssets) {
-					if (!record || !record->valid) continue;
-					if (record->type == selectedType) {
-						filteredAssets.push_back(record);
-					}
-				}
 
 				// Display filtered assets
 				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
@@ -1568,9 +2011,9 @@ namespace Engine
 
 						// Optional background color for selected
 						if (isSelected) {
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f));
-							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 						}
 
 						// Unique ID per button so ImGui doesn�t confuse them
@@ -1578,7 +2021,30 @@ namespace Engine
 
 						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
 							selectedResourcesIndex = static_cast<int>(i);
-							// Handle click event (e.g. open asset, show preview, etc.)
+							ImGui::OpenPopup("AssetContextMenu");
+						}
+
+						if (ImGui::BeginPopupContextItem("AssetContextMenu")) // right-click popup
+						{
+							ImGui::Text("%s", filename.c_str());
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Edit"))
+							{
+								// open asset editor or show rename dialog
+								LOG_INFO("Edit asset: ", filename);
+								displayDescriptorEditorPanel();
+							}
+
+							//TODO - Delete
+							if (ImGui::MenuItem("Delete"))
+							{
+								// confirmation dialog or delete function
+								LOG_WARNING("Deleted asset:", filename);
+								
+							}
+
+							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -1617,8 +2083,6 @@ namespace Engine
 			// For resources handled by filepath
 			if (!selectedFolder.empty() && !raw_asset)
 			{
-				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder);
 				// display the selected folder name
 				std::filesystem::path folderPath(selectedFolder);
 				std::string folderName = folderPath.filename().string();
@@ -1649,9 +2113,9 @@ namespace Engine
 					if (isSelected)
 					{
 						// Change the button background color
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 					}
 
 					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
@@ -1695,7 +2159,9 @@ namespace Engine
 
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
-
+								m_SelectedEntity = Entity{}; // resets
+								m_PickedID = 0xFFFFFFFFu;
+								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
 								isPrefabEditor = false;
 								//LOG_DEBUG("////m_Scene->GetName() in json ", currFileName);
 							}
@@ -1724,11 +2190,18 @@ namespace Engine
 								m_Scene->GetRegistry().clear();
 								PrefabRegistry::Get().RegisterPrefab(prefab);
 								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+
+								m_SelectedEntity = Entity{};
+								m_PickedID = 0xFFFFFFFFu;
+
 								if (!currScenePath.empty())
 								{
 									currScenePath.clear();
 								}
+								m_SelectedEntity = Entity(); //reset entity
+								m_PickedID = 0xFFFFFFFFu;
 								isPrefabEditor = true;
+
 
 								LOG_INFO("Now editing prefab:", currPrefabPath);
 							}
@@ -1977,54 +2450,39 @@ namespace Engine
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void Editor::renderViewport(GLuint texhandle)
 	{
-		// TODO: Get Texture from Graphics
-		// auto texture = GFXM.getImguiTex();
-
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
-		// Hard-coded values just in case (Will change values later)
-		ImVec2 viewportSize =
-		{
-			 600,
-			 600
-		};
-
+		// Your existing viewport size calculation...
+		ImVec2 viewportSize = { 600, 600 };
 		if (m_Window) {
-
 			int width = 0.f;
 			int height = 0.f;
 			glfwGetWindowSize(m_Window, &width, &height);
-
-			viewportSize =
-			{
-				 static_cast<float>(static_cast<float>(width)) / 2.0f,
-				 static_cast<float>(static_cast<float>(height)) / 2.0f
+			viewportSize = {
+				static_cast<float>(width) / 2.0f,
+				static_cast<float>(height) / 2.0f
 			};
-
 		}
 
 		ImGui::Begin("Viewport");
 
-		// Uncomment this once the viewport texture has been obtained
 		if (texhandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
+			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-			ImGui::Image((ImTextureID)(intptr_t)texhandle,
-				viewportSize,
-				ImVec2(0, 1), ImVec2(1, 0));
+			// KEEP YOUR ORIGINAL WORKING CODE FOR OBJECT PICKING
+			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
+			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
 
-			// Get editor viewport data
-			ImVec2 tl_screen = ImGui::GetItemRectMin();	// Top left of image wrt SCREEN space
-
-			// Which OS window is ImGui viewport in?
-			ImGuiViewport* vp = ImGui::GetWindowViewport(); 
+			ImGuiViewport* vp = ImGui::GetWindowViewport();
 
 			// Convert to CLIENT-WINDOW coords (origin = top-left of that GLFW window's content area)
-			ImVec2 tl_client, br_client;
+			ImVec2 tl_client;
 			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 				tl_client = { tl_screen.x - vp->Pos.x, tl_screen.y - vp->Pos.y }; // subtract OS window's top-left in screen coords
 			}
@@ -2033,21 +2491,103 @@ namespace Engine
 				tl_client = tl_screen;
 			}
 
-			// Save editor viewport data
+			// Save editor viewport data for OBJECT PICKING (client coordinates)
 			editorViewportData.tl = tl_client;
 			editorViewportData.size = viewportSize;
 
+			// Sync with renderer using the existing getEditorViewport() method
+			if (m_Renderer) {
+				m_Renderer->getEditorViewport() = editorViewportData;
+			}
 
-			// TODO: Handle mouse in viewport
-			//handleViewPortClick(imagePos, viewportSize);
+
+			bool currentCamToggle = m_Renderer->getEditorCamToggle();
+
+			if (m_PreviousEditorCamToggle != currentCamToggle)
+			{
+				// toggled camera
+				m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+				m_SelectedEntity = Entity{};
+				std::cout << "*** [GIZMO] Reset operation after camera toggle ***" << std::endl;
+				m_PreviousEditorCamToggle = currentCamToggle;
+			}
+
+			if (m_Renderer->getEditorCamToggle()) {
+				// Store screen coordinates separately for ImGuizmo - use ACTUAL size
+				m_ImGuizmoViewportData.tl = tl_screen;
+				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
+
+				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
+				{
+					LOG_INFO("[DEBUG] Right-click popup opened!");
+
+					// Unity-style: No checkmarks, just menu items
+					if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+					{
+						m_Operation = ImGuizmo::TRANSLATE;
+						std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
+					}
+
+					if (ImGui::MenuItem("Rotate", "E"))
+					{
+						m_Operation = ImGuizmo::ROTATE;
+						std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
+					}
+
+					if (ImGui::MenuItem("Scale", "R"))
+					{
+						m_Operation = ImGuizmo::SCALE;
+						std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
+					}
+
+					ImGui::Separator();
+					ImGui::EndPopup();
+				}
+
+				// Only handle keyboard shortcuts when viewport is focused
+				if (ImGui::IsWindowFocused()) {
+					if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+						m_Operation = ImGuizmo::TRANSLATE;
+						std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
+					}
+					if (ImGui::IsKeyPressed(ImGuiKey_E)) {
+						m_Operation = ImGuizmo::ROTATE;
+						std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
+					}
+					if (ImGui::IsKeyPressed(ImGuiKey_R)) {
+						m_Operation = ImGuizmo::SCALE;
+						std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
+					}
+					if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
+						m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+						std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
+					}
+				}
+
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+				{
+					if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+					{
+						LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+						m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+					}
+					else
+					{
+						m_SelectedEntity = Entity{};
+						LOG_INFO("Deselected entity.");
+					}
+				}
+
+				// ImGuizmo manipulation
+				if (m_SelectedEntity) {
+					ManipulateEntityTransform(m_SelectedEntity);
+				}
+			}
 		}
 
 		ImGui::End();
-
-
-		// Logic here 
-
 	}
+
 
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
@@ -2078,6 +2618,8 @@ namespace Engine
 					//LOG_DEBUG("This is in", fullPath);
 					// clear current scene
 					m_Scene->GetRegistry().clear();
+					m_SelectedEntity = Entity();
+					m_PickedID = 0xFFFFFFFFu;
 				
 					// load the selected scene file
 					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
@@ -2303,13 +2845,93 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
+	void Editor::ManipulateEntityTransform(Entity& entity)
+	{
+		//if (!entity) return;
+		if (!entity || !m_Scene) {
+			m_SelectedEntity = Entity{};
+			m_PickedID = 0xFFFFFFFFu;
+			return;
+		}
 
-	//std::vector<std::pair<std::string, std::string>> Editor::getFilesInFolder(const std::string& folderName)
-	//{
-	//	std::vector<std::pair<std::string, std::string>> files;
-	//	// Implementation placeholder
-	//	return files;
-	//}
 
+		Camera3D& camera = m_Renderer->getEditorCamera();
+
+		auto& tc = entity.GetComponent<TransformComponent>();
+		//glm::mat4 transform = BuildTransformMatrix(tc);
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Position);
+		transform = transform * glm::mat4_cast(tc.Rotation); // Use quaternion directly
+		transform = glm::scale(transform, tc.Scale);
+
+		// Set up ImGuizmo with SCREEN coordinates
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+
+		// Use screen coordinates for ImGuizmo
+		float x = m_ImGuizmoViewportData.tl.x;
+		float y = m_ImGuizmoViewportData.tl.y;
+		float width = m_ImGuizmoViewportData.size.x;
+		float height = m_ImGuizmoViewportData.size.y;
+
+		ImGuizmo::SetRect(x, y, width, height);
+
+		// Calculate aspect ratio from actual viewport size
+		float aspect_ratio = (height > 0) ? (width / height) : 1.0f;
+		glm::mat4 view = camera.getLookAt();
+		glm::mat4 proj = camera.getPerspective(aspect_ratio);
+
+		if (m_Operation != (ImGuizmo::OPERATION)-1) {
+
+			
+			//ImGuizmo::MODE mode = (m_Operation == ImGuizmo::ROTATE) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+
+			ImGuizmo::Manipulate(
+				glm::value_ptr(view),
+				glm::value_ptr(proj),
+				m_Operation,
+				ImGuizmo::WORLD,
+				glm::value_ptr(transform)
+			);
+
+			if (ImGuizmo::IsUsing()) {
+				if (m_Operation == ImGuizmo::TRANSLATE) {
+					// update position
+					glm::vec3 newPosition = glm::vec3(transform[3]);
+					tc.SetPosition(newPosition);
+				}
+				else if (m_Operation == ImGuizmo::ROTATE) {
+					glm::mat3 rotationMatrix;
+					rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
+					rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
+					rotationMatrix[2] = glm::normalize(glm::vec3(transform[2]));
+
+					// Convert to quaternion and set directly
+					glm::quat newRotation = glm::quat_cast(rotationMatrix);
+					tc.Rotation = newRotation;
+					tc.IsDirty = true; 
+
+				}
+				else if (m_Operation == ImGuizmo::SCALE) {
+					
+					glm::vec3 newScale;
+					newScale.x = glm::length(glm::vec3(transform[0]));
+					newScale.y = glm::length(glm::vec3(transform[1]));
+					newScale.z = glm::length(glm::vec3(transform[2]));
+
+					tc.SetScale(newScale);
+				}
+			}
+		}
+
+		// Use screen coordinates for the mode label too
+		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
+		ImGui::GetForegroundDrawList()->AddText(
+			modeLabelPos,
+			IM_COL32(255, 230, 100, 255),
+			m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
+			m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
+			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
+		);
+	}
 
 } // end of namespace Engine

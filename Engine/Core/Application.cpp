@@ -6,186 +6,229 @@
 #include <tracy/Tracy.hpp>
 #include <sstream>
 #include <iomanip>
+#include"../Scripting/MonoScriptEngine.h"
+#include "../ECS/Scene.h"  // <-- ADD THIS to get the full Scene definition
 
-namespace Engine {
 
-    static void GLFWErrorCallback(int error, const char* description) {
-        LOG_ERROR("GLFW Error (", error, "): ", description);
-    }
+namespace Engine
+{
 
-    static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-        glViewport(0, 0, width, height);
+	static void GLFWErrorCallback(int error, const char *description)
+	{
+		LOG_ERROR("GLFW Error (", error, "): ", description);
+	}
 
-        Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-        if (app) {
-            app->SetWindowSize(width, height);
-        }
-    }
+	static void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
+	{
+		glViewport(0, 0, width, height);
 
-    Application::Application(const std::string& name, int width, int height)
-        : m_Name(name)
-        , m_WindowWidth(width)
-        , m_WindowHeight(height)
-        , m_Editor_camera(ORBITING, glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.f, 0.f, 0.0f), 80.0f, 0.5f, 100.0f)
-        , m_Editor_light(glm::vec3(0.0f, 8.0f, 0.0f),
-                         glm::vec3(0.4f, 0.4f, 0.4f),
-                         glm::vec3(1.0f, 1.0f, 1.0f),
-                         glm::vec3(1.0f, 1.0f, 1.0f)) {
-        Init();
-    }
+		Application *app = static_cast<Application *>(glfwGetWindowUserPointer(window));
+		if (app)
+		{
+			app->SetWindowSize(width, height);
+		}
+	}
 
-    Application::~Application() {
-        Shutdown();
-    }
+	Application::Application(const std::string &name, int width, int height)
+		: m_Name(name)
+		, m_WindowWidth(width)
+		, m_WindowHeight(height)
+		, m_Editor_camera(ORBITING, glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.f, 0.f, 0.0f), 80.0f, 0.5f, 5000.0f)
+		, m_Editor_light(glm::vec3(0.0f, 8.0f, 0.0f),
+			glm::vec3(0.4f, 0.4f, 0.4f),
+			glm::vec3(1.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 1.0f, 1.0f))
+	{
+		Init();
+	}
 
-    void Application::Init() {
-        LOG_INFO("===========================================");
-        LOG_INFO("  ", m_Name);
-        LOG_INFO("===========================================");
+	Application::~Application()
+	{
+		Shutdown();
+	}
 
-        // Initialize GLFW
-        glfwSetErrorCallback(GLFWErrorCallback);
+	void Application::Init()
+	{
+		LOG_INFO("===========================================");
+		LOG_INFO("  ", m_Name);
+		LOG_INFO("===========================================");
 
-        if (!glfwInit()) {
-            LOG_CRITICAL("Failed to initialize GLFW!");
-            return;
-        }
+		// Initialize GLFW
+		glfwSetErrorCallback(GLFWErrorCallback);
 
-        LOG_INFO("GLFW initialized");
+		if (!glfwInit())
+		{
+			LOG_CRITICAL("Failed to initialize GLFW!");
+			return;
+		}
 
-        // Create window
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+		LOG_INFO("GLFW initialized");
 
-        m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_Name.c_str(), nullptr, nullptr);
+		// Create window
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        if (!m_Window) {
-            LOG_CRITICAL("Failed to create window!");
-            glfwTerminate();
-            return;
-        }
+		m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_Name.c_str(), nullptr, nullptr);
 
-        glfwSetWindowUserPointer(m_Window, this);
-        glfwMakeContextCurrent(m_Window);
-        glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
-        glfwSwapInterval(1); // VSync
+		if (!m_Window)
+		{
+			LOG_CRITICAL("Failed to create window!");
+			glfwTerminate();
+			return;
+		}
 
-        // Initialize Renderer
-        m_Renderer = std::make_unique<Renderer>(m_Editor_camera, m_Editor_light);
-        m_Renderer->setup();
-        LOG_INFO("Renderer setup initialized");
+		glfwSetWindowUserPointer(m_Window, this);
+		glfwMakeContextCurrent(m_Window);
+		glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
+		glfwSwapInterval(1); // VSync
 
-        glViewport(0, 0, m_WindowWidth, m_WindowHeight);
-        glEnable(GL_DEPTH_TEST);
+		// Initialize Renderer
+		m_Renderer = std::make_unique<Renderer>(m_Editor_camera, m_Editor_light);
+		m_Renderer->setup();
+		LOG_INFO("Renderer setup initialized");
 
-        // Initialize Input system
-        m_Input = std::make_unique<Input>();
-        m_Input->Init(m_Window);
-        LOG_INFO("Input system initialized");
+		glViewport(0, 0, m_WindowWidth, m_WindowHeight);
+		glEnable(GL_DEPTH_TEST);
 
-        // DO NOT call OnInit() here - it will be called in Run() instead!
+		// Initialize Input system
+		m_Input = std::make_unique<Input>();
+		m_Input->Init(m_Window);
+		LOG_INFO("Input system initialized");
 
-        LOG_INFO("Application initialized successfully");
-    }
 
-    void Application::Run() {
-        LOG_INFO("Starting application...");
+		//m_Scene = std::make_shared<Engine::Scene>("MainScene");
+		//Engine::SetScriptingCurrentScene(m_Scene.get());
 
-        // NOW call OnInit() after the derived class is fully constructed
-        LOG_INFO("Calling OnInit()...");
-        OnInit();
-        LOG_INFO("OnInit() completed");
+		Engine::SetScriptingInputSystem(&GetInput());
 
-        LOG_INFO("Press ESC to exit");
+		// Initialize Mono scripting
+#if defined(_DEBUG) || defined(DEBUG)
+		static constexpr const char *kScriptsDll = "Debug/GameScripts.dll";
+#else
+		static constexpr const char *kScriptsDll = "Release/GameScripts.dll";
+#endif
+		Engine::MonoScriptEngine::GetInstance().Initialize(kScriptsDll);
 
-        m_LastFrameTime = (float)glfwGetTime();
+		// Create your 
+		// 
+		// and systems
+	   // m_Scene = std::make_shared<Engine::Scene>();
 
-        while (m_Running && !glfwWindowShouldClose(m_Window)) {
-            ZoneScoped;
-            FrameMark;
+		// Set scene for scripting
+	   // Engine::SetScriptingCurrentScene(m_Scene.get());
 
-            // Calculate delta time
-            float time = (float)glfwGetTime();
-            Timestep timestep = time - m_LastFrameTime;
-            m_LastFrameTime = time;
+		// DO NOT call OnInit() here - it will be called in Run() instead!
 
-            // Update FPS counter and window title
-            m_FrameCount++;
-            m_FpsUpdateTimer += timestep;
+		LOG_INFO("Application initialized successfully");
+	}
 
-            if (m_FpsUpdateTimer >= 0.25f) {
-                m_CurrentFPS = m_FrameCount / m_FpsUpdateTimer;
-                UpdateWindowTitle(m_CurrentFPS);
+	void Application::Run()
+	{
+		LOG_INFO("Starting application...");
 
-                m_FrameCount = 0;
-                m_FpsUpdateTimer = 0.0f;
-            }
+		// NOW call OnInit() after the derived class is fully constructed
+		LOG_INFO("Calling OnInit()...");
+		OnInit();
+		LOG_INFO("OnInit() completed");
 
-            // Poll events first to get latest input
-            {
-                ZoneScopedN("Events");
-                //glfwPollEvents();
-            }
+		LOG_INFO("Press ESC to exit");
 
-            // Update
-            {
-                ZoneScopedN("Update");
+		m_LastFrameTime = (float)glfwGetTime();
 
-                // Update input system (after events are polled)
-                m_Input->Update();
+		while (m_Running && !glfwWindowShouldClose(m_Window))
+		{
+			ZoneScoped;
+			FrameMark;
 
-                // Then update game
-                OnUpdate(timestep);
-            }
+			// Calculate delta time
+			float time = (float)glfwGetTime();
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
 
-            // Swap buffers
-            {
-                ZoneScopedN("Render");
-                glfwSwapBuffers(m_Window);
-            }
+			// Update FPS counter and window title
+			m_FrameCount++;
+			m_FpsUpdateTimer += timestep;
 
-            // Check for ESC key
-            if (m_Input->IsKeyPressed(GLFW_KEY_ESCAPE)) {
-                LOG_INFO("ESC pressed - closing application");
-                Close();
-            }
-        }
+			if (m_FpsUpdateTimer >= 0.25f)
+			{
+				m_CurrentFPS = m_FrameCount / m_FpsUpdateTimer;
+				UpdateWindowTitle(m_CurrentFPS);
 
-        LOG_INFO("Calling OnShutdown()...");
-        OnShutdown();
-        LOG_INFO("OnShutdown() completed");
+				m_FrameCount = 0;
+				m_FpsUpdateTimer = 0.0f;
+			}
 
-        LOG_INFO("Application loop ended");
-    }
+			// Poll events first to get latest input
+			{
+				ZoneScopedN("Events");
+				//glfwPollEvents();
+			}
 
-    void Application::Close() {
-        m_Running = false;
-    }
+			// Update
+			{
+				ZoneScopedN("Update");
 
-    void Application::UpdateWindowTitle(float fps) {
-        std::stringstream ss;
-        ss << m_Name << " | FPS: " << std::fixed << std::setprecision(1) << fps;
-        glfwSetWindowTitle(m_Window, ss.str().c_str());
-    }
+				// Update input system (after events are polled)
+				m_Input->Update();
 
-    void Application::Shutdown() {
-        LOG_INFO("Shutting down application...");
+				// Then update game
+				OnUpdate(timestep);
+			}
 
-        //OnShutdown();
+			// Swap buffers
+			{
+				ZoneScopedN("Render");
+				glfwSwapBuffers(m_Window);
+			}
 
-        // Cleanup Input system
-        m_Input.reset();
+			// Check for ESC key
+			if (m_Input->IsKeyPressed(GLFW_KEY_ESCAPE))
+			{
+				LOG_INFO("ESC pressed - closing application");
+				Close();
+			}
+		}
 
-        if (m_Window) {
-            glfwDestroyWindow(m_Window);
-            m_Window = nullptr;
-        }
+		LOG_INFO("Calling OnShutdown()...");
+		OnShutdown();
+		LOG_INFO("OnShutdown() completed");
 
-        glfwTerminate();
+		LOG_INFO("Application loop ended");
+	}
 
-        LOG_INFO("Application shutdown complete");
-    }
+	void Application::Close()
+	{
+		m_Running = false;
+	}
+
+	void Application::UpdateWindowTitle(float fps)
+	{
+		std::stringstream ss;
+		ss << m_Name << " | FPS: " << std::fixed << std::setprecision(1) << fps;
+		glfwSetWindowTitle(m_Window, ss.str().c_str());
+	}
+
+	void Application::Shutdown()
+	{
+		LOG_INFO("Shutting down application...");
+
+		//OnShutdown();
+
+		// Cleanup Input system
+		m_Input.reset();
+
+		if (m_Window)
+		{
+			glfwDestroyWindow(m_Window);
+			m_Window = nullptr;
+		}
+
+		glfwTerminate();
+		Engine::MonoScriptEngine::GetInstance().Shutdown();
+
+		LOG_INFO("Application shutdown complete");
+	}
 
 } // namespace Engine
