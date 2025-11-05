@@ -686,8 +686,34 @@ namespace Engine
 
 					if (openMeshComponent)
 					{
-						//ImGui::Separator();
 						auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
+						
+						bool globalIlluminate = mesh.GlobalIlluminate;
+						if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
+							mesh.GlobalIlluminate = globalIlluminate;
+						}
+
+						bool shadowCast = mesh.ShadowCast;
+						if (ImGui::Checkbox("Shadow Cast", &shadowCast)) {
+							mesh.ShadowCast = shadowCast;
+						}
+
+						bool shadowReceive = mesh.ShadowReceive;
+						if (ImGui::Checkbox("Shadow Receive", &shadowReceive)) {
+							mesh.ShadowReceive = shadowReceive;
+						}
+
+						bool visible = mesh.Visible;
+						if (ImGui::Checkbox("Visible", &visible)) {
+							mesh.Visible = visible;
+						}
+
+						ImGui::SeparatorText("Values for Debugging:");
+
+						ImGui::Text("Material: %u", mesh.Material);
+						ImGui::Text("Mesh Type: %u", mesh.MeshType);
+						ImGui::Text("Submesh Index: %u", mesh.SubmeshIndex);
+						ImGui::Text("Texture: %u", mesh.Texture);
 
 					}
 					// ---------------------- Remove Mesh Component by ... -------------------------
@@ -916,8 +942,111 @@ namespace Engine
 					{
 						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
 					}
-				}
 
+					if (openReverbComponent) {
+						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
+						
+						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
+						int currentIndex = static_cast<int>(reverbZone.Preset);
+
+						ImGui::Text("Select an option:");
+
+						// Dropdown menu
+						if (ImGui::BeginCombo("Reverb Preset", presets[currentIndex]))
+						{
+							for (int i = 0; i < IM_ARRAYSIZE(presets); i++)
+							{
+								bool isSelected = (i == currentIndex);
+								if (ImGui::Selectable(presets[i], isSelected))
+								{
+									// Update the enum when user picks a new item
+									reverbZone.Preset = static_cast<ReverbPreset>(i);
+								}
+
+								if (isSelected)
+									ImGui::SetItemDefaultFocus();
+							}
+							ImGui::EndCombo();
+						}
+
+						if (reverbZone.Preset == ReverbPreset::Custom) {
+							
+							float& decayTime = reverbZone.DecayTime;
+							if (ImGui::SliderFloat("Decay Time", &decayTime, 100.f, 20000.f)) {
+								reverbZone.SetDecayTime(decayTime);
+							}
+
+							float& hfDecayRatio = reverbZone.HfDecayRatio;
+							if (ImGui::SliderFloat("High-Frequency Decay Ratio", &hfDecayRatio, 0.f, 100.f)) {
+								reverbZone.SetHfDecayRatio(hfDecayRatio);
+							}
+
+							float& diffusion = reverbZone.Diffusion;
+							if (ImGui::SliderFloat("Diffusion", &diffusion, 0.f, 100.f)) {
+								reverbZone.SetDiffusion(diffusion);
+							}
+
+							float& density = reverbZone.Density;
+							if (ImGui::SliderFloat("Density", &density, 0.f, 100.f)) {
+								reverbZone.SetDensity(density);
+							}
+
+							float& wetLevel = reverbZone.WetLevel;
+							if (ImGui::SliderFloat("Wet Level", &wetLevel, -80.f, 20.f)) {
+								reverbZone.SetWetLevel(wetLevel);
+							}
+						}
+
+						float& minDistanceReverb = reverbZone.MinDistance;
+						if (ImGui::InputFloat("MinDistance###minreverb", &minDistanceReverb)) {
+							reverbZone.SetMinDistance(minDistanceReverb);
+						}
+
+						float& maxDistanceReverb = reverbZone.MaxDistance;
+						if (ImGui::InputFloat("MaxDistance###maxreverb", &maxDistanceReverb)) {
+							reverbZone.SetMaxDistance(maxDistanceReverb);
+						}	
+					}
+				}
+				if (m_SelectedEntity.HasComponent<ListenerComponent>())
+				{
+					ImGui::Separator();
+
+					bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeListener = false;
+
+					// col2: ...
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###ListenBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ListenPopUp");
+					}
+					if (ImGui::BeginPopup("ListenPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeListener = true;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (removeListener)
+					{
+						m_SelectedEntity.RemoveComponent<ListenerComponent>();
+					}
+
+					if (openListenerComponent) {
+						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
+						bool& active = listener.Active;
+
+						if (ImGui::Checkbox("Active", &active)) {
+							listener.Active = active;
+						}
+					}
+				}
 				if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
 				{
 					ImGui::Separator();
@@ -930,178 +1059,184 @@ namespace Engine
 
 						// For actual BT
 						BehaviourTree& treeInstance = *(ai_bt.TreeInstance);
-						size_t stackDepth = treeInstance.GetStackDepth();
-						auto root = treeInstance.GetRootNode();
-
-						ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
-						ImGui::Text("Stack Depth: %zu", stackDepth);
-
-						// Draw a small "i" icon next to a label
-						/*ImGui::Text("Some setting");
-						ImGui::SameLine();
-
-						// Use a small colored "i" or unicode info character
-						ImGui::TextDisabled("(i)");
-
-						// Show tooltip when hovered
-						if (ImGui::IsItemHovered())
+						if (ai_bt.TreeInstance)
 						{
-							ImGui::BeginTooltip();
-							ImGui::TextWrapped("This is some helpful info about this setting.");
-							ImGui::EndTooltip();
-						}*/
+							size_t stackDepth = treeInstance.GetStackDepth();
+							auto root = treeInstance.GetRootNode();
 
-						if (root)
-						{
-							ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
-							DrawBTNodeEditor(root);
-						}
-						else
-						{
-							ImGui::TextDisabled("No root node.");
-							if (ImGui::Button("Create Root Node"))
+							ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
+							ImGui::Text("Stack Depth: %zu", stackDepth);
+
+							// Draw a small "i" icon next to a label
+							/*ImGui::Text("Some setting");
+							ImGui::SameLine();
+
+							// Use a small colored "i" or unicode info character
+							ImGui::TextDisabled("(i)");
+
+							// Show tooltip when hovered
+							if (ImGui::IsItemHovered())
 							{
-								auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
-								treeInstance.SetRootNode(rootNode);
+								ImGui::BeginTooltip();
+								ImGui::TextWrapped("This is some helpful info about this setting.");
+								ImGui::EndTooltip();
+							}*/
+
+							if (root)
+							{
+								ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
+								DrawBTNodeEditor(root);
 							}
-						}
+							else
+							{
+								ImGui::TextDisabled("No root node.");
+								if (ImGui::Button("Create Root Node"))
+								{
+									auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
+									treeInstance.SetRootNode(rootNode);
+								}
+							}
 
-						// --- Set Root Node ---
-						ImGui::Separator();
-						ImGui::Text("Root Node:");
+							// --- Set Root Node ---
+							ImGui::Separator();
+							ImGui::Text("Root Node:");
 
-						// Dropdown to pick node type for new root
-						static int rootNodeTypeIndex = 0;
-						auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
-						ImGui::SetNextItemWidth(200.0f);
-						if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
-							[](void* data, int idx, const char** outText) -> bool {
-								auto& types = *static_cast<std::vector<std::string>*>(data);
-								*outText = types[idx].c_str();
-								return true;
-							},
-							static_cast<void*>(&allTypes), (int)allTypes.size()))
-						{
-							// Optional: nothing here, selection changes root only when button clicked
-						}
+							// Dropdown to pick node type for new root
+							static int rootNodeTypeIndex = 0;
+							auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
+							ImGui::SetNextItemWidth(200.0f);
+							if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
+								[](void* data, int idx, const char** outText) -> bool {
+									auto& types = *static_cast<std::vector<std::string>*>(data);
+									*outText = types[idx].c_str();
+									return true;
+								},
+								static_cast<void*>(&allTypes), (int)allTypes.size()))
+							{
+								// Optional: nothing here, selection changes root only when button clicked
+							}
 
-						// Button to create/set the root node
-						if (ImGui::Button("Set Root Node"))
-						{
-							auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
-							treeInstance.SetRootNode(newRoot);
-						}
+							// Button to create/set the root node
+							if (ImGui::Button("Set Root Node"))
+							{
+								auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
+								treeInstance.SetRootNode(newRoot);
+							}
 
-						ImGui::Separator();
+							ImGui::Separator();
 
-						// Reset the tree to initial state
-						if (ImGui::Button("Reset")) {
-							ai_bt.Reset();
-						}
+							// Reset the tree to initial state
+							if (ImGui::Button("Reset")) {
+								ai_bt.Reset();
+							}
 
-						ImGui::BeginDisabled();
+							ImGui::BeginDisabled();
 
-						// Last execution status (for debugging)
-						BTStatus& lastStatus = ai_bt.LastStatus;
-						std::string lastStatusString{};
-						if (lastStatus == BTStatus::Success) {
-							lastStatusString = "Success";
-						}
-						else if (lastStatus == BTStatus::Failure) {
-							lastStatusString = "Failure";
+							// Last execution status (for debugging)
+							BTStatus& lastStatus = ai_bt.LastStatus;
+							std::string lastStatusString{};
+							if (lastStatus == BTStatus::Success) {
+								lastStatusString = "Success";
+							}
+							else if (lastStatus == BTStatus::Failure) {
+								lastStatusString = "Failure";
+							}
+							else {
+								lastStatusString = "Running";
+							}
+							ImGui::Text("Execution Status: %s", lastStatusString.c_str());
+
+							ImGui::EndDisabled();
+
+							// Whether tree executes every frame
+							bool& active = ai_bt.Active;
+							if (ImGui::Checkbox("Active", &active)) {
+								ai_bt.Active = active;
+							}
+
+							// Reset the tree when it completes
+							bool& resetComplete = ai_bt.ResetOnComplete;
+							if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
+								ai_bt.ResetOnComplete = resetComplete;
+							}
+
+							// Reference to current asset path
+							std::string& treeAssetPath = ai_bt.TreeAssetPath;
+
+							// Find BT folder
+
+							std::filesystem::path repoRoot = getRepository();
+							std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
+
+							auto folders = getAssetsInFolder(btPath.string());
+							std::string btFolderPath;
+							for (auto& folder : folders)
+							{
+								if (folder.name == "BT")
+								{
+									btFolderPath = folder.fullPath;
+									break;
+								}
+							}
+
+							// Collect all JSON assets in BT folder
+							std::vector<AssetEntry> btAssets;
+							if (!btFolderPath.empty())
+							{
+								auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
+								for (auto& f : files)
+								{
+									if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
+										btAssets.push_back(f);
+								}
+							}
+
+							// Determine current selection index
+							int currentIndex = 0;
+							for (size_t i = 0; i < btAssets.size(); ++i)
+							{
+								if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
+								{
+									currentIndex = (int)i;
+									break;
+								}
+							}
+
+							// Draw the combo box
+							ImGui::Text("Tree Asset Path:");
+							ImGui::SetNextItemWidth(400.0f);
+							if (ImGui::Combo("##TreeAssetPath", &currentIndex,
+								[](void* data, int idx, const char** outText) -> bool
+								{
+									auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
+									*outText = assets[idx].name.c_str(); // display name only
+
+									return true;
+								},
+								static_cast<void*>(&btAssets), (int)btAssets.size()))
+							{
+								// Update treeAssetPath when selected
+								ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
+							}
+
+							if (ImGui::Button("Load Tree"))
+							{
+								if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+								{
+									std::string chosenPath = btAssets[currentIndex].name;
+									ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+								}
+							}
+
+
+							if (ImGui::Button("Save Tree")) {
+								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
+							}
 						}
 						else {
-							lastStatusString = "Running";
-						}
-						ImGui::Text("Execution Status: %s", lastStatusString.c_str());
-
-						ImGui::EndDisabled();
-
-						// Whether tree executes every frame
-						bool& active = ai_bt.Active;
-						if (ImGui::Checkbox("Active", &active)) {
-							ai_bt.Active = active;
-						}
-
-						// Reset the tree when it completes
-						bool& resetComplete = ai_bt.ResetOnComplete;
-						if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
-							ai_bt.ResetOnComplete = resetComplete;
+							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("NewTree");
 						}
 						
-						// Reference to current asset path
-						std::string& treeAssetPath = ai_bt.TreeAssetPath;
-
-						// Find BT folder
-
-						std::filesystem::path repoRoot = getRepository();
-						std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
-
-						auto folders = getAssetsInFolder(btPath.string());
-						std::string btFolderPath;
-						for (auto& folder : folders)
-						{
-							if (folder.name == "BT")
-							{
-								btFolderPath = folder.fullPath;
-								break;
-							}
-						}
-
-						// Collect all JSON assets in BT folder
-						std::vector<AssetEntry> btAssets;
-						if (!btFolderPath.empty())
-						{
-							auto files = getAssetsInFolder(btFolderPath); // returns AssetEntry
-							for (auto& f : files)
-							{
-								if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
-									btAssets.push_back(f);
-							}
-						}
-
-						// Determine current selection index
-						int currentIndex = 0;
-						for (size_t i = 0; i < btAssets.size(); ++i)
-						{
-							if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
-							{
-								currentIndex = (int)i;
-								break;
-							}
-						}
-
-						// Draw the combo box
-						ImGui::Text("Tree Asset Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##TreeAssetPath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
-								*outText = assets[idx].name.c_str(); // display name only
-								
-								return true;
-							},
-							static_cast<void*>(&btAssets), (int)btAssets.size()))
-						{
-							// Update treeAssetPath when selected
-							ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
-						}
-
-						if (ImGui::Button("Load Tree"))
-						{
-							if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
-							{
-								std::string chosenPath = btAssets[currentIndex].name;
-								ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
-							}
-						}
-
-
-						if (ImGui::Button("Save Tree")) {
-							BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
-						}
-
 						// BehaviourTreeEditor:
 						/*CreateNewTree //IN ASSET BROWSER
 						SetNodeProperty //
@@ -1389,6 +1524,26 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Listener Component ----------------------------
+					bool hasListenerComponent = m_SelectedEntity.HasComponent<ListenerComponent>();
+					ImGui::BeginDisabled(hasListenerComponent);
+
+					if (ImGui::MenuItem("Listener Component"))
+					{
+						if (!hasListenerComponent)
+						{
+							m_SelectedEntity.AddComponent<ListenerComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasListenerComponent)
+						{
+							ImGui::SetTooltip("Sets object as listener.");
+						}
+					}
+					ImGui::EndDisabled();
+
 					// ------------------------ Add Behavior Tree Component ----------------------------
 					bool hasBehaviorTree = m_SelectedEntity.HasComponent<BehaviourTreeComponent>();
 					ImGui::BeginDisabled(hasBehaviorTree);
@@ -1442,6 +1597,54 @@ namespace Engine
 		ImGui::End();
 	}
 
+	void Editor::DrawEntityRecursive(Entity entity, entt::registry& registry)
+	{
+		auto& tag = entity.GetComponent<TagComponent>();
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		// Check for selection
+		if (m_SelectedEntity == entity)
+			flags |= ImGuiTreeNodeFlags_Selected;
+
+		// Check if entity has children
+		bool hasChildren = false;
+		auto view = registry.view<TransformComponent>();
+		for (auto childHandle : view)
+		{
+			auto& childTransform = view.get<TransformComponent>(childHandle);
+			if (childTransform.Parent == (uint32_t)entity)
+			{
+				hasChildren = true;
+				break;
+			}
+		}
+
+		if (!hasChildren)
+			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+
+		if (ImGui::IsItemClicked())
+			m_SelectedEntity = entity;
+
+		// Your existing popup code goes here (unchanged)
+		// ----------------------------------------------------
+
+		if (opened && hasChildren)
+		{
+			for (auto childHandle : view)
+			{
+				auto& childTransform = view.get<TransformComponent>(childHandle);
+				if (childTransform.Parent == (uint32_t)entity)
+				{
+					Entity child(childHandle, &registry);
+					DrawEntityRecursive(child, registry);
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+
 	void Editor::displayHierarchyPanel()
 	{
 		if (!hierachyWindow)
@@ -1488,6 +1691,12 @@ namespace Engine
 				{
 					Entity entity(entityHandle, &m_Scene->GetRegistry());
 					auto& tag = entity.GetComponent<TagComponent>();
+					/*auto& transform = entity.GetComponent<TransformComponent>();
+
+					if (transform.Parent == u32_max)
+					{
+						DrawEntityRecursive(entity, m_Scene->GetRegistry());
+					}*/
 
 					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 					if (m_SelectedEntity == entity)
@@ -1745,23 +1954,35 @@ namespace Engine
 			ImGui::EndChild();
 
 			// ================= Right column panel - display assets of selected type ========================
+
+			auto& db = AM.db();
+			auto allAssets = db.AllMutable();
+
+			std::vector<const AssetRecord*> filteredAssets;
+			filteredAssets.reserve(allAssets.size());
+
+			for (const auto* record : allAssets) {
+				if (!record || !record->valid) continue;
+				if (record->type == selectedType) {
+					filteredAssets.push_back(record);
+				}
+			}
+
+			// to get the files in the selected folder
+			auto assetsList = getAssetsInFolder(selectedFolder);
+
 			ImGui::NextColumn();
 			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
 
+
+			if (raw_asset && selectedResourcesIndex != -1) {
+				ImGui::Text("Asset Selected: %s", filteredAssets[selectedResourcesIndex]->sourcePath.c_str());
+			} else if(!raw_asset && selectedResourcesIndex != -1) {
+				ImGui::Text("Asset Selected: %s", assetsList[selectedResourcesIndex].fullPath.c_str());
+			}
+
 			// For resources handled by Asset Browser
 			if (!selectedFolder.empty() && raw_asset) {
-				auto& db = AM.db();
-				auto allAssets = db.AllMutable();
-
-				std::vector<const AssetRecord*> filteredAssets;
-				filteredAssets.reserve(allAssets.size());
-
-				for (const auto* record : allAssets) {
-					if (!record || !record->valid) continue;
-					if (record->type == selectedType) {
-						filteredAssets.push_back(record);
-					}
-				}
 
 				// Display filtered assets
 				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
@@ -1790,9 +2011,9 @@ namespace Engine
 
 						// Optional background color for selected
 						if (isSelected) {
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f));
-							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 						}
 
 						// Unique ID per button so ImGui doesn�t confuse them
@@ -1800,7 +2021,30 @@ namespace Engine
 
 						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
 							selectedResourcesIndex = static_cast<int>(i);
-							// Handle click event (e.g. open asset, show preview, etc.)
+							ImGui::OpenPopup("AssetContextMenu");
+						}
+
+						if (ImGui::BeginPopupContextItem("AssetContextMenu")) // right-click popup
+						{
+							ImGui::Text("%s", filename.c_str());
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Edit"))
+							{
+								// open asset editor or show rename dialog
+								LOG_INFO("Edit asset: ", filename);
+								displayDescriptorEditorPanel();
+							}
+
+							//TODO - Delete
+							if (ImGui::MenuItem("Delete"))
+							{
+								// confirmation dialog or delete function
+								LOG_WARNING("Deleted asset:", filename);
+								
+							}
+
+							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -1839,8 +2083,6 @@ namespace Engine
 			// For resources handled by filepath
 			if (!selectedFolder.empty() && !raw_asset)
 			{
-				// to get the files in the selected folder
-				auto assetsList = getAssetsInFolder(selectedFolder);
 				// display the selected folder name
 				std::filesystem::path folderPath(selectedFolder);
 				std::string folderName = folderPath.filename().string();
@@ -1871,9 +2113,9 @@ namespace Engine
 					if (isSelected)
 					{
 						// Change the button background color
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.5f, 0.9f, 1.0f)); // selected color
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.6f, 1.0f, 1.0f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.4f, 0.8f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 					}
 
 					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
@@ -1956,7 +2198,10 @@ namespace Engine
 								{
 									currScenePath.clear();
 								}
+								m_SelectedEntity = Entity(); //reset entity
+								m_PickedID = 0xFFFFFFFFu;
 								isPrefabEditor = true;
+
 
 								LOG_INFO("Now editing prefab:", currPrefabPath);
 							}
@@ -2373,6 +2618,8 @@ namespace Engine
 					//LOG_DEBUG("This is in", fullPath);
 					// clear current scene
 					m_Scene->GetRegistry().clear();
+					m_SelectedEntity = Entity();
+					m_PickedID = 0xFFFFFFFFu;
 				
 					// load the selected scene file
 					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
@@ -2634,6 +2881,7 @@ namespace Engine
 		glm::mat4 proj = camera.getPerspective(aspect_ratio);
 
 		if (m_Operation != (ImGuizmo::OPERATION)-1) {
+
 			
 			//ImGuizmo::MODE mode = (m_Operation == ImGuizmo::ROTATE) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 

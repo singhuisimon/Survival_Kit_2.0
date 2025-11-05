@@ -153,6 +153,75 @@ namespace Engine {
 
     // === PROPERTY MACROS ========================================================
 
+    // Register a vec2 property (serializes as "x,y")
+#define BT_REGISTER_VEC2_PROPERTY(NodeType, PropertyName, MemberVar) \
+        metadata.AddProperty(BTNodePropertyDescriptor( \
+            PropertyName, \
+            PropertyType::Vec2, \
+            [](BTNode* node) { \
+                auto* n = static_cast<NodeType*>(node); \
+                return std::to_string(n->MemberVar.x) + "," + \
+                       std::to_string(n->MemberVar.y); \
+            }, \
+            [](BTNode* node, const std::string& value) { \
+                auto* n = static_cast<NodeType*>(node); \
+                size_t pos = value.find(','); \
+                if (pos != std::string::npos) { \
+                    n->MemberVar.x = std::stof(value.substr(0, pos)); \
+                    n->MemberVar.y = std::stof(value.substr(pos + 1)); \
+                } \
+            } \
+        ))
+
+    // Register a vec3 property (serializes as "x,y,z")
+#define BT_REGISTER_VEC3_PROPERTY(NodeType, PropertyName, MemberVar) \
+        metadata.AddProperty(BTNodePropertyDescriptor( \
+            PropertyName, \
+            PropertyType::Vec3, \
+            [](BTNode* node) { \
+                auto* n = static_cast<NodeType*>(node); \
+                return std::to_string(n->MemberVar.x) + "," + \
+                       std::to_string(n->MemberVar.y) + "," + \
+                       std::to_string(n->MemberVar.z); \
+            }, \
+            [](BTNode* node, const std::string& value) { \
+                auto* n = static_cast<NodeType*>(node); \
+                size_t pos1 = value.find(','); \
+                size_t pos2 = value.find(',', pos1 + 1); \
+                if (pos1 != std::string::npos && pos2 != std::string::npos) { \
+                    n->MemberVar.x = std::stof(value.substr(0, pos1)); \
+                    n->MemberVar.y = std::stof(value.substr(pos1 + 1, pos2 - pos1 - 1)); \
+                    n->MemberVar.z = std::stof(value.substr(pos2 + 1)); \
+                } \
+            } \
+        ))
+
+    // Register a vec4 property (serializes as "x,y,z,w")
+#define BT_REGISTER_VEC4_PROPERTY(NodeType, PropertyName, MemberVar) \
+        metadata.AddProperty(BTNodePropertyDescriptor( \
+            PropertyName, \
+            PropertyType::Vec4, \
+            [](BTNode* node) { \
+                auto* n = static_cast<NodeType*>(node); \
+                return std::to_string(n->MemberVar.x) + "," + \
+                       std::to_string(n->MemberVar.y) + "," + \
+                       std::to_string(n->MemberVar.z) + "," + \
+                       std::to_string(n->MemberVar.w); \
+            }, \
+            [](BTNode* node, const std::string& value) { \
+                auto* n = static_cast<NodeType*>(node); \
+                size_t pos1 = value.find(','); \
+                size_t pos2 = value.find(',', pos1 + 1); \
+                size_t pos3 = value.find(',', pos2 + 1); \
+                if (pos1 != std::string::npos && pos2 != std::string::npos && pos3 != std::string::npos) { \
+                    n->MemberVar.x = std::stof(value.substr(0, pos1)); \
+                    n->MemberVar.y = std::stof(value.substr(pos1 + 1, pos2 - pos1 - 1)); \
+                    n->MemberVar.z = std::stof(value.substr(pos2 + 1, pos3 - pos2 - 1)); \
+                    n->MemberVar.w = std::stof(value.substr(pos3 + 1)); \
+                } \
+            } \
+        ))
+
     // Enum property (uses conversion helpers)
     #define BT_REGISTER_ENUM_PROPERTY(NodeType, PropertyName, MemberVar, EnumToStr, StrToEnum) \
         metadata.AddProperty(BTNodePropertyDescriptor{ \
