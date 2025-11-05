@@ -109,6 +109,9 @@ namespace Engine
 		Renderer* m_Renderer = nullptr;
 		EditorViewport m_ImGuizmoViewportData;
 
+		bool m_WasUsingGizmoLastFrame = false;
+		bool m_WasOverGizmoLastFrame = false;
+
 	public:
 		// Default contructor 
 		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
@@ -187,7 +190,6 @@ namespace Engine
 		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
 
 		void DrawEntityRecursive(Entity entity, entt::registry& registry);
-		static glm::mat4 BuildTransformMatrix(const TransformComponent& tc);
 
 		void ManipulateEntityTransform(Entity& entity);
 	};
