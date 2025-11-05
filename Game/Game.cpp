@@ -75,6 +75,7 @@ void Game::OnInit() {
     }
     LOG_INFO("  Descriptor Root: ", config.descriptorRoot);
     LOG_INFO("  Database File: ", config.databaseFile);
+    LOG_INFO("  Compiled Root: ", config.compiledPath);
 
     Engine::AM.setConfig(config);
 
