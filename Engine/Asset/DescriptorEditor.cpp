@@ -252,10 +252,10 @@ namespace Engine
 			return ValidateTextureSettings(outErrors);
 		case ResourceType::MESH:
 			return ValidateMeshSettings(outErrors);
-		case ResourceType::AUDIO:
+		/*case ResourceType::AUDIO:
 			return ValidateAudioSettings(outErrors);
 		case ResourceType::SHADER:
-			return ValidateShaderSettings(outErrors);
+			return ValidateShaderSettings(outErrors);*/
 		default:
 			if (outErrors) outErrors->push_back("Unknown resource type");
 			return false;

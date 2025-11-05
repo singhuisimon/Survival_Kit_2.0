@@ -100,6 +100,7 @@ namespace Engine
 
 		displayPerformanceProfilePanel(ts);
 
+		displayDescriptorEditorPanel();
 		//DrawPrefabInspector();
 
 		//Complete Imgui rendering for the frame
@@ -2024,27 +2025,26 @@ namespace Engine
 							ImGui::OpenPopup("AssetContextMenu");
 						}
 
-						if (ImGui::BeginPopupContextItem("AssetContextMenu")) // right-click popup
+						if (ImGui::BeginPopupContextItem("AssetContextMenu")) 
 						{
 							ImGui::Text("%s", filename.c_str());
-							ImGui::Separator();
+							
+							// Only Texture and Meshes for now
+							if (record->type == ResourceType::TEXTURE || record->type == ResourceType::MESH) {
+								ImGui::Separator();
 
-							if (ImGui::MenuItem("Edit"))
-							{
-								// open asset editor or show rename dialog
-								LOG_INFO("Edit asset: ", filename);
-								displayDescriptorEditorPanel();
+								if (ImGui::MenuItem("Edit"))
+								{
+									// open asset editor or show rename dialog
+									LOG_INFO("Edit asset: ", filename);
+
+									showDescriptorEditorPanel = true;
+									currentEditingGuid = record->guid;
+									editedAsset = filename;
+								}
+
+								ImGui::EndPopup();
 							}
-
-							//TODO - Delete
-							if (ImGui::MenuItem("Delete"))
-							{
-								// confirmation dialog or delete function
-								LOG_WARNING("Deleted asset:", filename);
-								
-							}
-
-							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -2249,7 +2249,41 @@ namespace Engine
 	}
 
 	void Editor::displayDescriptorEditorPanel() {
-		;
+		if (!showDescriptorEditorPanel) return;
+
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
+			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
+			// Load descriptor
+			if (editor.Load(currentEditingGuid)) {
+				// Check type and get appropriate settings
+				if (editor.GetType() == ResourceType::TEXTURE) {
+					TextureSettings* settings = editor.GetTextureSettings();
+					// Modify settings directly
+					ImGui::SliderFloat("Quality", &settings->quality, 0.0f, 1.0f);
+					ImGui::Checkbox("Mipmaps", &settings->generateMipmaps);
+					ImGui::Checkbox("sRGB", &settings->srgb);
+					// Combo box for usage type
+					if (ImGui::BeginCombo("Usage", settings->usageType.c_str())) {
+						for (auto& option : editor.GetUsageTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->usageType = option;
+								editor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+
+					}
+				}
+				// Save button
+				if (editor.IsModified() && ImGui::Button("Save Descriptor")) {
+					editor.Save();
+				}
+			}
+			else {
+				ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
+			}
+			ImGui::End();
+		}
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
