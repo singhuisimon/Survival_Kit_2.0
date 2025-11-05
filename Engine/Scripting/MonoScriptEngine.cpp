@@ -79,9 +79,9 @@ namespace Engine
 		mono_domain_set(m_AppDomain, true);
 
 		// Load assembly (only if it exists)
-		if (!assemblyPath.empty() && std::filesystem::exists(assemblyPath))
+		if (!assemblyPath.empty() &&  std::filesystem::exists("GameScripts.dll"))
 		{
-			LoadAssembly(assemblyPath);
+			LoadAssembly("GameScripts.dll");
 		}
 		else
 		{
