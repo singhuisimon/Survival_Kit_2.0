@@ -15,6 +15,7 @@
 #include <functional>
 #include "Core/Application.h"
 #include "Graphics/Material.h"
+#include "Transform/TransformSystem.h"
 
 namespace Engine {
 
@@ -381,7 +382,8 @@ namespace Engine {
         float speed = m_MoveSpeed * slowDownFactor;
 
         // Calculate movement with speed limit
-        float frameMovement = m_MoveSpeed * context.DeltaTime;
+        float frameMovement = speed * context.DeltaTime;
+        //float frameMovement = m_MoveSpeed * context.DeltaTime;
 
         // CRITICAL FIX: Clamp movement to prevent overshooting
         if (frameMovement > distance) {
@@ -458,6 +460,7 @@ namespace Engine {
         }
 
         LOG_INFO("BTDestroySelf: Destroying entity");
+        TransformSystem::UnParent(context.Scene, *context.Entity); // Unparent before destroying
         context.Scene->DestroyEntity(*context.Entity);
         return BTStatus::Success;
     }
@@ -497,6 +500,7 @@ namespace Engine {
             // Destroy entity outside of iteration
             if (entityToDestroy != entt::null) {
                 Entity entity(entityToDestroy, &registry);
+				TransformSystem::UnParent(context.Scene, entity); // Unparent before destroying
                 context.Scene->DestroyEntity(entity);
                 LOG_INFO("BTDestroyEntityByTag: Successfully destroyed entity");
                 return BTStatus::Success;
