@@ -18,8 +18,11 @@
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Asset/AssetManager.h"
+#include "../Asset/ResourceManager.h"
 #include "../Graphics/Camera.h"
+#include "../Graphics/Texture.h"
 
+#include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
 
@@ -591,14 +594,14 @@ namespace Engine
 
 						ImGui::Separator();
 
-						// gravity
-						ImGui::Text("Boolean to check if gravity affects the body");
-						bool isGravity = rigidBody.IsGravityEnabled();
-						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
-							rigidBody.SetGravityEnabled(isGravity);
-						}
+						//// gravity
+						//ImGui::Text("Boolean to check if gravity affects the body");
+						//bool isGravity = rigidBody.IsGravityEnabled();
+						//if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+						//	rigidBody.SetGravityEnabled(isGravity);
+						//}
 
-						ImGui::Separator();
+						//ImGui::Separator();
 
 						// velocity
 						glm::vec3 vel = rigidBody.GetVelocity();
@@ -2249,39 +2252,224 @@ namespace Engine
 	}
 
 	void Editor::displayDescriptorEditorPanel() {
-		if (!showDescriptorEditorPanel) return;
+		
+		if (!showDescriptorEditorPanel) {
+			descriptorEditor.Clear();
+			return;
+		}
 
 		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
 			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
-			// Load descriptor
-			if (editor.Load(currentEditingGuid)) {
-				// Check type and get appropriate settings
-				if (editor.GetType() == ResourceType::TEXTURE) {
-					TextureSettings* settings = editor.GetTextureSettings();
-					// Modify settings directly
-					ImGui::SliderFloat("Quality", &settings->quality, 0.0f, 1.0f);
-					ImGui::Checkbox("Mipmaps", &settings->generateMipmaps);
-					ImGui::Checkbox("sRGB", &settings->srgb);
-					// Combo box for usage type
-					if (ImGui::BeginCombo("Usage", settings->usageType.c_str())) {
-						for (auto& option : editor.GetUsageTypeOptions()) {
-							if (ImGui::Selectable(option.c_str())) {
-								settings->usageType = option;
-								editor.MarkModified();
-							}
-						}
-						ImGui::EndCombo();
 
-					}
-				}
-				// Save button
-				if (editor.IsModified() && ImGui::Button("Save Descriptor")) {
-					editor.Save();
+			if (!descriptorEditor.IsLoaded()) {
+				if (!descriptorEditor.Load(currentEditingGuid)) {
+					ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
 				}
 			}
 			else {
-				ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
+				ImGui::Columns(2, nullptr, true);
+
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
+					if (texture != nullptr) {
+						float tex_w = texture->width;
+						float tex_h = texture->height;
+
+						ImVec2 window_size = ImGui::GetWindowSize();
+						float win_w = window_size.x * 3 / 4;
+						float win_h = window_size.y * 3 / 4;
+
+						float aspect = tex_w / tex_h;
+
+						ImVec2 viewportSize;
+						if (win_w / win_h > aspect) {
+							viewportSize.x = win_h * aspect;
+							viewportSize.y = win_h;
+						}
+						else {
+							viewportSize.x = win_w;
+							viewportSize.y = win_w / aspect;
+						}
+
+						ImGui::Image(
+							(ImTextureID)(intptr_t)((GLuint)texture->textureID),
+							viewportSize,
+							ImVec2(0, 1), ImVec2(1, 0)
+						);
+					}
+				}
+
+				ImGui::NextColumn();
+
+				ImGui::SeparatorText("Asset Information");
+				ImGui::Text("Asset Name: %s", descriptorEditor.GetDisplayName().c_str());
+				ImGui::Text("Source: %s", descriptorEditor.GetSourcePath().c_str());
+
+				std::string assetType{};
+				switch (descriptorEditor.GetType()) {
+				case ResourceType::TEXTURE:
+					assetType = "Texture";
+					break;
+				case ResourceType::MESH:
+					assetType = "Mesh";
+					break;
+				default:
+					break;
+				}
+				ImGui::Text("Asset Type: %s", assetType.c_str());
+
+				ImGui::Spacing();
+				ImGui::SeparatorText("Editable Properties");
+
+				// Check type and get appropriate settings
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+
+					TextureSettings* settings = descriptorEditor.GetTextureSettings();
+
+					// Modify settings directly
+					auto quality = settings->quality;
+					if (ImGui::SliderFloat("Quality", &quality, 0.0f, 1.0f)) {
+						settings->quality = quality;
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Mipmaps", &settings->generateMipmaps)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("sRGB", &settings->srgb)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Usage", settings->compression.c_str())) {
+						for (auto& option : descriptorEditor.GetCompressionOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->compression = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					if (ImGui::BeginCombo("Compression", settings->usageType.c_str())) {
+						for (auto& option : descriptorEditor.GetUsageTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->usageType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+				}
+				else if (descriptorEditor.GetType() == ResourceType::MESH) {
+
+					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Position", &settings->includePos)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str())) {
+						for (auto& option : descriptorEditor.GetIndexTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->indexType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices)) {
+						descriptorEditor.MarkModified();
+					}
+					
+					char formatBuffer[256];
+					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer)))
+					{
+						settings->outputFormat = std::string(formatBuffer);
+					}
+
+					float meshScale = settings->scale;
+					if (ImGui::DragFloat("Scale", &meshScale))
+					{
+						settings->scale = meshScale;
+					}
+					
+				}
+
+				if (!descriptorEditor.GetTags().empty()) {
+					ImGui::SeparatorText("Tags");
+					for (auto& tag : descriptorEditor.GetTags()) {
+						ImGui::Text("%s", tag.c_str());
+					}
+				}
+
+				ImGui::SeparatorText("Last Imported");
+				std::time_t writeTime = descriptorEditor.GetLastImported();
+				char timeBuf[64];
+				std::tm* tm_local = std::localtime(&writeTime);
+				std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+				ImGui::Text("Last Write Time: %s", timeBuf);
+
+				static std::string notifMsg{};
+				static ImVec4 notifColour(0.0f, 0.0f, 0.0f, 0.0f);
+
+				if (ImGui::Button("Validate Descriptor")) {
+					if (descriptorEditor.Validate()) {
+						notifMsg = "Descriptor is Valid";
+						notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+					}
+					else {
+						notifMsg = "Descriptor is NOT Valid";
+						notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+					}
+				}
+
+				if (!notifMsg.empty()) {
+
+					ImGui::TextColored(notifColour, "%s", notifMsg.c_str());
+
+					static float notifTimer = 2.0f;
+					notifTimer -= ImGui::GetIO().DeltaTime;
+
+					if (notifTimer <= 0.0f) {
+						notifTimer = 2.0f;
+						notifMsg.clear();
+					}
+				}
+
+				// Save button
+				if (descriptorEditor.IsModified()) {
+					if (ImGui::Button("Save Descriptor")) {
+						if (descriptorEditor.Save()) {
+							notifMsg = "Descriptor is Saved";
+							notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+						}
+						else {
+							notifMsg = "Descriptor is NOT Saved";
+							notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+						}
+					}
+				}
 			}
+
 			ImGui::End();
 		}
 	}

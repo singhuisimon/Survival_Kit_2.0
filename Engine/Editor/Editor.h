@@ -110,7 +110,7 @@ namespace Engine
 		Renderer* m_Renderer = nullptr;
 		EditorViewport m_ImGuizmoViewportData;
 
-		DescriptorEditor editor;
+		DescriptorEditor descriptorEditor;
 		bool showDescriptorEditorPanel = false;
 		xresource::instance_guid currentEditingGuid;
 		std::string editedAsset{};
