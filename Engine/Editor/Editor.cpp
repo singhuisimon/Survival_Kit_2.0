@@ -945,9 +945,8 @@ namespace Engine
 					if (removeReverb)
 					{
 						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
-					}
-
-					if (openReverbComponent) {
+					
+					} else if (openReverbComponent) {
 						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
 						
 						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
@@ -1040,9 +1039,8 @@ namespace Engine
 					if (removeListener)
 					{
 						m_SelectedEntity.RemoveComponent<ListenerComponent>();
-					}
-
-					if (openListenerComponent) {
+					
+					} else if (openListenerComponent) {
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
@@ -2261,7 +2259,7 @@ namespace Engine
 		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
 			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
 
-			if (!descriptorEditor.IsLoaded()) {
+			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid()) {
 				if (!descriptorEditor.Load(currentEditingGuid)) {
 					ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
 				}
@@ -2333,7 +2331,7 @@ namespace Engine
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::Checkbox("Mipmaps", &settings->generateMipmaps)) {
+					if (ImGui::Checkbox("Minimaps", &settings->generateMipmaps)) {
 						descriptorEditor.MarkModified();
 					}
 
