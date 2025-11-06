@@ -206,7 +206,7 @@ namespace Engine {
         registry.RegisterNodeType<BTSetBlackboardVec3>("Action", "Sets a vec3 blackboard value",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboardVec3, "Key", m_Key);
-                // optional: you could expose XYZ too, but usually Key+Vec3 is fine
+                BT_REGISTER_VEC3_PROPERTY(BTSetBlackboardVec3, "Value", m_Value);
             });
 
         LOG_INFO("BTNodeRegistry: Registered Blackboard Set node types (Int, Float, Bool, Vec3)");
@@ -226,14 +226,13 @@ namespace Engine {
         registry.RegisterNodeType<BTSetTargetPosition>("Action", "Sets target position in blackboard",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTSetTargetPosition, "BlackboardKey", m_BlackboardKey);
-                // Note: For vec3, you might want to add custom property handling
+                BT_REGISTER_VEC3_PROPERTY(BTSetTargetPosition, "TargetPosition", m_TargetPosition);
             });
 
         registry.RegisterNodeType<BTDestroySelf>("Action", "Destroys the current entity");
 
         registry.RegisterNodeType<BTDestroyEntityByTag>("Action", "Destroys entity by tag",
             [](BTNodeMetadata& metadata) {
-                BT_REGISTER_VEC3_PROPERTY(BTSetTargetPosition, "TargetPosition", m_TargetPosition);
                 BT_REGISTER_STRING_PROPERTY(BTDestroyEntityByTag, "Tag", m_Tag);
             });
 
@@ -281,17 +280,34 @@ namespace Engine {
                 BT_REGISTER_STRING_PROPERTY(BTStoreEntityCount, "CountKey", m_CountKey);
             });
 
-        /*registry.RegisterNodeType<BTChangeColor>("Action", "Changes object color over time",
-            [](BTNodeMetadata& metadata) {
-                BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
-            });*/
         registry.RegisterNodeType<BTChangeColor>("Action", "Changes object color over time",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
                 BT_REGISTER_FLOAT_PROPERTY(BTChangeColor, "ChangeInterval", m_ChangeInterval);
             });
-
     
+        registry.RegisterNodeType<BTOrbitAroundPoint>("Action", "Moves in a circular direction around a point",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTOrbitAroundPoint, "OrbitRadius", m_OrbitRadius);
+                BT_REGISTER_FLOAT_PROPERTY(BTOrbitAroundPoint, "OrbitSpeed", m_OrbitSpeed);
+                BT_REGISTER_VEC3_PROPERTY(BTOrbitAroundPoint, "CenterPoint", m_CenterPoint);
+                BT_REGISTER_STRING_PROPERTY(BTOrbitAroundPoint, "CenterPointKey", m_CenterPointKey);
+            });
+
+        registry.RegisterNodeType<BTRotateAxis>("Action", "Rotate entity around a chosen axis",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_VEC3_PROPERTY(BTRotateAxis, "Axis", m_Axis);
+                BT_REGISTER_FLOAT_PROPERTY(BTRotateAxis, "DegreesPerSecond", m_DegPerSec);
+            }
+        );
+
+        registry.RegisterNodeType<BTLookAtSmooth>("Action", "Rotate entity to face a world position (from Blackboard)",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTLookAtSmooth, "TargetKey", m_Key);
+                BT_REGISTER_FLOAT_PROPERTY(BTLookAtSmooth, "TurnSpeedDeg", m_TurnSpeed);
+            }
+        );
+
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
     

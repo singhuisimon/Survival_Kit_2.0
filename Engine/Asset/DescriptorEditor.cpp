@@ -411,13 +411,8 @@ namespace Engine
 		}
 
 		// Extract GUID instance as hex string
-		if (doc.HasMember("guid") && doc["guid"].IsObject())
-		{
-			const auto &guidObj = doc["guid"];
-			if (guidObj.HasMember("instance") && guidObj["instance"].IsString())
-			{
-				m_guidString = guidObj["instance"].GetString();
-			}
+		if (doc.HasMember("guid") && doc["guid"].IsString()) {
+			m_guidString = doc["guid"].GetString();
 		}
 
 		// Extract tags

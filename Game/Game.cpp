@@ -75,6 +75,7 @@ void Game::OnInit() {
     }
     LOG_INFO("  Descriptor Root: ", config.descriptorRoot);
     LOG_INFO("  Database File: ", config.databaseFile);
+    LOG_INFO("  Compiled Root: ", config.compiledPath);
 
     Engine::AM.setConfig(config);
 
@@ -336,6 +337,7 @@ void Game::CreateDefaultScene() {
 
     std::cout << inst_guid_.m_Value << "\n";
 	//mesh.MeshResource = mesh_rsc;
+    LOG_INFO("Mesh GUID for ", meshName_, ": ", inst_guid_.m_Value);
 
     auto& script = player.AddComponent<Engine::ScriptComponent>();
     script.ScriptClassName = "Game.TestScript";

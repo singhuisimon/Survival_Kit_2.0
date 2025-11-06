@@ -1,0 +1,23 @@
+{
+    "Name": "LoveLetterTree",
+    "GUID": "3342287086780596645",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Node",
+        "GUID": "459983325263708585",
+        "Children": [
+            {
+                "Type": "RotateAxis",
+                "Name": "Node",
+                "GUID": "16600884389759631787",
+                "Properties": {
+                    "AxisX": "1.000000",
+                    "AxisY": "0.000000",
+                    "AxisZ": "0.000000",
+                    "DegreesPerSecond": "30.000000"
+                }
+            }
+        ]
+    }
+}
