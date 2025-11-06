@@ -76,7 +76,7 @@ namespace Engine {
          * @param ts Time elapsed since last frame
          * @details Override to implement your game logic
          */
-        virtual void OnUpdate(Timestep ts) {}
+        virtual void OnUpdate([[maybe_unused]] Timestep ts) {}
 
         /**
          * @brief Called once at shutdown
