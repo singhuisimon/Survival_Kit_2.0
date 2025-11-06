@@ -63,7 +63,7 @@ namespace Engine {
         std::string fullpath;
 
         if (prefab) {
-            fullpath = "Sources/Prefab/" + filepath;
+            fullpath = "Sources/Prefabs/" + filepath;
         }
         else {
             fullpath = "Sources/BT/" + filepath;
@@ -82,6 +82,8 @@ namespace Engine {
         // 2. Save to OUTPUT folder (executable's Resources/Sources/BT)
         std::string outputPath = getAssetFilePath(fullpath);
         outputSuccess = WriteToFile(json, outputPath, "OUTPUT");
+
+		LOG_INFO("BEHAVIOURTREESERIALIZER: OUTPUTPAHT IS : ", outputPath);
     
         // Log results
         if (sourceSuccess && outputSuccess) {
@@ -187,8 +189,9 @@ namespace Engine {
     
         //obtain this path:C:\Users\Admin\source\repos\Survival_Kit_2.0 <example>
         //^this path is where engine, external, game, out, resources is
-        std::filesystem::path root = exeDir.parent_path().parent_path().parent_path().parent_path();
-    
+        //std::filesystem::path root = exeDir.parent_path().parent_path().parent_path().parent_path();
+        std::filesystem::path root = getRepository();
+
         //obtain the root + resource
         std::filesystem::path fullpath = root / "Resources" / formattedPath;
         std::filesystem::path directory = fullpath.parent_path();

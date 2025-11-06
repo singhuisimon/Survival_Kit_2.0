@@ -42,9 +42,15 @@ namespace Engine {
      * @brief Save a tree to file
      */
     bool BehaviourTreeEditor::SaveTree(const BehaviourTree& tree, const std::string& filepath) {
-        bool success = BehaviourTreeSerializer::SerializeToFile(tree, filepath);
+
+		std::string path = filepath;
+        if (path.empty()) {
+            path = "new_tree.json";
+        }
+
+        bool success = BehaviourTreeSerializer::SerializeToFile(tree, path);
         if (success) {
-            LOG_INFO("BehaviourTreeEditor: Saved tree '", tree.GetName(), "' to ", filepath);
+            LOG_INFO("BehaviourTreeEditor: Saved tree '", tree.GetName(), "' to ", path);
         }
         return success;
     }
