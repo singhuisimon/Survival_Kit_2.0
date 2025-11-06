@@ -111,8 +111,8 @@ namespace Engine {
 				sourcesPath + "/Sources/Shaders",
 				sourcesPath + "/Sources/Meshes",
 				sourcesPath + "/Sources/Textures",
-				sourcesPath + "/Sources/Audio"
-
+				sourcesPath + "/Sources/Audio",
+				sourcesPath + "/Sources/Material"
 			};
 
 			//================= OUTPUT PATHS ===============
