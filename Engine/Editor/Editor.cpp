@@ -18,8 +18,11 @@
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Asset/AssetManager.h"
+#include "../Asset/ResourceManager.h"
 #include "../Graphics/Camera.h"
+#include "../Graphics/Texture.h"
 
+#include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
 
@@ -100,6 +103,7 @@ namespace Engine
 
 		displayPerformanceProfilePanel(ts);
 
+		displayDescriptorEditorPanel();
 		//DrawPrefabInspector();
 
 		//Complete Imgui rendering for the frame
@@ -590,14 +594,14 @@ namespace Engine
 
 						ImGui::Separator();
 
-						// gravity
-						ImGui::Text("Boolean to check if gravity affects the body");
-						bool isGravity = rigidBody.IsGravityEnabled();
-						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
-							rigidBody.SetGravityEnabled(isGravity);
-						}
+						//// gravity
+						//ImGui::Text("Boolean to check if gravity affects the body");
+						//bool isGravity = rigidBody.IsGravityEnabled();
+						//if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+						//	rigidBody.SetGravityEnabled(isGravity);
+						//}
 
-						ImGui::Separator();
+						//ImGui::Separator();
 
 						// velocity
 						glm::vec3 vel = rigidBody.GetVelocity();
@@ -941,9 +945,8 @@ namespace Engine
 					if (removeReverb)
 					{
 						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
-					}
-
-					if (openReverbComponent) {
+					
+					} else if (openReverbComponent) {
 						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
 						
 						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
@@ -1036,9 +1039,8 @@ namespace Engine
 					if (removeListener)
 					{
 						m_SelectedEntity.RemoveComponent<ListenerComponent>();
-					}
-
-					if (openListenerComponent) {
+					
+					} else if (openListenerComponent) {
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
@@ -1311,7 +1313,7 @@ namespace Engine
 							{
 								for (int i = 0; i < 3; i++)
 								{
-									bool isSelected = (particleComp.ParticleType == i);
+									bool isSelected = (particleComp.ParticleType == static_cast<unsigned int>(i));
 									if (ImGui::Selectable(particleTypes[i], isSelected))
 									{
 										particleComp.ParticleType = i;
@@ -2024,27 +2026,26 @@ namespace Engine
 							ImGui::OpenPopup("AssetContextMenu");
 						}
 
-						if (ImGui::BeginPopupContextItem("AssetContextMenu")) // right-click popup
+						if (ImGui::BeginPopupContextItem("AssetContextMenu")) 
 						{
 							ImGui::Text("%s", filename.c_str());
-							ImGui::Separator();
+							
+							// Only Texture and Meshes for now
+							if (record->type == ResourceType::TEXTURE || record->type == ResourceType::MESH) {
+								ImGui::Separator();
 
-							if (ImGui::MenuItem("Edit"))
-							{
-								// open asset editor or show rename dialog
-								LOG_INFO("Edit asset: ", filename);
-								displayDescriptorEditorPanel();
+								if (ImGui::MenuItem("Edit"))
+								{
+									// open asset editor or show rename dialog
+									LOG_INFO("Edit asset: ", filename);
+
+									showDescriptorEditorPanel = true;
+									currentEditingGuid = record->guid;
+									editedAsset = filename;
+								}
+
+								ImGui::EndPopup();
 							}
-
-							//TODO - Delete
-							if (ImGui::MenuItem("Delete"))
-							{
-								// confirmation dialog or delete function
-								LOG_WARNING("Deleted asset:", filename);
-								
-							}
-
-							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -2249,7 +2250,226 @@ namespace Engine
 	}
 
 	void Editor::displayDescriptorEditorPanel() {
-		;
+		
+		if (!showDescriptorEditorPanel) {
+			descriptorEditor.Clear();
+			return;
+		}
+
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
+			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
+
+			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid()) {
+				if (!descriptorEditor.Load(currentEditingGuid)) {
+					ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
+				}
+			}
+			else {
+				ImGui::Columns(2, nullptr, true);
+
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
+					if (texture != nullptr) {
+						float tex_w = texture->width;
+						float tex_h = texture->height;
+
+						ImVec2 window_size = ImGui::GetWindowSize();
+						float win_w = window_size.x * 3 / 4;
+						float win_h = window_size.y * 3 / 4;
+
+						float aspect = tex_w / tex_h;
+
+						ImVec2 viewportSize;
+						if (win_w / win_h > aspect) {
+							viewportSize.x = win_h * aspect;
+							viewportSize.y = win_h;
+						}
+						else {
+							viewportSize.x = win_w;
+							viewportSize.y = win_w / aspect;
+						}
+
+						ImGui::Image(
+							(ImTextureID)(intptr_t)((GLuint)texture->textureID),
+							viewportSize,
+							ImVec2(0, 0), ImVec2(1, 1)
+						);
+					}
+				}
+
+				ImGui::NextColumn();
+
+				ImGui::SeparatorText("Asset Information");
+				ImGui::Text("Asset Name: %s", descriptorEditor.GetDisplayName().c_str());
+				ImGui::Text("Source: %s", descriptorEditor.GetSourcePath().c_str());
+
+				std::string assetType{};
+				switch (descriptorEditor.GetType()) {
+				case ResourceType::TEXTURE:
+					assetType = "Texture";
+					break;
+				case ResourceType::MESH:
+					assetType = "Mesh";
+					break;
+				default:
+					break;
+				}
+				ImGui::Text("Asset Type: %s", assetType.c_str());
+
+				ImGui::Spacing();
+				ImGui::SeparatorText("Editable Properties");
+
+				// Check type and get appropriate settings
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+
+					TextureSettings* settings = descriptorEditor.GetTextureSettings();
+
+					// Modify settings directly
+					auto quality = settings->quality;
+					if (ImGui::SliderFloat("Quality", &quality, 0.0f, 1.0f)) {
+						settings->quality = quality;
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Minimaps", &settings->generateMipmaps)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("sRGB", &settings->srgb)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Usage", settings->compression.c_str())) {
+						for (auto& option : descriptorEditor.GetCompressionOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->compression = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					if (ImGui::BeginCombo("Compression", settings->usageType.c_str())) {
+						for (auto& option : descriptorEditor.GetUsageTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->usageType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+				}
+				else if (descriptorEditor.GetType() == ResourceType::MESH) {
+
+					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Position", &settings->includePos)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str())) {
+						for (auto& option : descriptorEditor.GetIndexTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->indexType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices)) {
+						descriptorEditor.MarkModified();
+					}
+					
+					char formatBuffer[256];
+					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer)))
+					{
+						settings->outputFormat = std::string(formatBuffer);
+					}
+
+					float meshScale = settings->scale;
+					if (ImGui::DragFloat("Scale", &meshScale))
+					{
+						settings->scale = meshScale;
+					}
+					
+				}
+
+				if (!descriptorEditor.GetTags().empty()) {
+					ImGui::SeparatorText("Tags");
+					for (auto& tag : descriptorEditor.GetTags()) {
+						ImGui::Text("%s", tag.c_str());
+					}
+				}
+
+				ImGui::SeparatorText("Last Imported");
+				std::time_t writeTime = descriptorEditor.GetLastImported();
+				char timeBuf[64];
+				std::tm* tm_local = std::localtime(&writeTime);
+				std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+				ImGui::Text("Last Write Time: %s", timeBuf);
+
+				static std::string notifMsg{};
+				static ImVec4 notifColour(0.0f, 0.0f, 0.0f, 0.0f);
+
+				if (ImGui::Button("Validate Descriptor")) {
+					if (descriptorEditor.Validate()) {
+						notifMsg = "Descriptor is Valid";
+						notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+					}
+					else {
+						notifMsg = "Descriptor is NOT Valid";
+						notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+					}
+				}
+
+				if (!notifMsg.empty()) {
+
+					ImGui::TextColored(notifColour, "%s", notifMsg.c_str());
+
+					static float notifTimer = 2.0f;
+					notifTimer -= ImGui::GetIO().DeltaTime;
+
+					if (notifTimer <= 0.0f) {
+						notifTimer = 2.0f;
+						notifMsg.clear();
+					}
+				}
+
+				// Save button
+				if (descriptorEditor.IsModified()) {
+					if (ImGui::Button("Save Descriptor")) {
+						if (descriptorEditor.Save()) {
+							notifMsg = "Descriptor is Saved";
+							notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+						}
+						else {
+							notifMsg = "Descriptor is NOT Saved";
+							notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+						}
+					}
+				}
+			}
+
+			ImGui::End();
+		}
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
@@ -2453,15 +2673,17 @@ namespace Engine
 		ImGuizmo::BeginFrame();
 	}
 
+
+#if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
-		// Your existing viewport size calculation...
+		// viewport size calculation...
 		ImVec2 viewportSize = { 600, 600 };
 		if (m_Window) {
-			int width = 0.f;
-			int height = 0.f;
+			int width = 0;
+			int height = 0;
 			glfwGetWindowSize(m_Window, &width, &height);
 			viewportSize = {
 				static_cast<float>(width) / 2.0f,
@@ -2475,7 +2697,6 @@ namespace Engine
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-			// KEEP YOUR ORIGINAL WORKING CODE FOR OBJECT PICKING
 			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
 			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
 
@@ -2500,7 +2721,6 @@ namespace Engine
 				m_Renderer->getEditorViewport() = editorViewportData;
 			}
 
-
 			bool currentCamToggle = m_Renderer->getEditorCamToggle();
 
 			if (m_PreviousEditorCamToggle != currentCamToggle)
@@ -2517,12 +2737,23 @@ namespace Engine
 				m_ImGuizmoViewportData.tl = tl_screen;
 				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
 
+				// Track current frame gizmo state
+				bool isUsingGizmoThisFrame = false;
+				bool isOverGizmoThisFrame = false;
+
+				// FIRST: Handle ImGuizmo manipulation if we have a selected entity
+				if (m_SelectedEntity) {
+					ManipulateEntityTransform(m_SelectedEntity);
+					isUsingGizmoThisFrame = ImGuizmo::IsUsing();
+					isOverGizmoThisFrame = ImGuizmo::IsOver();
+				}
+
 				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
 				{
 					LOG_INFO("[DEBUG] Right-click popup opened!");
 
-					// Unity-style: No checkmarks, just menu items
-					if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+					
+					if (ImGui::MenuItem("Move", "W"))  
 					{
 						m_Operation = ImGuizmo::TRANSLATE;
 						std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
@@ -2564,31 +2795,39 @@ namespace Engine
 					}
 				}
 
+				// SECOND: Handle object selection
 				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
-					if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+					// Only allow selection if we weren't using or over the gizmo in the PREVIOUS frame
+					if (!m_WasUsingGizmoLastFrame && !m_WasOverGizmoLastFrame)
 					{
-						LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
-						m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+						if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+						{
+							LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+							m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+						}
+						else
+						{
+							m_SelectedEntity = Entity{};
+							LOG_INFO("Deselected entity.");
+						}
 					}
 					else
 					{
-						m_SelectedEntity = Entity{};
-						LOG_INFO("Deselected entity.");
+						LOG_INFO("Selection blocked - was interacting with gizmo last frame");
 					}
 				}
 
-				// ImGuizmo manipulation
-				if (m_SelectedEntity) {
-					ManipulateEntityTransform(m_SelectedEntity);
-				}
+				// Update gizmo state for next frame
+				m_WasUsingGizmoLastFrame = isUsingGizmoThisFrame;
+				m_WasOverGizmoLastFrame = isOverGizmoThisFrame;
 			}
 		}
 
 		ImGui::End();
 	}
 
-
+#endif
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
 	{
@@ -2845,12 +3084,14 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
+
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
 		//if (!entity) return;
 		/*if (!entity || !m_Scene) {
 			m_SelectedEntity = Entity{};
 			m_PickedID = 0xFFFFFFFFu;
+		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
 			return;
 		}*/
 
@@ -2926,15 +3167,15 @@ namespace Engine
 			}
 		}
 
-		// Use screen coordinates for the mode label too
-		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		ImGui::GetForegroundDrawList()->AddText(
-			modeLabelPos,
-			IM_COL32(255, 230, 100, 255),
-			m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-			m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		);
+		//// Use screen coordinates for the mode label too
+		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
+		//ImGui::GetForegroundDrawList()->AddText(
+		//	modeLabelPos,
+		//	IM_COL32(255, 230, 100, 255),
+		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
+		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
+		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
+		//);
 	}
 
 } // end of namespace Engine

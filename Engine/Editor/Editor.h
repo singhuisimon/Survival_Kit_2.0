@@ -37,7 +37,8 @@
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
-
+#include "../Serialization/PrefabInstantiator.h"
+#include "../Asset/DescriptorEditor.h"
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
@@ -57,7 +58,6 @@ namespace Engine
 		ImGuiIO* io;
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
-		GLuint m_FBOTextureHandle;
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
 		
@@ -108,6 +108,13 @@ namespace Engine
 		EditorViewport editorViewportData;
 		Renderer* m_Renderer = nullptr;
 		EditorViewport m_ImGuizmoViewportData;
+
+		bool m_WasUsingGizmoLastFrame = false;
+		bool m_WasOverGizmoLastFrame = false;
+		DescriptorEditor descriptorEditor;
+		bool showDescriptorEditorPanel = false;
+		xresource::instance_guid currentEditingGuid;
+		std::string editedAsset{};
 
 	public:
 		// Default contructor 
@@ -187,7 +194,6 @@ namespace Engine
 		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
 
 		void DrawEntityRecursive(Entity entity, entt::registry& registry);
-		static glm::mat4 BuildTransformMatrix(const TransformComponent& tc);
 
 		void ManipulateEntityTransform(Entity& entity);
 	};
