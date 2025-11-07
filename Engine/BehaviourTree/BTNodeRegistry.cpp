@@ -128,9 +128,11 @@ namespace Engine {
         registry.RegisterNodeType<BTParallel>("Composite", "Executes all children simultaneously",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_ENUM_PROPERTY(BTParallel, "SuccessPolicy", m_SuccessPolicy,
-                    PolicyToString, StringToPolicy);
+                    PolicyToString, StringToPolicy,
+                    (std::vector<std::string>{"RequireAll", "RequireOne"}));
                 BT_REGISTER_ENUM_PROPERTY(BTParallel, "FailurePolicy", m_FailurePolicy,
-                    PolicyToString, StringToPolicy);
+                    PolicyToString, StringToPolicy,
+                    (std::vector<std::string>{"RequireAll", "RequireOne"}));
             });
     
         // Decorator nodes
@@ -241,7 +243,8 @@ namespace Engine {
                 BT_REGISTER_FLOAT_PROPERTY(BTCheckHealth, "Threshold", m_Threshold);
                 BT_REGISTER_STRING_PROPERTY(BTCheckHealth, "HealthKey", m_HealthKey);
                 BT_REGISTER_ENUM_PROPERTY(BTCheckHealth, "Comparison", m_Comparison,
-                    ComparisonToString, StringToComparison);
+                    ComparisonToString, StringToComparison,
+                    (std::vector<std::string>{"Greater", "Less", "Equal", "GreaterOrEqual", "LessOrEqual"}));
             });
 
         registry.RegisterNodeType<BTSetHealth>("Action", "Sets health value",

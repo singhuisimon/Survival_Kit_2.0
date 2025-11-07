@@ -44,11 +44,13 @@
 // KEPT FOR BT TEST <WILL REMOVE BY THIS WEEKEND PLS DUN TOUCH>
 #include "BehaviourTree/BTNodeRegistry.h"
 #include "Serialization/BehaviourTreeSerializer.h"
+#include "BehaviourTree/BehaviourTreeEditor.h"
 #include "Prefab/BehaviourTreePrefab.h"
 #include "Serialization/PrefabSerializer.h"
 #include "Serialization/PrefabInstantiator.h"
 #include "Prefab/PrefabRegistry.h"
 #include "BehaviourTree/BTNode.h"
+#include "Utility/AssetPath.h"
 
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
@@ -862,6 +864,122 @@ void Game::OnUpdate(Engine::Timestep ts) {
     }
 
     // === TEST BEHAVIOUR TREE SYSTEM ===
+
+    if (input.IsKeyJustPressed(GLFW_KEY_F5)) {
+        LOG_INFO("=== [F5] Create a new Behaviour Tree file: change_position.json ===");
+
+        // Build: Sequence -> SetBlackboard(Key=TargetPosition, Type=Vec3, Value=1,2,3) -> Wait(Duration=2.0)
+        auto tree = std::make_shared<Engine::BehaviourTree>();
+        tree->SetName("ChangePositionTree");
+
+        auto root = std::make_shared<Engine::BTSequence>();
+        tree->SetRootNode(root);
+
+        // Set a position in the blackboard (stored as text; editor/runner can parse as needed)
+        auto setPos = std::make_shared<Engine::BTSetBlackboard>("TargetPosition", "1,2,3", "Vec3");
+        root->AddChild(setPos);
+
+        // Wait a bit
+        auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
+        root->AddChild(waitNode);
+
+        // Save to file (project + output)
+        const std::string filePath = "change_position.json";
+        if (Engine::BehaviourTreeEditor::SaveTree(*tree, filePath)) {
+            LOG_INFO("[F5] Successfully created and saved: ", filePath);
+        }
+        else {
+            LOG_ERROR("[F5] Failed to save: ", filePath);
+        }
+    }
+
+    if (input.IsKeyJustPressed(GLFW_KEY_F6)) {
+        LOG_INFO("=== [F6] Rename BT file ===");
+        const std::string oldPath = "change_position.json";
+        const std::string newPath = "change_position_renamed.json";
+
+        // Pass m_Scene.get() if you want component references auto-updated
+        bool ok = Engine::BehaviourTreeEditor::RenameFile(oldPath, newPath, m_Scene.get());
+        if (ok) {
+            LOG_INFO("[F6] Renamed '", oldPath, "' -> '", newPath, "'");
+        }
+        else {
+            LOG_ERROR("[F6] Rename failed!");
+        }
+    }
+
+    if (input.IsKeyJustPressed(GLFW_KEY_F7)) {
+        LOG_INFO("=== [F7] SaveAs (duplicate file with new GUID) ===");
+
+        const std::string sourcePath = "change_position.json";
+        const std::string newPath = "change_position2.json";
+        const std::string newName = "ChangePosition_Copy"; // Optional new internal name
+
+        bool success = Engine::BehaviourTreeEditor::SaveAs(
+            sourcePath,
+            newPath,
+            newName,
+            /*generateNewGUID=*/true
+        );
+
+        if (success) {
+            LOG_INFO("[F7] Successfully saved a copy as '", newPath, "' with a new GUID!");
+        }
+        else {
+            LOG_ERROR("[F7] SaveAs failed!");
+        }
+    }
+
+
+    //if (input.IsKeyJustPressed(GLFW_KEY_F7)) {
+    //    LOG_INFO("=== [F7] SaveAs after editing a value ===");
+    //    const std::string sourcePath = "change_position.json";
+    //    const std::string outPath = "change_position2.json";
+
+    //    auto tree = Engine::BehaviourTreeEditor::LoadTree(sourcePath);
+    //    if (!tree) {
+    //        LOG_ERROR("[F7] Could not load source: ", sourcePath);
+    //    }
+    //    else {
+    //        // Find a node to tweak: prefer MoveEntity.Speed, else Wait.Duration
+    //        std::function<std::shared_ptr<Engine::BTNode>(std::shared_ptr<Engine::BTNode>, const char*)> findType =
+    //            [&](std::shared_ptr<Engine::BTNode> n, const char* typeName) -> std::shared_ptr<Engine::BTNode> {
+    //            if (!n) return nullptr;
+    //            if (std::string(n->GetTypeName()) == typeName) return n;
+    //            for (auto& c : n->GetChildren()) {
+    //                if (auto r = findType(c, typeName)) return r;
+    //            }
+    //            return nullptr;
+    //            };
+
+    //        auto root = tree->GetRootNode();
+    //        bool changed = false;
+
+    //        if (auto move = findType(root, "MoveEntity")) {
+    //            move->SetProperty("Speed", "10.0");
+    //            LOG_INFO("[F7] Changed MoveEntity.Speed to 10.0");
+    //            changed = true;
+    //        }
+    //        else if (auto wt = findType(root, "Wait")) {
+    //            wt->SetProperty("Duration", "3.0");
+    //            LOG_INFO("[F7] Changed Wait.Duration to 3.0");
+    //            changed = true;
+    //        }
+    //        else {
+    //            LOG_WARNING("[F7] No MoveEntity or Wait node found; saving copy without edits.");
+    //        }
+
+    //        // Save to a new file so the original remains unchanged
+    //        if (Engine::BehaviourTreeEditor::SaveTree(*tree, outPath)) {
+    //            LOG_INFO("[F7] Saved edited copy as '", outPath, "'");
+    //        }
+    //        else {
+    //            LOG_ERROR("[F7] Save copy failed!");
+    //        }
+    //    }
+    //}
+
+
 
     // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
     // F10 -> Create a BehaviourTree, attach to entity, and save to JSON

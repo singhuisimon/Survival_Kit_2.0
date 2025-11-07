@@ -30,7 +30,8 @@ namespace Engine {
         Vec3,
         Vec4,
         Quat,
-        Entity
+        Entity,
+        Enum
     };
 
     /**
