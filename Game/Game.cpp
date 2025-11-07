@@ -326,6 +326,7 @@ void Game::CreateDefaultScene() {
     std::string meshName = "E004_botnet_v001.fbx";
     xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
     mesh.MeshGuid = inst_guid;
+	//mesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
     //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
 
     std::cout << inst_guid.m_Value << "\n"; //this is the main value - amanda
@@ -396,7 +397,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Scale = glm::vec3(20, 0.1f, 20);
+    groundTransform.Scale = glm::vec3(20, 10.f, 20);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -405,6 +406,8 @@ void Game::CreateDefaultScene() {
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
     auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
+    groundmesh.MeshType = 2; // Sphere
+	groundmesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
     LOG_TRACE("  -> Ground created");
 
     

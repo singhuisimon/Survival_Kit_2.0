@@ -194,9 +194,9 @@ void main()
     // Gamma correction
     if(isGamma) {
         // RGB to sRGB
-        FragColor = vec4(pow(shadeColor, vec3(1.0/2.2)), 1.0);
+        FragColor = vec4(pow(shadeColor, vec3(1.0/2.2)), material.alpha);
     } else {
-        FragColor = vec4(shadeColor, 1.0);
+        FragColor = vec4(shadeColor, material.alpha);
     }
 
 }

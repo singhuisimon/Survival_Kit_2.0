@@ -31,6 +31,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 
+#include "Serialization/MaterialSerializer.h"
+
 namespace Engine
 {
 	void Editor::SetScene(Engine::Scene* scene)
@@ -710,6 +712,154 @@ namespace Engine
 						bool visible = mesh.Visible;
 						if (ImGui::Checkbox("Visible", &visible)) {
 							mesh.Visible = visible;
+						}
+
+						// Material Editor Section
+						ImGui::SeparatorText("Material Properties");
+
+						// Save Material Button
+						static char materialSaveName[256] = "";
+						ImGui::InputText("Material Name", materialSaveName, sizeof(materialSaveName));
+						ImGui::SameLine();
+						if (ImGui::Button("Save Material"))
+						{
+							if (strlen(materialSaveName) > 0)
+							{
+								MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+								if (material)
+								{
+									std::string filename = std::string(materialSaveName);
+									serializeMaterial(material, filename);
+
+									// Optional: Clear the input field after saving
+									memset(materialSaveName, 0, sizeof(materialSaveName));
+
+									// Optional: Show confirmation message
+									ImGui::OpenPopup("Material Saved");
+								}
+							}
+							else
+							{
+								ImGui::OpenPopup("Invalid Name");
+							}
+						}
+
+						// Popup for save confirmation
+						if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+						{
+							ImGui::Text("Material saved successfully!");
+							if (ImGui::Button("OK"))
+							{
+								ImGui::CloseCurrentPopup();
+							}
+							ImGui::EndPopup();
+						}
+
+						// Popup for invalid name
+						if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+						{
+							ImGui::Text("Please enter a valid material name.");
+							if (ImGui::Button("OK"))
+							{
+								ImGui::CloseCurrentPopup();
+							}
+							ImGui::EndPopup();
+						}
+
+						// Get material reference (assuming you have a way to get MaterialResource from mesh.Material)
+						// MaterialResource& material = GetMaterialResource(mesh.Material);
+						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+
+						if (material)
+						{
+							// Shader Name (read-only for now)
+							ImGui::Text("Shader: %s", material->shaderName.c_str());
+
+							// Texture Maps (stubs as requested)
+							if (ImGui::CollapsingHeader("Texture Maps"))
+							{
+								ImGui::Text("Diffuse Map: [Stub - ID: %u]", material->diffuseMap);
+								ImGui::Text("Normal Map: [Stub - ID: %u]", material->normalMap);
+								ImGui::Text("Specular Map: [Stub - ID: %u]", material->specularMap);
+								ImGui::Text("Emission Map: [Stub - ID: %u]", material->emissionMap);
+								ImGui::Text("Occlusion Map: [Stub - ID: %u]", material->occlusionMap);
+							}
+
+							// Color Properties
+							if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
+							{
+								// Diffuse Color with alpha
+								if (ImGui::ColorEdit4("Diffuse Color", material->diffuseColor.data(),
+									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+								{
+									// Material updated - real-time changes will be visible
+								}
+
+								// Specular Color (no alpha)
+								if (ImGui::ColorEdit3("Specular Color", material->specularColor.data(),
+									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+								{
+									// Material updated
+								}
+
+								// Emission Color
+								if (ImGui::ColorEdit3("Emission Color", material->emissionColor.data(),
+									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+								{
+									// Material updated
+								}
+							}
+
+							// Material Properties
+							if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
+							{
+								// Shininess slider
+								if (ImGui::SliderFloat("Shininess", &material->shininess, 1.0f, 128.0f, "%.1f"))
+								{
+									// Clamp to reasonable range
+									material->shininess = std::max(1.0f, std::min(128.0f, material->shininess));
+								}
+
+								// Emission Strength
+								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 10.0f, "%.2f"))
+								{
+									material->emissionStrength = std::max(0.0f, material->emissionStrength);
+								}
+
+								// Alpha Threshold for alpha testing
+								if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f"))
+								{
+									material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
+								}
+							}
+
+							// UV Transform
+							if (ImGui::CollapsingHeader("UV Transform"))
+							{
+								// Tiling
+								if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
+								{
+									// Prevent zero or negative tiling
+									material->tiling[0] = std::max(0.1f, material->tiling[0]);
+									material->tiling[1] = std::max(0.1f, material->tiling[1]);
+								}
+
+								// Offset
+								if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f"))
+								{
+									// No clamping needed for offset
+								}
+							}
+
+							// Render Flags
+							if (ImGui::CollapsingHeader("Render Settings"))
+							{
+								ImGui::Checkbox("Enable Emission", &material->enableEmission);
+								ImGui::Checkbox("Alpha Test", &material->alphaTest);
+								ImGui::Checkbox("Double Sided", &material->doubleSided);
+								ImGui::Checkbox("Receive Shadows", &material->receiveShadows);
+								ImGui::Checkbox("Cast Shadows", &material->castShadows);
+							}
 						}
 
 						ImGui::SeparatorText("Values for Debugging:");

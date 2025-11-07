@@ -533,26 +533,6 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
-			xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
-
-			if (TextureResource* texture_resource = RM.loadResource<TextureResource>(texture_guid)) {
-				glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-				prog.setUniform("Texture2D", 0);
-				prog.setUniform("isTexture", true);
-
-				if (texture_resource->format == "sRGB") {
-					prog.setUniform("isGamma", true);
-				}
-				else {
-					prog.setUniform("isGamma", false);
-				}
-
-			}
-			else {
-				prog.setUniform("isTexture", false);
-			}
-
-
 			// Temporary transformations
 			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
 
@@ -560,7 +540,6 @@ namespace Engine {
 			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			{
 				// New workflow has no ambient lighting
-
 				prog.setUniform("material.Kd", glm::vec3(material_resource->diffuseColor[0], 
 																   material_resource->diffuseColor[1], 
 																   material_resource->diffuseColor[2]));
@@ -572,9 +551,24 @@ namespace Engine {
 				// The alpha value is stored in the diffuse color's alpha channel, this value is used to control the transparency of the material
 				prog.setUniform("material.alpha", material_resource->diffuseColor[3]);
 				prog.setUniform("material.shininess", material_resource->shininess);
+
+				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
+					glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("Texture2D", 0);
+					prog.setUniform("isTexture", true);
+
+					if (texture_resource->format == "sRGB") {
+						prog.setUniform("isGamma", true);
+					}
+					else {
+						prog.setUniform("isGamma", false);
+					}
+
+				}
 			}
 			else
 			{
+				prog.setUniform("isTexture", false);
 				prog.setUniform("material.Ka", test_material.getMaterialAmbient());
 				prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
 				prog.setUniform("material.Ks", test_material.getMaterialSpecular());

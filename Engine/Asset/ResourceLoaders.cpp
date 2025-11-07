@@ -595,14 +595,14 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
 
     // Check if file exists
     if (!Engine::fileExists(filepath)) {
-		LOG_WARNING("MaterialLoader - Source file not found: ", filepath);
+		//LOG_WARNING("MaterialLoader - Source file not found: ", filepath);
         return nullptr;
     }
 
     // Open the file 
     std::ifstream ifs(filepath);
     if (!ifs.is_open()) {
-        LOG_WARNING("Material Loader - unable to open file: ", filepath);
+        //LOG_WARNING("Material Loader - unable to open file: ", filepath);
         return nullptr;
     }
 
@@ -617,7 +617,7 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
     doc.Parse(jsonString.c_str());
 
     if (doc.HasParseError()) {
-        LOG_ERROR("JSON Parse error at offset ", doc.GetErrorOffset());
+        //LOG_ERROR("JSON Parse error at offset ", doc.GetErrorOffset());
         return nullptr;
     }
 
@@ -629,19 +629,19 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
 		material->shaderName = doc["shaderName"].GetString();
     
     if (doc.HasMember("diffuseMap"))
-        material->diffuseMap = xresource::instance_guid{ doc["diffuseMap"].GetUint64() };
+        material->diffuseMap = xresource::instance_guid{ std::stoull(doc["diffuseMap"].GetString(), nullptr, 16) };
 
     if (doc.HasMember("specularMap"))
-		material->specularMap = xresource::instance_guid{ doc["specularMap"].GetUint64() };
+		material->specularMap = xresource::instance_guid{ std::stoull(doc["specularMap"].GetString(), nullptr, 16) };
 
 	if (doc.HasMember("normalMap"))
-		material->normalMap = xresource::instance_guid{ doc["normalMap"].GetUint64() };
+		material->normalMap = xresource::instance_guid{ std::stoull(doc["normalMap"].GetString(), nullptr, 16) };
 
     if (doc.HasMember("emissionMap"))
-		material->emissionMap = xresource::instance_guid{ doc["emissionMap"].GetUint64() };
+		material->emissionMap = xresource::instance_guid{ std::stoull(doc["emissionMap"].GetString(), nullptr, 16) };
 
     if (doc.HasMember("occlusionMap"))
-		material->occlusionMap = xresource::instance_guid{ doc["occlusionMap"].GetUint64() };
+		material->occlusionMap = xresource::instance_guid{ std::stoull(doc["occlusionMap"].GetString(), nullptr, 16) };
 
     if (doc.HasMember("diffuseColor"))
     {

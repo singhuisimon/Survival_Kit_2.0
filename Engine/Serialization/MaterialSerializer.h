@@ -4,7 +4,7 @@
 namespace Engine {
 
 
-	void serializeMaterial(MaterialResource* mat, std::string filepath);
+	void serializeMaterial(MaterialResource* mat, std::string filename);
 
 
 }

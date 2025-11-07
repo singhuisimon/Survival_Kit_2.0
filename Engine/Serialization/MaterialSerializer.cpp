@@ -9,6 +9,7 @@
 #include <rapidjson/prettywriter.h>
 
 #include <fstream> // For file output
+#include <format>  // For std::setw
 
 #include "Utility/AssetPath.h"
 #include "Utility/Logger.h"
@@ -25,11 +26,25 @@ namespace Engine {
 
 		doc.AddMember("shaderName", Value(mat->shaderName.c_str(), allocator), allocator);
 
-		doc.AddMember("diffuseMap", static_cast<uint64_t>(mat->diffuseMap.m_Value), allocator);
-		doc.AddMember("normalMap", static_cast<uint64_t>(mat->normalMap.m_Value), allocator);
-		doc.AddMember("specularMap", static_cast<uint64_t>(mat->specularMap.m_Value), allocator);
-		doc.AddMember("emissionMap", static_cast<uint64_t>(mat->emissionMap.m_Value), allocator);
-		doc.AddMember("occlusionMap", static_cast<uint64_t>(mat->occlusionMap.m_Value), allocator);
+        // diffuseMap (Formatted as hex string)
+        std::string diffuseMapHex = std::format("{:x}", mat->diffuseMap.m_Value);
+        doc.AddMember("diffuseMap", rapidjson::Value(diffuseMapHex.c_str(), allocator), allocator);
+
+        // normalMap (Formatted as hex string)
+        std::string normalMapHex = std::format("{:x}", mat->normalMap.m_Value);
+        doc.AddMember("normalMap", rapidjson::Value(normalMapHex.c_str(), allocator), allocator);
+
+        // specularMap (Formatted as hex string)
+        std::string specularMapHex = std::format("{:x}", mat->specularMap.m_Value);
+        doc.AddMember("specularMap", rapidjson::Value(specularMapHex.c_str(), allocator), allocator);
+
+        // emissionMap (Formatted as hex string)
+        std::string emissionMapHex = std::format("{:x}", mat->emissionMap.m_Value);
+        doc.AddMember("emissionMap", rapidjson::Value(emissionMapHex.c_str(), allocator), allocator);
+
+        // occlusionMap (Formatted as hex string)
+        std::string occlusionMapHex = std::format("{:x}", mat->occlusionMap.m_Value);
+        doc.AddMember("occlusionMap", rapidjson::Value(occlusionMapHex.c_str(), allocator), allocator);
 
         Value diffuseColorArray(kArrayType);
         for (float val : mat->diffuseColor) {
@@ -48,7 +63,6 @@ namespace Engine {
             emissionColorArray.PushBack(val, allocator);
         }
         doc.AddMember("emissionColor", emissionColorArray, allocator);
-
         doc.AddMember("shininess", mat->shininess, allocator);
         doc.AddMember("emissionStrength", mat->emissionStrength, allocator);
         doc.AddMember("alphaThreshold", mat->alphaThreshold, allocator);
