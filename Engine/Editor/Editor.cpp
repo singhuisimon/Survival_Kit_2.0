@@ -18,10 +18,14 @@
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Asset/AssetManager.h"
+#include "../Asset/ResourceManager.h"
 #include "../Graphics/Camera.h"
+#include "../Graphics/Texture.h"
 
+#include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
+#include <cctype>
 
 // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -100,6 +104,7 @@ namespace Engine
 
 		displayPerformanceProfilePanel(ts);
 
+		displayDescriptorEditorPanel();
 		//DrawPrefabInspector();
 
 		//Complete Imgui rendering for the frame
@@ -229,6 +234,8 @@ namespace Engine
 				if (ImGui::MenuItem("Open Script"))
 				{
 					// open script logic
+					openScript = true;
+
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Open script from file.");
@@ -251,16 +258,6 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			// ---------------- Display Current Scene Name ---------------------
-			if (!currScenePath.empty())
-			{
-				std::filesystem::path filePath(currScenePath);
-				std::string fileName = filePath.filename().string();
-
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x - 100.0f);
-				ImGui::TextUnformatted(fileName.c_str());
-			}
-
 			if (ImGui::BeginMenu("Edit"))
 			{
 				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
@@ -281,6 +278,25 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Compile"))
+			{
+				// Compile fucntion goes here
+				ImGui::EndMenu();
+			}
+
+			// ---------------- Display Current Scene Name ---------------------
+			if (!currScenePath.empty())
+			{
+				std::filesystem::path filePath(currScenePath);
+				std::string fileName = filePath.filename().string();
+
+				float textWidth = ImGui::CalcTextSize(fileName.c_str()).x;
+				float menuBarWidth = ImGui::GetWindowSize().x;
+
+				ImGui::SameLine(menuBarWidth - textWidth - 10.0f);
+				ImGui::TextUnformatted(fileName.c_str());
+			}
+
 			ImGui::EndMainMenuBar();
 		}
 
@@ -295,9 +311,33 @@ namespace Engine
 		{
 			saveAsScenePanel();
 		}
+
+		// ========================= Create Script Panel ===========================
+		if (createScript)
+		{
+			CreateScriptPanel();
+		}
+		// ========================== Open Script Panel ============================
+		if (openScript)
+		{
+			OpenScriptPanel();
+		}
 	}
 
-	static std::shared_ptr<BTNode> nodeToDelete = nullptr;
+	static void ReplaceChildNode(std::shared_ptr<BTNode> parent,
+		std::shared_ptr<BTNode> oldChild,
+		std::shared_ptr<BTNode> newChild)
+	{
+		auto& children = parent->GetChildren();
+		for (size_t i = 0; i < children.size(); ++i)
+		{
+			if (children[i] == oldChild)
+			{
+				children[i] = newChild;
+				break;
+			}
+		}
+	}
 
 	void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr)
 	{
@@ -371,39 +411,31 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 
-		/*ImVec4 bgColor;
-		if (node->GetTypeName() == "Succeeder" || node->GetTypeName() == "Sequence" || node->GetTypeName() == "Selector")
-			bgColor = ImVec4(0.8f, 0.6f, 0.2f, 0.3f);
-		else if (node->GetTypeName() == "RepeatUntilFail" || node->GetTypeName() == "Inverter" || node->GetTypeName() == "Parallel" 
-				|| node->GetTypeName() == "Condition" || node->GetTypeName() == "Failer" || node->GetTypeName() == "Repeater")
-			bgColor = ImVec4(0.2f, 0.7f, 0.2f, 0.3f);
-		else if (node->GetTypeName() == "Cooldown" || node->GetTypeName() == "Action" || node->GetTypeName() == "Wait" 
-			   || node->GetTypeName() == "Log") 
-			bgColor = ImVec4(0.2f, 0.6f, 0.9f, 0.3f);
-		else                          
-			bgColor = ImVec4(1.0f, 1.0f, 0.7f, 0.3f);
-
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		ImVec2 min = ImGui::GetCursorScreenPos();
-		float width = ImGui::GetContentRegionAvail().x;
-		float height = ImGui::GetTextLineHeightWithSpacing();
-		ImVec2 max = ImVec2(min.x + width, min.y + height);
-		drawList->AddRectFilled(min, max, ImGui::GetColorU32(bgColor));*/
-
 		// --- Inline node editor ---
 		if (nodeOpen)
 		{
 			// Node name
-			static char nameBuffer[128];
+			char nameBuffer[128];
 			strncpy_s(nameBuffer, node->GetName().c_str(), _TRUNCATE);
-			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer)))
+			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				node->SetName(nameBuffer);
+				std::string newName = nameBuffer;
+				newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+				newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+				if (!newName.empty()) {
+					node->SetName(nameBuffer);
+				}
+
+				/*if(nameBuffer[0] != '\0')
+				{
+					node->SetName(nameBuffer);
+				}*/
 			}
 
 			// Node type selector
 			std::vector<std::string> allTypes = BehaviourTreeEditor::GetAllNodeTypes();
-			static int currentTypeIndex = 0;
+			int currentTypeIndex = 0;
 			for (size_t i = 0; i < allTypes.size(); ++i)
 			{
 				if (allTypes[i] == node->GetTypeName())
@@ -421,31 +453,67 @@ namespace Engine
 				},
 				static_cast<void*>(&allTypes), (int)allTypes.size()))
 			{
-				auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
-				for (auto& child : node->GetChildren())
-					newNode->AddChild(child);
-				*node = *newNode; // replace contents
+				if (parent)
+				{
+					auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
+					newNode->SetName(node->GetName()); // Preserve name
+
+					// Transfer children
+					for (auto& child : node->GetChildren())
+						newNode->AddChild(child);
+
+					// Replace in parent's child list
+					ReplaceChildNode(parent, node, newNode);
+				}
 			}
 
 			// --- Node properties ---
 			std::vector<std::pair<std::string, std::string>> properties;
 			node->GetProperties(properties);
 
+			auto isNumeric = [](const std::string& s) {
+				if (s.empty()) return false;
+				bool hasDot = false;
+				for (unsigned char c : s) {
+					if (std::isdigit(c))
+						continue;
+					else if (c == '.') {
+						if (hasDot) return false;  // only one dot allowed
+						hasDot = true;
+					}
+					else {
+						return false;  // invalid character
+					}
+				}
+				return true;
+				};
+
 			for (auto& [name, value] : properties)
 			{
-				char propNameBuffer[256];
-				char valueBuffer[256];
+				bool oldIsNumeric = isNumeric(value);
 
-				strncpy_s(propNameBuffer, name.c_str(), _TRUNCATE);
+				char valueBuffer[256];
 				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
 
 				float fullWidth = ImGui::GetContentRegionAvail().x;
 				ImGui::PushItemWidth(fullWidth * 0.5f - ImGui::GetStyle().ItemSpacing.x * 0.5f);
 
 				// value box (left)
-				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer)))
+				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					node->SetProperty(name, valueBuffer);
+					std::string newValue = valueBuffer;
+					newValue.erase(newValue.find_last_not_of(" \t\n\r\f\v") + 1);
+					newValue.erase(0, newValue.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newValue.empty()) {
+
+						bool newIsNumeric = isNumeric(newValue);
+						
+						if (!(oldIsNumeric && !newIsNumeric))
+						{
+							node->SetProperty(name, newValue);
+						}
+					}
 				}
 
 				ImGui::PopItemWidth();
@@ -476,10 +544,20 @@ namespace Engine
 					auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
 					char buffer[256];
 					strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
-					if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+					if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
-						tag.Tag = std::string(buffer);
+						std::string newTag = buffer;
+						newTag.erase(newTag.find_last_not_of(" \t\n\r\f\v") + 1);
+						newTag.erase(0, newTag.find_first_not_of(" \t\n\r\f\v"));
+
+						if (!newTag.empty()) {
+							tag.Tag = newTag;
+						}
+
+						//tag.Tag = std::string(buffer);
 					}
+
+					
 				}
 				
 				ImGui::Separator();
@@ -590,14 +668,14 @@ namespace Engine
 
 						ImGui::Separator();
 
-						// gravity
-						ImGui::Text("Boolean to check if gravity affects the body");
-						bool isGravity = rigidBody.IsGravityEnabled();
-						if (ImGui::Checkbox("Use Gravity", &isGravity)) {
-							rigidBody.SetGravityEnabled(isGravity);
-						}
+						//// gravity
+						//ImGui::Text("Boolean to check if gravity affects the body");
+						//bool isGravity = rigidBody.IsGravityEnabled();
+						//if (ImGui::Checkbox("Use Gravity", &isGravity)) {
+						//	rigidBody.SetGravityEnabled(isGravity);
+						//}
 
-						ImGui::Separator();
+						//ImGui::Separator();
 
 						// velocity
 						glm::vec3 vel = rigidBody.GetVelocity();
@@ -762,51 +840,43 @@ namespace Engine
 
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
-						std::vector<const AssetRecord*> audioAssets;
-						audioAssets.reserve(allAssets.size());
+
+						std::vector<std::string> audioAssetNames;
+						audioAssetNames.reserve(allAssets.size());
+
 						for (const auto* record : allAssets) {
 							if (!record || !record->valid) continue;
+
 							if (record->type == ResourceType::AUDIO) {
-								audioAssets.push_back(record);
+								std::string filepath = record->sourcePath;
+								size_t lastSlash = filepath.find_last_of("/\\");
+								std::string filename = (lastSlash == std::string::npos)
+									? filepath
+									: filepath.substr(lastSlash + 1);
+
+								LOG_DEBUG("Filepath: ", filepath);
+								LOG_DEBUG("Filename: ", filename);
+
+								audioAssetNames.push_back(filename);
 							}
 						}
 
-						// Determine current selection index
+						std::vector<const char*> audioAssets;
+						audioAssets.reserve(audioAssetNames.size());
+						for (auto& name : audioAssetNames)
+							audioAssets.push_back(name.c_str());
+
 						int currentIndex = 0;
-						for (size_t i = 0; i < audioAssets.size(); ++i)
-						{
-							if (audioAssets[i]->sourcePath == audio.AudioFilePath)
-							{
-								currentIndex = (int)i;
+						for (size_t i = 0; i < audioAssetNames.size(); ++i) {
+							if (audioAssetNames[i] == audio.AudioFilePath) {
+								currentIndex = static_cast<int>(i);
 								break;
 							}
 						}
 
-						// Draw the combo box
-						ImGui::Text("Audio File Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##AudioFilePath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<const AssetRecord*>*>(data);
-								std::string path = assets[idx]->sourcePath;
-
-								// Extract filename from path
-								size_t lastSlash = path.find_last_of("/\\");
-								static std::string filename; // static to keep it alive for ImGui
-								filename = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
-
-								*outText = filename.c_str();
-								return true;
-							},
-							static_cast<void*>(&audioAssets), (int)audioAssets.size()))
-						{
-							// Extract and save just the filename
-							std::string fullPath = audioAssets[currentIndex]->sourcePath;
-							size_t lastSlash = fullPath.find_last_of("/\\");
-							std::string filename = (lastSlash != std::string::npos) ? fullPath.substr(lastSlash + 1) : fullPath;
-
-							audio.SetAudioFile(filename);
+						std::string label = "Filepath"; // Label for the dropdown
+						if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
+							audio.SetAudioFile(audioAssetNames[currentIndex]);
 						}
 
 						ImGui::Text("Audio Type:");
@@ -884,7 +954,7 @@ namespace Engine
 						ImGui::BeginDisabled(!is_3d);
 
 						float min_distance = audio.MinDistance;
-						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance)) {
 							if (is_3d) {
 								audio.SetMinDistance(min_distance);
 							}
@@ -894,7 +964,7 @@ namespace Engine
 						}
 
 						float max_distance = audio.MaxDistance;
-						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f)) {
 							if (is_3d) {
 								audio.SetMaxDistance(max_distance);
 							}
@@ -941,9 +1011,8 @@ namespace Engine
 					if (removeReverb)
 					{
 						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
-					}
-
-					if (openReverbComponent) {
+					
+					} else if (openReverbComponent) {
 						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
 						
 						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
@@ -1036,13 +1105,12 @@ namespace Engine
 					if (removeListener)
 					{
 						m_SelectedEntity.RemoveComponent<ListenerComponent>();
-					}
-
-					if (openListenerComponent) {
+					
+					} else if (openListenerComponent) {
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
-						if (ImGui::Checkbox("Active", &active)) {
+						if (ImGui::Checkbox("Active###activeListener", &active)) {
 							listener.Active = active;
 						}
 					}
@@ -1064,23 +1132,22 @@ namespace Engine
 							size_t stackDepth = treeInstance.GetStackDepth();
 							auto root = treeInstance.GetRootNode();
 
-							ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
-							ImGui::Text("Stack Depth: %zu", stackDepth);
-
-							// Draw a small "i" icon next to a label
-							/*ImGui::Text("Some setting");
-							ImGui::SameLine();
-
-							// Use a small colored "i" or unicode info character
-							ImGui::TextDisabled("(i)");
-
-							// Show tooltip when hovered
-							if (ImGui::IsItemHovered())
+							char treeBuffer[256];
+							strncpy_s(treeBuffer, sizeof(treeBuffer), treeInstance.GetName().c_str(), _TRUNCATE);
+							if (ImGui::InputText("Tree", treeBuffer, sizeof(treeBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 							{
-								ImGui::BeginTooltip();
-								ImGui::TextWrapped("This is some helpful info about this setting.");
-								ImGui::EndTooltip();
-							}*/
+								std::string newName = treeBuffer;
+								newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+								newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+								if (!newName.empty()) {
+									treeInstance.SetName(newName);
+									ai_bt.TreeAssetPath = newName + ".json";
+								}
+
+							}
+
+							ImGui::Text("Stack Depth: %zu", stackDepth);
 
 							if (root)
 							{
@@ -1150,7 +1217,7 @@ namespace Engine
 
 							// Whether tree executes every frame
 							bool& active = ai_bt.Active;
-							if (ImGui::Checkbox("Active", &active)) {
+							if (ImGui::Checkbox("Active###activeBT", &active)) {
 								ai_bt.Active = active;
 							}
 
@@ -1228,7 +1295,6 @@ namespace Engine
 								}
 							}
 
-
 							if (ImGui::Button("Save Tree")) {
 								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
 							}
@@ -1284,7 +1350,7 @@ namespace Engine
 					{
 						// Playback Controls
 						ImGui::Text("Playback");
-						ImGui::Checkbox("Active", &particleComp.Active);
+						ImGui::Checkbox("Active###activeParticle", &particleComp.Active);
 						ImGui::SameLine();
 						ImGui::Checkbox("Loop", &particleComp.Loop);
 
@@ -1311,7 +1377,7 @@ namespace Engine
 							{
 								for (int i = 0; i < 3; i++)
 								{
-									bool isSelected = (particleComp.ParticleType == i);
+									bool isSelected = (particleComp.ParticleType == static_cast<unsigned int>(i));
 									if (ImGui::Selectable(particleTypes[i], isSelected))
 									{
 										particleComp.ParticleType = i;
@@ -1400,6 +1466,72 @@ namespace Engine
 							particleComp.EmissionAccumulator = 0.0f;
 						}
 					}
+				}
+				// ========================= Display Script Compoment ===============================
+				if (m_SelectedEntity.HasComponent<ScriptComponent>())
+				{
+					ImGui::Separator();
+					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
+					std::string scriptPath = getRepository() + "\\Scripts\\Game";
+					auto scriptFiles = getAssetsInFolder(scriptPath);
+					
+					if (ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+						ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
+
+						if (!scriptFiles.empty())
+						{
+							
+							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
+							{
+								for (const auto& asset : scriptFiles)
+								{
+									std::string className = asset.name;
+									std::cout << className << "//////////////////" << "\n";
+									if (className.ends_with(".cs"))
+									{
+										className = className.substr(0, className.size() - 3); // remove extension
+									}
+									//std::cout << "////// className: " << className << "\n";
+									std::string selectedClassName = "Game." + className;
+
+									//std::cout << "////// selectedClassName: " << selectedClassName << "\n";
+									bool isSelected = (scriptComp.ScriptClassName == selectedClassName);
+									if (ImGui::Selectable(className.c_str(), isSelected))
+									{
+										// Destroy previous script instance if exists
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+											scriptComp.ScriptInstance = nullptr;
+											scriptComp.Started = false;
+										}
+
+										// Assign the new script class
+										scriptComp.ScriptClassName = selectedClassName;
+
+										scriptComp.ScriptInstance = MonoScriptEngine::GetInstance().CreateScriptInstance(scriptComp.ScriptClassName);
+
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().SetFieldValue((MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
+											MonoScriptEngine::GetInstance().CallMethod((MonoObject*)scriptComp.ScriptInstance, "OnStart");
+											scriptComp.Started = true;
+										}
+									}
+
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+						}
+
+					}
+
 				}
 
 				// ======================== Add Component Section ===============================
@@ -1564,6 +1696,7 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Particle Component ----------------------------
 					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
 					ImGui::BeginDisabled(hasParticleSystem);
 
@@ -1583,6 +1716,25 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Script Component ----------------------------
+					bool hasScriptComponent = m_SelectedEntity.HasComponent<ScriptComponent>();
+					ImGui::BeginDisabled(hasScriptComponent);
+
+					if (ImGui::MenuItem("Script Component"))
+					{
+						if (!hasScriptComponent)
+						{
+							m_SelectedEntity.AddComponent<ScriptComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasScriptComponent)
+						{
+							ImGui::SetTooltip("Add script to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 					//ImGui::SetWindowFontScale(1.0f); // Reset
 
 					ImGui::EndPopup(); // end pop up for Add Component  
@@ -2024,27 +2176,26 @@ namespace Engine
 							ImGui::OpenPopup("AssetContextMenu");
 						}
 
-						if (ImGui::BeginPopupContextItem("AssetContextMenu")) // right-click popup
+						if (ImGui::BeginPopupContextItem("AssetContextMenu")) 
 						{
 							ImGui::Text("%s", filename.c_str());
-							ImGui::Separator();
+							
+							// Only Texture and Meshes for now
+							if (record->type == ResourceType::TEXTURE || record->type == ResourceType::MESH) {
+								ImGui::Separator();
 
-							if (ImGui::MenuItem("Edit"))
-							{
-								// open asset editor or show rename dialog
-								LOG_INFO("Edit asset: ", filename);
-								displayDescriptorEditorPanel();
+								if (ImGui::MenuItem("Edit"))
+								{
+									// open asset editor or show rename dialog
+									LOG_INFO("Edit asset: ", filename);
+
+									showDescriptorEditorPanel = true;
+									currentEditingGuid = record->guid;
+									editedAsset = filename;
+								}
+
+								ImGui::EndPopup();
 							}
-
-							//TODO - Delete
-							if (ImGui::MenuItem("Delete"))
-							{
-								// confirmation dialog or delete function
-								LOG_WARNING("Deleted asset:", filename);
-								
-							}
-
-							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -2249,7 +2400,226 @@ namespace Engine
 	}
 
 	void Editor::displayDescriptorEditorPanel() {
-		;
+		
+		if (!showDescriptorEditorPanel) {
+			descriptorEditor.Clear();
+			return;
+		}
+
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
+			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
+
+			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid()) {
+				if (!descriptorEditor.Load(currentEditingGuid)) {
+					ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
+				}
+			}
+			else {
+				ImGui::Columns(2, nullptr, true);
+
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
+					if (texture != nullptr) {
+						float tex_w = texture->width;
+						float tex_h = texture->height;
+
+						ImVec2 window_size = ImGui::GetWindowSize();
+						float win_w = window_size.x * 3 / 4;
+						float win_h = window_size.y * 3 / 4;
+
+						float aspect = tex_w / tex_h;
+
+						ImVec2 viewportSize;
+						if (win_w / win_h > aspect) {
+							viewportSize.x = win_h * aspect;
+							viewportSize.y = win_h;
+						}
+						else {
+							viewportSize.x = win_w;
+							viewportSize.y = win_w / aspect;
+						}
+
+						ImGui::Image(
+							(ImTextureID)(intptr_t)((GLuint)texture->textureID),
+							viewportSize,
+							ImVec2(0, 0), ImVec2(1, 1)
+						);
+					}
+				}
+
+				ImGui::NextColumn();
+
+				ImGui::SeparatorText("Asset Information");
+				ImGui::Text("Asset Name: %s", descriptorEditor.GetDisplayName().c_str());
+				ImGui::Text("Source: %s", descriptorEditor.GetSourcePath().c_str());
+
+				std::string assetType{};
+				switch (descriptorEditor.GetType()) {
+				case ResourceType::TEXTURE:
+					assetType = "Texture";
+					break;
+				case ResourceType::MESH:
+					assetType = "Mesh";
+					break;
+				default:
+					break;
+				}
+				ImGui::Text("Asset Type: %s", assetType.c_str());
+
+				ImGui::Spacing();
+				ImGui::SeparatorText("Editable Properties");
+
+				// Check type and get appropriate settings
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+
+					TextureSettings* settings = descriptorEditor.GetTextureSettings();
+
+					// Modify settings directly
+					auto quality = settings->quality;
+					if (ImGui::SliderFloat("Quality", &quality, 0.0f, 1.0f)) {
+						settings->quality = quality;
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Minimaps", &settings->generateMipmaps)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("sRGB", &settings->srgb)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Usage", settings->compression.c_str())) {
+						for (auto& option : descriptorEditor.GetCompressionOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->compression = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					if (ImGui::BeginCombo("Compression", settings->usageType.c_str())) {
+						for (auto& option : descriptorEditor.GetUsageTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->usageType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+				}
+				else if (descriptorEditor.GetType() == ResourceType::MESH) {
+
+					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Position", &settings->includePos)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str())) {
+						for (auto& option : descriptorEditor.GetIndexTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->indexType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices)) {
+						descriptorEditor.MarkModified();
+					}
+					
+					char formatBuffer[256];
+					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+					{
+						settings->outputFormat = std::string(formatBuffer);
+					}
+
+					float meshScale = settings->scale;
+					if (ImGui::DragFloat("Scale", &meshScale))
+					{
+						settings->scale = meshScale;
+					}
+					
+				}
+
+				if (!descriptorEditor.GetTags().empty()) {
+					ImGui::SeparatorText("Tags");
+					for (auto& tag : descriptorEditor.GetTags()) {
+						ImGui::Text("%s", tag.c_str());
+					}
+				}
+
+				ImGui::SeparatorText("Last Imported");
+				std::time_t writeTime = descriptorEditor.GetLastImported();
+				char timeBuf[64];
+				std::tm* tm_local = std::localtime(&writeTime);
+				std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+				ImGui::Text("Last Write Time: %s", timeBuf);
+
+				static std::string notifMsg{};
+				static ImVec4 notifColour(0.0f, 0.0f, 0.0f, 0.0f);
+
+				if (ImGui::Button("Validate Descriptor")) {
+					if (descriptorEditor.Validate()) {
+						notifMsg = "Descriptor is Valid";
+						notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+					}
+					else {
+						notifMsg = "Descriptor is NOT Valid";
+						notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+					}
+				}
+
+				if (!notifMsg.empty()) {
+
+					ImGui::TextColored(notifColour, "%s", notifMsg.c_str());
+
+					static float notifTimer = 2.0f;
+					notifTimer -= ImGui::GetIO().DeltaTime;
+
+					if (notifTimer <= 0.0f) {
+						notifTimer = 2.0f;
+						notifMsg.clear();
+					}
+				}
+
+				// Save button
+				if (descriptorEditor.IsModified()) {
+					if (ImGui::Button("Save Descriptor")) {
+						if (descriptorEditor.Save()) {
+							notifMsg = "Descriptor is Saved";
+							notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+						}
+						else {
+							notifMsg = "Descriptor is NOT Saved";
+							notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+						}
+					}
+				}
+			}
+
+			ImGui::End();
+		}
 	}
 
 	void Editor::displayPerformanceProfilePanel(Timestep ts)
@@ -2453,15 +2823,17 @@ namespace Engine
 		ImGuizmo::BeginFrame();
 	}
 
+
+#if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
-		// Your existing viewport size calculation...
+		// viewport size calculation...
 		ImVec2 viewportSize = { 600, 600 };
 		if (m_Window) {
-			int width = 0.f;
-			int height = 0.f;
+			int width = 0;
+			int height = 0;
 			glfwGetWindowSize(m_Window, &width, &height);
 			viewportSize = {
 				static_cast<float>(width) / 2.0f,
@@ -2475,7 +2847,6 @@ namespace Engine
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-			// KEEP YOUR ORIGINAL WORKING CODE FOR OBJECT PICKING
 			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
 			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
 
@@ -2500,7 +2871,6 @@ namespace Engine
 				m_Renderer->getEditorViewport() = editorViewportData;
 			}
 
-
 			bool currentCamToggle = m_Renderer->getEditorCamToggle();
 
 			if (m_PreviousEditorCamToggle != currentCamToggle)
@@ -2517,12 +2887,23 @@ namespace Engine
 				m_ImGuizmoViewportData.tl = tl_screen;
 				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
 
+				// Track current frame gizmo state
+				bool isUsingGizmoThisFrame = false;
+				bool isOverGizmoThisFrame = false;
+
+				// FIRST: Handle ImGuizmo manipulation if we have a selected entity
+				if (m_SelectedEntity) {
+					ManipulateEntityTransform(m_SelectedEntity);
+					isUsingGizmoThisFrame = ImGuizmo::IsUsing();
+					isOverGizmoThisFrame = ImGuizmo::IsOver();
+				}
+
 				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
 				{
 					LOG_INFO("[DEBUG] Right-click popup opened!");
 
-					// Unity-style: No checkmarks, just menu items
-					if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+					
+					if (ImGui::MenuItem("Move", "W"))  
 					{
 						m_Operation = ImGuizmo::TRANSLATE;
 						std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
@@ -2564,31 +2945,39 @@ namespace Engine
 					}
 				}
 
+				// SECOND: Handle object selection
 				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
-					if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+					// Only allow selection if we weren't using or over the gizmo in the PREVIOUS frame
+					if (!m_WasUsingGizmoLastFrame && !m_WasOverGizmoLastFrame)
 					{
-						LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
-						m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+						if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+						{
+							LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+							m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+						}
+						else
+						{
+							m_SelectedEntity = Entity{};
+							LOG_INFO("Deselected entity.");
+						}
 					}
 					else
 					{
-						m_SelectedEntity = Entity{};
-						LOG_INFO("Deselected entity.");
+						LOG_INFO("Selection blocked - was interacting with gizmo last frame");
 					}
 				}
 
-				// ImGuizmo manipulation
-				if (m_SelectedEntity) {
-					ManipulateEntityTransform(m_SelectedEntity);
-				}
+				// Update gizmo state for next frame
+				m_WasUsingGizmoLastFrame = isUsingGizmoThisFrame;
+				m_WasOverGizmoLastFrame = isOverGizmoThisFrame;
 			}
 		}
 
 		ImGui::End();
 	}
 
-
+#endif
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
 	{
@@ -2845,14 +3234,19 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
+
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
 		//if (!entity) return;
-		if (!entity || !m_Scene) {
+		/*if (!entity || !m_Scene) {
 			m_SelectedEntity = Entity{};
 			m_PickedID = 0xFFFFFFFFu;
+		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
 			return;
-		}
+		}*/
+
+		if(!entity || !m_Scene || !entity.HasComponent<TransformComponent>())
+			return;
 
 
 		Camera3D& camera = m_Renderer->getEditorCamera();
@@ -2923,15 +3317,170 @@ namespace Engine
 			}
 		}
 
-		// Use screen coordinates for the mode label too
-		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		ImGui::GetForegroundDrawList()->AddText(
-			modeLabelPos,
-			IM_COL32(255, 230, 100, 255),
-			m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-			m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		);
+		//// Use screen coordinates for the mode label too
+		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
+		//ImGui::GetForegroundDrawList()->AddText(
+		//	modeLabelPos,
+		//	IM_COL32(255, 230, 100, 255),
+		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
+		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
+		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
+		//);
+	}
+
+	void Editor::CreateScriptPanel()
+	{
+		if (createScript)
+		{
+			ImGui::OpenPopup("Create Script Panel");
+		}
+
+		if (ImGui::BeginPopupModal("Create Script Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			static char scriptNewBuffer[128] = "";
+			static std::string newScriptName{};
+
+			ImGui::Text("Enter new script name:");
+			if (ImGui::InputText("##NewScriptName", scriptNewBuffer, sizeof(scriptNewBuffer)))
+			{
+				newScriptName = scriptNewBuffer;
+			}
+
+			if (ImGui::Button("Create", ImVec2(120, 0)))
+			{
+				if (!newScriptName.empty())
+				{
+					if (newScriptName.ends_with(".cs"))
+						newScriptName = newScriptName.substr(0, newScriptName.size() - 3);
+
+					std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + newScriptName + ".cs"; // get the saving path
+
+					// writing script template 
+					std::string scriptTemplate =
+						"using Engine;\n"
+						"using System;\n\n"
+						"namespace Game\n"
+						"{\n"
+						"    public class " + newScriptName + "\n"
+						"    {\n"
+						"        public override void OnStart()\n"
+						"        {\n"
+						//"            Log.Info(\"" + newScriptName + " started!\");\n"
+						"			 Engine.InternalCalls.Log(\"" + newScriptName + " started!\");\n"
+						"        }\n\n"
+						"        public override void OnUpdate(float deltaTime)\n"
+						"        {\n"
+						"\n"
+						"        }\n"
+						"    }\n"
+						"}\n";
+
+					std::ofstream outFile(scriptPath);
+					if (outFile.is_open())
+					{
+						outFile << scriptTemplate;
+						outFile.close();
+						OpenScriptInEditor(newScriptName); // to open script after created
+
+						//std::cout << "[Editor] Created new script: " << scriptPath << "\n";
+					}
+					
+
+					scriptNewBuffer[0] = '\0';
+					newScriptName.clear();
+					createScript = false;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void Editor::OpenScriptPanel()
+	{
+		
+		if (openScript)
+		{
+			ImGui::OpenPopup("Open Script");
+		}
+
+		// pop up panel to open scene file
+		if (ImGui::BeginPopupModal("Open Script", nullptr, ImGuiWindowFlags_NoDocking))
+		{
+			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+
+			std::string scriptPath = getRepository() + "\\Scripts\\Game";
+			auto getScriptFiles = getAssetsInFolder(scriptPath);
+
+			ImGui::Text("Select a script to open:");
+			ImGui::Separator();
+
+			if (getScriptFiles.empty())
+			{
+				ImGui::TextDisabled("No script files found in:");
+				ImGui::TextWrapped("%s", scriptPath.c_str());
+			}
+			else
+			{
+				for (const auto& scriptFile : getScriptFiles)
+				{
+					if (ImGui::Selectable(scriptFile.name.c_str()))
+					{
+						OpenScriptInEditor(scriptFile.name.c_str());
+						openScript = false;
+					}
+				}
+			}
+			
+			ImGui::Separator();
+			if (ImGui::Button("Cancel"))
+			{
+				openScript = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup(); 
+		}
+		
+	}
+
+	bool Editor::OpenScriptInEditor(const std::string& scriptName)
+	{
+		std::string sanitizedName = scriptName;
+		if (sanitizedName.ends_with(".cs"))
+		{
+			sanitizedName = sanitizedName.substr(0, sanitizedName.size() - 3);
+		}
+
+		std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + sanitizedName + ".cs";
+
+		if (!std::filesystem::exists(scriptPath))
+		{
+			//std::cerr << "[Editor] Script not found: " << scriptPath << "\n";
+			return false;
+		}
+		try
+		{
+			std::string windowsPath = scriptPath;
+			std::replace(windowsPath.begin(), windowsPath.end(), '/', '\\');
+
+			std::string command = "start \"\" \"" + windowsPath + "\"";
+
+			int result = system(command.c_str());
+			return result == 0;
+		}
+		catch (const std::exception& e)
+		{
+			return false;
+		}
 	}
 
 } // end of namespace Engine

@@ -19,6 +19,7 @@
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
+#include "../Component/ScriptComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -275,7 +276,7 @@ namespace Engine {
 
             propertiesObj.AddMember("Parent", transform.Parent, allocator);
 
-			rapidjson::Value childrenArray(rapidjson::kArrayType);
+            rapidjson::Value childrenArray(rapidjson::kArrayType);
             for (const auto& child : transform.Children) {
                 childrenArray.PushBack(child, allocator);
             }
@@ -313,10 +314,10 @@ namespace Engine {
             propertiesObj.AddMember("MeshGuid",
                 rapidjson::Value(mesh.MeshGuid.m_Value), allocator);
 
-            propertiesObj.AddMember("MaterialGuid", 
+            propertiesObj.AddMember("MaterialGuid",
                 rapidjson::Value(mesh.MaterialGuid.m_Value), allocator);
 
-            propertiesObj.AddMember("TextureGuid", 
+            propertiesObj.AddMember("TextureGuid",
                 rapidjson::Value(mesh.TextureGuid.m_Value), allocator);
 
             //propertiesObj.AddMember("MeshGuid",
@@ -493,6 +494,19 @@ namespace Engine {
             componentsArray.PushBack(componentObj, allocator);
         }
 
+        // Serialize ScriptComponent
+        if (entity.HasComponent<ScriptComponent>()) {
+            const auto& script = entity.GetComponent<ScriptComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ScriptComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("ScriptClassName",
+                rapidjson::Value(script.ScriptClassName.c_str(), allocator), allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
         doc.AddMember("Components", componentsArray, allocator);
 
         // Convert to string
