@@ -301,7 +301,20 @@ namespace Engine
 		}
 	}
 
-	static std::shared_ptr<BTNode> nodeToDelete = nullptr;
+	static void ReplaceChildNode(std::shared_ptr<BTNode> parent,
+		std::shared_ptr<BTNode> oldChild,
+		std::shared_ptr<BTNode> newChild)
+	{
+		auto& children = parent->GetChildren();
+		for (size_t i = 0; i < children.size(); ++i)
+		{
+			if (children[i] == oldChild)
+			{
+				children[i] = newChild;
+				break;
+			}
+		}
+	}
 
 	void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr)
 	{
@@ -375,39 +388,31 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 
-		/*ImVec4 bgColor;
-		if (node->GetTypeName() == "Succeeder" || node->GetTypeName() == "Sequence" || node->GetTypeName() == "Selector")
-			bgColor = ImVec4(0.8f, 0.6f, 0.2f, 0.3f);
-		else if (node->GetTypeName() == "RepeatUntilFail" || node->GetTypeName() == "Inverter" || node->GetTypeName() == "Parallel" 
-				|| node->GetTypeName() == "Condition" || node->GetTypeName() == "Failer" || node->GetTypeName() == "Repeater")
-			bgColor = ImVec4(0.2f, 0.7f, 0.2f, 0.3f);
-		else if (node->GetTypeName() == "Cooldown" || node->GetTypeName() == "Action" || node->GetTypeName() == "Wait" 
-			   || node->GetTypeName() == "Log") 
-			bgColor = ImVec4(0.2f, 0.6f, 0.9f, 0.3f);
-		else                          
-			bgColor = ImVec4(1.0f, 1.0f, 0.7f, 0.3f);
-
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		ImVec2 min = ImGui::GetCursorScreenPos();
-		float width = ImGui::GetContentRegionAvail().x;
-		float height = ImGui::GetTextLineHeightWithSpacing();
-		ImVec2 max = ImVec2(min.x + width, min.y + height);
-		drawList->AddRectFilled(min, max, ImGui::GetColorU32(bgColor));*/
-
 		// --- Inline node editor ---
 		if (nodeOpen)
 		{
 			// Node name
-			static char nameBuffer[128];
+			char nameBuffer[128];
 			strncpy_s(nameBuffer, node->GetName().c_str(), _TRUNCATE);
-			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer)))
+			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				node->SetName(nameBuffer);
+				std::string newName = nameBuffer;
+				newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+				newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+				if (!newName.empty()) {
+					node->SetName(nameBuffer);
+				}
+
+				/*if(nameBuffer[0] != '\0')
+				{
+					node->SetName(nameBuffer);
+				}*/
 			}
 
 			// Node type selector
 			std::vector<std::string> allTypes = BehaviourTreeEditor::GetAllNodeTypes();
-			static int currentTypeIndex = 0;
+			int currentTypeIndex = 0;
 			for (size_t i = 0; i < allTypes.size(); ++i)
 			{
 				if (allTypes[i] == node->GetTypeName())
@@ -425,10 +430,18 @@ namespace Engine
 				},
 				static_cast<void*>(&allTypes), (int)allTypes.size()))
 			{
-				auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
-				for (auto& child : node->GetChildren())
-					newNode->AddChild(child);
-				*node = *newNode; // replace contents
+				if (parent)
+				{
+					auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
+					newNode->SetName(node->GetName()); // Preserve name
+
+					// Transfer children
+					for (auto& child : node->GetChildren())
+						newNode->AddChild(child);
+
+					// Replace in parent's child list
+					ReplaceChildNode(parent, node, newNode);
+				}
 			}
 
 			// --- Node properties ---
@@ -437,19 +450,20 @@ namespace Engine
 
 			for (auto& [name, value] : properties)
 			{
-				char propNameBuffer[256];
 				char valueBuffer[256];
 
-				strncpy_s(propNameBuffer, name.c_str(), _TRUNCATE);
 				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
 
 				float fullWidth = ImGui::GetContentRegionAvail().x;
 				ImGui::PushItemWidth(fullWidth * 0.5f - ImGui::GetStyle().ItemSpacing.x * 0.5f);
 
 				// value box (left)
-				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer)))
+				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					node->SetProperty(name, valueBuffer);
+					if (nameBuffer[0] != '\0')
+					{
+						node->SetProperty(name, valueBuffer);
+					}
 				}
 
 				ImGui::PopItemWidth();
@@ -480,10 +494,20 @@ namespace Engine
 					auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
 					char buffer[256];
 					strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
-					if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+					if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
-						tag.Tag = std::string(buffer);
+						std::string newTag = buffer;
+						newTag.erase(newTag.find_last_not_of(" \t\n\r\f\v") + 1);
+						newTag.erase(0, newTag.find_first_not_of(" \t\n\r\f\v"));
+
+						if (!newTag.empty()) {
+							tag.Tag = newTag;
+						}
+
+						//tag.Tag = std::string(buffer);
 					}
+
+					
 				}
 				
 				ImGui::Separator();
@@ -1066,23 +1090,22 @@ namespace Engine
 							size_t stackDepth = treeInstance.GetStackDepth();
 							auto root = treeInstance.GetRootNode();
 
-							ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
-							ImGui::Text("Stack Depth: %zu", stackDepth);
-
-							// Draw a small "i" icon next to a label
-							/*ImGui::Text("Some setting");
-							ImGui::SameLine();
-
-							// Use a small colored "i" or unicode info character
-							ImGui::TextDisabled("(i)");
-
-							// Show tooltip when hovered
-							if (ImGui::IsItemHovered())
+							char treeBuffer[256];
+							strncpy_s(treeBuffer, sizeof(treeBuffer), treeInstance.GetName().c_str(), _TRUNCATE);
+							if (ImGui::InputText("Tree", treeBuffer, sizeof(treeBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 							{
-								ImGui::BeginTooltip();
-								ImGui::TextWrapped("This is some helpful info about this setting.");
-								ImGui::EndTooltip();
-							}*/
+								std::string newName = treeBuffer;
+								newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+								newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+								if (!newName.empty()) {
+									treeInstance.SetName(newName);
+									ai_bt.TreeAssetPath = newName + ".json";
+								}
+
+							}
+
+							ImGui::Text("Stack Depth: %zu", stackDepth);
 
 							if (root)
 							{
@@ -1229,7 +1252,6 @@ namespace Engine
 									ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
 								}
 							}
-
 
 							if (ImGui::Button("Save Tree")) {
 								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
@@ -2399,7 +2421,7 @@ namespace Engine
 					
 					char formatBuffer[256];
 					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
-					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer)))
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
 						settings->outputFormat = std::string(formatBuffer);
 					}
