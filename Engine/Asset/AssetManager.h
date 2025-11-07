@@ -161,6 +161,13 @@ namespace Engine {
 			return m_cfg.compiledPath;
 		}
 
+
+		/**
+		* @brief Compile a asset with guid
+		* @param guid the asset guid to compile 
+		*/
+		bool CompileSingleAsset(xresource::instance_guid guid, bool verbose); 
+
 		/**
 		 * @brief Get the descriptor root path
 		 * @return Reference to cached descriptor path from config
