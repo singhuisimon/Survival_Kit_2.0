@@ -8,7 +8,7 @@
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-#version 420 core
+#version 460 core
 
 layout(location=0) in vec3 VertexPosition;
 layout(location=1) in vec3 VertexNormal;

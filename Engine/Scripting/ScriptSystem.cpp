@@ -25,7 +25,7 @@ namespace Engine
 		// Hot-reload check: Only reload if DLL file has actually changed
 		static std::filesystem::file_time_type lastModifiedTime;
 		static bool initialized = false;
-
+		(void)ts;
 		std::string dllPath = "GameScripts.dll.tmp";
 
 		// Initialize the last modified time on first run

@@ -117,7 +117,7 @@ namespace Engine {
 					std::string result = fullPath.string(); 
 					std::replace(result.begin(), result.end(), '\\', '/');
 
-					rec.sourcePath = fullPath.string();
+					rec.sourcePath = result;
 				}
 				else {
 					rec.sourcePath = sourcePath;

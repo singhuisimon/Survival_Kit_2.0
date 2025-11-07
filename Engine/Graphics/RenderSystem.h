@@ -18,7 +18,8 @@ namespace Engine {
 	private:
 		Renderer& renderer; // Holds a reference to the renderer -> which is owned by the Application class
 		std::vector<DrawItem> m_drawitems;
-		std::vector<CameraComponent> m_cameralist;
+		std::vector<CameraComponent> m_cameralist;	// Collected scene cameras
+		std::vector<LightCPU>        m_lightlist;	// Collected scene lights
 	};
 
 }
