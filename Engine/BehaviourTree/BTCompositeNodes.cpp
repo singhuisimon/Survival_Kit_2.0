@@ -8,6 +8,7 @@
 #pragma once
 
 #include "BTCompositeNodes.h"
+#include "ECS/Scene.h"
 
 namespace Engine {
 
@@ -74,7 +75,14 @@ namespace Engine {
             BTStatus status = m_Children[m_CurrentChildIndex]->Execute(context);
 
             if (status == BTStatus::Failure) {
-                Reset();
+                // Check if entity still exists before resetting
+                if (context.Entity && context.Scene) {
+                    auto& registry = context.Scene->GetRegistry();
+                    entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                    if (registry.valid(entityHandle)) {
+                        Reset();
+                    }
+                }
                 return BTStatus::Failure;
             }
             else if (status == BTStatus::Running) {
@@ -87,8 +95,16 @@ namespace Engine {
 
         // All children succeeded
         if (!context.isroot) {
-            Reset();
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    Reset();
+                }
+            }
         }
+
         return BTStatus::Success;
     }
 
@@ -100,7 +116,19 @@ namespace Engine {
             BTStatus status = m_Children[m_CurrentChildIndex]->Execute(context);
 
             if (status == BTStatus::Success) {
-                Reset();
+
+                // Only reset if not root - prevents crash when entity is destroyed
+                if (!context.isroot) {
+                    // Check if entity still exists before resetting
+                    if (context.Entity && context.Scene) {
+                        auto& registry = context.Scene->GetRegistry();
+                        entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                        if (registry.valid(entityHandle)) {
+                            Reset();
+                        }
+                    }
+                }
+
                 return BTStatus::Success;
             }
             else if (status == BTStatus::Running) {
@@ -113,8 +141,16 @@ namespace Engine {
 
         // All children failed
         if (!context.isroot) {
-            Reset();
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    Reset();
+                }
+            }
         }
+
         return BTStatus::Failure;
     }
 
@@ -153,24 +189,52 @@ namespace Engine {
 
         // Check failure condition
         if (m_FailurePolicy == Policy::RequireOne && failureCount > 0) {
-            Reset();
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    Reset();
+                }
+            }
             return BTStatus::Failure;
         }
         if (m_FailurePolicy == Policy::RequireAll && failureCount == m_Children.size()) {
-            Reset();
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    Reset();
+                }
+            }
             return BTStatus::Failure;
         }
 
         // Check success condition
         if (m_SuccessPolicy == Policy::RequireAll && successCount == m_Children.size()) {
             if (!context.isroot) {
-                Reset();
+                // Check if entity still exists before resetting
+                if (context.Entity && context.Scene) {
+                    auto& registry = context.Scene->GetRegistry();
+                    entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                    if (registry.valid(entityHandle)) {
+                        Reset();
+                    }
+                }
             }
             return BTStatus::Success;
         }
         if (m_SuccessPolicy == Policy::RequireOne && successCount > 0 && runningCount == 0) {
             if (!context.isroot) {
-                Reset();
+                // Check if entity still exists before resetting
+                if (context.Entity && context.Scene) {
+                    auto& registry = context.Scene->GetRegistry();
+                    entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                    if (registry.valid(entityHandle)) {
+                        Reset();
+                    }
+                }
             }
             return BTStatus::Success;
         }

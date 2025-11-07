@@ -25,6 +25,7 @@
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
+#include <cctype>
 
 // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -257,16 +258,6 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			// ---------------- Display Current Scene Name ---------------------
-			if (!currScenePath.empty())
-			{
-				std::filesystem::path filePath(currScenePath);
-				std::string fileName = filePath.filename().string();
-
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x - 100.0f);
-				ImGui::TextUnformatted(fileName.c_str());
-			}
-
 			if (ImGui::BeginMenu("Edit"))
 			{
 				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
@@ -285,6 +276,25 @@ namespace Engine
 				ImGui::MenuItem("Properties", NULL, &inspectorWindow);
 				ImGui::MenuItem("Performance Profile", NULL, &performanceProfileWindow);
 				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Compile"))
+			{
+				// Compile fucntion goes here
+				ImGui::EndMenu();
+			}
+
+			// ---------------- Display Current Scene Name ---------------------
+			if (!currScenePath.empty())
+			{
+				std::filesystem::path filePath(currScenePath);
+				std::string fileName = filePath.filename().string();
+
+				float textWidth = ImGui::CalcTextSize(fileName.c_str()).x;
+				float menuBarWidth = ImGui::GetWindowSize().x;
+
+				ImGui::SameLine(menuBarWidth - textWidth - 10.0f);
+				ImGui::TextUnformatted(fileName.c_str());
 			}
 
 			ImGui::EndMainMenuBar();
@@ -314,7 +324,20 @@ namespace Engine
 		}
 	}
 
-	static std::shared_ptr<BTNode> nodeToDelete = nullptr;
+	static void ReplaceChildNode(std::shared_ptr<BTNode> parent,
+		std::shared_ptr<BTNode> oldChild,
+		std::shared_ptr<BTNode> newChild)
+	{
+		auto& children = parent->GetChildren();
+		for (size_t i = 0; i < children.size(); ++i)
+		{
+			if (children[i] == oldChild)
+			{
+				children[i] = newChild;
+				break;
+			}
+		}
+	}
 
 	void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr)
 	{
@@ -388,39 +411,31 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 
-		/*ImVec4 bgColor;
-		if (node->GetTypeName() == "Succeeder" || node->GetTypeName() == "Sequence" || node->GetTypeName() == "Selector")
-			bgColor = ImVec4(0.8f, 0.6f, 0.2f, 0.3f);
-		else if (node->GetTypeName() == "RepeatUntilFail" || node->GetTypeName() == "Inverter" || node->GetTypeName() == "Parallel" 
-				|| node->GetTypeName() == "Condition" || node->GetTypeName() == "Failer" || node->GetTypeName() == "Repeater")
-			bgColor = ImVec4(0.2f, 0.7f, 0.2f, 0.3f);
-		else if (node->GetTypeName() == "Cooldown" || node->GetTypeName() == "Action" || node->GetTypeName() == "Wait" 
-			   || node->GetTypeName() == "Log") 
-			bgColor = ImVec4(0.2f, 0.6f, 0.9f, 0.3f);
-		else                          
-			bgColor = ImVec4(1.0f, 1.0f, 0.7f, 0.3f);
-
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		ImVec2 min = ImGui::GetCursorScreenPos();
-		float width = ImGui::GetContentRegionAvail().x;
-		float height = ImGui::GetTextLineHeightWithSpacing();
-		ImVec2 max = ImVec2(min.x + width, min.y + height);
-		drawList->AddRectFilled(min, max, ImGui::GetColorU32(bgColor));*/
-
 		// --- Inline node editor ---
 		if (nodeOpen)
 		{
 			// Node name
-			static char nameBuffer[128];
+			char nameBuffer[128];
 			strncpy_s(nameBuffer, node->GetName().c_str(), _TRUNCATE);
-			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer)))
+			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				node->SetName(nameBuffer);
+				std::string newName = nameBuffer;
+				newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+				newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+				if (!newName.empty()) {
+					node->SetName(nameBuffer);
+				}
+
+				/*if(nameBuffer[0] != '\0')
+				{
+					node->SetName(nameBuffer);
+				}*/
 			}
 
 			// Node type selector
 			std::vector<std::string> allTypes = BehaviourTreeEditor::GetAllNodeTypes();
-			static int currentTypeIndex = 0;
+			int currentTypeIndex = 0;
 			for (size_t i = 0; i < allTypes.size(); ++i)
 			{
 				if (allTypes[i] == node->GetTypeName())
@@ -438,31 +453,67 @@ namespace Engine
 				},
 				static_cast<void*>(&allTypes), (int)allTypes.size()))
 			{
-				auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
-				for (auto& child : node->GetChildren())
-					newNode->AddChild(child);
-				*node = *newNode; // replace contents
+				if (parent)
+				{
+					auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
+					newNode->SetName(node->GetName()); // Preserve name
+
+					// Transfer children
+					for (auto& child : node->GetChildren())
+						newNode->AddChild(child);
+
+					// Replace in parent's child list
+					ReplaceChildNode(parent, node, newNode);
+				}
 			}
 
 			// --- Node properties ---
 			std::vector<std::pair<std::string, std::string>> properties;
 			node->GetProperties(properties);
 
+			auto isNumeric = [](const std::string& s) {
+				if (s.empty()) return false;
+				bool hasDot = false;
+				for (unsigned char c : s) {
+					if (std::isdigit(c))
+						continue;
+					else if (c == '.') {
+						if (hasDot) return false;  // only one dot allowed
+						hasDot = true;
+					}
+					else {
+						return false;  // invalid character
+					}
+				}
+				return true;
+				};
+
 			for (auto& [name, value] : properties)
 			{
-				char propNameBuffer[256];
-				char valueBuffer[256];
+				bool oldIsNumeric = isNumeric(value);
 
-				strncpy_s(propNameBuffer, name.c_str(), _TRUNCATE);
+				char valueBuffer[256];
 				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
 
 				float fullWidth = ImGui::GetContentRegionAvail().x;
 				ImGui::PushItemWidth(fullWidth * 0.5f - ImGui::GetStyle().ItemSpacing.x * 0.5f);
 
 				// value box (left)
-				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer)))
+				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					node->SetProperty(name, valueBuffer);
+					std::string newValue = valueBuffer;
+					newValue.erase(newValue.find_last_not_of(" \t\n\r\f\v") + 1);
+					newValue.erase(0, newValue.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newValue.empty()) {
+
+						bool newIsNumeric = isNumeric(newValue);
+						
+						if (!(oldIsNumeric && !newIsNumeric))
+						{
+							node->SetProperty(name, newValue);
+						}
+					}
 				}
 
 				ImGui::PopItemWidth();
@@ -493,10 +544,20 @@ namespace Engine
 					auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
 					char buffer[256];
 					strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
-					if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+					if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
-						tag.Tag = std::string(buffer);
+						std::string newTag = buffer;
+						newTag.erase(newTag.find_last_not_of(" \t\n\r\f\v") + 1);
+						newTag.erase(0, newTag.find_first_not_of(" \t\n\r\f\v"));
+
+						if (!newTag.empty()) {
+							tag.Tag = newTag;
+						}
+
+						//tag.Tag = std::string(buffer);
 					}
+
+					
 				}
 				
 				ImGui::Separator();
@@ -779,51 +840,43 @@ namespace Engine
 
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
-						std::vector<const AssetRecord*> audioAssets;
-						audioAssets.reserve(allAssets.size());
+
+						std::vector<std::string> audioAssetNames;
+						audioAssetNames.reserve(allAssets.size());
+
 						for (const auto* record : allAssets) {
 							if (!record || !record->valid) continue;
+
 							if (record->type == ResourceType::AUDIO) {
-								audioAssets.push_back(record);
+								std::string filepath = record->sourcePath;
+								size_t lastSlash = filepath.find_last_of("/\\");
+								std::string filename = (lastSlash == std::string::npos)
+									? filepath
+									: filepath.substr(lastSlash + 1);
+
+								LOG_DEBUG("Filepath: ", filepath);
+								LOG_DEBUG("Filename: ", filename);
+
+								audioAssetNames.push_back(filename);
 							}
 						}
 
-						// Determine current selection index
+						std::vector<const char*> audioAssets;
+						audioAssets.reserve(audioAssetNames.size());
+						for (auto& name : audioAssetNames)
+							audioAssets.push_back(name.c_str());
+
 						int currentIndex = 0;
-						for (size_t i = 0; i < audioAssets.size(); ++i)
-						{
-							if (audioAssets[i]->sourcePath == audio.AudioFilePath)
-							{
-								currentIndex = (int)i;
+						for (size_t i = 0; i < audioAssetNames.size(); ++i) {
+							if (audioAssetNames[i] == audio.AudioFilePath) {
+								currentIndex = static_cast<int>(i);
 								break;
 							}
 						}
 
-						// Draw the combo box
-						ImGui::Text("Audio File Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##AudioFilePath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<const AssetRecord*>*>(data);
-								std::string path = assets[idx]->sourcePath;
-
-								// Extract filename from path
-								size_t lastSlash = path.find_last_of("/\\");
-								static std::string filename; // static to keep it alive for ImGui
-								filename = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
-
-								*outText = filename.c_str();
-								return true;
-							},
-							static_cast<void*>(&audioAssets), (int)audioAssets.size()))
-						{
-							// Extract and save just the filename
-							std::string fullPath = audioAssets[currentIndex]->sourcePath;
-							size_t lastSlash = fullPath.find_last_of("/\\");
-							std::string filename = (lastSlash != std::string::npos) ? fullPath.substr(lastSlash + 1) : fullPath;
-
-							audio.SetAudioFile(filename);
+						std::string label = "Filepath"; // Label for the dropdown
+						if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
+							audio.SetAudioFile(audioAssetNames[currentIndex]);
 						}
 
 						ImGui::Text("Audio Type:");
@@ -901,7 +954,7 @@ namespace Engine
 						ImGui::BeginDisabled(!is_3d);
 
 						float min_distance = audio.MinDistance;
-						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance)) {
 							if (is_3d) {
 								audio.SetMinDistance(min_distance);
 							}
@@ -911,7 +964,7 @@ namespace Engine
 						}
 
 						float max_distance = audio.MaxDistance;
-						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f)) {
 							if (is_3d) {
 								audio.SetMaxDistance(max_distance);
 							}
@@ -1057,7 +1110,7 @@ namespace Engine
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
-						if (ImGui::Checkbox("Active", &active)) {
+						if (ImGui::Checkbox("Active###activeListener", &active)) {
 							listener.Active = active;
 						}
 					}
@@ -1079,23 +1132,22 @@ namespace Engine
 							size_t stackDepth = treeInstance.GetStackDepth();
 							auto root = treeInstance.GetRootNode();
 
-							ImGui::Text("Tree: %s", treeInstance.GetName().c_str());
-							ImGui::Text("Stack Depth: %zu", stackDepth);
-
-							// Draw a small "i" icon next to a label
-							/*ImGui::Text("Some setting");
-							ImGui::SameLine();
-
-							// Use a small colored "i" or unicode info character
-							ImGui::TextDisabled("(i)");
-
-							// Show tooltip when hovered
-							if (ImGui::IsItemHovered())
+							char treeBuffer[256];
+							strncpy_s(treeBuffer, sizeof(treeBuffer), treeInstance.GetName().c_str(), _TRUNCATE);
+							if (ImGui::InputText("Tree", treeBuffer, sizeof(treeBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 							{
-								ImGui::BeginTooltip();
-								ImGui::TextWrapped("This is some helpful info about this setting.");
-								ImGui::EndTooltip();
-							}*/
+								std::string newName = treeBuffer;
+								newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+								newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+								if (!newName.empty()) {
+									treeInstance.SetName(newName);
+									ai_bt.TreeAssetPath = newName + ".json";
+								}
+
+							}
+
+							ImGui::Text("Stack Depth: %zu", stackDepth);
 
 							if (root)
 							{
@@ -1165,7 +1217,7 @@ namespace Engine
 
 							// Whether tree executes every frame
 							bool& active = ai_bt.Active;
-							if (ImGui::Checkbox("Active", &active)) {
+							if (ImGui::Checkbox("Active###activeBT", &active)) {
 								ai_bt.Active = active;
 							}
 
@@ -1243,7 +1295,6 @@ namespace Engine
 								}
 							}
 
-
 							if (ImGui::Button("Save Tree")) {
 								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
 							}
@@ -1299,7 +1350,7 @@ namespace Engine
 					{
 						// Playback Controls
 						ImGui::Text("Playback");
-						ImGui::Checkbox("Active", &particleComp.Active);
+						ImGui::Checkbox("Active###activeParticle", &particleComp.Active);
 						ImGui::SameLine();
 						ImGui::Checkbox("Loop", &particleComp.Loop);
 
@@ -2498,7 +2549,7 @@ namespace Engine
 					
 					char formatBuffer[256];
 					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
-					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer)))
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
 						settings->outputFormat = std::string(formatBuffer);
 					}
@@ -3187,9 +3238,15 @@ namespace Engine
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
 		//if (!entity) return;
+		/*if (!entity || !m_Scene) {
+			m_SelectedEntity = Entity{};
+			m_PickedID = 0xFFFFFFFFu;
 		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
 			return;
-		}
+		}*/
+
+		if(!entity || !m_Scene || !entity.HasComponent<TransformComponent>())
+			return;
 
 
 		Camera3D& camera = m_Renderer->getEditorCamera();
