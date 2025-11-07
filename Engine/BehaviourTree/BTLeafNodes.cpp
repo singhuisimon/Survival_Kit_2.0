@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file BTLeafNodes.h
  * @brief Leaf behaviour tree nodes (Actions and Conditions)
  * @author AI System Team
@@ -15,24 +15,9 @@
 #include <functional>
 #include "Core/Application.h"
 #include "Graphics/Material.h"
+#include "Transform/TransformSystem.h"
 
 namespace Engine {
-
-    //helper function- yet to test
-    /*Entity* FindEntityByTag(Scene* scene, const std::string& tag) {
-        if (!scene) return nullptr;
-
-        auto& registry = scene->GetRegistry();
-        auto view = registry.view<TagComponent>();
-
-        for (auto entity : view) {
-            auto& tagComp = view.get<TagComponent>(entity);
-            if (tagComp.Tag == tag) {
-                return &Entity(static_cast<entt::entity>(entity), &scene->GetRegistry());
-            }
-        }
-        return nullptr;
-    }*/
 
     //Action
 
@@ -312,7 +297,6 @@ namespace Engine {
 
         auto& transform = context.Entity->GetComponent<TransformComponent>();
 
-        // Rotate around Y-axis (yaw)
         float rotationRadians = glm::radians(m_RotationSpeed * context.DeltaTime);
         glm::quat rotationDelta = glm::angleAxis(rotationRadians, glm::vec3(0, 1, 0));
         transform.Rotation = rotationDelta * transform.Rotation;
@@ -398,7 +382,8 @@ namespace Engine {
         float speed = m_MoveSpeed * slowDownFactor;
 
         // Calculate movement with speed limit
-        float frameMovement = m_MoveSpeed * context.DeltaTime;
+        float frameMovement = speed * context.DeltaTime;
+        //float frameMovement = m_MoveSpeed * context.DeltaTime;
 
         // CRITICAL FIX: Clamp movement to prevent overshooting
         if (frameMovement > distance) {
@@ -475,6 +460,7 @@ namespace Engine {
         }
 
         LOG_INFO("BTDestroySelf: Destroying entity");
+        TransformSystem::UnParent(context.Scene, *context.Entity); // Unparent before destroying
         context.Scene->DestroyEntity(*context.Entity);
         return BTStatus::Success;
     }
@@ -514,6 +500,7 @@ namespace Engine {
             // Destroy entity outside of iteration
             if (entityToDestroy != entt::null) {
                 Entity entity(entityToDestroy, &registry);
+				TransformSystem::UnParent(context.Scene, entity); // Unparent before destroying
                 context.Scene->DestroyEntity(entity);
                 LOG_INFO("BTDestroyEntityByTag: Successfully destroyed entity");
                 return BTStatus::Success;
@@ -681,7 +668,7 @@ namespace Engine {
             return BTStatus::Success;  // Already at target or invalid
         }
 
-        direction = glm::normalize(direction);
+        //direction = glm::normalize(direction);
 
         //if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
         //    return BTStatus::Failure;
@@ -1071,6 +1058,229 @@ namespace Engine {
         }
     }
 
+    // BTOrbitAroundPoint
+    BTOrbitAroundPoint::BTOrbitAroundPoint(float orbitRadius, 
+                                           float orbitSpeed, 
+                                           const glm::vec3& centerPoint)
+        : m_OrbitRadius(orbitRadius)
+        , m_OrbitSpeed(orbitSpeed)
+        , m_CenterPoint(centerPoint)
+        , m_CurrentAngle(0.0f)
+        , m_CenterPointKey("OrbitCenter") {
+    }
 
+    void BTOrbitAroundPoint::OnEnter(BTContext& context) {
+        // Initialize the starting angle based on entity's current position relative to center
+        if (context.Entity && context.Entity->HasComponent<TransformComponent>()) {
+            auto& transform = context.Entity->GetComponent<TransformComponent>();
+        
+            // Check if there's a dynamic center point in the blackboard
+            auto centerOpt = context.Blackboard.Get<glm::vec3>(m_CenterPointKey);
+            if (centerOpt) {
+                m_CenterPoint = *centerOpt;
+            }
+        
+            // Calculate initial angle from current position
+            glm::vec3 offset = transform.Position - m_CenterPoint;
+            m_CurrentAngle = glm::degrees(std::atan2(offset.z, offset.x));
+        }
+    }
+
+    BTStatus BTOrbitAroundPoint::Execute(BTContext& context) {
+        if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        auto& transform = context.Entity->GetComponent<TransformComponent>();
+
+        // Validate DeltaTime
+        if (context.DeltaTime <= 0.0f || std::isnan(context.DeltaTime) || std::isinf(context.DeltaTime)) {
+            return BTStatus::Running;
+        }
+
+        // Check for dynamic center point update from blackboard
+        auto centerOpt = context.Blackboard.Get<glm::vec3>(m_CenterPointKey);
+        if (centerOpt) {
+            m_CenterPoint = *centerOpt;
+        }
+
+        // Store the current Y position (height) - we want to orbit on the same plane
+        float currentHeight = transform.Position.y;
+
+        // Update the orbit angle
+        m_CurrentAngle += m_OrbitSpeed * context.DeltaTime;
+    
+        // Keep angle in 0-360 range
+        if (m_CurrentAngle >= 360.0f) {
+            m_CurrentAngle -= 360.0f;
+        } else if (m_CurrentAngle < 0.0f) {
+            m_CurrentAngle += 360.0f;
+        }
+
+        // Convert angle to radians for trig functions
+        float angleRad = glm::radians(m_CurrentAngle);
+
+        // Calculate new position on the circular path (XZ plane)
+        float newX = m_CenterPoint.x + m_OrbitRadius * std::cos(angleRad);
+        float newZ = m_CenterPoint.z + m_OrbitRadius * std::sin(angleRad);
+
+        // Set new position (maintaining the same height)
+        // NOTE: We do NOT modify transform.Rotation - entity keeps its current rotation
+        transform.Position = glm::vec3(newX, currentHeight, newZ);
+        transform.IsDirty = true;
+
+        // Always running - this creates continuous movement
+        return BTStatus::Running;
+    }
+
+    void BTOrbitAroundPoint::Reset() {
+        m_CurrentAngle = 0.0f;
+    }
+
+    void BTOrbitAroundPoint::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "OrbitRadius", std::to_string(m_OrbitRadius) });
+        properties.push_back({ "OrbitSpeed", std::to_string(m_OrbitSpeed) });
+        properties.push_back({ "CenterX", std::to_string(m_CenterPoint.x) });
+        properties.push_back({ "CenterY", std::to_string(m_CenterPoint.y) });
+        properties.push_back({ "CenterZ", std::to_string(m_CenterPoint.z) });
+        properties.push_back({ "CenterPointKey", m_CenterPointKey });
+    }
+
+    void BTOrbitAroundPoint::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "OrbitRadius") {
+            m_OrbitRadius = std::stof(value);
+        }
+        else if (name == "OrbitSpeed") {
+            m_OrbitSpeed = std::stof(value);
+        }
+        else if (name == "CenterX") {
+            m_CenterPoint.x = std::stof(value);
+        }
+        else if (name == "CenterY") {
+            m_CenterPoint.y = std::stof(value);
+        }
+        else if (name == "CenterZ") {
+            m_CenterPoint.z = std::stof(value);
+        }
+        else if (name == "CenterPointKey") {
+            m_CenterPointKey = value;
+        }
+    }
+
+	//BTRotateAxis
+    // axis should be a unit-like direction (ex: (0,1,0) or (0,0,1))
+        // degPerSec = rotation speed in degrees per second
+    BTRotateAxis::BTRotateAxis(glm::vec3 axis, float degPerSec)
+        : m_Axis(glm::normalize(axis)), m_DegPerSec(degPerSec) {
+    }
+
+    const char* BTRotateAxis::GetTypeName() const { return "RotateAxis"; }
+
+    BTStatus BTRotateAxis::Execute(BTContext& context) {
+        if (!context.Entity) return BTStatus::Failure;
+
+        if (!context.Entity->HasComponent<TransformComponent>())
+            return BTStatus::Failure;
+
+        auto& tc = context.Entity->GetComponent<TransformComponent>();
+
+        // Compute rotation amount this frame
+        float angleRad = glm::radians(m_DegPerSec * context.DeltaTime);
+
+        // Convert axis + angle into a quaternion
+        glm::quat dq = glm::angleAxis(angleRad, glm::normalize(m_Axis));
+
+        // Apply rotation: newRotation = dq * oldRotation (rotates in local space)
+        tc.Rotation = dq * tc.Rotation;
+        tc.IsDirty = true;
+
+        return BTStatus::Success; // continuous action
+    }
+
+    void BTRotateAxis::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "AxisX", std::to_string(m_Axis.x) });
+        properties.push_back({ "AxisY", std::to_string(m_Axis.y) });
+        properties.push_back({ "AxisZ", std::to_string(m_Axis.z) });
+        properties.push_back({ "DegreesPerSecond", std::to_string(m_DegPerSec) });
+    }
+    void BTRotateAxis::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "AxisX") m_Axis.x = std::stof(value);
+        else if (name == "AxisY") m_Axis.y = std::stof(value);
+        else if (name == "AxisZ") m_Axis.z = std::stof(value);
+        else if (name == "DegreesPerSecond") m_DegPerSec = std::stof(value);
+        m_Axis = glm::normalize(m_Axis);
+    }
+
+	//BTLookAtSmooth
+
+    BTLookAtSmooth::BTLookAtSmooth(std::string targetKey, float turnSpeedDeg)
+        : m_Key(std::move(targetKey)), m_TurnSpeed(glm::radians(turnSpeedDeg)) {
+    }
+
+    const char* BTLookAtSmooth::GetTypeName() const { return "LookAtSmooth"; }
+
+    BTStatus BTLookAtSmooth::Execute(BTContext& context) {
+        if (!context.Entity) return BTStatus::Failure;
+        if (!context.Entity->HasComponent<TransformComponent>()) return BTStatus::Failure;
+
+        auto& tc = context.Entity->GetComponent<TransformComponent>();
+
+        auto tgtOpt = context.Blackboard.Get<glm::vec3>(m_Key);
+        if (!tgtOpt) return BTStatus::Failure;
+        glm::vec3 target = *tgtOpt;
+
+        // Compute direction to face
+        glm::vec3 forward = target - tc.Position;
+        if (glm::dot(forward, forward) < 1e-8f)
+            return BTStatus::Success;
+        forward = glm::normalize(forward);
+
+        // World up
+        glm::vec3 up(0, 0, 1);
+
+        // Compute right vector
+        glm::vec3 right = glm::normalize(glm::cross(up, forward));
+
+        // Recompute up to ensure orthogonality
+        up = glm::normalize(glm::cross(forward, right));
+
+        // Important: GLM mat3 is COLUMN-MAJOR
+        // col0 = forward (+X local)
+        // col1 = right   (+Y local)
+        // col2 = up      (+Z local)
+        glm::mat3 rotMat(forward, right, up);
+
+        glm::quat desired = glm::quat_cast(rotMat);
+
+        // Smooth rotate
+        float t = glm::clamp(m_TurnSpeed * context.DeltaTime, 0.0f, 1.0f);
+        tc.Rotation = glm::slerp(tc.Rotation, desired, t);
+        tc.IsDirty = true;
+
+        // Finish when close
+        float angleDiff = 2.0f * std::acos(glm::clamp(glm::dot(glm::normalize(tc.Rotation),
+            glm::normalize(desired)),
+            -1.0f, 1.0f));
+
+        if (angleDiff < glm::radians(1.0f))
+            return BTStatus::Success;
+
+        return BTStatus::Running;
+
+    }
+
+    void BTLookAtSmooth::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+		properties.push_back({ "TargetKey", m_Key });
+        properties.push_back({ "TurnSpeedDeg", std::to_string(glm::degrees(m_TurnSpeed)) });
+    }
+
+    void BTLookAtSmooth::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "TargetKey") {
+            m_Key = value;
+        }
+        else if (name == "TurnSpeedDeg") {
+            m_TurnSpeed = glm::radians(std::stof(value));
+        }
+    }
 
 } // namespace Engine

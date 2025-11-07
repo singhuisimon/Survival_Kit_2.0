@@ -87,13 +87,19 @@ namespace Engine {
                 continue;
             }
 
+            if (!ent.HasComponent<BehaviourTreeComponent>()) {
+				LOG_TRACE("BehaviourTreeSystem: Entity lost BehaviourTreeComponent during execution");
+				continue;
+            }
+
             // Safe to update component - entity still exists
-            btComp.LastStatus = status;
-            btComp.PersistantBlackboard = context.Blackboard;
+            auto& btCompAfterExecution = ent.GetComponent<BehaviourTreeComponent>();
+            btCompAfterExecution.LastStatus = status;
+            btCompAfterExecution.PersistantBlackboard = context.Blackboard;
 
             // Reset on completion if configured
             if (status != BTStatus::Running && btComp.ResetOnComplete) {
-                btComp.TreeInstance->Reset();
+                btCompAfterExecution.TreeInstance->Reset();
             }
         }
     }

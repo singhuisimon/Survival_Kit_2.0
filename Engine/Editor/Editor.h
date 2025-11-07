@@ -37,7 +37,8 @@
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
-
+#include "../Serialization/PrefabInstantiator.h"
+#include "../Asset/DescriptorEditor.h"
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
@@ -110,6 +111,10 @@ namespace Engine
 
 		bool m_WasUsingGizmoLastFrame = false;
 		bool m_WasOverGizmoLastFrame = false;
+		DescriptorEditor descriptorEditor;
+		bool showDescriptorEditorPanel = false;
+		xresource::instance_guid currentEditingGuid;
+		std::string editedAsset{};
 
 	public:
 		// Default contructor 

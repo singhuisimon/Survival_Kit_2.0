@@ -465,4 +465,65 @@ namespace Engine {
         float m_ElapsedTime = 0.0f;     // Accumulated time
     };
 
+
+    /**
+     * @brief Orbits around a center point without changing rotation
+     * @details Moves in a circular path around a center point on the XZ plane.
+     *          Entity rotation is not modified - it maintains its current facing direction.
+     */
+    class BTOrbitAroundPoint : public BTNode {
+    public:
+        BTOrbitAroundPoint(float orbitRadius = 5.0f,
+            float orbitSpeed = 90.0f,
+            const glm::vec3& centerPoint = glm::vec3(0.0f));
+
+        const char* GetTypeName() const override { return "OrbitAroundPoint"; }
+        void OnEnter(BTContext& context) override;
+        BTStatus Execute(BTContext& context) override;
+        void Reset() override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        float m_OrbitRadius;          // Radius of the circular orbit
+        float m_OrbitSpeed;           // Degrees per second around the circle
+        glm::vec3 m_CenterPoint;      // Center point of the orbit
+        float m_CurrentAngle;         // Current angle in the orbit (in degrees)
+        std::string m_CenterPointKey; // Blackboard key for dynamic center point
+    };
+
+    class BTRotateAxis : public BTNode {
+    public:
+        // axis should be a unit-like direction (ex: (0,1,0) or (0,0,1))
+        // degPerSec = rotation speed in degrees per second
+        BTRotateAxis(glm::vec3 axis = glm::vec3(0, 0, 1), float degPerSec = 30.0f);
+
+        const char* GetTypeName() const override;
+
+        BTStatus Execute(BTContext& context) override;
+
+        // Editor / JSON support
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        glm::vec3 m_Axis;
+        float m_DegPerSec;
+    };
+
+    class BTLookAtSmooth : public BTNode {
+    public:
+        BTLookAtSmooth(std::string targetKey = "TargetPoint", float turnSpeedDeg = 120.0f);
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& p) const override;
+
+        void SetProperty(const std::string& n, const std::string& v) override;
+
+        std::string m_Key;
+        float m_TurnSpeed; // radians per second
+    };
+
 } // namespace Engine
