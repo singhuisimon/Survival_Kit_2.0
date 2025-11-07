@@ -20,6 +20,7 @@
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ScriptComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Utility/Logger.h"
 
@@ -240,7 +241,7 @@ namespace Engine {
                 comp.Scale = glm::vec3(scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat());
             }
             if (properties.HasMember("Parent")) {
-				comp.Parent = properties["Parent"].GetUint();
+                comp.Parent = properties["Parent"].GetUint();
             }
             if (properties.HasMember("Children") && properties["Children"].IsArray()) {
                 comp.Children.clear();
@@ -283,7 +284,7 @@ namespace Engine {
             }
             if (properties.HasMember("TextureGuid")) {
                 uint64_t guidValue = properties["TextureGuid"].GetUint64();
-				comp.TextureGuid = xresource::instance_guid{ guidValue };
+                comp.TextureGuid = xresource::instance_guid{ guidValue };
             }
             if (properties.HasMember("Visible")) {
                 comp.Visible = properties["Visible"].GetBool();
@@ -412,7 +413,7 @@ namespace Engine {
 
 
             comp.TreeInstance = nullptr; // runtime-only
-         }
+        }
 
         else if (componentType == "ParticleComponent") {
             auto& emitter = entity.AddComponent<ParticleComponent>();
@@ -485,8 +486,22 @@ namespace Engine {
 
             emitter.Particles.clear();
             emitter.EmissionAccumulator = 0.0f;
+        }
+
+        else if (componentType == "ScriptComponent") {
+            auto& comp = entity.AddComponent<ScriptComponent>();
+
+            if (properties.HasMember("ScriptClassName")) {
+                comp.ScriptClassName = properties["ScriptClassName"].GetString();
             }
+
+            // ScriptInstance and Started will be initialized by ScriptSystem at runtime
+            LOG_DEBUG("PrefabInstantiator: Added ScriptComponent with class '",
+                comp.ScriptClassName, "'");
+        }
     }
+
+
 
     // Explicit template instantiation for rapidjson::Value
     template void PrefabInstantiator::AddComponentFromJson<::rapidjson::Value>(
