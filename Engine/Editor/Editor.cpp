@@ -2848,11 +2848,14 @@ namespace Engine
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
 		//if (!entity) return;
-		if (!entity || !m_Scene) {
+		/*if (!entity || !m_Scene) {
 			m_SelectedEntity = Entity{};
 			m_PickedID = 0xFFFFFFFFu;
 			return;
-		}
+		}*/
+
+		if(!entity || !m_Scene || !entity.HasComponent<TransformComponent>())
+			return;
 
 
 		Camera3D& camera = m_Renderer->getEditorCamera();
