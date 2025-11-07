@@ -799,51 +799,43 @@ namespace Engine
 
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
-						std::vector<const AssetRecord*> audioAssets;
-						audioAssets.reserve(allAssets.size());
+
+						std::vector<std::string> audioAssetNames;
+						audioAssetNames.reserve(allAssets.size());
+
 						for (const auto* record : allAssets) {
 							if (!record || !record->valid) continue;
+
 							if (record->type == ResourceType::AUDIO) {
-								audioAssets.push_back(record);
+								std::string filepath = record->sourcePath;
+								size_t lastSlash = filepath.find_last_of("/\\");
+								std::string filename = (lastSlash == std::string::npos)
+									? filepath
+									: filepath.substr(lastSlash + 1);
+
+								LOG_DEBUG("Filepath: ", filepath);
+								LOG_DEBUG("Filename: ", filename);
+
+								audioAssetNames.push_back(filename);
 							}
 						}
 
-						// Determine current selection index
+						std::vector<const char*> audioAssets;
+						audioAssets.reserve(audioAssetNames.size());
+						for (auto& name : audioAssetNames)
+							audioAssets.push_back(name.c_str());
+
 						int currentIndex = 0;
-						for (size_t i = 0; i < audioAssets.size(); ++i)
-						{
-							if (audioAssets[i]->sourcePath == audio.AudioFilePath)
-							{
-								currentIndex = (int)i;
+						for (size_t i = 0; i < audioAssetNames.size(); ++i) {
+							if (audioAssetNames[i] == audio.AudioFilePath) {
+								currentIndex = static_cast<int>(i);
 								break;
 							}
 						}
 
-						// Draw the combo box
-						ImGui::Text("Audio File Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##AudioFilePath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<const AssetRecord*>*>(data);
-								std::string path = assets[idx]->sourcePath;
-
-								// Extract filename from path
-								size_t lastSlash = path.find_last_of("/\\");
-								static std::string filename; // static to keep it alive for ImGui
-								filename = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
-
-								*outText = filename.c_str();
-								return true;
-							},
-							static_cast<void*>(&audioAssets), (int)audioAssets.size()))
-						{
-							// Extract and save just the filename
-							std::string fullPath = audioAssets[currentIndex]->sourcePath;
-							size_t lastSlash = fullPath.find_last_of("/\\");
-							std::string filename = (lastSlash != std::string::npos) ? fullPath.substr(lastSlash + 1) : fullPath;
-
-							audio.SetAudioFile(filename);
+						std::string label = "Filepath"; // Label for the dropdown
+						if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
+							audio.SetAudioFile(audioAssetNames[currentIndex]);
 						}
 
 						ImGui::Text("Audio Type:");
