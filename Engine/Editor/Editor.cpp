@@ -233,6 +233,7 @@ namespace Engine
 				if (ImGui::MenuItem("Open Script"))
 				{
 					// open script logic
+					openScript = true;
 
 				}
 				if (ImGui::IsItemHovered())
@@ -299,6 +300,17 @@ namespace Engine
 		if (saveAsPanel)
 		{
 			saveAsScenePanel();
+		}
+
+		// ========================= Create Script Panel ===========================
+		if (createScript)
+		{
+			CreateScriptPanel();
+		}
+		// ========================== Open Script Panel ============================
+		if (openScript)
+		{
+			OpenScriptPanel();
 		}
 	}
 
@@ -3273,23 +3285,147 @@ namespace Engine
 			static char scriptNewBuffer[128] = "";
 			static std::string newScriptName{};
 
-			if (ImGui::InputText("New Script Name", scriptNewBuffer, sizeof(scriptNewBuffer)))
+			ImGui::Text("Enter new script name:");
+			if (ImGui::InputText("##NewScriptName", scriptNewBuffer, sizeof(scriptNewBuffer)))
 			{
 				newScriptName = scriptNewBuffer;
 			}
 
 			if (ImGui::Button("Create", ImVec2(120, 0)))
 			{
-				// Only create scripts when name is filled
 				if (!newScriptName.empty())
 				{
+					if (newScriptName.ends_with(".cs"))
+						newScriptName = newScriptName.substr(0, newScriptName.size() - 3);
+
+					std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + newScriptName + ".cs"; // get the saving path
+
+					// writing script template 
+					std::string scriptTemplate =
+						"using Engine;\n"
+						"using System;\n\n"
+						"namespace Game\n"
+						"{\n"
+						"    public class " + newScriptName + "\n"
+						"    {\n"
+						"        public override void OnStart()\n"
+						"        {\n"
+						//"            Log.Info(\"" + newScriptName + " started!\");\n"
+						"			 Engine.InternalCalls.Log(\"" + newScriptName + " started!\");\n"
+						"        }\n\n"
+						"        public override void OnUpdate(float deltaTime)\n"
+						"        {\n"
+						"\n"
+						"        }\n"
+						"    }\n"
+						"}\n";
+
+					std::ofstream outFile(scriptPath);
+					if (outFile.is_open())
+					{
+						outFile << scriptTemplate;
+						outFile.close();
+						OpenScriptInEditor(newScriptName); // to open script after created
+
+						//std::cout << "[Editor] Created new script: " << scriptPath << "\n";
+					}
 					
+
 					scriptNewBuffer[0] = '\0';
 					newScriptName.clear();
+					createScript = false;
+					ImGui::CloseCurrentPopup();
 				}
 			}
 
-			ImGui::EndPopup(); // end pop up for create script panel
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
 		}
 	}
+
+	void Editor::OpenScriptPanel()
+	{
+		
+		if (openScript)
+		{
+			ImGui::OpenPopup("Open Script");
+		}
+
+		// pop up panel to open scene file
+		if (ImGui::BeginPopupModal("Open Script", nullptr, ImGuiWindowFlags_NoDocking))
+		{
+			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+
+			std::string scriptPath = getRepository() + "\\Scripts\\Game";
+			auto getScriptFiles = getAssetsInFolder(scriptPath);
+
+			ImGui::Text("Select a script to open:");
+			ImGui::Separator();
+
+			if (getScriptFiles.empty())
+			{
+				ImGui::TextDisabled("No script files found in:");
+				ImGui::TextWrapped("%s", scriptPath.c_str());
+			}
+			else
+			{
+				for (const auto& scriptFile : getScriptFiles)
+				{
+					if (ImGui::Selectable(scriptFile.name.c_str()))
+					{
+						OpenScriptInEditor(scriptFile.name.c_str());
+						openScript = false;
+					}
+				}
+			}
+			
+			ImGui::Separator();
+			if (ImGui::Button("Cancel"))
+			{
+				openScript = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup(); 
+		}
+		
+	}
+
+	bool Editor::OpenScriptInEditor(const std::string& scriptName)
+	{
+		std::string sanitizedName = scriptName;
+		if (sanitizedName.ends_with(".cs"))
+		{
+			sanitizedName = sanitizedName.substr(0, sanitizedName.size() - 3);
+		}
+
+		std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + sanitizedName + ".cs";
+
+		if (!std::filesystem::exists(scriptPath))
+		{
+			//std::cerr << "[Editor] Script not found: " << scriptPath << "\n";
+			return false;
+		}
+		try
+		{
+			std::string windowsPath = scriptPath;
+			std::replace(windowsPath.begin(), windowsPath.end(), '/', '\\');
+
+			std::string command = "start \"\" \"" + windowsPath + "\"";
+
+			int result = system(command.c_str());
+			return result == 0;
+		}
+		catch (const std::exception& e)
+		{
+			return false;
+		}
+	}
+
 } // end of namespace Engine

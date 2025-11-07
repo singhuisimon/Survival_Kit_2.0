@@ -201,7 +201,12 @@ namespace Engine
 
 		void ManipulateEntityTransform(Entity& entity);
 
+		// Script helper function
 		void CreateScriptPanel();
+
+		void OpenScriptPanel();
+
+		bool OpenScriptInEditor(const std::string& scriptName);
 	};
 
 
