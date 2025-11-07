@@ -1313,7 +1313,7 @@ namespace Engine
 							{
 								for (int i = 0; i < 3; i++)
 								{
-									bool isSelected = (particleComp.ParticleType == i);
+									bool isSelected = (particleComp.ParticleType == static_cast<unsigned int>(i));
 									if (ImGui::Selectable(particleTypes[i], isSelected))
 									{
 										particleComp.ParticleType = i;
@@ -2673,15 +2673,17 @@ namespace Engine
 		ImGuizmo::BeginFrame();
 	}
 
+
+#if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
-		// Your existing viewport size calculation...
+		// viewport size calculation...
 		ImVec2 viewportSize = { 600, 600 };
 		if (m_Window) {
-			int width = 0.f;
-			int height = 0.f;
+			int width = 0;
+			int height = 0;
 			glfwGetWindowSize(m_Window, &width, &height);
 			viewportSize = {
 				static_cast<float>(width) / 2.0f,
@@ -2695,7 +2697,6 @@ namespace Engine
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-			// KEEP YOUR ORIGINAL WORKING CODE FOR OBJECT PICKING
 			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
 			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
 
@@ -2720,7 +2721,6 @@ namespace Engine
 				m_Renderer->getEditorViewport() = editorViewportData;
 			}
 
-
 			bool currentCamToggle = m_Renderer->getEditorCamToggle();
 
 			if (m_PreviousEditorCamToggle != currentCamToggle)
@@ -2737,12 +2737,23 @@ namespace Engine
 				m_ImGuizmoViewportData.tl = tl_screen;
 				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
 
+				// Track current frame gizmo state
+				bool isUsingGizmoThisFrame = false;
+				bool isOverGizmoThisFrame = false;
+
+				// FIRST: Handle ImGuizmo manipulation if we have a selected entity
+				if (m_SelectedEntity) {
+					ManipulateEntityTransform(m_SelectedEntity);
+					isUsingGizmoThisFrame = ImGuizmo::IsUsing();
+					isOverGizmoThisFrame = ImGuizmo::IsOver();
+				}
+
 				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
 				{
 					LOG_INFO("[DEBUG] Right-click popup opened!");
 
-					// Unity-style: No checkmarks, just menu items
-					if (ImGui::MenuItem("Move", "W"))  // Unity uses "Move" not "Translate"
+					
+					if (ImGui::MenuItem("Move", "W"))  
 					{
 						m_Operation = ImGuizmo::TRANSLATE;
 						std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
@@ -2784,31 +2795,39 @@ namespace Engine
 					}
 				}
 
+				// SECOND: Handle object selection
 				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
-					if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+					// Only allow selection if we weren't using or over the gizmo in the PREVIOUS frame
+					if (!m_WasUsingGizmoLastFrame && !m_WasOverGizmoLastFrame)
 					{
-						LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
-						m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+						if (m_PickedID != 0xFFFFFFFFu && m_Scene)
+						{
+							LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
+							m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+						}
+						else
+						{
+							m_SelectedEntity = Entity{};
+							LOG_INFO("Deselected entity.");
+						}
 					}
 					else
 					{
-						m_SelectedEntity = Entity{};
-						LOG_INFO("Deselected entity.");
+						LOG_INFO("Selection blocked - was interacting with gizmo last frame");
 					}
 				}
 
-				// ImGuizmo manipulation
-				if (m_SelectedEntity) {
-					ManipulateEntityTransform(m_SelectedEntity);
-				}
+				// Update gizmo state for next frame
+				m_WasUsingGizmoLastFrame = isUsingGizmoThisFrame;
+				m_WasOverGizmoLastFrame = isOverGizmoThisFrame;
 			}
 		}
 
 		ImGui::End();
 	}
 
-
+#endif
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
 	{
@@ -3065,12 +3084,11 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
+
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
 		//if (!entity) return;
-		if (!entity || !m_Scene) {
-			m_SelectedEntity = Entity{};
-			m_PickedID = 0xFFFFFFFFu;
+		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
 			return;
 		}
 
@@ -3143,15 +3161,15 @@ namespace Engine
 			}
 		}
 
-		// Use screen coordinates for the mode label too
-		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		ImGui::GetForegroundDrawList()->AddText(
-			modeLabelPos,
-			IM_COL32(255, 230, 100, 255),
-			m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-			m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		);
+		//// Use screen coordinates for the mode label too
+		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
+		//ImGui::GetForegroundDrawList()->AddText(
+		//	modeLabelPos,
+		//	IM_COL32(255, 230, 100, 255),
+		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
+		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
+		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
+		//);
 	}
 
 } // end of namespace Engine
