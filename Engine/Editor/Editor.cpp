@@ -1416,7 +1416,7 @@ namespace Engine
 						}
 					}
 				}
-				// ========================= Display ScriptCompoment ===============================
+				// ========================= Display Script Compoment ===============================
 				if (m_SelectedEntity.HasComponent<ScriptComponent>())
 				{
 					ImGui::Separator();
@@ -1431,6 +1431,7 @@ namespace Engine
 
 						if (!scriptFiles.empty())
 						{
+							
 							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.c_str()))
 							{
 								for (const auto& asset : scriptFiles)
@@ -1463,10 +1464,7 @@ namespace Engine
 
 										if (scriptComp.ScriptInstance)
 										{
-											MonoScriptEngine::GetInstance().SetFieldValue(
-												(MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
-
-											// Optionally call OnStart so it shows started
+											MonoScriptEngine::GetInstance().SetFieldValue((MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
 											MonoScriptEngine::GetInstance().CallMethod((MonoObject*)scriptComp.ScriptInstance, "OnStart");
 											scriptComp.Started = true;
 										}
