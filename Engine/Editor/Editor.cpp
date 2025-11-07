@@ -233,6 +233,7 @@ namespace Engine
 				if (ImGui::MenuItem("Open Script"))
 				{
 					// open script logic
+
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Open script from file.");
@@ -1403,6 +1404,74 @@ namespace Engine
 						}
 					}
 				}
+				// ========================= Display ScriptCompoment ===============================
+				if (m_SelectedEntity.HasComponent<ScriptComponent>())
+				{
+					ImGui::Separator();
+					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
+					std::string scriptPath = getRepository() + "\\Scripts\\Game";
+					auto scriptFiles = getAssetsInFolder(scriptPath);
+					
+					if (ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+						ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
+
+						if (!scriptFiles.empty())
+						{
+							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.c_str()))
+							{
+								for (const auto& asset : scriptFiles)
+								{
+									std::string className = asset.name;
+									std::cout << className << "//////////////////" << "\n";
+									if (className.ends_with(".cs"))
+									{
+										className = className.substr(0, className.size() - 3); // remove extension
+									}
+									//std::cout << "////// className: " << className << "\n";
+									std::string selectedClassName = "Game." + className;
+
+									//std::cout << "////// selectedClassName: " << selectedClassName << "\n";
+									bool isSelected = (scriptComp.ScriptClassName == selectedClassName);
+									if (ImGui::Selectable(className.c_str(), isSelected))
+									{
+										// Destroy previous script instance if exists
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+											scriptComp.ScriptInstance = nullptr;
+											scriptComp.Started = false;
+										}
+
+										// Assign the new script class
+										scriptComp.ScriptClassName = selectedClassName;
+
+										scriptComp.ScriptInstance = MonoScriptEngine::GetInstance().CreateScriptInstance(scriptComp.ScriptClassName);
+
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().SetFieldValue(
+												(MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
+
+											// Optionally call OnStart so it shows started
+											MonoScriptEngine::GetInstance().CallMethod((MonoObject*)scriptComp.ScriptInstance, "OnStart");
+											scriptComp.Started = true;
+										}
+									}
+
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+						}
+
+					}
+
+				}
 
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
@@ -1566,6 +1635,7 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Particle Component ----------------------------
 					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
 					ImGui::BeginDisabled(hasParticleSystem);
 
@@ -1585,6 +1655,25 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Script Component ----------------------------
+					bool hasScriptComponent = m_SelectedEntity.HasComponent<ScriptComponent>();
+					ImGui::BeginDisabled(hasScriptComponent);
+
+					if (ImGui::MenuItem("Script Component"))
+					{
+						if (!hasScriptComponent)
+						{
+							m_SelectedEntity.AddComponent<ScriptComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasScriptComponent)
+						{
+							ImGui::SetTooltip("Add script to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 					//ImGui::SetWindowFontScale(1.0f); // Reset
 
 					ImGui::EndPopup(); // end pop up for Add Component  
@@ -3172,4 +3261,35 @@ namespace Engine
 		//);
 	}
 
+	void Editor::CreateScriptPanel()
+	{
+		if (createScript)
+		{
+			ImGui::OpenPopup("Create Script Panel");
+		}
+
+		if (ImGui::BeginPopupModal("Create Script Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			static char scriptNewBuffer[128] = "";
+			static std::string newScriptName{};
+
+			if (ImGui::InputText("New Script Name", scriptNewBuffer, sizeof(scriptNewBuffer)))
+			{
+				newScriptName = scriptNewBuffer;
+			}
+
+			if (ImGui::Button("Create", ImVec2(120, 0)))
+			{
+				// Only create scripts when name is filled
+				if (!newScriptName.empty())
+				{
+					
+					scriptNewBuffer[0] = '\0';
+					newScriptName.clear();
+				}
+			}
+
+			ImGui::EndPopup(); // end pop up for create script panel
+		}
+	}
 } // end of namespace Engine
