@@ -1483,7 +1483,7 @@ namespace Engine
 						if (!scriptFiles.empty())
 						{
 							
-							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.c_str()))
+							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
 							{
 								for (const auto& asset : scriptFiles)
 								{
