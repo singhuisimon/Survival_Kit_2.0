@@ -16,6 +16,7 @@ struct Material
     vec3 Ka;            // Ambient reflectivity
     vec3 Kd;            // Diffuse reflectivity
     vec3 Ks;            // Specular reflectivity
+    float alpha;
     float shininess;    // Specular shininess factor
 };
 
@@ -167,7 +168,7 @@ vec3 BlinnPhong(vec3 position, vec3 normal, Light light, Material material, mat4
     }
 
     // Compute final illumination
-    vec3 illumination = ambient + diffuse + specular; 
+    vec3 illumination = diffuse + specular; 
     
     return illumination;
 }

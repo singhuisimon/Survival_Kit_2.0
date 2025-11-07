@@ -510,35 +510,6 @@ namespace Engine {
 		prog.setUniform("light.Ld", editor_light.getLightDiffuse());        // Diffuse
 		prog.setUniform("light.Ls", editor_light.getLightSpecular());       // Specular
 
-#if 0
-#pragma region SET_UNIFORM_TEMP
-		if (textureMode) {
-			glBindTextureUnit(0, static_cast<GLuint>(m_gl.t_testing_textures[selected_texture].handle()));
-			prog.setUniform("Texture2D", 0);
-			prog.setUniform("isTexture", true);
-
-			if (m_gl.t_testing_textures[selected_texture].is_srgb()) {
-				prog.setUniform("isGamma", true);
-			}
-			else {
-				prog.setUniform("isGamma", false);
-			}
-
-		}
-		else {
-			prog.setUniform("isTexture", false);
-		}
-
-		if (isPBR) {
-			prog.setUniform("isPBR", true);
-		}
-		else {
-			prog.setUniform("isPBR", false);
-		}
-
-#pragma endregion
-#endif
-
 		for (const auto& item : draw_items) {
 
 			if (pass.passtype == PassType::DEBUGGING) {
@@ -581,12 +552,34 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 			}
 
+
 			// Temporary transformations
 			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
-			prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-			prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-			prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-			prog.setUniform("material.shininess", test_material.getMaterialShininess());
+
+			// Check for material resource
+			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+			{
+				// New workflow has no ambient lighting
+
+				prog.setUniform("material.Kd", glm::vec3(material_resource->diffuseColor[0], 
+																   material_resource->diffuseColor[1], 
+																   material_resource->diffuseColor[2]));
+
+				prog.setUniform("material.Ks", glm::vec3(material_resource->specularColor[0],
+																   material_resource->specularColor[1],
+																   material_resource->specularColor[2]));
+
+				// The alpha value is stored in the diffuse color's alpha channel, this value is used to control the transparency of the material
+				prog.setUniform("material.alpha", material_resource->diffuseColor[3]);
+				prog.setUniform("material.shininess", material_resource->shininess);
+			}
+			else
+			{
+				prog.setUniform("material.Ka", test_material.getMaterialAmbient());
+				prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
+				prog.setUniform("material.Ks", test_material.getMaterialSpecular());
+				prog.setUniform("material.shininess", test_material.getMaterialShininess());
+			}
 
 			size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
 
@@ -594,7 +587,6 @@ namespace Engine {
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-			
 			xresource::full_guid guid = convertToMeshGuid(item.m_mesh_guid);
 
 			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(guid)) {
