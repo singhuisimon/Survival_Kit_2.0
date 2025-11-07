@@ -12,6 +12,7 @@
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/ScriptComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Prefab/BehaviourTreePrefab.h"
 
 #include "ReflectionRegistry.h"
@@ -375,6 +376,32 @@ namespace Engine {
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
             }
+            // Serialize LightComponent
+            if (entity.HasComponent<LightComponent>()) {
+                LOG_TRACE("  - Serializing LightComponent");
+                auto& light = entity.GetComponent<LightComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "LightComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Enabled", light.Enabled, allocator);
+                propertiesObj.AddMember("Type", static_cast<int>(light.Type), allocator);
+                //propertiesObj.AddMember("Mode", light.Mode, allocator); // For now only 1 mode, not required in scene file
+                Value colorArr(kArrayType);
+                colorArr.PushBack(light.Color.x, allocator);
+                colorArr.PushBack(light.Color.y, allocator);
+                colorArr.PushBack(light.Color.z, allocator);
+                propertiesObj.AddMember("Color", colorArr, allocator);
+                propertiesObj.AddMember("Intensity", light.Intensity, allocator);
+                propertiesObj.AddMember("Range", light.Range, allocator);
+                propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
+                propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
+
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+
             entityObj.AddMember("Components", componentsArray, allocator);
             entitiesArray.PushBack(entityObj, allocator);
         }
@@ -755,6 +782,32 @@ namespace Engine {
                             script.ScriptClassName = properties["ScriptClassName"].GetString();
                         }
 
+                    } else if (componentType == "LightComponent") {
+                        auto& light = entity.AddComponent<LightComponent>();
+
+                        if (properties.HasMember("Enabled"))
+                            light.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("Type"))
+                            light.Type = static_cast<LightType>(properties["Type"].GetInt()); // 0=Dir,1=Point,2=Spot
+                        // Optional: Mode is usually omitted in scene files (Realtime only), but handle if present
+                        //if (properties.HasMember("Mode"))
+                        //    light.Mode = static_cast<LightMode>(properties["Mode"].GetInt());
+                        if (properties.HasMember("Color") && properties["Color"].IsArray()) {
+                            const auto& col = properties["Color"];
+                            light.Color = glm::vec3(
+                                col[0].GetFloat(),
+                                col[1].GetFloat(),
+                                col[2].GetFloat()
+                            );
+                        }
+                        if (properties.HasMember("Intensity"))
+                            light.Intensity = properties["Intensity"].GetFloat();
+                        if (properties.HasMember("Range"))
+                            light.Range = properties["Range"].GetFloat();
+                        if (properties.HasMember("SpotAngleDeg"))
+                            light.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
+                        if (properties.HasMember("IndirectMultiplier"))
+                            light.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
                     }
                 }
             }

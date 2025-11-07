@@ -22,6 +22,7 @@
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ScriptComponent.h"
 #include "../Component/ParticleComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -498,6 +499,36 @@ namespace Engine {
             // ScriptInstance and Started will be initialized by ScriptSystem at runtime
             LOG_DEBUG("PrefabInstantiator: Added ScriptComponent with class '",
                 comp.ScriptClassName, "'");
+        }
+
+        else if (componentType == "LightComponent") {
+            auto& comp = entity.AddComponent<LightComponent>();
+
+            if (properties.HasMember("Enabled")) {
+                comp.Enabled = properties["Enabled"].GetBool();
+            }
+            if (properties.HasMember("Type")) {
+                comp.Type = static_cast<LightType>(properties["Type"].GetUint());
+            }
+            //if (properties.HasMember("Mode")) {
+            //    comp.Mode = static_cast<LightMode>(properties["Mode"].GetUint());
+            //}
+            if (properties.HasMember("Color") && properties["Color"].IsArray()) {
+                const auto& col = properties["Color"];
+                comp.Color = glm::vec3(col[0].GetFloat(), col[1].GetFloat(), col[2].GetFloat());
+            }
+            if (properties.HasMember("Intensity")) {
+                comp.Intensity = properties["Intensity"].GetFloat();
+            }
+            if (properties.HasMember("Range")) {
+                comp.Range = properties["Range"].GetFloat();
+            }
+            if (properties.HasMember("SpotAngleDeg")) {
+                comp.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
+            }
+            if (properties.HasMember("IndirectMultiplier")) {
+                comp.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+            }
         }
     }
 

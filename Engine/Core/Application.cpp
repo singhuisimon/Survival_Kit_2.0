@@ -34,10 +34,7 @@ namespace Engine
 		, m_WindowWidth(width)
 		, m_WindowHeight(height)
 		, m_Editor_camera(ORBITING, glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.f, 0.f, 0.0f), 80.0f, 0.5f, 5000.0f)
-		, m_Editor_light(glm::vec3(0.0f, 8.0f, 0.0f),
-			glm::vec3(0.4f, 0.4f, 0.4f),
-			glm::vec3(1.0f, 1.0f, 1.0f),
-			glm::vec3(1.0f, 1.0f, 1.0f))
+
 	{
 		Init();
 	}
@@ -85,7 +82,7 @@ namespace Engine
 		glfwSwapInterval(1); // VSync
 
 		// Initialize Renderer
-		m_Renderer = std::make_unique<Renderer>(m_Editor_camera, m_Editor_light);
+		m_Renderer = std::make_unique<Renderer>(m_Editor_camera);
 		m_Renderer->setup();
 		LOG_INFO("Renderer setup initialized");
 

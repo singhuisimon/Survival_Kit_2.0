@@ -20,6 +20,7 @@
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/ScriptComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -507,6 +508,33 @@ namespace Engine {
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }
+
+        // Serialize LightComponent
+        if (entity.HasComponent<LightComponent>()) {
+            const auto& light = entity.GetComponent<LightComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "LightComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Enabled", light.Enabled, allocator);
+            propertiesObj.AddMember("Type", static_cast<uint32_t>(light.Type), allocator);
+            //propertiesObj.AddMember("Mode", static_cast<uint32_t>(light.Mode), allocator);
+
+            rapidjson::Value colorArray(rapidjson::kArrayType);
+            colorArray.PushBack(light.Color.x, allocator);
+            colorArray.PushBack(light.Color.y, allocator);
+            colorArray.PushBack(light.Color.z, allocator);
+            propertiesObj.AddMember("Color", colorArray, allocator);
+
+            propertiesObj.AddMember("Intensity", light.Intensity, allocator);
+            propertiesObj.AddMember("Range", light.Range, allocator);
+            propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
+            propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
         doc.AddMember("Components", componentsArray, allocator);
 
         // Convert to string
