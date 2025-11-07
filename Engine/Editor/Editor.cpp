@@ -255,16 +255,6 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			// ---------------- Display Current Scene Name ---------------------
-			if (!currScenePath.empty())
-			{
-				std::filesystem::path filePath(currScenePath);
-				std::string fileName = filePath.filename().string();
-
-				ImGui::SameLine(ImGui::GetContentRegionAvail().x - 100.0f);
-				ImGui::TextUnformatted(fileName.c_str());
-			}
-
 			if (ImGui::BeginMenu("Edit"))
 			{
 				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
@@ -283,6 +273,25 @@ namespace Engine
 				ImGui::MenuItem("Properties", NULL, &inspectorWindow);
 				ImGui::MenuItem("Performance Profile", NULL, &performanceProfileWindow);
 				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Compile"))
+			{
+				// Compile fucntion goes here
+				ImGui::EndMenu();
+			}
+
+			// ---------------- Display Current Scene Name ---------------------
+			if (!currScenePath.empty())
+			{
+				std::filesystem::path filePath(currScenePath);
+				std::string fileName = filePath.filename().string();
+
+				float textWidth = ImGui::CalcTextSize(fileName.c_str()).x;
+				float menuBarWidth = ImGui::GetWindowSize().x;
+
+				ImGui::SameLine(menuBarWidth - textWidth - 10.0f);
+				ImGui::TextUnformatted(fileName.c_str());
 			}
 
 			ImGui::EndMainMenuBar();
@@ -1068,7 +1077,7 @@ namespace Engine
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
-						if (ImGui::Checkbox("Active", &active)) {
+						if (ImGui::Checkbox("Active###activeListener", &active)) {
 							listener.Active = active;
 						}
 					}
@@ -1175,7 +1184,7 @@ namespace Engine
 
 							// Whether tree executes every frame
 							bool& active = ai_bt.Active;
-							if (ImGui::Checkbox("Active", &active)) {
+							if (ImGui::Checkbox("Active###activeBT", &active)) {
 								ai_bt.Active = active;
 							}
 
@@ -1308,7 +1317,7 @@ namespace Engine
 					{
 						// Playback Controls
 						ImGui::Text("Playback");
-						ImGui::Checkbox("Active", &particleComp.Active);
+						ImGui::Checkbox("Active###activeParticle", &particleComp.Active);
 						ImGui::SameLine();
 						ImGui::Checkbox("Loop", &particleComp.Loop);
 
