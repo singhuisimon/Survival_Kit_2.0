@@ -25,6 +25,7 @@
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
+#include <cctype>
 
 // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -457,10 +458,28 @@ namespace Engine
 			std::vector<std::pair<std::string, std::string>> properties;
 			node->GetProperties(properties);
 
+			auto isNumeric = [](const std::string& s) {
+				if (s.empty()) return false;
+				bool hasDot = false;
+				for (unsigned char c : s) {
+					if (std::isdigit(c))
+						continue;
+					else if (c == '.') {
+						if (hasDot) return false;  // only one dot allowed
+						hasDot = true;
+					}
+					else {
+						return false;  // invalid character
+					}
+				}
+				return true;
+				};
+
 			for (auto& [name, value] : properties)
 			{
-				char valueBuffer[256];
+				bool oldIsNumeric = isNumeric(value);
 
+				char valueBuffer[256];
 				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
 
 				float fullWidth = ImGui::GetContentRegionAvail().x;
@@ -469,9 +488,18 @@ namespace Engine
 				// value box (left)
 				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					if (nameBuffer[0] != '\0')
-					{
-						node->SetProperty(name, valueBuffer);
+					std::string newValue = valueBuffer;
+					newValue.erase(newValue.find_last_not_of(" \t\n\r\f\v") + 1);
+					newValue.erase(0, newValue.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newValue.empty()) {
+
+						bool newIsNumeric = isNumeric(newValue);
+						
+						if (!(oldIsNumeric && !newIsNumeric))
+						{
+							node->SetProperty(name, newValue);
+						}
 					}
 				}
 
@@ -913,7 +941,7 @@ namespace Engine
 						ImGui::BeginDisabled(!is_3d);
 
 						float min_distance = audio.MinDistance;
-						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance)) {
 							if (is_3d) {
 								audio.SetMinDistance(min_distance);
 							}
@@ -923,7 +951,7 @@ namespace Engine
 						}
 
 						float max_distance = audio.MaxDistance;
-						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f)) {
 							if (is_3d) {
 								audio.SetMaxDistance(max_distance);
 							}
