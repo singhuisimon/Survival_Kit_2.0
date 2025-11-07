@@ -764,6 +764,9 @@ namespace Engine
 									std::string filename = std::string(materialSaveName);
 									serializeMaterial(material, filename);
 
+									// Refresh Asset Manager to recognize new material
+									AM.scanAndProcess();
+
 									// Optional: Clear the input field after saving
 									memset(materialSaveName, 0, sizeof(materialSaveName));
 

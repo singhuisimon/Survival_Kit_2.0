@@ -11,6 +11,7 @@
 #include <fstream> // For file output
 #include <format>  // For std::setw
 
+#include "Asset/AssetManager.h"
 #include "Utility/AssetPath.h"
 #include "Utility/Logger.h"
 
@@ -93,7 +94,7 @@ namespace Engine {
         filename += ".mat";
 
 		// Write the full filepath
-        std::string filepath = getAssetsPath() + "Sources/Material/" + filename;
+        std::string filepath = AssetManager::GetSourceResourcesPath() + "/Sources/Material/" + filename;
         
         std::ofstream ofs(filepath);
         if (ofs.is_open()) {
