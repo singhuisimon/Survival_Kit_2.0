@@ -1311,7 +1311,7 @@ namespace Engine
 							{
 								for (int i = 0; i < 3; i++)
 								{
-									bool isSelected = (particleComp.ParticleType == i);
+									bool isSelected = (particleComp.ParticleType == static_cast<unsigned int>(i));
 									if (ImGui::Selectable(particleTypes[i], isSelected))
 									{
 										particleComp.ParticleType = i;
@@ -2462,8 +2462,8 @@ namespace Engine
 		// viewport size calculation...
 		ImVec2 viewportSize = { 600, 600 };
 		if (m_Window) {
-			int width = 0.f;
-			int height = 0.f;
+			int width = 0;
+			int height = 0;
 			glfwGetWindowSize(m_Window, &width, &height);
 			viewportSize = {
 				static_cast<float>(width) / 2.0f,
@@ -2864,10 +2864,11 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
+
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
 		//if (!entity) return;
-		if (!entity || !m_Scene) {
+		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
 			return;
 		}
 
@@ -2940,15 +2941,15 @@ namespace Engine
 			}
 		}
 
-		// Use screen coordinates for the mode label too
-		ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		ImGui::GetForegroundDrawList()->AddText(
-			modeLabelPos,
-			IM_COL32(255, 230, 100, 255),
-			m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-			m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-			m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		);
+		//// Use screen coordinates for the mode label too
+		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
+		//ImGui::GetForegroundDrawList()->AddText(
+		//	modeLabelPos,
+		//	IM_COL32(255, 230, 100, 255),
+		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
+		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
+		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
+		//);
 	}
 
 } // end of namespace Engine

@@ -57,7 +57,6 @@ namespace Engine
 		ImGuiIO* io;
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
-		GLuint m_FBOTextureHandle;
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
 		
