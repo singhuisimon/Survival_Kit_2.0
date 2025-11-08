@@ -1,13 +1,18 @@
 /**
- * @file BTDecoratorNodes.h
- * @brief Decorator behaviour tree nodes (modify child behaviour)
- * @author AI System Team
- * @date 2025
+ * @file BTDecoratorNodes.cpp
+ * @brief Definition of Behaviour Tree Decorator Nodes classes
+ * @author Amanda Leow Boon Suan (90%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
 
 #pragma once
 
 #include "BTDecoratorNodes.h"
+#include "ECS/Scene.h"
 
 namespace Engine {
 
@@ -53,6 +58,15 @@ namespace Engine {
     BTStatus BTInverter::Execute(BTContext& context) {
         if (!m_Child) {
             return BTStatus::Failure;
+        }
+
+        // Check if entity still exists before resetting
+        if (context.Entity && context.Scene) {
+            auto& registry = context.Scene->GetRegistry();
+            entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+            if (registry.valid(entityHandle)) {
+                return BTStatus::Failure;
+            }
         }
     
         BTStatus status = m_Child->Execute(context);
@@ -112,7 +126,15 @@ namespace Engine {
 
             // If child completed (Success or Failure), reset it for next iteration
             if (status != BTStatus::Running) {
-                m_Child->Reset();
+                // Check if entity still exists before resetting
+                if (context.Entity && context.Scene) {
+                    auto& registry = context.Scene->GetRegistry();
+                    entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                    if (registry.valid(entityHandle)) {
+                        m_Child->Reset(); // Reset for next iteration
+                    }
+                }
+                //m_Child->Reset();
             }
 
             // Always return Running to keep the infinite loop going
@@ -132,7 +154,15 @@ namespace Engine {
 
             // Child completed this iteration (Success or Failure)
             // Reset child for next iteration
-            m_Child->Reset();
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    m_Child->Reset(); // Reset for next iteration
+                }
+            }
+            //m_Child->Reset();
 
             // Increment the counter
             m_CurrentCount++;
@@ -156,6 +186,7 @@ namespace Engine {
 
     void BTRepeater::Reset() {
         m_CurrentCount = 0;
+
         BTDecorator::Reset();
     }
     
@@ -180,11 +211,27 @@ namespace Engine {
         BTStatus status = m_Child->Execute(context);
     
         if (status == BTStatus::Failure) {
-            m_Child->Reset();
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    m_Child->Reset(); // Reset for next iteration
+                }
+            }
+            //m_Child->Reset();
             return BTStatus::Success; // We succeed when child fails
         }
         else if (status == BTStatus::Success) {
-            m_Child->Reset(); // Reset for next iteration
+            // Check if entity still exists before resetting
+            if (context.Entity && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
+                if (registry.valid(entityHandle)) {
+                    m_Child->Reset(); // Reset for next iteration
+                }
+            }
+            //m_Child->Reset(); // Reset for next iteration
         }
     
         return BTStatus::Running;

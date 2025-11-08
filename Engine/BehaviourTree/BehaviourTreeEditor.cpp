@@ -1,8 +1,11 @@
 /**
- * @file BehaviourTreeEditor.h
- * @brief Editor utilities for behaviour tree creation and editing
- * @author AI System Team
- * @date 2025
+ * @file BehaviourTreeEditor.cpp
+ * @brief Definition of BehaviourTreeEditor class for managing behaviour trees in the editor
+ * @author Amanda Leow Boon Suan (90%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once
@@ -46,7 +49,7 @@ namespace Engine {
      */
     bool BehaviourTreeEditor::SaveTree(const BehaviourTree& tree, const std::string& filepath) {
 
-		std::string path = filepath;
+        std::string path = filepath;
         if (path.empty()) {
             path = "new_tree.json";
         }
@@ -382,7 +385,7 @@ namespace Engine {
         return true;
     }
 
-    static bool RenameTreeFIle(const std::string& oldPath,
+    bool RenameTreeFile(const std::string& oldPath,
         const std::string& newPath,
         Scene* scene = nullptr) {
 
@@ -398,7 +401,7 @@ namespace Engine {
 
         // Step 1 - Load the tree from the old path
         LOG_INFO("BehaviourTreeEditor: Loading tree from '", oldPath, "'");
-        auto tree = BehaviourTreeEditor:: LoadTree(oldPath);
+        auto tree = BehaviourTreeEditor::LoadTree(oldPath);
         if (!tree) {
             LOG_ERROR("BehaviourTreeEditor: Failed to load tree from '", oldPath, "'");
             return false;
@@ -605,62 +608,62 @@ namespace Engine {
         LOG_INFO("BehaviourTreeEditor::RenameFile: Successfully renamed '", oldPath, "' to '", newPath, "'");
         return true;
 
-     }
+    }
 
-     bool BehaviourTreeEditor::SaveAs(const std::string& sourcePath,
-         const std::string& newPath,
-         const std::string& newName,
-         bool generateNewGUID) {
+    bool BehaviourTreeEditor::SaveAs(const std::string& sourcePath,
+        const std::string& newPath,
+        const std::string& newName,
+        bool generateNewGUID) {
 
-         if (sourcePath.empty() || newPath.empty()) {
-             LOG_ERROR("BehaviourTreeEditor::SaveAs: Empty path provided");
-             return false;
-         }
+        if (sourcePath.empty() || newPath.empty()) {
+            LOG_ERROR("BehaviourTreeEditor::SaveAs: Empty path provided");
+            return false;
+        }
 
-         // Step 1 - Load the source tree
-         auto tree = BehaviourTreeEditor::LoadTree(sourcePath);
-         if (!tree) {
-             LOG_ERROR("BehaviourTreeEditor::SaveAs: Failed to load source tree from '", sourcePath, "'");
-             return false;
-         }
+        // Step 1 - Load the source tree
+        auto tree = BehaviourTreeEditor::LoadTree(sourcePath);
+        if (!tree) {
+            LOG_ERROR("BehaviourTreeEditor::SaveAs: Failed to load source tree from '", sourcePath, "'");
+            return false;
+        }
 
-         // Step 2 - Update name if provided
-         if (!newName.empty()) {
-             tree->SetName(newName);
-         }
-         else {
-             // Extract name from path if not provided
-             std::string extractedName = newPath;
-             size_t extPos = extractedName.find_last_of('.');
+        // Step 2 - Update name if provided
+        if (!newName.empty()) {
+            tree->SetName(newName);
+        }
+        else {
+            // Extract name from path if not provided
+            std::string extractedName = newPath;
+            size_t extPos = extractedName.find_last_of('.');
 
-             if (extPos != std::string::npos) {
-                 extractedName = extractedName.substr(0, extPos);
-             }
-             size_t pathSep = extractedName.find_last_of("/\\");
-             if (pathSep != std::string::npos) {
-                 extractedName = extractedName.substr(pathSep + 1);
-             }
-             tree->SetName(extractedName);
-         }
+            if (extPos != std::string::npos) {
+                extractedName = extractedName.substr(0, extPos);
+            }
+            size_t pathSep = extractedName.find_last_of("/\\");
+            if (pathSep != std::string::npos) {
+                extractedName = extractedName.substr(pathSep + 1);
+            }
+            tree->SetName(extractedName);
+        }
 
-         // Step 3 - Generate a new GUID
-         if (generateNewGUID) {
-             tree->SetGUID(xresource::instance_guid::GenerateGUIDCopy());
-             LOG_INFO("BehaviourTreeEditor::SaveAs: Generated new GUID for copy");
-         }
-         else {
-             LOG_INFO("BehaviourTreeEditor::SaveAs: Keeping original GUID");
-         }
+        // Step 3 - Generate a new GUID
+        if (generateNewGUID) {
+            tree->SetGUID(xresource::instance_guid::GenerateGUIDCopy());
+            LOG_INFO("BehaviourTreeEditor::SaveAs: Generated new GUID for copy");
+        }
+        else {
+            LOG_INFO("BehaviourTreeEditor::SaveAs: Keeping original GUID");
+        }
 
-         // Step 4: Save to new location
-         if (!SaveTree(*tree, newPath)) {
-             LOG_ERROR("BehaviourTreeEditor::SaveAs: Failed to save to '", newPath, "'");
-             return false;
-         }
+        // Step 4: Save to new location
+        if (!SaveTree(*tree, newPath)) {
+            LOG_ERROR("BehaviourTreeEditor::SaveAs: Failed to save to '", newPath, "'");
+            return false;
+        }
 
-         LOG_INFO("BehaviourTreeEditor::SaveAs: Successfully saved copy from '",
-             sourcePath, "' to '", newPath, "'");
-         return true;
-     }
+        LOG_INFO("BehaviourTreeEditor::SaveAs: Successfully saved copy from '",
+            sourcePath, "' to '", newPath, "'");
+        return true;
+    }
 
 } // namespace Engine

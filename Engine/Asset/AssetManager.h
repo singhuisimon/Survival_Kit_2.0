@@ -111,13 +111,13 @@ namespace Engine {
 				sourcesPath + "/Sources/Shaders",
 				sourcesPath + "/Sources/Meshes",
 				sourcesPath + "/Sources/Textures",
-				sourcesPath + "/Sources/Audio"
-
+				sourcesPath + "/Sources/Audio",
+				sourcesPath + "/Sources/Material"
 			};
 
 			//================= OUTPUT PATHS ===============
 			cfg.descriptorRoot = sourcesPath + "/Descriptors";
-			cfg.compiledPath = assetsPath + "/Compiled";
+			cfg.compiledPath = assetsPath + "Compiled";
 
 			//================= INTERNAL PATHS ===================
 			cfg.databaseFile = sourcesPath + "/DB/assetdb.txt";
@@ -160,13 +160,15 @@ namespace Engine {
 		const std::string& getCompiledPath() const {
 			return m_cfg.compiledPath;
 		}
-
+		std::string getCompiledFilePath(xresource::instance_guid guid, ResourceType type)const;
 
 		/**
 		* @brief Compile a asset with guid
 		* @param guid the asset guid to compile 
 		*/
 		bool CompileSingleAsset(xresource::instance_guid guid, bool verbose); 
+
+		bool CompileAllAsset(bool verbose); 
 
 		/**
 		 * @brief Get the descriptor root path

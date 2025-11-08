@@ -11,8 +11,12 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 namespace Engine {
+
+
+    std::filesystem::path GetExecutableDirectory();
 
     /**
      * @brief Get the absolute path to the assets directory.

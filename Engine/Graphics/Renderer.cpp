@@ -538,35 +538,6 @@ namespace Engine {
 		// Light setting
 		prog.setUniform("uExposure", 2.0f); // Exposure
 
-#if 0
-#pragma region SET_UNIFORM_TEMP
-		if (textureMode) {
-			glBindTextureUnit(0, static_cast<GLuint>(m_gl.t_testing_textures[selected_texture].handle()));
-			prog.setUniform("Texture2D", 0);
-			prog.setUniform("isTexture", true);
-
-			if (m_gl.t_testing_textures[selected_texture].is_srgb()) {
-				prog.setUniform("isGamma", true);
-			}
-			else {
-				prog.setUniform("isGamma", false);
-			}
-
-		}
-		else {
-			prog.setUniform("isTexture", false);
-		}
-
-		if (isPBR) {
-			prog.setUniform("isPBR", true);
-		}
-		else {
-			prog.setUniform("isPBR", false);
-		}
-
-#pragma endregion
-#endif
-
 		for (const auto& item : draw_items) {
 
 			if (pass.passtype == PassType::DEBUGGING) {
@@ -590,6 +561,13 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
+			// Temporary transformations
+			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
+			//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
+			//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
+			//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
+			//prog.setUniform("material.shininess", test_material.getMaterialShinifness());
+
 			xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
 
 			if (TextureResource* texture_resource = RM.loadResource<TextureResource>(texture_guid)) {
@@ -609,25 +587,35 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 			}
 
-			// Temporary transformations
-			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
-			//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-			//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-			//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-			//prog.setUniform("material.shininess", test_material.getMaterialShininess());
+			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+			{
+				MaterialUBO_Std140 mubo;
+				mubo.Ka = test_material.getMaterialAmbient();
+				mubo._pad0 = 0.0f;
+				mubo.Kd = glm::vec3(material_resource->diffuseColor[0], material_resource->diffuseColor[1], material_resource->diffuseColor[2]);
+				mubo._pad1 = 0.0f;
+				mubo.Ks = glm::vec3(material_resource->specularColor[0], material_resource->specularColor[1], material_resource->specularColor[2]);
+				mubo.shininess = material_resource->shininess;
 
+				// Update UBO (48 bytes)
+				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+			}
+			else
+			{
 #pragma region TESTING UBO FOR MATERIALS
-			MaterialUBO_Std140 mubo;
-			mubo.Ka = test_material.getMaterialAmbient();
-			mubo._pad0 = 0.0f;
-			mubo.Kd = test_material.getMaterialDiffuse();
-			mubo._pad1 = 0.0f;
-			mubo.Ks = test_material.getMaterialSpecular();
-			mubo.shininess = test_material.getMaterialShininess();
+				MaterialUBO_Std140 mubo;
+				mubo.Ka = test_material.getMaterialAmbient();
+				mubo._pad0 = 0.0f;
+				mubo.Kd = test_material.getMaterialDiffuse();
+				mubo._pad1 = 0.0f;
+				mubo.Ks = test_material.getMaterialSpecular();
+				mubo.shininess = test_material.getMaterialShininess();
 
-			// Update UBO (48 bytes)
-			glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+				// Update UBO (48 bytes)
+				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
 #pragma endregion
+			}
+
 
 #pragma region TESTING UBO FOR LIGHTING
 			// --- per-object light culling + upload ---
