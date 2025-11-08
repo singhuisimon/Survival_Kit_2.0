@@ -13,6 +13,11 @@
 #include "ResourceHelpers.h"
 #include "../Utility/Logger.h"
 
+ // RapidJSON includes
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/prettywriter.h>
+
 #include "../include/glad/glad.h" // OpenGL functions
 #include "../glm/glm/glm.hpp"
 
@@ -521,6 +526,7 @@ void xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Destroy(
 
 // ========== MATERIAL LOADER IMPLEMENTATION ==========
 
+#if 0
 xresource::loader<Engine::ResourceGUID::material_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
     xresource::mgr& mgr, const full_guid& guid)
@@ -571,6 +577,133 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
     }
 
    // LM.writeLog("MaterialLoader - Loaded material GUID: %llX", guid.m_Instance.m_Value);
+
+    return material.release();
+}
+#endif
+
+xresource::loader<Engine::ResourceGUID::material_type_guid_v>::data_type*
+xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
+    xresource::mgr& mgr, const full_guid& guid)
+{
+    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
+
+    // Get the source file path
+    std::string filepath = Engine::AM.getNameFromGuid(guid.m_Instance);
+    std::string prefix = Engine::AssetManager::GetSourceResourcesPath() + "/Sources/Material/";
+	filepath = prefix + filepath;
+
+    // Check if file exists
+    if (!Engine::fileExists(filepath)) {
+		//LOG_WARNING("MaterialLoader - Source file not found: ", filepath);
+        return nullptr;
+    }
+
+    // Open the file 
+    std::ifstream ifs(filepath);
+    if (!ifs.is_open()) {
+        //LOG_WARNING("Material Loader - unable to open file: ", filepath);
+        return nullptr;
+    }
+
+	// Read entire file into a string
+    std::string jsonString((std::istreambuf_iterator<char>(ifs)),
+		std::istreambuf_iterator<char>());
+    ifs.close();
+
+	// Parse into a JSON document
+    using namespace  rapidjson;
+    Document doc;
+    doc.Parse(jsonString.c_str());
+
+    if (doc.HasParseError()) {
+        //LOG_ERROR("JSON Parse error at offset ", doc.GetErrorOffset());
+        return nullptr;
+    }
+
+    // Create material resource
+    auto material = std::make_unique<data_type>();
+
+	// Deserialize material properties from JSON
+    if (doc.HasMember("shaderName"))
+		material->shaderName = doc["shaderName"].GetString();
+    
+    if (doc.HasMember("diffuseMap"))
+        material->diffuseMap = xresource::instance_guid{ std::stoull(doc["diffuseMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("specularMap"))
+		material->specularMap = xresource::instance_guid{ std::stoull(doc["specularMap"].GetString(), nullptr, 16) };
+
+	if (doc.HasMember("normalMap"))
+		material->normalMap = xresource::instance_guid{ std::stoull(doc["normalMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("emissionMap"))
+		material->emissionMap = xresource::instance_guid{ std::stoull(doc["emissionMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("occlusionMap"))
+		material->occlusionMap = xresource::instance_guid{ std::stoull(doc["occlusionMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("diffuseColor"))
+    {
+		const Value& dColor = doc["diffuseColor"];
+        material->diffuseColor[0] = dColor[0].GetFloat();
+        material->diffuseColor[1] = dColor[1].GetFloat();
+        material->diffuseColor[2] = dColor[2].GetFloat();
+    }
+    
+    if (doc.HasMember("specularColor"))
+    {
+		const Value& sColor = doc["specularColor"];
+        material->specularColor[0] = sColor[0].GetFloat();
+        material->specularColor[1] = sColor[1].GetFloat();
+		material->specularColor[2] = sColor[2].GetFloat();
+    }
+
+    if (doc.HasMember("emissionColor"))
+    {
+	    const Value& eColor = doc["emissionColor"];
+        material->emissionColor[0] = eColor[0].GetFloat();
+        material->emissionColor[1] = eColor[1].GetFloat();
+		material->emissionColor[2] = eColor[2].GetFloat();
+    }
+
+    if (doc.HasMember("shininess"))
+		material->shininess = doc["shininess"].GetFloat();
+
+    if (doc.HasMember("emissionStrength"))
+		material->emissionStrength = doc["emissionStrength"].GetFloat();
+
+    if (doc.HasMember("alphaThreshold"))
+		material->alphaThreshold = doc["alphaThreshold"].GetFloat();
+
+    if (doc.HasMember("tiling"))
+    {
+	    const Value& tiling = doc["tiling"];
+        material->tiling[0] = tiling[0].GetFloat();
+		material->tiling[1] = tiling[1].GetFloat();
+    }
+
+    if (doc.HasMember("offset"))
+    {
+	    const Value& offset = doc["offset"];
+		material->offset[0] = offset[0].GetFloat();
+		material->offset[1] = offset[1].GetFloat();
+    }
+
+    if (doc.HasMember("enableEmission"))
+		material->enableEmission = doc["enableEmission"].GetBool();
+
+	if (doc.HasMember("alphaTest"))
+		material->alphaTest = doc["alphaTest"].GetBool();
+
+	if (doc.HasMember("doubleSided"))
+		material->doubleSided = doc["doubleSided"].GetBool();
+
+    if (doc.HasMember("receiveShadows"))
+		material->receiveShadows = doc["receiveShadows"].GetBool();
+
+    if (doc.HasMember("castShadows"))
+		material->castShadows = doc["castShadows"].GetBool();
 
     return material.release();
 }

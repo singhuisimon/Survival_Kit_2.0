@@ -26,14 +26,14 @@ namespace Engine {
      */
     template<typename T>
     void BTNodeRegistry::RegisterNodeType(
-        const std::string& category, 
+        const std::string& category,
         const std::string& description,
         std::function<void(BTNodeMetadata&)> setupProperties) {
-        
+
         // Create a temporary instance to get the type name
         auto temp = std::make_shared<T>();
         std::string typeName = temp->GetTypeName();
-    
+
         BTNodeTypeMetadata metadata(
             typeName,
             category,
@@ -41,16 +41,16 @@ namespace Engine {
             []() { return std::make_shared<T>(); },
             temp->CanHaveChildren()
         );
-    
+
         // Setup properties if callback provided
         if (setupProperties && metadata.PropertyMetadata) {
             setupProperties(*metadata.PropertyMetadata);
         }
-    
+
         m_NodeTypes[typeName] = metadata;
         LOG_INFO("BTNodeRegistry: Registered node type '", typeName, "' (Category: ", category, ")");
     }
-    
+
     /**
      * @brief Create a node instance by type name
      */
@@ -60,14 +60,14 @@ namespace Engine {
             LOG_ERROR("BTNodeRegistry: Unknown node type '", typeName, "'");
             return nullptr;
         }
-    
+
         auto node = it->second.Factory();
         if (node) {
             LOG_TRACE("BTNodeRegistry: Created node of type '", typeName, "'");
         }
         return node;
     }
-    
+
     /**
      * @brief Get metadata for a node type
      */
@@ -78,14 +78,14 @@ namespace Engine {
         }
         return &it->second;
     }
-    
+
     /**
      * @brief Get all registered node types
      */
     const std::unordered_map<std::string, BTNodeTypeMetadata>& BTNodeRegistry::GetAllNodeTypes() const {
         return m_NodeTypes;
     }
-    
+
     /**
      * @brief Get all node types in a specific category
      */
@@ -98,14 +98,14 @@ namespace Engine {
         }
         return types;
     }
-    
+
     /**
      * @brief Check if a node type is registered
      */
     bool BTNodeRegistry::IsNodeTypeRegistered(const std::string& typeName) const {
         return m_NodeTypes.find(typeName) != m_NodeTypes.end();
     }
-    
+
     /**
      * @brief Clear all registered types
      */
@@ -113,62 +113,64 @@ namespace Engine {
         m_NodeTypes.clear();
         LOG_INFO("BTNodeRegistry: Cleared all node types");
     }
-    
+
     /**
      * @brief Register all built-in node types
      */
     void BTNodeRegistry::RegisterBuiltInNodes() {
         auto& registry = Get();
-    
+
         // Composite nodes (no parameters)
         registry.RegisterNodeType<BTSequence>("Composite", "Executes children in sequence until one fails");
         registry.RegisterNodeType<BTSelector>("Composite", "Executes children until one succeeds");
-        
+
         // Parallel with properties
         registry.RegisterNodeType<BTParallel>("Composite", "Executes all children simultaneously",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_ENUM_PROPERTY(BTParallel, "SuccessPolicy", m_SuccessPolicy,
-                    PolicyToString, StringToPolicy);
+                    PolicyToString, StringToPolicy,
+                    (std::vector<std::string>{"RequireAll", "RequireOne"}));
                 BT_REGISTER_ENUM_PROPERTY(BTParallel, "FailurePolicy", m_FailurePolicy,
-                    PolicyToString, StringToPolicy);
+                    PolicyToString, StringToPolicy,
+                    (std::vector<std::string>{"RequireAll", "RequireOne"}));
             });
-    
+
         // Decorator nodes
         registry.RegisterNodeType<BTInverter>("Decorator", "Inverts the result of its child");
         registry.RegisterNodeType<BTSucceeder>("Decorator", "Always returns success");
         registry.RegisterNodeType<BTFailer>("Decorator", "Always returns failure");
-        
+
         // Repeater with properties
         registry.RegisterNodeType<BTRepeater>("Decorator", "Repeats child N times or infinitely",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_INT_PROPERTY(BTRepeater, "RepeatCount", m_RepeatCount);
             });
-        
+
         registry.RegisterNodeType<BTRepeatUntilFail>("Decorator", "Repeats child until it fails");
-        
+
         // Cooldown with properties
         registry.RegisterNodeType<BTCooldown>("Decorator", "Prevents child from running during cooldown",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_FLOAT_PROPERTY(BTCooldown, "CooldownTime", m_CooldownTime);
             });
-    
+
         // Leaf nodes
 		// for internal coding/testing purposes
         registry.RegisterNodeType<BTAction>("Action", "Executes custom action logic");
         registry.RegisterNodeType<BTCondition>("Condition", "Checks a condition");
-        
+
         // Wait with properties
         registry.RegisterNodeType<BTWait>("Action", "Waits for a duration",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_FLOAT_PROPERTY(BTWait, "Duration", m_Duration);
             });
-        
+
         // Log with properties
         registry.RegisterNodeType<BTLog>("Action", "Outputs a debug message",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTLog, "Message", m_Message);
             });
-        
+
         // SetBlackboard with properties
         registry.RegisterNodeType<BTSetBlackboard>("Action", "Sets a blackboard value",
             [](BTNodeMetadata& metadata) {
@@ -176,34 +178,34 @@ namespace Engine {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboard, "Type", m_Type);
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboard, "Value", m_Value);
             });
-    
-        
+
+
         // CheckBlackboard with properties
         registry.RegisterNodeType<BTCheckBlackboard>("Condition", "Checks a blackboard value",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTCheckBlackboard, "Key", m_Key);
                 BT_REGISTER_STRING_PROPERTY(BTCheckBlackboard, "ExpectedValue", m_ExpectedValue);
             });
-    
+
         // Blackboard convenience nodes
         registry.RegisterNodeType<BTSetBlackboardInt>("Action", "Sets an integer blackboard value",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboardInt, "Key", m_Key);
                 BT_REGISTER_INT_PROPERTY(BTSetBlackboardInt, "Value", m_Value);
             });
-    
+
         registry.RegisterNodeType<BTSetBlackboardFloat>("Action", "Sets a float blackboard value",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboardFloat, "Key", m_Key);
                 BT_REGISTER_FLOAT_PROPERTY(BTSetBlackboardFloat, "Value", m_Value);
             });
-    
+
         registry.RegisterNodeType<BTSetBlackboardBool>("Action", "Sets a bool blackboard value",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboardBool, "Key", m_Key);
                 BT_REGISTER_BOOL_PROPERTY(BTSetBlackboardBool, "Value", m_Value);
             });
-    
+
         registry.RegisterNodeType<BTSetBlackboardVec3>("Action", "Sets a vec3 blackboard value",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTSetBlackboardVec3, "Key", m_Key);
@@ -242,7 +244,8 @@ namespace Engine {
                 BT_REGISTER_FLOAT_PROPERTY(BTCheckHealth, "Threshold", m_Threshold);
                 BT_REGISTER_STRING_PROPERTY(BTCheckHealth, "HealthKey", m_HealthKey);
                 BT_REGISTER_ENUM_PROPERTY(BTCheckHealth, "Comparison", m_Comparison,
-                    ComparisonToString, StringToComparison);
+                    ComparisonToString, StringToComparison,
+                    (std::vector<std::string>{"Greater", "Less", "Equal", "GreaterOrEqual", "LessOrEqual"}));
             });
 
         registry.RegisterNodeType<BTSetHealth>("Action", "Sets health value",
@@ -286,7 +289,7 @@ namespace Engine {
                 BT_REGISTER_INT_PROPERTY(BTChangeColor, "MaterialID", m_MaterialID);
                 BT_REGISTER_FLOAT_PROPERTY(BTChangeColor, "ChangeInterval", m_ChangeInterval);
             });
-    
+
         registry.RegisterNodeType<BTOrbitAroundPoint>("Action", "Moves in a circular direction around a point",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_FLOAT_PROPERTY(BTOrbitAroundPoint, "OrbitRadius", m_OrbitRadius);
@@ -359,6 +362,6 @@ namespace Engine {
 
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
-    
+
 
 } // namespace Engine

@@ -30,7 +30,7 @@ namespace Engine {
 
 
     // Get the directory where the executable is located
-    static fs::path GetExecutableDirectory() {
+    fs::path GetExecutableDirectory() {
 #ifdef _WIN32
         // Windows: Get the full path to the .exe
         char buffer[MAX_PATH];
