@@ -560,6 +560,8 @@ namespace Engine {
             break;
         case Comparison::LessOrEqual:
             result = health <= m_Threshold;
+			LOG_INFO("BTCheckHealth result is", result ? "YES" : "NO");
+			LOG_INFO("BTCheckHealth: Health (", health, ") <= Threshold (", m_Threshold, ")");
             break;
         }
 
@@ -592,6 +594,7 @@ namespace Engine {
 
     BTStatus BTSetHealth::Execute(BTContext& context) {
         context.Blackboard.Set(m_HealthKey, m_Health);
+		LOG_TRACE("BTSetHealth: Set health to ", m_Health);
         return BTStatus::Success;
     }
 
@@ -613,15 +616,24 @@ namespace Engine {
     BTModifyHealth::BTModifyHealth(float amount)
         : m_Amount(amount)
         , m_HealthKey("Health") {
+        LOG_INFO("HEALTH TO MODIFY IN BTMODIFYHEALTH IS: ", amount);
     }
-
+    //change health to int give up
     BTStatus BTModifyHealth::Execute(BTContext& context) {
-        auto healthOpt = context.Blackboard.Get<float>(m_HealthKey);
-        float currentHealth = healthOpt.value_or(100.0f);  // Default to 100 if not set
+        //auto healthOpt = context.Blackboard.Get<float>(m_HealthKey);
+        //float currentHealth = healthOpt.value_or(100.0f);  // Default to 100 if not set
 
-        currentHealth += m_Amount;
+        float currentHealth = context.Blackboard.GetOrDefault(m_HealthKey, 100.0f);
+
+        if (m_Amount <= 0.01) {
+            m_Amount == 0.01;
+        }
+
+        currentHealth -= m_Amount;
         context.Blackboard.Set(m_HealthKey, currentHealth);
 
+
+		LOG_INFO("BTModifyHealth: Modified health by ", m_Amount, ", new health: ", currentHealth);
         return BTStatus::Success;
     }
 
@@ -1531,6 +1543,11 @@ namespace Engine {
         if(!context.Entity->HasComponent<RigidbodyComponent>()) {
 			context.Entity->AddComponent<RigidbodyComponent>();
 		}
+        
+        if (!context.Entity->GetComponent<RigidbodyComponent>().IsKinematic) {
+			LOG_WARNING("BTApplyLinearVelocity: Rigidbody is not kinematic");
+			return BTStatus::Failure;
+        }
 
 		PhysicsAPI::AddLinearVelocity(*context.Entity, m_linearVelocity);
         LOG_INFO("BTApplyLinearVelocity: Applied linear velocity (",
@@ -1558,7 +1575,7 @@ namespace Engine {
     }
 
 	//BTApplyDampening
-    BTApplyLinearDampening::BTApplyLinearDampening(float dampening) :
+    /*BTApplyLinearDampening::BTApplyLinearDampening(float dampening) :
         m_Dampening(dampening) {
     }
 
@@ -1584,6 +1601,56 @@ namespace Engine {
     void BTApplyLinearDampening::SetProperty(const std::string& name, const std::string& value) {
         if(name == "Dampening") {
             m_Dampening = std::stof(value);
+        }
+    }*/
+
+    //BTCreateShootableEnemy
+    BTCreateShootableEnemy::BTCreateShootableEnemy(const std::string& tag)
+        : m_Tag(tag){
+	}
+
+    const char* BTCreateShootableEnemy::GetTypeName() const { return "CreateShootableEnemy"; }
+
+    BTStatus BTCreateShootableEnemy::Execute(BTContext& context) {
+        if (!context.Entity) {
+			LOG_WARNING("BTCreateShootableEnemy: No entity in context");
+			return BTStatus::Failure;
+        }
+        
+        //create enemy entity
+        Entity enemy = context.Scene->CreateEntity(m_Tag);
+        enemy.AddComponent<MeshRendererComponent>();
+        enemy.AddComponent<RigidbodyComponent>();
+        enemy.AddComponent<BehaviourTreeComponent>();
+
+        if (!enemy.HasComponent<TransformComponent>() || !enemy.HasComponent<RigidbodyComponent>() ||
+            !enemy.HasComponent<BehaviourTreeComponent>()) {
+			LOG_WARNING("BTCreateShootableEnemy: Failed to add required components to enemy entity");
+            return BTStatus::Failure;
+        }
+
+        auto& transform = enemy.GetComponent<TransformComponent>();
+        transform.Position = context.Entity->GetComponent<TransformComponent>().Position;
+
+        auto& rb = enemy.GetComponent<RigidbodyComponent>();
+        rb.IsKinematic = true;
+
+        auto& bt = enemy.GetComponent<BehaviourTreeComponent>();
+        bt.Active = true;
+        bt.TreeAssetPath = "ShootableEnemy.json";
+
+        LOG_INFO("BTCreateShootableEnemy: Created shootable enemy with tag '", m_Tag, "'");
+		return BTStatus::Success;
+    }
+
+
+    void BTCreateShootableEnemy::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Tag", m_Tag });
+    }
+
+    void BTCreateShootableEnemy::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "Tag") {
+			m_Tag = value;
         }
     }
 

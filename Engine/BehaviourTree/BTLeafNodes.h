@@ -624,7 +624,8 @@ namespace Engine {
         glm::vec3 m_linearVelocity;
     };
 
-    class BTApplyLinearDampening : public BTNode {
+    //ERRORS IN THIS NEED TO DOUBLE CHECK WILL BLANK IT FOR NOW
+    /*class BTApplyLinearDampening : public BTNode {
 
     public:
 
@@ -636,6 +637,21 @@ namespace Engine {
 		void SetProperty(const std::string& name, const std::string& value) override;
 
         float m_Dampening;
+    };*/
+
+	//Change this to create enemy of specific tag/kind e.g. loveletter, botnets, trojan, etc
+    //Add vec3 spawn pos in the future
+    class BTCreateShootableEnemy : public BTNode {
+    public:
+        BTCreateShootableEnemy(const std::string& tag = "");
+        const char* GetTypeName() const override;
+
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_Tag;
     };
 
 

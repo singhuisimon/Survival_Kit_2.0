@@ -153,6 +153,7 @@ namespace Engine {
             });
     
         // Leaf nodes
+		// for internal coding/testing purposes
         registry.RegisterNodeType<BTAction>("Action", "Executes custom action logic");
         registry.RegisterNodeType<BTCondition>("Condition", "Checks a condition");
         
@@ -344,9 +345,15 @@ namespace Engine {
             }
         );
 
-        registry.RegisterNodeType<BTApplyLinearDampening>("Action", "Check if all waypoint has been visited",
+        /*registry.RegisterNodeType<BTApplyLinearDampening>("Action", "Check if all waypoint has been visited",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_FLOAT_PROPERTY(BTApplyLinearDampening, "Dampening", m_Dampening);
+            }
+        );*/
+
+        registry.RegisterNodeType<BTCreateShootableEnemy>("Action", "Create shootable enemy",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCreateShootableEnemy, "Tag", m_Tag);
             }
         );
 
