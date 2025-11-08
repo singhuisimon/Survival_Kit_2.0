@@ -1,9 +1,13 @@
 /**
- * @file BTDecoratorNodes.h
- * @brief Decorator behaviour tree nodes (modify child behaviour)
- * @author AI System Team
- * @date 2025
+ * @file BTDecoratorNodes.cpp
+ * @brief Definition of Behaviour Tree Decorator Nodes classes
+ * @author Amanda Leow Boon Suan (90%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
 
 #pragma once
 

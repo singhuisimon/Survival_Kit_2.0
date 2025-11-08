@@ -1,3 +1,13 @@
+/**
+ * @file AudioSystem.cpp
+ * @brief Definition of AudioSystem class for managing audio playback through AudioManager functionalities
+ * @author Amanda Leow Boon Suan (100%)
+ * @date 20/10/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include <fmod.hpp>
 #include "Utility/Logger.h"
 #include "AudioSystem.h"

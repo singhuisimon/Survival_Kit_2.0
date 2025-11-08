@@ -1,3 +1,13 @@
+/**
+ * @file DSPEffect.h
+ * @brief Class for DSP conversion to FMOD DSP effects and string representation
+ * @author Amanda Leow Boon Suan (100%)
+ * @date 22/10/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 #include "ECS/Scene.h"
 #include "ECS/System.h"

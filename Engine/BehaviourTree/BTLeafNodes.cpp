@@ -1,9 +1,13 @@
 ﻿/**
- * @file BTLeafNodes.h
- * @brief Leaf behaviour tree nodes (Actions and Conditions)
- * @author AI System Team
- * @date 2025
+ * @file BTLeafNodes.cpp
+ * @brief Definition of Behaviour Tree Leaf Nodes Classes 
+ * @author Amanda Leow Boon Suan (90%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
 
 #pragma once
 
