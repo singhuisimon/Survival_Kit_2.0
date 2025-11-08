@@ -25,6 +25,7 @@
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
+#include <cctype>
 
 // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -233,6 +234,8 @@ namespace Engine
 				if (ImGui::MenuItem("Open Script"))
 				{
 					// open script logic
+					openScript = true;
+
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Open script from file.");
@@ -307,6 +310,17 @@ namespace Engine
 		if (saveAsPanel)
 		{
 			saveAsScenePanel();
+		}
+
+		// ========================= Create Script Panel ===========================
+		if (createScript)
+		{
+			CreateScriptPanel();
+		}
+		// ========================== Open Script Panel ============================
+		if (openScript)
+		{
+			OpenScriptPanel();
 		}
 	}
 
@@ -457,10 +471,28 @@ namespace Engine
 			std::vector<std::pair<std::string, std::string>> properties;
 			node->GetProperties(properties);
 
+			auto isNumeric = [](const std::string& s) {
+				if (s.empty()) return false;
+				bool hasDot = false;
+				for (unsigned char c : s) {
+					if (std::isdigit(c))
+						continue;
+					else if (c == '.') {
+						if (hasDot) return false;  // only one dot allowed
+						hasDot = true;
+					}
+					else {
+						return false;  // invalid character
+					}
+				}
+				return true;
+				};
+
 			for (auto& [name, value] : properties)
 			{
-				char valueBuffer[256];
+				bool oldIsNumeric = isNumeric(value);
 
+				char valueBuffer[256];
 				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
 
 				float fullWidth = ImGui::GetContentRegionAvail().x;
@@ -469,9 +501,18 @@ namespace Engine
 				// value box (left)
 				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					if (nameBuffer[0] != '\0')
-					{
-						node->SetProperty(name, valueBuffer);
+					std::string newValue = valueBuffer;
+					newValue.erase(newValue.find_last_not_of(" \t\n\r\f\v") + 1);
+					newValue.erase(0, newValue.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newValue.empty()) {
+
+						bool newIsNumeric = isNumeric(newValue);
+						
+						if (!(oldIsNumeric && !newIsNumeric))
+						{
+							node->SetProperty(name, newValue);
+						}
 					}
 				}
 
@@ -799,51 +840,43 @@ namespace Engine
 
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
-						std::vector<const AssetRecord*> audioAssets;
-						audioAssets.reserve(allAssets.size());
+
+						std::vector<std::string> audioAssetNames;
+						audioAssetNames.reserve(allAssets.size());
+
 						for (const auto* record : allAssets) {
 							if (!record || !record->valid) continue;
+
 							if (record->type == ResourceType::AUDIO) {
-								audioAssets.push_back(record);
+								std::string filepath = record->sourcePath;
+								size_t lastSlash = filepath.find_last_of("/\\");
+								std::string filename = (lastSlash == std::string::npos)
+									? filepath
+									: filepath.substr(lastSlash + 1);
+
+								LOG_DEBUG("Filepath: ", filepath);
+								LOG_DEBUG("Filename: ", filename);
+
+								audioAssetNames.push_back(filename);
 							}
 						}
 
-						// Determine current selection index
+						std::vector<const char*> audioAssets;
+						audioAssets.reserve(audioAssetNames.size());
+						for (auto& name : audioAssetNames)
+							audioAssets.push_back(name.c_str());
+
 						int currentIndex = 0;
-						for (size_t i = 0; i < audioAssets.size(); ++i)
-						{
-							if (audioAssets[i]->sourcePath == audio.AudioFilePath)
-							{
-								currentIndex = (int)i;
+						for (size_t i = 0; i < audioAssetNames.size(); ++i) {
+							if (audioAssetNames[i] == audio.AudioFilePath) {
+								currentIndex = static_cast<int>(i);
 								break;
 							}
 						}
 
-						// Draw the combo box
-						ImGui::Text("Audio File Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##AudioFilePath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<const AssetRecord*>*>(data);
-								std::string path = assets[idx]->sourcePath;
-
-								// Extract filename from path
-								size_t lastSlash = path.find_last_of("/\\");
-								static std::string filename; // static to keep it alive for ImGui
-								filename = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
-
-								*outText = filename.c_str();
-								return true;
-							},
-							static_cast<void*>(&audioAssets), (int)audioAssets.size()))
-						{
-							// Extract and save just the filename
-							std::string fullPath = audioAssets[currentIndex]->sourcePath;
-							size_t lastSlash = fullPath.find_last_of("/\\");
-							std::string filename = (lastSlash != std::string::npos) ? fullPath.substr(lastSlash + 1) : fullPath;
-
-							audio.SetAudioFile(filename);
+						std::string label = "Filepath"; // Label for the dropdown
+						if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
+							audio.SetAudioFile(audioAssetNames[currentIndex]);
 						}
 
 						ImGui::Text("Audio Type:");
@@ -921,7 +954,7 @@ namespace Engine
 						ImGui::BeginDisabled(!is_3d);
 
 						float min_distance = audio.MinDistance;
-						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance)) {
 							if (is_3d) {
 								audio.SetMinDistance(min_distance);
 							}
@@ -931,7 +964,7 @@ namespace Engine
 						}
 
 						float max_distance = audio.MaxDistance;
-						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f)) {
 							if (is_3d) {
 								audio.SetMaxDistance(max_distance);
 							}
@@ -1434,6 +1467,72 @@ namespace Engine
 						}
 					}
 				}
+				// ========================= Display Script Compoment ===============================
+				if (m_SelectedEntity.HasComponent<ScriptComponent>())
+				{
+					ImGui::Separator();
+					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
+					std::string scriptPath = getRepository() + "\\Scripts\\Game";
+					auto scriptFiles = getAssetsInFolder(scriptPath);
+					
+					if (ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+						ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
+
+						if (!scriptFiles.empty())
+						{
+							
+							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
+							{
+								for (const auto& asset : scriptFiles)
+								{
+									std::string className = asset.name;
+									std::cout << className << "//////////////////" << "\n";
+									if (className.ends_with(".cs"))
+									{
+										className = className.substr(0, className.size() - 3); // remove extension
+									}
+									//std::cout << "////// className: " << className << "\n";
+									std::string selectedClassName = "Game." + className;
+
+									//std::cout << "////// selectedClassName: " << selectedClassName << "\n";
+									bool isSelected = (scriptComp.ScriptClassName == selectedClassName);
+									if (ImGui::Selectable(className.c_str(), isSelected))
+									{
+										// Destroy previous script instance if exists
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+											scriptComp.ScriptInstance = nullptr;
+											scriptComp.Started = false;
+										}
+
+										// Assign the new script class
+										scriptComp.ScriptClassName = selectedClassName;
+
+										scriptComp.ScriptInstance = MonoScriptEngine::GetInstance().CreateScriptInstance(scriptComp.ScriptClassName);
+
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().SetFieldValue((MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
+											MonoScriptEngine::GetInstance().CallMethod((MonoObject*)scriptComp.ScriptInstance, "OnStart");
+											scriptComp.Started = true;
+										}
+									}
+
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+						}
+
+					}
+
+				}
 
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
@@ -1597,6 +1696,7 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Particle Component ----------------------------
 					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
 					ImGui::BeginDisabled(hasParticleSystem);
 
@@ -1616,6 +1716,25 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Script Component ----------------------------
+					bool hasScriptComponent = m_SelectedEntity.HasComponent<ScriptComponent>();
+					ImGui::BeginDisabled(hasScriptComponent);
+
+					if (ImGui::MenuItem("Script Component"))
+					{
+						if (!hasScriptComponent)
+						{
+							m_SelectedEntity.AddComponent<ScriptComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasScriptComponent)
+						{
+							ImGui::SetTooltip("Add script to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 					//ImGui::SetWindowFontScale(1.0f); // Reset
 
 					ImGui::EndPopup(); // end pop up for Add Component  
@@ -3207,6 +3326,161 @@ namespace Engine
 		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
 		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
 		//);
+	}
+
+	void Editor::CreateScriptPanel()
+	{
+		if (createScript)
+		{
+			ImGui::OpenPopup("Create Script Panel");
+		}
+
+		if (ImGui::BeginPopupModal("Create Script Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			static char scriptNewBuffer[128] = "";
+			static std::string newScriptName{};
+
+			ImGui::Text("Enter new script name:");
+			if (ImGui::InputText("##NewScriptName", scriptNewBuffer, sizeof(scriptNewBuffer)))
+			{
+				newScriptName = scriptNewBuffer;
+			}
+
+			if (ImGui::Button("Create", ImVec2(120, 0)))
+			{
+				if (!newScriptName.empty())
+				{
+					if (newScriptName.ends_with(".cs"))
+						newScriptName = newScriptName.substr(0, newScriptName.size() - 3);
+
+					std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + newScriptName + ".cs"; // get the saving path
+
+					// writing script template 
+					std::string scriptTemplate =
+						"using Engine;\n"
+						"using System;\n\n"
+						"namespace Game\n"
+						"{\n"
+						"    public class " + newScriptName + "\n"
+						"    {\n"
+						"        public override void OnStart()\n"
+						"        {\n"
+						//"            Log.Info(\"" + newScriptName + " started!\");\n"
+						"			 Engine.InternalCalls.Log(\"" + newScriptName + " started!\");\n"
+						"        }\n\n"
+						"        public override void OnUpdate(float deltaTime)\n"
+						"        {\n"
+						"\n"
+						"        }\n"
+						"    }\n"
+						"}\n";
+
+					std::ofstream outFile(scriptPath);
+					if (outFile.is_open())
+					{
+						outFile << scriptTemplate;
+						outFile.close();
+						OpenScriptInEditor(newScriptName); // to open script after created
+
+						//std::cout << "[Editor] Created new script: " << scriptPath << "\n";
+					}
+					
+
+					scriptNewBuffer[0] = '\0';
+					newScriptName.clear();
+					createScript = false;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void Editor::OpenScriptPanel()
+	{
+		
+		if (openScript)
+		{
+			ImGui::OpenPopup("Open Script");
+		}
+
+		// pop up panel to open scene file
+		if (ImGui::BeginPopupModal("Open Script", nullptr, ImGuiWindowFlags_NoDocking))
+		{
+			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+
+			std::string scriptPath = getRepository() + "\\Scripts\\Game";
+			auto getScriptFiles = getAssetsInFolder(scriptPath);
+
+			ImGui::Text("Select a script to open:");
+			ImGui::Separator();
+
+			if (getScriptFiles.empty())
+			{
+				ImGui::TextDisabled("No script files found in:");
+				ImGui::TextWrapped("%s", scriptPath.c_str());
+			}
+			else
+			{
+				for (const auto& scriptFile : getScriptFiles)
+				{
+					if (ImGui::Selectable(scriptFile.name.c_str()))
+					{
+						OpenScriptInEditor(scriptFile.name.c_str());
+						openScript = false;
+					}
+				}
+			}
+			
+			ImGui::Separator();
+			if (ImGui::Button("Cancel"))
+			{
+				openScript = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup(); 
+		}
+		
+	}
+
+	bool Editor::OpenScriptInEditor(const std::string& scriptName)
+	{
+		std::string sanitizedName = scriptName;
+		if (sanitizedName.ends_with(".cs"))
+		{
+			sanitizedName = sanitizedName.substr(0, sanitizedName.size() - 3);
+		}
+
+		std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + sanitizedName + ".cs";
+
+		if (!std::filesystem::exists(scriptPath))
+		{
+			//std::cerr << "[Editor] Script not found: " << scriptPath << "\n";
+			return false;
+		}
+		try
+		{
+			std::string windowsPath = scriptPath;
+			std::replace(windowsPath.begin(), windowsPath.end(), '/', '\\');
+
+			std::string command = "start \"\" \"" + windowsPath + "\"";
+
+			int result = system(command.c_str());
+			return result == 0;
+		}
+		catch (const std::exception& e)
+		{
+			return false;
+		}
 	}
 
 } // end of namespace Engine

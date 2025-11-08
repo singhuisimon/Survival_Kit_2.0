@@ -21,6 +21,7 @@
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 #include "../Component/ScriptComponent.h"
 
@@ -560,6 +561,61 @@ namespace Engine {
                 PropertyType::Bool,
                 [](const ParticleComponent& c) { return c.Active; },
                 [](ParticleComponent& c, const bool& v) { c.Active = v; }
+            );
+        }
+
+        // Register LightComponent
+        {
+            auto& meta = REGISTER_COMPONENT(LightComponent);
+
+            meta.AddProperty<LightComponent, bool>(
+                "Enabled",
+                PropertyType::Bool,
+                [](const LightComponent& c) { return c.Enabled; },
+                [](LightComponent& c, const bool& v) { c.Enabled = v; }
+            );
+            // Enums as ints for editor/serialization
+            meta.AddProperty<LightComponent, LightType>(
+                "Type",
+                PropertyType::Int,
+                [](const LightComponent& c) { return c.Type; },
+                [](LightComponent& c, const LightType& v) { c.Type = v; }
+            );
+            meta.AddProperty<LightComponent, LightMode>(
+                "Mode",
+                PropertyType::Int,
+                [](const LightComponent& c) { return c.Mode; },
+                [](LightComponent& c, const LightMode& v) { c.Mode = v; }
+            );
+            meta.AddProperty<LightComponent, glm::vec3>(
+                "Color",
+                PropertyType::Vec3,
+                [](const LightComponent& c) { return c.Color; },
+                [](LightComponent& c, const glm::vec3& v) { c.Color = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "Intensity",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.Intensity; },
+                [](LightComponent& c, const float& v) { c.Intensity = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "Range",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.Range; },
+                [](LightComponent& c, const float& v) { c.Range = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "SpotAngleDeg",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.SpotAngleDeg; },
+                [](LightComponent& c, const float& v) { c.SpotAngleDeg = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "IndirectMultiplier",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.IndirectMultiplier; },
+                [](LightComponent& c, const float& v) { c.IndirectMultiplier = v; }
             );
         }
 

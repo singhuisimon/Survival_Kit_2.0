@@ -21,6 +21,7 @@
 #include "Component/MeshRendererComponent.h"
 #include "Component/RigidbodyComponent.h"
 #include "Component/ScriptComponent.h"  // ADD THIS
+#include "Component/LightComponent.h"  
 
 
 // Adding systems
@@ -330,14 +331,14 @@ void Game::CreateDefaultScene() {
 
     std::cout << inst_guid.m_Value << "\n"; //this is the main value - amanda
 
-    std::string meshName_ = "E005_loveletter_v001.fbx";
-    xresource::instance_guid inst_guid_ = Engine::AM.getAssetIdByFilename(meshName_);
-    //mesh.MeshGuid = inst_guid_;
-    //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
+ //   std::string meshName_ = "E005_loveletter_v001.fbx";
+ //   xresource::instance_guid inst_guid_ = Engine::AM.getAssetIdByFilename(meshName_);
+ //   //mesh.MeshGuid = inst_guid_;
+ //   //if (meshName == "E004_botnet_v001.fbx") { transform.SetRotation(glm::vec3(0, 90.0f, 0)); }
 
-    std::cout << inst_guid_.m_Value << "\n";
-	//mesh.MeshResource = mesh_rsc;
-    LOG_INFO("Mesh GUID for ", meshName_, ": ", inst_guid_.m_Value);
+ //   std::cout << inst_guid_.m_Value << "\n";
+	////mesh.MeshResource = mesh_rsc;
+ //   LOG_INFO("Mesh GUID for ", meshName_, ": ", inst_guid_.m_Value);
 
     auto& script = player.AddComponent<Engine::ScriptComponent>();
     script.ScriptClassName = "Game.TestScript";
@@ -442,6 +443,64 @@ void Game::CreateDefaultScene() {
     bt.TreeAssetPath = "SimpleWaitTree.json";
 
     LOG_TRACE("  -> ai created");
+
+    LOG_TRACE("  Creating Sunlight entity...");
+    auto sunlight = m_Scene->CreateEntity("Sunlight");
+    sunlight.AddComponent<Engine::TagComponent>("Sunlight");
+
+    auto& sunlightTransform = sunlight.AddComponent<Engine::TransformComponent>();
+    sunlightTransform.Position = glm::vec3(0, 10, 0);
+    sunlightTransform.Rotation = glm::quatLookAt(
+        glm::normalize(glm::vec3(-0.3f, -1.0f, -0.5f)), // forward vector (light direction)
+        glm::vec3(0.0f, 1.0f, 0.0f));
+    sunlightTransform.Scale = glm::vec3(1.0f);
+
+    auto& sunlightLight = sunlight.AddComponent<Engine::LightComponent>();
+    sunlightLight.Type = Engine::LightType::Directional;
+    sunlightLight.Enabled = true;
+    sunlightLight.Color = glm::vec3(1.0f, 0.956f, 0.839f); // warm white (~5500K)
+    sunlightLight.Intensity = 0.5f;     // good balance for full-scene lighting
+    sunlightLight.Range = 0.0f;         // ignored for directional
+    sunlightLight.SpotAngleDeg = 0.0f;  // ignored for directional
+    sunlightLight.IndirectMultiplier = 1.0f;
+    sunlightLight.Mode = Engine::LightMode::Realtime;
+    LOG_TRACE("  -> Sunlight created");
+
+    LOG_TRACE("  Creating Lamp entity...");
+    auto lamp = m_Scene->CreateEntity("Lamp");
+    lamp.AddComponent<Engine::TagComponent>("Lamp");
+
+    auto& lampTransform = lamp.AddComponent<Engine::TransformComponent>();
+    lampTransform.Position = glm::vec3(5, 5, 0);
+
+    auto& lampLight = lamp.AddComponent<Engine::LightComponent>();
+    lampLight.Type = Engine::LightType::Point;
+    lampLight.Enabled = true;
+    lampLight.Color = glm::vec3(0.0f, 0.67f, 0.0f);  // green
+    lampLight.Intensity = 1.0f;     // 1.0 = neutral brightness
+    lampLight.Range = 15.0f;         // meters / world units
+    lampLight.SpotAngleDeg = 0.0f;  // ignored for point light
+    lampLight.IndirectMultiplier = 1.0f;
+    lampLight.Mode = Engine::LightMode::Realtime;
+    LOG_TRACE("  -> Lamp created");
+
+    LOG_TRACE("  Creating Spotlight entity...");
+    auto spotlight = m_Scene->CreateEntity("Spotlight");
+    spotlight.AddComponent<Engine::TagComponent>("Spotlight");
+
+    auto& spotlightTransform = spotlight.AddComponent<Engine::TransformComponent>();
+    spotlightTransform.Position = glm::vec3(-5, 5, 0);
+
+    auto& spotlightLight = spotlight.AddComponent<Engine::LightComponent>();
+    spotlightLight.Type = Engine::LightType::Spot;
+    spotlightLight.Enabled = true;
+    spotlightLight.Color = glm::vec3(0.85f, 0.0f, 0.0f);  // red
+    spotlightLight.Intensity = 2.0f;     // 1.0 = neutral brightness
+    spotlightLight.Range = 10.0f;         // meters / world units
+    spotlightLight.SpotAngleDeg = 45.0f;
+    spotlightLight.IndirectMultiplier = 1.0f;
+    spotlightLight.Mode = Engine::LightMode::Realtime;
+    LOG_TRACE("  -> Spotlight created");
 }
 
 void Game::OnUpdate(Engine::Timestep ts) {

@@ -420,4 +420,80 @@ namespace Engine {
 		return p.filename().string();
 	}
 
+	bool AssetManager::CompileSingleAsset(xresource::instance_guid guid, bool verbose) {
+
+		//find the asset in the record and get the type 
+		const AssetRecord* rec = m_db.Find(guid); 
+
+		if (!rec) {
+			LOG_ERROR("AssetManager: Asset not found for GUID: ", std::hex, guid.m_Value); 
+			return false;
+		}
+
+		if (!rec->valid) {
+			LOG_ERROR("AssetManager: Asset is invalid: ", std::hex, guid.m_Value);
+			return false;
+		}
+
+		//get the path to the Resources folder in the root 
+		std::string descriptorPath = getDescriptorRoot();
+		std::string compiledPath = getCompiledPath();
+		//get the resource type string
+		std::string resourceTypeFolder = resourceTypeToString(rec->type);
+
+		//build the GUID hex string
+		std::ostringstream guidHex;
+		guidHex << std::uppercase << std::hex << std::setw(16) << std::setfill('0') << guid.m_Value;
+		std::string guidString = guidHex.str();
+
+		//build the command 
+		std::ostringstream command; 
+
+		//std::filesystem::current_path
+		std::filesystem::path compilerPath = std::filesystem::current_path() / "AssetCompiler.exe";
+
+		//if that does not exist 
+		if (!std::filesystem::exists(compilerPath)) {
+			LOG_ERROR("AssetManager: AssetCompiler.exe not found at: ", compilerPath.string()); 
+			LOG_ERROR("BUILD THE ASSET COMPILER"); 
+			return false;
+		}
+
+		command << "\"" << compilerPath.string() << "\"";
+		command << " --guid " << guidString;
+		command << " --type " << resourceTypeFolder;  // IMPORTANT: Pass the type for optimization!
+		command << " --input \"" << descriptorPath << "\"";
+		command << "--output \"" << compiledPath << "\""; 
+
+		//AssetCompiler.exe exists
+		if (verbose) {
+			command << " --verbose";
+		}
+
+		LOG_DEBUG("Running command: ", command.str());
+
+		// Execute the compiler
+		int result = std::system(command.str().c_str());
+
+		if (result == 0) {
+			LOG_INFO("Asset compiled successfully: ", guidString);
+
+			// Update the database
+			AssetRecord* mutableRec = m_db.FindMutable(guid);
+			if (mutableRec) {
+				mutableRec->needsRecompile = false;
+				mutableRec->descriptorModifiedTime = std::time(nullptr);
+
+				
+			}
+
+			return true;
+		}
+		else {
+			LOG_ERROR("Asset compilation failed with code: ", result);
+			return false;
+		}
+	}
+
+
 }// end of namespace Engine
