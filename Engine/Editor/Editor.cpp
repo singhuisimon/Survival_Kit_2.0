@@ -2211,6 +2211,9 @@ namespace Engine
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Text("Projects:");
 
+			bool inRawResouces = false;
+			bool inComposedResources = false;
+
 			// For resources handled by Asset Browser
 			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -2235,6 +2238,8 @@ namespace Engine
 						raw_asset = true;
 						selectedType = type;
 						selectedFolder = typeName;
+						//inRawResouces = true;
+						//inComposedResources = false;
 						selectedResourcesIndex = -1;
 					}
 				}
@@ -2251,6 +2256,7 @@ namespace Engine
 						bool isSelected = (selectedFolder == folder.fullPath);
 						if (ImGui::Selectable(folder.name.c_str(), isSelected))
 						{
+							selectedType = ResourceType::UNKNOWN;
 							raw_asset = false;
 							selectedFolder = folder.fullPath;
 							selectedResourcesIndex = -1; // reset asset selection
@@ -2350,8 +2356,8 @@ namespace Engine
 									editedAsset = filename;
 								}
 
-								ImGui::EndPopup();
 							}
+							ImGui::EndPopup();
 						}
 
 						if (isSelected)
