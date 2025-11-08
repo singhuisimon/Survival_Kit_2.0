@@ -2490,7 +2490,7 @@ namespace Engine
 
 				for (auto& folder : folders)
 				{
-					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" && folder.name != "Textures") {
+					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" && folder.name != "Textures" && folder.name != "Material") {
 						bool isSelected = (selectedFolder == folder.fullPath);
 						if (ImGui::Selectable(folder.name.c_str(), isSelected))
 						{
