@@ -449,27 +449,28 @@ namespace Engine {
 		//build the command 
 		std::ostringstream command; 
 
+		fs::path exeDir = GetExecutableDirectory();
+
 		//std::filesystem::current_path
-		std::filesystem::path compilerPath = std::filesystem::current_path() / "AssetCompiler.exe";
+		fs::path compilerPath = exeDir / "AssetCompiler.exe";
 
 		//if that does not exist 
-		if (!std::filesystem::exists(compilerPath)) {
+		if (!fs::exists(compilerPath)) {
 			LOG_ERROR("AssetManager: AssetCompiler.exe not found at: ", compilerPath.string()); 
 			LOG_ERROR("BUILD THE ASSET COMPILER"); 
 			return false;
 		}
 
 		command << "\"" << compilerPath.string() << "\"";
+		//command << "\AssetCompiler";
 		command << " --guid " << guidString;
-		command << " --type " << resourceTypeFolder;  // IMPORTANT: Pass the type for optimization!
-		command << " --input \"" << descriptorPath << "\"";
-		command << "--output \"" << compiledPath << "\""; 
-
-		//AssetCompiler.exe exists
+		command << " --type " << resourceTypeFolder;
+		command << " --input " << descriptorPath ;  
+		command << " --output " << compiledPath;	
 		if (verbose) {
 			command << " --verbose";
 		}
-
+		
 		LOG_DEBUG("Running command: ", command.str());
 
 		// Execute the compiler
@@ -484,7 +485,10 @@ namespace Engine {
 				mutableRec->needsRecompile = false;
 				mutableRec->descriptorModifiedTime = std::time(nullptr);
 
-				
+				std::string compiledFilePath = getCompiledFilePath(guid, mutableRec->type);
+				if (fs::exists(compiledFilePath)) {
+					mutableRec->lastCompiledTime = fs::last_write_time(compiledFilePath).time_since_epoch().count();
+				}
 			}
 
 			return true;
@@ -493,7 +497,73 @@ namespace Engine {
 			LOG_ERROR("Asset compilation failed with code: ", result);
 			return false;
 		}
+
 	}
+
+	bool AssetManager::CompileAllAsset(bool verbose) {
+		//build the command 
+		std::ostringstream command;
+
+		fs::path exeDir = GetExecutableDirectory();
+
+		//std::filesystem::current_path
+		fs::path compilerPath = exeDir / "AssetCompiler.exe";
+
+		//if that does not exist 
+		if (!fs::exists(compilerPath)) {
+			LOG_ERROR("AssetManager: AssetCompiler.exe not found at: ", compilerPath.string());
+			LOG_ERROR("BUILD THE ASSET COMPILER");
+			return false;
+		}
+
+		std::string descriptorPath = getDescriptorRoot();
+		std::string compiledPath = getCompiledPath();
+
+
+		command << "\"" << compilerPath.string() << "\"";
+		command << " --input " << descriptorPath;
+		command << " --output " << compiledPath;
+
+		if (verbose) {
+			command << " --verbose";
+		}
+		LOG_DEBUG("Running command: ", command.str());
+
+		// Execute the compiler
+		int result = std::system(command.str().c_str());
+
+		if (result == 0) {
+			LOG_INFO("All Assets Compiled Successfully"); 
+			return true;
+		}
+		else {
+			LOG_DEBUG("All Assets Failed to Compile"); 
+			return false;
+		}
+
+
+	}
+
+	std::string AssetManager::getCompiledFilePath(xresource::instance_guid guid, ResourceType type)const {
+		std::ostringstream guidHex;
+		guidHex << std::uppercase << std::hex << std::setw(16) << std::setfill('0') << guid.m_Value;
+
+		std::string extension;
+		switch (type) {
+		case ResourceType::MESH: extension = ".mesh"; break;
+		case ResourceType::TEXTURE: extension = ".tex"; break;
+		case ResourceType::AUDIO: extension = ".audio"; break;
+		case ResourceType::SHADER: extension = ".shader"; break;
+		default: extension = ".bin"; break;
+		}
+
+		fs::path compiledPath = fs::path(getCompiledPath())
+			/ resourceTypeToString(type)
+			/ (guidHex.str() + extension);
+
+		return compiledPath.string();
+	}
+
 
 
 }// end of namespace Engine
