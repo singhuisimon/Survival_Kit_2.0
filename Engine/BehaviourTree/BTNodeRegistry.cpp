@@ -338,6 +338,18 @@ namespace Engine {
             }
         );
 
+        registry.RegisterNodeType<BTApplyLinearVelocity>("Action", "Check if all waypoint has been visited",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_VEC3_PROPERTY(BTApplyLinearVelocity, "LinearVelocity", m_linearVelocity);
+            }
+        );
+
+        registry.RegisterNodeType<BTApplyLinearDampening>("Action", "Check if all waypoint has been visited",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTApplyLinearDampening, "Dampening", m_Dampening);
+            }
+        );
+
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
     

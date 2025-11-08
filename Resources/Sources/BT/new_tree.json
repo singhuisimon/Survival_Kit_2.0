@@ -1,100 +1,21 @@
 {
     "Name": "NewTree",
-    "GUID": "11720671247194636653",
+    "GUID": "11316807432558084267",
     "Version": "1.0",
     "Root": {
         "Type": "Sequence",
         "Name": "Node",
-        "GUID": "3073759962643579247",
+        "GUID": "17657875707895824557",
         "Children": [
             {
-                "Type": "Sequence",
+                "Type": "ApplyLinearVelocity",
                 "Name": "Node",
-                "GUID": "14026514256408740209",
-                "Children": [
-                    {
-                        "Type": "CheckEntityCount",
-                        "Name": "Node",
-                        "GUID": "1920838458037059955",
-                        "Properties": {
-                            "Tag": "Path1",
-                            "TargetCount": "1",
-                            "Comparison": "0"
-                        }
-                    },
-                    {
-                        "Type": "LoadWaypoints",
-                        "Name": "Node",
-                        "GUID": "5956063724164792717",
-                        "Properties": {
-                            "WaypointKey": "Path1",
-                            "CountKey": "Count"
-                        }
-                    }
-                ]
-            },
-            {
-                "Type": "GetNextWaypoint",
-                "Name": "Node",
-                "GUID": "8261906733378765199",
+                "GUID": "3822817652613857455",
                 "Properties": {
-                    "WaypointKey": "Path1",
-                    "CountKey": "Count",
-                    "TargetKey": "TargetPosition"
+                    "LinearVelocity.x": "1.000000",
+                    "LinearVelocity.y": "0.000000",
+                    "LinearVelocity.z": "0.000000"
                 }
-            },
-            {
-                "Type": "LookAtSmooth",
-                "Name": "Node",
-                "GUID": "2497299210344792465",
-                "Properties": {
-                    "TargetKey": "TargetPosition",
-                    "TurnSpeedDeg": "30.000002"
-                }
-            },
-            {
-                "Type": "RepeatUntilFail",
-                "Name": "Node",
-                "GUID": "14602975008716964243",
-                "Children": [
-                    {
-                        "Type": "Parallel",
-                        "Name": "Node",
-                        "GUID": "7108985228772589973",
-                        "Properties": {
-                            "SuccessPolicy": "RequireAll",
-                            "FailurePolicy": "RequireOne"
-                        },
-                        "Children": [
-                            {
-                                "Type": "Inverter",
-                                "Name": "Node",
-                                "GUID": "1344377705738518935",
-                                "Children": [
-                                    {
-                                        "Type": "CheckWaypointReached",
-                                        "Name": "Node",
-                                        "GUID": "191456201132278173",
-                                        "Properties": {
-                                            "TargetKey": "TargetPosition",
-                                            "ArrivalDistance": "0.000000"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "Type": "MoveToTarget",
-                                "Name": "Node",
-                                "GUID": "767916953435914655",
-                                "Properties": {
-                                    "MoveSpeed": "5.000000",
-                                    "ArrivalDistance": "0.000000",
-                                    "TargetPositionKey": "TargetPosition"
-                                }
-                            }
-                        ]
-                    }
-                ]
             }
         ]
     }

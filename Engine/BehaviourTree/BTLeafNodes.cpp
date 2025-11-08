@@ -15,7 +15,9 @@
 #include <functional>
 #include "Core/Application.h"
 #include "Graphics/Material.h"
+#include "ECS/Components.h"
 #include "Transform/TransformSystem.h"
+#include "Physics/PhysicsAPI.h"
 
 namespace Engine {
 
@@ -1509,10 +1511,80 @@ namespace Engine {
     void BTCheckVisitAllWaypoints::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
         properties.push_back({ "CountKey", m_CountKey });
     }
+
     void BTCheckVisitAllWaypoints::SetProperty(const std::string& name, const std::string& value) {
         if (name == "CountKey") {
             m_CountKey = value;
         }
 	}
+
+	//BTApplyLinearVelocity
+    BTApplyLinearVelocity::BTApplyLinearVelocity(glm::vec3 linearVelocity) : m_linearVelocity(linearVelocity) {
+	}
+
+    const char* BTApplyLinearVelocity::GetTypeName() const {
+		return "ApplyLinearVelocity";
+    }
+
+    BTStatus BTApplyLinearVelocity::Execute(BTContext& context) {
+        
+        if(!context.Entity->HasComponent<RigidbodyComponent>()) {
+			context.Entity->AddComponent<RigidbodyComponent>();
+		}
+
+		PhysicsAPI::AddLinearVelocity(*context.Entity, m_linearVelocity);
+        LOG_INFO("BTApplyLinearVelocity: Applied linear velocity (",
+			m_linearVelocity.x, ", ", m_linearVelocity.y, ", ", m_linearVelocity.z, ") to entity.");
+
+		return BTStatus::Success;
+    }
+
+    void BTApplyLinearVelocity::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "LinearVelocity.x", std::to_string(m_linearVelocity.x) });
+        properties.push_back({ "LinearVelocity.y", std::to_string(m_linearVelocity.y) });
+        properties.push_back({ "LinearVelocity.z", std::to_string(m_linearVelocity.z) });
+    }
+
+    void BTApplyLinearVelocity::SetProperty(const std::string& name, const std::string& value) {
+        if(name == "LinearVelocity.x") {
+            m_linearVelocity.x = std::stof(value);
+        }
+        else if(name == "LinearVelocity.y") {
+            m_linearVelocity.y = std::stof(value);
+        }
+        else if(name == "LinearVelocity.z") {
+            m_linearVelocity.z = std::stof(value);
+		}
+    }
+
+	//BTApplyDampening
+    BTApplyLinearDampening::BTApplyLinearDampening(float dampening) :
+        m_Dampening(dampening) {
+    }
+
+    const char* BTApplyLinearDampening::GetTypeName() const {
+        return "ApplyLinearDampening";
+    }
+
+    BTStatus BTApplyLinearDampening::Execute(BTContext& context) {
+        if(!context.Entity->HasComponent<RigidbodyComponent>()) {
+			LOG_WARNING("BTApplyDampening: Entity does not have RigidbodyComponent");
+			return BTStatus::Failure;
+		}
+
+        PhysicsAPI::SetLinearDamping(*context.Entity, m_Dampening);
+		LOG_INFO("BTApplyDampening: Applied dampening of ", m_Dampening, " to entity.");
+        return BTStatus::Success;
+    }
+
+    void BTApplyLinearDampening::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "Dampening", std::to_string(m_Dampening)});
+    }
+
+    void BTApplyLinearDampening::SetProperty(const std::string& name, const std::string& value) {
+        if(name == "Dampening") {
+            m_Dampening = std::stof(value);
+        }
+    }
 
 } // namespace Engine

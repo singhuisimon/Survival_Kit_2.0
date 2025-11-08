@@ -610,4 +610,33 @@ namespace Engine {
 		std::string m_CountKey;
     };
 
+    //linear velocity - move in a singular directoin
+    //dampening
+
+    class BTApplyLinearVelocity : public BTNode {
+    public:
+        BTApplyLinearVelocity(glm::vec3 linearVelocity = glm::vec3(0));
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        glm::vec3 m_linearVelocity;
+    };
+
+    class BTApplyLinearDampening : public BTNode {
+
+    public:
+
+        BTApplyLinearDampening(float dampening = 0.0f);
+		const char* GetTypeName() const override;
+
+		BTStatus Execute(BTContext& context) override;
+		void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+		void SetProperty(const std::string& name, const std::string& value) override;
+
+        float m_Dampening;
+    };
+
+
 } // namespace Engine
