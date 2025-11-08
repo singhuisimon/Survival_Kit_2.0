@@ -3586,6 +3586,7 @@ namespace Engine
 
 			if (ImGui::Button("Cancel", ImVec2(120, 0)))
 			{
+				createScript = false;
 				ImGui::CloseCurrentPopup();
 			}
 
