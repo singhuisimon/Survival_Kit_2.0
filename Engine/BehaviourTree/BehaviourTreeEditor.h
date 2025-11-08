@@ -1,9 +1,12 @@
-/**
- * @file BehaviourTreeEditor.h
- * @brief Editor utilities for behaviour tree creation and editing
- * @author AI System Team
- * @date 2025
- */
+ /**
+  * @file BehaviourTree.h
+  * @brief Editor utilities for behaviour tree creation and editing
+  * @author Amanda Leow Boon Suan (90%)
+  * @date 3/11/2025
+  * Copyright (C) 2025 DigiPen Institute of Technology.
+  * Reproduction or disclosure of this file or its contents without the
+  * prior written consent of DigiPen Institute of Technology is prohibited.
+  */
 
 #pragma once
 
@@ -148,7 +151,7 @@ namespace Engine {
         /**
         * @brief Rename a behaviour tree (in-memory only)
         */
-        static bool RenameTreeFIle(const std::string& oldPath,
+        static bool RenameTreeFile(const std::string& oldPath,
             const std::string& newPath,
             Scene* scene = nullptr);
 

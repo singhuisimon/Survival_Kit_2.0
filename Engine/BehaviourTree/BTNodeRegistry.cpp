@@ -1,8 +1,11 @@
 /**
- * @file BTNodeRegistry.h
- * @brief Registry for behaviour tree node types
- * @author AI System Team
- * @date 2025
+ * @file BTNodeRegistry.cpp
+ * @brief Definition of Behaviour Tree Node Registry, Where you register all the created nodes
+ * @author Amanda Leow Boon Suan (90%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once
@@ -155,6 +158,7 @@ namespace Engine {
             });
 
         // Leaf nodes
+		// for internal coding/testing purposes
         registry.RegisterNodeType<BTAction>("Action", "Executes custom action logic");
         registry.RegisterNodeType<BTCondition>("Condition", "Checks a condition");
 
@@ -308,6 +312,54 @@ namespace Engine {
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTLookAtSmooth, "TargetKey", m_Key);
                 BT_REGISTER_FLOAT_PROPERTY(BTLookAtSmooth, "TurnSpeedDeg", m_TurnSpeed);
+            }
+        );
+
+        registry.RegisterNodeType<BTCountLoadWaypoints>("Action", "count and load waypoint into board",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCountLoadWaypoints, "WaypointKey", m_WaypointKey);
+                BT_REGISTER_STRING_PROPERTY(BTCountLoadWaypoints, "CountKey", m_CountKey);
+            }
+        );
+
+        registry.RegisterNodeType<BTGetNextWaypoint>("Action", "Get and Set the next waypoint as target",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTGetNextWaypoint, "WaypointKey", m_WaypointKey);
+                BT_REGISTER_STRING_PROPERTY(BTGetNextWaypoint, "CountKey", m_CountKey);
+                BT_REGISTER_STRING_PROPERTY(BTGetNextWaypoint, "TargetKey", m_TargetKey);
+            }
+        );
+
+        registry.RegisterNodeType<BTIncrementWaypointIndex>("Action", "Increment internal index to + 1");
+
+        registry.RegisterNodeType<BTCheckWaypointReached>("Action", "Check if waypoint has been reached",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckWaypointReached, "TargetKey", m_TargetKey);
+                BT_REGISTER_FLOAT_PROPERTY(BTCheckWaypointReached, "ArrivalDistance", m_ArrivalDistance);
+            }
+        );
+
+        registry.RegisterNodeType<BTCheckVisitAllWaypoints>("Action", "Check if all waypoint has been visited",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckVisitAllWaypoints, "CountKey", m_CountKey);
+            }
+        );
+
+        registry.RegisterNodeType<BTApplyLinearVelocity>("Action", "Check if all waypoint has been visited",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_VEC3_PROPERTY(BTApplyLinearVelocity, "LinearVelocity", m_linearVelocity);
+            }
+        );
+
+        /*registry.RegisterNodeType<BTApplyLinearDampening>("Action", "Check if all waypoint has been visited",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_FLOAT_PROPERTY(BTApplyLinearDampening, "Dampening", m_Dampening);
+            }
+        );*/
+
+        registry.RegisterNodeType<BTCreateShootableEnemy>("Action", "Create shootable enemy",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCreateShootableEnemy, "Tag", m_Tag);
             }
         );
 
