@@ -217,7 +217,7 @@ namespace Engine {
 
         while (!currentPath.empty()) {
             if (fs::exists(currentPath / "build")) {
-                std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
+              //  std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
                 return currentPath.string();
             }
             currentPath = currentPath.parent_path();

@@ -194,29 +194,12 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 {
     Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
-    //LOG_INFO(">>> MESH LOADER CALLED <<<");
-    //LOG_INFO("Mesh Loader - full_guid.m_Instance.m_Value (decimal): ", guid.m_Instance.m_Value);
-    //LOG_INFO("Mesh Loader - full_guid.m_Type.m_Value (decimal): ", guid.m_Type.m_Value);
-    // CRITICAL: Verify OpenGL context is active
-    //GLint currentFBO = 0;
-    //glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
-    //GLenum contextError = glGetError();
-    //if (contextError != GL_NO_ERROR) {
-    //    LOG_ERROR("!!! NO OPENGL CONTEXT ACTIVE !!!");
-    //    LOG_ERROR("Cannot create mesh buffers without active OpenGL context");
-    //    LOG_ERROR("Mesh loading must happen on the main thread with active GL context");
-    //    return nullptr;
-    //}
-    //LOG_INFO("OpenGL context is active and ready");
-    // Get compiled file path
+
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
     //LOG_INFO("MESHFILE PATH : ", compiled_path);
 
     if (!Engine::fileExists(compiled_path)) {
-        //LOG_ERROR(">>> COMPILED MESH FILE NOT FOUND <<<");
-        //LOG_ERROR("Looking for: ", compiled_path);
-        //LOG_INFO("Listing all available compiled mesh files:");
         Engine::listCompiledFiles(Engine::ResourceType::MESH);  // <-- ADD THIS LINE
         return nullptr;
     }
@@ -362,71 +345,17 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     LOG_INFO("Starting OpenGL buffer creation...");
 
 
-
-#if 0
-    // Convert to interleaved format for OpenGL
-    // Format: pos(3) + normal(3) + color(3) + uv(2) = 11 floats per vertex
-    mesh->vertices.resize(meshHeader.vertexCount * 11);
-
-    for (uint32_t i = 0; i < meshHeader.vertexCount; ++i) {
-        size_t offset = i * 11;
-
-        // Position (3 floats)
-        mesh->vertices[offset + 0] = positions[i].x;
-        mesh->vertices[offset + 1] = positions[i].y;
-        mesh->vertices[offset + 2] = positions[i].z;
-
-        // Normal (3 floats)
-        mesh->vertices[offset + 3] = normals[i].x;
-        mesh->vertices[offset + 4] = normals[i].y;
-        mesh->vertices[offset + 5] = normals[i].z;
-
-        // Color (3 floats)
-        mesh->vertices[offset + 6] = colors[i].x;
-        mesh->vertices[offset + 7] = colors[i].y;
-        mesh->vertices[offset + 8] = colors[i].z;
-
-        // TexCoord (2 floats)
-        mesh->vertices[offset + 9] = texcoords[i].x;
-        mesh->vertices[offset + 10] = texcoords[i].y;
-    }
-#endif
     // Create OpenGL buffers
     glGenVertexArrays(1, &mesh->VAO);
 
-    //GLenum err1 = glGetError();
-    //if (err1 != GL_NO_ERROR) {
-    //    LOG_ERROR("glGenVertexArrays failed: 0x", std::hex, err1);
-    //    return nullptr;
-    //}
-
     glGenBuffers(1, &mesh->VBO);
-    //GLenum err2 = glGetError();
-    //if (err2 != GL_NO_ERROR) {
-    //    LOG_ERROR("glGenBuffers(VBO) failed: 0x", std::hex, err2);
-    //    glDeleteVertexArrays(1, &mesh->VAO);
-    //    return nullptr;
-    //}
 
     glGenBuffers(1, &mesh->EBO);
     GLenum err3 = glGetError();
-    //if (err3 != GL_NO_ERROR) {
-    //    LOG_ERROR("glGenBuffers(EBO) failed: 0x", std::hex, err3);
-    //    glDeleteVertexArrays(1, &mesh->VAO);
-    //    glDeleteBuffers(1, &mesh->VBO);
-    //    return nullptr;
-    //}
     LOG_INFO("OpenGL buffers generated: VAO=", mesh->VAO, " VBO=", mesh->VBO, " EBO=", mesh->EBO);
 
     glBindVertexArray(mesh->VAO);
     GLenum err4 = glGetError();
-    //if (err4 != GL_NO_ERROR) {
-    //    LOG_ERROR("glBindVertexArray failed: 0x", std::hex, err4);
-    //    glDeleteVertexArrays(1, &mesh->VAO);
-    //    glDeleteBuffers(1, &mesh->VBO);
-    //    glDeleteBuffers(1, &mesh->EBO);
-    //    return nullptr;
-    //}
     LOG_INFO("VAO bound successfully");
 
     // Upload interleaved vertex data
@@ -435,14 +364,6 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
         mesh->vertices.size() * sizeof(float),
         mesh->vertices.data(), GL_STATIC_DRAW);
     GLenum err5 = glGetError();
-    //if (err5 != GL_NO_ERROR) {
-    //    LOG_ERROR("glBufferData(VBO) failed: 0x", std::hex, err5);
-    //    LOG_ERROR("Attempted to upload ", mesh->vertices.size() * sizeof(float), " bytes");
-    //    glDeleteVertexArrays(1, &mesh->VAO);
-    //    glDeleteBuffers(1, &mesh->VBO);
-    //    glDeleteBuffers(1, &mesh->EBO);
-    //    return nullptr;
-    //}
     LOG_INFO("VBO data uploaded: ", mesh->vertices.size() * sizeof(float), " bytes");
 
     // Upload index data
@@ -451,14 +372,6 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
         mesh->indices.size() * sizeof(unsigned int),
         mesh->indices.data(), GL_STATIC_DRAW);
     GLenum err6 = glGetError();
-    //if (err6 != GL_NO_ERROR) {
-    //    LOG_ERROR("glBufferData(EBO) failed: 0x", std::hex, err6);
-    //    LOG_ERROR("Attempted to upload ", mesh->indices.size() * sizeof(unsigned int), " bytes");
-    //    glDeleteVertexArrays(1, &mesh->VAO);
-    //    glDeleteBuffers(1, &mesh->VBO);
-    //    glDeleteBuffers(1, &mesh->EBO);
-    //    return nullptr;
-    //}
     LOG_INFO("EBO data uploaded: ", mesh->indices.size() * sizeof(unsigned int), " bytes");
 
 
@@ -485,13 +398,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     // Check for OpenGL errors
     GLenum error = glGetError();
-    //if (error != GL_NO_ERROR) {
-    //    LOG_ERROR("OpenGL error during mesh creation: 0x", std::hex, error);
-    //    glDeleteVertexArrays(1, &mesh->VAO);
-    //    glDeleteBuffers(1, &mesh->VBO);
-    //    glDeleteBuffers(1, &mesh->EBO);
-    //    return nullptr;
-    //}
+ 
     LOG_INFO("OpenGL buffers created successfully");
     LOG_INFO("Mesh VAO: ", mesh->VAO, " VBO: ", mesh->VBO, " EBO: ", mesh->EBO);
     LOG_INFO("Returning mesh pointer...");
@@ -525,62 +432,6 @@ void xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Destroy(
 
 
 // ========== MATERIAL LOADER IMPLEMENTATION ==========
-
-#if 0
-xresource::loader<Engine::ResourceGUID::material_type_guid_v>::data_type*
-xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
-    xresource::mgr& mgr, const full_guid& guid)
-{
-    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
-
-    // Get compiled file path
-    std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MATERIAL);
-
-    if (!Engine::fileExists(compiled_path)) {
-     //   LM.writeLog("MaterialLoader - Compiled file not found: %s", compiled_path.c_str());
-        return nullptr;
-    }
-
-    // Open compiled binary file
-    std::ifstream file(compiled_path, std::ios::binary);
-    if (!file.is_open()) {
-      //  LM.writeLog("MaterialLoader - Failed to open: %s", compiled_path.c_str());
-        return nullptr;
-    }
-
-    // Read header
-    Engine::CompiledResourceHeader header;
-    if (!Engine::readCompiledHeader(file, header)) {
-        return nullptr;
-    }
-
-    // Create material resource
-    auto material = std::make_unique<data_type>();
-
-    // Read material properties
-    file.read(reinterpret_cast<char*>(&material->diffuseTexture), sizeof(xresource::full_guid));
-    file.read(reinterpret_cast<char*>(&material->normalTexture), sizeof(xresource::full_guid));
-    file.read(reinterpret_cast<char*>(&material->specularTexture), sizeof(xresource::full_guid));
-    file.read(reinterpret_cast<char*>(&material->shininess), sizeof(float));
-    file.read(reinterpret_cast<char*>(&material->opacity), sizeof(float));
-    file.read(reinterpret_cast<char*>(&material->doubleSided), sizeof(bool));
-
-    // Read shader name length and string
-    uint32_t nameLength;
-    file.read(reinterpret_cast<char*>(&nameLength), sizeof(uint32_t));
-    material->shaderName.resize(nameLength);
-    file.read(material->shaderName.data(), nameLength);
-
-    if (!file) {
-   //     LM.writeLog("MaterialLoader - Failed to read material data");
-        return nullptr;
-    }
-
-   // LM.writeLog("MaterialLoader - Loaded material GUID: %llX", guid.m_Instance.m_Value);
-
-    return material.release();
-}
-#endif
 
 xresource::loader<Engine::ResourceGUID::material_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(

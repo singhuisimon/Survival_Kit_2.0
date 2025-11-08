@@ -752,6 +752,85 @@ namespace Engine
 					{
 						auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
 						
+#if 1 //start of AssetReference
+						// ======================= Asset Reference Section =======================
+						ImGui::SeparatorText("Asset References");
+
+						// Helper lambda to display asset field with drag-drop support
+						auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType) {
+							// Get the filename from the GUID
+							std::string displayName = AM.getNameFromGuid(guid);
+							if (displayName.empty()) {
+								displayName = "<None>";
+							}
+
+							// Create a buffer for the input text (read-only display)
+							char buffer[256];
+							strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
+							buffer[sizeof(buffer) - 1] = '\0';
+
+							ImGui::Text("%s", label);
+							ImGui::SameLine();
+
+							// Input text field (read-only)
+							ImGui::PushID(label);
+							ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
+
+							// Drag-drop target
+							if (ImGui::BeginDragDropTarget())
+							{
+								// Accept payload from asset browser (assuming you use "ASSET_BROWSER_ITEM" as payload ID)
+								if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+								{
+									// Assuming payload contains xresource::instance_guid
+									xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
+
+									// Verify the asset type matches what's expected
+									const AssetRecord* record = AM.getAssetRecord(droppedGuid);
+									if (record && record->type == expectedType)
+									{
+										guid = droppedGuid;
+									}
+									else
+									{
+										// Optional: Show error message for incompatible type
+										ImGui::OpenPopup("Incompatible Asset Type");
+									}
+								}
+								ImGui::EndDragDropTarget();
+							}
+
+							// Context menu to clear the reference
+							if (ImGui::BeginPopupContextItem())
+							{
+								if (ImGui::MenuItem("Clear Reference"))
+								{
+									guid = xresource::instance_guid(); // Reset to invalid/default
+								}
+								ImGui::EndPopup();
+							}
+
+							ImGui::PopID();
+							};
+
+						// Display asset reference fields
+						DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
+						DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
+						DisplayAssetField("Texture", mesh.TextureGuid, ResourceType::TEXTURE);
+
+						// Popup for incompatible asset type
+						if (ImGui::BeginPopupModal("Incompatible Asset Type", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+						{
+							ImGui::Text("The dropped asset type does not match the expected type.");
+							if (ImGui::Button("OK"))
+							{
+								ImGui::CloseCurrentPopup();
+							}
+							ImGui::EndPopup();
+						}
+
+						ImGui::Spacing();
+#endif
 						bool globalIlluminate = mesh.GlobalIlluminate;
 						if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
 							mesh.GlobalIlluminate = globalIlluminate;
@@ -2574,6 +2653,21 @@ namespace Engine
 						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
 							selectedResourcesIndex = static_cast<int>(i);
 							ImGui::OpenPopup("AssetContextMenu");
+						}
+
+						// ======================= DRAG-DROP SOURCE - ADD THIS =======================
+						// This enables dragging assets from the browser to component fields
+						if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+						{
+							// Package the GUID as the payload
+							xresource::instance_guid draggedGuid = record->guid;
+							ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", &draggedGuid, sizeof(xresource::instance_guid));
+
+							// Visual feedback while dragging
+							ImGui::Text("Dragging: %s", filename.c_str());
+							ImGui::Text("Type: %s", resourceTypeToString(record->type).c_str());
+
+							ImGui::EndDragDropSource();
 						}
 
 						if (ImGui::BeginPopupContextItem("AssetContextMenu")) 
