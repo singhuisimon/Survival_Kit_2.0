@@ -9,6 +9,9 @@
  */
 
 #include "AssetDatabase.h"
+#include "AssetManager.h"
+#include "../Utility/AssetPath.h"
+
 #include <filesystem>
 #include <fstream>
 #include <random>
@@ -74,6 +77,7 @@ namespace Engine {
 			// Parse line: guid|type|sourcePath|ext|contentHash|lastWriteTime|valid
 			std::stringstream ss(line);
 			std::string guidStr, typeStr, sourcePath, ext, contentHash, timeStr, validStr;
+			std::string descModTimeStr, lastCompTimeStr, needsRecompileStr;  // NEW
 
 			if (!std::getline(ss, guidStr, '|')) continue;
 			if (!std::getline(ss, typeStr, '|')) continue;
@@ -81,17 +85,61 @@ namespace Engine {
 			if (!std::getline(ss, ext, '|')) continue;
 			if (!std::getline(ss, contentHash, '|')) continue;
 			if (!std::getline(ss, timeStr, '|')) continue;
-			if (!std::getline(ss, validStr)) continue;
+			if (!std::getline(ss, validStr, '|')) continue;
+
+			// NEW: Try to read new fields (backwards compatible)
+			bool hasNewFields = false;
+			if (std::getline(ss, descModTimeStr, '|')) {
+				hasNewFields = true;
+				std::getline(ss, lastCompTimeStr, '|');
+				std::getline(ss, needsRecompileStr);
+			}
 
 			try {
 				AssetRecord rec;
 				rec.guid.m_Value = std::stoull(guidStr, nullptr, 16);
 				rec.type = static_cast<ResourceType>(std::stoi(typeStr));
-				rec.sourcePath = sourcePath;
+				
+				//since the files are stored in relative path, get the absolute path
+				if (sourcePath.find("\\Resources\\") == 0 || sourcePath.find("/Resources/") == 0) {
+					// Remove the leading \Resources\ or /Resources/ part
+					std::string pathWithoutResources = sourcePath;
+					if (pathWithoutResources.find("\\Resources\\") == 0) {
+						pathWithoutResources = pathWithoutResources.substr(11); // Length of "\Resources\"
+					}
+					else if (pathWithoutResources.find("/Resources/") == 0) {
+						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
+					}
+					std::string sourceRoot = AssetManager::GetSourceResourcesPath();
+					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
+
+					//normalize here
+					std::string result = fullPath.string(); 
+					std::replace(result.begin(), result.end(), '\\', '/');
+
+					rec.sourcePath = result;
+				}
+				else {
+					rec.sourcePath = sourcePath;
+				}
+
 				rec.ext = ext;
 				rec.contentHash = contentHash;
 				rec.lastWriteTime = static_cast<std::time_t>(std::stoll(timeStr));
 				rec.valid = (validStr == "1");
+
+				// NEW: Parse new fields if present
+				if (hasNewFields) {
+					rec.descriptorModifiedTime = descModTimeStr.empty() ? 0 : static_cast<std::time_t>(std::stoll(descModTimeStr));
+					rec.lastCompiledTime = lastCompTimeStr.empty() ? 0 : static_cast<std::time_t>(std::stoll(lastCompTimeStr));
+					rec.needsRecompile = (needsRecompileStr == "1");
+				}
+				else {
+					// Old format - initialize to defaults
+					rec.descriptorModifiedTime = 0;
+					rec.lastCompiledTime = 0;
+					rec.needsRecompile = false;
+				}
 
 				byId[rec.guid] = rec;
 				bySourcePath[rec.sourcePath] = rec.guid;
@@ -123,19 +171,29 @@ namespace Engine {
 
 		// Write header
 		out << "# Asset Database\n";
-		out << "# Format: guid|type|sourcePath|ext|contentHash|lastWriteTime|valid\n";
+		out << "# guid|type|sourcePath|ext|contentHash|lastWriteTime|valid|descriptorModifiedTime|lastCompiledTime|needsRecompile\n";		
 		out << "# Version: 1.0\n\n";
 
 		// Write records
 		for (const auto& [guid, rec] : byId) {
+			//convert absolute path to relative path before writing
+			std::string pathToWrite = getRelativeAssetPath(rec.sourcePath);
+
 			out << std::hex << guid.m_Value << std::dec << '|'
 				<< static_cast<int>(rec.type) << '|'
-				<< rec.sourcePath << '|'
+				<< pathToWrite << '|'
 				<< rec.ext << '|'
 				<< rec.contentHash << '|'
 				<< rec.lastWriteTime << '|'
-				<< (rec.valid ? '1' : '0') << '\n';
+				<< (rec.valid ? "1" : "0") << '|';
+
+			//for tracking fields
+			out << rec.descriptorModifiedTime << "|"
+				<< rec.lastCompiledTime << "|"
+				<< (rec.needsRecompile ? "1" : "0") << "\n";
 		}
+
+		out.close(); 
 
 		LOG_DEBUG("Saved ", byId.size(), " asset records to database");
 		return true;

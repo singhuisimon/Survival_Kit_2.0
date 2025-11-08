@@ -128,6 +128,11 @@ else()
     endif()
 endif()
 
+
+# After your project declaration and before add_subdirectory calls
+
+
+
 # ====================================
 # Add Subdirectories
 # ====================================
@@ -137,13 +142,35 @@ add_subdirectory(Engine)
 add_subdirectory(Game)
 add_subdirectory(AssetCompiler)
 
+
+# Include Mono configuration (this just sets variables, doesn't modify targets)
+include(MonoIntegration.cmake)
+
+# Add Scripting source files to your engine
+set(SCRIPTING_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Scripting/MonoScriptEngine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Scripting/ScriptSystem.cpp
+)
+
+# Assuming your engine library is called "GameEngine" (replace with your actual target name)
+target_sources(GameEngine PRIVATE ${SCRIPTING_SOURCES})
+target_include_directories(GameEngine PUBLIC ${MONO_INCLUDE_DIR})
+target_link_libraries(GameEngine PUBLIC ${MONO_LIBRARIES})
+
+# If you have a separate executable target
+#target_link_libraries(GameEngine PRIVATE GameEngine)
 # ====================================
 # Copy Resources to Build Directory
 # ====================================
 
 file(COPY ${CMAKE_SOURCE_DIR}/Resources 
-     DESTINATION ${CMAKE_BINARY_DIR})
+     DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
+file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Debug/GameScripts.dll"
+     DESTINATION "${CMAKE_BINARY_DIR}/bin/Debug")
+
+file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Release/GameScripts.dll"
+     DESTINATION "${CMAKE_BINARY_DIR}/bin/Release")
 # ====================================
 # Build Information
 # ====================================

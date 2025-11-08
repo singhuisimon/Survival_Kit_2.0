@@ -14,6 +14,31 @@
 
 namespace fs = std::filesystem;
 
+// Helper function to transform a point by a matrix
+static ofbx::Vec3 transformPoint(const ofbx::DMatrix& mtx, const ofbx::Vec3& point) {
+    ofbx::Vec3 result;
+    result.x = mtx.m[0] * point.x + mtx.m[4] * point.y + mtx.m[8] * point.z + mtx.m[12];
+    result.y = mtx.m[1] * point.x + mtx.m[5] * point.y + mtx.m[9] * point.z + mtx.m[13];
+    result.z = mtx.m[2] * point.x + mtx.m[6] * point.y + mtx.m[10] * point.z + mtx.m[14];
+    return result;
+}
+
+// Helper function to transform a vector (no translation)
+static ofbx::Vec3 transformVector(const ofbx::DMatrix& mtx, const ofbx::Vec3& vec) {
+    ofbx::Vec3 result;
+    result.x = mtx.m[0] * vec.x + mtx.m[4] * vec.y + mtx.m[8] * vec.z;
+    result.y = mtx.m[1] * vec.x + mtx.m[5] * vec.y + mtx.m[9] * vec.z;
+    result.z = mtx.m[2] * vec.x + mtx.m[6] * vec.y + mtx.m[10] * vec.z;
+    return result;
+}
+
+// Helper to normalize a vector
+static ofbx::Vec3 normalize(const ofbx::Vec3& v) {
+    float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (length < 0.0001f) return v;
+    return {v.x / length, v.y / length, v.z / length};
+}
+
 namespace AssetCompiler {
 
 // ============================================================================
@@ -112,12 +137,15 @@ namespace AssetCompiler {
 
         // Step 5: Prepare binary header
         CompiledMeshHeader header;
+		header.meshCount = static_cast<uint32_t>(meshData.submeshes.size()); 
         header.vertexCount = static_cast<uint32_t>(meshData.getVertexCount());
         header.indexCount = static_cast<uint32_t>(meshData.getIndexCount());
         header.hasPositions = settings.includePos ? 1 : 0;
         header.hasNormals = (settings.includeNormals && !meshData.normals.empty()) ? 1 : 0;
         header.hasColors = (settings.includeColors && !meshData.colors.empty()) ? 1 : 0;
         header.hasTexCoords = (settings.includeTexCoords && !meshData.texCoords.empty()) ? 1 : 0;
+
+		log("Size of mesh header: %zu", sizeof(CompiledMeshHeader), " bytes");
 
         // Calculate vertex stride (bytes per vertex)
         header.vertexStride = 0;
@@ -141,6 +169,9 @@ namespace AssetCompiler {
         }
 
         log("Success! Compiled mesh: %s", outputPath.c_str());
+        log("  Submeshes: %u", header.meshCount); 
+        log("  Vertices: %u", header.vertexCount);
+        log("  Indices: %u", header.indexCount);
         log("Output size: %.2f KB", fs::file_size(outputPath) / 1024.0f);
 
         return true;
@@ -180,17 +211,27 @@ namespace AssetCompiler {
             return false;
         }
 
-        log("FBX loaded: %d meshes found", scene->getMeshCount());
-
         // Process all meshes in the scene
         int meshCount = scene->getMeshCount();
+
+        log("FBX loaded: %d meshes found", meshCount);
+
         for (int mesh_idx = 0; mesh_idx < meshCount; mesh_idx++) {
             const ofbx::Mesh* mesh = scene->getMesh(mesh_idx);
             const ofbx::GeometryData& geom = mesh->getGeometryData();
 
             log("Processing mesh %d: %s", mesh_idx, mesh->name);
 
+			// Track submesh info
+			uint32_t submeshStartIndex = static_cast<uint32_t>(meshData.indices.size());
+            uint32_t submeshIndexCount = 0;
+
             size_t vertex_offset = meshData.positions.size();
+
+            log("Mesh %d: vertex_offset=%zu, adding %d vertices",
+                mesh_idx, vertex_offset, geom.getPositions().count);
+
+            ofbx::DMatrix globalTransform = mesh->getGlobalTransform();
 
             // Get vertex attributes
             ofbx::Vec3Attributes positions = geom.getPositions();
@@ -209,19 +250,34 @@ namespace AssetCompiler {
                     for (int i = polygon.from_vertex; i < polygon.from_vertex + polygon.vertex_count; ++i) {
                         // Position
                         ofbx::Vec3 pos = positions.get(i);
+
+                        // Apply Transform
+                        ofbx::Vec3 transformedPos = transformPoint(globalTransform, pos);
                         meshData.positions.push_back(glm::vec3(
-                            static_cast<float>(pos.x),
-                            static_cast<float>(pos.y),
-                            static_cast<float>(pos.z)
+                            static_cast<float>(transformedPos.x),
+                            static_cast<float>(transformedPos.y),
+                            static_cast<float>(transformedPos.z)
                         ));
 
                         // Normal (if available)
                         if (normals.values != nullptr) {
                             ofbx::Vec3 normal = normals.get(i);
-                            meshData.normals.push_back(glm::vec3(
-                                static_cast<float>(normal.x),
-                                static_cast<float>(normal.y),
-                                static_cast<float>(normal.z)
+                            ofbx::Vec3 transformedNormal = transformVector(globalTransform, normal);
+
+                            // Normalize
+                            float length = sqrtf(transformedNormal.x * transformedNormal.x +
+                                transformedNormal.y * transformedNormal.y +
+                                transformedNormal.z * transformedNormal.z);
+                            if (length > 0.0001f) {
+                                transformedNormal.x /= length;
+                                transformedNormal.y /= length;
+                                transformedNormal.z /= length;
+                            }
+
+                            meshData.normals.push_back(glm::vec3(   
+                                static_cast<float>(transformedNormal.x),
+                                static_cast<float>(transformedNormal.y),
+                                static_cast<float>(transformedNormal.z)
                             ));
                         }
                         else {
@@ -250,6 +306,7 @@ namespace AssetCompiler {
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 0));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 1));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 2));
+                        submeshIndexCount += 3;
                     }
                     else if (polygon.vertex_count == 4) {
                         // Quad - split into two triangles
@@ -260,6 +317,7 @@ namespace AssetCompiler {
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 0));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 2));
                         meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + polygon.from_vertex + 3));
+                        submeshIndexCount += 6;
                     }
                     else if (polygon.vertex_count > 4) {
                         // N-gon - use OpenFBX triangulate function
@@ -269,11 +327,23 @@ namespace AssetCompiler {
                         for (ofbx::u32 t = 0; t < tri_count; ++t) {
                             meshData.indices.push_back(static_cast<uint32_t>(vertex_offset + tri_indices[t]));
                         }
+						submeshIndexCount += tri_count;
                     }
                 }
             }
 
-            vertex_offset = meshData.positions.size();
+            SubMeshDescriptor submesh;
+            submesh.startIndex = submeshStartIndex;
+			submesh.indexCount = submeshIndexCount;
+			submesh.materialId = 0; // TODO: Assign material ID based on partition
+            strncpy(submesh.name, mesh->name ? mesh->name : "Unnamed", sizeof(submesh.name) - 1);
+            submesh.name[63] = '\0';
+            memset(submesh.reserved, 0, sizeof(submesh.reserved));
+
+			meshData.submeshes.push_back(submesh);
+
+            log("Submesh %d: startIndex=%u, indexCount=%u", 
+                mesh_idx, submesh.startIndex, submesh.indexCount, submesh.name);
         }
 
         // Clean up
@@ -433,6 +503,14 @@ namespace AssetCompiler {
 
         // Write header
         file.write(reinterpret_cast<const char*>(&header), sizeof(CompiledMeshHeader));
+
+        // Write submesh descriptors
+        if (header.meshCount > 0 && !meshData.submeshes.empty()){
+
+            file.write(reinterpret_cast<const char*>(meshData.submeshes.data()), 
+                sizeof(SubMeshDescriptor) * header.meshCount);
+			log("Wrote %u submesh descriptors", header.meshCount);
+        }
 
         // Write vertex data (interleaved)
         for (size_t i = 0; i < meshData.positions.size(); ++i) {

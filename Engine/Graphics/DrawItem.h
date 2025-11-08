@@ -14,7 +14,10 @@
 #pragma once
 
 #include "../Utility/Types.h"
+#include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
+
+#include "Asset/ResourceData.h"
 
 namespace Engine{
 
@@ -27,12 +30,23 @@ namespace Engine{
 	 */
 	struct DrawItem
 	{
-		u32		  m_id;
-		u32       m_mesh_handle;
-		u32       m_material_handle;
-		u32       m_texture_handle;
-
 		glm::mat4 m_model_to_world_transform;
+
+		// Unique entity identifier
+		u32		  m_entity_id; 
+
+		// Submesh index for multi-mesh objects
+		u32		  m_submesh_index;
+
+		// Fallback resource handles
+		u32       m_default_mesh_handle;
+		u32       m_default_material_handle;
+		u32       m_default_u32texture_handle;
+
+		// Resource GUIDs
+		xresource::instance_guid m_mesh_guid;
+		xresource::instance_guid m_material_guid;
+		xresource::instance_guid m_texture_guid;
 	};
 
 }

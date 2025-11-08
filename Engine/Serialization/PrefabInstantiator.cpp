@@ -19,6 +19,10 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ScriptComponent.h"
+#include "../Component/ParticleComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -237,6 +241,16 @@ namespace Engine {
                 const auto& scale = properties["Scale"];
                 comp.Scale = glm::vec3(scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat());
             }
+            if (properties.HasMember("Parent")) {
+                comp.Parent = properties["Parent"].GetUint();
+            }
+            if (properties.HasMember("Children") && properties["Children"].IsArray()) {
+                comp.Children.clear();
+                const auto& childrenArray = properties["Children"];
+
+                for (rapidjson::SizeType i = 0; i < childrenArray.Size(); ++i)
+                    comp.Children.push_back(childrenArray[i].GetUint());
+            }
         }
         else if (componentType == "CameraComponent") {
             auto& comp = entity.AddComponent<CameraComponent>();
@@ -248,11 +262,11 @@ namespace Engine {
             if (properties.HasMember("FOV")) {
                 comp.FOV = properties["FOV"].GetFloat();
             }
-            if (properties.HasMember("NearClip")) {
-                comp.NearClip = properties["NearClip"].GetFloat();
+            if (properties.HasMember("NearPlane")) {
+                comp.NearPlane = properties["NearPlane"].GetFloat();
             }
-            if (properties.HasMember("FarClip")) {
-                comp.FarClip = properties["FarClip"].GetFloat();
+            if (properties.HasMember("FarPlane")) {
+                comp.FarPlane = properties["FarPlane"].GetFloat();
             }
             if (properties.HasMember("Primary")) {
                 comp.Primary = properties["Primary"].GetBool();
@@ -261,9 +275,17 @@ namespace Engine {
         else if (componentType == "MeshRendererComponent") {
             auto& comp = entity.AddComponent<MeshRendererComponent>();
 
-            if (properties.HasMember("ComponentGUID")) {
-                uint64_t guidValue = std::stoull(properties["ComponentGUID"].GetString());
-                comp.ComponentGUID = xresource::instance_guid{ guidValue };
+            if (properties.HasMember("MeshGuid")) {
+                uint64_t guidValue = properties["MeshGuid"].GetUint64();
+                comp.MeshGuid = xresource::instance_guid{ guidValue };
+            }
+            if (properties.HasMember("MaterialGuid")) {
+                uint64_t guidValue = properties["MaterialGuid"].GetUint64();
+                comp.MaterialGuid = xresource::instance_guid{ guidValue };
+            }
+            if (properties.HasMember("TextureGuid")) {
+                uint64_t guidValue = properties["TextureGuid"].GetUint64();
+                comp.TextureGuid = xresource::instance_guid{ guidValue };
             }
             if (properties.HasMember("Visible")) {
                 comp.Visible = properties["Visible"].GetBool();
@@ -377,7 +399,140 @@ namespace Engine {
             // Runtime fields are NOT deserialized (ReverbZone, IsDirty)
             // They will be initialized to their default values
         }
+
+        else if (componentType == "BehaviourTreeComponent") {
+            auto& comp = entity.AddComponent<BehaviourTreeComponent>();
+
+            if (properties.HasMember("Active"))
+                comp.Active = properties["Active"].GetBool();
+            if (properties.HasMember("ResetOnComplete"))
+                comp.ResetOnComplete = properties["ResetOnComplete"].GetBool();
+            if (properties.HasMember("TreeAssetPath"))
+                comp.TreeAssetPath = properties["TreeAssetPath"].GetString();
+
+            LOG_INFO("[PrefabInstantiator] Added BehaviourTreeComponent from prefab with path: ", comp.TreeAssetPath);
+
+
+            comp.TreeInstance = nullptr; // runtime-only
+        }
+
+        else if (componentType == "ParticleComponent") {
+            auto& emitter = entity.AddComponent<ParticleComponent>();
+
+            // Initial Velocity
+            if (properties.HasMember("Initial Velocity") && properties["Initial Velocity"].IsArray()) {
+                const auto& velArray = properties["Initial Velocity"].GetArray();
+                if (velArray.Size() >= 3) {
+                    emitter.InitialVelocity.x = velArray[0].GetFloat();
+                    emitter.InitialVelocity.y = velArray[1].GetFloat();
+                    emitter.InitialVelocity.z = velArray[2].GetFloat();
+                }
+            }
+
+            // Color Min
+            if (properties.HasMember("Color Min") && properties["Color Min"].IsArray()) {
+                const auto& minColorArray = properties["Color Min"].GetArray();
+                if (minColorArray.Size() >= 3) {
+                    emitter.ColorMin.x = minColorArray[0].GetFloat();
+                    emitter.ColorMin.y = minColorArray[1].GetFloat();
+                    emitter.ColorMin.z = minColorArray[2].GetFloat();
+                }
+            }
+
+            // Color Max
+            if (properties.HasMember("Color Max") && properties["Color Max"].IsArray()) {
+                const auto& maxColorArray = properties["Color Max"].GetArray();
+                if (maxColorArray.Size() >= 3) {
+                    emitter.ColorMax.x = maxColorArray[0].GetFloat();
+                    emitter.ColorMax.y = maxColorArray[1].GetFloat();
+                    emitter.ColorMax.z = maxColorArray[2].GetFloat();
+                }
+            }
+
+            // Numeric properties
+            if (properties.HasMember("Max Particles"))
+                emitter.MaxParticles = properties["Max Particles"].GetUint();
+            if (properties.HasMember("Particle Type"))
+                emitter.ParticleType = properties["Particle Type"].GetUint();
+            if (properties.HasMember("Emission Rate"))
+                emitter.EmissionRate = properties["Emission Rate"].GetFloat();
+            if (properties.HasMember("Particle Lifetime"))
+                emitter.ParticleLifetime = properties["Particle Lifetime"].GetFloat();
+            if (properties.HasMember("Emission Accumulator"))
+                emitter.EmissionAccumulator = properties["Emission Accumulator"].GetFloat();
+            if (properties.HasMember("Particle Size"))
+                emitter.ParticleSize = properties["Particle Size"].GetFloat();
+
+            // Randomization parameters
+            if (properties.HasMember("Velocity Randomness"))
+                emitter.VelocityRandomness = properties["Velocity Randomness"].GetFloat();
+            if (properties.HasMember("Lifetime Randomness"))
+                emitter.LifetimeRandomness = properties["Lifetime Randomness"].GetFloat();
+            if (properties.HasMember("Spread Angle"))
+                emitter.SpreadAngle = properties["Spread Angle"].GetFloat();
+            if (properties.HasMember("Min Speed"))
+                emitter.MinSpeed = properties["Min Speed"].GetFloat();
+            if (properties.HasMember("Max Speed"))
+                emitter.MaxSpeed = properties["Max Speed"].GetFloat();
+            if (properties.HasMember("Rotation Speed"))
+                emitter.RotationSpeed = properties["Rotation Speed"].GetFloat();
+
+            // Boolean parameters
+            if (properties.HasMember("Randomize Rotation"))
+                emitter.RandomizeRotation = properties["Randomize Rotation"].GetBool();
+            if (properties.HasMember("Loop"))
+                emitter.Loop = properties["Loop"].GetBool();
+            if (properties.HasMember("Active"))
+                emitter.Active = properties["Active"].GetBool();
+
+            emitter.Particles.clear();
+            emitter.EmissionAccumulator = 0.0f;
+        }
+
+        else if (componentType == "ScriptComponent") {
+            auto& comp = entity.AddComponent<ScriptComponent>();
+
+            if (properties.HasMember("ScriptClassName")) {
+                comp.ScriptClassName = properties["ScriptClassName"].GetString();
+            }
+
+            // ScriptInstance and Started will be initialized by ScriptSystem at runtime
+            LOG_DEBUG("PrefabInstantiator: Added ScriptComponent with class '",
+                comp.ScriptClassName, "'");
+        }
+
+        else if (componentType == "LightComponent") {
+            auto& comp = entity.AddComponent<LightComponent>();
+
+            if (properties.HasMember("Enabled")) {
+                comp.Enabled = properties["Enabled"].GetBool();
+            }
+            if (properties.HasMember("Type")) {
+                comp.Type = static_cast<LightType>(properties["Type"].GetUint());
+            }
+            //if (properties.HasMember("Mode")) {
+            //    comp.Mode = static_cast<LightMode>(properties["Mode"].GetUint());
+            //}
+            if (properties.HasMember("Color") && properties["Color"].IsArray()) {
+                const auto& col = properties["Color"];
+                comp.Color = glm::vec3(col[0].GetFloat(), col[1].GetFloat(), col[2].GetFloat());
+            }
+            if (properties.HasMember("Intensity")) {
+                comp.Intensity = properties["Intensity"].GetFloat();
+            }
+            if (properties.HasMember("Range")) {
+                comp.Range = properties["Range"].GetFloat();
+            }
+            if (properties.HasMember("SpotAngleDeg")) {
+                comp.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
+            }
+            if (properties.HasMember("IndirectMultiplier")) {
+                comp.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+            }
+        }
     }
+
+
 
     // Explicit template instantiation for rapidjson::Value
     template void PrefabInstantiator::AddComponentFromJson<::rapidjson::Value>(

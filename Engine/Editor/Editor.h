@@ -23,6 +23,8 @@
 #include <sstream>
 #include <filesystem>
 #include <algorithm>
+#include <ImGuizmo.h>
+
 
 // Include other necessary headers
 #include "../Profiler/Profiler.h"
@@ -33,10 +35,18 @@
 #include "../Utility/AssetPath.h"
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
+#include "../Serialization/PrefabInstantiator.h"
+#include "../BehaviourTree/BehaviourTreeEditor.h"
+#include "../Asset/DescriptorEditor.h"
+#include "../Scripting/MonoScriptEngine.h"
+#include "../Scripting/ScriptReloader.h"
+#include "../Component/ScriptComponent.h"
+
+
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
-
+#include "Graphics/Renderer.h"
 
 namespace Engine
 {
@@ -52,8 +62,9 @@ namespace Engine
 		ImGuiIO* io;
 		Scene* m_Scene;
 		Entity m_SelectedEntity{};
-		std::shared_ptr<Prefab> m_Prefab; // for prefab
 		std::weak_ptr<TracyProfiler> m_Profiler;
+		u32 m_PickedID = 0xFFFFFFFFu;
+		
 
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -72,9 +83,22 @@ namespace Engine
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+
+		// Prefab helper variables
+		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
 		std::string currPrefabPath{};
+		bool isPrefabEditor = false;
+		bool replacePrefabPending = false;
+		std::string selectedPrefabPath{};
+		std::string currFileName{};
+		Prefab* m_CurrentPrefab = nullptr;
+		bool createEttFromPrfab = false;
+		//std::string loadPrefabNextFrame{}; // store prefab path to load if it is at scene
+		//bool prefabModified = false;
+		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE;
 
-
+		bool m_PreviousEditorCamToggle = false;
+	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
 		{
@@ -82,25 +106,40 @@ namespace Engine
 			std::string fullPath;
 		};
 
+		bool raw_asset = false;
+
 		// Editor viewport's data storage
 		EditorViewport editorViewportData;
+		Renderer* m_Renderer = nullptr;
+		EditorViewport m_ImGuizmoViewportData;
+
+		bool m_WasUsingGizmoLastFrame = false;
+		bool m_WasOverGizmoLastFrame = false;
+		DescriptorEditor descriptorEditor;
+		bool showDescriptorEditorPanel = false;
+		xresource::instance_guid currentEditingGuid;
+		std::string editedAsset{};
 
 	public:
 		// Default contructor 
 		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
 
+		void SetRenderer(Renderer* renderer) { m_Renderer = renderer; }
+
 		// Deconstuctor
-		~Editor() = default;
+		~Editor() {
+			CleanupTemporaryPrefabs();
+		};
 
 		// Delected copy constructor
-		Editor(const Editor&) = delete;
+		//Editor(const Editor&) = delete;
 
 		// Deleted copy assignment operator
 		Editor& operator=(const Editor&) = delete;
 
 		// Set scene for editor
 		void SetScene(Engine::Scene* scene);
-
+		
 		// Initialise Imgui
 		void OnInit();
 
@@ -120,6 +159,9 @@ namespace Engine
 
 		// display assets browser list
 		void displayAssetsBrowserPanel();
+
+		// display assets editor panel
+		void displayDescriptorEditorPanel();
 
 		// display performance profile
 		void displayPerformanceProfilePanel(Timestep ts);
@@ -143,6 +185,9 @@ namespace Engine
 		// Complete the ImGui frame
 		void CompleteFrame();
 
+		// to clean unsave prefab
+		void CleanupTemporaryPrefabs();
+
 		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
 			m_Profiler = profiler; // still increases refcount, no extra copy on call
 		}
@@ -150,6 +195,18 @@ namespace Engine
 		// Set Editor viewport's data for object picking
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
+		void RetrievePickedID(u32 id) { m_PickedID = id; /* Comment/delete output if needed*/std::cout << "Selected Entity: " << m_PickedID << std::endl; }
+
+		void DrawEntityRecursive(Entity entity, entt::registry& registry);
+
+		void ManipulateEntityTransform(Entity& entity);
+
+		// Script helper function
+		void CreateScriptPanel();
+
+		void OpenScriptPanel();
+
+		bool OpenScriptInEditor(const std::string& scriptName);
 	};
 
 

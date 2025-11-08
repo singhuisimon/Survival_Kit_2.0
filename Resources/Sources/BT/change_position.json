@@ -1,0 +1,30 @@
+{
+    "Name": "ChangePositionTree",
+    "GUID": "11725210030938718315",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Node",
+        "GUID": "3654759498690789485",
+        "Children": [
+            {
+                "Type": "SetBlackboard",
+                "Name": "Node",
+                "GUID": "14607513792455835759",
+                "Properties": {
+                    "Key": "TargetPosition",
+                    "Type": "Vec3",
+                    "Value": "1,2,3"
+                }
+            },
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "4231220250994212977",
+                "Properties": {
+                    "Duration": "2.000000"
+                }
+            }
+        ]
+    }
+}

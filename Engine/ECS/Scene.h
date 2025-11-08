@@ -26,6 +26,18 @@ namespace Engine {
          */
         Entity CreateEntity(const std::string& name = "Entity");
 
+
+        /**
+  * @brief Get an entity by its ID
+  */
+        Entity GetEntity(entt::entity entityId);
+
+        /**
+         * @brief Check if an entity ID is valid
+         */
+        bool IsEntityValid(entt::entity entityId) const;
+
+
         /**
          * @brief Destroy an entity and all its components
          * @param entity The entity to destroy
@@ -164,6 +176,14 @@ namespace Engine {
         void ShutdownSystems() {
             m_SystemRegistry.OnShutdown(this);
         }
+
+
+        /**
+  * @brief Find an entity by its tag/name
+  * @param name The tag/name to search for
+  * @return The entity with matching tag, or invalid entity if not found
+  */
+        Entity FindEntityByName(const std::string& name);
 
     private:
         std::string m_Name;

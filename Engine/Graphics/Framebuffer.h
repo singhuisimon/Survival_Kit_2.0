@@ -147,6 +147,18 @@ namespace Engine {
 		}
 
 		/**
+		 * @brief Clears a color attachment with unsigned integer values
+		 * @param drawbuf Color attachment index to clear
+		 * @param r Red component (unsigned integer)
+		 * @param g Green component (unsigned integer)
+		 * @param b Blue component (unsigned integer)
+		 * @param a Alpha component (unsigned integer)
+		 */
+		inline void clear_colorui(GLuint drawbuf, u32 r, u32 g, u32 b, u32 a) const {
+			glClearNamedFramebufferuiv(gl_id(), GL_COLOR, drawbuf, std::array<GLuint, 4>{r, g, b, a}.data());
+		}
+
+		/**
 		 * @brief Clears a color attachment with floating-point values
 		 * @param drawbuf Color attachment index to clear
 		 * @param r Red component (0.0 - 1.0)

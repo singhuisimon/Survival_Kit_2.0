@@ -30,7 +30,7 @@ namespace Engine {
 
 
     // Get the directory where the executable is located
-    static fs::path GetExecutableDirectory() {
+    fs::path GetExecutableDirectory() {
 #ifdef _WIN32
         // Windows: Get the full path to the .exe
         char buffer[MAX_PATH];
@@ -216,9 +216,8 @@ namespace Engine {
         fs::path currentPath = fs::current_path();
 
         while (!currentPath.empty()) {
-            if (fs::exists(currentPath / "Survival_Kit.sln") ||
-                fs::exists(currentPath / ".git")) {
-                std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
+            if (fs::exists(currentPath / "build")) {
+              //  std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
                 return currentPath.string();
             }
             currentPath = currentPath.parent_path();

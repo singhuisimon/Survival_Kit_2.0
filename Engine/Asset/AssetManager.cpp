@@ -28,8 +28,6 @@ namespace Engine {
 		return instance;
 	}
 
-	//============================== COMPILER ===================================
-
 	//=========================== ASSET MANAGER ===================================================
 	// Configuration
 	void AssetManager::setConfig(const Config& cfg) {
@@ -44,15 +42,18 @@ namespace Engine {
 			m_cfg = createDefaultConfig();
 		}
 
-		//get assetpath (with the utility fun)
-		std::string assetsPath = Engine::getAssetsPath();
-
 		//create directories 
 		try {
-			fs::create_directories(assetsPath + "Descriptors");
-			fs::create_directories(assetsPath + "DB");
+			
+			if (!m_cfg.descriptorRoot.empty()) {
+				fs::create_directories(m_cfg.descriptorRoot);
+			}
 
-			//LM.writeLog("AssetManager::startUp() - Created working directories");
+			// Create database directory from config
+			if (!m_cfg.databaseFile.empty()) {
+				fs::path dbPath(m_cfg.databaseFile);
+				fs::create_directories(dbPath.parent_path());  // FROM CONFIG!
+			}
 		}
 		catch (const std::exception& e) {
 			//LM.writeLog("AssetManager::startUp() - Failed to create directories: %s", e.what());
@@ -77,10 +78,6 @@ namespace Engine {
 		//set up the root for descriptor generator
 		m_descGen.SetOutputRoot(m_cfg.descriptorRoot);
 
-		// NEW: Initialize compiler system
-		//initializeCompilers();
-
-		//LM.writeLog("AssetManager::startUp() - complete");
 		return 0;
 	}
 
@@ -101,11 +98,8 @@ namespace Engine {
 				snapCount, success, m_cfg.snapshotFile.c_str());*/
 		}
 
-		//LM.writeLog("AssetManager::shutDown() - complete");
-		//Manager::shutDown();
+	
 	}
-
-	// ==================== COMPILER SYSTEM ====================
 
 	// ==================== CHANGE HANDLING ====================
 
@@ -241,8 +235,8 @@ namespace Engine {
 		const AssetRecord* rec = m_db.FindBySource(src);
 
 		if (!rec) {
-			//LM.writeLog("AssetManager - WARNING: No record found for removed file: %s", src.c_str());
-			//return;
+			LOG_WARNING("No record found for removed file: ", src);
+			return;
 		}
 
 
@@ -255,36 +249,57 @@ namespace Engine {
 				std::string descriptorPath = m_descGen.GetDescriptorFolderPath(*rec);
 
 				if (fs::exists(descriptorPath)) {
-					fs::remove(descriptorPath);
-					//LM.writeLog("AssetManager - Deleted descriptor file: %s", descriptorPath.c_str());
+					try {
+						fs::remove_all(descriptorPath);
+						LOG_DEBUG("Deleted descriptor folder: ", descriptorPath);
+
+					}
+					catch(const std::exception& e){
+						LOG_ERROR("Failed to delete descriptor folder: ", descriptorPath,
+							" Error: ", e.what());
+					}
 				}
 
 				// Clean up empty parent folders for descriptors
-				fs::path currentFolder = fs::path(descriptorPath).parent_path();
-				fs::path descriptorsRoot = fs::absolute(m_cfg.descriptorRoot);
+				try {
 
-				while (currentFolder.has_parent_path()) {
-					if (fs::equivalent(currentFolder, descriptorsRoot)) {
-						break;
+					fs::path currentFolder = fs::path(descriptorPath).parent_path();
+					fs::path descriptorsRoot = fs::absolute(m_cfg.descriptorRoot);
+
+					while (currentFolder.has_parent_path()) {
+						// Check if both paths exist before using equivalent
+						if (!fs::exists(currentFolder) || !fs::exists(descriptorsRoot)) {
+							break;
+						}
+
+						if (fs::equivalent(currentFolder, descriptorsRoot)) {
+							break;
+						}
+
+						if (fs::exists(currentFolder) && fs::is_empty(currentFolder)) {
+							fs::remove(currentFolder);
+							LOG_DEBUG("Deleted empty descriptor folder: ",
+								currentFolder.string());
+							currentFolder = currentFolder.parent_path();
+							currentFolder = currentFolder.parent_path();
+						}
+						else {
+							break;
+						}
 					}
 
-					if (fs::exists(currentFolder) && fs::is_empty(currentFolder)) {
-						fs::remove(currentFolder);
-						//LM.writeLog("AssetManager - Deleted empty descriptor folder: %s",
-						//	currentFolder.string().c_str());
-						currentFolder = currentFolder.parent_path();
-					}
-					else {
-						break;
-					}
 				}
+				catch (const std::exception& e) {
+					LOG_WARNING("Error cleaning up descriptor folders: ", e.what());
+				}
+
 			}
 		
 
 		// Remove from database
 		if (m_db.RemoveBySource(src)) {
-			//LM.writeLog("AssetManager - Removed from DB: %s (GUID: %016llx, Type: %s"
-			//	, src.c_str(), guid.m_Value, resourceTypeToString(type).c_str());
+			LOG_INFO("Removed from DB: ", src, " (GUID: ", std::hex, guid.m_Value,
+				std::dec, ", Type: ", resourceTypeToString(type), ")");
 
 			if (!m_cfg.databaseFile.empty()) {
 				//save the final databasefile
@@ -297,7 +312,7 @@ namespace Engine {
 			}
 		}
 		else {
-			//LM.writeLog("AssetManager - ERROR: Failed to remove from database: %s", src.c_str());
+			LOG_ERROR("Failed to remove from database: ", src);
 		}
 	}
 
@@ -404,5 +419,151 @@ namespace Engine {
 		fs::path p(rec->sourcePath);
 		return p.filename().string();
 	}
+
+	bool AssetManager::CompileSingleAsset(xresource::instance_guid guid, bool verbose) {
+
+		//find the asset in the record and get the type 
+		const AssetRecord* rec = m_db.Find(guid); 
+
+		if (!rec) {
+			LOG_ERROR("AssetManager: Asset not found for GUID: ", std::hex, guid.m_Value); 
+			return false;
+		}
+
+		if (!rec->valid) {
+			LOG_ERROR("AssetManager: Asset is invalid: ", std::hex, guid.m_Value);
+			return false;
+		}
+
+		//get the path to the Resources folder in the root 
+		std::string descriptorPath = getDescriptorRoot();
+		std::string compiledPath = getCompiledPath();
+		//get the resource type string
+		std::string resourceTypeFolder = resourceTypeToString(rec->type);
+
+		//build the GUID hex string
+		std::ostringstream guidHex;
+		guidHex << std::uppercase << std::hex << std::setw(16) << std::setfill('0') << guid.m_Value;
+		std::string guidString = guidHex.str();
+
+		//build the command 
+		std::ostringstream command; 
+
+		fs::path exeDir = GetExecutableDirectory();
+
+		//std::filesystem::current_path
+		fs::path compilerPath = exeDir / "AssetCompiler.exe";
+
+		//if that does not exist 
+		if (!fs::exists(compilerPath)) {
+			LOG_ERROR("AssetManager: AssetCompiler.exe not found at: ", compilerPath.string()); 
+			LOG_ERROR("BUILD THE ASSET COMPILER"); 
+			return false;
+		}
+
+		command << "\"" << compilerPath.string() << "\"";
+		//command << "\AssetCompiler";
+		command << " --guid " << guidString;
+		command << " --type " << resourceTypeFolder;
+		command << " --input " << descriptorPath ;  
+		command << " --output " << compiledPath;	
+		if (verbose) {
+			command << " --verbose";
+		}
+		
+		LOG_DEBUG("Running command: ", command.str());
+
+		// Execute the compiler
+		int result = std::system(command.str().c_str());
+
+		if (result == 0) {
+			LOG_INFO("Asset compiled successfully: ", guidString);
+
+			// Update the database
+			AssetRecord* mutableRec = m_db.FindMutable(guid);
+			if (mutableRec) {
+				mutableRec->needsRecompile = false;
+				mutableRec->descriptorModifiedTime = std::time(nullptr);
+
+				std::string compiledFilePath = getCompiledFilePath(guid, mutableRec->type);
+				if (fs::exists(compiledFilePath)) {
+					mutableRec->lastCompiledTime = fs::last_write_time(compiledFilePath).time_since_epoch().count();
+				}
+			}
+
+			return true;
+		}
+		else {
+			LOG_ERROR("Asset compilation failed with code: ", result);
+			return false;
+		}
+
+	}
+
+	bool AssetManager::CompileAllAsset(bool verbose) {
+		//build the command 
+		std::ostringstream command;
+
+		fs::path exeDir = GetExecutableDirectory();
+
+		//std::filesystem::current_path
+		fs::path compilerPath = exeDir / "AssetCompiler.exe";
+
+		//if that does not exist 
+		if (!fs::exists(compilerPath)) {
+			LOG_ERROR("AssetManager: AssetCompiler.exe not found at: ", compilerPath.string());
+			LOG_ERROR("BUILD THE ASSET COMPILER");
+			return false;
+		}
+
+		std::string descriptorPath = getDescriptorRoot();
+		std::string compiledPath = getCompiledPath();
+
+
+		command << "\"" << compilerPath.string() << "\"";
+		command << " --input " << descriptorPath;
+		command << " --output " << compiledPath;
+
+		if (verbose) {
+			command << " --verbose";
+		}
+		LOG_DEBUG("Running command: ", command.str());
+
+		// Execute the compiler
+		int result = std::system(command.str().c_str());
+
+		if (result == 0) {
+			LOG_INFO("All Assets Compiled Successfully"); 
+			return true;
+		}
+		else {
+			LOG_DEBUG("All Assets Failed to Compile"); 
+			return false;
+		}
+
+
+	}
+
+	std::string AssetManager::getCompiledFilePath(xresource::instance_guid guid, ResourceType type)const {
+		std::ostringstream guidHex;
+		guidHex << std::uppercase << std::hex << std::setw(16) << std::setfill('0') << guid.m_Value;
+
+		std::string extension;
+		switch (type) {
+		case ResourceType::MESH: extension = ".mesh"; break;
+		case ResourceType::TEXTURE: extension = ".tex"; break;
+		case ResourceType::AUDIO: extension = ".audio"; break;
+		case ResourceType::SHADER: extension = ".shader"; break;
+		default: extension = ".bin"; break;
+		}
+
+		fs::path compiledPath = fs::path(getCompiledPath())
+			/ resourceTypeToString(type)
+			/ (guidHex.str() + extension);
+
+		return compiledPath.string();
+	}
+
+
 
 }// end of namespace Engine

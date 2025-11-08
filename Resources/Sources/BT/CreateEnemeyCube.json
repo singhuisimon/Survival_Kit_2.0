@@ -1,0 +1,20 @@
+{
+    "Name": "NewTree",
+    "GUID": "9124328470543351943",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Node",
+        "GUID": "3936181699812622473",
+        "Children": [
+            {
+                "Type": "CreateShootableEnemy",
+                "Name": "Node",
+                "GUID": "9700789222850413641",
+                "Properties": {
+                    "Tag": "Enemy"
+                }
+            }
+        ]
+    }
+}

@@ -19,7 +19,11 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ParticleComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
+#include "../Component/ScriptComponent.h"
 
  // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -71,6 +75,17 @@ namespace Engine {
             );
         }
 
+        //script 
+     // Register ScriptComponent
+        {
+            auto& meta = REGISTER_COMPONENT(ScriptComponent);
+            meta.AddProperty<ScriptComponent, std::string>(
+                "ScriptClassName",
+                PropertyType::String,
+                [](const ScriptComponent& c) -> std::string { return c.ScriptClassName; },
+                [](ScriptComponent& c, const std::string& v) { c.ScriptClassName = v; }
+            );
+        }
         // Register CameraComponent
         {
             auto& meta = REGISTER_COMPONENT(CameraComponent);
@@ -133,6 +148,28 @@ namespace Engine {
         // Register MeshRendererComponent
         {
             auto& meta = REGISTER_COMPONENT(MeshRendererComponent);
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"MeshGuid",
+                PropertyType::U64,                
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.MeshGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.MeshGuid = xresource::instance_guid{v}; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"MaterialGuid",
+                PropertyType::U64,
+				[](const MeshRendererComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+				"TextureGuid",
+				PropertyType::U64,
+				[](const MeshRendererComponent& c) { return static_cast<u64>(c.TextureGuid.m_Value); },
+				[](MeshRendererComponent& c, const u64& v) { c.TextureGuid = xresource::instance_guid{ v }; }
+            );
+
             meta.AddProperty<MeshRendererComponent, bool>(
                 "Visible",
                 PropertyType::Bool,
@@ -181,6 +218,14 @@ namespace Engine {
                 [](const MeshRendererComponent& c) { return c.Texture; },
                 [](MeshRendererComponent& c, const u32& v) { c.Texture = v; }
             );
+
+            meta.AddProperty<MeshRendererComponent, u32>(
+                "SubmeshIndex",
+                PropertyType::U32,
+                [](const MeshRendererComponent& c) { return c.SubmeshIndex; },
+				[](MeshRendererComponent& c, const u32& v) { c.SubmeshIndex = v; }
+            );
+
         }
 
         // Register RigidbodyComponent
@@ -357,8 +402,225 @@ namespace Engine {
             );
         }
 
+        {
+            // Register BehaviourTreeComponent
+            auto& meta = REGISTER_COMPONENT(BehaviourTreeComponent);
+
+            // Active property
+            meta.AddProperty<BehaviourTreeComponent, bool>(
+                "Active",
+                PropertyType::Bool,
+                [](const BehaviourTreeComponent& c) { return c.Active; },
+                [](BehaviourTreeComponent& c, const bool& v) { c.Active = v; }
+            );
+
+            // ResetOnComplete property
+            meta.AddProperty<BehaviourTreeComponent, bool>(
+                "ResetOnComplete",
+                PropertyType::Bool,
+                [](const BehaviourTreeComponent& c) { return c.ResetOnComplete; },
+                [](BehaviourTreeComponent& c, const bool& v) { c.ResetOnComplete = v; }
+            );
+
+            meta.AddProperty<BehaviourTreeComponent, std::string>(
+                "TreeAssetPath",
+                PropertyType::String,
+                [](const BehaviourTreeComponent& c) {
+                    return c.TreeAssetPath;
+                },
+                [](BehaviourTreeComponent& c, const std::string& v) {
+                    c.TreeAssetPath = v;
+                }
+            );
+        }
+
+        {
+	        auto& meta = REGISTER_COMPONENT(ParticleComponent);
+
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "InitialVelocity",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.InitialVelocity; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.InitialVelocity = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, glm::vec4>(
+            "ColorMin",
+                PropertyType::Vec4,
+                [](const ParticleComponent& c) { return c.ColorMin; },
+                [](ParticleComponent& c, const glm::vec4& v) { c.ColorMin = v; }
+                );
+
+            meta.AddProperty<ParticleComponent, glm::vec4>(
+                "ColorMax",
+                PropertyType::Vec4,
+                [](const ParticleComponent& c) { return c.ColorMax; },
+                [](ParticleComponent& c, const glm::vec4& v) { c.ColorMax = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, u32>(
+                "MaxParticles",
+                PropertyType::U32,
+                [](const ParticleComponent& c) { return c.MaxParticles; },
+                [](ParticleComponent& c, const u32& v) { c.MaxParticles = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, u32>(
+                "ParticleType",
+                PropertyType::U32,
+                [](const ParticleComponent& c) { return c.ParticleType; },
+                [](ParticleComponent& c, const u32& v) { c.ParticleType = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "EmissionRate",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.EmissionRate; },
+                [](ParticleComponent& c, const float& v) { c.EmissionRate = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "ParticleLifetime",
+                PropertyType::Float,
+				[](const ParticleComponent& c) { return c.ParticleLifetime; },
+				[](ParticleComponent& c, const float& v) { c.ParticleLifetime = v; }
+                );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "EmissionAccumulator",
+				PropertyType::Float,
+                [](const ParticleComponent& c) { return c.EmissionAccumulator; },
+				[](ParticleComponent& c, const float& v) { c.EmissionAccumulator = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "ParticleSize",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.ParticleSize; },
+                [](ParticleComponent& c, const float& v) { c.ParticleSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "VelocityRandomness",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.VelocityRandomness; },
+                [](ParticleComponent& c, const float& v) { c.VelocityRandomness = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "LifetimeRandomness",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.LifetimeRandomness; },
+                [](ParticleComponent& c, const float& v) { c.LifetimeRandomness = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "SpreadAngle",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.SpreadAngle; },
+                [](ParticleComponent& c, const float& v) { c.SpreadAngle = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "MinSpeed",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.MinSpeed; },
+                [](ParticleComponent& c, const float& v) { c.MinSpeed = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "MaxSpeed",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.MaxSpeed; },
+                [](ParticleComponent& c, const float& v) { c.MaxSpeed = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "RotationSpeed",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.RotationSpeed; },
+                [](ParticleComponent& c, const float& v) { c.RotationSpeed = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "RandomizeRotation",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.RandomizeRotation; },
+                [](ParticleComponent& c, const bool& v) { c.RandomizeRotation = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "Loop",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.Loop; },
+				[](ParticleComponent& c, const bool& v) { c.Loop = v; }
+                );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "Active",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.Active; },
+                [](ParticleComponent& c, const bool& v) { c.Active = v; }
+            );
+        }
+
+        // Register LightComponent
+        {
+            auto& meta = REGISTER_COMPONENT(LightComponent);
+
+            meta.AddProperty<LightComponent, bool>(
+                "Enabled",
+                PropertyType::Bool,
+                [](const LightComponent& c) { return c.Enabled; },
+                [](LightComponent& c, const bool& v) { c.Enabled = v; }
+            );
+            // Enums as ints for editor/serialization
+            meta.AddProperty<LightComponent, LightType>(
+                "Type",
+                PropertyType::Int,
+                [](const LightComponent& c) { return c.Type; },
+                [](LightComponent& c, const LightType& v) { c.Type = v; }
+            );
+            meta.AddProperty<LightComponent, LightMode>(
+                "Mode",
+                PropertyType::Int,
+                [](const LightComponent& c) { return c.Mode; },
+                [](LightComponent& c, const LightMode& v) { c.Mode = v; }
+            );
+            meta.AddProperty<LightComponent, glm::vec3>(
+                "Color",
+                PropertyType::Vec3,
+                [](const LightComponent& c) { return c.Color; },
+                [](LightComponent& c, const glm::vec3& v) { c.Color = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "Intensity",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.Intensity; },
+                [](LightComponent& c, const float& v) { c.Intensity = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "Range",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.Range; },
+                [](LightComponent& c, const float& v) { c.Range = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "SpotAngleDeg",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.SpotAngleDeg; },
+                [](LightComponent& c, const float& v) { c.SpotAngleDeg = v; }
+            );
+            meta.AddProperty<LightComponent, float>(
+                "IndirectMultiplier",
+                PropertyType::Float,
+                [](const LightComponent& c) { return c.IndirectMultiplier; },
+                [](LightComponent& c, const float& v) { c.IndirectMultiplier = v; }
+            );
+        }
+
         LOG_INFO("Component reflection registration complete");
-        LOG_INFO("  - Registered 7 component types");
+        LOG_INFO("  - Registered 10 component types");
     }
 
 } // namespace Engine

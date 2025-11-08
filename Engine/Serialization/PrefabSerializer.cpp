@@ -17,6 +17,10 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ParticleComponent.h"
+#include "../Component/ScriptComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -24,6 +28,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 #include <fstream>
+#include <filesystem> 
 
 namespace Engine {
 
@@ -82,6 +87,21 @@ namespace Engine {
 
     bool PrefabSerializer::SavePrefabToFile(const Prefab& prefab, const std::string& filepath) {
         LOG_INFO("PrefabSerializer: Saving prefab to ", filepath);
+
+        // Create parent directory if it doesn't exist
+        std::filesystem::path filePath(filepath);
+        std::filesystem::path parentDir = filePath.parent_path();
+
+        if (!parentDir.empty() && !std::filesystem::exists(parentDir)) {
+            try {
+                std::filesystem::create_directories(parentDir);
+                LOG_INFO("PrefabSerializer: Created directory ", parentDir.string());
+            }
+            catch (const std::filesystem::filesystem_error& e) {
+                LOG_ERROR("PrefabSerializer: Failed to create directory: ", e.what());
+                return false;
+            }
+        }
 
         std::string jsonString = SerializePrefabToString(prefab);
 
@@ -255,6 +275,14 @@ namespace Engine {
             scaleArray.PushBack(transform.Scale.z, allocator);
             propertiesObj.AddMember("Scale", scaleArray, allocator);
 
+            propertiesObj.AddMember("Parent", transform.Parent, allocator);
+
+            rapidjson::Value childrenArray(rapidjson::kArrayType);
+            for (const auto& child : transform.Children) {
+                childrenArray.PushBack(child, allocator);
+            }
+            propertiesObj.AddMember("Children", childrenArray, allocator);
+
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }
@@ -269,8 +297,8 @@ namespace Engine {
             propertiesObj.AddMember("ComponentGUID",
                 rapidjson::Value(std::to_string(camera.ComponentGUID.m_Value).c_str(), allocator), allocator);
             propertiesObj.AddMember("FOV", camera.FOV, allocator);
-            propertiesObj.AddMember("NearClip", camera.NearClip, allocator);
-            propertiesObj.AddMember("FarClip", camera.FarClip, allocator);
+            propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
+            propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
             propertiesObj.AddMember("Primary", camera.Primary, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
@@ -284,12 +312,19 @@ namespace Engine {
             componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
-            propertiesObj.AddMember("ComponentGUID",
-                rapidjson::Value(std::to_string(mesh.ComponentGUID.m_Value).c_str(), allocator), allocator);
-            propertiesObj.AddMember("Visible", mesh.Visible, allocator);
+            propertiesObj.AddMember("MeshGuid",
+                rapidjson::Value(mesh.MeshGuid.m_Value), allocator);
 
-            componentObj.AddMember("Properties", propertiesObj, allocator);
-            componentsArray.PushBack(componentObj, allocator);
+            propertiesObj.AddMember("MaterialGuid",
+                rapidjson::Value(mesh.MaterialGuid.m_Value), allocator);
+
+            propertiesObj.AddMember("TextureGuid",
+                rapidjson::Value(mesh.TextureGuid.m_Value), allocator);
+
+            //propertiesObj.AddMember("MeshGuid",
+            //    rapidjson::Value(std::to_string(mesh.MeshGuid.m_Value).c_str(), allocator), allocator);
+
+            propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 
             propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
             propertiesObj.AddMember("Material", mesh.Material, allocator);
@@ -374,6 +409,127 @@ namespace Engine {
             propertiesObj.AddMember("Diffusion", reverb.Diffusion, allocator);
             propertiesObj.AddMember("Density", reverb.Density, allocator);
             propertiesObj.AddMember("WetLevel", reverb.WetLevel, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        if (entity.HasComponent<BehaviourTreeComponent>()) {
+            const auto& bt = entity.GetComponent<BehaviourTreeComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "BehaviourTreeComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Active", bt.Active, allocator);
+            propertiesObj.AddMember("ResetOnComplete", bt.ResetOnComplete, allocator);
+            propertiesObj.AddMember("TreeAssetPath",
+                rapidjson::Value(bt.TreeAssetPath.c_str(), allocator), allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+
+            LOG_INFO("[PrefabSerializer] Serializing BehaviourTreeComponent with path: ", bt.TreeAssetPath);
+
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        if (entity.HasComponent<ParticleComponent>()) {
+            const auto& emitter = entity.GetComponent<ParticleComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ParticleComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+
+            // Initial Velocity
+            rapidjson::Value velArray(rapidjson::kArrayType);
+            velArray.PushBack(emitter.InitialVelocity.x, allocator);
+            velArray.PushBack(emitter.InitialVelocity.y, allocator);
+            velArray.PushBack(emitter.InitialVelocity.z, allocator);
+            propertiesObj.AddMember("Initial Velocity", velArray, allocator);
+
+            // Min Color
+            rapidjson::Value minColorArray(rapidjson::kArrayType);
+            minColorArray.PushBack(emitter.ColorMin.x, allocator);
+            minColorArray.PushBack(emitter.ColorMin.y, allocator);
+            minColorArray.PushBack(emitter.ColorMin.z, allocator);
+            propertiesObj.AddMember("Color Min", minColorArray, allocator);
+
+            // Max Color
+            rapidjson::Value maxColorArray(rapidjson::kArrayType);
+            maxColorArray.PushBack(emitter.ColorMax.x, allocator);
+            maxColorArray.PushBack(emitter.ColorMax.y, allocator);
+            maxColorArray.PushBack(emitter.ColorMax.z, allocator);
+            propertiesObj.AddMember("Color Max", maxColorArray, allocator);
+
+            // Max Particles
+            propertiesObj.AddMember("Max Particles", emitter.MaxParticles, allocator);
+
+            // Particle Type
+            propertiesObj.AddMember("Particle Type", emitter.ParticleType, allocator);
+
+            // Emission Rate
+            propertiesObj.AddMember("Emission Rate", emitter.EmissionRate, allocator);
+
+            // Particle Lifetime
+            propertiesObj.AddMember("Particle Lifetime", emitter.ParticleLifetime, allocator);
+
+            // Emission Accumulator
+            propertiesObj.AddMember("Emission Accumulator", emitter.EmissionAccumulator, allocator);
+
+            // Particle Size
+            propertiesObj.AddMember("Particle Size", emitter.ParticleSize, allocator);
+
+            // Randomization parameters
+            propertiesObj.AddMember("Velocity Randomness", emitter.VelocityRandomness, allocator);
+            propertiesObj.AddMember("Lifetime Randomness", emitter.LifetimeRandomness, allocator);
+            propertiesObj.AddMember("Spread Angle", emitter.SpreadAngle, allocator);
+            propertiesObj.AddMember("Min Speed", emitter.MinSpeed, allocator);
+            propertiesObj.AddMember("Max Speed", emitter.MaxSpeed, allocator);
+            propertiesObj.AddMember("Rotation Speed", emitter.RotationSpeed, allocator);
+
+            // Boolean parameters
+            propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
+            propertiesObj.AddMember("Loop", emitter.Loop, allocator);
+            propertiesObj.AddMember("Active", emitter.Active, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize ScriptComponent
+        if (entity.HasComponent<ScriptComponent>()) {
+            const auto& script = entity.GetComponent<ScriptComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ScriptComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("ScriptClassName",
+                rapidjson::Value(script.ScriptClassName.c_str(), allocator), allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize LightComponent
+        if (entity.HasComponent<LightComponent>()) {
+            const auto& light = entity.GetComponent<LightComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "LightComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Enabled", light.Enabled, allocator);
+            propertiesObj.AddMember("Type", static_cast<uint32_t>(light.Type), allocator);
+            //propertiesObj.AddMember("Mode", static_cast<uint32_t>(light.Mode), allocator);
+
+            rapidjson::Value colorArray(rapidjson::kArrayType);
+            colorArray.PushBack(light.Color.x, allocator);
+            colorArray.PushBack(light.Color.y, allocator);
+            colorArray.PushBack(light.Color.z, allocator);
+            propertiesObj.AddMember("Color", colorArray, allocator);
+
+            propertiesObj.AddMember("Intensity", light.Intensity, allocator);
+            propertiesObj.AddMember("Range", light.Range, allocator);
+            propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
+            propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);

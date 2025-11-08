@@ -11,6 +11,12 @@
 #include "ResourceManager.h"
 #include "CompiledResourceFormat.h"
 #include "ResourceHelpers.h"
+#include "../Utility/Logger.h"
+
+ // RapidJSON includes
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/prettywriter.h>
 
 #include "../include/glad/glad.h" // OpenGL functions
 #include "../glm/glm/glm.hpp"
@@ -18,15 +24,19 @@
 #include <fstream>
 #include <memory>
 
+#include "../../AssetCompiler/CompilerCore/MeshCompiler.h"
 
- // Loader registrations - defined once
-xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
-xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
-xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
-xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
-xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
 
 namespace Engine {
+
+    //void InitializeResourceLoaders() {
+    //    //force the linker to include these symbols 
+    //    (void)&texture_loader;
+    //    (void)&mesh_loader;
+    //    (void)&material_loader;
+    //    (void)&audio_loader;
+    //    (void)&shader_loader;
+    //}
 
     // Helper to get ResourceManager from xresource::mgr
     ResourceManager* getResourceManager(xresource::mgr& mgr) {
@@ -78,6 +88,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     // Open compiled binary file
     std::ifstream file(compiled_path, std::ios::binary);
     if (!file.is_open()) {
+        LOG_WARNING("Failed to open binary file");
         return nullptr;
     }
 
@@ -86,6 +97,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     file.read(reinterpret_cast<char*>(&texHeader), sizeof(Engine::CompiledTextureData));
 
     if (!file) {
+		LOG_WARNING("Failed to read texture header");
         return nullptr;
     }
 
@@ -134,6 +146,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
 
         if (!file) {
             glDeleteTextures(1, &texture->textureID);
+            LOG_WARNING("Failed to read texture");
             return nullptr;
         }
 
@@ -150,6 +163,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         glDeleteTextures(1, &texture->textureID);
+		LOG_WARNING("OpenGL error occurred while creating texture: 0x%X", error);
         return nullptr;
     }
 
@@ -180,35 +194,76 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 {
     Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
-    // Get compiled file path
+
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
+    //LOG_INFO("MESHFILE PATH : ", compiled_path);
+
     if (!Engine::fileExists(compiled_path)) {
+        Engine::listCompiledFiles(Engine::ResourceType::MESH);  // <-- ADD THIS LINE
         return nullptr;
     }
 
     // Open compiled binary file
     std::ifstream file(compiled_path, std::ios::binary);
     if (!file.is_open()) {
+        LOG_ERROR("File cannot be opened ", compiled_path);
+
         return nullptr;
     }
+
+    LOG_INFO("File Opened Successfully"); 
 
     // Read compiled mesh data header
     Engine::CompiledMeshData meshHeader;
+	assert(sizeof(Engine::CompiledMeshData) == 68); // Ensure no padding issues
     file.read(reinterpret_cast<char*>(&meshHeader), sizeof(meshHeader));
     if (!file) {
+        LOG_ERROR("Failed to read mesh header from file");
         return nullptr;
     }
+    LOG_INFO("Mesh header read successfully");
 
     //validate magic number
-    if (strncmp(meshHeader.magic, "MSH", 3) != 0) return nullptr;
+    if (strncmp(meshHeader.magic, "MSH", 3) != 0) {
+        LOG_ERROR("Invalid magic number in mesh file. Expected 'MSH', got: ",
+            meshHeader.magic[0], meshHeader.magic[1], meshHeader.magic[2]);
+        return nullptr;
+    }
+    LOG_INFO("Magic number validated");
+
+    LOG_INFO("Mesh Header Info - Meshes: ", meshHeader.meshCount);
+
+    std::vector<Engine::SubMeshDescriptor> submeshes;
+
+    if (meshHeader.meshCount > 0) {
+        submeshes.resize(meshHeader.meshCount);
+        file.read(reinterpret_cast<char*>(submeshes.data()),
+			meshHeader.meshCount * sizeof(Engine::SubMeshDescriptor));
+
+		// Check for read errors
+        if (!file) {
+            LOG_ERROR("Failed to read submesh descriptors from file");
+			return nullptr;
+        }
+
+        LOG_INFO("Read ", meshHeader.meshCount, " submesh descriptors");
+
+        for (uint32_t i = 0; i < meshHeader.meshCount; ++i) {
+
+            LOG_INFO("  Submesh ", i, ": ", submeshes[i].name,
+                     " (indices: ", submeshes[i].startIndex, "-",
+                     (submeshes[i].startIndex + submeshes[i].indexCount - 1), ")");
+
+        }
+    }
 
     // Create mesh resource
     auto mesh = std::make_unique<data_type>();
     // Prepare interleaved vertex data
       // Format: pos(3) + normal(3) + color(3) + uv(2) = 11 floats per vertex
     mesh->vertices.resize(meshHeader.vertexCount * 11);
-
+    mesh->subMeshes = submeshes;
     // Read interleaved vertex data
     for (uint32_t i = 0; i < meshHeader.vertexCount; ++i) {
         size_t offset = i * 11;
@@ -283,56 +338,42 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
             meshHeader.indexCount * sizeof(uint32_t));
     }
     if (!file) {
-      //  LM.writeLog("MeshLoader - Failed to read mesh data");
+        LOG_ERROR("Failed to read mesh indices from file");
         return nullptr;
     }
+    LOG_INFO("Mesh data loaded - Vertices: ", meshHeader.vertexCount, " Indices: ", meshHeader.indexCount);
+    LOG_INFO("Starting OpenGL buffer creation...");
 
-#if 0
-    // Convert to interleaved format for OpenGL
-    // Format: pos(3) + normal(3) + color(3) + uv(2) = 11 floats per vertex
-    mesh->vertices.resize(meshHeader.vertexCount * 11);
 
-    for (uint32_t i = 0; i < meshHeader.vertexCount; ++i) {
-        size_t offset = i * 11;
-
-        // Position (3 floats)
-        mesh->vertices[offset + 0] = positions[i].x;
-        mesh->vertices[offset + 1] = positions[i].y;
-        mesh->vertices[offset + 2] = positions[i].z;
-
-        // Normal (3 floats)
-        mesh->vertices[offset + 3] = normals[i].x;
-        mesh->vertices[offset + 4] = normals[i].y;
-        mesh->vertices[offset + 5] = normals[i].z;
-
-        // Color (3 floats)
-        mesh->vertices[offset + 6] = colors[i].x;
-        mesh->vertices[offset + 7] = colors[i].y;
-        mesh->vertices[offset + 8] = colors[i].z;
-
-        // TexCoord (2 floats)
-        mesh->vertices[offset + 9] = texcoords[i].x;
-        mesh->vertices[offset + 10] = texcoords[i].y;
-    }
-#endif
     // Create OpenGL buffers
     glGenVertexArrays(1, &mesh->VAO);
+
     glGenBuffers(1, &mesh->VBO);
+
     glGenBuffers(1, &mesh->EBO);
+    GLenum err3 = glGetError();
+    LOG_INFO("OpenGL buffers generated: VAO=", mesh->VAO, " VBO=", mesh->VBO, " EBO=", mesh->EBO);
 
     glBindVertexArray(mesh->VAO);
+    GLenum err4 = glGetError();
+    LOG_INFO("VAO bound successfully");
 
     // Upload interleaved vertex data
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
     glBufferData(GL_ARRAY_BUFFER,
         mesh->vertices.size() * sizeof(float),
         mesh->vertices.data(), GL_STATIC_DRAW);
+    GLenum err5 = glGetError();
+    LOG_INFO("VBO data uploaded: ", mesh->vertices.size() * sizeof(float), " bytes");
 
     // Upload index data
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
         mesh->indices.size() * sizeof(unsigned int),
         mesh->indices.data(), GL_STATIC_DRAW);
+    GLenum err6 = glGetError();
+    LOG_INFO("EBO data uploaded: ", mesh->indices.size() * sizeof(unsigned int), " bytes");
+
 
     // Setup vertex attributes - interleaved format
     size_t stride = 11 * sizeof(float);
@@ -357,15 +398,17 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     // Check for OpenGL errors
     GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-     //   LM.writeLog("MeshLoader - OpenGL error: 0x%X", error);
-        glDeleteVertexArrays(1, &mesh->VAO);
-        glDeleteBuffers(1, &mesh->VBO);
-        glDeleteBuffers(1, &mesh->EBO);
-        return nullptr;
-    }
+ 
+    LOG_INFO("OpenGL buffers created successfully");
+    LOG_INFO("Mesh VAO: ", mesh->VAO, " VBO: ", mesh->VBO, " EBO: ", mesh->EBO);
+    LOG_INFO("Returning mesh pointer...");
 
-    return mesh.release();
+    LOG_INFO("Vertex count: ", (mesh->vertices.size() / 11));
+    LOG_INFO("Index count: ", mesh->indices.size());
+
+    auto* meshPtr = mesh.release();
+    LOG_INFO("mesh.release() returned pointer: ", static_cast<void*>(meshPtr));
+    return meshPtr;
 }
 
 
@@ -396,50 +439,122 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
 {
     Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
-    // Get compiled file path
-    std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MATERIAL);
+    // Get the source file path
+    std::string filepath = Engine::AM.getNameFromGuid(guid.m_Instance);
+    std::string prefix = Engine::AssetManager::GetSourceResourcesPath() + "/Sources/Material/";
+	filepath = prefix + filepath;
 
-    if (!Engine::fileExists(compiled_path)) {
-     //   LM.writeLog("MaterialLoader - Compiled file not found: %s", compiled_path.c_str());
+    // Check if file exists
+    if (!Engine::fileExists(filepath)) {
+		//LOG_WARNING("MaterialLoader - Source file not found: ", filepath);
         return nullptr;
     }
 
-    // Open compiled binary file
-    std::ifstream file(compiled_path, std::ios::binary);
-    if (!file.is_open()) {
-      //  LM.writeLog("MaterialLoader - Failed to open: %s", compiled_path.c_str());
+    // Open the file 
+    std::ifstream ifs(filepath);
+    if (!ifs.is_open()) {
+        //LOG_WARNING("Material Loader - unable to open file: ", filepath);
         return nullptr;
     }
 
-    // Read header
-    Engine::CompiledResourceHeader header;
-    if (!Engine::readCompiledHeader(file, header)) {
+	// Read entire file into a string
+    std::string jsonString((std::istreambuf_iterator<char>(ifs)),
+		std::istreambuf_iterator<char>());
+    ifs.close();
+
+	// Parse into a JSON document
+    using namespace  rapidjson;
+    Document doc;
+    doc.Parse(jsonString.c_str());
+
+    if (doc.HasParseError()) {
+        //LOG_ERROR("JSON Parse error at offset ", doc.GetErrorOffset());
         return nullptr;
     }
 
     // Create material resource
     auto material = std::make_unique<data_type>();
 
-    // Read material properties
-    file.read(reinterpret_cast<char*>(&material->diffuseTexture), sizeof(xresource::full_guid));
-    file.read(reinterpret_cast<char*>(&material->normalTexture), sizeof(xresource::full_guid));
-    file.read(reinterpret_cast<char*>(&material->specularTexture), sizeof(xresource::full_guid));
-    file.read(reinterpret_cast<char*>(&material->shininess), sizeof(float));
-    file.read(reinterpret_cast<char*>(&material->opacity), sizeof(float));
-    file.read(reinterpret_cast<char*>(&material->doubleSided), sizeof(bool));
+	// Deserialize material properties from JSON
+    if (doc.HasMember("shaderName"))
+		material->shaderName = doc["shaderName"].GetString();
+    
+    if (doc.HasMember("diffuseMap"))
+        material->diffuseMap = xresource::instance_guid{ std::stoull(doc["diffuseMap"].GetString(), nullptr, 16) };
 
-    // Read shader name length and string
-    uint32_t nameLength;
-    file.read(reinterpret_cast<char*>(&nameLength), sizeof(uint32_t));
-    material->shaderName.resize(nameLength);
-    file.read(material->shaderName.data(), nameLength);
+    if (doc.HasMember("specularMap"))
+		material->specularMap = xresource::instance_guid{ std::stoull(doc["specularMap"].GetString(), nullptr, 16) };
 
-    if (!file) {
-   //     LM.writeLog("MaterialLoader - Failed to read material data");
-        return nullptr;
+	if (doc.HasMember("normalMap"))
+		material->normalMap = xresource::instance_guid{ std::stoull(doc["normalMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("emissionMap"))
+		material->emissionMap = xresource::instance_guid{ std::stoull(doc["emissionMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("occlusionMap"))
+		material->occlusionMap = xresource::instance_guid{ std::stoull(doc["occlusionMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("diffuseColor"))
+    {
+		const Value& dColor = doc["diffuseColor"];
+        material->diffuseColor[0] = dColor[0].GetFloat();
+        material->diffuseColor[1] = dColor[1].GetFloat();
+        material->diffuseColor[2] = dColor[2].GetFloat();
+    }
+    
+    if (doc.HasMember("specularColor"))
+    {
+		const Value& sColor = doc["specularColor"];
+        material->specularColor[0] = sColor[0].GetFloat();
+        material->specularColor[1] = sColor[1].GetFloat();
+		material->specularColor[2] = sColor[2].GetFloat();
     }
 
-   // LM.writeLog("MaterialLoader - Loaded material GUID: %llX", guid.m_Instance.m_Value);
+    if (doc.HasMember("emissionColor"))
+    {
+	    const Value& eColor = doc["emissionColor"];
+        material->emissionColor[0] = eColor[0].GetFloat();
+        material->emissionColor[1] = eColor[1].GetFloat();
+		material->emissionColor[2] = eColor[2].GetFloat();
+    }
+
+    if (doc.HasMember("shininess"))
+		material->shininess = doc["shininess"].GetFloat();
+
+    if (doc.HasMember("emissionStrength"))
+		material->emissionStrength = doc["emissionStrength"].GetFloat();
+
+    if (doc.HasMember("alphaThreshold"))
+		material->alphaThreshold = doc["alphaThreshold"].GetFloat();
+
+    if (doc.HasMember("tiling"))
+    {
+	    const Value& tiling = doc["tiling"];
+        material->tiling[0] = tiling[0].GetFloat();
+		material->tiling[1] = tiling[1].GetFloat();
+    }
+
+    if (doc.HasMember("offset"))
+    {
+	    const Value& offset = doc["offset"];
+		material->offset[0] = offset[0].GetFloat();
+		material->offset[1] = offset[1].GetFloat();
+    }
+
+    if (doc.HasMember("enableEmission"))
+		material->enableEmission = doc["enableEmission"].GetBool();
+
+	if (doc.HasMember("alphaTest"))
+		material->alphaTest = doc["alphaTest"].GetBool();
+
+	if (doc.HasMember("doubleSided"))
+		material->doubleSided = doc["doubleSided"].GetBool();
+
+    if (doc.HasMember("receiveShadows"))
+		material->receiveShadows = doc["receiveShadows"].GetBool();
+
+    if (doc.HasMember("castShadows"))
+		material->castShadows = doc["castShadows"].GetBool();
 
     return material.release();
 }

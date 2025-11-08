@@ -30,9 +30,10 @@ namespace fs = std::filesystem;
 // ============================================================================
 
 struct CompilerConfig {
-    std::string descriptorsPath = "Resources/Descriptors/";
-    std::string outputPath = "Resources/Compiled/";
+    std::string descriptorsPath = "Resources/Descriptors";
+    std::string outputPath = "Resources/Compiled";
     std::string resourceType = "all";  // "all", "texture", "mesh", "audio", "shader"
+    std::string specifiedGuid = "";
     bool verbose = false;
     bool force = false;  // Force recompile even if up-to-date
     int threadCount = 4;
@@ -82,6 +83,9 @@ bool parseArguments(int argc, char* argv[], CompilerConfig& config) {
         else if (arg == "--type" && i + 1 < argc) {
             config.resourceType = argv[++i];
         }
+        else if (arg == "--guid" && i + 1 < argc) {          // ADD THIS
+            config.specifiedGuid = argv[++i];
+        }
         else if (arg == "--threads" && i + 1 < argc) {
             config.threadCount = std::stoi(argv[++i]);
         }
@@ -114,13 +118,58 @@ struct DescriptorInfo {
 };
 
 std::vector<DescriptorInfo> discoverDescriptors(const std::string& descriptorsRoot, 
-                                                  const std::string& typeFilter) {
+                                                  const std::string& typeFilter,
+                                                  const std::string& guidFilter = "") {
     std::vector<DescriptorInfo> descriptors;
     
     if (!fs::exists(descriptorsRoot)) {
         std::cerr << "ERROR: Descriptors path does not exist: " << descriptorsRoot << "\n";
         return descriptors;
     }
+
+    //OPTIMIZATION: IF GUID and type are already both specified, directly construct the path 
+    if (!guidFilter.empty() && !typeFilter.empty()) {
+        std::cout << "Looking for specific asset: " << typeFilter << "/" << guidFilter << "\n";
+
+        // Extract last 4 characters for folder structure
+            // Example: 5F7ED05B14224003 -> folders: "40/03"
+        std::string dir1 = guidFilter.substr(12, 2);  // Characters 13-14
+        std::string dir2 = guidFilter.substr(14, 2);  // Characters 15-16
+
+        // Construct the exact path
+        fs::path guidPath = fs::path(descriptorsRoot) / typeFilter / dir1 / dir2 / guidFilter;
+        fs::path infoPath = guidPath / "Info.txt";
+        fs::path descPath = guidPath / "Descriptor.txt";
+
+        if (fs::exists(infoPath) && fs::exists(descPath)) {
+            DescriptorInfo info;
+            info.guidFolder = guidPath.string();
+            info.infoFile = infoPath.string();
+            info.descriptorFile = descPath.string();
+            info.resourceType = typeFilter;
+            info.guid = guidFilter;
+
+            descriptors.push_back(info);
+            std::cout << "Found asset at: " << guidPath << "\n";
+        }
+        else {
+            std::cerr << "ERROR: Asset not found at: " << guidPath << "\n";
+            if (!fs::exists(guidPath)) {
+                std::cerr << "       Folder does not exist: " << guidPath << "\n";
+            }
+            else {
+                if (!fs::exists(infoPath)) {
+                    std::cerr << "       Missing Info.txt\n";
+                }
+                if (!fs::exists(descPath)) {
+                    std::cerr << "       Missing Descriptor.txt\n";
+                }
+            }
+        }
+
+        return descriptors;
+
+    }// end of optimization
     
     std::cout << "Scanning descriptors in: " << descriptorsRoot << "\n";
     
@@ -176,7 +225,7 @@ std::vector<DescriptorInfo> discoverDescriptors(const std::string& descriptorsRo
 }
 
 // ============================================================================
-// COMPILATION (PLACEHOLDER - TO BE IMPLEMENTED)
+// COMPILATION
 // ============================================================================
 
 bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config) {
@@ -229,7 +278,7 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
         AssetCompiler::MeshCompiler meshCompiler;
 
         // Generate output path: Resources/Compiled/Mesh/GUID.mesh
-        std::string outputPath = config.outputPath + descriptor.resourceType + "/" + descriptor.guid + ".mesh";
+        std::string outputPath = config.outputPath + "/" + descriptor.resourceType + "/" + descriptor.guid + ".mesh";
 
         success = meshCompiler.compile(descriptor.descriptorFile, outputPath, config.verbose);
     }
@@ -239,7 +288,7 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
         AssetCompiler::TextureCompiler compiler; 
 
         //generate output path: Resources/Compiled/Texture/GUID.tex
-        std::string output = config.outputPath + "Texture/" + descriptor.guid + ".tex";
+        std::string output = config.outputPath + "/" + descriptor.resourceType + "/" + descriptor.guid + ".tex";
 
         success = compiler.compile(descriptor.descriptorFile, output, config.verbose);
     }
@@ -295,8 +344,26 @@ int main(int argc, char* argv[]) {
     std::cout << "  Force:   " << (config.force ? "Yes" : "No") << "\n";
     std::cout << "  Verbose: " << (config.verbose ? "Yes" : "No") << "\n\n";
     
+
+    // SAVE THE CURRENT DIRECTORY
+    fs::path originalPath = fs::current_path();
+
+    std::cout << "Original Path: " << originalPath << "\n";
+
+    // CHANGE WORKING DIRECTORY to where the resources are
+    // Extract the directory from descriptorsPath
+    fs::path descriptorsDir = fs::path(config.descriptorsPath);
+    fs::path projectRoot = descriptorsDir.parent_path().parent_path(); // Go from Descriptors to Resources to project root
+    std::cout << "Descriptors directory: " << descriptorsDir << "\n";
+    std::cout << "Project root direcotry" << projectRoot << "\n";
+
+    if (fs::exists(projectRoot)) {
+        fs::current_path(projectRoot);
+        std::cout << "Working directory: " << fs::current_path().string() << "\n\n";
+    }
+
     // Discover all descriptors
-    auto descriptors = discoverDescriptors(config.descriptorsPath, config.resourceType);
+    auto descriptors = discoverDescriptors(config.descriptorsPath, config.resourceType, config.specifiedGuid);
     
     if (descriptors.empty()) {
         std::cout << "No descriptors found to compile.\n";

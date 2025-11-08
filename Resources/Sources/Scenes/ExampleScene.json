@@ -63,8 +63,8 @@
 					"Type": "CameraComponent",
 					"Properties": {
 						"FOV": 60.0,
-						"NearClip": 0.1,
-						"FarClip": 1000.0,
+						"NearPlane": 0.1,
+						"FarPlane": 1000.0,
 						"Primary": true
 					}
 				}
@@ -177,6 +177,37 @@
 						"MeshType": 0,
 						"Material": 0,
 						"Texture": 0
+					}
+				}
+			]
+		},
+		{
+			"ID": 5,
+			"Components": [
+				{
+					"Type": "TagComponent",
+					"Properties": {
+						"Tag": "Sunlight"
+					}
+				},
+				{
+					"Type": "TransformComponent",
+					"Properties": {
+						"Position": [ 0.0, 10.0, 0.0 ],
+						"Rotation": [ -100.0, 0.0, 0.0 ],
+						"Scale": [ 1.0, 1.0, 1.0 ]
+					}
+				},
+				{
+					"Type": "LightComponent",
+					"Properties": {
+						"Enabled": true,
+						"Type": 0,
+						"Color": [ 1.0, 1.0, 1.0 ],
+						"Intensity": 1.0,
+						"Range": 0.0,
+						"SpotAngleDeg": 0.0,
+						"IndirectMultiplier": 1.0
 					}
 				}
 			]

@@ -87,16 +87,9 @@ namespace Engine {
             ss << "  \"comment\": \"" << EscapeJson(extras->comment) << "\",\n";
         }
 
-        // GUID (for debugging/reference)
-        ss << "  \"guid\": {\n";
-        ss << "    \"instance\": \"" << std::uppercase << std::hex << std::setw(16) 
-           << std::setfill('0') << rec.guid.m_Value << "\",\n";
-        
-        // Get type GUID
-        xresource::type_guid typeGuid = ResourceGUID::getTypeGUID(rec.type);
-        ss << "    \"type\": \"" << std::uppercase << std::hex << std::setw(16) 
-           << std::setfill('0') << typeGuid.m_Value << "\"\n";
-        ss << "  },\n";
+        //GUID 
+        ss << "  \"guid\": \"" << std::uppercase << std::hex << std::setw(16)
+            << std::setfill('0') << rec.guid.m_Value << "\",\n";
 
         // Tags
         ss << "  \"tags\": [";
@@ -110,10 +103,14 @@ namespace Engine {
 
         // Last imported timestamp
         if (extras) {
-            ss << "  \"lastImported\": " << extras->lastImported << ",\n";
-        } else {
-            ss << "  \"lastImported\": 0,\n";
+            ss << "  \"lastImported\": \"" << std::uppercase << std::hex << std::setw(16)
+                << std::setfill('0') << extras->lastImported << "\",\n";
         }
+        else {
+            ss << "  \"lastImported\": \"0\",\n";
+        }
+        // Reset to decimal mode after
+        ss << std::dec;
 
         // Resource links (optional dependencies)
         ss << "  \"resourceLinks\": [";

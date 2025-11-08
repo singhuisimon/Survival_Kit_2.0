@@ -82,11 +82,14 @@ namespace Engine {
 
 			//get project root using existing function
 			std::string projectRoot = Engine::getRepository();
-
 			//add the Resources path
 			std::filesystem::path resourcesPath = std::filesystem::path(projectRoot) / "Resources";
 
-			return resourcesPath.string();
+			//Normalize to forward slashes for consistency
+			std::string result = resourcesPath.string(); 
+			std::replace(result.begin(), result.end(), '\\', '/'); 
+
+			return result;
 		}
 
 		/**
@@ -108,13 +111,13 @@ namespace Engine {
 				sourcesPath + "/Sources/Shaders",
 				sourcesPath + "/Sources/Meshes",
 				sourcesPath + "/Sources/Textures",
-				sourcesPath + "/Sources/Audio"
-
+				sourcesPath + "/Sources/Audio",
+				sourcesPath + "/Sources/Material"
 			};
 
 			//================= OUTPUT PATHS ===============
 			cfg.descriptorRoot = sourcesPath + "/Descriptors";
-			cfg.compiledPath = assetsPath + "/Compiled";
+			cfg.compiledPath = assetsPath + "Compiled";
 
 			//================= INTERNAL PATHS ===================
 			cfg.databaseFile = sourcesPath + "/DB/assetdb.txt";
@@ -157,6 +160,15 @@ namespace Engine {
 		const std::string& getCompiledPath() const {
 			return m_cfg.compiledPath;
 		}
+		std::string getCompiledFilePath(xresource::instance_guid guid, ResourceType type)const;
+
+		/**
+		* @brief Compile a asset with guid
+		* @param guid the asset guid to compile 
+		*/
+		bool CompileSingleAsset(xresource::instance_guid guid, bool verbose); 
+
+		bool CompileAllAsset(bool verbose); 
 
 		/**
 		 * @brief Get the descriptor root path

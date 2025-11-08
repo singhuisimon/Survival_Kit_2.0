@@ -1,3 +1,14 @@
+/**
+ * @file AudioComponent.h
+ * @brief Represent the audio parts of an entity in ECS
+ * @author Amanda Leow Boon Suan (100%)
+ * @date 20/10/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+
 #pragma once
 #include <fmod.hpp>
 #include <string>
@@ -68,6 +79,17 @@ namespace Engine {
         }
 
         // --- Setters that mark component dirty ---
+
+        void SetAudioType(AudioType type) {
+            Type = type;
+            IsDirty = true;
+        }
+
+        void Set3D(bool is3d) {
+            Is3D = is3d;
+            IsDirty = true;
+        }
+
         void SetState(PlayState state) {
             State = state;
             IsDirty = true;
@@ -100,6 +122,16 @@ namespace Engine {
 
         void SetAudioFile(const std::string& path) {
             AudioFilePath = path;
+            IsDirty = true;
+        }
+
+        void SetMinDistance(float min) {
+            MinDistance = min;
+            IsDirty = true;
+        }
+
+        void SetMaxDistance(float max){
+            MaxDistance = max;
             IsDirty = true;
         }
     };

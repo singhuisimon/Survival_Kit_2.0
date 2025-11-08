@@ -16,6 +16,7 @@
 #include "ResourceTypes.h"
 #include "../include/xresource_mgr.h"
 #include <string>
+#include <array>
 #include <vector>
 
 namespace Engine {
@@ -40,12 +41,26 @@ namespace Engine {
         }
     };
 
+
+    /**
+	 * @brief Sub-mesh descriptor for mesh resources.
+     */
+    struct SubMeshDescriptor {
+        uint32_t startIndex;
+        uint32_t indexCount;
+        uint32_t materialId;
+        char name[64];
+        uint32_t reserved[4];
+    };
+
     /**
      * @brief Runtime mesh resource data.
      */
     struct MeshResource {
         std::vector<float> vertices;
         std::vector<unsigned int> indices;
+		std::vector<SubMeshDescriptor> subMeshes;
+
         unsigned int VAO = 0;  // Vertex Array Object
         unsigned int VBO = 0;  // Vertex Buffer Object
         unsigned int EBO = 0;  // Element Buffer Object
@@ -59,13 +74,36 @@ namespace Engine {
      * @brief Runtime material resource data.
      */
     struct MaterialResource {
-        std::string shaderName;
-        xresource::full_guid diffuseTexture;
-        xresource::full_guid normalTexture;
-        xresource::full_guid specularTexture;
-        float shininess = 32.0f;
-        float opacity = 1.0f;
-        bool doubleSided = false;
+
+        std::string shaderName; // Tells the material what shader to use
+
+        // Texture Maps
+        xresource::instance_guid diffuseMap;
+		xresource::instance_guid normalMap;         // For normal mapping
+		xresource::instance_guid specularMap;
+        xresource::instance_guid emissionMap;
+		xresource::instance_guid occlusionMap;      // Optional for ambient occlusion
+
+		// Color properties
+        std::array<float, 4> diffuseColor =  { 1.0f, 1.0f, 1.0f, 1.0f };   // White, fully opaque
+        std::array<float, 3> specularColor = { 1.0f, 1.0f, 1.0f };        // White highlights
+        std::array<float, 3> emissionColor = { 0.0f, 0.0f, 0.0f };        // White (no emission)
+
+        float                    shininess = 32.f;         // Specular shininess factor
+        float                    emissionStrength = 1.f;  
+		float                    alphaThreshold   = 0.5f;	  // For alpha testing
+
+        // UV transforms
+		std::array<float, 2>     tiling = {1.f, 1.f};        // UV scale
+		std::array<float, 2>     offset = {0.f, 0.f};        // UV offset
+
+        bool enableEmission = false;
+        bool alphaTest = false;
+
+        // Render flags
+        bool doubleSided    = false;
+        bool receiveShadows = true;
+        bool castShadows    = true;
     };
 
     /**
@@ -97,10 +135,9 @@ namespace Engine {
         }
     };
 
-} // namespace gam300
+} // namespace Engine
 
 // ========== XRESOURCE_MGR LOADER SPECIALIZATIONS ==========
-
 /**
  * @brief Texture loader specialization.
  */
@@ -168,10 +205,11 @@ struct xresource::loader<Engine::ResourceGUID::shader_type_guid_v> {
 
 // ========== LOADER REGISTRATIONS ==========
 // These register the loaders with xresource_mgr
-extern xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
-extern xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::texture_type_guid_v> texture_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::mesh_type_guid_v> mesh_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::material_type_guid_v> material_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::audio_type_guid_v> audio_loader;
+inline xresource::loader_registration<Engine::ResourceGUID::shader_type_guid_v> shader_loader;
+
 
 #endif // __RESOURCE_DATA_H__

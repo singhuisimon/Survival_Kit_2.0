@@ -9,6 +9,11 @@
 #include "../Component/AudioComponent.h"
 #include "../Component/ListenerComponent.h"
 #include "../Component/ReverbZoneComponent.h"
+#include "../Component/BehaviourTreeComponent.h"
+#include "../Component/ParticleComponent.h"
+#include "../Component/ScriptComponent.h"
+#include "../Component/LightComponent.h"
+#include "../Prefab/BehaviourTreePrefab.h"
 
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
@@ -134,6 +139,16 @@ namespace Engine {
                 scaleArray.PushBack(transform.Scale.z, allocator);
                 propertiesObj.AddMember("Scale", scaleArray, allocator);
 
+                // Parent 
+                propertiesObj.AddMember("Parent", transform.Parent, allocator);
+
+                // List of children 
+                Value childrenArray(kArrayType);
+                for (const auto& child : transform.Children) {
+                    childrenArray.PushBack(child, allocator);
+                }
+                propertiesObj.AddMember("Children", childrenArray, allocator);
+
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
             }
@@ -173,11 +188,14 @@ namespace Engine {
                 componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
                 Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("MeshGuid", mesh.MeshGuid.m_Value, allocator);
+                propertiesObj.AddMember("MaterialGuid", mesh.MaterialGuid.m_Value, allocator);
+                propertiesObj.AddMember("TextureGuid", mesh.TextureGuid.m_Value, allocator);
                 propertiesObj.AddMember("Visible", mesh.Visible, allocator);
                 propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
                 propertiesObj.AddMember("Material", mesh.Material, allocator);
                 propertiesObj.AddMember("Texture", mesh.Texture, allocator);
-
+                propertiesObj.AddMember("SubmeshIndex", mesh.SubmeshIndex, allocator);
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
             }
@@ -259,6 +277,126 @@ namespace Engine {
                 propertiesObj.AddMember("Diffusion", reverb.Diffusion, allocator);
                 propertiesObj.AddMember("Density", reverb.Density, allocator);
                 propertiesObj.AddMember("WetLevel", reverb.WetLevel, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+            // Serialize BehaviourTreeComponent
+            if (entity.HasComponent<BehaviourTreeComponent>()) {
+                LOG_TRACE("  - Serializing BehaviourTreeComponent");
+                auto& bt = entity.GetComponent<BehaviourTreeComponent>();
+                rapidjson::Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "BehaviourTreeComponent", allocator);
+
+                rapidjson::Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Active", bt.Active, allocator);
+                propertiesObj.AddMember("ResetOnComplete", bt.ResetOnComplete, allocator);
+                propertiesObj.AddMember("TreeAssetPath",
+                    rapidjson::Value(bt.TreeAssetPath.c_str(), allocator), allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+            // Serialize ParticleComponent
+            if (entity.HasComponent<ParticleComponent>()) {
+                LOG_TRACE("  - Serializing Particle Component");
+
+                const auto& emitter = entity.GetComponent<ParticleComponent>();
+                rapidjson::Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ParticleComponent", allocator);
+
+                rapidjson::Value propertiesObj(kObjectType);
+
+                // Initial Velocity
+                rapidjson::Value velArray(kArrayType);
+                velArray.PushBack(emitter.InitialVelocity.x, allocator);
+                velArray.PushBack(emitter.InitialVelocity.y, allocator);
+                velArray.PushBack(emitter.InitialVelocity.z, allocator);
+                propertiesObj.AddMember("Initial Velocity", velArray, allocator);
+
+                // Min Color
+                rapidjson::Value minColorArray(kArrayType);
+                minColorArray.PushBack(emitter.ColorMin.x, allocator);
+                minColorArray.PushBack(emitter.ColorMin.y, allocator);
+                minColorArray.PushBack(emitter.ColorMin.z, allocator);
+                propertiesObj.AddMember("Color Min", minColorArray, allocator);
+
+                // Max Color
+                rapidjson::Value maxColorArray(kArrayType);
+                maxColorArray.PushBack(emitter.ColorMax.x, allocator);
+                maxColorArray.PushBack(emitter.ColorMax.y, allocator);
+                maxColorArray.PushBack(emitter.ColorMax.z, allocator);
+                propertiesObj.AddMember("Color Max", maxColorArray, allocator);
+
+                // Max Particles
+                propertiesObj.AddMember("Max Particles", emitter.MaxParticles, allocator);
+
+                // Particle Type
+                propertiesObj.AddMember("Particle Type", emitter.ParticleType, allocator);
+
+                // Emission Rate
+                propertiesObj.AddMember("Emission Rate", emitter.EmissionRate, allocator);
+
+                // Particle Lifetime
+                propertiesObj.AddMember("Particle Lifetime", emitter.ParticleLifetime, allocator);
+
+                // Emission Accumulator
+                propertiesObj.AddMember("Emission Accumulator", emitter.EmissionAccumulator, allocator);
+
+                // Particle Size
+                propertiesObj.AddMember("Particle Size", emitter.ParticleSize, allocator);
+
+                // Randomization parameters
+                propertiesObj.AddMember("Velocity Randomness", emitter.VelocityRandomness, allocator);
+                propertiesObj.AddMember("Lifetime Randomness", emitter.LifetimeRandomness, allocator);
+                propertiesObj.AddMember("Spread Angle", emitter.SpreadAngle, allocator);
+                propertiesObj.AddMember("Min Speed", emitter.MinSpeed, allocator);
+                propertiesObj.AddMember("Max Speed", emitter.MaxSpeed, allocator);
+                propertiesObj.AddMember("Rotation Speed", emitter.RotationSpeed, allocator);
+
+                // Boolean parameters
+                propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
+                propertiesObj.AddMember("Loop", emitter.Loop, allocator);
+                propertiesObj.AddMember("Active", emitter.Active, allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+            // Serialize ScriptComponent
+            if (entity.HasComponent<ScriptComponent>()) {
+                LOG_TRACE("  - Serializing ScriptComponent");
+                auto& script = entity.GetComponent<ScriptComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "ScriptComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("ScriptClassName",
+                    Value(script.ScriptClassName.c_str(), allocator), allocator);
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+            // Serialize LightComponent
+            if (entity.HasComponent<LightComponent>()) {
+                LOG_TRACE("  - Serializing LightComponent");
+                auto& light = entity.GetComponent<LightComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "LightComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("Enabled", light.Enabled, allocator);
+                propertiesObj.AddMember("Type", static_cast<int>(light.Type), allocator);
+                //propertiesObj.AddMember("Mode", light.Mode, allocator); // For now only 1 mode, not required in scene file
+                Value colorArr(kArrayType);
+                colorArr.PushBack(light.Color.x, allocator);
+                colorArr.PushBack(light.Color.y, allocator);
+                colorArr.PushBack(light.Color.z, allocator);
+                propertiesObj.AddMember("Color", colorArr, allocator);
+                propertiesObj.AddMember("Intensity", light.Intensity, allocator);
+                propertiesObj.AddMember("Range", light.Range, allocator);
+                propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
+                propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
+
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -410,6 +548,20 @@ namespace Engine {
                                 scaleArray[2].GetFloat()
                             );
                         }
+
+                        if (properties.HasMember("Parent")) {
+                            transform.Parent = properties["Parent"].GetUint();
+                        }
+
+                        if (properties.HasMember("Children") && properties["Children"].IsArray()) {
+
+                            transform.Children.clear();
+                            const Value& childrenArray = properties["Children"];
+
+                            for (rapidjson::SizeType i = 0; i < childrenArray.Size(); ++i)
+                                transform.Children.push_back(childrenArray[i].GetUint());
+
+                        }
                     }
                     else if (componentType == "CameraComponent") {
                         auto& camera = entity.AddComponent<CameraComponent>();
@@ -442,10 +594,19 @@ namespace Engine {
                     }
                     else if (componentType == "MeshRendererComponent") {
                         auto& mesh = entity.AddComponent<MeshRendererComponent>();
+                        if (properties.HasMember("MeshGuid"))
+                            mesh.MeshGuid = xresource::instance_guid{ properties["MeshGuid"].GetUint64() };
+                        if (properties.HasMember("MaterialGuid")) {
+                            mesh.MaterialGuid = xresource::instance_guid{ properties["MaterialGuid"].GetUint64() };
+                        }
+                        if (properties.HasMember("TextureGuid")) {
+                            mesh.TextureGuid = xresource::instance_guid{ properties["TextureGuid"].GetUint64() };
+                        }
                         if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
                         if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
                         if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
                         if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
+                        if (properties.HasMember("SubmeshIndex")) mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
                     }
                     else if (componentType == "RigidbodyComponent") {
                         auto& rb = entity.AddComponent<RigidbodyComponent>();
@@ -463,30 +624,30 @@ namespace Engine {
                         }
                     }
                     else if (componentType == "AudioComponent") {
-						auto& audio = entity.AddComponent<AudioComponent>();
+                        auto& audio = entity.AddComponent<AudioComponent>();
 
-                        if(properties.HasMember("FilePath"))
-							audio.AudioFilePath = properties["FilePath"].GetString();
-						if (properties.HasMember("Type"))
-							audio.Type = static_cast<AudioType>(properties["Type"].GetInt());
-						if (properties.HasMember("State"))
-							audio.State = static_cast<PlayState>(properties["State"].GetInt());
-						if (properties.HasMember("Volume"))
-							audio.Volume = properties["Volume"].GetFloat();
-						if (properties.HasMember("Pitch"))
-							audio.Pitch = properties["Pitch"].GetFloat();
-						if (properties.HasMember("Loop"))
-							audio.Loop = properties["Loop"].GetBool();
-						if (properties.HasMember("Mute"))
-							audio.Mute = properties["Mute"].GetBool();
-						if (properties.HasMember("Reverb"))
-							audio.ReverbProperties = properties["ReverbProperties"].GetFloat();
-						if (properties.HasMember("Is3D"))
-							audio.Is3D = properties["Is3D"].GetBool();
-						if (properties.HasMember("MinDistance"))
-							audio.MinDistance = properties["MinDistance"].GetFloat();
-						if (properties.HasMember("MaxDistance"))
-							audio.MaxDistance = properties["MaxDistance"].GetFloat();
+                        if (properties.HasMember("FilePath"))
+                            audio.AudioFilePath = properties["FilePath"].GetString();
+                        if (properties.HasMember("Type"))
+                            audio.Type = static_cast<AudioType>(properties["Type"].GetInt());
+                        if (properties.HasMember("State"))
+                            audio.State = static_cast<PlayState>(properties["State"].GetInt());
+                        if (properties.HasMember("Volume"))
+                            audio.Volume = properties["Volume"].GetFloat();
+                        if (properties.HasMember("Pitch"))
+                            audio.Pitch = properties["Pitch"].GetFloat();
+                        if (properties.HasMember("Loop"))
+                            audio.Loop = properties["Loop"].GetBool();
+                        if (properties.HasMember("Mute"))
+                            audio.Mute = properties["Mute"].GetBool();
+                        if (properties.HasMember("Reverb"))
+                            audio.ReverbProperties = properties["ReverbProperties"].GetFloat();
+                        if (properties.HasMember("Is3D"))
+                            audio.Is3D = properties["Is3D"].GetBool();
+                        if (properties.HasMember("MinDistance"))
+                            audio.MinDistance = properties["MinDistance"].GetFloat();
+                        if (properties.HasMember("MaxDistance"))
+                            audio.MaxDistance = properties["MaxDistance"].GetFloat();
                     }
                     else if (componentType == "ListenerComponent") {
                         auto& listener = entity.AddComponent<ListenerComponent>();
@@ -513,8 +674,141 @@ namespace Engine {
                             reverb.Density = properties["Density"].GetFloat();
                         if (properties.HasMember("WetLevel"))
                             reverb.WetLevel = properties["WetLevel"].GetFloat();
-                            }
+                    }
+                    else if (componentType == "BehaviourTreeComponent") {
+                        auto& bt = entity.AddComponent<BehaviourTreeComponent>();
+                        if (properties.HasMember("Active"))
+                            bt.Active = properties["Active"].GetBool();
+                        if (properties.HasMember("ResetOnComplete"))
+                            bt.ResetOnComplete = properties["ResetOnComplete"].GetBool();
+                        if (properties.HasMember("TreeAssetPath")) {
+                            bt.TreeAssetPath = properties["TreeAssetPath"].GetString();
+                        }
 
+                        // Do NOT load the tree here only store the reference
+                        bt.TreeInstance = nullptr;
+
+                    }
+                    else if (componentType == "ParticleComponent") {
+                        auto& emitter = entity.AddComponent<ParticleComponent>();
+
+                        // Initial Velocity
+                        if (properties.HasMember("Initial Velocity") && properties["Initial Velocity"].IsArray()) {
+                            const auto& velArray = properties["Initial Velocity"].GetArray();
+                            if (velArray.Size() >= 3) {
+                                emitter.InitialVelocity.x = velArray[0].GetFloat();
+                                emitter.InitialVelocity.y = velArray[1].GetFloat();
+                                emitter.InitialVelocity.z = velArray[2].GetFloat();
+                            }
+                        }
+
+                        // Color Min
+                        if (properties.HasMember("Color Min") && properties["Color Min"].IsArray()) {
+                            const auto& minColorArray = properties["Color Min"].GetArray();
+                            if (minColorArray.Size() >= 3) {
+                                emitter.ColorMin.x = minColorArray[0].GetFloat();
+                                emitter.ColorMin.y = minColorArray[1].GetFloat();
+                                emitter.ColorMin.z = minColorArray[2].GetFloat();
+                            }
+                        }
+
+                        // Color Max
+                        if (properties.HasMember("Color Max") && properties["Color Max"].IsArray()) {
+                            const auto& maxColorArray = properties["Color Max"].GetArray();
+                            if (maxColorArray.Size() >= 3) {
+                                emitter.ColorMax.x = maxColorArray[0].GetFloat();
+                                emitter.ColorMax.y = maxColorArray[1].GetFloat();
+                                emitter.ColorMax.z = maxColorArray[2].GetFloat();
+                            }
+                        }
+
+                        // Max Particles
+                        if (properties.HasMember("Max Particles"))
+                            emitter.MaxParticles = properties["Max Particles"].GetUint();
+
+                        // Particle Type
+                        if (properties.HasMember("Particle Type"))
+                            emitter.ParticleType = properties["Particle Type"].GetUint();
+
+                        // Emission Rate
+                        if (properties.HasMember("Emission Rate"))
+                            emitter.EmissionRate = properties["Emission Rate"].GetFloat();
+
+                        // Particle Lifetime
+                        if (properties.HasMember("Particle Lifetime"))
+                            emitter.ParticleLifetime = properties["Particle Lifetime"].GetFloat();
+
+                        // Emission Accumulator
+                        if (properties.HasMember("Emission Accumulator"))
+                            emitter.EmissionAccumulator = properties["Emission Accumulator"].GetFloat();
+
+                        // Particle Size
+                        if (properties.HasMember("Particle Size"))
+                            emitter.ParticleSize = properties["Particle Size"].GetFloat();
+
+                        // Randomization parameters
+                        if (properties.HasMember("Velocity Randomness"))
+                            emitter.VelocityRandomness = properties["Velocity Randomness"].GetFloat();
+
+                        if (properties.HasMember("Lifetime Randomness"))
+                            emitter.LifetimeRandomness = properties["Lifetime Randomness"].GetFloat();
+
+                        if (properties.HasMember("Spread Angle"))
+                            emitter.SpreadAngle = properties["Spread Angle"].GetFloat();
+
+                        if (properties.HasMember("Min Speed"))
+                            emitter.MinSpeed = properties["Min Speed"].GetFloat();
+
+                        if (properties.HasMember("Max Speed"))
+                            emitter.MaxSpeed = properties["Max Speed"].GetFloat();
+
+                        if (properties.HasMember("Rotation Speed"))
+                            emitter.RotationSpeed = properties["Rotation Speed"].GetFloat();
+
+                        // Boolean parameters
+                        if (properties.HasMember("Randomize Rotation"))
+                            emitter.RandomizeRotation = properties["Randomize Rotation"].GetBool();
+
+                        if (properties.HasMember("Loop"))
+                            emitter.Loop = properties["Loop"].GetBool();
+
+                        if (properties.HasMember("Active"))
+                            emitter.Active = properties["Active"].GetBool();
+                    }
+                    else if (componentType == "ScriptComponent") {
+                        auto& script = entity.AddComponent<ScriptComponent>();
+
+                        if (properties.HasMember("ScriptClassName")) {
+                            script.ScriptClassName = properties["ScriptClassName"].GetString();
+                        }
+
+                    } else if (componentType == "LightComponent") {
+                        auto& light = entity.AddComponent<LightComponent>();
+
+                        if (properties.HasMember("Enabled"))
+                            light.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("Type"))
+                            light.Type = static_cast<LightType>(properties["Type"].GetInt()); // 0=Dir,1=Point,2=Spot
+                        // Optional: Mode is usually omitted in scene files (Realtime only), but handle if present
+                        //if (properties.HasMember("Mode"))
+                        //    light.Mode = static_cast<LightMode>(properties["Mode"].GetInt());
+                        if (properties.HasMember("Color") && properties["Color"].IsArray()) {
+                            const auto& col = properties["Color"];
+                            light.Color = glm::vec3(
+                                col[0].GetFloat(),
+                                col[1].GetFloat(),
+                                col[2].GetFloat()
+                            );
+                        }
+                        if (properties.HasMember("Intensity"))
+                            light.Intensity = properties["Intensity"].GetFloat();
+                        if (properties.HasMember("Range"))
+                            light.Range = properties["Range"].GetFloat();
+                        if (properties.HasMember("SpotAngleDeg"))
+                            light.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
+                        if (properties.HasMember("IndirectMultiplier"))
+                            light.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+                    }
                 }
             }
         }

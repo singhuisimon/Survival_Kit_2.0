@@ -30,6 +30,43 @@
 
 namespace Engine {
 
+	// Material UBO layout mirrored from GLSL std140
+	struct MaterialUBO_Std140 {
+		glm::vec3 Ka; float _pad0;   // 16 bytes
+		glm::vec3 Kd; float _pad1;   // 16 bytes
+		glm::vec3 Ks; float shininess; // 16 bytes
+	}; // total = 48 bytes
+
+	// ---------------- Lights UBO (new) ----------------
+	enum : uint32_t { LIGHT_DIRECTIONAL = 0u, LIGHT_POINT = 1u, LIGHT_SPOT = 2u };
+
+	// CPU-side light as collected by RenderSystem
+	struct LightCPU {
+		glm::vec3 color{ 1,1,1 }; float intensity{ 1 };
+		glm::vec3 position{ 0 };   float range{ 5 };
+		glm::vec3 direction{ 0,-1,0 }; float cosInner{ std::cos(glm::radians(25.f)) };
+		float cosOuter{ std::cos(glm::radians(30.f)) };
+		float indirectMultiplier{ 1 };
+		uint32_t type{ LIGHT_POINT };
+		uint32_t _pad{ 0 };
+	};
+
+	// std140-tight 64B/light packing (4x vec4)
+	struct LightGPUStd140 {
+		glm::vec4 color_intensity;   // rgb + intensity
+		glm::vec4 position_range;    // xyz + range
+		glm::vec4 direction_type;    // xyz + type (as float in .w)
+		glm::vec4 spot_cos_misc;     // x=cosInner, y=cosOuter, z=indirect, w=unused
+	};
+
+	constexpr uint32_t MAX_LIGHTS = 64; // cap per frame block
+
+	struct LightsBlockGPU {
+		glm::vec4 ambient_indirect; // rgb ambient, a = global indirect multiplier
+		glm::uvec4 count;            // x = lightCount; yzw unused
+		LightGPUStd140 lights[MAX_LIGHTS];
+	};
+
 	/**
 	 * @brief System responsible for interacting with the graphics layer in order to render game objects.
 	 * @details Internally calls OpenGL API calls to the graphics card to perform rendering operations.
@@ -37,7 +74,7 @@ namespace Engine {
 	class Renderer {
 
 	public:
-		Renderer(Camera3D& cam, Light& light);
+		Renderer(Camera3D& cam);
 
 		/**
 		 * @brief Initializes the renderer and sets up required resources
@@ -48,7 +85,7 @@ namespace Engine {
 		 * @brief Renders a complete frame with the given draw items
 		 * @param draw_items Collection of drawable objects to render
 		 */
-		void render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list);
+		void render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list, std::span<const LightCPU> lights);
 
 		/**
 		 * @brief Retrieves the OpenGL texture handle for ImGui rendering
@@ -88,6 +125,11 @@ namespace Engine {
 
 		// Return editor viewport data (Temp solution)
 		inline EditorViewport& getEditorViewport() { return renderEditorVP; }
+		inline const u32 getPickedID() const { return pickedID; }
+
+		// Return editor camera toggle 
+		inline bool& getEditorCamToggle() { return isEditorCamOn; }
+
 
 	private:
 		/**
@@ -101,7 +143,11 @@ namespace Engine {
 		 * @param pass The active render pass configuration
 		 * @param draw_items Collection of objects to draw
 		 */
-		void draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4 v, const glm::mat4 p);
+		void draw(RenderPass const& pass,
+			std::span<const DrawItem> draw_items,
+			const glm::mat4 v,
+			const glm::mat4 p,
+			std::span<const LightCPU> lights);
 
 		/**
 		 * @brief Finalizes the render pass and performs cleanup
@@ -109,8 +155,19 @@ namespace Engine {
 		 */
 		void endFrame(RenderPass const& pass);
 
+		// Helper to build a per-draw light list and upload it (returns count)
+		uint32_t buildAndUploadLightsForDraw(const glm::vec3& objCenter, float objRadius,
+			std::span<const LightCPU> sceneLights);
+
 		Camera3D& editor_camera;
-		Light& editor_light;
+		//Light& editor_light;
+
+		// MATERIALS UBO
+		GLuint m_materialUBO = 0;
+
+		// LIGHT UBO
+		GLuint m_lightsUBO = 0;
+		LightsBlockGPU m_lightsCPU{}; // scratch buffer
 
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
@@ -118,6 +175,10 @@ namespace Engine {
 		// Temp objects for object picking
 		GLuint temp_rbo;				// Used for scene and GPU ID FBO
 		EditorViewport renderEditorVP;	// Editor viewport data
+		u32 pickedID;
+
+		// Temp toggle to check if editor camera is enabled
+		bool isEditorCamOn;
 
 		// Temporary object
 		GraphicsLoader m_gl;
