@@ -9,6 +9,11 @@
 #include "../Core/input.h"
 #include "Core/Application.h"
 
+// Prefabs headers
+#include "../Serialization/PrefabSerializer.h"
+#include "../Serialization/PrefabInstantiator.h"
+#include "../Prefab/PrefabRegistry.h"
+
 // Mono headers
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -375,6 +380,9 @@ namespace Engine
 		static void Input_GetMousePosition(glm::vec2 *outPosition);
 		//static Input* s_InputSystem = nullptr;  // Will be set later!
 
+		// Prefab instantiation
+		static uint64_t Prefab_Instantiate(MonoString* prefabPathStr);
+
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -394,6 +402,9 @@ namespace Engine
 		// Entity
 		mono_add_internal_call("Engine.Entity::GetEntityID_Native", (void *)InternalCalls::Entity_GetEntityID);
 		mono_add_internal_call("Engine.Entity::HasComponent_Native", (void *)InternalCalls::Entity_HasComponent);
+
+		// Prefab
+		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void*)InternalCalls::Prefab_Instantiate);
 
 		// Transform
 		mono_add_internal_call("Engine.Transform::GetPosition_Native", (void *)InternalCalls::Transform_GetPosition);
@@ -524,6 +535,62 @@ namespace Engine
 			auto id = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
 			s_CurrentScene->DestroyEntity(id);
 			LOG_INFO("[InternalCall] Destroyed entity ID=", entityID);
+		}
+
+		static uint64_t Prefab_Instantiate(MonoString* prefabPathStr)
+		{
+			if (!InternalCalls::s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCall] Prefab_Instantiate: current scene is null");
+				return 0;
+			}
+
+			if (!prefabPathStr)
+			{
+				LOG_ERROR("[InternalCall] Prefab_Instantiate: prefab path is null");
+				return 0;
+			}
+
+			// Convert MonoString to C++ string
+			char* c = mono_string_to_utf8(prefabPathStr);
+			std::string prefabPath = c ? c : "";
+			if (c) mono_free(c);
+
+			if (prefabPath.empty())
+			{
+				LOG_ERROR("[InternalCall] Prefab_Instantiate: empty prefab path");
+				return 0;
+			}
+
+			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
+
+			// Load prefab from file
+			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+			if (!prefab)
+			{
+				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to load prefab from ", prefabPath);
+				return 0;
+			}
+
+			// Register prefab
+			PrefabRegistry::Get().RegisterPrefab(prefab);
+
+			// Instantiate entity from prefab
+			Entity entity = PrefabInstantiator::InstantiateEntityPrefab(
+				InternalCalls::s_CurrentScene,
+				prefab->GetGUID()
+			);
+
+			if (!entity)
+			{
+				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to instantiate entity");
+				return 0;
+			}
+
+			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
+			LOG_INFO("[InternalCall] Successfully instantiated prefab - Entity ID: ", entityID);
+
+			return entityID;
 		}
 
 		void Transform_Move(uint64_t entityID, float deltaX, float deltaY, float deltaZ)

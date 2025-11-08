@@ -40,6 +40,9 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Entity_AddScript(uint entity, string managedClassFullName);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Prefab_Instantiate(string prefabPath);
+
         //[MethodImpl(MethodImplOptions.InternalCall)]
         //public static extern void Rigidbody_SetVelocity(uint entity, float x, float y, float z);
     }

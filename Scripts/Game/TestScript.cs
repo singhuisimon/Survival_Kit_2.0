@@ -38,7 +38,7 @@ namespace Game
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.Up))        // 265
             {
                 moveZ -= moveSpeed * deltaTime; // Forward
-                moved = true;   
+                moved = true;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.Down))      // 264
             {
@@ -61,31 +61,27 @@ namespace Game
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.Enter) && fireCD <= 0)
             {
                 Engine.InternalCalls.Log("Firing Bullet!");
-                // Set cd
                 fireCD = fireTimer;
 
-                // Create bullet ent
-                uint bullet = Engine.InternalCalls.Scene_CreateEntity("Bullet");
+                // NEW WAY: Instantiate from prefab
+                string prefabPath = "Resources/Sources/Prefabs/Bullet.prefab";
+                uint bullet = Engine.InternalCalls.Prefab_Instantiate(prefabPath);
 
-                // Add script to bullet
-                Engine.InternalCalls.Entity_AddScript(bullet, "Game.Projectile");
+                if (bullet != 0)
+                {
+                    // Get player position
+                    Engine.Vector3 v3 = default;
+                    Engine.InternalCalls.Transform_GetPosition((uint)EntityID, ref v3);
 
-                // Get player position
-                Engine.Vector3 v3 = default; // must be initialized before ref
-                Engine.InternalCalls.Transform_GetPosition((uint)EntityID, ref v3);
-
-                // Place slightly in front (+Z adjust as you prefer)
-                Engine.Vector3 spawn = new Engine.Vector3(v3.X, v3.Y, v3.Z + 0.5f);
-                Engine.InternalCalls.Transform_SetPosition(bullet, ref spawn);
-
+                    // Place bullet in front of player
+                    Engine.Vector3 spawn = new Engine.Vector3(v3.X, v3.Y, v3.Z + 0.5f);
+                    Engine.InternalCalls.Transform_SetPosition(bullet, ref spawn);
+                }
+                else
+                {
+                    Engine.InternalCalls.LogError("Failed to instantiate bullet prefab!");
+                }
             }
-
-            // Apply movement if any key was pressed
-            if (moved)
-            {
-                Engine.InternalCalls.Transform_Move(playerID, moveX, moveY, moveZ);
-            }
-
         }
 
         public void OnDestroy()
