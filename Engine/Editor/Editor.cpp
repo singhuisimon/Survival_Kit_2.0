@@ -120,7 +120,7 @@ namespace Engine
 			if (ImGui::BeginMenu("File"))
 			{
 				// --------------- New Scene -------------------
-				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+				if (ImGui::MenuItem("New Scene"))
 				{
 					if (m_Scene)
 					{
@@ -133,7 +133,7 @@ namespace Engine
 					ImGui::SetTooltip("Create new scene.");
 
 				// --------------- Open Scene -------------------
-				if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
+				if (ImGui::MenuItem("Open Scene..."))
 				{
 					openScenePanel = true;
 				}
@@ -141,7 +141,7 @@ namespace Engine
 					ImGui::SetTooltip("Open scene from file.");
 
 				// --------------- Save Scene -------------------
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+				if (ImGui::MenuItem("Save Scene"))
 				{
 					
 					//if (isPrefabEditor && !currPrefabPath.empty() && m_Scene->GetName() == "Prefab")
@@ -169,42 +169,9 @@ namespace Engine
 								}
 							}
 
-							//if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-							//{
-							//	auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
-							//	std::string prefabPath = currPrefabPath;
-
-							//	if (!prefabPath.empty())
-							//	{
-							//		// Create updated prefab from current entity state
-							//		std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-							//		auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-							//		{
-							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
-							//			prefabComp.ClearModifications(); // Reset overrides 
-							//			LOG_INFO("Prefab updated: {}", prefabPath);
-							//		}
-							//	}
-							//}
+						
 						}
 					}
-					/*else if (!currScenePath.empty())
-					{
-						//SceneSerializer serializer(m_Scene);
-
-						//if (serializer.Serialize(currScenePath))
-						//{
-						//	m_TemporaryPrefabPaths.clear(); // remove from temporary list
-						//	//PrefabInstantiator::InstantiateScenePrefab()
-						//
-						//}
-						m_Scene->SaveToFile(currScenePath);
-						LOG_DEBUG("current scene is ", currScenePath);
-					}*/
 					else
 					{
 						if (!currScenePath.empty())
@@ -222,7 +189,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("Save Scene As..."))
 				{
 					saveAsPanel = true;
 				}
@@ -259,16 +226,16 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Edit"))
-			{
-				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
-				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
-				if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
-				if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
-				ImGui::EndMenu();
-			}
+			//if (ImGui::BeginMenu("Edit"))
+			//{
+			//	if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
+			//	if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
+			//	ImGui::Separator();
+			//	if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
+			//	if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
+			//	if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
+			//	ImGui::EndMenu();
+			//}
 
 			// to toggle show which panel
 			if (ImGui::BeginMenu("View"))
@@ -3505,16 +3472,6 @@ namespace Engine
 				}
 			}
 		}
-
-		//// Use screen coordinates for the mode label too
-		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		//ImGui::GetForegroundDrawList()->AddText(
-		//	modeLabelPos,
-		//	IM_COL32(255, 230, 100, 255),
-		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		//);
 	}
 
 	void Editor::CreateScriptPanel()
