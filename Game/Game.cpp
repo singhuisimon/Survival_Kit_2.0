@@ -401,7 +401,7 @@ void Game::CreateDefaultScene() {
 
     auto& groundTransform = ground.AddComponent<Engine::TransformComponent>();
     groundTransform.Position = glm::vec3(0, -1, 0);
-    groundTransform.Scale = glm::vec3(20, 10.f, 20);
+    groundTransform.Scale = glm::vec3(20, 0.1f, 20);
 
     auto& groundRb = ground.AddComponent<Engine::RigidbodyComponent>();
     groundRb.Mass = 0.0f;
@@ -410,11 +410,27 @@ void Game::CreateDefaultScene() {
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
     auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
-    groundmesh.MeshType = 2; // Sphere
-	groundmesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
     LOG_TRACE("  -> Ground created");
 
-    groundmesh.TextureGuid = tex_inst_guid;
+    LOG_TRACE("  Creating Sphere entity...");
+    auto sphere = m_Scene->CreateEntity("Sphere");
+    sphere.AddComponent<Engine::TagComponent>("Sphere");
+
+    auto& sphereTransform = sphere.AddComponent<Engine::TransformComponent>();
+    sphereTransform.Position = glm::vec3(-5.0f, 1.0f, 1.0f);
+    sphereTransform.Scale = glm::vec3(1.0f);
+
+    auto& sphereRb = sphere.AddComponent<Engine::RigidbodyComponent>();
+    sphereRb.Mass = 0.0f;
+    sphereRb.IsKinematic = true;
+    sphereRb.UseGravity = false;
+    sphereRb.Velocity = glm::vec3(0, 0, 0);
+
+    auto& spheremesh = sphere.AddComponent<Engine::MeshRendererComponent>();
+    spheremesh.MeshType = 2; // Sphere
+    spheremesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
+    spheremesh.TextureGuid = tex_inst_guid;
+    LOG_TRACE("  -> Sphere created");
 
     LOG_TRACE("  Creating ReverbZone entity...");
     auto reverbZone = m_Scene->CreateEntity("CaveReverb");
@@ -495,14 +511,17 @@ void Game::CreateDefaultScene() {
 
     auto& spotlightTransform = spotlight.AddComponent<Engine::TransformComponent>();
     spotlightTransform.Position = glm::vec3(-5, 5, 0);
+    spotlightTransform.Rotation = glm::quatLookAt(
+        glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)), 
+        glm::vec3(0.0f, 1.0f, 0.0f));
 
     auto& spotlightLight = spotlight.AddComponent<Engine::LightComponent>();
     spotlightLight.Type = Engine::LightType::Spot;
     spotlightLight.Enabled = true;
-    spotlightLight.Color = glm::vec3(0.85f, 0.0f, 0.0f);  // red
-    spotlightLight.Intensity = 2.0f;     // 1.0 = neutral brightness
-    spotlightLight.Range = 10.0f;         // meters / world units
-    spotlightLight.SpotAngleDeg = 45.0f;
+    spotlightLight.Color = glm::vec3(1.0f); // Bright white
+    spotlightLight.Intensity = 2.0f;     
+    spotlightLight.Range = 15.0f;           // meters / world units
+    spotlightLight.SpotAngleDeg = 40.0f;
     spotlightLight.IndirectMultiplier = 1.0f;
     spotlightLight.Mode = Engine::LightMode::Realtime;
     LOG_TRACE("  -> Spotlight created");
