@@ -467,6 +467,8 @@ namespace Engine {
 
             LOG_INFO("BehaviourTreeEditor: Updated ", updatedCount, " component references");
         }
+
+        return true; // "temporary" code to fix warning
     }
 
     bool BehaviourTreeEditor::RenameAndSave(std::shared_ptr<BehaviourTree> tree,
