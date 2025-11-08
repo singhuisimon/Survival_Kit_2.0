@@ -413,7 +413,6 @@ void Game::CreateDefaultScene() {
 	groundmesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
     LOG_TRACE("  -> Ground created");
 
-
     groundmesh.TextureGuid = tex_inst_guid;
 
     LOG_TRACE("  Creating ReverbZone entity...");

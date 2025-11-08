@@ -566,20 +566,56 @@ namespace Engine {
 			//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
 			//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
 			//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-			//prog.setUniform("material.shininess", test_material.getMaterialShininess());
+			//prog.setUniform("material.shininess", test_material.getMaterialShinifness());
 
+			xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
+
+			if (TextureResource* texture_resource = RM.loadResource<TextureResource>(texture_guid)) {
+				glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+				prog.setUniform("Texture2D", 0);
+				prog.setUniform("isTexture", true);
+
+				if (texture_resource->format == "sRGB") {
+					prog.setUniform("isGamma", true);
+				}
+				else {
+					prog.setUniform("isGamma", false);
+				}
+
+			}
+			else {
+				prog.setUniform("isTexture", false);
+			}
+
+			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+			{
+				MaterialUBO_Std140 mubo;
+				mubo.Ka = test_material.getMaterialAmbient();
+				mubo._pad0 = 0.0f;
+				mubo.Kd = glm::vec3(material_resource->diffuseColor[0], material_resource->diffuseColor[1], material_resource->diffuseColor[2]);
+				mubo._pad1 = 0.0f;
+				mubo.Ks = glm::vec3(material_resource->specularColor[0], material_resource->specularColor[1], material_resource->specularColor[2]);
+				mubo.shininess = material_resource->shininess;
+
+				// Update UBO (48 bytes)
+				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+			}
+			else
+			{
 #pragma region TESTING UBO FOR MATERIALS
-			MaterialUBO_Std140 mubo;
-			mubo.Ka = test_material.getMaterialAmbient();
-			mubo._pad0 = 0.0f;
-			mubo.Kd = test_material.getMaterialDiffuse();
-			mubo._pad1 = 0.0f;
-			mubo.Ks = test_material.getMaterialSpecular();
-			mubo.shininess = test_material.getMaterialShininess();
+				MaterialUBO_Std140 mubo;
+				mubo.Ka = test_material.getMaterialAmbient();
+				mubo._pad0 = 0.0f;
+				mubo.Kd = test_material.getMaterialDiffuse();
+				mubo._pad1 = 0.0f;
+				mubo.Ks = test_material.getMaterialSpecular();
+				mubo.shininess = test_material.getMaterialShininess();
 
-			// Update UBO (48 bytes)
-			glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+				// Update UBO (48 bytes)
+				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
 #pragma endregion
+			}
+
 
 #pragma region TESTING UBO FOR LIGHTING
 			// --- per-object light culling + upload ---
