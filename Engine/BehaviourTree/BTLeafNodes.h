@@ -526,4 +526,88 @@ namespace Engine {
         float m_TurnSpeed; // radians per second
     };
 
+    /**
+     * @brief Loads waypoints from script into blackboard
+     * @details Finds entities with tag that contains the waypoint key
+     * Sets up the waypoint array and initializes current index to 0
+     */
+    class BTCountLoadWaypoints : public BTNode {
+    public:
+        BTCountLoadWaypoints(std::string waypointKey = "", std::string countKey = "Count");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_WaypointKey;
+        std::string m_CountKey;
+    };
+
+    /**
+     * @brief Gets the next waypoint from the array
+     * @details Reads current index, fetches waypoint, outputs to target key
+     * Returns Success if waypoint retrieved, Failure if no more waypoints
+     */
+    class BTGetNextWaypoint : public BTNode {
+    public:
+        BTGetNextWaypoint(const std::string& waypointKey = "", const std::string& countKey = "Count",
+            const std::string& targetKey = "TargetPosition");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_WaypointKey;
+        std::string m_CountKey;
+        std::string m_TargetKey;
+    };
+
+    /**
+     * @brief Increments the waypoint index
+     * @details Moves to next waypoint in the array
+     * Returns Success if incremented, Failure if at end of array
+     */
+    class BTIncrementWaypointIndex : public BTNode {
+    public:
+        BTIncrementWaypointIndex() = default;
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+    };
+
+    /**
+     * @brief Checks if waypoint has been reached
+     * @details Compares entity position to target waypoint position
+     * Returns Success if within arrival distance, Running otherwise
+     */
+    class BTCheckWaypointReached : public BTNode {
+    public:
+        BTCheckWaypointReached(const std::string& targetKey = "", float arrivalDistance = 1.0f);
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_TargetKey;
+        float m_ArrivalDistance;
+    };
+
+    class BTCheckVisitAllWaypoints : public BTNode {
+    public:
+        BTCheckVisitAllWaypoints(const std::string& countKey = "Count");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+		std::string m_CountKey;
+    };
+
 } // namespace Engine

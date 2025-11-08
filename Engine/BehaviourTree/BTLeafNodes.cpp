@@ -1015,7 +1015,6 @@ namespace Engine {
         // Reset timer
         m_ElapsedTime = 0.0f;
 
-        // CRITICAL: Return Running to keep executing every frame
         return BTStatus::Success;
     }
 
@@ -1222,6 +1221,7 @@ namespace Engine {
     BTStatus BTLookAtSmooth::Execute(BTContext& context) {
         if (!context.Entity) return BTStatus::Failure;
         if (!context.Entity->HasComponent<TransformComponent>()) return BTStatus::Failure;
+		if (!context.Blackboard.Has(m_Key)) return BTStatus::Failure;
 
         auto& tc = context.Entity->GetComponent<TransformComponent>();
 
@@ -1252,18 +1252,27 @@ namespace Engine {
 
         glm::quat desired = glm::quat_cast(rotMat);
 
-        // Smooth rotate
-        float t = glm::clamp(m_TurnSpeed * context.DeltaTime, 0.0f, 1.0f);
-        tc.Rotation = glm::slerp(tc.Rotation, desired, t);
-        tc.IsDirty = true;
-
         // Finish when close
         float angleDiff = 2.0f * std::acos(glm::clamp(glm::dot(glm::normalize(tc.Rotation),
             glm::normalize(desired)),
             -1.0f, 1.0f));
 
-        if (angleDiff < glm::radians(1.0f))
+        if (angleDiff < glm::radians(1.0f)) {
+            LOG_TRACE("BTLookAtSmooth: Completed looking at target");
             return BTStatus::Success;
+        }
+
+        // Smooth rotate
+        float t = glm::clamp(m_TurnSpeed * context.DeltaTime, 0.0f, 1.0f);
+        tc.Rotation = glm::slerp(tc.Rotation, desired, t);
+        tc.IsDirty = true;
+
+        
+
+        /*if (angleDiff < glm::radians(1.0f)) {
+			LOG_TRACE("BTLookAtSmooth: Completed looking at target");
+            return BTStatus::Success;
+        }*/
 
         return BTStatus::Running;
 
@@ -1282,5 +1291,228 @@ namespace Engine {
             m_TurnSpeed = glm::radians(std::stof(value));
         }
     }
+
+    //BTLoadWayPoints
+    BTCountLoadWaypoints::BTCountLoadWaypoints(std::string waypointKey, std::string countKey)
+        : m_WaypointKey(waypointKey)
+        , m_CountKey(countKey) {
+	}
+
+    const char* BTCountLoadWaypoints::GetTypeName() const { return "LoadWaypoints"; }
+
+    BTStatus BTCountLoadWaypoints::Execute(BTContext& context) {
+        
+        if (!context.Scene) {
+            LOG_WARNING("BTLoadWaypoints: No scene context");
+            return BTStatus::Failure;
+        }
+
+		auto& registry = context.Scene->GetRegistry();
+		auto view = registry.view<TagComponent>();
+
+		int count = 0;
+
+        for (auto entityHandle : view) {
+			Entity entity(entityHandle, &registry);
+
+            if(entity.HasComponent<TagComponent>()) {
+                auto& tag = entity.GetComponent<TagComponent>();
+                // CRITICAL FIX: Use partial match (contains) instead of exact match
+                if (tag.Tag.find(m_WaypointKey) != std::string::npos) {
+                    // Get TransformComponent
+                    if (entity.HasComponent<TransformComponent>()) {
+                        auto& transform = entity.GetComponent<TransformComponent>();
+                        context.Blackboard.Set(m_WaypointKey + std::to_string(count), transform.Position);
+                        count++;
+                    }
+                }
+			}
+        }
+
+        context.Blackboard.Set(m_CountKey, count);
+
+        LOG_TRACE("BTLoadWaypoints: Found ", count, " entities containing '", m_WaypointKey, "'");
+
+		return BTStatus::Success;
+	}
+
+    void BTCountLoadWaypoints::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "WaypointKey", m_WaypointKey });
+        properties.push_back({ "CountKey", m_CountKey });
+    }
+
+    void BTCountLoadWaypoints::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "WaypointKey") m_WaypointKey = value;
+        else if (name == "CountKey") m_CountKey = value;
+    }
+
+    //BTGetNextWaypoint
+    BTGetNextWaypoint::BTGetNextWaypoint(const std::string& waypointKey, const std::string& countKey,
+        const std::string& targetKey) : m_WaypointKey(waypointKey), m_CountKey(countKey), m_TargetKey(targetKey) {
+    }
+
+    const char* BTGetNextWaypoint::GetTypeName() const { return "GetNextWaypoint"; }
+
+    BTStatus BTGetNextWaypoint::Execute(BTContext& context) {
+
+        auto countOpt = context.Blackboard.Get<int>(m_CountKey);
+        if (!countOpt) {
+            LOG_WARNING("BTGetNextWaypoint: Count key '", m_CountKey, "' not found in blackboard");
+            return BTStatus::Failure;
+        }
+
+        int count = *countOpt;
+        if (count <= 0) {
+            LOG_WARNING("BTGetNextWaypoint: No waypoints loaded under key '", m_WaypointKey, "'");
+            return BTStatus::Failure;
+        }
+
+        // Get current index
+        int index = context.Blackboard.GetOrDefault<int>("CurrentWaypointIndex", 0);
+        //int index = indexOpt.value_or(0);
+
+        if (index < 0) {
+            LOG_WARNING("BTGetNextWaypoint: 'CurrentWaypointIndex' not found or invalid in blackboard");
+			return BTStatus::Failure;
+        }
+
+        // Get the waypoint transform
+        glm::vec3 transformOpt = context.Blackboard.GetOrDefault<glm::vec3>(m_WaypointKey + std::to_string(index), glm::vec3(0));
+
+        if (transformOpt == context.Entity->GetComponent<TransformComponent>().Position) {
+            LOG_WARNING("BTGetNextWaypoint: Waypoint '", m_WaypointKey + std::to_string(index), "is the same as entity current position");
+            return BTStatus::Failure;
+        }
+
+        // Store the target position
+        context.Blackboard.Set(m_TargetKey, transformOpt);
+
+        // Update index for next call
+        //index = (index + 1) % count;
+        context.Blackboard.Set("CurrentWaypointIndex", index);
+
+        return BTStatus::Success;
+	}
+
+    void BTGetNextWaypoint::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "WaypointKey", m_WaypointKey });
+        properties.push_back({ "CountKey", m_CountKey });
+        properties.push_back({ "TargetKey", m_TargetKey });
+    }
+
+    void BTGetNextWaypoint::SetProperty(const std::string& name, const std::string& value) {
+        if(name == "WaypointKey") m_WaypointKey = value;
+        else if(name == "CountKey") m_CountKey = value;
+		else if (name == "TargetKey") m_TargetKey = value;
+    }
+
+    //BTIncrementWaypointIndex
+
+    const char* BTIncrementWaypointIndex::GetTypeName() const { return "IncrementWaypointIndex"; }
+
+    BTStatus BTIncrementWaypointIndex::Execute(BTContext& context) {
+
+        auto currIndex = context.Blackboard.Get<int>("CurrentWaypointIndex");
+        if (!currIndex) {
+            LOG_WARNING("BTIncrementWaypointIndex: 'CurrentWaypointIndex' not found in blackboard");
+            return BTStatus::Failure;
+        }
+
+        int index = *currIndex;
+
+        if (index < 0) {
+            LOG_WARNING("BTIncrementWaypointIndex: No waypoints loaded");
+            return BTStatus::Failure;
+        }
+
+        // Increment index
+        index++;
+
+		// Set the index back to blackboard
+        context.Blackboard.Set("CurrentWaypointIndex", index);
+        return BTStatus::Success;
+	}
+
+    //BTCheckWaypointReached
+    BTCheckWaypointReached::BTCheckWaypointReached(const std::string& targetKey, float arrivalDistance)
+        : m_TargetKey(targetKey), m_ArrivalDistance(arrivalDistance) {
+	}
+
+    const char* BTCheckWaypointReached::GetTypeName() const { return "CheckWaypointReached"; }
+
+    BTStatus BTCheckWaypointReached::Execute(BTContext& context) {
+        if (!context.Entity || !context.Entity->HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        auto targetPosOpt = context.Blackboard.Get<glm::vec3>(m_TargetKey);
+        if (!targetPosOpt) {
+            LOG_WARNING("BTCheckWaypointReached: Target position key '", m_TargetKey, "' not found");
+            return BTStatus::Failure;
+        }
+
+        glm::vec3 targetPos = *targetPosOpt;
+        auto& transform = context.Entity->GetComponent<TransformComponent>();
+
+        float distance = glm::length(targetPos - transform.Position);
+        if (distance <= m_ArrivalDistance) {
+            return BTStatus::Success;
+        }
+        else {
+            return BTStatus::Failure;
+        }
+	}
+
+    void BTCheckWaypointReached::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "TargetKey", m_TargetKey });
+        properties.push_back({ "ArrivalDistance", std::to_string(m_ArrivalDistance)});
+    }
+
+    void BTCheckWaypointReached::SetProperty(const std::string& name, const std::string& value) {
+        if(name == "TargetKey") {
+            m_TargetKey = value;
+        }
+        else if(name == "ArrivalDistance") {
+            m_ArrivalDistance = std::stof(value);
+		}
+    }
+
+	//BTCheckVisitAllWaypoints - use invert
+    BTCheckVisitAllWaypoints::BTCheckVisitAllWaypoints(const std::string& countKey): m_CountKey(countKey) {
+	}
+
+    const char* BTCheckVisitAllWaypoints::GetTypeName() const { return "CheckVisitAllWaypoints"; }
+
+    BTStatus BTCheckVisitAllWaypoints::Execute(BTContext& context) {
+        auto totalcount = context.Blackboard.GetOrDefault<int>(m_CountKey, -1);
+        if (totalcount == -1) {
+            LOG_WARNING("BTCheckVisitAllWaypoints: Count key '", m_CountKey, "' not found in blackboard");
+            return BTStatus::Failure;
+        }
+
+        int visitCount = context.Blackboard.GetOrDefault<int>("CurrentWaypointIndex", -1);
+        if (visitCount < 0) {
+            LOG_WARNING("BTCheckVisitAllWaypoints: No waypoints visited under key 'CurrentWaypointIndex'");
+            return BTStatus::Failure;
+        }
+
+        if (visitCount < totalcount || visitCount > totalcount) {
+			LOG_TRACE("BTCheckVisitAllWaypoints: Visited ", visitCount, " out of ", totalcount, " waypoints");
+            return BTStatus::Failure;
+        }
+        else if (visitCount == totalcount) {
+			LOG_TRACE("BTCheckVisitAllWaypoints: All ", totalcount, " waypoints visited");
+			return BTStatus::Success;
+        }
+    }
+
+    void BTCheckVisitAllWaypoints::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "CountKey", m_CountKey });
+    }
+    void BTCheckVisitAllWaypoints::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "CountKey") {
+            m_CountKey = value;
+        }
+	}
 
 } // namespace Engine

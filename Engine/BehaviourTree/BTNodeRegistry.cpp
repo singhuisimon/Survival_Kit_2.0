@@ -308,6 +308,36 @@ namespace Engine {
             }
         );
 
+        registry.RegisterNodeType<BTCountLoadWaypoints>("Action", "count and load waypoint into board",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCountLoadWaypoints, "WaypointKey", m_WaypointKey);
+                BT_REGISTER_STRING_PROPERTY(BTCountLoadWaypoints, "CountKey", m_CountKey);
+            }
+        );
+
+        registry.RegisterNodeType<BTGetNextWaypoint>("Action", "Get and Set the next waypoint as target",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTGetNextWaypoint, "WaypointKey", m_WaypointKey);
+                BT_REGISTER_STRING_PROPERTY(BTGetNextWaypoint, "CountKey", m_CountKey);
+                BT_REGISTER_STRING_PROPERTY(BTGetNextWaypoint, "TargetKey", m_TargetKey);
+            }
+        );
+
+        registry.RegisterNodeType<BTIncrementWaypointIndex>("Action", "Increment internal index to + 1");
+
+        registry.RegisterNodeType<BTCheckWaypointReached>("Action", "Check if waypoint has been reached",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckWaypointReached, "TargetKey", m_TargetKey);
+                BT_REGISTER_FLOAT_PROPERTY(BTCheckWaypointReached, "ArrivalDistance", m_ArrivalDistance);
+            }
+        );
+
+        registry.RegisterNodeType<BTCheckVisitAllWaypoints>("Action", "Check if all waypoint has been visited",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckVisitAllWaypoints, "CountKey", m_CountKey);
+            }
+        );
+
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
     
