@@ -132,6 +132,7 @@ namespace Engine {
 	}
 
 	void AudioSystem::UpdateAudioComponentState(Entity entity, AudioComponent& audio, TransformComponent* transform, RigidbodyComponent* rb) {
+		(void)entity; //entity is not used currently but may be useful for future debugging/logging
 		switch (audio.State) {
 		case PlayState::PLAY:
 			//haven't play any sound as no channel assign

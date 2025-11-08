@@ -385,7 +385,7 @@ namespace Engine {
         return true;
     }
 
-    static bool RenameTreeFIle(const std::string& oldPath,
+    bool RenameTreeFile(const std::string& oldPath,
         const std::string& newPath,
         Scene* scene = nullptr) {
 

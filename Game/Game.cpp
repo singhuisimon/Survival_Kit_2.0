@@ -41,16 +41,17 @@
 // Math Utility
 #include "Utility/MathUtils.h"
 
+// FOR BT TESTING
+//#include "BehaviourTree/BTNodeRegistry.h"
+//#include "Serialization/BehaviourTreeSerializer.h"
+//#include "BehaviourTree/BehaviourTreeEditor.h"
+//#include "Prefab/BehaviourTreePrefab.h"
+//#include "BehaviourTree/BTNode.h"
 
-// KEPT FOR BT TEST <WILL REMOVE BY THIS WEEKEND PLS DUN TOUCH>
-#include "BehaviourTree/BTNodeRegistry.h"
-#include "Serialization/BehaviourTreeSerializer.h"
-#include "BehaviourTree/BehaviourTreeEditor.h"
-#include "Prefab/BehaviourTreePrefab.h"
 #include "Serialization/PrefabSerializer.h"
 #include "Serialization/PrefabInstantiator.h"
 #include "Prefab/PrefabRegistry.h"
-#include "BehaviourTree/BTNode.h"
+
 #include "Utility/AssetPath.h"
 
 Game::Game()
@@ -383,7 +384,7 @@ void Game::CreateDefaultScene() {
     camComponent.Enabled = true;
     camComponent.autoAspect = true;
     camComponent.Depth = 0; // 0 is the main camera
-    camComponent.Aspect = GetWidth() / GetHeight();
+    camComponent.Aspect = static_cast<float>(GetWidth() / GetHeight());
     camComponent.FOV = 45.0f;
     camComponent.NearPlane = 0.5f;
     camComponent.FarPlane = 100.0f;
@@ -926,227 +927,70 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // === TEST BEHAVIOUR TREE SYSTEM ===
 
-    if (input.IsKeyJustPressed(GLFW_KEY_F5)) {
-        LOG_INFO("=== [F5] Create a new Behaviour Tree file: change_position.json ===");
+    //if (input.IsKeyJustPressed(GLFW_KEY_F5)) {
+    //    LOG_INFO("=== [F5] Create a new Behaviour Tree file: change_position.json ===");
 
-        // Build: Sequence -> SetBlackboard(Key=TargetPosition, Type=Vec3, Value=1,2,3) -> Wait(Duration=2.0)
-        auto tree = std::make_shared<Engine::BehaviourTree>();
-        tree->SetName("ChangePositionTree");
+    //    // Build: Sequence -> SetBlackboard(Key=TargetPosition, Type=Vec3, Value=1,2,3) -> Wait(Duration=2.0)
+    //    auto tree = std::make_shared<Engine::BehaviourTree>();
+    //    tree->SetName("ChangePositionTree");
 
-        auto root = std::make_shared<Engine::BTSequence>();
-        tree->SetRootNode(root);
+    //    auto root = std::make_shared<Engine::BTSequence>();
+    //    tree->SetRootNode(root);
 
-        // Set a position in the blackboard (stored as text; editor/runner can parse as needed)
-        auto setPos = std::make_shared<Engine::BTSetBlackboard>("TargetPosition", "1,2,3", "Vec3");
-        root->AddChild(setPos);
+    //    // Set a position in the blackboard (stored as text; editor/runner can parse as needed)
+    //    auto setPos = std::make_shared<Engine::BTSetBlackboard>("TargetPosition", "1,2,3", "Vec3");
+    //    root->AddChild(setPos);
 
-        // Wait a bit
-        auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
-        root->AddChild(waitNode);
+    //    // Wait a bit
+    //    auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
+    //    root->AddChild(waitNode);
 
-        // Save to file (project + output)
-        const std::string filePath = "change_position.json";
-        if (Engine::BehaviourTreeEditor::SaveTree(*tree, filePath)) {
-            LOG_INFO("[F5] Successfully created and saved: ", filePath);
-        }
-        else {
-            LOG_ERROR("[F5] Failed to save: ", filePath);
-        }
-    }
-
-    if (input.IsKeyJustPressed(GLFW_KEY_F6)) {
-        LOG_INFO("=== [F6] Rename BT file ===");
-        const std::string oldPath = "change_position.json";
-        const std::string newPath = "change_position_renamed.json";
-
-        // Pass m_Scene.get() if you want component references auto-updated
-        bool ok = Engine::BehaviourTreeEditor::RenameFile(oldPath, newPath, m_Scene.get());
-        if (ok) {
-            LOG_INFO("[F6] Renamed '", oldPath, "' -> '", newPath, "'");
-        }
-        else {
-            LOG_ERROR("[F6] Rename failed!");
-        }
-    }
-
-    if (input.IsKeyJustPressed(GLFW_KEY_F7)) {
-        LOG_INFO("=== [F7] SaveAs (duplicate file with new GUID) ===");
-
-        const std::string sourcePath = "change_position.json";
-        const std::string newPath = "change_position2.json";
-        const std::string newName = "ChangePosition_Copy"; // Optional new internal name
-
-        bool success = Engine::BehaviourTreeEditor::SaveAs(
-            sourcePath,
-            newPath,
-            newName,
-            /*generateNewGUID=*/true
-        );
-
-        if (success) {
-            LOG_INFO("[F7] Successfully saved a copy as '", newPath, "' with a new GUID!");
-        }
-        else {
-            LOG_ERROR("[F7] SaveAs failed!");
-        }
-    }
-
-
-    //if (input.IsKeyJustPressed(GLFW_KEY_F7)) {
-    //    LOG_INFO("=== [F7] SaveAs after editing a value ===");
-    //    const std::string sourcePath = "change_position.json";
-    //    const std::string outPath = "change_position2.json";
-
-    //    auto tree = Engine::BehaviourTreeEditor::LoadTree(sourcePath);
-    //    if (!tree) {
-    //        LOG_ERROR("[F7] Could not load source: ", sourcePath);
+    //    // Save to file (project + output)
+    //    const std::string filePath = "change_position.json";
+    //    if (Engine::BehaviourTreeEditor::SaveTree(*tree, filePath)) {
+    //        LOG_INFO("[F5] Successfully created and saved: ", filePath);
     //    }
     //    else {
-    //        // Find a node to tweak: prefer MoveEntity.Speed, else Wait.Duration
-    //        std::function<std::shared_ptr<Engine::BTNode>(std::shared_ptr<Engine::BTNode>, const char*)> findType =
-    //            [&](std::shared_ptr<Engine::BTNode> n, const char* typeName) -> std::shared_ptr<Engine::BTNode> {
-    //            if (!n) return nullptr;
-    //            if (std::string(n->GetTypeName()) == typeName) return n;
-    //            for (auto& c : n->GetChildren()) {
-    //                if (auto r = findType(c, typeName)) return r;
-    //            }
-    //            return nullptr;
-    //            };
-
-    //        auto root = tree->GetRootNode();
-    //        bool changed = false;
-
-    //        if (auto move = findType(root, "MoveEntity")) {
-    //            move->SetProperty("Speed", "10.0");
-    //            LOG_INFO("[F7] Changed MoveEntity.Speed to 10.0");
-    //            changed = true;
-    //        }
-    //        else if (auto wt = findType(root, "Wait")) {
-    //            wt->SetProperty("Duration", "3.0");
-    //            LOG_INFO("[F7] Changed Wait.Duration to 3.0");
-    //            changed = true;
-    //        }
-    //        else {
-    //            LOG_WARNING("[F7] No MoveEntity or Wait node found; saving copy without edits.");
-    //        }
-
-    //        // Save to a new file so the original remains unchanged
-    //        if (Engine::BehaviourTreeEditor::SaveTree(*tree, outPath)) {
-    //            LOG_INFO("[F7] Saved edited copy as '", outPath, "'");
-    //        }
-    //        else {
-    //            LOG_ERROR("[F7] Save copy failed!");
-    //        }
+    //        LOG_ERROR("[F5] Failed to save: ", filePath);
     //    }
     //}
 
+    //if (input.IsKeyJustPressed(GLFW_KEY_F6)) {
+    //    LOG_INFO("=== [F6] Rename BT file ===");
+    //    const std::string oldPath = "change_position.json";
+    //    const std::string newPath = "change_position_renamed.json";
 
+    //    // Pass m_Scene.get() if you want component references auto-updated
+    //    bool ok = Engine::BehaviourTreeEditor::RenameFile(oldPath, newPath, m_Scene.get());
+    //    if (ok) {
+    //        LOG_INFO("[F6] Renamed '", oldPath, "' -> '", newPath, "'");
+    //    }
+    //    else {
+    //        LOG_ERROR("[F6] Rename failed!");
+    //    }
+    //}
 
-    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
-    // F10 -> Create a BehaviourTree, attach to entity, and save to JSON
-    if (input.IsKeyJustPressed(GLFW_KEY_F10)) {
-        LOG_INFO("=== [F10] Create Behaviour Tree and attach to entity ===");
+    //if (input.IsKeyJustPressed(GLFW_KEY_F7)) {
+    //    LOG_INFO("=== [F7] SaveAs (duplicate file with new GUID) ===");
 
-        // 1. Create a simple behaviour tree
-        //auto tree = std::make_shared<Engine::BehaviourTree>();
-        //tree->SetName("SimpleWaitTree");
+    //    const std::string sourcePath = "change_position.json";
+    //    const std::string newPath = "change_position2.json";
+    //    const std::string newName = "ChangePosition_Copy"; // Optional new internal name
 
-        // Create nodes
-        //auto root = std::make_shared<Engine::BTSequence>();
-        //auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
-        //auto logNode = std::make_shared<Engine::BTLog>("HELLO");
-            //= std::make_shared<Engine::BTAction>([](Engine::BTContext& ctx) {
-            //LOG_INFO("[AI Action] Hello from Behaviour Tree!");
-            //return Engine::BTStatus::Success;
-            //});
+    //    bool success = Engine::BehaviourTreeEditor::SaveAs(
+    //        sourcePath,
+    //        newPath,
+    //        newName,
+    //        /*generateNewGUID=*/true
+    //    );
 
-        //root->AddChild(waitNode);
-        //root->AddChild(logNode);
-        //tree->SetRootNode(root);
-
-        auto tree = std::make_shared<Engine::BehaviourTree>();
-        tree->SetName("RotationColorChange");
-
-        auto sequence = std::make_shared<Engine::BTSequence>();
-
-        auto parallel = std::make_shared<Engine::BTParallel>();
-        parallel->AddChild(std::make_shared<Engine::BTChangeColor>(0));
-        parallel->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0));
-
-        auto parallel1 = std::make_shared<Engine::BTParallel>();
-        parallel1->AddChild(std::make_shared<Engine::BTChangeColor>(1));
-        parallel1->AddChild(std::make_shared<Engine::BTRotateEntity>(30.0));
-
-        sequence->AddChild(parallel);
-        sequence->AddChild(parallel1);
-
-        tree->SetRootNode(sequence);
-
-        // 2. Serialize the tree to file
-        std::string btPath = "RotationColorChange.json";
-        Engine::BehaviourTreeSerializer::SerializeToFile(*tree, btPath);
-
-        // 3. Create entity & attach component
-        Engine::Entity aiEntity = m_Scene->CreateEntity("TestAI");
-        auto& btComp = aiEntity.AddComponent<Engine::BehaviourTreeComponent>(tree);
-        btComp.Active = true;
-        btComp.ResetOnComplete = true;
-
-        // Set the file path so it persists to SavedScene.json
-        btComp.TreeAssetPath = btPath;
-
-        LOG_INFO("Created AI Entity with BehaviourTreeComponent!");
-        LOG_INFO("Tree path set to: ", btComp.TreeAssetPath);
-    }
-
-    // F11 -> Create a BehaviourTreePrefab from the tree file
-    if (input.IsKeyJustPressed(GLFW_KEY_F11)) {
-        LOG_INFO("=== [F11] Create BehaviourTreePrefab from file ===");
-
-
-        Engine::Entity foundEntity;
-        bool found = false;
-
-        auto view = registry.view<Engine::TagComponent>();
-        for (auto entityHandle : view) {
-            auto& tag = view.get<Engine::TagComponent>(entityHandle);
-            if (tag.Tag == "TestAI") { // change to whatever name you want
-                foundEntity = Engine::Entity(entityHandle, &registry);
-                found = true;
-                break;
-            }
-        }
-
-        if (!foundEntity) {
-            LOG_ERROR("No entity named 'TestAI' found. Create one first with F10.");
-            return;
-        }
-
-        // Make sure it has a valid BehaviourTreeComponent
-        if (!foundEntity.HasComponent<Engine::BehaviourTreeComponent>()) {
-            LOG_ERROR("Entity 'TestAI' does not have a BehaviourTreeComponent!");
-            return;
-        }
-
-        // Save the entity itself as a prefab (not just the tree)
-        auto prefab = Engine::PrefabSerializer::CreateEntityPrefab(foundEntity, "AIPrefab_SimpleWaitTree");
-        Engine::PrefabRegistry::Get().RegisterPrefab(prefab);
-
-        LOG_INFO("Entity Prefab 'AIPrefab_SimpleWaitTree' created and registered.");
-    }
-
-
-    // F12 -> Instantiate entity from BehaviourTreePrefab
-    if (input.IsKeyJustPressed(GLFW_KEY_K)) {
-        auto prefab = Engine::PrefabRegistry::Get().GetPrefabByName("AIPrefab_SimpleWaitTree");
-        if (prefab) {
-            Engine::PrefabInstantiator::InstantiateEntityPrefab(m_Scene.get(), prefab->GetGUID());
-            LOG_INFO("Instantiated AI entity from prefab 'AIPrefab_SimpleWaitTree'");
-        }
-        else {
-            LOG_WARNING("Prefab 'AIPrefab_SimpleWaitTree' not found!");
-        }
-    }
+    //    if (success) {
+    //        LOG_INFO("[F7] Successfully saved a copy as '", newPath, "' with a new GUID!");
+    //    }
+    //    else {
+    //        LOG_ERROR("[F7] SaveAs failed!");
+    //    }
+    //}
 
     //m_Editor->StartImguiFrame();
 

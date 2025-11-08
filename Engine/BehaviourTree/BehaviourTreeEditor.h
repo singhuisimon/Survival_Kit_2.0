@@ -151,7 +151,7 @@ namespace Engine {
         /**
         * @brief Rename a behaviour tree (in-memory only)
         */
-        static bool RenameTreeFIle(const std::string& oldPath,
+        static bool RenameTreeFile(const std::string& oldPath,
             const std::string& newPath,
             Scene* scene = nullptr);
 

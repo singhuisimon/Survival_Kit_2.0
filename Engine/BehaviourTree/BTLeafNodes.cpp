@@ -630,7 +630,7 @@ namespace Engine {
         float currentHealth = context.Blackboard.GetOrDefault(m_HealthKey, 100.0f);
 
         if (m_Amount <= 0.01) {
-            m_Amount == 0.01;
+            m_Amount = 0.01;
         }
 
         currentHealth -= m_Amount;
@@ -1522,6 +1522,8 @@ namespace Engine {
 			LOG_TRACE("BTCheckVisitAllWaypoints: All ", totalcount, " waypoints visited");
 			return BTStatus::Success;
         }
+
+		return BTStatus::Failure;
     }
 
     void BTCheckVisitAllWaypoints::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
