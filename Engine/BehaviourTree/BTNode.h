@@ -1,7 +1,7 @@
 /**
  * @file BTNode.h
  * @brief Base class for all behaviour tree nodes with stack-based execution
- * @author Amanda Leow Boon Suan (90%)
+ * @author Amanda Leow Boon Suan (100%)
  * @date 3/11/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

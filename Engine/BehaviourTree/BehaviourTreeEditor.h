@@ -1,7 +1,7 @@
  /**
   * @file BehaviourTree.h
   * @brief Editor utilities for behaviour tree creation and editing
-  * @author Amanda Leow Boon Suan (90%)
+  * @author Amanda Leow Boon Suan (70%), Rio Shannon Yvon Leonardo (30%)
   * @date 3/11/2025
   * Copyright (C) 2025 DigiPen Institute of Technology.
   * Reproduction or disclosure of this file or its contents without the
