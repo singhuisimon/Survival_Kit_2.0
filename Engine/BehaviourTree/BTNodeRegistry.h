@@ -84,7 +84,8 @@ namespace Engine {
             , Description(description)
             , Factory(factory)
             , CanHaveChildren(canHaveChildren)
-            , PropertyMetadata(std::make_shared<BTNodeMetadata>(typeName, category)) {}
+            , PropertyMetadata(std::make_shared<BTNodeMetadata>(typeName, category)) {
+        }
     };
 
     /**

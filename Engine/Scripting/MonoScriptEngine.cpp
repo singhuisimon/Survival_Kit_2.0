@@ -1,3 +1,6 @@
+
+#include <windows.h>  // Add at top
+
 #include "MonoScriptEngine.h"
 #include "../Utility/Logger.h"
 #include "../ECS/Scene.h"
@@ -11,7 +14,6 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
-#include <windows.h>  // Add at top
 
 #include <filesystem>
 #include <iostream>
@@ -491,7 +493,7 @@ namespace Engine
 
 			// Set EntityID field on the C# instance (your scripts have: public uint/int EntityID;)
 			// If your field is 'int', this still works (Mono boxes by pointer size); adjust type if needed.
-			uint32_t idCopy = entityID;
+			uint32_t idCopy = static_cast<uint32_t>(entityID);
 			se.SetFieldValue(instance, "EntityID", &idCopy);
 
 			if (e.HasComponent<ScriptComponent>())
@@ -609,6 +611,8 @@ namespace Engine
 
 		uint64_t Entity_GetEntityID(MonoObject *entityObj)
 		{
+			(void)entityObj;  // Suppress warning
+
 			// Entity ID is stored in the C# Entity class
 			return 0; // Placeholder - implement based on your C# Entity class structure
 		}
@@ -616,7 +620,7 @@ namespace Engine
 		bool Entity_HasComponent(uint64_t entityID, MonoReflectionType *componentType)
 		{
 			if (!s_CurrentScene) return false;
-
+			(void)componentType;
 			auto &registry = s_CurrentScene->GetRegistry();
 			auto handle = static_cast<entt::entity>(entityID);
 

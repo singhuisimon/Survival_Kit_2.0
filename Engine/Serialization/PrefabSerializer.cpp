@@ -19,6 +19,8 @@
 #include "../Component/ReverbZoneComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
+#include "../Component/ScriptComponent.h"
+#include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -275,7 +277,7 @@ namespace Engine {
 
             propertiesObj.AddMember("Parent", transform.Parent, allocator);
 
-			rapidjson::Value childrenArray(rapidjson::kArrayType);
+            rapidjson::Value childrenArray(rapidjson::kArrayType);
             for (const auto& child : transform.Children) {
                 childrenArray.PushBack(child, allocator);
             }
@@ -313,10 +315,10 @@ namespace Engine {
             propertiesObj.AddMember("MeshGuid",
                 rapidjson::Value(mesh.MeshGuid.m_Value), allocator);
 
-            propertiesObj.AddMember("MaterialGuid", 
+            propertiesObj.AddMember("MaterialGuid",
                 rapidjson::Value(mesh.MaterialGuid.m_Value), allocator);
 
-            propertiesObj.AddMember("TextureGuid", 
+            propertiesObj.AddMember("TextureGuid",
                 rapidjson::Value(mesh.TextureGuid.m_Value), allocator);
 
             //propertiesObj.AddMember("MeshGuid",
@@ -488,6 +490,46 @@ namespace Engine {
             propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
             propertiesObj.AddMember("Loop", emitter.Loop, allocator);
             propertiesObj.AddMember("Active", emitter.Active, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize ScriptComponent
+        if (entity.HasComponent<ScriptComponent>()) {
+            const auto& script = entity.GetComponent<ScriptComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "ScriptComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("ScriptClassName",
+                rapidjson::Value(script.ScriptClassName.c_str(), allocator), allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize LightComponent
+        if (entity.HasComponent<LightComponent>()) {
+            const auto& light = entity.GetComponent<LightComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "LightComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("Enabled", light.Enabled, allocator);
+            propertiesObj.AddMember("Type", static_cast<uint32_t>(light.Type), allocator);
+            //propertiesObj.AddMember("Mode", static_cast<uint32_t>(light.Mode), allocator);
+
+            rapidjson::Value colorArray(rapidjson::kArrayType);
+            colorArray.PushBack(light.Color.x, allocator);
+            colorArray.PushBack(light.Color.y, allocator);
+            colorArray.PushBack(light.Color.z, allocator);
+            propertiesObj.AddMember("Color", colorArray, allocator);
+
+            propertiesObj.AddMember("Intensity", light.Intensity, allocator);
+            propertiesObj.AddMember("Range", light.Range, allocator);
+            propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
+            propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);

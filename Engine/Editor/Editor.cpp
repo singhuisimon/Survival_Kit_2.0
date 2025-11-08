@@ -14,6 +14,7 @@
 #include "../Component/TransformComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Transform/TransformSystem.h"
+#include "../Component/LightComponent.h"
 
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
@@ -25,6 +26,7 @@
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
 #include <GLFW/glfw3.h>
+#include <cctype>
 
 // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -120,7 +122,7 @@ namespace Engine
 			if (ImGui::BeginMenu("File"))
 			{
 				// --------------- New Scene -------------------
-				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+				if (ImGui::MenuItem("New Scene"))
 				{
 					if (m_Scene)
 					{
@@ -133,7 +135,7 @@ namespace Engine
 					ImGui::SetTooltip("Create new scene.");
 
 				// --------------- Open Scene -------------------
-				if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
+				if (ImGui::MenuItem("Open Scene..."))
 				{
 					openScenePanel = true;
 				}
@@ -141,7 +143,7 @@ namespace Engine
 					ImGui::SetTooltip("Open scene from file.");
 
 				// --------------- Save Scene -------------------
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+				if (ImGui::MenuItem("Save Scene"))
 				{
 					
 					//if (isPrefabEditor && !currPrefabPath.empty() && m_Scene->GetName() == "Prefab")
@@ -169,42 +171,9 @@ namespace Engine
 								}
 							}
 
-							//if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-							//{
-							//	auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
-							//	std::string prefabPath = currPrefabPath;
-
-							//	if (!prefabPath.empty())
-							//	{
-							//		// Create updated prefab from current entity state
-							//		std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-							//		auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-							//		{
-							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
-							//			prefabComp.ClearModifications(); // Reset overrides 
-							//			LOG_INFO("Prefab updated: {}", prefabPath);
-							//		}
-							//	}
-							//}
+						
 						}
 					}
-					/*else if (!currScenePath.empty())
-					{
-						//SceneSerializer serializer(m_Scene);
-
-						//if (serializer.Serialize(currScenePath))
-						//{
-						//	m_TemporaryPrefabPaths.clear(); // remove from temporary list
-						//	//PrefabInstantiator::InstantiateScenePrefab()
-						//
-						//}
-						m_Scene->SaveToFile(currScenePath);
-						LOG_DEBUG("current scene is ", currScenePath);
-					}*/
 					else
 					{
 						if (!currScenePath.empty())
@@ -222,7 +191,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("Save Scene As..."))
 				{
 					saveAsPanel = true;
 				}
@@ -235,6 +204,8 @@ namespace Engine
 				if (ImGui::MenuItem("Open Script"))
 				{
 					// open script logic
+					openScript = true;
+
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Open script from file.");
@@ -257,16 +228,16 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Edit"))
-			{
-				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
-				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
-				if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
-				if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
-				ImGui::EndMenu();
-			}
+			//if (ImGui::BeginMenu("Edit"))
+			//{
+			//	if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
+			//	if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
+			//	ImGui::Separator();
+			//	if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
+			//	if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
+			//	if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
+			//	ImGui::EndMenu();
+			//}
 
 			// to toggle show which panel
 			if (ImGui::BeginMenu("View"))
@@ -309,6 +280,17 @@ namespace Engine
 		if (saveAsPanel)
 		{
 			saveAsScenePanel();
+		}
+
+		// ========================= Create Script Panel ===========================
+		if (createScript)
+		{
+			CreateScriptPanel();
+		}
+		// ========================== Open Script Panel ============================
+		if (openScript)
+		{
+			OpenScriptPanel();
 		}
 	}
 
@@ -459,10 +441,38 @@ namespace Engine
 			std::vector<std::pair<std::string, std::string>> properties;
 			node->GetProperties(properties);
 
+			auto isNumeric = [](const std::string& s) {
+				if (s.empty()) return false;
+				bool hasDot = false;
+				bool hasDash = false;
+				for (unsigned char c : s) {
+					if (std::isdigit(c)) {
+						continue;
+					}
+					else if (c == '.') {
+						if (hasDot) { 
+							return false; 
+						}
+						hasDot = true;
+					}
+					else if (c == '-') {
+						if (hasDash) { 
+							return false; 
+						}
+						hasDash = true;
+					}
+					else {
+						return false;  // invalid character
+					}
+				}
+				return true;
+				};
+
 			for (auto& [name, value] : properties)
 			{
-				char valueBuffer[256];
+				bool oldIsNumeric = isNumeric(value);
 
+				char valueBuffer[256];
 				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
 
 				float fullWidth = ImGui::GetContentRegionAvail().x;
@@ -471,9 +481,18 @@ namespace Engine
 				// value box (left)
 				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					if (nameBuffer[0] != '\0')
-					{
-						node->SetProperty(name, valueBuffer);
+					std::string newValue = valueBuffer;
+					newValue.erase(newValue.find_last_not_of(" \t\n\r\f\v") + 1);
+					newValue.erase(0, newValue.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newValue.empty()) {
+
+						bool newIsNumeric = isNumeric(newValue);
+						
+						if (!(oldIsNumeric && !newIsNumeric))
+						{
+							node->SetProperty(name, newValue);
+						}
 					}
 				}
 
@@ -949,54 +968,48 @@ namespace Engine
 						auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
 
 						ImGui::Separator();
+					/*	ImGui::Columns(2, nullptr, false);
+						ImGui::SetColumnWidth(0, 200.0f);*/
 
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
-						std::vector<const AssetRecord*> audioAssets;
-						audioAssets.reserve(allAssets.size());
+
+						std::vector<std::string> audioAssetNames;
+						audioAssetNames.reserve(allAssets.size());
+
 						for (const auto* record : allAssets) {
 							if (!record || !record->valid) continue;
+
 							if (record->type == ResourceType::AUDIO) {
-								audioAssets.push_back(record);
+								std::string filepath = record->sourcePath;
+								size_t lastSlash = filepath.find_last_of("/\\");
+								std::string filename = (lastSlash == std::string::npos)
+									? filepath
+									: filepath.substr(lastSlash + 1);
+
+								LOG_DEBUG("Filepath: ", filepath);
+								LOG_DEBUG("Filename: ", filename);
+
+								audioAssetNames.push_back(filename);
 							}
 						}
 
-						// Determine current selection index
+						std::vector<const char*> audioAssets;
+						audioAssets.reserve(audioAssetNames.size());
+						for (auto& name : audioAssetNames)
+							audioAssets.push_back(name.c_str());
+
 						int currentIndex = 0;
-						for (size_t i = 0; i < audioAssets.size(); ++i)
-						{
-							if (audioAssets[i]->sourcePath == audio.AudioFilePath)
-							{
-								currentIndex = (int)i;
+						for (size_t i = 0; i < audioAssetNames.size(); ++i) {
+							if (audioAssetNames[i] == audio.AudioFilePath) {
+								currentIndex = static_cast<int>(i);
 								break;
 							}
 						}
 
-						// Draw the combo box
-						ImGui::Text("Audio File Path:");
-						ImGui::SetNextItemWidth(400.0f);
-						if (ImGui::Combo("##AudioFilePath", &currentIndex,
-							[](void* data, int idx, const char** outText) -> bool
-							{
-								auto& assets = *static_cast<std::vector<const AssetRecord*>*>(data);
-								std::string path = assets[idx]->sourcePath;
-
-								// Extract filename from path
-								size_t lastSlash = path.find_last_of("/\\");
-								static std::string filename; // static to keep it alive for ImGui
-								filename = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
-
-								*outText = filename.c_str();
-								return true;
-							},
-							static_cast<void*>(&audioAssets), (int)audioAssets.size()))
-						{
-							// Extract and save just the filename
-							std::string fullPath = audioAssets[currentIndex]->sourcePath;
-							size_t lastSlash = fullPath.find_last_of("/\\");
-							std::string filename = (lastSlash != std::string::npos) ? fullPath.substr(lastSlash + 1) : fullPath;
-
-							audio.SetAudioFile(filename);
+						std::string label = "Filepath"; // Label for the dropdown
+						if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
+							audio.SetAudioFile(audioAssetNames[currentIndex]);
 						}
 
 						ImGui::Text("Audio Type:");
@@ -1074,7 +1087,7 @@ namespace Engine
 						ImGui::BeginDisabled(!is_3d);
 
 						float min_distance = audio.MinDistance;
-						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance)) {
 							if (is_3d) {
 								audio.SetMinDistance(min_distance);
 							}
@@ -1084,7 +1097,7 @@ namespace Engine
 						}
 
 						float max_distance = audio.MaxDistance;
-						if (ImGui::SliderFloat("MaxDistance", &max_distance, 0.1f, 0.f)) {
+						if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f)) {
 							if (is_3d) {
 								audio.SetMaxDistance(max_distance);
 							}
@@ -1101,10 +1114,14 @@ namespace Engine
 					{
 						m_SelectedEntity.RemoveComponent<AudioComponent>();
 					}
+					
 				}
+				// ========================== Display ReverbZoneComponent =====================================
 				if (m_SelectedEntity.HasComponent<ReverbZoneComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
 					bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
 					bool removeReverb = false;
@@ -1128,11 +1145,8 @@ namespace Engine
 
 					ImGui::Columns(1);
 
-					if (removeReverb)
+					if (openReverbComponent) 
 					{
-						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
-					
-					} else if (openReverbComponent) {
 						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
 						
 						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
@@ -1196,10 +1210,19 @@ namespace Engine
 							reverbZone.SetMaxDistance(maxDistanceReverb);
 						}	
 					}
+					//---------------------- Remove ReverbZone Component by ... -------------------------
+					if (removeReverb)
+					{
+						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
+
+					}
 				}
+				// ====================================== Display ListenerComponent ==================================
 				if (m_SelectedEntity.HasComponent<ListenerComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
 					bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
 					bool removeListener = false;
@@ -1222,11 +1245,8 @@ namespace Engine
 
 					ImGui::Columns(1);
 
-					if (removeListener)
+					if (openListenerComponent)
 					{
-						m_SelectedEntity.RemoveComponent<ListenerComponent>();
-					
-					} else if (openListenerComponent) {
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
@@ -1234,14 +1254,43 @@ namespace Engine
 							listener.Active = active;
 						}
 					}
+					// -------------------------- Remove ListernerComponent -------------------------
+					if (removeListener)
+					{
+						m_SelectedEntity.RemoveComponent<ListenerComponent>();
+
+					}
 				}
+				// =============================== Display BT Component =========================
 				if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
 					bool openBTComponent = ImGui::CollapsingHeader("Behaviour Tree Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeBTComponent = false;
 
-					if (openBTComponent) {
+					ImGui::NextColumn();
+
+					if (ImGui::Button("...###BTBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("BTPopUp");
+					}
+					if (ImGui::BeginPopup("BTPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeBTComponent = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openBTComponent) 
+					{
 
 						auto& ai_bt = m_SelectedEntity.GetComponent<BehaviourTreeComponent>();
 
@@ -1267,6 +1316,7 @@ namespace Engine
 
 							}
 
+							ImGui::Text("Current Asset Path: %s", ai_bt.TreeAssetPath.c_str());
 							ImGui::Text("Stack Depth: %zu", stackDepth);
 
 							if (root)
@@ -1288,7 +1338,6 @@ namespace Engine
 							ImGui::Separator();
 							ImGui::Text("Root Node:");
 
-							// Dropdown to pick node type for new root
 							static int rootNodeTypeIndex = 0;
 							auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
 							ImGui::SetNextItemWidth(200.0f);
@@ -1300,7 +1349,7 @@ namespace Engine
 								},
 								static_cast<void*>(&allTypes), (int)allTypes.size()))
 							{
-								// Optional: nothing here, selection changes root only when button clicked
+								;
 							}
 
 							// Button to create/set the root node
@@ -1382,7 +1431,7 @@ namespace Engine
 							int currentIndex = 0;
 							for (size_t i = 0; i < btAssets.size(); ++i)
 							{
-								if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
+								if (btAssets[i].name == treeAssetPath) // store fullPath in treeAssetPath
 								{
 									currentIndex = (int)i;
 									break;
@@ -1390,7 +1439,7 @@ namespace Engine
 							}
 
 							// Draw the combo box
-							ImGui::Text("Tree Asset Path:");
+							ImGui::Text("Choose Tree Asset Path:");
 							ImGui::SetNextItemWidth(400.0f);
 							if (ImGui::Combo("##TreeAssetPath", &currentIndex,
 								[](void* data, int idx, const char** outText) -> bool
@@ -1401,9 +1450,11 @@ namespace Engine
 									return true;
 								},
 								static_cast<void*>(&btAssets), (int)btAssets.size()))
-							{
-								// Update treeAssetPath when selected
-								ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
+							{	
+								if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+								{
+									treeAssetPath = btAssets[currentIndex].name;
+								}
 							}
 
 							if (ImGui::Button("Load Tree"))
@@ -1412,49 +1463,97 @@ namespace Engine
 								{
 									std::string chosenPath = btAssets[currentIndex].name;
 									ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+									
+									// Update treeAssetPath when selected
+									//std::string filename = std::filesystem::path(btAssets[currentIndex].fullPath).filename().string();
+									//ai_bt.TreeAssetPath = chosenPath; // store full path
 								}
 							}
 
 							if (ImGui::Button("Save Tree")) {
 								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
 							}
+
+							static char changeNewNameBuffer[256] = "";
+							static char saveNewFileName[256] = "";  // Changed from saveNewTreePath - clearer naming
+							static char saveNewTreeName[256] = "";
+
+							if (ImGui::Button("Rename Tree File")) {
+								strncpy_s(changeNewNameBuffer, sizeof(changeNewNameBuffer), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
+								ImGui::OpenPopup("TreeRename Panel");
+							}
+
+							if (ImGui::Button("Save Tree File As")) {
+								strncpy_s(saveNewFileName, sizeof(saveNewFileName), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
+								strncpy_s(saveNewTreeName, sizeof(saveNewTreeName), treeInstance.GetName().c_str(), _TRUNCATE);
+								ImGui::OpenPopup("SaveTreeRename Panel");
+							}
+
+							// Rename Tree Panel
+							if (ImGui::BeginPopupModal("TreeRename Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+							{
+								ImGui::Text("Current file: %s", ai_bt.TreeAssetPath.c_str());
+								ImGui::Separator();
+
+								ImGui::Text("Enter file name ('.json' will be added automatically):");
+								ImGui::InputText("New Tree Filename", changeNewNameBuffer, sizeof(changeNewNameBuffer));
+
+								if (ImGui::Button("Rename File", ImVec2(120, 0))) {
+									std::string newFileName = changeNewNameBuffer;
+									if (!newFileName.empty()) {
+										std::string saveTreeName = newFileName + ".json";
+										BehaviourTreeEditor::RenameFile(ai_bt.TreeAssetPath, saveTreeName, m_Scene);
+										ImGui::CloseCurrentPopup();
+									}
+								}
+
+								ImGui::SameLine();
+
+								if (ImGui::Button("Cancel###RenameCancel", ImVec2(120, 0))) {  // Fixed ID
+									ImGui::CloseCurrentPopup();
+								}
+
+								ImGui::EndPopup();
+							}
+
+							// Save As Panel
+							if (ImGui::BeginPopupModal("SaveTreeRename Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+							{
+								ImGui::Text("Save tree as new file");
+								ImGui::Separator();
+
+								ImGui::Text("Current Asset Path: %s", ai_bt.TreeAssetPath.c_str());
+								ImGui::Text("Enter file name ('.json' will be added automatically):");
+								ImGui::InputText("New Filename", saveNewFileName, sizeof(saveNewFileName));
+								ImGui::InputText("New Tree Name", saveNewTreeName, sizeof(saveNewTreeName));
+
+								if (ImGui::Button("Save As Tree File", ImVec2(120, 0))) {
+									std::string newSaveFileName = saveNewFileName;
+									std::string newSaveTreeName = saveNewTreeName;
+									if (!newSaveFileName.empty() && !newSaveTreeName.empty()) {
+										std::string saveFileName = newSaveFileName + ".json";
+										BehaviourTreeEditor::SaveAs(ai_bt.TreeAssetPath, saveFileName, newSaveTreeName, true);
+										ImGui::CloseCurrentPopup();
+									}
+								}
+
+								ImGui::SameLine();
+
+								if (ImGui::Button("Cancel###SaveAsCancel", ImVec2(120, 0))) {  // Fixed ID
+									ImGui::CloseCurrentPopup();
+								}
+
+								ImGui::EndPopup();
+							}
+
 						}
 						else {
-							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("NewTree");
+							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("PlaceholderTreeName");
 						}
 						
-						// BehaviourTreeEditor:
-						/*CreateNewTree //IN ASSET BROWSER
-						SetNodeProperty //
-						GetAllNodeTypes
-						GetAllCategories
-						ConvertToPrefab //LATER
-						LoadFromPrefab //LATER
-						ValidateTree - Button -> 
-						CloneTree
-						*/
 					}
-
-					bool removeBT = false;
-
-					ImGui::NextColumn();
-
-					if (ImGui::Button("... ###BehaviorbBtn", dotButtonSize))
-					{
-						ImGui::OpenPopup("BehaviorPopUp");
-					}
-					if (ImGui::BeginPopup("BehaviorPopUp"))
-					{
-						if (ImGui::MenuItem("Remove Component"))
-						{
-							removeBT = true;
-						}
-						ImGui::EndPopup();
-					}
-
-					ImGui::Columns(1);
-
-					if (removeBT)
+					// ----------------------------------- Remove BT Component -----------------------
+					if (removeBTComponent)
 					{
 						m_SelectedEntity.RemoveComponent<BehaviourTreeComponent>();
 					}
@@ -1464,9 +1563,34 @@ namespace Engine
 				if (m_SelectedEntity.HasComponent<ParticleComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openParticleComp = ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeParticleComp = false;
+
 					auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
 
-					if (ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen))
+					ImGui::NextColumn();
+					//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
+
+					if (ImGui::Button("...###ParticleBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ParticlePopUp");
+					}
+					if (ImGui::BeginPopup("ParticlePopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeParticleComp = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openParticleComp)
 					{
 						// Playback Controls
 						ImGui::Text("Playback");
@@ -1586,8 +1710,199 @@ namespace Engine
 							particleComp.EmissionAccumulator = 0.0f;
 						}
 					}
+					// ----------------------------------------- Remove Particle Component -------------------------------
+					if (removeParticleComp)
+					{
+						m_SelectedEntity.RemoveComponent<ParticleComponent>();
+					}
 				}
+				// ========================= Display Script Compoment ===============================
+				if (m_SelectedEntity.HasComponent<ScriptComponent>())
+				{
+					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+					
+					bool openScriptComp = ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeScriptComp = false;
 
+
+					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
+					std::string scriptPath = getRepository() + "\\Scripts\\Game";
+					auto scriptFiles = getAssetsInFolder(scriptPath);
+					
+					ImGui::NextColumn();
+
+					if (ImGui::Button("...###ScriptBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ScriptPopUp");
+					}
+					if (ImGui::BeginPopup("ScriptPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeScriptComp = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openScriptComp)
+					{
+						ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+						ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
+
+						if (!scriptFiles.empty())
+						{
+							
+							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
+							{
+								for (const auto& asset : scriptFiles)
+								{
+									std::string className = asset.name;
+									std::cout << className << "//////////////////" << "\n";
+									if (className.ends_with(".cs"))
+									{
+										className = className.substr(0, className.size() - 3); // remove extension
+									}
+									//std::cout << "////// className: " << className << "\n";
+									std::string selectedClassName = "Game." + className;
+
+									//std::cout << "////// selectedClassName: " << selectedClassName << "\n";
+									bool isSelected = (scriptComp.ScriptClassName == selectedClassName);
+									if (ImGui::Selectable(className.c_str(), isSelected))
+									{
+										// Destroy previous script instance if exists
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+											scriptComp.ScriptInstance = nullptr;
+											scriptComp.Started = false;
+										}
+
+										// Assign the new script class
+										scriptComp.ScriptClassName = selectedClassName;
+
+										scriptComp.ScriptInstance = MonoScriptEngine::GetInstance().CreateScriptInstance(scriptComp.ScriptClassName);
+
+										if (scriptComp.ScriptInstance)
+										{
+											MonoScriptEngine::GetInstance().SetFieldValue((MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
+											MonoScriptEngine::GetInstance().CallMethod((MonoObject*)scriptComp.ScriptInstance, "OnStart");
+											scriptComp.Started = true;
+										}
+									}
+
+									if (isSelected)
+									{
+										ImGui::SetItemDefaultFocus();
+									}
+								}
+								ImGui::EndCombo();
+							}
+						}
+
+					}
+					// ----------------------------- Remove Script Comp --------------------------------------
+					if (removeScriptComp)
+					{
+						m_SelectedEntity.RemoveComponent<ScriptComponent>();
+					}
+
+				}
+				// ================================ Display Light Component ======================================
+				if (m_SelectedEntity.HasComponent<LightComponent>())
+				{
+					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openLightComp = ImGui::CollapsingHeader("Light Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeLightComp = false;
+
+					ImGui::NextColumn();
+					//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
+
+					if (ImGui::Button("...###LightBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("LightPopUp");
+					}
+					if (ImGui::BeginPopup("LightPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeLightComp = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openLightComp)
+					{
+						auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
+						ImGui::Checkbox("Enabled", &lightComp.Enabled);
+
+						// --- Light Type Dropdown ---
+						const char* lightTypeNames[] = { "Directional", "Point", "Spot" };
+						int currentType = static_cast<int>(lightComp.Type);
+
+						if (ImGui::Combo("Type", &currentType, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
+						{
+							lightComp.SetType(static_cast<LightType>(currentType));
+						}
+
+						// --- Color ---
+						glm::vec3 color = lightComp.Color;
+						if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
+						{
+							lightComp.SetColorLinear(color); // uses setter
+						}
+
+						
+						// --- Intensity ---
+						float intensity = lightComp.Intensity;
+						if (ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, 100.0f, "%.2f"))
+						{
+							lightComp.SetIntensity(intensity); //  uses setter
+						}
+
+
+						// --- Range  ---
+						if (lightComp.Type != LightType::Directional)
+						{
+							float range = lightComp.Range;
+							if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, 1000.0f, "%.2f"))
+							{
+								lightComp.SetRange(range); // uses setter
+							}
+						}
+
+						if (lightComp.Type == LightType::Spot)
+						{
+							float spotAngle = lightComp.SpotAngleDeg;
+							if (ImGui::DragFloat("Spot Angle", &spotAngle, 0.1f, 1.0f, 179.0f, "%.2f"))
+							{
+								lightComp.SetSpotAngleDeg(spotAngle); // uses setter
+							}
+						}
+						// --- Indirect Multiplier ---
+						float indirectMult = lightComp.IndirectMultiplier;
+						if (ImGui::DragFloat("Indirect Multiplier", &indirectMult, 0.01f, 0.0f, 10.0f, "%.2f"))
+						{
+							lightComp.SetIndirectMultiplier(indirectMult); // uses setter
+						}
+
+					}
+					// ---------------------------- Remove Light Comp --------------------------
+					if (removeLightComp)
+					{
+						m_SelectedEntity.RemoveComponent<LightComponent>();
+					}
+				}
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -1750,6 +2065,7 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Particle Component ----------------------------
 					bool hasParticleSystem = m_SelectedEntity.HasComponent<ParticleComponent>();
 					ImGui::BeginDisabled(hasParticleSystem);
 
@@ -1769,7 +2085,45 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Script Component ----------------------------
+					bool hasScriptComponent = m_SelectedEntity.HasComponent<ScriptComponent>();
+					ImGui::BeginDisabled(hasScriptComponent);
+
+					if (ImGui::MenuItem("Script Component"))
+					{
+						if (!hasScriptComponent)
+						{
+							m_SelectedEntity.AddComponent<ScriptComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasScriptComponent)
+						{
+							ImGui::SetTooltip("Add script to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 					//ImGui::SetWindowFontScale(1.0f); // Reset
+					// ------------------------ Add Light Component ----------------------------
+					bool hasLightComponent = m_SelectedEntity.HasComponent<LightComponent>();
+					ImGui::BeginDisabled(hasLightComponent);
+
+					if (ImGui::MenuItem("Light Component"))
+					{
+						if (!hasLightComponent)
+						{
+							m_SelectedEntity.AddComponent<LightComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasLightComponent)
+						{
+							ImGui::SetTooltip("Add script to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 
 					ImGui::EndPopup(); // end pop up for Add Component  
 				}
@@ -2089,6 +2443,9 @@ namespace Engine
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Text("Projects:");
 
+			bool inRawResouces = false;
+			bool inComposedResources = false;
+
 			// For resources handled by Asset Browser
 			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -2113,6 +2470,8 @@ namespace Engine
 						raw_asset = true;
 						selectedType = type;
 						selectedFolder = typeName;
+						//inRawResouces = true;
+						//inComposedResources = false;
 						selectedResourcesIndex = -1;
 					}
 				}
@@ -2129,6 +2488,7 @@ namespace Engine
 						bool isSelected = (selectedFolder == folder.fullPath);
 						if (ImGui::Selectable(folder.name.c_str(), isSelected))
 						{
+							selectedType = ResourceType::UNKNOWN;
 							raw_asset = false;
 							selectedFolder = folder.fullPath;
 							selectedResourcesIndex = -1; // reset asset selection
@@ -2228,8 +2588,8 @@ namespace Engine
 									editedAsset = filename;
 								}
 
-								ImGui::EndPopup();
 							}
+							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -3350,16 +3710,162 @@ namespace Engine
 				}
 			}
 		}
+	}
 
-		//// Use screen coordinates for the mode label too
-		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		//ImGui::GetForegroundDrawList()->AddText(
-		//	modeLabelPos,
-		//	IM_COL32(255, 230, 100, 255),
-		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		//);
+	void Editor::CreateScriptPanel()
+	{
+		if (createScript)
+		{
+			ImGui::OpenPopup("Create Script Panel");
+		}
+
+		if (ImGui::BeginPopupModal("Create Script Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			static char scriptNewBuffer[128] = "";
+			static std::string newScriptName{};
+
+			ImGui::Text("Enter new script name:");
+			if (ImGui::InputText("##NewScriptName", scriptNewBuffer, sizeof(scriptNewBuffer)))
+			{
+				newScriptName = scriptNewBuffer;
+			}
+
+			if (ImGui::Button("Create", ImVec2(120, 0)))
+			{
+				if (!newScriptName.empty())
+				{
+					if (newScriptName.ends_with(".cs"))
+						newScriptName = newScriptName.substr(0, newScriptName.size() - 3);
+
+					std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + newScriptName + ".cs"; // get the saving path
+
+					// writing script template 
+					std::string scriptTemplate =
+						"using Engine;\n"
+						"using System;\n\n"
+						"namespace Game\n"
+						"{\n"
+						"    public class " + newScriptName + "\n"
+						"    {\n"
+						"        public override void OnStart()\n"
+						"        {\n"
+						//"            Log.Info(\"" + newScriptName + " started!\");\n"
+						"			 Engine.InternalCalls.Log(\"" + newScriptName + " started!\");\n"
+						"        }\n\n"
+						"        public override void OnUpdate(float deltaTime)\n"
+						"        {\n"
+						"\n"
+						"        }\n"
+						"    }\n"
+						"}\n";
+
+					std::ofstream outFile(scriptPath);
+					if (outFile.is_open())
+					{
+						outFile << scriptTemplate;
+						outFile.close();
+						OpenScriptInEditor(newScriptName); // to open script after created
+
+						//std::cout << "[Editor] Created new script: " << scriptPath << "\n";
+					}
+					
+
+					scriptNewBuffer[0] = '\0';
+					newScriptName.clear();
+					createScript = false;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				createScript = false;
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void Editor::OpenScriptPanel()
+	{
+		
+		if (openScript)
+		{
+			ImGui::OpenPopup("Open Script");
+		}
+
+		// pop up panel to open scene file
+		if (ImGui::BeginPopupModal("Open Script", nullptr, ImGuiWindowFlags_NoDocking))
+		{
+			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+
+			std::string scriptPath = getRepository() + "\\Scripts\\Game";
+			auto getScriptFiles = getAssetsInFolder(scriptPath);
+
+			ImGui::Text("Select a script to open:");
+			ImGui::Separator();
+
+			if (getScriptFiles.empty())
+			{
+				ImGui::TextDisabled("No script files found in:");
+				ImGui::TextWrapped("%s", scriptPath.c_str());
+			}
+			else
+			{
+				for (const auto& scriptFile : getScriptFiles)
+				{
+					if (ImGui::Selectable(scriptFile.name.c_str()))
+					{
+						OpenScriptInEditor(scriptFile.name.c_str());
+						openScript = false;
+					}
+				}
+			}
+			
+			ImGui::Separator();
+			if (ImGui::Button("Cancel"))
+			{
+				openScript = false; //  reset after click cancel button
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup(); 
+		}
+		
+	}
+
+	bool Editor::OpenScriptInEditor(const std::string& scriptName)
+	{
+		std::string sanitizedName = scriptName;
+		if (sanitizedName.ends_with(".cs"))
+		{
+			sanitizedName = sanitizedName.substr(0, sanitizedName.size() - 3);
+		}
+
+		std::string scriptPath = getRepository() + "\\Scripts\\Game\\" + sanitizedName + ".cs";
+
+		if (!std::filesystem::exists(scriptPath))
+		{
+			//std::cerr << "[Editor] Script not found: " << scriptPath << "\n";
+			return false;
+		}
+		try
+		{
+			std::string windowsPath = scriptPath;
+			std::replace(windowsPath.begin(), windowsPath.end(), '/', '\\');
+
+			std::string command = "start \"\" \"" + windowsPath + "\"";
+
+			int result = system(command.c_str());
+			return result == 0;
+		}
+		catch (const std::exception& e)
+		{
+			return false;
+		}
 	}
 
 } // end of namespace Engine

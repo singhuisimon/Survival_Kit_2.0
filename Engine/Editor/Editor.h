@@ -37,8 +37,12 @@
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
-#include "../Serialization/PrefabInstantiator.h"
 #include "../Asset/DescriptorEditor.h"
+#include "../Scripting/MonoScriptEngine.h"
+#include "../Scripting/ScriptReloader.h"
+#include "../Component/ScriptComponent.h"
+
+
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
@@ -196,6 +200,13 @@ namespace Engine
 		void DrawEntityRecursive(Entity entity, entt::registry& registry);
 
 		void ManipulateEntityTransform(Entity& entity);
+
+		// Script helper function
+		void CreateScriptPanel();
+
+		void OpenScriptPanel();
+
+		bool OpenScriptInEditor(const std::string& scriptName);
 	};
 
 

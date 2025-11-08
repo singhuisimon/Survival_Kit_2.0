@@ -118,7 +118,7 @@ namespace Engine {
 
 namespace Engine {
 
-	Renderer::Renderer(Camera3D& cam, Light& light) : editor_camera(cam), editor_light(light) {}
+	Renderer::Renderer(Camera3D& cam) : editor_camera(cam) {}
 
 	// On first load, setup some simple stuff
 	void Renderer::setup() {
@@ -142,6 +142,42 @@ namespace Engine {
 
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
+
+#pragma region TESTING LOADING UBO FOR MATERIALS
+		// -------- Materials UBO (binding = 1)  --------
+		glCreateBuffers(1, &m_materialUBO);
+		glNamedBufferData(m_materialUBO, sizeof(MaterialUBO_Std140), nullptr, GL_DYNAMIC_DRAW);
+
+		// Bind the buffer to binding point 1 (match `binding = 1` in GLSL)
+		glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_materialUBO);
+		auto bindMaterialBlock = [&](GLuint programID) {
+			GLuint blockIndex = glGetUniformBlockIndex(programID, "MaterialBlock");
+			if (blockIndex != GL_INVALID_INDEX) {
+				glUniformBlockBinding(programID, blockIndex, 1);
+			}
+			};
+
+		// Call for the object shader(s) that read `material`
+		// Assuming program 0 is your main object shader (survival_kit_obj.*)
+		bindMaterialBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // adjust accessor if different
+		// If your debug or other passes use the material, bind them too:
+		// bindMaterialBlock(m_gl.m_shader_storage[1].program());
+#pragma endregion
+
+#pragma region TESTING LOADING UBO FOR LIGHTINGS
+		// -------- Lights UBO (binding = 0)  --------
+		glCreateBuffers(1, &m_lightsUBO);
+		glNamedBufferData(m_lightsUBO, sizeof(LightsBlockGPU), nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_lightsUBO);
+
+		auto bindLightsBlock = [&](GLuint programID) {
+			GLuint blockIndex = glGetUniformBlockIndex(programID, "LightsBlock");
+			if (blockIndex != GL_INVALID_INDEX) {
+				glUniformBlockBinding(programID, blockIndex, 0);
+			}
+			};
+		bindLightsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // object shader
+#pragma endregion
 
 		// Set default picked ID 
 		pickedID = NO_HIT;
@@ -334,9 +370,7 @@ namespace Engine {
 
 		// If this pass targets the GPU-ID FBO (Shader program 2, R32UI), clear with integer clear:
 		if (pass.shdpgm_handle == 2) {
-			//auto& fbo = m_framebuffers[pass.fbo_handle];
-			// 0 means "no hit" � reserve ID=0 as empty
-			//fbo.clear_colori(/*drawbuf index*/169, 0, 0, 0, 0);
+			// entt::null == NO_HIT
 			fbo.clear_colorui(/*drawbuf index*/0, NO_HIT, 0, 0, 0);
 		}
 
@@ -389,7 +423,9 @@ namespace Engine {
 		prog.programUse();
 	}
 
-	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list) {
+	void Renderer::render_frame(std::span<const DrawItem> draw_items,
+								std::span<const CameraComponent> camera_list,
+								std::span<const LightCPU> lights) {
 
 		// For rendering from editor's camera
 		if (isEditorCamOn) {
@@ -418,7 +454,7 @@ namespace Engine {
 
 				// Begin drawing frame
 				beginFrame(pass);
-				draw(pass, draw_items, v, p);
+				draw(pass, draw_items, v, p, lights);
 				endFrame(pass);
 
 				// Read ID at mouse position for GPU ID pass
@@ -427,15 +463,12 @@ namespace Engine {
 					// Get mouse position WRT window client
 					double mx, my;
 					glfwGetCursorPos(glfwGetCurrentContext(), &mx, &my);
-					//LOG_INFO("MX and MY: ", mx, " ", my);
 
 					// Check mouse pos if inside viewport panel
 					if (mx >= renderEditorVP.tl.x && mx <= (renderEditorVP.tl.x + renderEditorVP.size.x)
 						&& my >= renderEditorVP.tl.y && my <= (renderEditorVP.tl.y + renderEditorVP.size.y)) {
 
 						// Normalize mouse position to viewport panel's top left position 
-						//LOG_INFO("u Calculation ", mx, " - ", renderEditorVP.tl.x, " / ", renderEditorVP.size.x);
-						//LOG_INFO("v Calculation ", my, " - ", renderEditorVP.tl.y, " / ", renderEditorVP.size.y);
 						float u = float(mx - renderEditorVP.tl.x) / renderEditorVP.size.x;
 						float v = float(my - renderEditorVP.tl.y) / renderEditorVP.size.y;
 
@@ -451,20 +484,13 @@ namespace Engine {
 						glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
 						glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
-						////LOG_INFO("Px Py = ", px," ", py);
-						//if (id == NO_HIT) {
-						//	LOG_INFO("GPU id = No Object");
-						//}
-						//else {
-						//	LOG_INFO("GPU id = ", id);
-						//}
-
 						// Save Picked ID to somewhere (entt::null will be used as NO_HIT)
 						pickedID = id;
 					}
 				}
 			}
-		} else {
+		}
+		else {
 			// For rendering all enabled camera displays
 			for (const auto& cam : camera_list) {
 
@@ -489,7 +515,7 @@ namespace Engine {
 
 					// Begin drawing frame
 					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
-					draw(pass, draw_items, cam.View, cam.Persp);
+					draw(pass, draw_items, cam.View, cam.Persp, lights);
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
 			}
@@ -497,7 +523,11 @@ namespace Engine {
 
 	}
 
-	void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4 v, const glm::mat4 p) {
+	void Renderer::draw(RenderPass const& pass,
+		std::span<const DrawItem> draw_items,
+		const glm::mat4 v,
+		const glm::mat4 p,
+		std::span<const LightCPU> lights) {
 
 
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
@@ -505,10 +535,8 @@ namespace Engine {
 		prog.setUniform("V", v);					// View transform
 		prog.setUniform("P", p);					// Perspective transform
 
-		prog.setUniform("light.position", editor_light.getLightPos());      // Position
-		prog.setUniform("light.La", editor_light.getLightAmbient());        // Ambient
-		prog.setUniform("light.Ld", editor_light.getLightDiffuse());        // Diffuse
-		prog.setUniform("light.Ls", editor_light.getLightSpecular());       // Specular
+		// Light setting
+		prog.setUniform("uExposure", 2.0f); // Exposure
 
 		for (const auto& item : draw_items) {
 
@@ -535,45 +563,33 @@ namespace Engine {
 
 			// Temporary transformations
 			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
+			//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
+			//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
+			//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
+			//prog.setUniform("material.shininess", test_material.getMaterialShininess());
 
-			// Check for material resource
-			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
-			{
-				// New workflow has no ambient lighting
-				prog.setUniform("material.Kd", glm::vec3(material_resource->diffuseColor[0], 
-																   material_resource->diffuseColor[1], 
-																   material_resource->diffuseColor[2]));
+#pragma region TESTING UBO FOR MATERIALS
+			MaterialUBO_Std140 mubo;
+			mubo.Ka = test_material.getMaterialAmbient();
+			mubo._pad0 = 0.0f;
+			mubo.Kd = test_material.getMaterialDiffuse();
+			mubo._pad1 = 0.0f;
+			mubo.Ks = test_material.getMaterialSpecular();
+			mubo.shininess = test_material.getMaterialShininess();
 
-				prog.setUniform("material.Ks", glm::vec3(material_resource->specularColor[0],
-																   material_resource->specularColor[1],
-																   material_resource->specularColor[2]));
+			// Update UBO (48 bytes)
+			glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+#pragma endregion
 
-				// The alpha value is stored in the diffuse color's alpha channel, this value is used to control the transparency of the material
-				prog.setUniform("material.alpha", material_resource->diffuseColor[3]);
-				prog.setUniform("material.shininess", material_resource->shininess);
+#pragma region TESTING UBO FOR LIGHTING
+			// --- per-object light culling + upload ---
+			// Object center/radius (approx): extract translation; radius = heuristic
+			glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
+			const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
 
-				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
-					glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-					prog.setUniform("Texture2D", 0);
-					prog.setUniform("isTexture", true);
-
-					if (texture_resource->format == "sRGB") {
-						prog.setUniform("isGamma", true);
-					}
-					else {
-						prog.setUniform("isGamma", false);
-					}
-
-				}
-			}
-			else
-			{
-				prog.setUniform("isTexture", false);
-				prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-				prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-				prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-				prog.setUniform("material.shininess", test_material.getMaterialShininess());
-			}
+			uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
+			(void)usedLights; // block is visible to shader via binding=0
+#pragma endregion
 
 			size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
 
@@ -654,5 +670,85 @@ namespace Engine {
 			fpfbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
 			fpfbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
 		}
+	}
+
+	// Build a small per-draw light list with simple sphere-sphere test and brightness score
+	uint32_t Renderer::buildAndUploadLightsForDraw(const glm::vec3& objCenter, float objRadius,
+												   std::span<const LightCPU> sceneLights) {
+
+		// For scoring the lights to sort subsequently
+		struct Ref { uint32_t idx; float score; };
+		std::vector<Ref> picked; picked.reserve(32);
+
+		auto luminance = [](glm::vec3 c) { return 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b; };
+
+		for (uint32_t i = 0; i < sceneLights.size(); ++i) {
+			const auto& L = sceneLights[i];
+
+			// Quick reject by type/range
+			if (L.type == LIGHT_POINT || L.type == LIGHT_SPOT) {
+				// Get distance between object center and light
+				float d2 = glm::dot(L.position - objCenter, L.position - objCenter);
+
+				// Compute light limit using its range and object radius; Cull if out of sphere range
+				float lim = L.range + objRadius;
+				if (d2 > lim * lim) continue;
+			}
+
+			// Compute and store base values
+			float base = luminance(L.color) * L.intensity;
+			float invd2 = 1.0f;
+			float angle = 1.0f;
+
+			// For Point and Spot
+			if (L.type != LIGHT_DIRECTIONAL) {
+				float d = glm::length(L.position - objCenter) - objRadius;
+				d = glm::max(d, 1e-3f);
+				invd2 = 1.0f / (d * d);
+			}
+
+			// For Spot only
+			if (L.type == LIGHT_SPOT) {
+				glm::vec3 v = glm::normalize(objCenter - L.position);
+				float cosT = glm::dot(v, glm::normalize(L.direction));
+				angle = glm::clamp((cosT - L.cosOuter) / glm::max(1e-3f, (L.cosInner - L.cosOuter)), 0.0f, 1.0f);
+			}
+
+			// Store the final value for the picked light
+			picked.push_back({ i, base * invd2 * angle });
+		}
+
+		// Keep directionals first (stable)
+		std::stable_sort(picked.begin(), picked.end(), [](const Ref& a, const Ref& b) { return a.score > b.score; });
+
+		// cap lights per draw
+		const uint32_t MAX_PER_DRAW = 12;
+		if (picked.size() > MAX_PER_DRAW) picked.resize(MAX_PER_DRAW);
+
+		// pack to UBO to send to GPU
+		m_lightsCPU.ambient_indirect = glm::vec4(0.005f, 0.005f, 0.005f, 1.0f); // a=global indirect multiplier (future)
+		m_lightsCPU.count = glm::uvec4((uint32_t)picked.size(), 0, 0, 0);
+
+		// Pack all picked lights into GLSL-friendly std140 UBO pack
+		for (uint32_t j = 0; j < (uint32_t)picked.size(); ++j) {
+
+			// Find light from original light list using index
+			const auto& L = sceneLights[picked[j].idx];
+
+			// Create std140 GPU UBO pack
+			LightGPUStd140 G;
+			G.color_intensity = glm::vec4(L.color, L.intensity);								// rgb + intensity
+			G.position_range = glm::vec4(L.position, L.range);									// xyz (world) + range
+			G.direction_type = glm::vec4(glm::normalize(L.direction), float(L.type));			// xyz (world dir) + type (float)
+			G.spot_cos_misc = glm::vec4(L.cosInner, L.cosOuter, L.indirectMultiplier, 0.0f);	// x=cosInner, y=cosOuter, z=indirect, w=unused
+
+			// Store GPU UBO pack
+			m_lightsCPU.lights[j] = G;
+		}
+
+		// Send LightsBlockGPU over
+		glNamedBufferSubData(m_lightsUBO, 0, sizeof(LightsBlockGPU), &m_lightsCPU);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_lightsUBO);
+		return (uint32_t)picked.size();
 	}
 }

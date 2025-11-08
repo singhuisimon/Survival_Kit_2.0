@@ -114,13 +114,58 @@ struct DescriptorInfo {
 };
 
 std::vector<DescriptorInfo> discoverDescriptors(const std::string& descriptorsRoot, 
-                                                  const std::string& typeFilter) {
+                                                  const std::string& typeFilter,
+                                                  const std::string& guidFilter = "") {
     std::vector<DescriptorInfo> descriptors;
     
     if (!fs::exists(descriptorsRoot)) {
         std::cerr << "ERROR: Descriptors path does not exist: " << descriptorsRoot << "\n";
         return descriptors;
     }
+
+    //OPTIMIZATION: IF GUID and type are already both specified, directly construct the path 
+    if (!guidFilter.empty() && !typeFilter.empty()) {
+        std::cout << "Looking for specific asset: " << typeFilter << "/" << guidFilter << "\n";
+
+        // Extract last 4 characters for folder structure
+            // Example: 5F7ED05B14224003 -> folders: "40/03"
+        std::string dir1 = guidFilter.substr(12, 2);  // Characters 13-14
+        std::string dir2 = guidFilter.substr(14, 2);  // Characters 15-16
+
+        // Construct the exact path
+        fs::path guidPath = fs::path(descriptorsRoot) / typeFilter / dir1 / dir2 / guidFilter;
+        fs::path infoPath = guidPath / "Info.txt";
+        fs::path descPath = guidPath / "Descriptor.txt";
+
+        if (fs::exists(infoPath) && fs::exists(descPath)) {
+            DescriptorInfo info;
+            info.guidFolder = guidPath.string();
+            info.infoFile = infoPath.string();
+            info.descriptorFile = descPath.string();
+            info.resourceType = typeFilter;
+            info.guid = guidFilter;
+
+            descriptors.push_back(info);
+            std::cout << "Found asset at: " << guidPath << "\n";
+        }
+        else {
+            std::cerr << "ERROR: Asset not found at: " << guidPath << "\n";
+            if (!fs::exists(guidPath)) {
+                std::cerr << "       Folder does not exist: " << guidPath << "\n";
+            }
+            else {
+                if (!fs::exists(infoPath)) {
+                    std::cerr << "       Missing Info.txt\n";
+                }
+                if (!fs::exists(descPath)) {
+                    std::cerr << "       Missing Descriptor.txt\n";
+                }
+            }
+        }
+
+        return descriptors;
+
+    }// end of optimization
     
     std::cout << "Scanning descriptors in: " << descriptorsRoot << "\n";
     

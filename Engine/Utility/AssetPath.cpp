@@ -216,8 +216,7 @@ namespace Engine {
         fs::path currentPath = fs::current_path();
 
         while (!currentPath.empty()) {
-            if (fs::exists(currentPath / "Survival_Kit.sln") ||
-                fs::exists(currentPath / ".git")) {
+            if (fs::exists(currentPath / "build")) {
                 std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
                 return currentPath.string();
             }
