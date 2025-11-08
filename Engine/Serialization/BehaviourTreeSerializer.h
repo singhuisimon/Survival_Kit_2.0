@@ -47,13 +47,14 @@ namespace Engine {
          */
         static std::shared_ptr<BehaviourTree> DeserializeFromFile(const std::string& filepath, bool prefab = false);
 
-    private:
+        // moved GetSourcePath to public
 
         /**
         * @brief Get the source file path (project root Resources folder)
         */
         static std::string GetSourceFilePath(const std::string& relativePath);
 
+    private:
 
         /**
          * @brief Write JSON string to file with directory creation

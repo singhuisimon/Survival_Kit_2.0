@@ -3,7 +3,7 @@
  * @brief Property metadata system for behaviour tree nodes
  * @author AI System Team
  * @date 2025
- * 
+ *
  * Integrates BT nodes with the engine's Property/Reflection system
  */
 
@@ -26,15 +26,28 @@ namespace Engine {
         PropertyType Type;
         std::function<std::string(BTNode*)> Getter;   // Returns string representation
         std::function<void(BTNode*, const std::string&)> Setter;
-        
+        std::vector<std::string> EnumOptions;
+
         BTNodePropertyDescriptor() = default;
-        
+
+        //Constructor for regular properties
         BTNodePropertyDescriptor(
             const std::string& name,
             PropertyType type,
             std::function<std::string(BTNode*)> getter,
             std::function<void(BTNode*, const std::string&)> setter)
-            : Name(name), Type(type), Getter(getter), Setter(setter) {}
+            : Name(name), Type(type), Getter(getter), Setter(setter) {
+        }
+
+        // Constructor for enum properties (constructor overloading)
+        BTNodePropertyDescriptor(
+            const std::string& name,
+            PropertyType type,
+            std::function<std::string(BTNode*)> getter,
+            std::function<void(BTNode*, const std::string&)> setter,
+            const std::vector<std::string> enumOptions)
+            : Name(name), Type(type), Getter(getter), Setter(setter), EnumOptions(enumOptions) {
+        }
     };
 
     /**
@@ -43,11 +56,12 @@ namespace Engine {
     class BTNodeMetadata {
     public:
         BTNodeMetadata(const std::string& typeName, const std::string& category)
-            : m_TypeName(typeName), m_Category(category) {}
+            : m_TypeName(typeName), m_Category(category) {
+        }
 
         const std::string& GetTypeName() const { return m_TypeName; }
         const std::string& GetCategory() const { return m_Category; }
-        
+
         void AddProperty(const BTNodePropertyDescriptor& descriptor) {
             m_Properties.push_back(descriptor);
         }
@@ -90,9 +104,9 @@ namespace Engine {
     /**
      * @brief Helper macros for registering node properties
      */
-    
-    // Register a float property
-    #define BT_REGISTER_FLOAT_PROPERTY(NodeType, PropertyName, MemberVar) \
+
+     // Register a float property
+#define BT_REGISTER_FLOAT_PROPERTY(NodeType, PropertyName, MemberVar) \
         metadata.AddProperty(BTNodePropertyDescriptor( \
             PropertyName, \
             PropertyType::Float, \
@@ -107,7 +121,7 @@ namespace Engine {
         ))
 
     // Register an int property
-    #define BT_REGISTER_INT_PROPERTY(NodeType, PropertyName, MemberVar) \
+#define BT_REGISTER_INT_PROPERTY(NodeType, PropertyName, MemberVar) \
         metadata.AddProperty(BTNodePropertyDescriptor( \
             PropertyName, \
             PropertyType::Int, \
@@ -122,7 +136,7 @@ namespace Engine {
         ))
 
     // Register a bool property
-    #define BT_REGISTER_BOOL_PROPERTY(NodeType, PropertyName, MemberVar) \
+#define BT_REGISTER_BOOL_PROPERTY(NodeType, PropertyName, MemberVar) \
         metadata.AddProperty(BTNodePropertyDescriptor( \
             PropertyName, \
             PropertyType::Bool, \
@@ -137,7 +151,7 @@ namespace Engine {
         ))
 
     // Register a string property
-    #define BT_REGISTER_STRING_PROPERTY(NodeType, PropertyName, MemberVar) \
+#define BT_REGISTER_STRING_PROPERTY(NodeType, PropertyName, MemberVar) \
         metadata.AddProperty(BTNodePropertyDescriptor( \
             PropertyName, \
             PropertyType::String, \
@@ -223,10 +237,10 @@ namespace Engine {
         ))
 
     // Enum property (uses conversion helpers)
-    #define BT_REGISTER_ENUM_PROPERTY(NodeType, PropertyName, MemberVar, EnumToStr, StrToEnum) \
-        metadata.AddProperty(BTNodePropertyDescriptor{ \
+#define BT_REGISTER_ENUM_PROPERTY(NodeType, PropertyName, MemberVar, EnumToStr, StrToEnum, EnumOptions) \
+        metadata.AddProperty(BTNodePropertyDescriptor( \
             PropertyName, \
-            PropertyType::String, \
+            PropertyType::Enum, \
             [](BTNode* node) { \
                 auto* n = static_cast<NodeType*>(node); \
                 return EnumToStr(n->MemberVar); \
@@ -234,7 +248,8 @@ namespace Engine {
             [](BTNode* node, const std::string& value) { \
                 auto* n = static_cast<NodeType*>(node); \
                 n->MemberVar = StrToEnum(value); \
-            } \
-        })
+            }, \
+            EnumOptions \
+        ))
 
 } // namespace Engine

@@ -14,6 +14,7 @@
 #include "../Component/TransformComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Transform/TransformSystem.h"
+#include "../Component/LightComponent.h"
 
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
@@ -119,7 +120,7 @@ namespace Engine
 			if (ImGui::BeginMenu("File"))
 			{
 				// --------------- New Scene -------------------
-				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+				if (ImGui::MenuItem("New Scene"))
 				{
 					if (m_Scene)
 					{
@@ -132,7 +133,7 @@ namespace Engine
 					ImGui::SetTooltip("Create new scene.");
 
 				// --------------- Open Scene -------------------
-				if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
+				if (ImGui::MenuItem("Open Scene..."))
 				{
 					openScenePanel = true;
 				}
@@ -140,7 +141,7 @@ namespace Engine
 					ImGui::SetTooltip("Open scene from file.");
 
 				// --------------- Save Scene -------------------
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+				if (ImGui::MenuItem("Save Scene"))
 				{
 					
 					//if (isPrefabEditor && !currPrefabPath.empty() && m_Scene->GetName() == "Prefab")
@@ -168,42 +169,9 @@ namespace Engine
 								}
 							}
 
-							//if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-							//{
-							//	auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
-							//	std::string prefabPath = currPrefabPath;
-
-							//	if (!prefabPath.empty())
-							//	{
-							//		// Create updated prefab from current entity state
-							//		std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-							//		auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-							//		if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-							//		{
-							//			PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-							//			m_TemporaryPrefabPaths.erase(currPrefabPath);
-							//			prefabComp.ClearModifications(); // Reset overrides 
-							//			LOG_INFO("Prefab updated: {}", prefabPath);
-							//		}
-							//	}
-							//}
+						
 						}
 					}
-					/*else if (!currScenePath.empty())
-					{
-						//SceneSerializer serializer(m_Scene);
-
-						//if (serializer.Serialize(currScenePath))
-						//{
-						//	m_TemporaryPrefabPaths.clear(); // remove from temporary list
-						//	//PrefabInstantiator::InstantiateScenePrefab()
-						//
-						//}
-						m_Scene->SaveToFile(currScenePath);
-						LOG_DEBUG("current scene is ", currScenePath);
-					}*/
 					else
 					{
 						if (!currScenePath.empty())
@@ -221,7 +189,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("Save Scene As..."))
 				{
 					saveAsPanel = true;
 				}
@@ -258,16 +226,16 @@ namespace Engine
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Edit"))
-			{
-				if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
-				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
-				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
-				if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
-				if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
-				ImGui::EndMenu();
-			}
+			//if (ImGui::BeginMenu("Edit"))
+			//{
+			//	if (ImGui::MenuItem("Undo", "Ctrl+Z", false, false)) {}  // Disabled for now
+			//	if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {}  // Disabled for now
+			//	ImGui::Separator();
+			//	if (ImGui::MenuItem("Cut", "Ctrl+X", false, false)) {}
+			//	if (ImGui::MenuItem("Copy", "Ctrl+C", false, false)) {}
+			//	if (ImGui::MenuItem("Paste", "Ctrl+V", false, false)) {}
+			//	ImGui::EndMenu();
+			//}
 
 			// to toggle show which panel
 			if (ImGui::BeginMenu("View"))
@@ -480,12 +448,22 @@ namespace Engine
 			auto isNumeric = [](const std::string& s) {
 				if (s.empty()) return false;
 				bool hasDot = false;
+				bool hasDash = false;
 				for (unsigned char c : s) {
-					if (std::isdigit(c))
+					if (std::isdigit(c)) {
 						continue;
+					}
 					else if (c == '.') {
-						if (hasDot) return false;  // only one dot allowed
+						if (hasDot) { 
+							return false; 
+						}
 						hasDot = true;
+					}
+					else if (c == '-') {
+						if (hasDash) { 
+							return false; 
+						}
+						hasDash = true;
 					}
 					else {
 						return false;  // invalid character
@@ -843,6 +821,8 @@ namespace Engine
 						auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
 
 						ImGui::Separator();
+					/*	ImGui::Columns(2, nullptr, false);
+						ImGui::SetColumnWidth(0, 200.0f);*/
 
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
@@ -987,10 +967,14 @@ namespace Engine
 					{
 						m_SelectedEntity.RemoveComponent<AudioComponent>();
 					}
+					
 				}
+				// ========================== Display ReverbZoneComponent =====================================
 				if (m_SelectedEntity.HasComponent<ReverbZoneComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
 					bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
 					bool removeReverb = false;
@@ -1014,11 +998,8 @@ namespace Engine
 
 					ImGui::Columns(1);
 
-					if (removeReverb)
+					if (openReverbComponent) 
 					{
-						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
-					
-					} else if (openReverbComponent) {
 						auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
 						
 						const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };	
@@ -1082,10 +1063,19 @@ namespace Engine
 							reverbZone.SetMaxDistance(maxDistanceReverb);
 						}	
 					}
+					//---------------------- Remove ReverbZone Component by ... -------------------------
+					if (removeReverb)
+					{
+						m_SelectedEntity.RemoveComponent<ReverbZoneComponent>();
+
+					}
 				}
+				// ====================================== Display ListenerComponent ==================================
 				if (m_SelectedEntity.HasComponent<ListenerComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
 					bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
 					bool removeListener = false;
@@ -1108,11 +1098,8 @@ namespace Engine
 
 					ImGui::Columns(1);
 
-					if (removeListener)
+					if (openListenerComponent)
 					{
-						m_SelectedEntity.RemoveComponent<ListenerComponent>();
-					
-					} else if (openListenerComponent) {
 						auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
 						bool& active = listener.Active;
 
@@ -1120,14 +1107,43 @@ namespace Engine
 							listener.Active = active;
 						}
 					}
+					// -------------------------- Remove ListernerComponent -------------------------
+					if (removeListener)
+					{
+						m_SelectedEntity.RemoveComponent<ListenerComponent>();
+
+					}
 				}
+				// =============================== Display BT Component =========================
 				if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
 					bool openBTComponent = ImGui::CollapsingHeader("Behaviour Tree Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeBTComponent = false;
 
-					if (openBTComponent) {
+					ImGui::NextColumn();
+
+					if (ImGui::Button("...###BTBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("BTPopUp");
+					}
+					if (ImGui::BeginPopup("BTPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeBTComponent = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openBTComponent) 
+					{
 
 						auto& ai_bt = m_SelectedEntity.GetComponent<BehaviourTreeComponent>();
 
@@ -1153,6 +1169,7 @@ namespace Engine
 
 							}
 
+							ImGui::Text("Current Asset Path: %s", ai_bt.TreeAssetPath.c_str());
 							ImGui::Text("Stack Depth: %zu", stackDepth);
 
 							if (root)
@@ -1174,7 +1191,6 @@ namespace Engine
 							ImGui::Separator();
 							ImGui::Text("Root Node:");
 
-							// Dropdown to pick node type for new root
 							static int rootNodeTypeIndex = 0;
 							auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
 							ImGui::SetNextItemWidth(200.0f);
@@ -1186,7 +1202,7 @@ namespace Engine
 								},
 								static_cast<void*>(&allTypes), (int)allTypes.size()))
 							{
-								// Optional: nothing here, selection changes root only when button clicked
+								;
 							}
 
 							// Button to create/set the root node
@@ -1268,7 +1284,7 @@ namespace Engine
 							int currentIndex = 0;
 							for (size_t i = 0; i < btAssets.size(); ++i)
 							{
-								if (btAssets[i].fullPath == treeAssetPath) // store fullPath in treeAssetPath
+								if (btAssets[i].name == treeAssetPath) // store fullPath in treeAssetPath
 								{
 									currentIndex = (int)i;
 									break;
@@ -1276,7 +1292,7 @@ namespace Engine
 							}
 
 							// Draw the combo box
-							ImGui::Text("Tree Asset Path:");
+							ImGui::Text("Choose Tree Asset Path:");
 							ImGui::SetNextItemWidth(400.0f);
 							if (ImGui::Combo("##TreeAssetPath", &currentIndex,
 								[](void* data, int idx, const char** outText) -> bool
@@ -1287,9 +1303,11 @@ namespace Engine
 									return true;
 								},
 								static_cast<void*>(&btAssets), (int)btAssets.size()))
-							{
-								// Update treeAssetPath when selected
-								ai_bt.TreeAssetPath = btAssets[currentIndex].fullPath; // store full path
+							{	
+								if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+								{
+									treeAssetPath = btAssets[currentIndex].name;
+								}
 							}
 
 							if (ImGui::Button("Load Tree"))
@@ -1298,49 +1316,97 @@ namespace Engine
 								{
 									std::string chosenPath = btAssets[currentIndex].name;
 									ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+									
+									// Update treeAssetPath when selected
+									//std::string filename = std::filesystem::path(btAssets[currentIndex].fullPath).filename().string();
+									//ai_bt.TreeAssetPath = chosenPath; // store full path
 								}
 							}
 
 							if (ImGui::Button("Save Tree")) {
 								BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
 							}
+
+							static char changeNewNameBuffer[256] = "";
+							static char saveNewFileName[256] = "";  // Changed from saveNewTreePath - clearer naming
+							static char saveNewTreeName[256] = "";
+
+							if (ImGui::Button("Rename Tree File")) {
+								strncpy_s(changeNewNameBuffer, sizeof(changeNewNameBuffer), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
+								ImGui::OpenPopup("TreeRename Panel");
+							}
+
+							if (ImGui::Button("Save Tree File As")) {
+								strncpy_s(saveNewFileName, sizeof(saveNewFileName), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
+								strncpy_s(saveNewTreeName, sizeof(saveNewTreeName), treeInstance.GetName().c_str(), _TRUNCATE);
+								ImGui::OpenPopup("SaveTreeRename Panel");
+							}
+
+							// Rename Tree Panel
+							if (ImGui::BeginPopupModal("TreeRename Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+							{
+								ImGui::Text("Current file: %s", ai_bt.TreeAssetPath.c_str());
+								ImGui::Separator();
+
+								ImGui::Text("Enter file name ('.json' will be added automatically):");
+								ImGui::InputText("New Tree Filename", changeNewNameBuffer, sizeof(changeNewNameBuffer));
+
+								if (ImGui::Button("Rename File", ImVec2(120, 0))) {
+									std::string newFileName = changeNewNameBuffer;
+									if (!newFileName.empty()) {
+										std::string saveTreeName = newFileName + ".json";
+										BehaviourTreeEditor::RenameFile(ai_bt.TreeAssetPath, saveTreeName, m_Scene);
+										ImGui::CloseCurrentPopup();
+									}
+								}
+
+								ImGui::SameLine();
+
+								if (ImGui::Button("Cancel###RenameCancel", ImVec2(120, 0))) {  // Fixed ID
+									ImGui::CloseCurrentPopup();
+								}
+
+								ImGui::EndPopup();
+							}
+
+							// Save As Panel
+							if (ImGui::BeginPopupModal("SaveTreeRename Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+							{
+								ImGui::Text("Save tree as new file");
+								ImGui::Separator();
+
+								ImGui::Text("Current Asset Path: %s", ai_bt.TreeAssetPath.c_str());
+								ImGui::Text("Enter file name ('.json' will be added automatically):");
+								ImGui::InputText("New Filename", saveNewFileName, sizeof(saveNewFileName));
+								ImGui::InputText("New Tree Name", saveNewTreeName, sizeof(saveNewTreeName));
+
+								if (ImGui::Button("Save As Tree File", ImVec2(120, 0))) {
+									std::string newSaveFileName = saveNewFileName;
+									std::string newSaveTreeName = saveNewTreeName;
+									if (!newSaveFileName.empty() && !newSaveTreeName.empty()) {
+										std::string saveFileName = newSaveFileName + ".json";
+										BehaviourTreeEditor::SaveAs(ai_bt.TreeAssetPath, saveFileName, newSaveTreeName, true);
+										ImGui::CloseCurrentPopup();
+									}
+								}
+
+								ImGui::SameLine();
+
+								if (ImGui::Button("Cancel###SaveAsCancel", ImVec2(120, 0))) {  // Fixed ID
+									ImGui::CloseCurrentPopup();
+								}
+
+								ImGui::EndPopup();
+							}
+
 						}
 						else {
-							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("NewTree");
+							ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("PlaceholderTreeName");
 						}
 						
-						// BehaviourTreeEditor:
-						/*CreateNewTree //IN ASSET BROWSER
-						SetNodeProperty //
-						GetAllNodeTypes
-						GetAllCategories
-						ConvertToPrefab //LATER
-						LoadFromPrefab //LATER
-						ValidateTree - Button -> 
-						CloneTree
-						*/
 					}
-
-					bool removeBT = false;
-
-					ImGui::NextColumn();
-
-					if (ImGui::Button("... ###BehaviorbBtn", dotButtonSize))
-					{
-						ImGui::OpenPopup("BehaviorPopUp");
-					}
-					if (ImGui::BeginPopup("BehaviorPopUp"))
-					{
-						if (ImGui::MenuItem("Remove Component"))
-						{
-							removeBT = true;
-						}
-						ImGui::EndPopup();
-					}
-
-					ImGui::Columns(1);
-
-					if (removeBT)
+					// ----------------------------------- Remove BT Component -----------------------
+					if (removeBTComponent)
 					{
 						m_SelectedEntity.RemoveComponent<BehaviourTreeComponent>();
 					}
@@ -1350,9 +1416,34 @@ namespace Engine
 				if (m_SelectedEntity.HasComponent<ParticleComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openParticleComp = ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeParticleComp = false;
+
 					auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
 
-					if (ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen))
+					ImGui::NextColumn();
+					//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
+
+					if (ImGui::Button("...###ParticleBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ParticlePopUp");
+					}
+					if (ImGui::BeginPopup("ParticlePopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeParticleComp = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openParticleComp)
 					{
 						// Playback Controls
 						ImGui::Text("Playback");
@@ -1472,16 +1563,46 @@ namespace Engine
 							particleComp.EmissionAccumulator = 0.0f;
 						}
 					}
+					// ----------------------------------------- Remove Particle Component -------------------------------
+					if (removeParticleComp)
+					{
+						m_SelectedEntity.RemoveComponent<ParticleComponent>();
+					}
 				}
 				// ========================= Display Script Compoment ===============================
 				if (m_SelectedEntity.HasComponent<ScriptComponent>())
 				{
 					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+					
+					bool openScriptComp = ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeScriptComp = false;
+
+
 					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
 					std::string scriptPath = getRepository() + "\\Scripts\\Game";
 					auto scriptFiles = getAssetsInFolder(scriptPath);
 					
-					if (ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen))
+					ImGui::NextColumn();
+
+					if (ImGui::Button("...###ScriptBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("ScriptPopUp");
+					}
+					if (ImGui::BeginPopup("ScriptPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeScriptComp = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openScriptComp)
 					{
 						ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
 						ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
@@ -1537,9 +1658,104 @@ namespace Engine
 						}
 
 					}
+					// ----------------------------- Remove Script Comp --------------------------------------
+					if (removeScriptComp)
+					{
+						m_SelectedEntity.RemoveComponent<ScriptComponent>();
+					}
 
 				}
+				// ================================ Display Light Component ======================================
+				if (m_SelectedEntity.HasComponent<LightComponent>())
+				{
+					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
 
+					bool openLightComp = ImGui::CollapsingHeader("Light Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeLightComp = false;
+
+					ImGui::NextColumn();
+					//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 30);
+
+					if (ImGui::Button("...###LightBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("LightPopUp");
+					}
+					if (ImGui::BeginPopup("LightPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeLightComp = true;
+							//return;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openLightComp)
+					{
+						auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
+						ImGui::Checkbox("Enabled", &lightComp.Enabled);
+
+						// --- Light Type Dropdown ---
+						const char* lightTypeNames[] = { "Directional", "Point", "Spot" };
+						int currentType = static_cast<int>(lightComp.Type);
+
+						if (ImGui::Combo("Type", &currentType, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
+						{
+							lightComp.SetType(static_cast<LightType>(currentType));
+						}
+
+						// --- Color ---
+						glm::vec3 color = lightComp.Color;
+						if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
+						{
+							lightComp.SetColorLinear(color); // uses setter
+						}
+
+						
+						// --- Intensity ---
+						float intensity = lightComp.Intensity;
+						if (ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, 100.0f, "%.2f"))
+						{
+							lightComp.SetIntensity(intensity); //  uses setter
+						}
+
+
+						// --- Range  ---
+						if (lightComp.Type != LightType::Directional)
+						{
+							float range = lightComp.Range;
+							if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, 1000.0f, "%.2f"))
+							{
+								lightComp.SetRange(range); // uses setter
+							}
+						}
+
+						if (lightComp.Type == LightType::Spot)
+						{
+							float spotAngle = lightComp.SpotAngleDeg;
+							if (ImGui::DragFloat("Spot Angle", &spotAngle, 0.1f, 1.0f, 179.0f, "%.2f"))
+							{
+								lightComp.SetSpotAngleDeg(spotAngle); // uses setter
+							}
+						}
+						// --- Indirect Multiplier ---
+						float indirectMult = lightComp.IndirectMultiplier;
+						if (ImGui::DragFloat("Indirect Multiplier", &indirectMult, 0.01f, 0.0f, 10.0f, "%.2f"))
+						{
+							lightComp.SetIndirectMultiplier(indirectMult); // uses setter
+						}
+
+					}
+					// ---------------------------- Remove Light Comp --------------------------
+					if (removeLightComp)
+					{
+						m_SelectedEntity.RemoveComponent<LightComponent>();
+					}
+				}
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -1742,6 +1958,25 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 					//ImGui::SetWindowFontScale(1.0f); // Reset
+					// ------------------------ Add Light Component ----------------------------
+					bool hasLightComponent = m_SelectedEntity.HasComponent<LightComponent>();
+					ImGui::BeginDisabled(hasLightComponent);
+
+					if (ImGui::MenuItem("Light Component"))
+					{
+						if (!hasLightComponent)
+						{
+							m_SelectedEntity.AddComponent<LightComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasLightComponent)
+						{
+							ImGui::SetTooltip("Add script to this object.");
+						}
+					}
+					ImGui::EndDisabled();
 
 					ImGui::EndPopup(); // end pop up for Add Component  
 				}
@@ -2061,6 +2296,9 @@ namespace Engine
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Text("Projects:");
 
+			bool inRawResouces = false;
+			bool inComposedResources = false;
+
 			// For resources handled by Asset Browser
 			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -2085,6 +2323,8 @@ namespace Engine
 						raw_asset = true;
 						selectedType = type;
 						selectedFolder = typeName;
+						//inRawResouces = true;
+						//inComposedResources = false;
 						selectedResourcesIndex = -1;
 					}
 				}
@@ -2101,6 +2341,7 @@ namespace Engine
 						bool isSelected = (selectedFolder == folder.fullPath);
 						if (ImGui::Selectable(folder.name.c_str(), isSelected))
 						{
+							selectedType = ResourceType::UNKNOWN;
 							raw_asset = false;
 							selectedFolder = folder.fullPath;
 							selectedResourcesIndex = -1; // reset asset selection
@@ -2200,8 +2441,8 @@ namespace Engine
 									editedAsset = filename;
 								}
 
-								ImGui::EndPopup();
 							}
+							ImGui::EndPopup();
 						}
 
 						if (isSelected)
@@ -3334,16 +3575,6 @@ namespace Engine
 				}
 			}
 		}
-
-		//// Use screen coordinates for the mode label too
-		//ImVec2 modeLabelPos = { m_ImGuizmoViewportData.tl.x + 10.0f, m_ImGuizmoViewportData.tl.y + 10.0f };
-		//ImGui::GetForegroundDrawList()->AddText(
-		//	modeLabelPos,
-		//	IM_COL32(255, 230, 100, 255),
-		//	m_Operation == ImGuizmo::TRANSLATE ? "Mode: Translate" :
-		//	m_Operation == ImGuizmo::ROTATE ? "Mode: Rotate" :
-		//	m_Operation == ImGuizmo::SCALE ? "Mode: Scale" : "Mode: None"
-		//);
 	}
 
 	void Editor::CreateScriptPanel()
@@ -3415,6 +3646,7 @@ namespace Engine
 
 			if (ImGui::Button("Cancel", ImVec2(120, 0)))
 			{
+				createScript = false;
 				ImGui::CloseCurrentPopup();
 			}
 
