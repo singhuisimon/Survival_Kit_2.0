@@ -280,7 +280,13 @@ namespace Engine
 
 			if (ImGui::BeginMenu("Compile"))
 			{
-				// Compile fucntion goes here
+	
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+
+				AM.CompileAllAsset(0); 
+				}
+				
+
 				ImGui::EndMenu();
 			}
 
@@ -2489,7 +2495,7 @@ namespace Engine
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::BeginCombo("Usage", settings->compression.c_str())) {
+					if (ImGui::BeginCombo("Compression", settings->compression.c_str())) {
 						for (auto& option : descriptorEditor.GetCompressionOptions()) {
 							if (ImGui::Selectable(option.c_str())) {
 								settings->compression = option;
@@ -2499,7 +2505,7 @@ namespace Engine
 						ImGui::EndCombo();
 					}
 
-					if (ImGui::BeginCombo("Compression", settings->usageType.c_str())) {
+					if (ImGui::BeginCombo("Usage", settings->usageType.c_str())) {
 						for (auto& option : descriptorEditor.GetUsageTypeOptions()) {
 							if (ImGui::Selectable(option.c_str())) {
 								settings->usageType = option;
@@ -2605,16 +2611,28 @@ namespace Engine
 
 				// Save button
 				if (descriptorEditor.IsModified()) {
-					if (ImGui::Button("Save Descriptor")) {
+					if (ImGui::Button("Save & Compile")) {
 						if (descriptorEditor.Save()) {
 							notifMsg = "Descriptor is Saved";
 							notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+
+							//compile
+							if (AM.CompileSingleAsset(currentEditingGuid, true)) {
+								notifMsg = "Saved and Compiled successfully!"; 
+								notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);//green 
+							}
+							else {
+								notifMsg = "Saved but compilation FAILED";
+								notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red for error
+							}
 						}
 						else {
 							notifMsg = "Descriptor is NOT Saved";
 							notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 						}
 					}
+
+
 				}
 			}
 
