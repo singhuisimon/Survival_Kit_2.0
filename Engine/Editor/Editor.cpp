@@ -2528,8 +2528,8 @@ namespace Engine
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Text("Projects:");
 
-			bool inRawResouces = false;
-			bool inComposedResources = false;
+			//bool inRawResouces = false;
+			//bool inComposedResources = false;
 
 			// For resources handled by Asset Browser
 			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
@@ -2914,8 +2914,9 @@ namespace Engine
 				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
 					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
 					if (texture != nullptr) {
-						float tex_w = texture->width;
-						float tex_h = texture->height;
+						float tex_w = static_cast<float>(texture->width);
+						float tex_h = static_cast<float>(texture->height);
+
 
 						ImVec2 window_size = ImGui::GetWindowSize();
 						float win_w = window_size.x * 3 / 4;
@@ -3743,13 +3744,7 @@ namespace Engine
 
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
-		//if (!entity) return;
-		/*if (!entity || !m_Scene) {
-			m_SelectedEntity = Entity{};
-			m_PickedID = 0xFFFFFFFFu;
-		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
-			return;
-		}*/
+		
 
 		if(!entity || !m_Scene || !entity.HasComponent<TransformComponent>())
 			return;
@@ -3974,7 +3969,7 @@ namespace Engine
 			int result = system(command.c_str());
 			return result == 0;
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 			return false;
 		}
