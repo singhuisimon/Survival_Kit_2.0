@@ -12,6 +12,7 @@ namespace Engine {
 
     // Forward declarations
     class Input;
+    class Scene;  // <-- ADD THIS LINE (forward declare Scene)
 
     /**
      * @brief Base application class - provides the core framework
@@ -75,7 +76,7 @@ namespace Engine {
          * @param ts Time elapsed since last frame
          * @details Override to implement your game logic
          */
-        virtual void OnUpdate(Timestep ts) {}
+        virtual void OnUpdate([[maybe_unused]] Timestep ts) {}
 
         /**
          * @brief Called once at shutdown
@@ -92,6 +93,7 @@ namespace Engine {
         void Init();
         void Shutdown();
         void UpdateWindowTitle(float fps);
+        std::shared_ptr<Scene> m_Scene;
 
         GLFWwindow* m_Window = nullptr;
         bool m_Running = true;
@@ -111,7 +113,6 @@ namespace Engine {
 
         // Editor 
         Camera3D m_Editor_camera;
-        Light    m_Editor_light;
 
     };
 
