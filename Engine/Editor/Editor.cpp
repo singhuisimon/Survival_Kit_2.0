@@ -582,13 +582,12 @@ namespace Engine
 
 						u32 parent_id = transform.Parent;
 
-						if (ImGui::InputScalar("Parent", ImGuiDataType_U32, &parent_id))
-						{
-							TransformSystem::SetParent(m_Scene, m_SelectedEntity,  static_cast<entt::entity>(parent_id));
-						}
-
 						if (parent_id != u32_max)
 						{
+							if (ImGui::InputScalar("Parent", ImGuiDataType_U32, &parent_id))
+							{
+								TransformSystem::SetParent(m_Scene, m_SelectedEntity, static_cast<entt::entity>(parent_id));
+							}
 							ImGui::Text("Parent: %zu", parent_id);
 						}
 						else
