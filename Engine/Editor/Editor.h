@@ -1,7 +1,7 @@
 #pragma once
 /**
  * @file ImguiManager.h
- * @brief Declaration of the IMGUI_Manager class for running the IMGUI level editor.
+ * @brief Declaration of the Editor class for running the IMGUI level editor.
  * @author Liliana Hanawardani (50%), Saw Hui Shan (50%)
  * @date September 8, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.

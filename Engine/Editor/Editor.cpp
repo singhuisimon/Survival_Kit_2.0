@@ -1,6 +1,6 @@
 /**
 * @file Editor.cpp
-* @brief Implementation of the functions of IMGUI_Manager class for running the IMGUI level editor.
+* @brief Implementation of the functions of Editor class for running the IMGUI level editor.
 * @author Liliana Hanawardani (47%), Saw Hui Shan (47%), Rio Shannon Yvon Leonardo (2%), Tan Jun Rui (2%), Wai Lwin Thit (2%)
 * @date September 8, 2025
 * Copyright (C) 2025 DigiPen Institute of Technology.
