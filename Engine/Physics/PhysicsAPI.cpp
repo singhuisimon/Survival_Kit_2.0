@@ -1,122 +1,263 @@
+/**************************************************************************
+ * @file
+ * PhysicsAPI.cpp
+ * @author
+ * Low Yue Jun, yuejun.low, yuejun.low@digipen.edu
+ * @date
+ * 2025/11/09 (YYYY/MM/DD)
+ * @brief
+ * Implementation of a Jolt-backed, entity-addressed physics façade:
+ * - Body lookup and activation
+ * - Force/impulse/torque and velocity adjustments
+ * - Damping, gravity factor, and CCD configuration
+ * - Per-frame collision events with pair de-duplication
+ * @copyright
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ **************************************************************************/
+
 #include "Physics/PhysicsAPI.h"
 
+#include <cstdint>
+#include <unordered_set>
+
 #include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyLock.h>
+#include <Jolt/Physics/Body/MotionProperties.h>
 
 namespace Engine
 {
-    static inline bool GetBodyID(const Entity &e, JPH::BodyID &out)
-    {
-        auto it = mBodyOf.find(static_cast<entt::entity>(e));
-        if (it == mBodyOf.end()) return false;
-        out = it->second;
-        return true;
-    }
+	/**************************************************************************
+	 * @brief
+	 * Internal helper: resolves BodyID for an entity.
+	 * @param e
+	 * Entity handle.
+	 * @param out
+	 * Output BodyID if found.
+	 * @return
+	 * True if resolution succeeds, false otherwise.
+	 **************************************************************************/
+	static inline bool GetBodyID(const Entity &e, JPH::BodyID &out)
+	{
+		auto it = mBodyOf.find(static_cast<entt::entity>(e));
+		if (it == mBodyOf.end()) return false;
+		out = it->second;
+		return true;
+	}
 
-    bool PhysicsAPI::HasBody(const Entity &e)
-    {
-        return mBodyOf.find(static_cast<entt::entity>(e)) != mBodyOf.end();
-    }
+	/**************************************************************************
+	 * @brief
+	 * Returns true if the given entity has a registered physics body.
+	 * @param e
+	 * Entity handle.
+	 * @return
+	 * True if a body exists, false otherwise.
+	 **************************************************************************/
+	bool PhysicsAPI::HasBody(const Entity &e)
+	{
+		return mBodyOf.find(static_cast<entt::entity>(e)) != mBodyOf.end();
+	}
 
-    void PhysicsAPI::Activate(const Entity &e)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Wakes the body so it participates in the next simulation step.
+	 * @param e
+	 * Entity handle.
+	 **************************************************************************/
+	void PhysicsAPI::Activate(const Entity &e)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::AddForce(const Entity &e, const glm::vec3 &force)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        mBodyInterface->AddForce(id, ToJPHVec3(force));
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Applies a world-space force at the center of mass.
+	 * @param e
+	 * Entity handle.
+	 * @param force
+	 * Force in Newtons.
+	 **************************************************************************/
+	void PhysicsAPI::AddForce(const Entity &e, const glm::vec3 &force)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		mBodyInterface->AddForce(id, ToJPHVec3(force));
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::AddImpulse(const Entity &e, const glm::vec3 &impulse)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        mBodyInterface->AddImpulse(id, ToJPHVec3(impulse));
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Applies a world-space linear impulse at the center of mass.
+	 * @param e
+	 * Entity handle.
+	 * @param impulse
+	 * Impulse in N·s.
+	 **************************************************************************/
+	void PhysicsAPI::AddImpulse(const Entity &e, const glm::vec3 &impulse)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		mBodyInterface->AddImpulse(id, ToJPHVec3(impulse));
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::AddTorque(const Entity &e, const glm::vec3 &torque)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        mBodyInterface->AddTorque(id, ToJPHVec3(torque));
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Applies a world-space torque.
+	 * @param e
+	 * Entity handle.
+	 * @param torque
+	 * Torque in N·m.
+	 **************************************************************************/
+	void PhysicsAPI::AddTorque(const Entity &e, const glm::vec3 &torque)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		mBodyInterface->AddTorque(id, ToJPHVec3(torque));
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::AddAngularImpulse(const Entity &e, const glm::vec3 &angularImpulse)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        mBodyInterface->AddAngularImpulse(id, ToJPHVec3(angularImpulse));
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Applies an angular impulse.
+	 * @param e
+	 * Entity handle.
+	 * @param angularImpulse
+	 * Angular impulse in N·m·s.
+	 **************************************************************************/
+	void PhysicsAPI::AddAngularImpulse(const Entity &e, const glm::vec3 &angularImpulse)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		mBodyInterface->AddAngularImpulse(id, ToJPHVec3(angularImpulse));
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::AddLinearVelocity(const Entity &e, const glm::vec3 &deltaVelocity)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        JPH::Vec3 cur = mBodyInterface->GetLinearVelocity(id);
-        JPH::Vec3 nxt = cur + ToJPHVec3(deltaVelocity);
-        mBodyInterface->SetLinearVelocity(id, nxt);
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Adds a delta to the body’s linear velocity.
+	 * @param e
+	 * Entity handle.
+	 * @param deltaVelocity
+	 * Linear velocity change in m/s.
+	 **************************************************************************/
+	void PhysicsAPI::AddLinearVelocity(const Entity &e, const glm::vec3 &deltaVelocity)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		JPH::Vec3 cur{ mBodyInterface->GetLinearVelocity(id) };
+		JPH::Vec3 nxt{ cur + ToJPHVec3(deltaVelocity) };
+		mBodyInterface->SetLinearVelocity(id, nxt);
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::AddAngularVelocity(const Entity &e, const glm::vec3 &deltaOmega)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        JPH::Vec3 cur = mBodyInterface->GetAngularVelocity(id);
-        JPH::Vec3 nxt = cur + ToJPHVec3(deltaOmega);
-        mBodyInterface->SetAngularVelocity(id, nxt);
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Adds a delta to the body’s angular velocity.
+	 * @param e
+	 * Entity handle.
+	 * @param deltaOmega
+	 * Angular velocity change in rad/s.
+	 **************************************************************************/
+	void PhysicsAPI::AddAngularVelocity(const Entity &e, const glm::vec3 &deltaOmega)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		JPH::Vec3 cur{ mBodyInterface->GetAngularVelocity(id) };
+		JPH::Vec3 nxt{ cur + ToJPHVec3(deltaOmega) };
+		mBodyInterface->SetAngularVelocity(id, nxt);
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::SetLinearDamping(const Entity &e, float damping)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
-        if (!lock.Succeeded()) return;
-        lock.GetBody().GetMotionProperties()->SetLinearDamping(damping);
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Sets linear damping.
+	 * @param e
+	 * Entity handle.
+	 * @param damping
+	 * Coefficient (>= 0).
+	 **************************************************************************/
+	void PhysicsAPI::SetLinearDamping(const Entity &e, float damping)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		JPH::BodyLockWrite lock{ mPhysics.GetBodyLockInterface(), id };
+		if (!lock.Succeeded()) return;
+		lock.GetBody().GetMotionProperties()->SetLinearDamping(damping);
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::SetAngularDamping(const Entity &e, float damping)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
-        if (!lock.Succeeded()) return;
-        lock.GetBody().GetMotionProperties()->SetAngularDamping(damping);
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Sets angular damping.
+	 * @param e
+	 * Entity handle.
+	 * @param damping
+	 * Coefficient (>= 0).
+	 **************************************************************************/
+	void PhysicsAPI::SetAngularDamping(const Entity &e, float damping)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		JPH::BodyLockWrite lock{ mPhysics.GetBodyLockInterface(), id };
+		if (!lock.Succeeded()) return;
+		lock.GetBody().GetMotionProperties()->SetAngularDamping(damping);
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::SetGravityFactor(const Entity &e, float factor)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
-        if (!lock.Succeeded()) return;
-        lock.GetBody().GetMotionProperties()->SetGravityFactor(factor);
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Scales world gravity for this body.
+	 * @param e
+	 * Entity handle.
+	 * @param factor
+	 * Gravity multiplier (1 = default).
+	 **************************************************************************/
+	void PhysicsAPI::SetGravityFactor(const Entity &e, float factor)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		JPH::BodyLockWrite lock{ mPhysics.GetBodyLockInterface(), id };
+		if (!lock.Succeeded()) return;
+		lock.GetBody().GetMotionProperties()->SetGravityFactor(factor);
+		mBodyInterface->ActivateBody(id);
+	}
 
-    void PhysicsAPI::SetContinuousDetection(const Entity &e, bool enabled)
-    {
-        JPH::BodyID id{};
-        if (!GetBodyID(e, id)) return;
-        mBodyInterface->SetMotionQuality(id, enabled ? JPH::EMotionQuality::LinearCast : JPH::EMotionQuality::Discrete);
-        mBodyInterface->ActivateBody(id);
-    }
+	/**************************************************************************
+	 * @brief
+	 * Enables or disables continuous collision detection (CCD).
+	 * @param e
+	 * Entity handle.
+	 * @param enabled
+	 * True to enable, false to disable.
+	 **************************************************************************/
+	void PhysicsAPI::SetContinuousDetection(const Entity &e, bool enabled)
+	{
+		JPH::BodyID id{};
+		if (!GetBodyID(e, id)) return;
+		mBodyInterface->SetMotionQuality(
+			id,
+			enabled ? JPH::EMotionQuality::LinearCast : JPH::EMotionQuality::Discrete
+		);
+		mBodyInterface->ActivateBody(id);
+	}
 
-	static std::vector<ContactEvent> s_frame_contacts;
-	static std::unordered_set<std::uint64_t> s_dedupe;
+	/**************************************************************************
+	 * @brief
+	 * Per-frame collision event buffer (deduped unordered pairs).
+	 **************************************************************************/
+	static std::vector<ContactEvent>         s_frame_contacts{};
+	static std::unordered_set<std::uint64_t> s_dedupe{};
 
+	/**************************************************************************
+	 * @brief
+	 * Internal: converts BodyID back to EntityID.
+	 * @param id
+	 * Jolt BodyID.
+	 * @return
+	 * Matching EntityID or entt::null if not found.
+	 **************************************************************************/
 	static inline EntityID BodyIDToEntityID(JPH::BodyID id)
 	{
 		for (const auto &kv : mBodyOf)
@@ -124,66 +265,127 @@ namespace Engine
 		return entt::null;
 	}
 
+	/**************************************************************************
+	 * @brief
+	 * Stable, commutative 64-bit key for an entity pair.
+	 * @param a
+	 * First entity.
+	 * @param b
+	 * Second entity.
+	 * @return
+	 * 64-bit key with smaller ID in high bits.
+	 **************************************************************************/
 	static inline std::uint64_t PairKey(EntityID a, EntityID b)
 	{
-		auto aa = static_cast<std::uint32_t>(a);
-		auto bb = static_cast<std::uint32_t>(b);
+		auto aa{ static_cast<std::uint32_t>(a) };
+		auto bb{ static_cast<std::uint32_t>(b) };
 		if (bb < aa) std::swap(aa, bb);
 		return (static_cast<std::uint64_t>(aa) << 32) | static_cast<std::uint64_t>(bb);
 	}
 
+	/**************************************************************************
+	 * @brief
+	 * Local contact listener that records added/persisted contacts.
+	 **************************************************************************/
 	class LocalContactListener final : public JPH::ContactListener
 	{
 	public:
-		JPH::ValidateResult OnContactValidate(const JPH::Body &, const JPH::Body &,
+		/**************************************************************************
+		 * @brief
+		 * Accepts all contacts for this body pair.
+		 **************************************************************************/
+		JPH::ValidateResult OnContactValidate(
+			const JPH::Body &,
+			const JPH::Body &,
 			JPH::RVec3Arg,
-			const JPH::CollideShapeResult &) override
+			const JPH::CollideShapeResult &
+		) override
 		{
 			return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 		}
 
-		void OnContactAdded(const JPH::Body &a, const JPH::Body &b,
+		/**************************************************************************
+		 * @brief
+		 * Called when a contact is added; records the pair.
+		 **************************************************************************/
+		void OnContactAdded(
+			const JPH::Body &a,
+			const JPH::Body &b,
 			const JPH::ContactManifold &,
-			JPH::ContactSettings &) override
+			JPH::ContactSettings &
+		) override
 		{
 			Record(a.GetID(), b.GetID());
 		}
 
-		void OnContactPersisted(const JPH::Body &a, const JPH::Body &b,
+		/**************************************************************************
+		 * @brief
+		 * Called when a contact persists; records the pair.
+		 **************************************************************************/
+		void OnContactPersisted(
+			const JPH::Body &a,
+			const JPH::Body &b,
 			const JPH::ContactManifold &,
-			JPH::ContactSettings &) override
+			JPH::ContactSettings &
+		) override
 		{
 			Record(a.GetID(), b.GetID());
 		}
 
 	private:
+		/**************************************************************************
+		 * @brief
+		 * Records a pair into the frame buffer with de-duplication.
+		 * @param ba
+		 * BodyID A.
+		 * @param bb
+		 * BodyID B.
+		 **************************************************************************/
 		static void Record(JPH::BodyID ba, JPH::BodyID bb)
 		{
-			const EntityID ea = BodyIDToEntityID(ba);
-			const EntityID eb = BodyIDToEntityID(bb);
+			const EntityID ea{ BodyIDToEntityID(ba) };
+			const EntityID eb{ BodyIDToEntityID(bb) };
 			if (ea == entt::null || eb == entt::null) return;
 
-			const std::uint64_t key = PairKey(ea, eb);
+			const std::uint64_t key{ PairKey(ea, eb) };
 			if (s_dedupe.insert(key).second)
 				s_frame_contacts.push_back(ContactEvent{ ea, eb });
 		}
 	};
 
-	static LocalContactListener g_contact_listener;
+	/**************************************************************************
+	 * @brief
+	 * Singleton contact listener instance.
+	 **************************************************************************/
+	static LocalContactListener g_contact_listener{};
 
+	/**************************************************************************
+	 * @brief
+	 * Hooks a contact listener to the physics system (idempotent).
+	 **************************************************************************/
 	void PhysicsAPI::EnableCollisionEvents()
 	{
 		mPhysics.SetContactListener(&g_contact_listener);
 	}
 
+	/**************************************************************************
+	 * @brief
+	 * Clears the per-frame collision buffer and de-duplication set.
+	 **************************************************************************/
 	void PhysicsAPI::BeginCollisionFrame()
 	{
 		s_frame_contacts.clear();
 		s_dedupe.clear();
 	}
 
+	/**************************************************************************
+	 * @brief
+	 * Returns the current frame’s contact events without draining.
+	 * @return
+	 * Const reference to the per-frame events buffer.
+	 **************************************************************************/
 	const std::vector<ContactEvent> &PhysicsAPI::GetCollisionEvents()
 	{
 		return s_frame_contacts;
 	}
-}
+} // namespace Engine
