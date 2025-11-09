@@ -23,7 +23,8 @@ out vec3 Position;
 out vec3 Normal;
 out vec3 Color;
 out vec2 TexCoord;
-
+out vec3 Tangent;
+out vec3 Bitangent;
 
 void main()
 {
@@ -33,6 +34,20 @@ void main()
     mat3 N = mat3(vec3(MV[0]), vec3(MV[1]), vec3(MV[2])); // Normal transform matrix
     Normal = normalize(N * VertexNormal);
     TexCoord = VertexTexCoords;
+
+    // Simple tangent calculation: pick a perpendicular vector
+    vec3 c1 = cross(VertexNormal, vec3(0.0, 0.0, 1.0));
+    vec3 c2 = cross(VertexNormal, vec3(0.0, 1.0, 0.0));
+    
+    // Choose the cross product that isn't near-zero
+    vec3 tangent = length(c1) > length(c2) ? c1 : c2;
+    tangent = normalize(tangent);
+    
+    vec3 bitangent = normalize(cross(VertexNormal, tangent));
+    
+    // Transform to view space
+    Tangent = normalize(N * tangent);
+    Bitangent = normalize(N * bitangent);
 
     vec4 VertexPositionInView = MV * vec4(VertexPosition, 1.0f);
     Position = VertexPositionInView.xyz;
