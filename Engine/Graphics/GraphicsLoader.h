@@ -1,3 +1,14 @@
+/**
+ * @file GraphicsLoader.h
+ * @brief	Temporary space and loader for graphics-related assets and data
+ * @details Store assets and data for use in the graphics pipeline
+ * @author Chua Wen Bin Kenny
+ * @date 14 October 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 
 // For graphics related defines and functionality
@@ -10,7 +21,7 @@
 #include "Graphics/Texture.h"
 #include "Graphics/Material.h"
 
-// KENNY TESTING
+// For ImGui type
 #include "imgui.h"
 
 

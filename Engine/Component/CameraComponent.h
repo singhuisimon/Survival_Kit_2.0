@@ -1,8 +1,10 @@
 /**
  * @file CameraComponent.h
- * @brief Camera component - camera properties and projection
- * @author
- * @date 2025
+ * @brief   Component that stores Camera-related properties
+ * @details The data stored will be used by the graphics pipeline to
+ *          create the desired view of the scene
+ * @author Chua Wen Bin Kenny
+ * @date 20 October 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.

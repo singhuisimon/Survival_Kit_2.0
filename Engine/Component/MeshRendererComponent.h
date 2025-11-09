@@ -1,8 +1,10 @@
 /**
  * @file MeshRendererComponent.h
- * @brief Mesh renderer component - rendering properties for 3D meshes
- * @author
- * @date 2025
+ * @brief   Component that stores Mesh-related properties
+ * @details The data stored will be used by the graphics pipeline to
+ *          render 3D meshes in accordance to the settings
+ * @authors Chua Wen Bin Kenny (50%), Tan Jun Rui (50%)
+ * @date 14 October 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
