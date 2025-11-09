@@ -756,6 +756,8 @@ namespace Engine
 						// ======================= Asset Reference Section =======================
 						ImGui::SeparatorText("Asset References");
 
+						static bool showWrongType = false;
+
 						// Helper lambda to display asset field with drag-drop support
 						auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType) {
 							// Get the filename from the GUID
@@ -789,12 +791,24 @@ namespace Engine
 									const AssetRecord* record = AM.getAssetRecord(droppedGuid);
 									if (record && record->type == expectedType)
 									{
-										guid = droppedGuid;
+										// Temporary fix for now: To be fully fixed by M3
+										std::string fileName = std::filesystem::path(currScenePath).filename().string();
+										std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
+
+										if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
+											&& recordName != "E005_loveletter_v001.fbx") {
+											
+											showWrongType = true;
+										}
+										else {
+
+											guid = droppedGuid;
+
+										}
 									}
 									else
 									{
-										// Optional: Show error message for incompatible type
-										ImGui::OpenPopup("Incompatible Asset Type");
+										showWrongType = true;
 									}
 								}
 								ImGui::EndDragDropTarget();
@@ -818,11 +832,17 @@ namespace Engine
 						DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
 						DisplayAssetField("Texture", mesh.TextureGuid, ResourceType::TEXTURE);
 
+						if (showWrongType) {
+
+							ImGui::OpenPopup("Incompatible Asset Type");
+							showWrongType = false;
+						}
+
 						// Popup for incompatible asset type
-						if (ImGui::BeginPopupModal("Incompatible Asset Type", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+						if (ImGui::BeginPopup("Incompatible Asset Type"))
 						{
 							ImGui::Text("The dropped asset type does not match the expected type.");
-							if (ImGui::Button("OK"))
+							if (ImGui::Button("Close"))
 							{
 								ImGui::CloseCurrentPopup();
 							}
@@ -2647,7 +2667,7 @@ namespace Engine
 							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 						}
 
-						// Unique ID per button so ImGui doesn�t confuse them
+						// Unique ID per button
 						ImGui::PushID(static_cast<int>(i));
 
 						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
@@ -2768,7 +2788,7 @@ namespace Engine
 						selectedResourcesIndex = static_cast<int>(i);
 
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
-						if (extension == ".json") // if it is scene
+						if (extension == ".json" && folderName != "BT") // For scene, not BT
 						{
 							if (isPrefabEditor)
 							{
@@ -2814,7 +2834,7 @@ namespace Engine
 							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
 
 						}
-						else if (extension == ".prefab")
+						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
 							//auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
 							if (!isPrefabEditor)
