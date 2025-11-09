@@ -1,5 +1,5 @@
 {
-    "Name": "NewTree",
+    "Name": "ShootableEnemy",
     "GUID": "8894433783141269751",
     "Version": "1.0",
     "Root": {
@@ -64,9 +64,18 @@
                                 "GUID": "1976904755502072077",
                                 "Children": [
                                     {
+                                        "Type": "CheckCollision",
+                                        "Name": "Node",
+                                        "GUID": "1708280871705510133",
+                                        "Properties": {
+                                            "OtherTag": "Bullet",
+                                            "DestroyOnHit": "false"
+                                        }
+                                    },
+                                    {
                                         "Type": "ModifyHealth",
                                         "Name": "Node",
-                                        "GUID": "1976904755502432529",
+                                        "GUID": "6896427642436583671",
                                         "Properties": {
                                             "Amount": "0.100000",
                                             "HealthKey": "Health"
