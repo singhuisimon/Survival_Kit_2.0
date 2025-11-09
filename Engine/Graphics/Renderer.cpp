@@ -563,7 +563,7 @@ namespace Engine {
 			// Temporary transformations
 			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
 
-			xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
+			/*xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
 
 			if (TextureResource* texture_resource = RM.loadResource<TextureResource>(texture_guid)) {
 				glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
@@ -580,7 +580,7 @@ namespace Engine {
 			}
 			else {
 				prog.setUniform("isTexture", false);
-			}
+			}*/
 
 			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			{
@@ -594,6 +594,26 @@ namespace Engine {
 
 				// Update UBO (48 bytes)
 				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+
+				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
+					glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("Texture2D", 0);
+					prog.setUniform("isTexture", true);
+
+					if (texture_resource->format == "sRGB") {
+						prog.setUniform("isGamma", true);
+					}
+					else {
+						prog.setUniform("isGamma", false);
+					}
+
+				}
+
+				if (TextureResource* normal_map = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap))) {
+					glBindTextureUnit(1, static_cast<GLuint>(normal_map->textureID));
+					prog.setUniform("NormalMap", 1);
+					prog.setUniform("useNormalMap", true);
+				}
 			}
 			else
 			{
@@ -608,6 +628,9 @@ namespace Engine {
 
 				// Update UBO (48 bytes)
 				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+
+				prog.setUniform("isTexture", false);
+				prog.setUniform("useNormalMap", false);
 #pragma endregion
 			}
 

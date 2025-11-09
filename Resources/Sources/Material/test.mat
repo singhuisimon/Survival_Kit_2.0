@@ -1,8 +1,8 @@
 {
   "shaderName": "StandardDiffuseSpecular",
 
-  "diffuseMap": "f992d866396f4025",
-  "normalMap": "0",
+  "diffuseMap": "678bc866fd0b4001",
+  "normalMap": "5f8bc866fd0b4003",
   "specularMap": "0",
   "emissionMap": "0",
   "occlusionMap": "0",
