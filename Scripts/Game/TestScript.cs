@@ -7,8 +7,7 @@ namespace Game
     {
         public int EntityID;
         private int frameCount = 0;
-        private uint playerID = 69;
-        private float moveSpeed = 5.0f;
+        private uint playerID = 99;
         private float fireCD = 0.0f;
         private float fireTimer = 0.1f;
 
@@ -20,67 +19,32 @@ namespace Game
         public void OnUpdate(float deltaTime)
         {
             frameCount++;
-            if (playerID == 69)
+            if (playerID == 99)
             {
 
                 playerID = Engine.InternalCalls.Scene_FindEntityByName("Player");
 
             }
-            // Only try to move if we found the player
-            // if (playerID == 0) return;
-
-            bool moved = false;
-            float moveX = 0f;
-            float moveY = 0f;
-            float moveZ = 0f;
-
-            // --- Arrow keys ---
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.Up))        // 265
-            {
-                moveZ -= moveSpeed * deltaTime; // Forward
-                moved = true;
-            }
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.Down))      // 264
-            {
-                moveZ += moveSpeed * deltaTime; // Backward
-                moved = true;
-            }
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.Left))      // 263
-            {
-                moveX -= moveSpeed * deltaTime; // Left
-                moved = true;
-            }
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.Right))     // 262
-            {
-                moveX += moveSpeed * deltaTime; // Right
-                moved = true;
-            }
 
             fireCD -= deltaTime;
+            //Engine.InternalCalls.Log(string.Concat("FireCD: ", fireCD.ToString()));
 
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.Enter) && fireCD <= 0)
             {
-                Engine.InternalCalls.Log("Firing Bullet!");
                 fireCD = fireTimer;
 
-                // NEW WAY: Instantiate from prefab
-                string prefabPath = "Resources/Sources/Prefabs/Bullet.prefab";
-                uint bullet = Engine.InternalCalls.Prefab_Instantiate(prefabPath);
+                // Create bullet ent
+                uint bullet = Engine.InternalCalls.Scene_CreateEntity("Bullet");
 
-                if (bullet != 0)
-                {
-                    // Get player position
-                    Engine.Vector3 v3 = default;
-                    Engine.InternalCalls.Transform_GetPosition((uint)EntityID, ref v3);
-
-                    // Place bullet in front of player
-                    Engine.Vector3 spawn = new Engine.Vector3(v3.X, v3.Y, v3.Z + 0.5f);
-                    Engine.InternalCalls.Transform_SetPosition(bullet, ref spawn);
-                }
-                else
-                {
-                    Engine.InternalCalls.LogError("Failed to instantiate bullet prefab!");
-                }
+                // Add script to bullet
+                Engine.InternalCalls.Entity_AddScript(bullet, "Game.Projectile");
+                Engine.InternalCalls.Entity_AddRigidBody(bullet);
+                Engine.Vector3 v3 = default;
+                Engine.Vector3 spawn = new Engine.Vector3(v3.X, v3.Y, v3.Z + 0.5f);
+                Engine.InternalCalls.Transform_SetPosition(bullet, ref spawn);
+                Engine.Vector3 vel = new Engine.Vector3(0, 0, 1400f);
+                Engine.InternalCalls.Rigidbody_SetVelocity(bullet, ref vel);
+                Engine.InternalCalls.Log("Firing Bullet!");
             }
         }
 

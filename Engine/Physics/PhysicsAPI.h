@@ -49,6 +49,12 @@ namespace Engine
 	class PhysicsAPI
 	{
 	public:
+		// Singleton easy access
+		static PhysicsAPI &GetInstance()
+		{
+			static PhysicsAPI s_instance;   // Meyers singleton (thread-safe)
+			return s_instance;
+		}
 		// =========================
 		//  Body query / activation
 		// =========================
@@ -208,5 +214,13 @@ namespace Engine
 		 * Const reference to the per-frame contact event buffer.
 		 **************************************************************************/
 		const std::vector<ContactEvent> &GetCollisionEvents();
+
+		private:
+			PhysicsAPI() = default;
+			~PhysicsAPI() = default;
+			PhysicsAPI(const PhysicsAPI &) = delete;
+			PhysicsAPI &operator=(const PhysicsAPI &) = delete;
+			PhysicsAPI(PhysicsAPI &&) = delete;
+			PhysicsAPI &operator=(PhysicsAPI &&) = delete;
 	};
 } // namespace Engine

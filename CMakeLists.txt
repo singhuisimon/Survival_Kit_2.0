@@ -173,11 +173,74 @@ target_link_libraries(GameEngine PUBLIC ${MONO_LIBRARIES})
 file(COPY "${CMAKE_SOURCE_DIR}/Resources"
      DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Debug/GameScripts.dll"
-     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+# ===== Build C# scripts (GameScripts.dll) =====
+set(SCRIPTS_DIR "${CMAKE_SOURCE_DIR}/Scripts")
+set(SCRIPTS_CSPROJ "${SCRIPTS_DIR}/GameScripts.csproj")
 
-file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Release/GameScripts.dll"
-     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+if(NOT EXISTS "${SCRIPTS_CSPROJ}")
+  message(FATAL_ERROR "C# scripts project not found at: ${SCRIPTS_CSPROJ}")
+endif()
+
+# Prefer dotnet; fallback to MSBuild (Visual Studio generators)
+find_program(DOTNET_EXE dotnet)
+if(NOT DOTNET_EXE)
+  # For VS generators, CMAKE_MAKE_PROGRAM is MSBuild.exe
+  if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(MSBUILD_EXE "${CMAKE_MAKE_PROGRAM}")
+  endif()
+endif()
+
+# Helper: choose config expression for multi/single config
+if(CMAKE_CONFIGURATION_TYPES)
+  set(_CFG_GEN "$<CONFIG>")
+else()
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
+  endif()
+  set(_CFG_GEN "${CMAKE_BUILD_TYPE}")
+endif()
+
+# Build output: put GameScripts.dll directly next to the runtime for the active config
+# - dotnet/MSBuild OutDir must end with a trailing slash
+set(_SCRIPTS_OUTDIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
+
+if(DOTNET_EXE)
+  add_custom_target(GameScripts
+    COMMAND "${DOTNET_EXE}" build "${SCRIPTS_CSPROJ}"
+            -c "${_CFG_GEN}"
+            -nologo -v:m
+            -p:WarningLevel=4
+            -p:OutDir="${_SCRIPTS_OUTDIR}"
+    WORKING_DIRECTORY "${SCRIPTS_DIR}"
+    COMMENT "Building C# scripts with dotnet build (${_CFG_GEN}) -> ${_SCRIPTS_OUTDIR}"
+  )
+else()
+  if(NOT MSBUILD_EXE)
+    message(FATAL_ERROR "Neither 'dotnet' nor Visual Studio MSBuild found to build C# scripts.")
+  endif()
+  add_custom_target(GameScripts
+    COMMAND "${MSBUILD_EXE}" "${SCRIPTS_CSPROJ}"
+            /restore
+            /t:Build
+            /p:Configuration="${_CFG_GEN}"
+            /p:OutDir="${_SCRIPTS_OUTDIR}"
+    WORKING_DIRECTORY "${SCRIPTS_DIR}"
+    COMMENT "Building C# scripts with MSBuild (${_CFG_GEN}) -> ${_SCRIPTS_OUTDIR}"
+  )
+endif()
+
+# Make your main run target depend on scripts
+# Adjust these to your actual targets (keep both if you have both)
+if(TARGET Survival_Kit_2.0)
+  add_dependencies(Survival_Kit_2.0 GameScripts)
+endif()
+if(TARGET Game) # e.g., your game executable target
+  add_dependencies(Game GameScripts)
+endif()
+if(TARGET GameEngine) # if you want the engine lib to trigger it too
+  add_dependencies(GameEngine GameScripts)
+endif()
+
 
 # ====================================
 # Build Information
