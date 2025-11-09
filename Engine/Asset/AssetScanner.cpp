@@ -1,4 +1,19 @@
-
+/**
+ * @file AssetScanner.cpp
+ * @brief Incremental file system scanner for detecting asset changes
+ *
+ * @details
+ * Recursively scans configured source directories and detects file changes
+ * (additions, modifications, deletions) by comparing against a persistent
+ * snapshot. Uses timestamp and file size heuristics for efficient change detection.
+ *
+ * @author Wai Lwin Thit
+ * @date September 17 2025
+ *
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #include "AssetScanner.h"
 #include "../Utility/AssetPath.h"
 #include "AssetManager.h"
@@ -9,8 +24,7 @@
 #include <algorithm>
 #include <unordered_set>
 
-//include log manager
-//#include "../Manager/LogManager.h"
+
 
 namespace fs = std::filesystem;
 
@@ -156,18 +170,9 @@ namespace Engine {
 			}
 			catch (const std::filesystem::filesystem_error& e)
             {
-               // LM.writeLog("AssetScanner - Filesystem error in '%s': %s", 
-                           // root.c_str(), e.what());
+				LOG_ERROR("Filesystem error: ", e.what());
             }
-            catch (const std::exception& e)
-            {
-            /*    LM.writeLog("AssetScanner - Error scanning '%s': %s", 
-                            root.c_str(), e.what());*/
-            }
-            catch (...)
-            {
-               // LM.writeLog("AssetScanner - Unknown error scanning '%s'", root.c_str());
-            }
+            
 		} //finished iterating the Source folders
 
 		// Detect removed files (present in snapshot but not seen now)

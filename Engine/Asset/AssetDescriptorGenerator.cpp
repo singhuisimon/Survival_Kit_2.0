@@ -1,3 +1,18 @@
+/**
+ * @file AssetDescriptorGenerator.cpp
+ * @brief Generates descriptor files for asset compilation pipeline
+ * @details
+ * Automatically generates Info.txt and Descriptor.txt files for each asset detected
+ * by the AssetScanner. These descriptor files serve as input to the AssetCompiler,
+ * specifying how source assets should be compiled into runtime binary formats.
+ * @author Wai Lwin Thit
+ * @date October 17 2025
+ *
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "AssetDescriptorGenerator.h"
 #include "AssetDatabase.h"
 #include "../Utility/Logger.h"
@@ -291,7 +306,7 @@ namespace Engine {
             std::error_code ec;
             bool created = fs::create_directories(p, ec);
 
-            if (ec) {
+            if (!created) {
                 LOG_ERROR("Failed to create directory: ", path);
                 LOG_ERROR("  Error: ", ec.message(), " (code: ", ec.value(), ")");
                 return false;

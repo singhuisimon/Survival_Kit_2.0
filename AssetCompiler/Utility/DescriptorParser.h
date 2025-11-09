@@ -2,6 +2,11 @@
  * @file DescriptorParser.h
  * @brief Utility functions for parsing descriptor files
  * @details Provides JSON parsing and data extraction from Info.txt and Descriptor.txt
+ * @author Wai Lwin Thit
+ * @date October 22 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once

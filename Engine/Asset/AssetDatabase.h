@@ -1,7 +1,7 @@
 /**
  * @file AssetDatabase.h
  * @brief Defines asset metadata storage and lookup utilities. 
- * @author 
+ * @author Wai Lwin Thit
  * @date 15/09/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -34,7 +34,7 @@ namespace Engine {
         //metadata 
         std::string ext; //file extension
         std::string contentHash;
-        std::time_t lastWriteTime; 
+        std::time_t lastWriteTime = 0; 
 
         //Status
         bool valid = false;

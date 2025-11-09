@@ -1,7 +1,7 @@
 /**
  * @file AssetManager.cpp
  * @brief Implements the asset management system and compilation pipeline.
- * @author Wai Lwin Thit(20%), Simon Chan(30%), Rio Shannon Yvon Leonardo(50%)
+ * @author Wai Lwin Thit
  * @date 18/09/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -56,7 +56,7 @@ namespace Engine {
 			}
 		}
 		catch (const std::exception& e) {
-			//LM.writeLog("AssetManager::startUp() - Failed to create directories: %s", e.what());
+			LOG_ERROR("Failed to create directories: ", e.what());
 			return -1;
 		}
 		// Configure scanner
@@ -94,8 +94,10 @@ namespace Engine {
 		if (!m_cfg.snapshotFile.empty()) {
 			const size_t snapCount = m_scanner.GetSnapshotSize();
 			bool success = m_scanner.SaveSnapshot(m_cfg.snapshotFile);
-			/*LM.writeLog("AssetManager::shutDown() - Saved snapshot: %zu files, success=%d, path=%s",
-				snapCount, success, m_cfg.snapshotFile.c_str());*/
+			if (success)
+				LOG_INFO("Snapshot has: ", snapCount);
+			else 
+				LOG_ERROR("Snapshot not saved at shutdown");
 		}
 
 	
@@ -135,7 +137,7 @@ namespace Engine {
 			}
 		}
 		catch (const std::exception& e) {
-			LOG_WARNING("Could not get timestamp for ", src);
+			LOG_WARNING("Could not get timestamp for ", src, e.what());
 			rec->lastWriteTime = std::time(nullptr);
 		}
 
