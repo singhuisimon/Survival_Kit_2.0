@@ -1,9 +1,12 @@
-/**
- * @file BehaviourTreeEditor.h
- * @brief Editor utilities for behaviour tree creation and editing
- * @author AI System Team
- * @date 2025
- */
+ /**
+  * @file BehaviourTree.h
+  * @brief Editor utilities for behaviour tree creation and editing
+  * @author Amanda Leow Boon Suan (70%), Rio Shannon Yvon Leonardo (30%)
+  * @date 3/11/2025
+  * Copyright (C) 2025 DigiPen Institute of Technology.
+  * Reproduction or disclosure of this file or its contents without the
+  * prior written consent of DigiPen Institute of Technology is prohibited.
+  */
 
 #pragma once
 
@@ -12,6 +15,9 @@
 #include "../Prefab/BehaviourTreePrefab.h"
 #include "BTNodeRegistry.h"
 #include "../Utility/Logger.h"
+#include "../ECS/Scene.h"
+#include "../ECS/Entity.h"
+#include "../Component/BehaviourTreeComponent.h"
 
 namespace Engine {
 
@@ -136,6 +142,40 @@ namespace Engine {
         static bool SetNodePropertyValue(std::shared_ptr<BTNode> node,
             const std::string& propertyName,
             const std::string& value);
+
+        /**
+        * @brief Rename a behaviour tree (in-memory only)
+        */
+        static bool RenameTree(std::shared_ptr<BehaviourTree> tree, const std::string& newName);
+
+        /**
+        * @brief Rename a behaviour tree (in-memory only)
+        */
+        static bool RenameTreeFile(const std::string& oldPath,
+            const std::string& newPath,
+            Scene* scene = nullptr);
+
+        /**
+        * @brief Rename and save a tree to a new file
+        */
+        static bool RenameAndSave(std::shared_ptr<BehaviourTree> tree,
+            const std::string& newName,
+            const std::string& newFilePath = "");
+
+        /**
+        * @brief Rename actual file name on disk
+        */
+        static bool RenameFile(const std::string& oldPath,
+            const std::string& newPath,
+            Scene* scene = nullptr);
+
+        /**
+        * @brief Save a copy with optional modifications (Save as)
+        */
+        static bool SaveAs(const std::string& sourcePath,
+            const std::string& newPath,
+            const std::string& newName = "",
+            bool generateNewGUID = true);
 
         //END OF NEWLY ADDED - AMANDA
 

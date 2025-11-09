@@ -159,7 +159,7 @@ void main()
         vec3 pos_view = (V * vec4(Lg.position_range.xyz, 1.0)).xyz;
 
         // Get light type
-        uint type = floatBitsToUint(Lg.direction_type.w);
+        uint type = uint(Lg.direction_type.w + 0.5);
 
         // Light attributes
         vec3 Ldir;              // Light direction

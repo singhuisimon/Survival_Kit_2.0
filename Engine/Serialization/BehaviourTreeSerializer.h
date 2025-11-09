@@ -1,8 +1,11 @@
 /**
  * @file BehaviourTreeSerializer.h
  * @brief Serialization for behaviour trees (save/load to JSON)
- * @author AI System Team
- * @date 2025
+ * @author Amanda Leow Boon Suan (90%), Rio Shannon Yvon Leonardo (10%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once
@@ -47,13 +50,14 @@ namespace Engine {
          */
         static std::shared_ptr<BehaviourTree> DeserializeFromFile(const std::string& filepath, bool prefab = false);
 
-    private:
+        // moved GetSourcePath to public
 
         /**
         * @brief Get the source file path (project root Resources folder)
         */
         static std::string GetSourceFilePath(const std::string& relativePath);
 
+    private:
 
         /**
          * @brief Write JSON string to file with directory creation

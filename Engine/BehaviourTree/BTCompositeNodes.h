@@ -1,8 +1,11 @@
 /**
  * @file BTCompositeNodes.h
  * @brief Composite behaviour tree nodes (Sequence, Selector, Parallel)
- * @author AI System Team
- * @date 2025
+ * @author Amanda Leow Boon Suan (100%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once

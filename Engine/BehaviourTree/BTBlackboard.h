@@ -1,13 +1,12 @@
 /**
  * @file BTBlackboard.h
  * @brief Type-safe blackboard for behaviour tree data storage
- * @author AI System Team
- * @date 2025
+ * @author Amanda Leow Boon Suan (80%), Rio Shannon Yvon Leonardo (20%)
+ * @date 5/11/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
 #pragma once
 
 #include <string>

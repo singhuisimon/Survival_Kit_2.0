@@ -1,18 +1,24 @@
 /**
- * @file BehaviourTreeEditor.h
- * @brief Editor utilities for behaviour tree creation and editing
- * @author AI System Team
- * @date 2025
+ * @file BehaviourTreeEditor.cpp
+ * @brief Definition of BehaviourTreeEditor class for managing behaviour trees in the editor
+ * @author Amanda Leow Boon Suan (70%), Rio Shannon Yvon Leonardo (30%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once
 
 #include "BehaviourTree.h"
+#include "BehaviourTreeEditor.h"
 #include "../Serialization/BehaviourTreeSerializer.h"
 #include "BehaviourTreeEditor.h"
 #include "../Prefab/BehaviourTreePrefab.h"
 #include "BTNodeRegistry.h"
 #include "../Utility/Logger.h"
+
+
 
 namespace Engine {
 
@@ -43,7 +49,7 @@ namespace Engine {
      */
     bool BehaviourTreeEditor::SaveTree(const BehaviourTree& tree, const std::string& filepath) {
 
-		std::string path = filepath;
+        std::string path = filepath;
         if (path.empty()) {
             path = "new_tree.json";
         }
@@ -358,6 +364,308 @@ namespace Engine {
                 "' on node type ", node->GetTypeName());
         }
         return success;
+    }
+
+    bool BehaviourTreeEditor::RenameTree(std::shared_ptr<BehaviourTree> tree, const std::string& newName)
+    {
+        if (!tree) {
+            LOG_ERROR("BehaviourTreeEditor::RenameTree: Null tree provided");
+            return false;
+        }
+
+        if (newName.empty()) {
+            LOG_ERROR("BehaviourTreeEditor::RenameTree: Cannot rename tree to empty name");
+            return false;
+        }
+
+        std::string oldName = tree->GetName();
+        tree->SetName(newName);
+
+        LOG_INFO("BehaviourTreeEditor: Renamed tree from '", oldName, "' to '", newName, "'");
+        return true;
+    }
+
+    bool RenameTreeFile(const std::string& oldPath,
+        const std::string& newPath,
+        Scene* scene = nullptr) {
+
+        if (oldPath.empty() || newPath.empty()) {
+            LOG_ERROR("BehaviourTreeEditor::RenameTreeFile: Empty path provided");
+            return false;
+        }
+
+        if (oldPath == newPath) {
+            LOG_WARNING("BehaviourTreeEditor::RenameTreeFile: Old and new paths are identical");
+            return true;
+        }
+
+        // Step 1 - Load the tree from the old path
+        LOG_INFO("BehaviourTreeEditor: Loading tree from '", oldPath, "'");
+        auto tree = BehaviourTreeEditor::LoadTree(oldPath);
+        if (!tree) {
+            LOG_ERROR("BehaviourTreeEditor: Failed to load tree from '", oldPath, "'");
+            return false;
+        }
+
+        // Step 2 - Extract new name from path (remove .json and path)
+        std::string newName = newPath;
+
+        // Remove .json extension if present
+        size_t extPos = newName.find_last_of('.');
+        if (extPos != std::string::npos) {
+            std::string ext = newName.substr(extPos);
+            if (ext == ".json" || ext == ".JSON") {
+                newName = newName.substr(0, extPos);
+            }
+        }
+
+        // Remove any path prefix
+        size_t pathSep = newName.find_last_of("/\\");
+        if (pathSep != std::string::npos) {
+            newName = newName.substr(pathSep + 1);
+        }
+
+        // Step 3: Update the tree's internal
+        tree->SetName(newName);
+
+        // Step 4: Save to the new path
+        LOG_INFO("BehaviourTreeEditor: Saving tree to new path '", newPath, "'");
+        if (!BehaviourTreeEditor::SaveTree(*tree, newPath)) {
+            LOG_ERROR("BehaviourTreeEditor: Failed to save tree to new path '", newPath, "'");
+            return false;
+        }
+
+        // Step 5: Update all component references in the scene
+        if (scene) {
+            LOG_INFO("BehaviourTreeEditor: Updating component references in scene");
+
+            auto& registry = scene->GetRegistry();
+            auto view = registry.view<BehaviourTreeComponent>();
+
+            int updatedCount = 0;
+            for (auto entity : view) {
+                Entity ent(entity, &registry);
+
+                if (!ent.HasComponent<BehaviourTreeComponent>()) {
+                    continue;
+                }
+
+                auto& btComp = ent.GetComponent<BehaviourTreeComponent>();
+
+                // If this component was using the old path, update it
+                if (btComp.TreeAssetPath == oldPath) {
+                    btComp.TreeAssetPath = newPath;
+
+                    // Also update the runtime instance if loaded
+                    if (btComp.TreeInstance) {
+                        btComp.TreeInstance->SetName(newName);
+                    }
+
+                    updatedCount++;
+                }
+            }
+
+            LOG_INFO("BehaviourTreeEditor: Updated ", updatedCount, " component references");
+        }
+
+        return true; // "temporary" code to fix warning
+    }
+
+    bool BehaviourTreeEditor::RenameAndSave(std::shared_ptr<BehaviourTree> tree,
+        const std::string& newName,
+        const std::string& newFilePath) {
+        if (!tree) {
+            LOG_ERROR("BehaviourTreeEditor::RenameAndSave: Null tree provided");
+            return false;
+        }
+
+        if (newName.empty()) {
+            LOG_ERROR("BehaviourTreeEditor::RenameAndSave: Empty name provided");
+            return false;
+        }
+
+        // Update the tree's name
+        tree->SetName(newName);
+
+        // Determine the file path
+        std::string filepath = newFilePath;
+        if (filepath.empty()) {
+            filepath = newName + ".json";
+        }
+
+        // Make sure path ends with .json
+        if (filepath.find(".json") == std::string::npos) {
+            filepath += ".json";
+        }
+
+        // Save the tree
+        LOG_INFO("BehaviourTreeEditor: Renaming and saving tree to '", filepath, "'");
+        if (!BehaviourTreeEditor::SaveTree(*tree, filepath)) {
+            LOG_ERROR("BehaviourTreeEditor: Failed to save renamed tree");
+            return false;
+        }
+
+        LOG_INFO("BehaviourTreeEditor: Successfully renamed and saved tree as '", newName, "'");
+        return true;
+    }
+
+    bool BehaviourTreeEditor::RenameFile(const std::string& oldPath,
+        const std::string& newPath,
+        Scene* scene) {
+
+        if (oldPath.empty() || newPath.empty()) {
+            LOG_ERROR("BehaviourTreeEditor::RenameFile: Empty path provided");
+            return false;
+        }
+
+        if (oldPath == newPath) {
+            LOG_WARNING("BehaviourTreeEditor::RenameFile: Paths are identical");
+            return true;
+        }
+
+        // Step 1: Get full paths (need both source and output locations)
+        std::string oldSourcePath = BehaviourTreeSerializer::GetSourceFilePath("Sources/BT/" + oldPath);
+        std::string oldOutputPath = getAssetFilePath("Sources/BT/" + oldPath);
+        std::string newSourcePath = BehaviourTreeSerializer::GetSourceFilePath("Sources/BT/" + newPath);
+        std::string newOutputPath = getAssetFilePath("Sources/BT/" + newPath);
+
+        // Step 2: Ensure source file exists
+        if (!std::filesystem::exists(oldSourcePath) && !std::filesystem::exists(oldOutputPath)) {
+            LOG_ERROR("BehaviourTreeEditor::RenameFile: Source file not found at '", oldPath, "'");
+            return false;
+        }
+
+        // Step 3 - Load the tree to update internal name
+        auto tree = BehaviourTreeEditor::LoadTree(oldPath);
+        if (!tree) {
+            LOG_ERROR("BehaviourTreeEditor::RenameFile: Failed to load tree from '", oldPath, "'");
+            return false;
+        }
+
+        // Step 4 - Extract new name from path
+        std::string newName = newPath;
+        size_t extPos = newName.find_last_of('.');
+        if (extPos != std::string::npos) {
+            newName = newName.substr(0, extPos);
+        }
+        size_t pathSep = newName.find_last_of("/\\");
+        if (pathSep != std::string::npos) {
+            newName = newName.substr(pathSep + 1);
+        }
+
+        // Step 5: Update tree's internal name (GUID will stay the same)
+        tree->SetName(newName);
+
+        // Step 6: Save to new location
+        if (!SaveTree(*tree, newPath)) {
+            LOG_ERROR("BehaviourTreeEditor::RenameFile: Failed to save to new path '", newPath, "'");
+            return false;
+        }
+
+        // Step 7 - Delete all old files (both source and output)
+        bool deletedSource = false;
+        bool deletedOutput = false;
+
+        if (std::filesystem::exists(oldSourcePath)) {
+            std::error_code ec;
+            deletedSource = std::filesystem::remove(oldSourcePath, ec);
+            if (!deletedSource) {
+                LOG_WARNING("BehaviourTreeEditor::RenameFile: Failed to delete old source file: ", ec.message());
+            }
+        }
+
+        if (std::filesystem::exists(oldOutputPath)) {
+            std::error_code ec;
+            deletedOutput = std::filesystem::remove(oldOutputPath, ec);
+            if (!deletedOutput) {
+                LOG_WARNING("BehaviourTreeEditor::RenameFile: Failed to delete old output file: ", ec.message());
+            }
+        }
+
+        // Step 8: Update scene component references if provided
+        if (scene) {
+            auto& registry = scene->GetRegistry();
+            auto view = registry.view<BehaviourTreeComponent>();
+
+            int updatedCount = 0;
+            for (auto entity : view) {
+                Entity ent(entity, &registry);
+                if (!ent.HasComponent<BehaviourTreeComponent>()) continue;
+
+                auto& btComp = ent.GetComponent<BehaviourTreeComponent>();
+
+                // Update path references
+                if (btComp.TreeAssetPath == oldPath) {
+                    btComp.TreeAssetPath = newPath;
+                    if (btComp.TreeInstance) {
+                        btComp.TreeInstance->SetName(newName);
+                    }
+                    updatedCount++;
+                }
+            }
+
+            LOG_INFO("BehaviourTreeEditor::RenameFile: Updated ", updatedCount, " component references");
+        }
+
+        LOG_INFO("BehaviourTreeEditor::RenameFile: Successfully renamed '", oldPath, "' to '", newPath, "'");
+        return true;
+
+    }
+
+    bool BehaviourTreeEditor::SaveAs(const std::string& sourcePath,
+        const std::string& newPath,
+        const std::string& newName,
+        bool generateNewGUID) {
+
+        if (sourcePath.empty() || newPath.empty()) {
+            LOG_ERROR("BehaviourTreeEditor::SaveAs: Empty path provided");
+            return false;
+        }
+
+        // Step 1 - Load the source tree
+        auto tree = BehaviourTreeEditor::LoadTree(sourcePath);
+        if (!tree) {
+            LOG_ERROR("BehaviourTreeEditor::SaveAs: Failed to load source tree from '", sourcePath, "'");
+            return false;
+        }
+
+        // Step 2 - Update name if provided
+        if (!newName.empty()) {
+            tree->SetName(newName);
+        }
+        else {
+            // Extract name from path if not provided
+            std::string extractedName = newPath;
+            size_t extPos = extractedName.find_last_of('.');
+
+            if (extPos != std::string::npos) {
+                extractedName = extractedName.substr(0, extPos);
+            }
+            size_t pathSep = extractedName.find_last_of("/\\");
+            if (pathSep != std::string::npos) {
+                extractedName = extractedName.substr(pathSep + 1);
+            }
+            tree->SetName(extractedName);
+        }
+
+        // Step 3 - Generate a new GUID
+        if (generateNewGUID) {
+            tree->SetGUID(xresource::instance_guid::GenerateGUIDCopy());
+            LOG_INFO("BehaviourTreeEditor::SaveAs: Generated new GUID for copy");
+        }
+        else {
+            LOG_INFO("BehaviourTreeEditor::SaveAs: Keeping original GUID");
+        }
+
+        // Step 4: Save to new location
+        if (!SaveTree(*tree, newPath)) {
+            LOG_ERROR("BehaviourTreeEditor::SaveAs: Failed to save to '", newPath, "'");
+            return false;
+        }
+
+        LOG_INFO("BehaviourTreeEditor::SaveAs: Successfully saved copy from '",
+            sourcePath, "' to '", newPath, "'");
+        return true;
     }
 
 } // namespace Engine

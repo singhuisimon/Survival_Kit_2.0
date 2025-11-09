@@ -30,9 +30,10 @@ namespace fs = std::filesystem;
 // ============================================================================
 
 struct CompilerConfig {
-    std::string descriptorsPath = "Resources/Descriptors/";
-    std::string outputPath = "Resources/Compiled/";
+    std::string descriptorsPath = "Resources/Descriptors";
+    std::string outputPath = "Resources/Compiled";
     std::string resourceType = "all";  // "all", "texture", "mesh", "audio", "shader"
+    std::string specifiedGuid = "";
     bool verbose = false;
     bool force = false;  // Force recompile even if up-to-date
     int threadCount = 4;
@@ -81,6 +82,9 @@ bool parseArguments(int argc, char* argv[], CompilerConfig& config) {
         }
         else if (arg == "--type" && i + 1 < argc) {
             config.resourceType = argv[++i];
+        }
+        else if (arg == "--guid" && i + 1 < argc) {          // ADD THIS
+            config.specifiedGuid = argv[++i];
         }
         else if (arg == "--threads" && i + 1 < argc) {
             config.threadCount = std::stoi(argv[++i]);
@@ -221,7 +225,7 @@ std::vector<DescriptorInfo> discoverDescriptors(const std::string& descriptorsRo
 }
 
 // ============================================================================
-// COMPILATION (PLACEHOLDER - TO BE IMPLEMENTED)
+// COMPILATION
 // ============================================================================
 
 bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config) {
@@ -274,7 +278,7 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
         AssetCompiler::MeshCompiler meshCompiler;
 
         // Generate output path: Resources/Compiled/Mesh/GUID.mesh
-        std::string outputPath = config.outputPath + descriptor.resourceType + "/" + descriptor.guid + ".mesh";
+        std::string outputPath = config.outputPath + "/" + descriptor.resourceType + "/" + descriptor.guid + ".mesh";
 
         success = meshCompiler.compile(descriptor.descriptorFile, outputPath, config.verbose);
     }
@@ -284,7 +288,7 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
         AssetCompiler::TextureCompiler compiler; 
 
         //generate output path: Resources/Compiled/Texture/GUID.tex
-        std::string output = config.outputPath + "Texture/" + descriptor.guid + ".tex";
+        std::string output = config.outputPath + "/" + descriptor.resourceType + "/" + descriptor.guid + ".tex";
 
         success = compiler.compile(descriptor.descriptorFile, output, config.verbose);
     }
@@ -340,8 +344,26 @@ int main(int argc, char* argv[]) {
     std::cout << "  Force:   " << (config.force ? "Yes" : "No") << "\n";
     std::cout << "  Verbose: " << (config.verbose ? "Yes" : "No") << "\n\n";
     
+
+    // SAVE THE CURRENT DIRECTORY
+    fs::path originalPath = fs::current_path();
+
+    std::cout << "Original Path: " << originalPath << "\n";
+
+    // CHANGE WORKING DIRECTORY to where the resources are
+    // Extract the directory from descriptorsPath
+    fs::path descriptorsDir = fs::path(config.descriptorsPath);
+    fs::path projectRoot = descriptorsDir.parent_path().parent_path(); // Go from Descriptors to Resources to project root
+    std::cout << "Descriptors directory: " << descriptorsDir << "\n";
+    std::cout << "Project root direcotry" << projectRoot << "\n";
+
+    if (fs::exists(projectRoot)) {
+        fs::current_path(projectRoot);
+        std::cout << "Working directory: " << fs::current_path().string() << "\n\n";
+    }
+
     // Discover all descriptors
-    auto descriptors = discoverDescriptors(config.descriptorsPath, config.resourceType);
+    auto descriptors = discoverDescriptors(config.descriptorsPath, config.resourceType, config.specifiedGuid);
     
     if (descriptors.empty()) {
         std::cout << "No descriptors found to compile.\n";

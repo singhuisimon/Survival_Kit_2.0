@@ -1,8 +1,11 @@
 /**
  * @file BTNodeRegistry.h
  * @brief Registry for behaviour tree node types
- * @author AI System Team
- * @date 2025
+ * @author Amanda Leow Boon Suan (80%), Rio Shannon Yvon Leonardo (20%)
+ * @date 3/11/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once
@@ -84,7 +87,8 @@ namespace Engine {
             , Description(description)
             , Factory(factory)
             , CanHaveChildren(canHaveChildren)
-            , PropertyMetadata(std::make_shared<BTNodeMetadata>(typeName, category)) {}
+            , PropertyMetadata(std::make_shared<BTNodeMetadata>(typeName, category)) {
+        }
     };
 
     /**
