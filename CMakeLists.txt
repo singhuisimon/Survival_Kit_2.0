@@ -202,8 +202,7 @@ endif()
 
 # Build output: put GameScripts.dll directly next to the runtime for the active config
 # - dotnet/MSBuild OutDir must end with a trailing slash
-set(_CFG_DIR "$<$<BOOL:${CMAKE_CONFIGURATION_TYPES}>:$<CONFIG>>$<$<NOT:$<BOOL:${CMAKE_CONFIGURATION_TYPES}>>:${CMAKE_BUILD_TYPE}>")
-set(_SCRIPTS_OUTDIR "${_OUT_ROOT}/bin/${_CFG_DIR}/")
+set(_SCRIPTS_OUTDIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
 
 if(DOTNET_EXE)
   add_custom_target(GameScripts
