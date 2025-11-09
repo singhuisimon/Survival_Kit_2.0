@@ -339,6 +339,15 @@ namespace Engine
 		*   exist or an error occurred while opening it.
 		**************************************************************************/
 		bool OpenScriptInEditor(const std::string& scriptName);
+
+		/**************************************************************************
+		* @brief
+		* 	Display the camera component when camera component is added to the 
+		*	selected entity. 
+		* @param buttonSize
+		*	The size of the button used for removing the component.
+		**************************************************************************/
+		void displayCameraComp(ImVec2& buttonSize);
 	};
 
 
