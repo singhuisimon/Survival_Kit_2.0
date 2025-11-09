@@ -1,13 +1,24 @@
 #pragma once
+#include <vector>
 #include <glm/glm.hpp>
+
 #include "ECS/Entity.h"
-#include "Physics/PhysicsBridge.h"
+#include "Physics/PhysicsBridge.h"      // EntityID, mPhysics, mBodyInterface, mBodyOf
+#include <Jolt/Physics/Body/BodyID.h>   // JPH::BodyID
 
 namespace Engine
 {
+    // Minimal per-contact record: just the two entities
+    struct ContactEvent
+    {
+        EntityID entA{ entt::null };
+        EntityID entB{ entt::null };
+    };
+
     class PhysicsAPI
     {
     public:
+        // ===== Existing API (unchanged) =====
         static bool HasBody(const Entity &e);
         static void Activate(const Entity &e);
 
@@ -23,5 +34,10 @@ namespace Engine
         static void SetAngularDamping(const Entity &e, float damping);
         static void SetGravityFactor(const Entity &e, float factor);
         static void SetContinuousDetection(const Entity &e, bool enabled);
+
+        // ===== Collisions (your requested signatures) =====
+        static void EnableCollisionEvents();                  // hook listener to mPhysics
+        static void BeginCollisionFrame();                    // clear per-frame buffer
+        const std::vector<ContactEvent> &GetCollisionEvents();// const ref (non-draining)
     };
 }

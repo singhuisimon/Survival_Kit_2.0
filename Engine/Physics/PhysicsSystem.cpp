@@ -32,7 +32,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <vector>
 
 #include "PhysicsSystem.h"
-
+#include "PhysicsAPI.h"
 namespace Engine
 {
 	static constexpr float DEFAULT_HALF_EXT = 0.5f;
@@ -117,6 +117,7 @@ namespace Engine
 		mBodyInterface = &mPhysics.GetBodyInterface();
 
 		BuildOrRefreshBodies(scene);
+		Engine::PhysicsAPI::EnableCollisionEvents();
 	}
 
 	void PhysicsSystem::OnShutdown(Scene * /*scene*/)
@@ -223,7 +224,7 @@ namespace Engine
 				}
 			}
 		);
-
+		PhysicsAPI::BeginCollisionFrame();
 		mPhysics.Update(dt.GetSeconds(), 1, mTempAllocator, mJobSystem);
 
 		reg.view<TransformComponent, RigidbodyComponent>().each(
