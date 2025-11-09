@@ -1,28 +1,20 @@
 {
-	"configurations": [
-		{
-			"name": "x64-Debug",
-			"generator": "Ninja",
-			"configurationType": "Debug",
-			"buildRoot": "${projectDir}\\out\\build\\${name}",
-			"installRoot": "${projectDir}\\out\\install\\${name}",
-			"cmakeCommandArgs": "",
-			"buildCommandArgs": "",
-			"ctestCommandArgs": "",
-			"inheritEnvironments": [ "msvc_x64_x64" ],
-			"variables": []
-		},
-		{
-			"name": "x64-Release",
-			"generator": "Ninja",
-			"configurationType": "Release",
-			"buildRoot": "${projectDir}\\out\\build\\${name}",
-			"installRoot": "${projectDir}\\out\\install\\${name}",
-			"cmakeCommandArgs": "",
-			"buildCommandArgs": "",
-			"ctestCommandArgs": "",
-			"inheritEnvironments": [ "msvc_x64_x64" ],
-			"variables": []
-		}
-	]
+  "configurations": [
+    {
+      "name": "Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\build\\Debug",
+      "installRoot": "${projectDir}\\build\\install\\Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ]
+    },
+    {
+      "name": "Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\build\\Release",
+      "installRoot": "${projectDir}\\build\\install\\Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ]
+    }
+  ]
 }

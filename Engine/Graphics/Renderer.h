@@ -117,17 +117,36 @@ namespace Engine {
 		 */
 		inline const std::vector<Texture>& getTextureStorage() { return m_gl.t_testing_textures; }
 
-		// Return editor camera
+		/**
+		 * @brief Provide a reference to the editor camera
+		 * @return Reference to the editor camera
+		 */
 		inline Camera3D& getEditorCamera() { return editor_camera; }
 
-		// Resizes FBO if auto aspect is allowed
+		/**
+		 * @brief Resize a FBO with the given width and height
+		 * @param handle The handle of the FBO to resize
+		 * @param w The new width 
+		 * @param h The new height
+		 */
 		inline void resizeFBO(u32 handle, int w, int h);
 
-		// Return editor viewport data (Temp solution)
+		/**
+		 * @brief Provide a reference to the editor viewport data
+		 * @return Reference to the editor viewport data
+		 */
 		inline EditorViewport& getEditorViewport() { return renderEditorVP; }
+
+		/**
+		 * @brief Provides read-only access to the picked ID in the editor
+		 * @return Const reference to the picked ID
+		 */
 		inline const u32 getPickedID() const { return pickedID; }
 
-		// Return editor camera toggle 
+		/**
+		 * @brief Provide a reference to the active status of the editor camera
+		 * @return Reference to the active status of the editor camera
+		 */
 		inline bool& getEditorCamToggle() { return isEditorCamOn; }
 
 
@@ -160,12 +179,11 @@ namespace Engine {
 			std::span<const LightCPU> sceneLights);
 
 		Camera3D& editor_camera;
-		//Light& editor_light;
 
-		// MATERIALS UBO
+		// Material UBO handle
 		GLuint m_materialUBO = 0;
 
-		// LIGHT UBO
+		// Light UBO handle
 		GLuint m_lightsUBO = 0;
 		LightsBlockGPU m_lightsCPU{}; // scratch buffer
 
@@ -173,12 +191,12 @@ namespace Engine {
 		std::vector<FrameBuffer> m_framebuffers;
 
 		// Temp objects for object picking
-		GLuint temp_rbo;				// Used for scene and GPU ID FBO
+		GLuint temp_rbo = 0;				// Used for scene and GPU ID FBO
 		EditorViewport renderEditorVP;	// Editor viewport data
-		u32 pickedID;
+		u32 pickedID = 0xFFFFFFFFu;
 
 		// Temp toggle to check if editor camera is enabled
-		bool isEditorCamOn;
+		bool isEditorCamOn = true;
 
 		// Temporary object
 		GraphicsLoader m_gl;
