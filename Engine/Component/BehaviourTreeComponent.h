@@ -1,7 +1,7 @@
  /**
   * @file BehaviourTreeComponent.h
   * @brief Attaches a behaviour tree to the entity as well as blackboard data
-  * @author Amanda Leow Boon Suan (90%)
+  * @author Amanda Leow Boon Suan (90%), Rio Shannon Yvon Leonardo (10%)
   * @date 3/11/2025
   * Copyright (C) 2025 DigiPen Institute of Technology.
   * Reproduction or disclosure of this file or its contents without the

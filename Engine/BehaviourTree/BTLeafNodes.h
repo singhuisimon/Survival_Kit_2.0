@@ -1,7 +1,7 @@
 /**
  * @file BTLeafNodes.h
  * @brief Leaf behaviour tree nodes (Actions and Conditions)
- * @author Amanda Leow Boon Suan (90%)
+ * @author Amanda Leow Boon Suan (90%), Rio Shannon Yvon Leonardo (10%)
  * @date 3/11/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -654,6 +654,34 @@ namespace Engine {
         void SetProperty(const std::string& name, const std::string& value) override;
 
         std::string m_Tag;
+    };
+
+    class BTCheckCollision : public BTNode {
+    public:
+        BTCheckCollision(const std::string& againstTag = "", bool destroyOnHit = false);
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_OtherTag;
+        bool m_DestroyOnHit;
+		std::string m_CollidedIDKey;
+    };
+
+    class BTDeleteCollidedEntity : public BTNode {
+    public:
+        BTDeleteCollidedEntity(const std::string& collidedKey = "");
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_CollidedIDKey;
+
     };
 
 

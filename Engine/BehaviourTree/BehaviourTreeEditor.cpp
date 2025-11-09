@@ -1,7 +1,7 @@
 /**
  * @file BehaviourTreeEditor.cpp
  * @brief Definition of BehaviourTreeEditor class for managing behaviour trees in the editor
- * @author Amanda Leow Boon Suan (90%)
+ * @author Amanda Leow Boon Suan (70%), Rio Shannon Yvon Leonardo (30%)
  * @date 3/11/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -467,6 +467,8 @@ namespace Engine {
 
             LOG_INFO("BehaviourTreeEditor: Updated ", updatedCount, " component references");
         }
+
+        return true; // "temporary" code to fix warning
     }
 
     bool BehaviourTreeEditor::RenameAndSave(std::shared_ptr<BehaviourTree> tree,

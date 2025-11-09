@@ -1,7 +1,7 @@
 /**
  * @file BTNodeRegistry.cpp
  * @brief Definition of Behaviour Tree Node Registry, Where you register all the created nodes
- * @author Amanda Leow Boon Suan (90%)
+ * @author Amanda Leow Boon Suan (90%), Rio Shannon Yvon Leonardo (10%)
  * @date 3/11/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -360,6 +360,20 @@ namespace Engine {
         registry.RegisterNodeType<BTCreateShootableEnemy>("Action", "Create shootable enemy",
             [](BTNodeMetadata& metadata) {
                 BT_REGISTER_STRING_PROPERTY(BTCreateShootableEnemy, "Tag", m_Tag);
+            }
+        );
+
+        registry.RegisterNodeType<BTCheckCollision>("Action", "Check for collision other tag entities",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckCollision, "OtherTag", m_OtherTag);
+                BT_REGISTER_STRING_PROPERTY(BTCheckCollision, "CollidedIDKey", m_CollidedIDKey);
+                BT_REGISTER_BOOL_PROPERTY(BTCheckCollision, "DestroyOnHit", m_DestroyOnHit);
+            }
+        );
+        
+        registry.RegisterNodeType<BTDeleteCollidedEntity>("Action", "Delete collided entity",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTDeleteCollidedEntity, "CollidedIDKey", m_CollidedIDKey);
             }
         );
 
