@@ -1988,6 +1988,9 @@ namespace Engine
 						m_SelectedEntity.RemoveComponent<LightComponent>();
 					}
 				}
+
+				// ============================ Display Camera Comp ===============================
+				displayCameraComp(dotButtonSize);
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -2205,7 +2208,27 @@ namespace Engine
 					{
 						if (!hasLightComponent)
 						{
-							ImGui::SetTooltip("Add script to this object.");
+							ImGui::SetTooltip("Add light to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Canera Component ----------------------------
+					bool hasCameraComponent = m_SelectedEntity.HasComponent<CameraComponent>();
+					ImGui::BeginDisabled(hasCameraComponent);
+
+					if (ImGui::MenuItem("Camera Component"))
+					{
+						if (!hasCameraComponent)
+						{
+							m_SelectedEntity.AddComponent<CameraComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasCameraComponent)
+						{
+							ImGui::SetTooltip("Add camera to this object.");
 						}
 					}
 					ImGui::EndDisabled();
@@ -3974,5 +3997,73 @@ namespace Engine
 			return false;
 		}
 	}
+	void Editor::displayCameraComp(ImVec2& buttonSize)
+	{
+		if (m_SelectedEntity.HasComponent<CameraComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
 
+			bool openCameraComp = ImGui::CollapsingHeader("Camera Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removeCameraComp = false;
+			ImGui::NextColumn();
+
+			if (ImGui::Button("...###CameraBtn", buttonSize))
+			{
+				ImGui::OpenPopup("CameraPopUp");
+			}
+			if (ImGui::BeginPopup("CameraPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeCameraComp = true;
+					//return;
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openCameraComp)
+			{
+				auto& camComp = m_SelectedEntity.GetComponent<CameraComponent>();
+				bool changed = false;
+
+				changed |= ImGui::Checkbox("Enabled", &camComp.Enabled);
+		/*		changed |= ImGui::Checkbox("Primary", &camComp.Primary);*/
+				changed |= ImGui::Checkbox("Auto Aspect", &camComp.autoAspect);
+
+				if (!camComp.autoAspect)
+				{
+					changed |= ImGui::DragFloat("Aspect", &camComp.Aspect, 0.01f, 0.1f, 10.0f);
+				}
+
+				changed |= ImGui::DragFloat("FOV", &camComp.FOV, 0.1f, 10.0f, 120.0f);
+				changed |= ImGui::DragFloat("Near Plane", &camComp.NearPlane, 0.01f, 0.01f, camComp.FarPlane - 0.01f);
+				changed |= ImGui::DragFloat("Far Plane", &camComp.FarPlane, 1.0f, camComp.NearPlane + 0.01f, 10000.0f);
+
+			/*	int depth = static_cast<int>(camComp.Depth);
+				if (ImGui::DragInt("Depth", &depth, 1, 0, 100))
+				{
+					camComp.Depth = static_cast<u32>(depth);
+					changed = true;
+				}*/
+
+				/*changed |= ImGui::DragFloat3("Target", glm::value_ptr(camComp.Target), 0.1f);*/
+
+				if (changed)
+				{
+					camComp.isDirty = true;
+
+				}
+			}
+			// ---------------------- Remove Camera Comp ---------------------------
+			if (removeCameraComp)
+			{
+				m_SelectedEntity.RemoveComponent<CameraComponent>();
+			}
+
+		}
+	}
 } // end of namespace Engine

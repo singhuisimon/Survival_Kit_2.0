@@ -339,6 +339,8 @@ namespace Engine
 		*   exist or an error occurred while opening it.
 		**************************************************************************/
 		bool OpenScriptInEditor(const std::string& scriptName);
+
+		void displayCameraComp(ImVec2& buttonSize);
 	};
 
 
