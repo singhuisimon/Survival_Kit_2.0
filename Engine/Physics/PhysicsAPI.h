@@ -215,12 +215,11 @@ namespace Engine
 		 **************************************************************************/
 		const std::vector<ContactEvent> &GetCollisionEvents();
 
-		private:
-			PhysicsAPI() = default;
-			~PhysicsAPI() = default;
-			PhysicsAPI(const PhysicsAPI &) = delete;
-			PhysicsAPI &operator=(const PhysicsAPI &) = delete;
-			PhysicsAPI(PhysicsAPI &&) = delete;
-			PhysicsAPI &operator=(PhysicsAPI &&) = delete;
+		PhysicsAPI() = default;
+		~PhysicsAPI() = default;
+		PhysicsAPI(const PhysicsAPI &) = delete;
+		PhysicsAPI &operator=(const PhysicsAPI &) = delete;
+		PhysicsAPI(PhysicsAPI &&) = delete;
+		PhysicsAPI &operator=(PhysicsAPI &&) = delete;
 	};
 } // namespace Engine
