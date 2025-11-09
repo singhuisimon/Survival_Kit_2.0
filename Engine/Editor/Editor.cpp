@@ -756,6 +756,8 @@ namespace Engine
 						// ======================= Asset Reference Section =======================
 						ImGui::SeparatorText("Asset References");
 
+						static bool showWrongType = false;
+
 						// Helper lambda to display asset field with drag-drop support
 						auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType) {
 							// Get the filename from the GUID
@@ -789,12 +791,24 @@ namespace Engine
 									const AssetRecord* record = AM.getAssetRecord(droppedGuid);
 									if (record && record->type == expectedType)
 									{
-										guid = droppedGuid;
+										// Temporary fix for now: To be fully fixed by M3
+										std::string fileName = std::filesystem::path(currScenePath).filename().string();
+										std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
+
+										if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
+											&& recordName != "E005_loveletter_v001.fbx") {
+											
+											showWrongType = true;
+										}
+										else {
+
+											guid = droppedGuid;
+
+										}
 									}
 									else
 									{
-										// Optional: Show error message for incompatible type
-										ImGui::OpenPopup("Incompatible Asset Type");
+										showWrongType = true;
 									}
 								}
 								ImGui::EndDragDropTarget();
@@ -818,11 +832,17 @@ namespace Engine
 						DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
 						DisplayAssetField("Texture", mesh.TextureGuid, ResourceType::TEXTURE);
 
+						if (showWrongType) {
+
+							ImGui::OpenPopup("Incompatible Asset Type");
+							showWrongType = false;
+						}
+
 						// Popup for incompatible asset type
-						if (ImGui::BeginPopupModal("Incompatible Asset Type", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+						if (ImGui::BeginPopup("Incompatible Asset Type"))
 						{
 							ImGui::Text("The dropped asset type does not match the expected type.");
-							if (ImGui::Button("OK"))
+							if (ImGui::Button("Close"))
 							{
 								ImGui::CloseCurrentPopup();
 							}
@@ -1988,6 +2008,9 @@ namespace Engine
 						m_SelectedEntity.RemoveComponent<LightComponent>();
 					}
 				}
+
+				// ============================ Display Camera Comp ===============================
+				displayCameraComp(dotButtonSize);
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -2205,7 +2228,27 @@ namespace Engine
 					{
 						if (!hasLightComponent)
 						{
-							ImGui::SetTooltip("Add script to this object.");
+							ImGui::SetTooltip("Add light to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Canera Component ----------------------------
+					bool hasCameraComponent = m_SelectedEntity.HasComponent<CameraComponent>();
+					ImGui::BeginDisabled(hasCameraComponent);
+
+					if (ImGui::MenuItem("Camera Component"))
+					{
+						if (!hasCameraComponent)
+						{
+							m_SelectedEntity.AddComponent<CameraComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasCameraComponent)
+						{
+							ImGui::SetTooltip("Add camera to this object.");
 						}
 					}
 					ImGui::EndDisabled();
@@ -2528,8 +2571,8 @@ namespace Engine
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 			ImGui::Text("Projects:");
 
-			bool inRawResouces = false;
-			bool inComposedResources = false;
+			//bool inRawResouces = false;
+			//bool inComposedResources = false;
 
 			// For resources handled by Asset Browser
 			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
@@ -2647,7 +2690,7 @@ namespace Engine
 							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
 						}
 
-						// Unique ID per button so ImGui doesn�t confuse them
+						// Unique ID per button
 						ImGui::PushID(static_cast<int>(i));
 
 						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
@@ -2768,7 +2811,7 @@ namespace Engine
 						selectedResourcesIndex = static_cast<int>(i);
 
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
-						if (extension == ".json") // if it is scene
+						if (extension == ".json" && folderName != "BT") // For scene, not BT
 						{
 							if (isPrefabEditor)
 							{
@@ -2814,7 +2857,7 @@ namespace Engine
 							// LOG_DEBUG("Check isPrefabEditor is ", isPrefabEditor);
 
 						}
-						else if (extension == ".prefab")
+						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
 							//auto prefab = PrefabSerializer::LoadPrefabFromFile(filePath);
 							if (!isPrefabEditor)
@@ -2914,8 +2957,9 @@ namespace Engine
 				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
 					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
 					if (texture != nullptr) {
-						float tex_w = texture->width;
-						float tex_h = texture->height;
+						float tex_w = static_cast<float>(texture->width);
+						float tex_h = static_cast<float>(texture->height);
+
 
 						ImVec2 window_size = ImGui::GetWindowSize();
 						float win_w = window_size.x * 3 / 4;
@@ -3743,13 +3787,7 @@ namespace Engine
 
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
-		//if (!entity) return;
-		/*if (!entity || !m_Scene) {
-			m_SelectedEntity = Entity{};
-			m_PickedID = 0xFFFFFFFFu;
-		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>()) {
-			return;
-		}*/
+		
 
 		if(!entity || !m_Scene || !entity.HasComponent<TransformComponent>())
 			return;
@@ -3974,10 +4012,78 @@ namespace Engine
 			int result = system(command.c_str());
 			return result == 0;
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 			return false;
 		}
 	}
+	void Editor::displayCameraComp(ImVec2& buttonSize)
+	{
+		if (m_SelectedEntity.HasComponent<CameraComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
 
+			bool openCameraComp = ImGui::CollapsingHeader("Camera Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removeCameraComp = false;
+			ImGui::NextColumn();
+
+			if (ImGui::Button("...###CameraBtn", buttonSize))
+			{
+				ImGui::OpenPopup("CameraPopUp");
+			}
+			if (ImGui::BeginPopup("CameraPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeCameraComp = true;
+					//return;
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openCameraComp)
+			{
+				auto& camComp = m_SelectedEntity.GetComponent<CameraComponent>();
+				bool changed = false;
+
+				changed |= ImGui::Checkbox("Enabled", &camComp.Enabled);
+		/*		changed |= ImGui::Checkbox("Primary", &camComp.Primary);*/
+				changed |= ImGui::Checkbox("Auto Aspect", &camComp.autoAspect);
+
+				if (!camComp.autoAspect)
+				{
+					changed |= ImGui::DragFloat("Aspect", &camComp.Aspect, 0.01f, 0.1f, 10.0f);
+				}
+
+				changed |= ImGui::DragFloat("FOV", &camComp.FOV, 0.1f, 10.0f, 120.0f);
+				changed |= ImGui::DragFloat("Near Plane", &camComp.NearPlane, 0.01f, 0.01f, camComp.FarPlane - 0.01f);
+				changed |= ImGui::DragFloat("Far Plane", &camComp.FarPlane, 1.0f, camComp.NearPlane + 0.01f, 10000.0f);
+
+			/*	int depth = static_cast<int>(camComp.Depth);
+				if (ImGui::DragInt("Depth", &depth, 1, 0, 100))
+				{
+					camComp.Depth = static_cast<u32>(depth);
+					changed = true;
+				}*/
+
+				/*changed |= ImGui::DragFloat3("Target", glm::value_ptr(camComp.Target), 0.1f);*/
+
+				if (changed)
+				{
+					camComp.isDirty = true;
+
+				}
+			}
+			// ---------------------- Remove Camera Comp ---------------------------
+			if (removeCameraComp)
+			{
+				m_SelectedEntity.RemoveComponent<CameraComponent>();
+			}
+
+		}
+	}
 } // end of namespace Engine
