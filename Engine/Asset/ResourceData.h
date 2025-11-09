@@ -3,7 +3,7 @@
 * @brief Resource properties definitions
 *	Defines property structure for different resource types (descriptor files data)
 * @author Wai Lwin Thit
-* @date
+* @date September 11 2025
 * Copyright (C) 2025 DigiPen Institute of Technology.
 * Reproduction or disclosure of this file or its contents without the
 * prior written consent of DigiPen Institute of Technology is prohibited.
@@ -35,10 +35,6 @@ namespace Engine {
         int channels = 0;
         unsigned int textureID = 0;  // OpenGL texture ID
         std::string format;
-
-        ~TextureResource() {
-            // TODO: Release OpenGL texture if needed
-        }
     };
 
 
@@ -65,9 +61,6 @@ namespace Engine {
         unsigned int VBO = 0;  // Vertex Buffer Object
         unsigned int EBO = 0;  // Element Buffer Object
 
-        ~MeshResource() {
-            // TODO: Release OpenGL buffers if needed
-        }
     };
 
     /**
@@ -116,9 +109,6 @@ namespace Engine {
         int bitDepth = 16;
         unsigned int bufferID = 0;  // OpenAL buffer ID
 
-        ~AudioResource() {
-            // TODO: Release OpenAL buffer if needed
-        }
     };
 
     /**
@@ -130,9 +120,6 @@ namespace Engine {
         std::string fragmentSource;
         std::string geometrySource;
 
-        ~ShaderResource() {
-            // TODO: Release OpenGL shader program if needed
-        }
     };
 
 } // namespace Engine

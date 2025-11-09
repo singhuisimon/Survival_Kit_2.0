@@ -1,0 +1,131 @@
+{
+    "Name": "ShootableKillableEnemy",
+    "GUID": "9587407584735051901",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Enemy Cube",
+        "GUID": "3246339309397704831",
+        "Children": [
+            {
+                "Type": "SetHealth",
+                "Name": "Set health to 100",
+                "GUID": "4399260814007058565",
+                "Properties": {
+                    "Health": "100.000000",
+                    "HealthKey": "Health"
+                }
+            },
+            {
+                "Type": "ApplyLinearVelocity",
+                "Name": "Move the Enemy along X axis",
+                "GUID": "4399260814007173255",
+                "Properties": {
+                    "LinearVelocity.x": "0.500000",
+                    "LinearVelocity.y": "0.000000",
+                    "LinearVelocity.z": "0.000000"
+                }
+            },
+            {
+                "Type": "RepeatUntilFail",
+                "Name": "Node",
+                "GUID": "940496300186828937",
+                "Children": [
+                    {
+                        "Type": "Sequence",
+                        "Name": "Node",
+                        "GUID": "15928475860075970699",
+                        "Children": [
+                            {
+                                "Type": "Selector",
+                                "Name": "Node",
+                                "GUID": "2669878557097754765",
+                                "Children": [
+                                    {
+                                        "Type": "Sequence",
+                                        "Name": "Check if Entity is low in health and destroy",
+                                        "GUID": "4975721566311530639",
+                                        "Children": [
+                                            {
+                                                "Type": "CheckHealth",
+                                                "Name": "Check if healh is less than or equal to 0",
+                                                "GUID": "15928475860076707985",
+                                                "Properties": {
+                                                    "Threshold": "0.000000",
+                                                    "Comparison": "4",
+                                                    "HealthKey": "Health"
+                                                }
+                                            },
+                                            {
+                                                "Type": "DestroySelf",
+                                                "Name": "If so kill itself",
+                                                "GUID": "3246339309401653395"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "Type": "Wait",
+                                        "Name": "Node",
+                                        "GUID": "4975721566312022165",
+                                        "Properties": {
+                                            "Duration": "0.000000"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "Type": "Selector",
+                                "Name": "Node",
+                                "GUID": "6705103823222538391",
+                                "Children": [
+                                    {
+                                        "Type": "Sequence",
+                                        "Name": "Handle Collision with Bullet",
+                                        "GUID": "18234318869291040921",
+                                        "Children": [
+                                            {
+                                                "Type": "CheckCollision",
+                                                "Name": "Check if Collide with Bullet",
+                                                "GUID": "6128643070919426205",
+                                                "Properties": {
+                                                    "OtherTag": "Bullet",
+                                                    "DestroyOnHit": "false",
+                                                    "CollidedIDKey": "Destroy"
+                                                }
+                                            },
+                                            {
+                                                "Type": "DeleteCollidedEntity",
+                                                "Name": "Node",
+                                                "GUID": "3096005283584802973",
+                                                "Properties": {
+                                                    "CollidedIDKey": "Destroy"
+                                                }
+                                            },
+                                            {
+                                                "Type": "ModifyHealth",
+                                                "Name": "Upon Contact Modify Health by -20",
+                                                "GUID": "10013534311226802335",
+                                                "Properties": {
+                                                    "Amount": "20.000000",
+                                                    "HealthKey": "Health"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "Type": "Wait",
+                                        "Name": "Node",
+                                        "GUID": "9587407584739737755",
+                                        "Properties": {
+                                            "Duration": "0.000000"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

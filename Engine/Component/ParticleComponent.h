@@ -42,8 +42,8 @@ namespace Engine {
 		float     RotationSpeed = 0.0f;   // Angular velocity (degrees/sec), 0 = no spin
 
 		bool      RandomizeRotation = true;   // Enable/disable random rotation
-		bool      Loop;
-		bool      Active;
+		bool      Loop = false;
+		bool      Active = true;
 	};
 
 }

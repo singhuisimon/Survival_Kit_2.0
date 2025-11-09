@@ -1,4 +1,13 @@
 #pragma once
+/**
+ * @file Profiler.h
+ * @brief Declaration of the TracyProfiler class for running Tracy.exe.
+ * @author Amanda Leow Boon Suan (70%), Liliana Hanawardani (30%)
+ * @date September 8, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #ifndef __TRACY_PROFILER_H__
 #define __TRACY_PROFILER_H__
 
@@ -66,6 +75,9 @@ namespace Engine {
         **************************************************************************/
         void OnUpdate();
 
+        /**************************************************************************
+         * @brief Shuts down the Tracy profiler by cleaning up resources and terminating its process.
+         **************************************************************************/
         void Shutdown();
 
         /**************************************************************************

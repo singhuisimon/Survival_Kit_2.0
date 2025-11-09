@@ -1,10 +1,9 @@
 #pragma once
 
-
 /**
  * @file AssetManager.h
  * @brief Declares the AssetManager for coordinating asset pipeline tasks.
- * @author
+ * @author Wai Lwin Thit
  * @date 18/09/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

@@ -409,7 +409,7 @@ void Game::CreateDefaultScene() {
     groundRb.UseGravity = false;
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
-    auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
+    ground.AddComponent<Engine::MeshRendererComponent>();
     LOG_TRACE("  -> Ground created");
 
     LOG_TRACE("  Creating Sphere entity...");
@@ -461,7 +461,7 @@ void Game::CreateDefaultScene() {
     auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
     bt.Active = true;
     bt.ResetOnComplete = false;
-    bt.TreeAssetPath = "SimpleWaitTree.json";
+    bt.TreeAssetPath = "CreateEnemeyCube.json";
 
     LOG_TRACE("  -> ai created");
 
@@ -797,7 +797,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
 
         // Check moving input
-        auto& camPos = editorCam.getCamPos();
         if (input.IsKeyPressed(GLFW_KEY_W)) {
             editorCam.moveCamForward();
         }

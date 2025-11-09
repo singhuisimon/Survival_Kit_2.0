@@ -1,9 +1,11 @@
 /**
  * @file DescriptorEditor.cpp
- * @brief Implementation of  DescriptorEditor
- * @author
+ * @brief Editor interface for modifying Descriptors 
+ * @author Wai Lwin Thit
  * @date 03/11/2025
- * Copyright (C) 2025 DigiPen Institute of Technology.
+* Copyright (C) 2025 DigiPen Institute of Technology.
+* Reproduction or disclosure of this file or its contents without the
+* prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #include "DescriptorEditor.h"

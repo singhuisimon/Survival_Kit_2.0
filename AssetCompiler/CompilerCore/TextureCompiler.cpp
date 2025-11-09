@@ -1,14 +1,31 @@
+/**
+ * @file TextureCompiler.cpp
+ * @brief Texture resource compiler implementation for the AssetCompiler tool
+ * @details
+ * Compiles source texture files (PNG, JPG, TGA) into an optimized binary format
+ * for runtime loading by the engine. The compiler performs the following operations:
+ * @author Wai Lwin Thit
+ * @date October 22 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+
+
 #include "TextureCompiler.h"
 #include "../Utility/DescriptorParser.h"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <cstdarg>
 #include <algorithm>
 #include <cmath>
+
+
 #include "../rapidjson/document.h"
 #include "../rapidjson/istreamwrapper.h"
-
 // STB Image - for loading images
 #define STB_IMAGE_IMPLEMENTATION
 #include "../Engine/Graphics/stb_image.h"
@@ -170,6 +187,8 @@ namespace AssetCompiler {
     }
 
     void TextureCompiler::premultiplyAlpha(std::vector<unsigned char>& data, int width, int height, int channels) {
+        (void)height; (void)width;
+
         if (channels != 4) return;  // Only works with RGBA
 
         for (size_t i = 0; i < data.size(); i += 4) {

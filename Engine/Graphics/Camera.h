@@ -1,7 +1,7 @@
 /**
  * @file Camera.h
- * @brief Declaration of the camera class to manipulate the viewing angle of the scene.
- * @details Manages the camera in the editor and game engine.
+ * @brief Declaration of the editor camera class to manipulate the viewing angle of the scene.
+ * @details Manages the camera in the editor.
  * @author Chua Wen Bin Kenny
  * @date 10 September 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.

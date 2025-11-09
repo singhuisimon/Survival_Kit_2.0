@@ -1,7 +1,7 @@
 /**
  * @file AssetDatabase.cpp
  * @brief Implements asset database management functions. 
- * @author
+ * @author Wai Lwin Thit
  * @date 15/09/2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

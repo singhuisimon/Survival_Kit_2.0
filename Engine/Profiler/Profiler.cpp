@@ -1,7 +1,15 @@
+/**
+* @file Profiler.h
+* @brief Implementation of the functions of the TracyProfiler class for running Tracy.exe.
+* @author Amanda Leow Boon Suan (70%), Liliana Hanawardani (30%)
+* @date September 8, 2025
+* Copyright (C) 2025 DigiPen Institute of Technology.
+* Reproduction or disclosure of this file or its contents without the
+* prior written consent of DigiPen Institute of Technology is prohibited.
+*/
 #include "Profiler.h"
 #include <cstdlib>
 #include <filesystem>
-//#include <tlhelp32.h> // for CreateToolhelp32Snapshot
 
 namespace Engine {
 
@@ -11,7 +19,8 @@ namespace Engine {
     }
 
     void TracyProfiler::SetTracyPath(const std::string& exename) {
-        m_tracyPath = exename;// getTracyFilePath(exename);
+        // getTracyFilePath(exename);
+        m_tracyPath = exename;
         LOG_DEBUG("m_tracyPath: %s", m_tracyPath);
     }
 
@@ -20,21 +29,21 @@ namespace Engine {
 #ifndef TRACY_ENABLE
         return;
 #else
-        // Prevent multiple concurrent profiler instances
+        // Prevent multiple profiler instances
         if (m_running && m_processHandle) {
             DWORD exitCode = 0;
             if (GetExitCodeProcess(m_processHandle, &exitCode) && exitCode == STILL_ACTIVE) {
                 return; // still running
             }
             else {
-                // Process was closed
+                // Process closed
                 CloseHandle(m_processHandle);
                 m_processHandle = nullptr;
                 m_running = false;
             }
         }
 
-        // Verify that the executable path is valid
+        // Verify valid executable path
         if (m_tracyPath.empty() || !std::filesystem::exists(m_tracyPath)) {
             return;
         }
@@ -75,58 +84,10 @@ namespace Engine {
         }
     }
 
-
-    /*void TracyProfiler::Shutdown()
-    {
-        if (m_processHandle)
-        {
-            DWORD launcherPid = GetProcessId(m_processHandle);
-
-            // Try to find any Tracy.exe processes spawned by this one
-            HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-            if (snapshot != INVALID_HANDLE_VALUE)
-            {
-                PROCESSENTRY32 entry = { sizeof(PROCESSENTRY32) };
-                if (Process32First(snapshot, &entry))
-                {
-                    do
-                    {
-                        if (_stricmp(entry.szExeFile, "Tracy.exe") == 0)
-                        {
-                            // Check if this process was spawned by the launcher PID
-                            if (entry.th32ParentProcessID == launcherPid)
-                            {
-                                HANDLE child = OpenProcess(PROCESS_TERMINATE, FALSE, entry.th32ProcessID);
-                                if (child)
-                                {
-                                    LOG_DEBUG("Terminating Tracy child process PID: %lu (parent %lu)", entry.th32ProcessID, launcherPid);
-                                    TerminateProcess(child, 0);
-                                    CloseHandle(child);
-                                }
-                            }
-                        }
-                    } while (Process32Next(snapshot, &entry));
-                }
-                CloseHandle(snapshot);
-            }
-
-            // Kill the launcher process (if still active)
-            LOG_DEBUG("Terminating Tracy launcher process PID: %lu", launcherPid);
-            TerminateProcess(m_processHandle, 0);
-            CloseHandle(m_processHandle);
-            m_processHandle = nullptr;
-        }
-
-        m_running = false;
-        LOG_DEBUG("TracyProfiler::Shutdown() complete");
-    }*/
-
-
     void TracyProfiler::Shutdown() {
         if (m_processHandle) {
 
-            // Ask Windows to kill the Tracy GUI process (force-kills)
-            // remove should u want to test what happends when shutdown
+            // Force terminates Tracy GUI process
             TerminateProcess(m_processHandle, 0);
 
             CloseHandle(m_processHandle);
@@ -134,6 +95,5 @@ namespace Engine {
         }
         m_running = false;
     }
-
 
 }
