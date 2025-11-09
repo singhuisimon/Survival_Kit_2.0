@@ -1,10 +1,17 @@
-/*
-* @file MeshCompiler.h
-* @brief Mesh resource compiler for AssetCompiler
-* @details Compiles FBX/OBJ meshes to optimized binary format for runtime loading 
-* @author
-* @date 
-*/
+/**
+ * @file MeshCompiler.cpp
+ * @brief Mesh resource compiler implementation for the AssetCompiler tool
+ * @details
+ * Compiles source mesh files (FBX) into an optimized binary format for
+ * runtime loading by the engine. The compiler performs the following operations:
+ * @author Wai Lwin Thit
+ * @date October 22 2025
+ *
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 
 #pragma once
 

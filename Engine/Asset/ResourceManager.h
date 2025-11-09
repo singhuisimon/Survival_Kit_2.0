@@ -1,4 +1,17 @@
-
+/**
+ * @file ResourceManager.h
+ * @brief Runtime resource loading and lifecycle management
+ * @details
+ * Manages loading, caching, and reference counting of compiled runtime resources.
+ * Provides type-safe access to textures, meshes, materials
+ * through the xresource::mgr system. Resources are loaded on-demand from compiled
+ * binary files and automatically unloaded when no longer referenced.
+ * @author Wai Lwin Thit
+ * @date September 15 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #pragma once
 #ifndef __RESOURCE_MANAGER_H__
 #define __RESOURCE_MANAGER_H__

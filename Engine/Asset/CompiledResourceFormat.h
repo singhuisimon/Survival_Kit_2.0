@@ -2,9 +2,11 @@
  * @file CompiledResourceFormats.h
  * @brief Binary format definitions for compiled resources
  * @details Defines the structure of compiled binary files that ResourceLoaders read
- * @author [Your Name]
- * @date October 2025
- * Copyright (C) 2025 DigiPen Institute of Technology.
+ * @author Wai Lwin Thit
+ * @date 22 October 2025
+* Copyright (C) 2025 DigiPen Institute of Technology.
+* Reproduction or disclosure of this file or its contents without the
+* prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #pragma once

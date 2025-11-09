@@ -1,10 +1,16 @@
-/*
-* @file TextureCompiler.h
-* @brief Texture resource compiler for AssetCompiler
-* @details Compiles PNG/JPG/TGA textures to optimized binary format for runtime loading
-* @author
-* @date
-*/
+/**
+ * @file TextureCompiler.cpp
+ * @brief Texture resource compiler implementation for the AssetCompiler tool
+ * @details
+ * Compiles source texture files (PNG, JPG) into an optimized binary format
+ * for runtime loading by the engine. The compiler performs the following operations:
+ * @author Wai Lwin Thit
+ * @date October 22 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 
 #pragma once
 

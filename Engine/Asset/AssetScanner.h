@@ -1,4 +1,19 @@
-
+/**
+ * @file AssetScanner.h
+ * @brief Incremental file system scanner for detecting asset changes
+ *
+ * @details
+ * Recursively scans configured source directories and detects file changes
+ * (additions, modifications, deletions) by comparing against a persistent
+ * snapshot. Uses timestamp and file size heuristics for efficient change detection.
+ *
+ * @author Wai Lwin Thit
+ * @date September 17 2025
+ *
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #pragma once
 #ifndef __ASSET_SCANNER_H__
 #define __ASSET_SCANNER_H__

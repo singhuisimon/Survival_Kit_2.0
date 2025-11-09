@@ -2,9 +2,11 @@
  * @file Main.cpp
  * @brief Asset Compiler - Command-line tool for compiling game assets
  * @details Reads descriptor files and compiles source assets into optimized runtime formats
- * @author 
- * @date 2025
+ * @author Wai Lwin Thit
+ * @date October 22 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #include <iostream>
