@@ -461,7 +461,7 @@ void Game::CreateDefaultScene() {
     auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
     bt.Active = true;
     bt.ResetOnComplete = false;
-    bt.TreeAssetPath = "SimpleWaitTree.json";
+    bt.TreeAssetPath = "CreateEnemeyCube.json";
 
     LOG_TRACE("  -> ai created");
 
