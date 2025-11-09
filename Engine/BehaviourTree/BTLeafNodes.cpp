@@ -1680,7 +1680,6 @@ namespace Engine {
 			return BTStatus::Failure;
         }
 
-		auto& registry = context.Scene->GetRegistry();
 		Entity self = *context.Entity;
 
         if (!self.HasComponent<TagComponent>()) {
