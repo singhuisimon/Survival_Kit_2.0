@@ -304,9 +304,9 @@ namespace Engine {
 
             // Try to create with error code
             std::error_code ec;
-            bool created = fs::create_directories(p, ec);
+            fs::create_directories(p, ec);
 
-            if (!created) {
+            if (ec) {
                 LOG_ERROR("Failed to create directory: ", path);
                 LOG_ERROR("  Error: ", ec.message(), " (code: ", ec.value(), ")");
                 return false;

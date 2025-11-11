@@ -145,8 +145,9 @@ namespace Engine {
 			if (!EnsureDirectory(folderPath)) return false;
 
 			//write Info.txt (metadata)
-			if (!WriteInfoFile(folderPath, rec, extras)) return false;
-
+			if (!WriteInfoFile(folderPath, rec, extras)) {
+				return false;
+			}
 
 			//write descriptor.txt (compile settings)
 			if (!WriteDescriptorFile(folderPath, rec.sourcePath, settings)) return false;
