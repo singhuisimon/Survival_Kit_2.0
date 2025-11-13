@@ -1,3 +1,13 @@
+/**
+ * @file CameraSystem.cpp
+ * @brief	Definition of Camera System that manages Camera components in the ECS
+ * @details Updates and rebuild component's View and Perpsective transform upon modification
+ * @author Chua Wen Bin Kenny
+ * @date 20 October 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #include "../Graphics/CameraSystem.h"
 #include "../ECS/Scene.h"
 #include <GLFW/glfw3.h>
@@ -10,16 +20,24 @@ namespace Engine {
 
 		(void)ts;
 
-		auto camView = scene->GetRegistry().view<CameraComponent, TransformComponent>();
+		auto& registry = scene->GetRegistry();
+		auto camView = registry.view<CameraComponent>();
+
 		for (auto cam : camView) {
 
-			auto& camera = camView.get<CameraComponent>(cam);
+			// Get entity's camera component
+			Entity entity(cam, &registry);
+			auto& camera = entity.GetComponent<CameraComponent>();
+
+			// Check if it has transform component
+			if (!entity.HasComponent<TransformComponent>()) continue;
+			
 			if (camera.Enabled && camera.isDirty) {
 
 				// Get transform component
-				auto& trans = camView.get<TransformComponent>(cam);
+				auto& trans = entity.GetComponent<TransformComponent>();
 
-				// Update aspect ratio if autoAspect is on (This should be updated somewhere in script/elsewhere using the setter; will be here for now)
+				// Update aspect ratio if autoAspect is on 
 				if (camera.autoAspect) {
 					int vp_w, vp_h;
 					glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);

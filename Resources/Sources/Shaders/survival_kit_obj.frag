@@ -14,6 +14,8 @@ in vec3 Position;   // view-space position
 in vec3 Normal;     // view-space normal
 in vec3 Color;
 in vec2 TexCoord;
+in vec3 Tangent;
+in vec3 Bitangent;
 
 layout(location=0) out vec4 FragColor;
 
@@ -49,7 +51,9 @@ uniform mat4 V;
 uniform bool isPBR;
 uniform bool isGamma;
 uniform bool isTexture;
+uniform bool useNormalMap;
 layout(binding = 0) uniform sampler2D Texture2D;
+layout(binding = 1) uniform sampler2D NormalMap;
 
 // ===== PBR constants =====
 const float PI = 3.14159265358979323846;
@@ -127,7 +131,21 @@ vec3 BRDF_Microfacet_View(vec3 N, vec3 Ldir, vec3 Vview, vec3 albedo)
 
 void main()
 {
-    vec3 N      = normalize(Normal);
+    vec3 N;
+    if (useNormalMap) {
+        // Construct TBN matrix in fragment shader
+        mat3 TBN = mat3(normalize(Tangent), normalize(Bitangent), normalize(Normal));
+        
+        // Sample and remap normal map
+        vec3 normalSample = texture(NormalMap, TexCoord).rgb;
+        normalSample = normalSample * 2.0 - 1.0;
+        
+        // Transform to view space
+        N = normalize(TBN * normalSample);
+    } else {
+        N = normalize(Normal);
+    }
+
     vec3 Vview  = normalize(-Position);   // camera at origin in view space
 
     // Albedo (linear)

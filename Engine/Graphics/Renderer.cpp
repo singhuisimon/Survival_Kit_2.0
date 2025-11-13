@@ -157,11 +157,8 @@ namespace Engine {
 			}
 			};
 
-		// Call for the object shader(s) that read `material`
-		// Assuming program 0 is your main object shader (survival_kit_obj.*)
+		// Call for the object shader(s) that read material
 		bindMaterialBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // adjust accessor if different
-		// If your debug or other passes use the material, bind them too:
-		// bindMaterialBlock(m_gl.m_shader_storage[1].program());
 #pragma endregion
 
 #pragma region TESTING LOADING UBO FOR LIGHTINGS
@@ -176,7 +173,9 @@ namespace Engine {
 				glUniformBlockBinding(programID, blockIndex, 0);
 			}
 			};
-		bindLightsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // object shader
+
+		// Call for the object shader(s) that read light
+		bindLightsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle());
 #pragma endregion
 
 		// Set default picked ID 
@@ -429,7 +428,7 @@ namespace Engine {
 
 		// For rendering from editor's camera
 		if (isEditorCamOn) {
-			glm::mat4 v = editor_camera.getLookAt(); // Editor camera view transform
+			glm::mat4 view = editor_camera.getLookAt(); // Editor camera view transform
 			for (/*const */auto& pass : m_passes) {
 
 				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
@@ -441,8 +440,8 @@ namespace Engine {
 
 					// Check if viewport needs update
 					if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
-						pass.view_port.z = vp_w;
-						pass.view_port.w = vp_h;
+						pass.view_port.z = static_cast<float>(vp_w);
+						pass.view_port.w = static_cast<float>(vp_h);
 
 						// Resize FBO according to changes
 						resizeFBO(pass.fbo_handle, vp_w, vp_h);
@@ -450,11 +449,11 @@ namespace Engine {
 				}
 
 				// Get camera perspective transform
-				glm::mat4 p = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+				glm::mat4 persp = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
 
 				// Begin drawing frame
 				beginFrame(pass);
-				draw(pass, draw_items, v, p, lights);
+				draw(pass, draw_items, view, persp, lights);
 				endFrame(pass);
 
 				// Read ID at mouse position for GPU ID pass
@@ -505,8 +504,8 @@ namespace Engine {
 
 						// Check if viewport needs update
 						if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
-							pass.view_port.z = vp_w;
-							pass.view_port.w = vp_h;
+							pass.view_port.z = static_cast<float>(vp_w);
+							pass.view_port.w = static_cast<float>(vp_h);
 
 							// Resize FBO according to changes
 							resizeFBO(pass.fbo_handle, vp_w, vp_h);
@@ -563,12 +562,8 @@ namespace Engine {
 
 			// Temporary transformations
 			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
-			//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-			//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-			//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-			//prog.setUniform("material.shininess", test_material.getMaterialShinifness());
 
-			xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
+			/*xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
 
 			if (TextureResource* texture_resource = RM.loadResource<TextureResource>(texture_guid)) {
 				glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
@@ -585,7 +580,7 @@ namespace Engine {
 			}
 			else {
 				prog.setUniform("isTexture", false);
-			}
+			}*/
 
 			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			{
@@ -599,6 +594,26 @@ namespace Engine {
 
 				// Update UBO (48 bytes)
 				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+
+				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
+					glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("Texture2D", 0);
+					prog.setUniform("isTexture", true);
+
+					if (texture_resource->format == "sRGB") {
+						prog.setUniform("isGamma", true);
+					}
+					else {
+						prog.setUniform("isGamma", false);
+					}
+
+				}
+
+				if (TextureResource* normal_map = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap))) {
+					glBindTextureUnit(1, static_cast<GLuint>(normal_map->textureID));
+					prog.setUniform("NormalMap", 1);
+					prog.setUniform("useNormalMap", true);
+				}
 			}
 			else
 			{
@@ -613,12 +628,15 @@ namespace Engine {
 
 				// Update UBO (48 bytes)
 				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+
+				prog.setUniform("isTexture", false);
+				prog.setUniform("useNormalMap", false);
 #pragma endregion
 			}
 
 
 #pragma region TESTING UBO FOR LIGHTING
-			// --- per-object light culling + upload ---
+			// Per-object light culling + upload 
 			// Object center/radius (approx): extract translation; radius = heuristic
 			glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
 			const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available

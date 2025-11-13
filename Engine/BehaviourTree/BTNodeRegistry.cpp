@@ -363,6 +363,20 @@ namespace Engine {
             }
         );
 
+        registry.RegisterNodeType<BTCheckCollision>("Action", "Check for collision other tag entities",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTCheckCollision, "OtherTag", m_OtherTag);
+                BT_REGISTER_STRING_PROPERTY(BTCheckCollision, "CollidedIDKey", m_CollidedIDKey);
+                BT_REGISTER_BOOL_PROPERTY(BTCheckCollision, "DestroyOnHit", m_DestroyOnHit);
+            }
+        );
+        
+        registry.RegisterNodeType<BTDeleteCollidedEntity>("Action", "Delete collided entity",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTDeleteCollidedEntity, "CollidedIDKey", m_CollidedIDKey);
+            }
+        );
+
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
 

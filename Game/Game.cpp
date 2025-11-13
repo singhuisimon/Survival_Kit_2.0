@@ -409,7 +409,8 @@ void Game::CreateDefaultScene() {
     groundRb.UseGravity = false;
     groundRb.Velocity = glm::vec3(0, 0, 0);
 
-    auto& groundmesh = ground.AddComponent<Engine::MeshRendererComponent>();
+    auto& g_mesh = ground.AddComponent<Engine::MeshRendererComponent>();
+    g_mesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
     LOG_TRACE("  -> Ground created");
 
     LOG_TRACE("  Creating Sphere entity...");
@@ -428,8 +429,6 @@ void Game::CreateDefaultScene() {
 
     auto& spheremesh = sphere.AddComponent<Engine::MeshRendererComponent>();
     spheremesh.MeshType = 2; // Sphere
-    spheremesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
-    spheremesh.TextureGuid = tex_inst_guid;
     LOG_TRACE("  -> Sphere created");
 
     LOG_TRACE("  Creating ReverbZone entity...");
@@ -461,7 +460,7 @@ void Game::CreateDefaultScene() {
     auto& bt = ai.AddComponent<Engine::BehaviourTreeComponent>();
     bt.Active = true;
     bt.ResetOnComplete = false;
-    bt.TreeAssetPath = "SimpleWaitTree.json";
+    bt.TreeAssetPath = "CreateEnemeyCube.json";
 
     LOG_TRACE("  -> ai created");
 
@@ -797,7 +796,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
         }
 
         // Check moving input
-        auto& camPos = editorCam.getCamPos();
         if (input.IsKeyPressed(GLFW_KEY_W)) {
             editorCam.moveCamForward();
         }

@@ -1,3 +1,19 @@
+/**
+ * @file AssetDescriptorGenerator.h
+ * @brief Generates descriptor files for asset compilation pipeline
+ * @details
+ * Automatically generates Info.txt and Descriptor.txt files for each asset detected
+ * by the AssetScanner. These descriptor files serve as input to the AssetCompiler,
+ * specifying how source assets should be compiled into runtime binary formats.
+ * @author Wai Lwin Thit
+ * @date October 17 2025
+ *
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+
 #ifndef __ASSET_DESCGENERATOR_H__
 #define __ASSET_DESCGENERATOR_H__
 
@@ -97,25 +113,6 @@ namespace Engine {
 		std::vector<xresource::full_guid> resourceLinks;
 	};
 
-	// /**
-	// * @brief To display for the Descriptor.txt
-	// * @details contains the compile settings and the relative source paths
-	// */
-	// struct WriteCompilerSettings{
-
-	//     //contain the relative path to the actual file
-	//     std::string sourcePath; 
-
-	//     //new texture settings (for compiler)
-	//     TextrueSettings textureSettings;
-	// 	//new audio settings (for compile settings)
-	// 	AudioSettings audioSettings;
-	// 	//new mesh settings (for compile settings)
-	// 	MeshSettings meshSettings;
-	// 	//new shader settings (for compiler)
-	// 	ShaderSettings shaderSettings;
-	// };
-
 	/**
 	* @class AssetDescriptorGenerator
 	* @brief Emits .desc files with metadata for editor/importer use.
@@ -148,8 +145,9 @@ namespace Engine {
 			if (!EnsureDirectory(folderPath)) return false;
 
 			//write Info.txt (metadata)
-			if (!WriteInfoFile(folderPath, rec, extras)) return false;
-
+			if (!WriteInfoFile(folderPath, rec, extras)) {
+				return false;
+			}
 
 			//write descriptor.txt (compile settings)
 			if (!WriteDescriptorFile(folderPath, rec.sourcePath, settings)) return false;

@@ -22,6 +22,7 @@
 #include "ECS/Components.h"
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsAPI.h"
+#include "Physics/PhysicsSystem.h"
 
 namespace Engine {
 
@@ -540,6 +541,9 @@ namespace Engine {
     }
 
     BTStatus BTCheckHealth::Execute(BTContext& context) {
+
+        //LOG_INFO("HIIIIIIIIII FROM BTCHECKHEALTH");
+
         auto healthOpt = context.Blackboard.Get<float>(m_HealthKey);
         if (!healthOpt) {
             LOG_WARNING("BTCheckHealth: Health not found in blackboard");
@@ -1643,7 +1647,8 @@ namespace Engine {
 
         auto& bt = enemy.GetComponent<BehaviourTreeComponent>();
         bt.Active = true;
-        bt.TreeAssetPath = "ShootableEnemy.json";
+        bt.TreeAssetPath = "ShootableKillableEnemy.json";
+        bt.ResetOnComplete = false;
 
         LOG_INFO("BTCreateShootableEnemy: Created shootable enemy with tag '", m_Tag, "'");
 		return BTStatus::Success;
@@ -1659,5 +1664,162 @@ namespace Engine {
 			m_Tag = value;
         }
     }
+
+    BTCheckCollision::BTCheckCollision(const std::string& otherTag, bool destroyOnHit)
+        : m_OtherTag(otherTag), m_DestroyOnHit(destroyOnHit) {
+	}
+
+	const char* BTCheckCollision::GetTypeName() const { return "CheckCollision"; }
+
+    BTStatus BTCheckCollision::Execute(BTContext& context) {
+
+		//LOG_INFO("BTCheckCollision: Executing collision check for tag '", m_OtherTag, "'");
+
+        if (!context.Scene || !context.Entity) {
+			LOG_WARNING("BTCheckCollision: No scene or entity context");
+			return BTStatus::Failure;
+        }
+
+		Entity self = *context.Entity;
+
+        if (!self.HasComponent<TagComponent>()) {
+			LOG_WARNING("BTCheckCollision: Entity does not have TagComponent");
+			return BTStatus::Failure;
+        }
+
+        // Get collisions this frame (temporary instance ok)
+        PhysicsAPI api;
+        const auto& collisions = api.GetCollisionEvents();
+
+        if (collisions.empty()) {
+			LOG_WARNING("BTCheckCollision: No collisions detected this frame");
+            return BTStatus::Failure;
+        }
+
+		// Get this entity's tag
+        entt::entity selfID = (entt::entity)self;
+
+        bool collided = false;
+		Entity other(entt::null, nullptr);
+
+        for (const auto& c : collisions) {
+            entt::entity otherID = entt::null;
+
+            if (c.entA == selfID){
+                LOG_TRACE("BTCheckCollision: Checking collision with entity A");
+            otherID = c.entB;
+            }
+            else if (c.entB == selfID) {
+                LOG_TRACE("BTCheckCollision: Checking collision with entity B");
+                otherID = c.entA;
+            }
+            else {
+                continue;
+            }
+
+            other = context.Scene->GetEntity(otherID);
+            if (!other || !other.HasComponent<TagComponent>()) {
+				LOG_TRACE("BTCheckCollision: Other entity invalid or missing TagComponent");
+                continue;
+            }
+
+            auto& tagOther = other.GetComponent<TagComponent>();
+
+            if (tagOther.Tag.find(m_OtherTag) != std::string::npos) {
+                collided = true;
+
+                LOG_INFO("BTCheckCollision: '", self.GetComponent<TagComponent>().Tag,
+                    "' collided with '", tagOther.Tag, "'");
+
+                // Store in blackboard using TYPE-SAFE API
+                if (!m_CollidedIDKey.empty()) {
+                    context.Blackboard.Set<int>(m_CollidedIDKey, (int)otherID);
+                    LOG_INFO("BTCheckCollision: Stored collided entity ID (", (int)otherID,
+                        ") in Blackboard key '", m_CollidedIDKey, "'");
+                }
+
+                if (m_DestroyOnHit) {
+					LOG_INFO("BTCheckCollision: Destroying entity '", tagOther.Tag, "' on hit");
+                    context.Scene->DestroyEntity(other);
+                }
+
+                break;
+            }
+        }
+
+		return collided ? BTStatus::Success : BTStatus::Failure;
+    }
+
+    void BTCheckCollision::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "OtherTag", m_OtherTag });
+        properties.push_back({ "DestroyOnHit", m_DestroyOnHit? "true" : "false"});
+        properties.push_back({ "CollidedIDKey", m_CollidedIDKey});
+	}
+
+    void BTCheckCollision::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "OtherTag") {
+            m_OtherTag = value;
+        } else if (name == "DestroyOnHit") {
+            m_DestroyOnHit = (value == "true" || value == "1");
+		} else if (name == "CollidedIDKey") {
+            m_CollidedIDKey = value;
+		}
+	}
+
+    //BTDeleteCollidedEntity
+    BTDeleteCollidedEntity::BTDeleteCollidedEntity(const std::string& collidedIDKey)
+        : m_CollidedIDKey(collidedIDKey) {
+    }
+
+    const char* BTDeleteCollidedEntity::GetTypeName() const {
+        return "DeleteCollidedEntity";
+	}
+
+    BTStatus BTDeleteCollidedEntity::Execute(BTContext& context) {
+
+        if (!context.Scene) {
+            LOG_WARNING("BTDeleteCollidedEntity: No scene context");
+			return BTStatus::Failure;
+        }
+
+        // Blackboard must contain a key
+        if (m_CollidedIDKey.empty()) {
+            LOG_WARNING("BTDeleteCollidedEntity: CollidedIDKey not set");
+            return BTStatus::Failure;
+        }
+
+        // Try to get the stored entity ID (int) from blackboard
+        std::optional<int> idOpt = context.Blackboard.Get<int>(m_CollidedIDKey);
+        if (!idOpt) {
+            // No stored collision → no deletion → safe fail
+            return BTStatus::Failure;
+        }
+
+        entt::entity targetID = (entt::entity)*idOpt;
+
+        // Validate the entity still exists
+        if (!context.Scene->IsEntityValid(targetID)) {
+            LOG_WARNING("BTDeleteCollidedEntity: Stored entity is no longer valid");
+            return BTStatus::Failure;
+        }
+
+        // Destroy it
+        Entity target = context.Scene->GetEntity(targetID);
+        LOG_INFO("BTDeleteCollidedEntity: Destroying collided entity (ID: ", (int)targetID, ")");
+        context.Scene->DestroyEntity(target);
+
+        return BTStatus::Success;
+    }
+
+    void BTDeleteCollidedEntity::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "CollidedIDKey", m_CollidedIDKey });
+	}
+
+    void BTDeleteCollidedEntity::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "CollidedIDKey") {
+            m_CollidedIDKey = value;
+        }
+	}
+
 
 } // namespace Engine

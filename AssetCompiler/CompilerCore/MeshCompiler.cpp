@@ -1,14 +1,30 @@
+/**
+ * @file MeshCompiler.cpp
+ * @brief Mesh resource compiler implementation for the AssetCompiler tool
+ * @details
+ * Compiles source mesh files (FBX) into an optimized binary format for
+ * runtime loading by the engine. The compiler performs the following operations:
+ * @author Wai Lwin Thit
+ * @date October 22 2025
+ *
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+
+
 #include "MeshCompiler.h"
 #include "../Utility/DescriptorParser.h"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <cstdarg>
+
+//External Library headers
 #include "../rapidjson/document.h"
 #include "../rapidjson/istreamwrapper.h"
-
-
-//open FBX 
 #include "../openFBX/openFBX/src/ofbx.h"
 
 
@@ -17,23 +33,23 @@ namespace fs = std::filesystem;
 // Helper function to transform a point by a matrix
 static ofbx::Vec3 transformPoint(const ofbx::DMatrix& mtx, const ofbx::Vec3& point) {
     ofbx::Vec3 result;
-    result.x = mtx.m[0] * point.x + mtx.m[4] * point.y + mtx.m[8] * point.z + mtx.m[12];
-    result.y = mtx.m[1] * point.x + mtx.m[5] * point.y + mtx.m[9] * point.z + mtx.m[13];
-    result.z = mtx.m[2] * point.x + mtx.m[6] * point.y + mtx.m[10] * point.z + mtx.m[14];
+    result.x = static_cast<float>(mtx.m[0] * point.x + mtx.m[4] * point.y + mtx.m[8] * point.z + mtx.m[12]);
+    result.y = static_cast<float>(mtx.m[1] * point.x + mtx.m[5] * point.y + mtx.m[9] * point.z + mtx.m[13]);
+    result.z = static_cast<float>(mtx.m[2] * point.x + mtx.m[6] * point.y + mtx.m[10] * point.z + mtx.m[14]);
     return result;
 }
 
 // Helper function to transform a vector (no translation)
 static ofbx::Vec3 transformVector(const ofbx::DMatrix& mtx, const ofbx::Vec3& vec) {
     ofbx::Vec3 result;
-    result.x = mtx.m[0] * vec.x + mtx.m[4] * vec.y + mtx.m[8] * vec.z;
-    result.y = mtx.m[1] * vec.x + mtx.m[5] * vec.y + mtx.m[9] * vec.z;
-    result.z = mtx.m[2] * vec.x + mtx.m[6] * vec.y + mtx.m[10] * vec.z;
+    result.x = static_cast<float>(mtx.m[0] * vec.x + mtx.m[4] * vec.y + mtx.m[8] * vec.z);
+    result.y = static_cast<float>(mtx.m[1] * vec.x + mtx.m[5] * vec.y + mtx.m[9] * vec.z);
+    result.z = static_cast<float>(mtx.m[2] * vec.x + mtx.m[6] * vec.y + mtx.m[10] * vec.z);
     return result;
 }
 
 // Helper to normalize a vector
-static ofbx::Vec3 normalize(const ofbx::Vec3& v) {
+inline ofbx::Vec3 normalize(const ofbx::Vec3& v) {
     float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
     if (length < 0.0001f) return v;
     return {v.x / length, v.y / length, v.z / length};
@@ -363,9 +379,6 @@ namespace AssetCompiler {
 
         log("Loading OBJ mesh: %s", path.c_str());
 
-        // TODO: Implement OBJ loading
-        // Simple OBJ parser or use tinyobjloader
-
         log("ERROR: OBJ loading not yet implemented");
         return false;
     }
@@ -483,9 +496,8 @@ namespace AssetCompiler {
     }
 
     void MeshCompiler::optimizeVertexCache(MeshData& meshData) {
-        // TODO: Implement Forsyth or similar vertex cache optimization
-        // For now, this is a placeholder
-        log("Vertex cache optimization: placeholder (implement Forsyth algorithm)");
+        (void)meshData;
+        log("Vertex cache optimization: placeholder");
     }
 
     // ============================================================================

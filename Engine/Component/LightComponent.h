@@ -1,6 +1,8 @@
 /**
  * @file LightComponent.h
- * @brief Light component - directional / point / spot light properties
+ * @brief   Component that stores Light-related properties
+ * @details The data stored will be used by the graphics pipeline to   
+ *          produce the desired lighting in the scene
  * @author Chua Wen Bin Kenny
  * @date 03 November 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
@@ -16,52 +18,47 @@
  // Types for u32
 #include "../Utility/Types.h"
 
-// Resource types for xresource::instance_guid
-#include "../Asset/ResourceTypes.h"
-
 namespace Engine {
 
     // Must match the values used in Renderer.h (LIGHT_DIRECTIONAL=0, LIGHT_POINT=1, LIGHT_SPOT=2)
-    enum class LightType : uint32_t {
+    enum class LightType : u32 {
         Directional = 0u,
         Point = 1u,
         Spot = 2u
     };
 
     // For future expansion; currently only Realtime is used
-    enum class LightMode : uint32_t {
+    enum class LightMode : u32 {
         Realtime = 0u,
         // Baked = 1u, // reserved
     };
 
     struct LightComponent
     {
-        //// --------- Identity ---------
-        //xresource::instance_guid ComponentGUID{ xresource::instance_guid::GenerateGUIDCopy() };
 
         // --------- On/Off ---------
         bool Enabled = true;
 
         // --------- Type / Mode ---------
-        LightType Type = LightType::Point;      // default to Point (common for scene lights)
-        LightMode Mode = LightMode::Realtime;   // realtime only for now
+        LightType Type = LightType::Point;      // Default to Point 
+        LightMode Mode = LightMode::Realtime;   // Realtime only for now
 
         // --------- Radiometric properties ---------
         // Use linear RGB (NOT sRGB) here 
-        glm::vec3 Color = glm::vec3(1.0f);      // white
-        float     Intensity = 1.0f;             // default 1.0; Directional defaults to 0.5 
+        glm::vec3 Color = glm::vec3(1.0f);      // White
+        float     Intensity = 1.0f;             // Default 1.0; Directional defaults to 0.5 
 
         // --------- Range / cone (used for point & spot) ---------
         // Range is the "influence radius" used both for CPU culling and shader falloff.
-        float     Range = 5.0f;                 // only point/spot; ignored for directional
-        float     SpotAngleDeg = 30.0f;         // outer cone angle in degrees; inner = 0.85 * outer (in RenderSystem);
+        float     Range = 5.0f;                 // Only point/spot; ignored for directional
+        float     SpotAngleDeg = 30.0f;         // Outer cone angle in degrees; inner = 0.85 * outer (in RenderSystem);
 
         // --------- Indirect / future GI scaling ---------
-        float     IndirectMultiplier = 1.0f;    // reserved for ambient/IBL/lightmaps scaling
+        float     IndirectMultiplier = 1.0f;    // Reserved for ambient/IBL/lightmaps scaling
 
-        // --------- Reserved / alignment (keep struct compact & consistent) ---------
-        // (Not strictly necessary here, but good to leave room for flags like CastShadows, CookieIndex, etc.)
-        uint32_t  _Reserved0 = 0u;
+        // --------- Reserved / alignment  ---------
+        // For future implementations; CastShadows, etc
+        u32  _Reserved0 = 0u;
 
         // Default constructor
         LightComponent() = default;
@@ -96,8 +93,11 @@ namespace Engine {
         {
         }
 
-        // Convenience mutators that maintain sensible defaults
-
+        /**
+        * @brief Set lighting type with defaults for certain lights
+        * @param t The type to set 
+        * @param resetIntensityToDefault To set type-specific intensity defaults
+        */
         void SetType(LightType t, bool resetIntensityToDefault = true) {
             Type = t;
             if (resetIntensityToDefault) {
@@ -105,16 +105,34 @@ namespace Engine {
             }
         }
 
+        /**
+        * @brief Set lighting color
+        * @param c The color value to set
+        */
         void SetColorLinear(const glm::vec3& c) { Color = c; }
 
+        /**
+        * @brief Set lighting intensity
+        * @param i The intensity value to set
+        */
         void SetIntensity(float i) { Intensity = i; }
 
-        // For point/spot only (safe to set anyway; directional ignores Range)
+        /**
+        * @brief Set lighting range (For point/spot light only; directional ignores Range)
+        * @param r The range value to set
+        */
         void SetRange(float r) { Range = r; }
 
-        // For spot only (safe to set anyway; non-spot ignores SpotAngleDeg)
+        /**
+        * @brief Set lighting range (For spot light only; non-spot ignores SpotAngleDeg)
+        * @param deg The degree value to set
+        */
         void SetSpotAngleDeg(float deg) { SpotAngleDeg = deg; }
 
+        /**
+        * @brief Set indirect multiplier 
+        * @param m The multiplier value to set
+        */
         void SetIndirectMultiplier(float m) { IndirectMultiplier = m; }
     };
 

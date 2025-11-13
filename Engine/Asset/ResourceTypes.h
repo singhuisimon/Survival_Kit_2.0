@@ -1,12 +1,17 @@
 /**
-* @file ResourceTypes.h
-* @brief
-* @author
-* @date 15/09/2025
-* Copyright (C) 2025 DigiPen Institute of Technology.
-* Reproduction or disclosure of this file or its contents without the
-* prior written consent of DigiPen Institute of Technology is prohibited.
-*/
+ * @file ResourceTypes.h
+ * @brief Resource type definitions and utilities for the asset pipeline
+ * @details
+ * Provides the ResourceType enum and utility functions for type identification,
+ * conversion, and file extension mapping. Integrates with the xresource::guid
+ * system for compile-time type-safe resource identification.
+ * 
+ * @author Wai Lwin Thit
+ * @date 15/09/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
 
 
@@ -168,15 +173,6 @@ namespace ResourceGUID {
 	inline static constexpr auto shader_type_guid_v = xresource::type_guid("shader");
 	inline static constexpr auto entity_prefab_type_guid_v = xresource::type_guid("entity_prefab");
 	inline static constexpr auto scene_prefab_type_guid_v = xresource::type_guid("scene_prefab");
-
-	////type safe guid alias 
-	//using texture_guid = xresource::def_guid<texture_type_guid_v>;
-	//using mesh_guid = xresource::def_guid<mesh_type_guid_v>;
-	//using material_guid = xresource::def_guid<material_type_guid_v>;
-	//using audio_guid = xresource::def_guid<audio_type_guid_v>;
-	//using shader_guid = xresource::def_guid<shader_type_guid_v>;
-	//using entity_prefab_guid = xresource::def_guid<entity_prefab_type_guid_v>;
-	//using scene_prefab_guid = xresource::def_guid<scene_prefab_type_guid_v>;
 
 	//get the type guid for a resource type
 	inline xresource::type_guid getTypeGUID(ResourceType type) {

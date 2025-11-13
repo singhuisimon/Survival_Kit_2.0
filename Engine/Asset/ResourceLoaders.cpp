@@ -2,9 +2,11 @@
  * @file ResourceLoaders.cpp
  * @brief Complete implementation of xresource_mgr loaders with OpenGL integration
  * @details Loads compiled binary resources and creates OpenGL handles
- * @author 
- * @date October 2025
- * Copyright (C) 2025 DigiPen Institute of Technology.
+ * @author Wai Lwin Thit
+ * @date 11 October 2025
+* Copyright (C) 2025 DigiPen Institute of Technology.
+* Reproduction or disclosure of this file or its contents without the
+* prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #include "ResourceData.h"
@@ -27,16 +29,7 @@
 #include "../../AssetCompiler/CompilerCore/MeshCompiler.h"
 
 
-namespace Engine {
-
-    //void InitializeResourceLoaders() {
-    //    //force the linker to include these symbols 
-    //    (void)&texture_loader;
-    //    (void)&mesh_loader;
-    //    (void)&material_loader;
-    //    (void)&audio_loader;
-    //    (void)&shader_loader;
-    //}
+namespace Engine { 
 
     // Helper to get ResourceManager from xresource::mgr
     ResourceManager* getResourceManager(xresource::mgr& mgr) {
@@ -48,19 +41,16 @@ namespace Engine {
         file.read(reinterpret_cast<char*>(&header), sizeof(CompiledResourceHeader));
 
         if (!file) {
-           /* LM.writeLog("ResourceLoader - Failed to read compiled resource header");*/
             return false;
         }
 
         // Validate magic number
         if (header.magic != CompiledResourceHeader::MAGIC_NUMBER) {
-         //   LM.writeLog("ResourceLoader - Invalid magic number: 0x%X", header.magic);
             return false;
         }
 
         // Check version compatibility
         if (header.version != CompiledResourceHeader::CURRENT_VERSION) {
-         //   LM.writeLog("ResourceLoader - Unsupported version: %u", header.version);
             return false;
         }
 
@@ -74,9 +64,8 @@ namespace Engine {
 
 xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
-    xresource::mgr& mgr, const full_guid& guid)
+    xresource::mgr& /*mgr*/, const full_guid& guid)
 {
-    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
     // Get compiled file path
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::TEXTURE);
@@ -174,7 +163,7 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
 }
 
 void xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Destroy(
-    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& guid)
+    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& /*guid*/)
 {
     // Delete OpenGL texture
     if (data.textureID != 0) {
@@ -190,9 +179,8 @@ void xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Destroy(
 
 xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
-    xresource::mgr& mgr, const full_guid& guid)
+    xresource::mgr& /*mgr*/, const full_guid& guid)
 {
-    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
 
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
@@ -200,7 +188,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     //LOG_INFO("MESHFILE PATH : ", compiled_path);
 
     if (!Engine::fileExists(compiled_path)) {
-        Engine::listCompiledFiles(Engine::ResourceType::MESH);  // <-- ADD THIS LINE
+        Engine::listCompiledFiles(Engine::ResourceType::MESH);  
         return nullptr;
     }
 
@@ -351,11 +339,9 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     glGenBuffers(1, &mesh->VBO);
 
     glGenBuffers(1, &mesh->EBO);
-    GLenum err3 = glGetError();
     LOG_INFO("OpenGL buffers generated: VAO=", mesh->VAO, " VBO=", mesh->VBO, " EBO=", mesh->EBO);
 
     glBindVertexArray(mesh->VAO);
-    GLenum err4 = glGetError();
     LOG_INFO("VAO bound successfully");
 
     // Upload interleaved vertex data
@@ -363,7 +349,6 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     glBufferData(GL_ARRAY_BUFFER,
         mesh->vertices.size() * sizeof(float),
         mesh->vertices.data(), GL_STATIC_DRAW);
-    GLenum err5 = glGetError();
     LOG_INFO("VBO data uploaded: ", mesh->vertices.size() * sizeof(float), " bytes");
 
     // Upload index data
@@ -371,33 +356,35 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
         mesh->indices.size() * sizeof(unsigned int),
         mesh->indices.data(), GL_STATIC_DRAW);
-    GLenum err6 = glGetError();
     LOG_INFO("EBO data uploaded: ", mesh->indices.size() * sizeof(unsigned int), " bytes");
 
 
     // Setup vertex attributes - interleaved format
-    size_t stride = 11 * sizeof(float);
+    size_t stride = (11 * sizeof(float));
 
     // Position attribute (location = 0)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(stride), (void*)0);
     glEnableVertexAttribArray(0);
 
     // Normal attribute (location = 1)
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(stride), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     // Color attribute (location = 2)
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(stride), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     // TexCoord attribute (location = 3)
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride, (void*)(9 * sizeof(float)));
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(stride), (void*)(9 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
     glBindVertexArray(0);
 
     // Check for OpenGL errors
     GLenum error = glGetError();
+    if (error) {
+        LOG_ERROR("OpenGL error after creating buffers: ", error);
+    }
  
     LOG_INFO("OpenGL buffers created successfully");
     LOG_INFO("Mesh VAO: ", mesh->VAO, " VBO: ", mesh->VBO, " EBO: ", mesh->EBO);
@@ -414,7 +401,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
 
 void xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Destroy(
-    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& guid)
+    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& /*guid*/)
 {
     // Delete OpenGL buffers
     if (data.VAO != 0) {
@@ -435,9 +422,8 @@ void xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Destroy(
 
 xresource::loader<Engine::ResourceGUID::material_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
-    xresource::mgr& mgr, const full_guid& guid)
+    xresource::mgr& /*mgr*/, const full_guid& guid)
 {
-    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
     // Get the source file path
     std::string filepath = Engine::AM.getNameFromGuid(guid.m_Instance);
@@ -560,7 +546,7 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
 }
 
 void xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Destroy(
-    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& guid)
+    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& /*guid*/)
 {
     //LM.writeLog("MaterialLoader - Destroyed material GUID: %llX", guid.m_Instance.m_Value);
     delete& data;
@@ -571,9 +557,8 @@ void xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Destroy(
 
 xresource::loader<Engine::ResourceGUID::audio_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::audio_type_guid_v>::Load(
-    xresource::mgr& mgr, const full_guid& guid)
+    xresource::mgr& /*mgr*/, const full_guid& guid)
 {
-    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
 
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::AUDIO);
 
@@ -610,20 +595,12 @@ xresource::loader<Engine::ResourceGUID::audio_type_guid_v>::Load(
         return nullptr;
     }
 
-    // TODO: Create OpenAL buffer if using OpenAL
-    // For now, just keep data in memory
-
- ///   LM.writeLog("AudioLoader - Loaded audio GUID: %llX, Size: %u bytes",
-   //     guid.m_Instance.m_Value, dataSize);
-
     return audio.release();
 }
 
 void xresource::loader<Engine::ResourceGUID::audio_type_guid_v>::Destroy(
-    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& guid)
+    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& /*guid*/)
 {
-    // TODO: Delete OpenAL buffer if created
-    //LM.writeLog("AudioLoader - Destroyed audio GUID: %llX", guid.m_Instance.m_Value);
     delete& data;
 }
 
@@ -632,9 +609,9 @@ void xresource::loader<Engine::ResourceGUID::audio_type_guid_v>::Destroy(
 
 xresource::loader<Engine::ResourceGUID::shader_type_guid_v>::data_type*
 xresource::loader<Engine::ResourceGUID::shader_type_guid_v>::Load(
-    xresource::mgr& mgr, const full_guid& guid)
+    xresource::mgr& /*mgr*/, const full_guid& guid)
 {
-    Engine::ResourceManager* rm = Engine::getResourceManager(mgr);
+  
 
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::SHADER);
 
@@ -682,16 +659,13 @@ xresource::loader<Engine::ResourceGUID::shader_type_guid_v>::Load(
         return nullptr;
     }
 
-    // TODO: Compile and link OpenGL shader program
-    // For now, just keep sources in memory
-
  //   LM.writeLog("ShaderLoader - Loaded shader GUID: %llX", guid.m_Instance.m_Value);
 
     return shader.release();
 }
 
 void xresource::loader<Engine::ResourceGUID::shader_type_guid_v>::Destroy(
-    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& guid)
+    xresource::mgr& /*mgr*/, data_type&& data, const full_guid& /*guid*/)
 {
     // TODO: Delete OpenGL shader program if created
     if (data.programID != 0) {

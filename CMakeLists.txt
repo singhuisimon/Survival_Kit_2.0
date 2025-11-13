@@ -6,15 +6,32 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Output directories (separates Debug and Release automatically)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# ====================================
+# Output directories (fixed to <source>/build/bin/<Config>)
+# Minimal change: anchor outputs to SOURCE dir so Ninja doesn't flip to build/<cfg>/bin
+# ====================================
+set(_OUT_ROOT "${CMAKE_SOURCE_DIR}/build")
 
-# Set default build type to Release if not specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+# Base (used for copies / messages)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${_OUT_ROOT}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${_OUT_ROOT}/lib")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${_OUT_ROOT}/lib")
+
+if(CMAKE_CONFIGURATION_TYPES)  # multi-config (VS/Xcode/Ninja-Multi)
+  foreach(cfg Debug Release RelWithDebInfo MinSizeRel)
+    string(TOUPPER ${cfg} CFGU)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFGU} "${_OUT_ROOT}/bin/${cfg}")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFGU} "${_OUT_ROOT}/lib/${cfg}")
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFGU} "${_OUT_ROOT}/lib/${cfg}")
+  endforeach()
+else()  # single-config (Ninja/Make)
+  if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+  endif()
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${_OUT_ROOT}/bin/${CMAKE_BUILD_TYPE}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${_OUT_ROOT}/lib/${CMAKE_BUILD_TYPE}")
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${_OUT_ROOT}/lib/${CMAKE_BUILD_TYPE}")
 endif()
 
 # ====================================
@@ -34,7 +51,6 @@ if(MSVC)
     add_compile_options(/Oi)
     # Fast floating point
     add_compile_options(/fp:fast)
-    
 else()
     # GCC/Clang warnings
     add_compile_options(-Wall -Wextra -Wpedantic)
@@ -65,7 +81,6 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /OPT:REF /OPT:ICF")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /OPT:REF /OPT:ICF")
     set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG")
-    
 else()
     # GCC/Clang Release optimizations
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -ffast-math")
@@ -128,11 +143,6 @@ else()
     endif()
 endif()
 
-
-# After your project declaration and before add_subdirectory calls
-
-
-
 # ====================================
 # Add Subdirectories
 # ====================================
@@ -141,7 +151,6 @@ add_subdirectory(External)
 add_subdirectory(Engine)
 add_subdirectory(Game)
 add_subdirectory(AssetCompiler)
-
 
 # Include Mono configuration (this just sets variables, doesn't modify targets)
 include(MonoIntegration.cmake)
@@ -157,20 +166,82 @@ target_sources(GameEngine PRIVATE ${SCRIPTING_SOURCES})
 target_include_directories(GameEngine PUBLIC ${MONO_INCLUDE_DIR})
 target_link_libraries(GameEngine PUBLIC ${MONO_LIBRARIES})
 
-# If you have a separate executable target
-#target_link_libraries(GameEngine PRIVATE GameEngine)
 # ====================================
-# Copy Resources to Build Directory
+# Copy Resources & Script DLLs next to runtime dir
 # ====================================
 
-file(COPY ${CMAKE_SOURCE_DIR}/Resources 
-     DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY "${CMAKE_SOURCE_DIR}/Resources"
+     DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Debug/GameScripts.dll"
-     DESTINATION "${CMAKE_BINARY_DIR}/bin/Debug")
+# ===== Build C# scripts (GameScripts.dll) =====
+set(SCRIPTS_DIR "${CMAKE_SOURCE_DIR}/Scripts")
+set(SCRIPTS_CSPROJ "${SCRIPTS_DIR}/GameScripts.csproj")
 
-file(COPY "${CMAKE_SOURCE_DIR}/Scripts/obj/Release/GameScripts.dll"
-     DESTINATION "${CMAKE_BINARY_DIR}/bin/Release")
+if(NOT EXISTS "${SCRIPTS_CSPROJ}")
+  message(FATAL_ERROR "C# scripts project not found at: ${SCRIPTS_CSPROJ}")
+endif()
+
+# Prefer dotnet; fallback to MSBuild (Visual Studio generators)
+find_program(DOTNET_EXE dotnet)
+if(NOT DOTNET_EXE)
+  # For VS generators, CMAKE_MAKE_PROGRAM is MSBuild.exe
+  if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(MSBUILD_EXE "${CMAKE_MAKE_PROGRAM}")
+  endif()
+endif()
+
+# Helper: choose config expression for multi/single config
+if(CMAKE_CONFIGURATION_TYPES)
+  set(_CFG_GEN "$<CONFIG>")
+else()
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
+  endif()
+  set(_CFG_GEN "${CMAKE_BUILD_TYPE}")
+endif()
+
+# Build output: put GameScripts.dll directly next to the runtime for the active config
+# - dotnet/MSBuild OutDir must end with a trailing slash
+set(_SCRIPTS_OUTDIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
+
+if(DOTNET_EXE)
+  add_custom_target(GameScripts
+    COMMAND "${DOTNET_EXE}" build "${SCRIPTS_CSPROJ}"
+            -c "${_CFG_GEN}"
+            -nologo -v:m
+            -p:WarningLevel=4
+            -p:OutDir="${_SCRIPTS_OUTDIR}"
+    WORKING_DIRECTORY "${SCRIPTS_DIR}"
+    COMMENT "Building C# scripts with dotnet build (${_CFG_GEN}) -> ${_SCRIPTS_OUTDIR}"
+  )
+else()
+  if(NOT MSBUILD_EXE)
+    message(FATAL_ERROR "Neither 'dotnet' nor Visual Studio MSBuild found to build C# scripts.")
+  endif()
+  add_custom_target(GameScripts
+    COMMAND "${MSBUILD_EXE}" "${SCRIPTS_CSPROJ}"
+            /restore
+            /t:Build
+            /p:Configuration="${_CFG_GEN}"
+            /p:OutDir="${_SCRIPTS_OUTDIR}"
+    WORKING_DIRECTORY "${SCRIPTS_DIR}"
+    COMMENT "Building C# scripts with MSBuild (${_CFG_GEN}) -> ${_SCRIPTS_OUTDIR}"
+  )
+endif()
+
+# Make your main run target depend on scripts
+# Adjust these to your actual targets (keep both if you have both)
+if(TARGET Survival_Kit_2.0)
+  add_dependencies(Survival_Kit_2.0 GameScripts)
+endif()
+if(TARGET Game) # e.g., your game executable target
+  add_dependencies(Game GameScripts)
+endif()
+if(TARGET GameEngine) # if you want the engine lib to trigger it too
+  add_dependencies(GameEngine GameScripts)
+endif()
+
+
 # ====================================
 # Build Information
 # ====================================
@@ -200,4 +271,7 @@ if(CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Available configurations: ${CMAKE_CONFIGURATION_TYPES}")
 endif()
 
+message(STATUS "SOURCE = ${CMAKE_SOURCE_DIR}")
+message(STATUS "BUILD  = ${CMAKE_BINARY_DIR}")
+message(STATUS "RUN    = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message(STATUS "========================================")

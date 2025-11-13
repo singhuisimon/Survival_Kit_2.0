@@ -1,19 +1,26 @@
+/**
+ * @file ResourceManager.cpp
+ * @brief Runtime resource loading and lifecycle management
+ * @details
+ * Manages loading, caching, and reference counting of compiled runtime resources.
+ * Provides type-safe access to textures, meshes, materials
+ * through the xresource::mgr system. Resources are loaded on-demand from compiled
+ * binary files and automatically unloaded when no longer referenced.
+ * @author Wai Lwin Thit
+ * @date September 15 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+
 
 #include "ResourceManager.h"
 #include "AssetManager.h"
 #include "ResourceData.h"
-//#include "ResourceLoaders.cpp"
+
 
 namespace Engine {
-
-    //forward declaration
-   // extern void InitializeResourceLoaders();
-
-	//ResourceManager::ResourceManager() {
-
-	//	//setType("ResourceManager");
-	//	m_resource_mgr = std::make_unique<xresource::mgr>();
-	//}
 
 	//get 
 	ResourceManager& ResourceManager::getInstance() {
@@ -42,15 +49,12 @@ namespace Engine {
             std::wstring wide_descriptor_path(descriptor_root.begin(), descriptor_root.end());
             m_resource_mgr->setRootPath(std::move(wide_descriptor_path));
 
-            //LM.writeLog("ResourceManager::startUp() - Resource Manager started successfully");
-            //LM.writeLog("ResourceManager::startUp() - Descriptor root: %s", descriptor_root.c_str());
-            //LM.writeLog("ResourceManager::startUp() - Intermediate root: %s", m_paths->getIntermediateRootPath().c_str());
-            //LM.writeLog("ResourceManager::startUp() - Compiled root: %s", m_paths->getCompiledRootPath().c_str());
+      
 
             return 0;
         }
         catch (const std::exception& e) {
-         //   LM.writeLog("ResourceManager::startUp() - Exception: %s", e.what());
+            LOG_DEBUG("Resource Manager failed to Initialize: ", e.what());
             return -1;
         }
 
@@ -58,7 +62,6 @@ namespace Engine {
 
 	void ResourceManager::shutDown() {
 
-       // LM.writeLog("ResourceManager::shutDown() - ResourceManager shutting down");
 
 		m_resource_mgr.reset();
 
