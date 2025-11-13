@@ -220,6 +220,10 @@ namespace Engine
 
         auto &reg = scene->GetRegistry();
 
+        // ---------------------------------------------------------------------
+        // ECS -> Jolt: sync kinematics, mass/shape changes, damping/rest,
+        // poses and velocities.
+        // ---------------------------------------------------------------------
         reg.view<TransformComponent, RigidbodyComponent>().each(
             [&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
             {
@@ -229,6 +233,7 @@ namespace Engine
 
                 AppliedProps &ap = mApplied[e];
 
+                // Kinematic flag -> motion type & layer
                 if (rb.IsKinematic != ap.isKinematic)
                 {
                     mBodyInterface->SetMotionType(id, ToMotionType(rb), JPH::EActivation::Activate);
@@ -236,6 +241,7 @@ namespace Engine
                     ap.isKinematic = rb.IsKinematic;
                 }
 
+                // Gravity toggle -> gravity factor
                 if (rb.UseGravity != ap.useGravity)
                 {
                     JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
@@ -246,6 +252,7 @@ namespace Engine
                     ap.useGravity = rb.UseGravity;
                 }
 
+                // Mass change -> rebuild body (keeps inertia in sync)
                 if (!NearlyEqual(rb.Mass, ap.mass))
                 {
                     DestroyBodyFor(e);
@@ -253,6 +260,7 @@ namespace Engine
                     return;
                 }
 
+                // Mesh / shape changes -> rebuild body
                 if (mFetchMeshInfo)
                 {
                     MeshBuildInfo info;
@@ -271,6 +279,29 @@ namespace Engine
                     }
                 }
 
+                // Damping + restitution bindings
+                {
+                    JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
+                    if (lock.Succeeded())
+                    {
+                        JPH::Body &body = lock.GetBody();
+
+                        if (JPH::MotionProperties *mp = body.GetMotionProperties())
+                        {
+                            if (!NearlyEqual(mp->GetLinearDamping(), rb.LinearDamping))
+                                mp->SetLinearDamping(rb.LinearDamping);
+
+                            if (!NearlyEqual(mp->GetAngularDamping(), rb.AngularDamping))
+                                mp->SetAngularDamping(rb.AngularDamping);
+                        }
+
+                        float const targetRest = std::clamp(rb.Restitution, 0.0f, 1.0f);
+                        if (!NearlyEqual(body.GetRestitution(), targetRest))
+                            body.SetRestitution(targetRest);
+                    }
+                }
+
+                // Pose push for kinematic bodies (or if transform changed)
                 glm::vec3 curPos = tc.Position;
                 glm::quat curRot = AsQuat(tc.Rotation);
                 float dotq = std::abs(glm::dot(curRot, ap.lastRot));
@@ -289,16 +320,24 @@ namespace Engine
                     ap.lastRot = curRot;
                 }
 
+                // Velocity push for dynamics
                 if (!rb.IsKinematic)
                 {
                     mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
+                    mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
                 }
             }
         );
 
+        // ---------------------------------------------------------------------
+        // Step the physics world
+        // ---------------------------------------------------------------------
         PhysicsAPI::BeginCollisionFrame();
         mPhysics.Update(dt.GetSeconds(), 1, mTempAllocator, mJobSystem);
 
+        // ---------------------------------------------------------------------
+        // Jolt -> ECS: sync back dynamic poses and velocities
+        // ---------------------------------------------------------------------
         reg.view<TransformComponent, RigidbodyComponent>().each(
             [&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
             {
@@ -325,6 +364,9 @@ namespace Engine
                 {
                     JPH::Vec3 v = mBodyInterface->GetLinearVelocity(id);
                     rb.Velocity = glm::vec3(v.GetX(), v.GetY(), v.GetZ());
+
+                    JPH::Vec3 w = mBodyInterface->GetAngularVelocity(id);
+                    rb.AngularVelocity = glm::vec3(w.GetX(), w.GetY(), w.GetZ());
                 }
             }
         );
@@ -476,14 +518,19 @@ namespace Engine
 
         settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
         settings.mMassPropertiesOverride.mMass = std::max(0.0001f, rb.Mass);
+
+        // Material / damping properties from ECS component
         settings.mFriction = 0.6f;
-        settings.mRestitution = 0.1f;
+        settings.mRestitution = std::clamp(rb.Restitution, 0.0f, 1.0f);
+        settings.mLinearDamping = rb.LinearDamping;
+        settings.mAngularDamping = rb.AngularDamping;
 
         JPH::BodyID const id = mBodyInterface->CreateAndAddBody(settings, JPH::EActivation::Activate);
 
         if (!rb.IsKinematic)
         {
             mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
+            mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
         }
 
         if (!rb.UseGravity)

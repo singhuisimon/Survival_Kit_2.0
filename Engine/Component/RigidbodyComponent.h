@@ -13,7 +13,8 @@
 #include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
 
-namespace Engine {
+namespace Engine
+{
 
     /**
      * @brief Rigidbody component - defines physics properties for dynamic objects
@@ -21,7 +22,8 @@ namespace Engine {
      *          entity behaves in the physics simulation. Works with Jolt Physics
      *          or can be used for simple custom physics implementations.
      */
-    struct RigidbodyComponent {
+    struct RigidbodyComponent
+    {
         /// Unique identifier for this component instance
         xresource::instance_guid ComponentGUID;
 
@@ -34,17 +36,20 @@ namespace Engine {
         /// Whether gravity affects this body
         bool UseGravity;
 
-        /// Current velocity in world space (units per second)
+        /// Current linear velocity in world space (units per second)
         glm::vec3 Velocity;
 
-        // Future fields (planned for Jolt Physics integration):
-        // glm::vec3 AngularVelocity;     // Rotation velocity
-        // float LinearDamping;            // Air resistance for linear motion
-        // float AngularDamping;           // Air resistance for rotation
-        // float Restitution;              // Bounciness (0 = no bounce, 1 = perfect bounce)
-        // float Friction;                 // Surface friction coefficient
-        // bool IsSleeping;                // Whether physics body is sleeping
-        // CollisionShape Shape;           // Collision shape type
+        /// Current angular velocity in world space (radians per second)
+        glm::vec3 AngularVelocity;
+
+        /// Linear damping (air resistance for translation)
+        float LinearDamping;
+
+        /// Angular damping (air resistance for rotation)
+        float AngularDamping;
+
+        /// Bounciness (0 = inelastic, 1 = perfectly elastic)
+        float Restitution;
 
         /**
          * @brief Default constructor - creates a standard dynamic rigidbody
@@ -54,8 +59,12 @@ namespace Engine {
             , Mass(1.0f)
             , IsKinematic(false)
             , UseGravity(true)
-            , Velocity(0.0f, 0.0f, 0.0f) {
-        }
+            , Velocity(0.0f, 0.0f, 0.0f)
+            , AngularVelocity(0.0f, 0.0f, 0.0f)
+            , LinearDamping(0.05f)
+            , AngularDamping(0.05f)
+            , Restitution(0.1f)
+        {}
 
         /**
          * @brief Constructor with custom mass
@@ -66,14 +75,19 @@ namespace Engine {
             , Mass(mass)
             , IsKinematic(false)
             , UseGravity(true)
-            , Velocity(0.0f, 0.0f, 0.0f) {
-        }
+            , Velocity(0.0f, 0.0f, 0.0f)
+            , AngularVelocity(0.0f, 0.0f, 0.0f)
+            , LinearDamping(0.05f)
+            , AngularDamping(0.05f)
+            , Restitution(0.1f)
+        {}
 
         /**
          * @brief Set the mass
          * @param mass New mass in kilograms
          */
-        void SetMass(float mass) {
+        void SetMass(float mass)
+        {
             Mass = mass;
         }
 
@@ -81,7 +95,8 @@ namespace Engine {
          * @brief Get the mass
          * @return Current mass in kilograms
          */
-        float GetMass() const {
+        float GetMass() const
+        {
             return Mass;
         }
 
@@ -89,7 +104,8 @@ namespace Engine {
          * @brief Set kinematic mode
          * @param kinematic Whether this body should be kinematic
          */
-        void SetKinematic(bool kinematic) {
+        void SetKinematic(bool kinematic)
+        {
             IsKinematic = kinematic;
         }
 
@@ -97,7 +113,8 @@ namespace Engine {
          * @brief Check if body is kinematic
          * @return True if kinematic (controlled by code, not physics)
          */
-        bool IsKinematicBody() const {
+        bool IsKinematicBody() const
+        {
             return IsKinematic;
         }
 
@@ -105,7 +122,8 @@ namespace Engine {
          * @brief Enable/disable gravity
          * @param enabled Whether gravity should affect this body
          */
-        void SetGravityEnabled(bool enabled) {
+        void SetGravityEnabled(bool enabled)
+        {
             UseGravity = enabled;
         }
 
@@ -113,7 +131,8 @@ namespace Engine {
          * @brief Check if gravity is enabled
          * @return True if gravity affects this body
          */
-        bool IsGravityEnabled() const {
+        bool IsGravityEnabled() const
+        {
             return UseGravity;
         }
 
@@ -121,7 +140,8 @@ namespace Engine {
          * @brief Set the velocity
          * @param velocity New velocity in world space
          */
-        void SetVelocity(const glm::vec3& velocity) {
+        void SetVelocity(const glm::vec3 &velocity)
+        {
             Velocity = velocity;
         }
 
@@ -129,15 +149,26 @@ namespace Engine {
          * @brief Get the velocity
          * @return Current velocity in world space
          */
-        const glm::vec3& GetVelocity() const {
+        const glm::vec3 &GetVelocity() const
+        {
             return Velocity;
+        }
+
+        /**
+         * @brief Stop all movement
+         */
+        void Stop()
+        {
+            Velocity = glm::vec3(0.0f);
+            AngularVelocity = glm::vec3(0.0f);
         }
 
         /**
          * @brief Add force to the velocity (impulse)
          * @param force Force vector to add
          */
-        void AddForce(const glm::vec3& force) {
+        void AddForce(const glm::vec3 &force)
+        {
             Velocity += force / Mass;
         }
 
@@ -145,22 +176,17 @@ namespace Engine {
          * @brief Add velocity directly
          * @param deltaVelocity Velocity to add
          */
-        void AddVelocity(const glm::vec3& deltaVelocity) {
+        void AddVelocity(const glm::vec3 &deltaVelocity)
+        {
             Velocity += deltaVelocity;
-        }
-
-        /**
-         * @brief Stop all movement
-         */
-        void Stop() {
-            Velocity = glm::vec3(0.0f);
         }
 
         /**
          * @brief Get speed (magnitude of velocity)
          * @return Current speed
          */
-        float GetSpeed() const {
+        float GetSpeed() const
+        {
             return glm::length(Velocity);
         }
 
@@ -168,7 +194,8 @@ namespace Engine {
          * @brief Check if body is moving
          * @return True if velocity is non-zero
          */
-        bool IsMoving() const {
+        bool IsMoving() const
+        {
             return glm::length(Velocity) > 0.001f; // Small epsilon for floating point comparison
         }
 
@@ -176,7 +203,8 @@ namespace Engine {
          * @brief Check if this is a static body (zero mass, non-kinematic)
          * @return True if body should be treated as static
          */
-        bool IsStatic() const {
+        bool IsStatic() const
+        {
             return Mass <= 0.0f && !IsKinematic;
         }
     };
