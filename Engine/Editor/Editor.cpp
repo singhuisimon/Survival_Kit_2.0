@@ -998,7 +998,20 @@ namespace Engine
 						ImGui::SeparatorText("Values for Debugging:");
 
 						ImGui::Text("Material: %u", mesh.Material);
-						ImGui::Text("Mesh Type: %u", mesh.MeshType);
+
+						// For Ease of Gameplay Programmers to Use For the Time Being
+						ImU32 meshType = mesh.MeshType;
+						if (ImGui::InputScalar("Mesh Type", ImGuiDataType_U32, &meshType))
+						{
+							if (meshType == 0 || meshType  == 1 || meshType  == 2) {
+								mesh.MeshType = meshType;
+							}
+							else {
+								meshType = mesh.MeshType;
+							}
+						}
+
+						
 						ImGui::Text("Submesh Index: %u", mesh.SubmeshIndex);
 						ImGui::Text("Texture: %u", mesh.Texture);
 
