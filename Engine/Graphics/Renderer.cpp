@@ -540,20 +540,20 @@ namespace Engine {
 		prog.setUniform("P", p);					// Perspective transform
 
 		// Light setting
-		prog.setUniform("uExposure", 2.0f); // Exposure
+		//prog.setUniform("uExposure", 2.0f); // Exposure
 
-	// NEW PBR
-	// void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4& v, const glm::mat4& p, const glm::vec3& campos) {
+		// NEW PBR
+		// void Renderer::draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4& v, const glm::mat4& p, const glm::vec3& campos) {
 
-	// 	auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
-		
-	// 	glm::mat4 projection_view = p * v;
-	// 	prog.setUniform("CamPos", campos);
-	// 	prog.setUniform("u_ViewProjection", projection_view);
-	// 	prog.setUniform("light.position", editor_light.getLightPos());      // Position
-	// 	prog.setUniform("light.La", editor_light.getLightAmbient());        // Ambient
-	// 	prog.setUniform("light.Ld", editor_light.getLightDiffuse());        // Diffuse
-	// 	prog.setUniform("light.Ls", editor_light.getLightSpecular());       // Specular
+		// 	auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
+
+		// 	glm::mat4 projection_view = p * v;
+		// 	prog.setUniform("CamPos", campos);
+		// 	prog.setUniform("u_ViewProjection", projection_view);
+		// 	prog.setUniform("light.position", editor_light.getLightPos());      // Position
+		// 	prog.setUniform("light.La", editor_light.getLightAmbient());        // Ambient
+		// 	prog.setUniform("light.Ld", editor_light.getLightDiffuse());        // Diffuse
+		// 	prog.setUniform("light.Ls", editor_light.getLightSpecular());       // Specular
 
 		for (const auto& item : draw_items) {
 
@@ -574,7 +574,7 @@ namespace Engine {
 
 			// Set GPU ID for object picking
 			if (pass.shdpgm_handle == 2) {
-				u32 pickId = item.m_entity_id;   
+				u32 pickId = item.m_entity_id;
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
@@ -600,38 +600,38 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 			}*/
 
-			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+			if (0 /*MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid))*/)
 			{
-				MaterialUBO_Std140 mubo;
-				mubo.Ka = test_material.getMaterialAmbient();
-				mubo._pad0 = 0.0f;
-				mubo.Kd = glm::vec3(material_resource->diffuseColor[0], material_resource->diffuseColor[1], material_resource->diffuseColor[2]);
-				mubo._pad1 = 0.0f;
-				mubo.Ks = glm::vec3(material_resource->specularColor[0], material_resource->specularColor[1], material_resource->specularColor[2]);
-				mubo.shininess = material_resource->shininess;
+				//MaterialUBO_Std140 mubo;
+				//mubo.Ka = test_material.getMaterialAmbient();
+				//mubo._pad0 = 0.0f;
+				//mubo.Kd = glm::vec3(material_resource->diffuseColor[0], material_resource->diffuseColor[1], material_resource->diffuseColor[2]);
+				//mubo._pad1 = 0.0f;
+				//mubo.Ks = glm::vec3(material_resource->specularColor[0], material_resource->specularColor[1], material_resource->specularColor[2]);
+				//mubo.shininess = material_resource->shininess;
 
-				// Update UBO (48 bytes)
-				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
+				//// Update UBO (48 bytes)
+				//glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
 
-				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
-					glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-					prog.setUniform("Texture2D", 0);
-					prog.setUniform("isTexture", true);
+				//if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
+				//	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+				//	prog.setUniform("Texture2D", 0);
+				//	prog.setUniform("isTexture", true);
 
-					if (texture_resource->format == "sRGB") {
-						prog.setUniform("isGamma", true);
-					}
-					else {
-						prog.setUniform("isGamma", false);
-					}
+				//	if (texture_resource->format == "sRGB") {
+				//		prog.setUniform("isGamma", true);
+				//	}
+				//	else {
+				//		prog.setUniform("isGamma", false);
+				//	}
 
-				}
+				//}
 
-				if (TextureResource* normal_map = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap))) {
-					glBindTextureUnit(1, static_cast<GLuint>(normal_map->textureID));
-					prog.setUniform("NormalMap", 1);
-					prog.setUniform("useNormalMap", true);
-				}
+				//if (TextureResource* normal_map = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap))) {
+				//	glBindTextureUnit(1, static_cast<GLuint>(normal_map->textureID));
+				//	prog.setUniform("NormalMap", 1);
+				//	prog.setUniform("useNormalMap", true);
+				//}
 			}
 			else
 			{
@@ -651,87 +651,88 @@ namespace Engine {
 				prog.setUniform("useNormalMap", false);
 #pragma endregion
 
-			// NEW PBR
-			// // Check for material resource
-			// if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
-			// {
-			// 	// New workflow has no ambient lighting
-			// 	prog.setUniform("material.albedo", glm::vec3(material_resource->baseColor[0], 
-			// 													       material_resource->baseColor[1], 
-			// 													       material_resource->baseColor[2]));
+				// NEW PBR
+				// // Check for material resource
+				// if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+				// {
+				// 	// New workflow has no ambient lighting
+				// 	prog.setUniform("material.albedo", glm::vec3(material_resource->baseColor[0], 
+				// 													       material_resource->baseColor[1], 
+				// 													       material_resource->baseColor[2]));
 
-			// 	prog.setUniform("material.metallic", material_resource->metallic);
-			// 	prog.setUniform("material.roughness", material_resource->roughness);
-			// 	prog.setUniform("material.ao", material_resource->ambientOcclusion);
-			// 	prog.setUniform("material.opacity", material_resource->opacity);
+				// 	prog.setUniform("material.metallic", material_resource->metallic);
+				// 	prog.setUniform("material.roughness", material_resource->roughness);
+				// 	prog.setUniform("material.ao", material_resource->ambientOcclusion);
+				// 	prog.setUniform("material.opacity", material_resource->opacity);
 
-			// 	//if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
-			// 	//	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-			// 	//	prog.setUniform("Texture2D", 0);
-			// 	//	prog.setUniform("isTexture", true);
+				// 	//if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
+				// 	//	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+				// 	//	prog.setUniform("Texture2D", 0);
+				// 	//	prog.setUniform("isTexture", true);
 
-			// 	//	if (texture_resource->format == "sRGB") {
-			// 	//		prog.setUniform("isGamma", true);
-			// 	//	}
-			// 	//	else {
-			// 	//		prog.setUniform("isGamma", false);
-			// 	//	}
-			// 	//}
-			// }
-			// else
-			// {
-			// 	//prog.setUniform("isTexture", false);
-			// 	//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-			// 	//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-			// 	//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-			// 	//prog.setUniform("material.shininess", test_material.getMaterialShininess());
-			// }
+				// 	//	if (texture_resource->format == "sRGB") {
+				// 	//		prog.setUniform("isGamma", true);
+				// 	//	}
+				// 	//	else {
+				// 	//		prog.setUniform("isGamma", false);
+				// 	//	}
+				// 	//}
+				// }
+				// else
+				// {
+				// 	//prog.setUniform("isTexture", false);
+				// 	//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
+				// 	//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
+				// 	//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
+				// 	//prog.setUniform("material.shininess", test_material.getMaterialShininess());
+				// }
 
 
 #pragma region TESTING UBO FOR LIGHTING
 			// Per-object light culling + upload 
 			// Object center/radius (approx): extract translation; radius = heuristic
-			glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
-			const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
+				glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
+				const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
 
-			uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
-			(void)usedLights; // block is visible to shader via binding=0
+				uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
+				(void)usedLights; // block is visible to shader via binding=0
 #pragma endregion
 
-			size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+				size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
 
-			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
-			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
-			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+				GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+				GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
 
-			prog.setUniform("u_World", item.m_model_to_world_transform); // Model transform
+				prog.setUniform("u_World", item.m_model_to_world_transform); // Model transform
 
-			glm::mat4 normal_matrix = glm::transpose(glm::inverse(item.m_model_to_world_transform));
-			prog.setUniform("u_NormalMatrix", normal_matrix); // Normal matrix
+				glm::mat4 normal_matrix = glm::transpose(glm::inverse(item.m_model_to_world_transform));
+				prog.setUniform("u_NormalMatrix", normal_matrix); // Normal matrix
 
-			xresource::full_guid guid = convertToMeshGuid(item.m_mesh_guid);
-			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(guid)) {
-				glBindVertexArray(mesh_resource->VAO);
+				xresource::full_guid guid = convertToMeshGuid(item.m_mesh_guid);
+				if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(guid)) {
+					glBindVertexArray(mesh_resource->VAO);
 
-				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
+					const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
 
-				// Calculate byte offset into the index buffer
-				const void* indexOffset = reinterpret_cast<const void*>(
-					submesh.startIndex * sizeof(unsigned int)
-					);
+					// Calculate byte offset into the index buffer
+					const void* indexOffset = reinterpret_cast<const void*>(
+						submesh.startIndex * sizeof(unsigned int)
+						);
 
-				glDrawElements(GL_TRIANGLES,
-					submesh.indexCount,
-					GL_UNSIGNED_INT,
-					indexOffset);
+					glDrawElements(GL_TRIANGLES,
+						submesh.indexCount,
+						GL_UNSIGNED_INT,
+						indexOffset);
 
-				glBindVertexArray(0);
-			}
-			else {
-				m_gl.m_mesh_storage[mesh_handle].vao.bind();
-				glDrawElements(primitive, draw_count, index_type, NULL);
-				glBindVertexArray(0);
+					glBindVertexArray(0);
+				}
+				else {
+					m_gl.m_mesh_storage[mesh_handle].vao.bind();
+					glDrawElements(primitive, draw_count, index_type, NULL);
+					glBindVertexArray(0);
+				}
 			}
 		}
 	}

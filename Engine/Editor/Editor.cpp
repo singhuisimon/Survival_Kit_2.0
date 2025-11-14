@@ -923,18 +923,12 @@ namespace Engine
 							// Color Properties
 							if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
 							{
-								// Diffuse Color with alpha
-								if (ImGui::ColorEdit4("Diffuse Color", material->diffuseColor.data(),
-									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
-								{
-									// Material updated - real-time changes will be visible (To do in M3)
-								}
 
-								// Specular Color (no alpha)
-								if (ImGui::ColorEdit3("Specular Color", material->specularColor.data(),
+								// Base Color (RGB) - no alpha, as opacity is separate
+								if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
 									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
 								{
-									// Material updated (To do in M3)
+									// Material updated
 								}
 
 								// Emission Color

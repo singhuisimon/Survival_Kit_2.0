@@ -16,6 +16,10 @@ layout(location=1) in vec3 VertexNormal;
 layout(location=2) in vec3 VertexColor;
 layout(location=3) in vec2 VertexTexCoords;
 
+uniform mat4 M; // Model transform matrix
+uniform mat4 V; // View transform matrix
+uniform mat4 P; // Projection transform matrix
+
 out vec3 Position;
 out vec3 Normal;
 out vec3 Color;
@@ -30,6 +34,11 @@ uniform mat4 u_NormalMatrix;
 
 void main()
 {
+    mat4 MV = V * M; // Model-View transform matrix
+
+    mat3 N = mat3(vec3(MV[0]), vec3(MV[1]), vec3(MV[2])); // Normal transform matrix
+    //Normal = normalize(N * VertexNormal);
+
     // Transform positions and normals into world position for lighting calculation
     Position = vec3(u_World * vec4(VertexPosition, 1.0));
     Normal   = vec3(u_NormalMatrix * vec4(VertexNormal, 1.0));
