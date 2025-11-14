@@ -231,3 +231,155 @@ void main()
 
     FragColor = vec4(outColor, 1.0);
 }
+
+// #version 420 core
+
+// struct Material
+// {
+//     vec3  albedo;
+//     float metallic;
+//     float roughness;
+//     float ao;
+//     float opacity;
+// };
+
+// struct Light 
+// {
+//     vec3 position;      // Position of the light source in the world space
+//     vec3 La;            // Ambient light intensity
+//     vec3 Ld;            // Diffuse light intensity
+//     vec3 Ls;            // Specular light intensity
+// };
+
+// const float PI = 3.14159265358979323846;
+
+// in vec3 Position;       // In World Space
+// in vec3 Normal;         // In World space
+// in vec3 Color;         
+// in vec2 TexCoord;
+
+// uniform Light light;
+// uniform Material material;
+// uniform vec3 CamPos;
+
+// // For handling textures
+// uniform bool isTexture;
+// layout(binding=0) uniform sampler2D Texture2D;
+// layout(location=0) out vec4 FragColor;
+
+// ////////////////////////////////////////////////////////////////////
+// // @Brief
+// // The Trowbridge-Reitz GGX normal distribution function. It
+// // statistically approximates the relative surface area of
+// // microfacets exactly aligned to the halfway vector
+// //
+// // @Param[in] N 
+// //     The normal vector of the surface.
+// //
+// // @Param[in] H
+// //     The halfway vector between the view angle, and the
+// //     incidence of light angle. 
+// //
+// // @Param[in] a
+// //     The roughness value of the surface.
+// //
+// // @Return the relative surface area of microfacets exactly
+// // aligned to the halfway vector H.
+// ////////////////////////////////////////////////////////////////////
+// float DistributionGGX(vec3 N, vec3 H, float roughness)
+// {
+//     float a      = roughness*roughness;
+//     float a2     = a*a;
+//     float NdotH  = max(dot(N, H), 0.0);
+//     float NdotH2 = NdotH*NdotH;
+	
+//     float num   = a2;
+//     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+//     denom = PI * denom * denom;
+	
+//     return num / denom;
+// }
+
+
+// ////////////////////////////////////////////////////////////////////
+// // @Brief The 
+// //
+// // @Param[in] NdotV
+// //     The normal vector of the surface dotted with the 
+// //     view vector.
+// //
+// // @Param[in] k
+// //     The roughness value of the material.
+// //
+// // @Return 
+// ////////////////////////////////////////////////////////////////////
+// float GeometrySchlickGGX(float NdotV, float roughness)
+// {
+//     float r = (roughness + 1.0);
+//     float k = (r*r) / 8.0;
+
+//     float num   = NdotV;
+//     float denom = NdotV * (1.0 - k) + k;
+	
+//     return num / denom;
+// }
+  
+// float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+// {
+//     float NdotV = max(dot(N, V), 0.0);
+//     float NdotL = max(dot(N, L), 0.0);
+//     float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+//     float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+//     return ggx1 * ggx2;
+// }
+
+// vec3 fresnelSchlick(float cosTheta, vec3 F0)
+// {
+//     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+// }
+
+
+// void main() 
+// {
+//     vec3 N = normalize(Normal);
+//     vec3 V = normalize(CamPos - Position);
+
+//     vec3 F0 = vec3(0.04);
+//     F0 = mix(F0, material.albedo, material.metallic);
+
+//     // Reflectance equation
+//     vec3 Lo = vec3(0.0);
+    
+//     // Only calculate single light (placeholder)
+//     vec3 L = normalize(light.position - Position);
+//     vec3 H = normalize(V + L);
+//     float distance = length(light.position - Position);
+//     float attenuation = 1.0 / (distance * distance);
+//     vec3  radiance = light.La * attenuation;
+
+//     // Cook-Torrance brdf
+//     float NDF = DistributionGGX(N, H, material.roughness);
+//     float G   = GeometrySmith(N, V, L, material.roughness);
+//     vec3  F   = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+//     vec3 KS = F;
+//     vec3 KD = vec3(1.0) - KS;
+//     KD *= 1.0 - material.metallic;
+
+//     vec3 numerator = NDF * G * F;
+//     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+//     vec3  specular = numerator/denominator;
+
+//     // Add to outgoing radiance
+//     float NdotL = max(dot(N, L), 0.0);
+//     Lo += (KD * material.albedo / PI + specular) * radiance * NdotL;
+
+//     vec3 ambient = vec3(0.03) * material.albedo * material.ao;
+//     vec3 color = ambient + Lo;
+	
+//     color = color / (color + vec3(1.0));
+//     color = pow(color, vec3(1.0/2.2));  
+   
+//     FragColor = vec4(color, material.opacity);
+// }

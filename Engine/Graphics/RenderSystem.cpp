@@ -56,6 +56,12 @@ namespace Engine {
 			if (!camera.Enabled) continue;
 			m_cameralist.emplace_back(camera);
 
+			// NEW PBR
+			// if (camera.Enabled) {
+			// 	auto& transform = camView.get<TransformComponent>(cam);
+			// 	m_cameralist.emplace_back(std::make_pair(camera, transform.Position));
+			// }
+
 		}
 
 		auto particleView = scene->GetRegistry().view<ParticleComponent>();
@@ -124,6 +130,10 @@ namespace Engine {
 		std::span<LightCPU>			light_span(m_lightlist.data(), m_lightlist.size());
 
 		renderer.render_frame(drawitem_span, cameralist_span, light_span);
+
+		// NEW PBR
+		// std::span<std::pair<CameraComponent, glm::vec3>> cameralist_span(m_cameralist.data(), m_cameralist.size());
+		// renderer.render_frame(drawitem_span, cameralist_span);
 	}
 
 	int RenderSystem::GetPriority() const { return 151; }

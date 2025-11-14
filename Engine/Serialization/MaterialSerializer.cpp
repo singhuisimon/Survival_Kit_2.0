@@ -25,49 +25,50 @@ namespace Engine {
 		doc.SetObject();
 		auto& allocator = doc.GetAllocator();
 
-		doc.AddMember("shaderName", Value(mat->shaderName.c_str(), allocator), allocator);
+        // --- ShaderName ---
+        doc.AddMember("shaderName", Value(mat->shaderName.c_str(), allocator), allocator);
 
-        // diffuseMap (Formatted as hex string)
-        std::string diffuseMapHex = std::format("{:x}", mat->diffuseMap.m_Value);
-        doc.AddMember("diffuseMap", rapidjson::Value(diffuseMapHex.c_str(), allocator), allocator);
+        // --- Texture Maps (Formatted as hex strings) ---
+        std::string baseMapHex = std::format("{:x}", mat->baseMap.m_Value);
+        doc.AddMember("baseMap", rapidjson::Value(baseMapHex.c_str(), allocator), allocator);
 
-        // normalMap (Formatted as hex string)
         std::string normalMapHex = std::format("{:x}", mat->normalMap.m_Value);
         doc.AddMember("normalMap", rapidjson::Value(normalMapHex.c_str(), allocator), allocator);
 
-        // specularMap (Formatted as hex string)
-        std::string specularMapHex = std::format("{:x}", mat->specularMap.m_Value);
-        doc.AddMember("specularMap", rapidjson::Value(specularMapHex.c_str(), allocator), allocator);
+        std::string metallicMapHex = std::format("{:x}", mat->metallicMap.m_Value);
+        doc.AddMember("metallicMap", rapidjson::Value(metallicMapHex.c_str(), allocator), allocator);
 
-        // emissionMap (Formatted as hex string)
+        std::string roughnessMapHex = std::format("{:x}", mat->roughnessMap.m_Value);
+        doc.AddMember("roughnessMap", rapidjson::Value(roughnessMapHex.c_str(), allocator), allocator);
+
         std::string emissionMapHex = std::format("{:x}", mat->emissionMap.m_Value);
         doc.AddMember("emissionMap", rapidjson::Value(emissionMapHex.c_str(), allocator), allocator);
 
-        // occlusionMap (Formatted as hex string)
         std::string occlusionMapHex = std::format("{:x}", mat->occlusionMap.m_Value);
         doc.AddMember("occlusionMap", rapidjson::Value(occlusionMapHex.c_str(), allocator), allocator);
 
-        Value diffuseColorArray(kArrayType);
-        for (float val : mat->diffuseColor) {
-            diffuseColorArray.PushBack(val, allocator);
+        // --- Color Properties (Arrays) ---
+        Value baseColorArray(kArrayType);
+        for (float val : mat->baseColor) {
+            baseColorArray.PushBack(val, allocator);
         }
-        doc.AddMember("diffuseColor", diffuseColorArray, allocator);
-
-        Value specularColorArray(kArrayType);
-        for (float val : mat->specularColor) {
-            specularColorArray.PushBack(val, allocator);
-        }
-        doc.AddMember("specularColor", specularColorArray, allocator);
+        doc.AddMember("baseColor", baseColorArray, allocator);
 
         Value emissionColorArray(kArrayType);
         for (float val : mat->emissionColor) {
             emissionColorArray.PushBack(val, allocator);
         }
         doc.AddMember("emissionColor", emissionColorArray, allocator);
-        doc.AddMember("shininess", mat->shininess, allocator);
+
+        // --- Float Properties ---
+        doc.AddMember("metallic", mat->metallic, allocator);
+        doc.AddMember("roughness", mat->roughness, allocator);
+        doc.AddMember("opacity", mat->opacity, allocator);
         doc.AddMember("emissionStrength", mat->emissionStrength, allocator);
         doc.AddMember("alphaThreshold", mat->alphaThreshold, allocator);
+        doc.AddMember("ambientOcclusion", mat->ambientOcclusion, allocator);
 
+        // --- UV Transforms (Arrays) ---
         Value tilingArray(kArrayType);
         for (float val : mat->tiling) {
             tilingArray.PushBack(val, allocator);
@@ -80,6 +81,7 @@ namespace Engine {
         }
         doc.AddMember("offset", offsetArray, allocator);
 
+        // --- Bools / Render Flags ---
         doc.AddMember("enableEmission", mat->enableEmission, allocator);
         doc.AddMember("alphaTest", mat->alphaTest, allocator);
         doc.AddMember("doubleSided", mat->doubleSided, allocator);

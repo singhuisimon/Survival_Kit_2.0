@@ -20,6 +20,7 @@ namespace Engine {
 		std::vector<DrawItem> m_drawitems;
 		std::vector<CameraComponent> m_cameralist;	// Collected scene cameras
 		std::vector<LightCPU>        m_lightlist;	// Collected scene lights
+		//std::vector<std::pair<CameraComponent, glm::vec3>> m_cameralist; NEW PBR
 	};
 
 }

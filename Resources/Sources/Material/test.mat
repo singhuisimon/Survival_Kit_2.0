@@ -1,19 +1,22 @@
 {
-  "shaderName": "StandardDiffuseSpecular",
+  "shaderName": "StandardMetallicRoughness",
 
-  "diffuseMap": "678bc866fd0b4001",
-  "normalMap": "5f8bc866fd0b4003",
-  "specularMap": "0",
+  "baseMap": "f992d866396f4025",
+  "normalMap": "0",
+  "metallicMap": "0",
+  "roughnessMap": "0",
   "emissionMap": "0",
   "occlusionMap": "0",
 
-  "diffuseColor": [ 1.0, 1.0, 1.0, 1.0 ],
-  "specularColor": [ 1.0, 1.0, 1.0 ],
+  "baseColor": [ 1.0, 1.0, 1.0 ],
   "emissionColor": [ 0.0, 0.0, 0.0 ],
 
-  "shininess": 32.0,
+  "metallic": 0.0,
+  "roughness": 0.0,
+  "opacity": 1.0,
   "emissionStrength": 1.0,
   "alphaThreshold": 0.5,
+  "ambientOcclusion": 0.5,
 
   "tiling": [ 1.0, 1.0 ],
   "offset": [ 0.0, 0.0 ],

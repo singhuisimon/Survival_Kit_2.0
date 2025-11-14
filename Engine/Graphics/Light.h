@@ -46,7 +46,7 @@ namespace Engine {
 
         // Default constructor for a default light
         Light() :   pos{ 0.0f, 2.0f, 0.0f},         // From the top
-                    light_ambient{ 0.4f, 0.4f, 0.4f },
+                    light_ambient{ 1.0f, 1.0f, 1.0f },
                     light_diffuse{ 1.0f, 1.0f, 1.0f },
                     light_specular{ 1.0f, 1.0f, 1.0f }
         {}
