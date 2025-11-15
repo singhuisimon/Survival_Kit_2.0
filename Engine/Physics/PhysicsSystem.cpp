@@ -503,34 +503,26 @@ namespace Engine
 		}
 
 		case ColliderType::SPHERE:
-			if (hasMesh)
+		{
+			float radius = rb.SphereRadius;
+
+			if (radius <= 0.0f && hasMesh)
 			{
+				// auto-fit from mesh if designer didn't set a positive radius
 				float maxLen2 = 0.0f;
 				for (auto const &v : info.vertices)
 				{
 					float len2 = v.x * v.x + v.y * v.y + v.z * v.z;
 					if (len2 > maxLen2) maxLen2 = len2;
 				}
-				float radius = maxLen2 > 0.0f ? std::sqrt(maxLen2) : DEFAULT_HALF_EXT;
-				return JPH::Ref<JPH::Shape>(new JPH::SphereShape(radius));
+				radius = maxLen2 > 0.0f ? std::sqrt(maxLen2) : DEFAULT_HALF_EXT;
 			}
-			else
+			else if (radius <= 0.0f)
 			{
-				float radius =
-					rb.SphereRadius > 0.0f ? rb.SphereRadius : DEFAULT_HALF_EXT;
-				return JPH::Ref<JPH::Shape>(new JPH::SphereShape(radius));
+				radius = DEFAULT_HALF_EXT;
 			}
 
-		case ColliderType::CAPSULE:
-		{
-			float radius = rb.CapsuleRadius;
-			float halfHeight = rb.CapsuleHalfHeight;
-			if (radius <= 0.0f) radius = DEFAULT_HALF_EXT;
-			if (halfHeight < 0.0f) halfHeight = 0.0f;
-
-			// Jolt's CapsuleShape is aligned along the local Y axis
-			return JPH::Ref<JPH::Shape>(
-				new JPH::CapsuleShape(halfHeight, radius));
+			return JPH::Ref<JPH::Shape>(new JPH::SphereShape(radius));
 		}
 
 		case ColliderType::MESH:

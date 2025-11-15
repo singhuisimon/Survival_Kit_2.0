@@ -37,8 +37,7 @@ namespace Engine
 		AABB = 0, // Automatically builds based on mesh
 		BOX = 1,
 		SPHERE = 2, // Automatically builds based on mesh
-		CAPSULE = 3,
-		MESH = 4
+		MESH = 3
 	};
 
 	/*****************************************************************************/
@@ -97,10 +96,6 @@ namespace Engine
 		/// Sphere radius (used as fallback if mesh is missing)
 		float SphereRadius;
 
-		/// Capsule parameters (used when Shape == CAPSULE, along local Y)
-		float CapsuleRadius;
-		float CapsuleHalfHeight;
-
 		/*****************************************************************************/
 		/*!
 		\brief  Default constructor - creates a standard dynamic rigidbody.
@@ -124,8 +119,6 @@ namespace Engine
 			, Shape(BOX)                                // default: simple box
 			, BoxHalfExtents(0.5f, 0.5f, 0.5f)
 			, SphereRadius(0.5f)
-			, CapsuleRadius(0.5f)
-			, CapsuleHalfHeight(0.5f)
 		{
 		}
 
@@ -154,8 +147,6 @@ namespace Engine
 			, Shape(BOX)
 			, BoxHalfExtents(0.5f, 0.5f, 0.5f)
 			, SphereRadius(0.5f)
-			, CapsuleRadius(0.5f)
-			, CapsuleHalfHeight(0.5f)
 		{
 		}
 

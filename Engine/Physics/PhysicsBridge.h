@@ -45,7 +45,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 
 #include "ECS/Components.h"
 #include "ECS/Entity.h"
