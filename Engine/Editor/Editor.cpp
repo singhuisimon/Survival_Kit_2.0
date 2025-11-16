@@ -519,6 +519,21 @@ namespace Engine
 		}
 	}
 
+	const char* ColliderTypeToString(ColliderType& colliderType) {
+		if (colliderType == ColliderType::AABB) {
+			return "AABB";
+		} 
+		else if (colliderType == ColliderType::BOX) {
+			return "Box";
+		}
+		else if (colliderType == ColliderType::MESH) {
+			return "Mesh";
+		}
+		else if (colliderType == ColliderType::SPHERE) {
+			return "Sphere";
+		}
+	}
+
 	void Editor::displayPropertiesPanel()
 	{
 		if (!inspectorWindow)
@@ -651,13 +666,6 @@ namespace Engine
 
 						ImGui::Separator();
 
-						// Removed Gravity
-						//ImGui::Text("Boolean to check if gravity affects the body");
-						//bool isGravity = rigidBody.IsGravityEnabled();
-						//if (ImGui::Checkbox("Use Gravity", &isGravity)) {
-						//	rigidBody.SetGravityEnabled(isGravity);
-						//}
-
 						// velocity
 						glm::vec3 vel = rigidBody.GetVelocity();
 						if (ImGui::DragFloat3("Velocity", &vel.x, 1.0f))
@@ -667,6 +675,54 @@ namespace Engine
 
 						if (ImGui::Button("Stop")) {
 							rigidBody.Stop();
+						}
+
+						ImGui::Separator();
+
+						ColliderType& colliderShape = rigidBody.Shape;
+
+						if (ImGui::BeginCombo("Collider Shape", ColliderTypeToString(colliderShape))) {
+							for (int i = 0; i < 4; ++i) {
+								ColliderType type = (ColliderType)i;
+								bool selected = (colliderShape == type);
+
+								if (ImGui::Selectable(ColliderTypeToString(type), selected)) {
+									colliderShape = type;
+								}
+
+								if (selected) {
+									ImGui::SetItemDefaultFocus();
+								}
+							}
+							ImGui::EndCombo();
+						}
+
+						switch (colliderShape)
+						{
+
+						case ColliderType::AABB:
+							ImGui::Text("AABB is automatically generated from the mesh.");
+							break;
+
+						case ColliderType::BOX:
+							
+							ImGui::Text("Box Properties");
+							ImGui::DragFloat3("Box Half Extents", &rigidBody.BoxHalfExtents.x, 1.0f);
+							break;
+
+						case ColliderType::SPHERE:
+							
+							ImGui::Text("Sphere Properties");
+							ImGui::Text("Sphere radius is originally determined from the mesh.");
+							ImGui::DragFloat("Sphere Radius", &rigidBody.SphereRadius, 1.0f);
+							break;
+
+						case ColliderType::MESH:
+							ImGui::Text("Mesh collider is generated directly from the mesh.");
+							break;
+
+						default:
+							break;
 						}
 
 						ImGui::Separator();
