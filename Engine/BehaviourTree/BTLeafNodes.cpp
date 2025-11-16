@@ -2087,23 +2087,24 @@ namespace Engine {
 
             Entity entity(entityHandle, &registry);
 
+            //TODO:: FIX THE ROTATION SPAWNING
             if (entity.HasComponent<TagComponent>() && entity.HasComponent<TransformComponent>()) {
                 auto& tag = entity.GetComponent<TagComponent>();
                 auto& transform = entity.GetComponent<TransformComponent>();
-				glm::quat rotation;
+				//glm::quat rotation;
 
                 if (m_WallA && tag.Tag == "Wall_A") {
-                    rotation = LookRotation(glm::vec3(1, 0, 0));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation });//transform.Rotation});//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                    //rotation = LookRotation(glm::vec3(1, 0, 0));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation});//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
                 }
                 else if (m_WallB && tag.Tag == "Wall_B") {
                     // Face backward (-Z)
-                    rotation = LookRotation(glm::vec3(0, 0, 1));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation }); //transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                    //rotation = LookRotation(glm::vec3(0, 0, 1));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
                 }
                 else if (m_WallC && tag.Tag == "Wall_C") {
-                    rotation = LookRotation(glm::vec3(1, 0, 0));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation }); //transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                    //rotation = LookRotation(glm::vec3(1, 0, 0));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
                 }
                 else if (m_WallD && tag.Tag == "Wall_D") {
                     m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
@@ -2123,6 +2124,7 @@ namespace Engine {
 
         // ========================================================================
         // 2. Spawn Loveletter at specific position (unchanged)
+		// TODO::SPAWN LOVELETTER AT A1,A2, etc
         // ========================================================================
         if (m_LoveletterCount > 0) {
             for (int i = 0; i < m_LoveletterCount; ++i) {
@@ -2165,6 +2167,8 @@ namespace Engine {
 
         // ========================================================================
         // 3. Helper: Spawn single enemy at a random wall with offset
+        // TODO::Ensure that depending on the wall itself, the offset changes. 
+        // TODO::Ensure it is based off the wall size as well.
         // ========================================================================
         auto spawnAtRandomWall = [&](EnemyType type, const std::string& tag, const std::string& meshName) {
             // Pick a random wall
