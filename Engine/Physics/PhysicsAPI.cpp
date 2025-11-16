@@ -11,6 +11,15 @@
  * - Force/impulse/torque and velocity adjustments
  * - Damping, gravity factor, and CCD configuration
  * - Per-frame collision events with pair de-duplication
+ *
+ * NOTE:
+ * Persistent properties that are also stored on the ECS (e.g. damping)
+ * are updated via RigidbodyComponent. Jolt is updated from ECS in
+ * PhysicsSystem, so ECS remains the source of truth on refresh.
+ *
+ * Transient operations (forces, impulses, direct velocity nudges) still
+ * talk to Jolt directly; PhysicsSystem pulls velocities back into ECS.
+ *
  * @copyright
  * Copyright (C) 2025 DigiPen Institute of Technology.
  **************************************************************************/
@@ -23,6 +32,9 @@
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyLock.h>
 #include <Jolt/Physics/Body/MotionProperties.h>
+
+ // ECS components (for RigidbodyComponent)
+#include "ECS/Components.h"
 
 namespace Engine
 {
@@ -42,6 +54,25 @@ namespace Engine
 		if (it == mBodyOf.end()) return false;
 		out = it->second;
 		return true;
+	}
+
+	/**************************************************************************
+	 * @brief
+	 * Internal helper: fetches the RigidbodyComponent for an entity, if any.
+	 * NOTE:
+	 * PhysicsAPI uses const Entity& in its public API, but we need to mutate
+	 * the ECS component here; const_cast is used locally for that purpose.
+	 * @param e
+	 * Entity handle (const in the public API).
+	 * @return
+	 * Pointer to RigidbodyComponent or nullptr if missing.
+	 **************************************************************************/
+	static inline RigidbodyComponent *GetRigidbody(const Entity &e)
+	{
+		// Strip const because we intentionally want to modify the component
+		Entity &nc = const_cast<Entity &>(e);
+		if (!nc.HasComponent<RigidbodyComponent>()) return nullptr;
+		return &nc.GetComponent<RigidbodyComponent>();
 	}
 
 	/**************************************************************************
@@ -172,7 +203,8 @@ namespace Engine
 
 	/**************************************************************************
 	 * @brief
-	 * Sets linear damping.
+	 * Sets linear damping via ECS (RigidbodyComponent).
+	 * PhysicsSystem will propagate this value into Jolt each frame.
 	 * @param e
 	 * Entity handle.
 	 * @param damping
@@ -180,17 +212,17 @@ namespace Engine
 	 **************************************************************************/
 	void PhysicsAPI::SetLinearDamping(const Entity &e, float damping)
 	{
-		JPH::BodyID id{};
-		if (!GetBodyID(e, id)) return;
-		JPH::BodyLockWrite lock{ mPhysics.GetBodyLockInterface(), id };
-		if (!lock.Succeeded()) return;
-		lock.GetBody().GetMotionProperties()->SetLinearDamping(damping);
-		mBodyInterface->ActivateBody(id);
+		if (RigidbodyComponent *rb = GetRigidbody(e))
+		{
+			if (damping < 0.0f) damping = 0.0f;
+			rb->LinearDamping = damping;
+		}
 	}
 
 	/**************************************************************************
 	 * @brief
-	 * Sets angular damping.
+	 * Sets angular damping via ECS (RigidbodyComponent).
+	 * PhysicsSystem will propagate this value into Jolt each frame.
 	 * @param e
 	 * Entity handle.
 	 * @param damping
@@ -198,17 +230,18 @@ namespace Engine
 	 **************************************************************************/
 	void PhysicsAPI::SetAngularDamping(const Entity &e, float damping)
 	{
-		JPH::BodyID id{};
-		if (!GetBodyID(e, id)) return;
-		JPH::BodyLockWrite lock{ mPhysics.GetBodyLockInterface(), id };
-		if (!lock.Succeeded()) return;
-		lock.GetBody().GetMotionProperties()->SetAngularDamping(damping);
-		mBodyInterface->ActivateBody(id);
+		if (RigidbodyComponent *rb = GetRigidbody(e))
+		{
+			if (damping < 0.0f) damping = 0.0f;
+			rb->AngularDamping = damping;
+		}
 	}
 
 	/**************************************************************************
 	 * @brief
 	 * Scales world gravity for this body.
+	 * NOTE: currently still applied directly to Jolt; ECS only stores
+	 * a UseGravity flag, which PhysicsSystem maps to 0/1 gravity factor.
 	 * @param e
 	 * Entity handle.
 	 * @param factor
@@ -227,6 +260,8 @@ namespace Engine
 	/**************************************************************************
 	 * @brief
 	 * Enables or disables continuous collision detection (CCD).
+	 * Currently applied directly to Jolt. If you add a CCD flag to
+	 * RigidbodyComponent, this can be rerouted through ECS as well.
 	 * @param e
 	 * Entity handle.
 	 * @param enabled
