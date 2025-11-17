@@ -69,10 +69,13 @@ namespace Engine {
         const std::string& filename = "Descriptor.txt");
 
     std::string getRepository();
+    std::string getRootResourcesPath();
     std::string getManagedScriptsPath();
     std::vector<std::string> getAvailableScripts();
 
     std::string getRelativeAssetPath(const std::string& absolutePath);
+    std::string getRootAssetFilePath(const std::string& inputRelativePath);
+    std::string convertAssetPathToRootResources(const std::string& absoluteNonRootPath);
     std::string escapeBackslashesForJSON(const std::string& input);
 } // end of namespace Engine
 

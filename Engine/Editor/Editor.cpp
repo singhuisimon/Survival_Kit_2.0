@@ -177,6 +177,8 @@ namespace Engine
 						if (!currScenePath.empty())
 						{
 							m_Scene->SaveToFile(currScenePath);
+							m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
+
 						}
 						else
 						{
@@ -262,7 +264,7 @@ namespace Engine
 			if (!currScenePath.empty())
 			{
 				std::filesystem::path filePath(currScenePath);
-				std::string fileName = filePath.filename().string();
+				std::string fileName = filePath.string();
 
 				float textWidth = ImGui::CalcTextSize(fileName.c_str()).x;
 				float menuBarWidth = ImGui::GetWindowSize().x;
@@ -2634,6 +2636,7 @@ namespace Engine
 								if (!currScenePath.empty())
 								{
 									m_Scene->SaveToFile(currScenePath);
+									m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
 									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
 								}
 							}
@@ -3388,6 +3391,7 @@ namespace Engine
 					{
 
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
+						m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
 						currScenePath = defaultNewScenePath; // update current scene path
 						m_Scene->SetName(saveAsDefaultSceneName);
 						saveAsPanel = false; // to close pop up
@@ -3421,6 +3425,7 @@ namespace Engine
 						defaultNewScenePath += ".json"; // ensure .json extension
 					}
 					m_Scene->SaveToFile(defaultNewScenePath);
+					m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
 					currScenePath = defaultNewScenePath;
 
 					saveAsPanel = false;

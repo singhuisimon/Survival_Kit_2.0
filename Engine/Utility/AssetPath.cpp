@@ -228,6 +228,18 @@ namespace Engine {
         return fs::current_path().string();
     }
 
+    std::string getRootResourcesPath() {
+        fs::path repoRoot = getRepository();
+
+        fs::path rootResourcesPath = repoRoot / "Resources";
+        if (!fs::exists(rootResourcesPath)) {
+            LOG_ERROR("Resources directory not found: ", rootResourcesPath);
+            return {};
+        }
+        LOG_DEBUG("RootResources path : ", rootResourcesPath);
+        return rootResourcesPath.generic_string();
+    }
+
     std::string getManagedScriptsPath() {
         fs::path repoRoot = getRepository();
 
@@ -283,6 +295,61 @@ namespace Engine {
 
         // fallback: just filename
         return "\\Resources\\" + full.filename().string();
+    }
+
+    // Does the same thing as getAssetFilePath, but for the root assets at the root Resources file
+    // Get the absolute filepath for files in root assets directory
+    std::string getRootAssetFilePath(const std::string& inputRelativePath) {
+        std::filesystem::path resourcesRoot = getRootResourcesPath();
+
+        std::filesystem::path relative = std::filesystem::path(inputRelativePath);
+        // Prevent absolute paths
+        if (relative.is_absolute()) {
+            LOG_ERROR("Asset path must be relative, got absolute: ", inputRelativePath);
+            return {};
+        }
+
+        // Remove ".", "..", and duplicate slashes
+        relative = relative.lexically_normal();
+
+        std::filesystem::path finalPath = resourcesRoot / relative;
+
+        if (!std::filesystem::exists(finalPath)) {
+            LOG_ERROR("Asset at root directory not found: ", finalPath);
+            return {};
+        }
+
+        LOG_DEBUG("Asset at root path: ", finalPath);
+        return finalPath.generic_string();
+    }
+
+    std::string convertAssetPathToRootResources(const std::string& absoluteNonRootPath) {
+        std::filesystem::path resourcesRoot = getRootResourcesPath();
+
+        std::filesystem::path absoluteNonRoot = std::filesystem::absolute(absoluteNonRootPath);
+        if (!absoluteNonRoot.is_absolute()) {
+            LOG_ERROR("Asset path must be absolute, got relative: ", absoluteNonRootPath);
+            return {};
+        }
+
+        // Find "Sources" inside the path.
+        auto it = std::find(absoluteNonRoot.begin(), absoluteNonRoot.end(), "Sources");
+        if (it == absoluteNonRoot.end()) {
+            LOG_ERROR("Path does not contain 'Sources': ", absoluteNonRootPath);
+            return {};
+        }
+
+        // Extract everything from "Sources" onward
+        fs::path relativeFromSources;
+        for (; it != absoluteNonRoot.end(); ++it) {
+            relativeFromSources /= *it;
+        }
+
+        // Final root path
+        fs::path finalPath = resourcesRoot / relativeFromSources;
+
+        LOG_DEBUG("Asset mapped to root resources path: ", finalPath);
+        return finalPath.generic_string();
     }
 
     std::string escapeBackslashesForJSON(const std::string& input)
