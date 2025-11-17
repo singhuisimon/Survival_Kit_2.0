@@ -459,88 +459,97 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
     }
 
     // Create material resource
-    auto material = std::make_unique<data_type>();
+    auto material = std::make_unique<data_type>(); // Assumes data_type is your new MaterialResource
 
-	// Deserialize material properties from JSON
+    // Deserialize material properties from JSON
     if (doc.HasMember("shaderName"))
-		material->shaderName = doc["shaderName"].GetString();
-    
-    if (doc.HasMember("diffuseMap"))
-        material->diffuseMap = xresource::instance_guid{ std::stoull(doc["diffuseMap"].GetString(), nullptr, 16) };
+        material->shaderName = doc["shaderName"].GetString();
 
-    if (doc.HasMember("specularMap"))
-		material->specularMap = xresource::instance_guid{ std::stoull(doc["specularMap"].GetString(), nullptr, 16) };
+    // --- Texture Maps ---
+    if (doc.HasMember("baseMap"))
+        material->baseMap = xresource::instance_guid{ std::stoull(doc["baseMap"].GetString(), nullptr, 16) };
 
-	if (doc.HasMember("normalMap"))
-		material->normalMap = xresource::instance_guid{ std::stoull(doc["normalMap"].GetString(), nullptr, 16) };
+    if (doc.HasMember("normalMap"))
+        material->normalMap = xresource::instance_guid{ std::stoull(doc["normalMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("metallicMap"))
+        material->metallicMap = xresource::instance_guid{ std::stoull(doc["metallicMap"].GetString(), nullptr, 16) };
+
+    if (doc.HasMember("roughnessMap"))
+        material->roughnessMap = xresource::instance_guid{ std::stoull(doc["roughnessMap"].GetString(), nullptr, 16) };
 
     if (doc.HasMember("emissionMap"))
-		material->emissionMap = xresource::instance_guid{ std::stoull(doc["emissionMap"].GetString(), nullptr, 16) };
+        material->emissionMap = xresource::instance_guid{ std::stoull(doc["emissionMap"].GetString(), nullptr, 16) };
 
     if (doc.HasMember("occlusionMap"))
-		material->occlusionMap = xresource::instance_guid{ std::stoull(doc["occlusionMap"].GetString(), nullptr, 16) };
+        material->occlusionMap = xresource::instance_guid{ std::stoull(doc["occlusionMap"].GetString(), nullptr, 16) };
 
-    if (doc.HasMember("diffuseColor"))
+    // --- Color Properties (3-component) ---
+    if (doc.HasMember("baseColor"))
     {
-		const Value& dColor = doc["diffuseColor"];
-        material->diffuseColor[0] = dColor[0].GetFloat();
-        material->diffuseColor[1] = dColor[1].GetFloat();
-        material->diffuseColor[2] = dColor[2].GetFloat();
-    }
-    
-    if (doc.HasMember("specularColor"))
-    {
-		const Value& sColor = doc["specularColor"];
-        material->specularColor[0] = sColor[0].GetFloat();
-        material->specularColor[1] = sColor[1].GetFloat();
-		material->specularColor[2] = sColor[2].GetFloat();
+        const Value& bColor = doc["baseColor"];
+        material->baseColor[0] = bColor[0].GetFloat();
+        material->baseColor[1] = bColor[1].GetFloat();
+        material->baseColor[2] = bColor[2].GetFloat();
     }
 
     if (doc.HasMember("emissionColor"))
     {
-	    const Value& eColor = doc["emissionColor"];
+        const Value& eColor = doc["emissionColor"];
         material->emissionColor[0] = eColor[0].GetFloat();
         material->emissionColor[1] = eColor[1].GetFloat();
-		material->emissionColor[2] = eColor[2].GetFloat();
+        material->emissionColor[2] = eColor[2].GetFloat();
     }
 
-    if (doc.HasMember("shininess"))
-		material->shininess = doc["shininess"].GetFloat();
+    // --- Float Properties ---
+    if (doc.HasMember("metallic"))
+        material->metallic = doc["metallic"].GetFloat();
+
+    if (doc.HasMember("roughness"))
+        material->roughness = doc["roughness"].GetFloat();
+
+    if (doc.HasMember("opacity"))
+        material->opacity = doc["opacity"].GetFloat();
 
     if (doc.HasMember("emissionStrength"))
-		material->emissionStrength = doc["emissionStrength"].GetFloat();
+        material->emissionStrength = doc["emissionStrength"].GetFloat();
 
     if (doc.HasMember("alphaThreshold"))
-		material->alphaThreshold = doc["alphaThreshold"].GetFloat();
+        material->alphaThreshold = doc["alphaThreshold"].GetFloat();
 
+    if (doc.HasMember("ambientOcclusion"))
+		material->ambientOcclusion = doc["ambientOcclusion"].GetFloat();
+
+    // --- UV Transforms ---
     if (doc.HasMember("tiling"))
     {
-	    const Value& tiling = doc["tiling"];
+        const Value& tiling = doc["tiling"];
         material->tiling[0] = tiling[0].GetFloat();
-		material->tiling[1] = tiling[1].GetFloat();
+        material->tiling[1] = tiling[1].GetFloat();
     }
 
     if (doc.HasMember("offset"))
     {
-	    const Value& offset = doc["offset"];
-		material->offset[0] = offset[0].GetFloat();
-		material->offset[1] = offset[1].GetFloat();
+        const Value& offset = doc["offset"];
+        material->offset[0] = offset[0].GetFloat();
+        material->offset[1] = offset[1].GetFloat();
     }
 
+    // --- Bools / Render Flags ---
     if (doc.HasMember("enableEmission"))
-		material->enableEmission = doc["enableEmission"].GetBool();
+        material->enableEmission = doc["enableEmission"].GetBool();
 
-	if (doc.HasMember("alphaTest"))
-		material->alphaTest = doc["alphaTest"].GetBool();
+    if (doc.HasMember("alphaTest"))
+        material->alphaTest = doc["alphaTest"].GetBool();
 
-	if (doc.HasMember("doubleSided"))
-		material->doubleSided = doc["doubleSided"].GetBool();
+    if (doc.HasMember("doubleSided"))
+        material->doubleSided = doc["doubleSided"].GetBool();
 
     if (doc.HasMember("receiveShadows"))
-		material->receiveShadows = doc["receiveShadows"].GetBool();
+        material->receiveShadows = doc["receiveShadows"].GetBool();
 
     if (doc.HasMember("castShadows"))
-		material->castShadows = doc["castShadows"].GetBool();
+        material->castShadows = doc["castShadows"].GetBool();
 
     return material.release();
 }

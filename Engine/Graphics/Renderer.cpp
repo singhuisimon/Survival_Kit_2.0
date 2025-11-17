@@ -59,8 +59,6 @@ namespace {
 
 	inline void test_load_shaders(std::vector<Engine::ShaderProgram>& shd) {
 
-
-
 		std::string vertex_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.vert") };
 		std::string fragment_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.frag") };
 
@@ -107,9 +105,7 @@ namespace Engine {
 	namespace {
 		int  selected_texture = 0;
 		bool textureMode = false;
-		bool isPBR = false;
 		bool isDebug = false;
-		bool isGamma = false;
 	}
 
 }
@@ -259,8 +255,8 @@ namespace Engine {
 			.fbo_handle = 0,
 			.shdpgm_handle = 0,
 			.auto_aspect = true,
+			.blending =  true,
 			.culling = false
-			// Leave the rest as default settings
 		};
 
 		// Register the pass with the renderer
@@ -298,7 +294,6 @@ namespace Engine {
 				.pass_name = "Stub Pass",
 				.fbo_handle = 0,
 				.shdpgm_handle = 0,
-
 			};
 
 			//m_passes.push_back(stub_pass);
@@ -422,14 +417,16 @@ namespace Engine {
 		prog.programUse();
 	}
 
-	void Renderer::render_frame(std::span<const DrawItem> draw_items,
-								std::span<const CameraComponent> camera_list,
-								std::span<const LightCPU> lights) {
 
-		// For rendering from editor's camera
-		if (isEditorCamOn) {
-			glm::mat4 view = editor_camera.getLookAt(); // Editor camera view transform
-			for (/*const */auto& pass : m_passes) {
+	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<std::pair<CameraComponent, glm::vec3>> camera_list, std::span<const LightCPU> lights) {
+
+	 	// Render through editor camera
+	 	if (isEditorCamOn) {
+
+	 		glm::mat4  cam_view = editor_camera.getLookAt(); 
+			glm::vec3& cam_pos  = editor_camera.getCamPos();
+
+	 		for (auto& pass : m_passes) {
 
 				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
@@ -449,11 +446,11 @@ namespace Engine {
 				}
 
 				// Get camera perspective transform
-				glm::mat4 persp = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+				glm::mat4 cam_perspective = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
 
 				// Begin drawing frame
 				beginFrame(pass);
-				draw(pass, draw_items, view, persp, lights);
+				draw(pass, draw_items, cam_view, cam_perspective, cam_pos, lights);
 				endFrame(pass);
 
 				// Read ID at mouse position for GPU ID pass
@@ -514,31 +511,38 @@ namespace Engine {
 
 					// Begin drawing frame
 					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
-					draw(pass, draw_items, cam.View, cam.Persp, lights);
+
+					// cam.first is the actual underlying camera object
+					// cam.second is the camera's position using the transform component
+					draw(pass, draw_items, cam.first.View, cam.first.Persp, cam.second, lights);
+
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
 			}
 		}
-
+		
 	}
 
 	void Renderer::draw(RenderPass const& pass,
-		std::span<const DrawItem> draw_items,
-		const glm::mat4 v,
-		const glm::mat4 p,
-		std::span<const LightCPU> lights) {
+						std::span<const DrawItem> draw_items,
+					    const glm::mat4& v,
+					    const glm::mat4& p,
+						const glm::vec3& cam_pos,
+						std::span<const LightCPU> lights) {
 
-
+		// Get a reference to the shader program being used
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
-		prog.setUniform("V", v);					// View transform
-		prog.setUniform("P", p);					// Perspective transform
+		// Compute perspective view transform on CPU before uploading to GPU
+		glm::mat4 projection_view = p * v;
 
-		// Light setting
-		prog.setUniform("uExposure", 2.0f); // Exposure
+		// Upload camera related information
+		prog.setUniform("CamPos", cam_pos);
+		prog.setUniform("u_ViewProjection", projection_view);
 
 		for (const auto& item : draw_items) {
 
+			// Specific Pass Handling Logic
 			if (pass.passtype == PassType::DEBUGGING) {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				glEnable(GL_POLYGON_OFFSET_LINE);
@@ -549,74 +553,14 @@ namespace Engine {
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 
-#pragma region TESTING
-			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
-			Material& test_material = m_gl.t_testing_material[material_handle];
-#pragma endregion
-
-			// Set GPU ID for object picking
 			if (pass.shdpgm_handle == 2) {
-				u32 pickId = item.m_entity_id;   
+				u32 pickId = item.m_entity_id;
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
-			// Temporary transformations
-			prog.setUniform("M", item.m_model_to_world_transform); // Model transform
+			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
+			Material& test_material = m_gl.t_testing_material[material_handle];
 
-			/*xresource::full_guid texture_guid = convertToTextureGuid(item.m_texture_guid);
-
-			if (TextureResource* texture_resource = RM.loadResource<TextureResource>(texture_guid)) {
-				glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-				prog.setUniform("Texture2D", 0);
-				prog.setUniform("isTexture", true);
-
-				if (texture_resource->format == "sRGB") {
-					prog.setUniform("isGamma", true);
-				}
-				else {
-					prog.setUniform("isGamma", false);
-				}
-
-			}
-			else {
-				prog.setUniform("isTexture", false);
-			}*/
-
-			if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
-			{
-				MaterialUBO_Std140 mubo;
-				mubo.Ka = test_material.getMaterialAmbient();
-				mubo._pad0 = 0.0f;
-				mubo.Kd = glm::vec3(material_resource->diffuseColor[0], material_resource->diffuseColor[1], material_resource->diffuseColor[2]);
-				mubo._pad1 = 0.0f;
-				mubo.Ks = glm::vec3(material_resource->specularColor[0], material_resource->specularColor[1], material_resource->specularColor[2]);
-				mubo.shininess = material_resource->shininess;
-
-				// Update UBO (48 bytes)
-				glNamedBufferSubData(m_materialUBO, 0, sizeof(MaterialUBO_Std140), &mubo);
-
-				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->diffuseMap))) {
-					glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-					prog.setUniform("Texture2D", 0);
-					prog.setUniform("isTexture", true);
-
-					if (texture_resource->format == "sRGB") {
-						prog.setUniform("isGamma", true);
-					}
-					else {
-						prog.setUniform("isGamma", false);
-					}
-
-				}
-
-				if (TextureResource* normal_map = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap))) {
-					glBindTextureUnit(1, static_cast<GLuint>(normal_map->textureID));
-					prog.setUniform("NormalMap", 1);
-					prog.setUniform("useNormalMap", true);
-				}
-			}
-			else
-			{
 #pragma region TESTING UBO FOR MATERIALS
 				MaterialUBO_Std140 mubo;
 				mubo.Ka = test_material.getMaterialAmbient();
@@ -632,49 +576,84 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 				prog.setUniform("useNormalMap", false);
 #pragma endregion
-			}
 
+				 // Check for material resource
+				 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+				 {
+				 	// New workflow has no ambient lighting
+				 	prog.setUniform("material_.albedo", glm::vec3(material_resource->baseColor[0], 
+				 													       material_resource->baseColor[1], 
+				 													       material_resource->baseColor[2]));
+
+				 	prog.setUniform("material_.metallic", material_resource->metallic);
+				 	prog.setUniform("material_.roughness", material_resource->roughness);
+				 	prog.setUniform("material_.ao", material_resource->ambientOcclusion);
+				 	prog.setUniform("material_.opacity", material_resource->opacity);
+
+				 	if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
+				 		glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+				 		prog.setUniform("Texture2D", 0);
+				 		prog.setUniform("isTexture", true);
+
+				 		if (texture_resource->format == "sRGB") {
+				 			prog.setUniform("isGamma", true);
+				 		}
+				 		else {
+				 			prog.setUniform("isGamma", false);
+				 		}
+				 	}
+				 }
+				 else
+				 {
+				 	//prog.setUniform("isTexture", false);
+				 	//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
+				 	//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
+				 	//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
+				 	//prog.setUniform("material.shininess", test_material.getMaterialShininess());
+				 }
 
 #pragma region TESTING UBO FOR LIGHTING
 			// Per-object light culling + upload 
 			// Object center/radius (approx): extract translation; radius = heuristic
-			glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
-			const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
+				glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
+				const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
 
-			uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
-			(void)usedLights; // block is visible to shader via binding=0
+				uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
+				(void)usedLights; // block is visible to shader via binding=0
 #pragma endregion
 
-			size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+				size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
 
-			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
-			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
-			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+				GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+				GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
-			xresource::full_guid guid = convertToMeshGuid(item.m_mesh_guid);
 
-			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(guid)) {
-				glBindVertexArray(mesh_resource->VAO);
+				// Upload model to world transform
+				prog.setUniform("u_World", item.m_model_to_world_transform); 
 
-				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
+				// Compute the normal matrix and upload it
+				glm::mat4 normal_matrix = glm::transpose(glm::inverse(item.m_model_to_world_transform));
+				prog.setUniform("u_NormalMatrix", normal_matrix); // Normal matrix
 
-				// Calculate byte offset into the index buffer
-				const void* indexOffset = reinterpret_cast<const void*>(
-					submesh.startIndex * sizeof(unsigned int)
-					);
+				// Get the underlying mesh resource using its guid
+				if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(convertToMeshGuid(item.m_mesh_guid))) {
+					glBindVertexArray(mesh_resource->VAO);
 
-				glDrawElements(GL_TRIANGLES,
-					submesh.indexCount,
-					GL_UNSIGNED_INT,
-					indexOffset);
+					// Get the submesh descriptor
+					const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
 
-				glBindVertexArray(0);
-			}
-			else {
-				m_gl.m_mesh_storage[mesh_handle].vao.bind();
-				glDrawElements(primitive, draw_count, index_type, NULL);
-				glBindVertexArray(0);
-			}
+					// Calculate byte offset into the index buffer
+					const void* indexOffset = reinterpret_cast<const void*>( submesh.startIndex * sizeof(unsigned int));
+
+					glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, indexOffset);
+					glBindVertexArray(0);
+				}
+				else { // Draws primitives
+					m_gl.m_mesh_storage[mesh_handle].vao.bind();
+					glDrawElements(primitive, draw_count, index_type, nullptr);
+					glBindVertexArray(0);
+				}
 		}
 	}
 

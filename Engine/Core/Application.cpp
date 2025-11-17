@@ -34,7 +34,6 @@ namespace Engine
 		, m_WindowWidth(width)
 		, m_WindowHeight(height)
 		, m_Editor_camera(ORBITING, glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.f, 0.f, 0.0f), 80.0f, 0.5f, 5000.0f)
-
 	{
 		Init();
 	}
