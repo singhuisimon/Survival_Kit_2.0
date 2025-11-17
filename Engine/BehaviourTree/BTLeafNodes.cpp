@@ -23,6 +23,7 @@
 #include "Transform/TransformSystem.h"
 #include "Physics/PhysicsAPI.h"
 #include "Physics/PhysicsSystem.h"
+#include "Asset/AssetManager.h"
 
 namespace Engine {
 
@@ -1821,5 +1822,622 @@ namespace Engine {
         }
 	}
 
+    // ============================================================================
+    // BTSpawnEnemies - Simple spawn at spawner position
+    // ============================================================================
+
+    BTSpawnEnemies::BTSpawnEnemies(int count, const std::string& enemyTag)
+        : m_SpawnCount(count)
+        , m_EnemyTag(enemyTag) {
+    }
+
+    const char* BTSpawnEnemies::GetTypeName() const {
+        return "SpawnEnemies";
+    }
+
+    BTStatus BTSpawnEnemies::Execute(BTContext& context) {
+        if (!context.Entity || !context.Scene) {
+            LOG_WARNING("BTSpawnEnemies: No entity or scene in context");
+            return BTStatus::Failure;
+        }
+
+        // Get spawner position
+        if (!context.Entity->HasComponent<TransformComponent>()) {
+            LOG_WARNING("BTSpawnEnemies: Spawner has no TransformComponent");
+            return BTStatus::Failure;
+        }
+
+        auto& spawnerTransform = context.Entity->GetComponent<TransformComponent>();
+        glm::vec3 spawnPos = spawnerTransform.Position;
+
+        int successCount = 0;
+
+        // Spawn enemies
+        for (int i = 0; i < m_SpawnCount; ++i) {
+            Entity enemy = context.Scene->CreateEntity(m_EnemyTag);
+
+            // Add required components
+            enemy.AddComponent<MeshRendererComponent>();
+            enemy.AddComponent<RigidbodyComponent>();
+
+            // Set position
+            if (enemy.HasComponent<TransformComponent>()) {
+                auto& enemyTransform = enemy.GetComponent<TransformComponent>();
+                enemyTransform.Position = spawnPos;
+                successCount++;
+            }
+        }
+
+        LOG_INFO("BTSpawnEnemies: Spawned ", successCount, "/", m_SpawnCount, " enemies");
+
+        return (successCount > 0) ? BTStatus::Success : BTStatus::Failure;
+    }
+
+    void BTSpawnEnemies::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "SpawnCount", std::to_string(m_SpawnCount) });
+        properties.push_back({ "EnemyTag", m_EnemyTag });
+    }
+
+    void BTSpawnEnemies::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "SpawnCount") {
+            m_SpawnCount = std::max(1, std::stoi(value));
+        }
+        else if (name == "EnemyTag") {
+            m_EnemyTag = value;
+        }
+    }
+
+    // ============================================================================
+    // BTSpawnEnemiesGrid - Spawn in a grid pattern
+    // ============================================================================
+
+    BTSpawnEnemiesGrid::BTSpawnEnemiesGrid(
+        int count,
+        float spacing,
+        const std::string& enemyTag)
+        : m_SpawnCount(count)
+        , m_Spacing(spacing)
+        , m_EnemyTag(enemyTag) {
+    }
+
+    const char* BTSpawnEnemiesGrid::GetTypeName() const {
+        return "SpawnEnemiesGrid";
+    }
+
+    BTStatus BTSpawnEnemiesGrid::Execute(BTContext& context) {
+        if (!context.Entity || !context.Scene) {
+            LOG_WARNING("BTSpawnEnemiesGrid: No entity or scene in context");
+            return BTStatus::Failure;
+        }
+
+        // Get spawner position
+        if (!context.Entity->HasComponent<TransformComponent>()) {
+            LOG_WARNING("BTSpawnEnemiesGrid: Spawner has no TransformComponent");
+            return BTStatus::Failure;
+        }
+
+        auto& spawnerTransform = context.Entity->GetComponent<TransformComponent>();
+        glm::vec3 centerPos = spawnerTransform.Position;
+
+        // Calculate grid dimensions (make it roughly square)
+        int gridWidth = static_cast<int>(std::ceil(std::sqrt(static_cast<float>(m_SpawnCount))));
+        int gridHeight = static_cast<int>(std::ceil(static_cast<float>(m_SpawnCount) / gridWidth));
+
+        int successCount = 0;
+        int enemyIndex = 0;
+
+        // Spawn enemies in grid pattern
+        for (int row = 0; row < gridHeight && enemyIndex < m_SpawnCount; ++row) {
+            for (int col = 0; col < gridWidth && enemyIndex < m_SpawnCount; ++col) {
+                Entity enemy = context.Scene->CreateEntity(m_EnemyTag);
+
+                // Add required components
+                enemy.AddComponent<MeshRendererComponent>();
+                enemy.AddComponent<RigidbodyComponent>();
+
+                // Calculate grid position (centered around spawner)
+                if (enemy.HasComponent<TransformComponent>()) {
+                    auto& enemyTransform = enemy.GetComponent<TransformComponent>();
+
+                    float offsetX = (col - gridWidth / 2.0f) * m_Spacing;
+                    float offsetZ = (row - gridHeight / 2.0f) * m_Spacing;
+
+                    enemyTransform.Position = centerPos + glm::vec3(offsetX, 0.0f, offsetZ);
+                    successCount++;
+                }
+
+                enemyIndex++;
+            }
+        }
+
+        LOG_INFO("BTSpawnEnemiesGrid: Spawned ", successCount, "/", m_SpawnCount,
+            " enemies in ", gridWidth, "x", gridHeight, " grid");
+
+        return (successCount > 0) ? BTStatus::Success : BTStatus::Failure;
+    }
+
+    void BTSpawnEnemiesGrid::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "SpawnCount", std::to_string(m_SpawnCount) });
+        properties.push_back({ "Spacing", std::to_string(m_Spacing) });
+        properties.push_back({ "EnemyTag", m_EnemyTag });
+    }
+
+    void BTSpawnEnemiesGrid::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "SpawnCount") {
+            m_SpawnCount = std::max(1, std::stoi(value));
+        }
+        else if (name == "Spacing") {
+            m_Spacing = std::max(0.1f, std::stof(value));
+        }
+        else if (name == "EnemyTag") {
+            m_EnemyTag = value;
+        }
+    }
+
+    // ============================================================================
+    // BTSpawnEnemyAt - Spawn at specific position
+    // ============================================================================
+
+    BTSpawnEnemyAt::BTSpawnEnemyAt(
+        const std::string& enemyTag,
+        const glm::vec3& position)
+        : m_EnemyTag(enemyTag)
+        , m_SpawnPosition(position) {
+    }
+
+    const char* BTSpawnEnemyAt::GetTypeName() const {
+        return "SpawnEnemyAt";
+    }
+
+    BTStatus BTSpawnEnemyAt::Execute(BTContext& context) {
+        if (!context.Scene) {
+            LOG_WARNING("BTSpawnEnemyAt: No scene in context");
+            return BTStatus::Failure;
+        }
+
+        // Create enemy
+        Entity enemy = context.Scene->CreateEntity(m_EnemyTag);
+
+        // Add required components
+        enemy.AddComponent<MeshRendererComponent>();
+        enemy.AddComponent<RigidbodyComponent>();
+
+        // Set position to the specified spawn position
+        if (enemy.HasComponent<TransformComponent>()) {
+            auto& enemyTransform = enemy.GetComponent<TransformComponent>();
+            enemyTransform.Position = m_SpawnPosition;
+
+            LOG_INFO("BTSpawnEnemyAt: Spawned '", m_EnemyTag,
+                "' at (", m_SpawnPosition.x, ", ", m_SpawnPosition.y, ", ", m_SpawnPosition.z, ")");
+            return BTStatus::Success;
+        }
+
+        return BTStatus::Failure;
+    }
+
+    void BTSpawnEnemyAt::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "EnemyTag", m_EnemyTag });
+        properties.push_back({ "SpawnPosition",
+            std::to_string(m_SpawnPosition.x) + "," +
+            std::to_string(m_SpawnPosition.y) + "," +
+            std::to_string(m_SpawnPosition.z) });
+    }
+
+    void BTSpawnEnemyAt::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "EnemyTag") {
+            m_EnemyTag = value;
+        }
+        else if (name == "SpawnPosition") {
+            // Parse "x,y,z" format
+            size_t comma1 = value.find(',');
+            size_t comma2 = value.find(',', comma1 + 1);
+
+            if (comma1 != std::string::npos && comma2 != std::string::npos) {
+                m_SpawnPosition.x = std::stof(value.substr(0, comma1));
+                m_SpawnPosition.y = std::stof(value.substr(comma1 + 1, comma2 - comma1 - 1));
+                m_SpawnPosition.z = std::stof(value.substr(comma2 + 1));
+            }
+        }
+    }
+
+    // ============================================================================
+    // BTSpawnMultipleTypes - Spawn all 5 enemy types with individual counts
+    // ============================================================================
+
+    BTSpawnMultipleTypes::BTSpawnMultipleTypes()
+        : m_LoveletterCount(0)
+        , m_TrojanCount(0)
+        , m_AdwareCount(0)
+        , m_WormsCount(0)
+        , m_BotnetCount(0)
+        , m_Spacing(2.0f)
+        , m_LoveletterPos(0.0f, 0.0f, 0.0f) 
+        , m_WallA(false)
+		, m_WallB(false)
+		, m_WallC(false)
+		, m_WallD(false)
+		, m_WallE(false)
+		, m_Boss(false)
+       {
+    }
+
+    const char* BTSpawnMultipleTypes::GetTypeName() const {
+        return "SpawnMultipleTypes";
+    }
+
+    void BTSpawnMultipleTypes::OnEnter(BTContext& context) {
+        m_EnabledWalls.clear();
+        m_totalSpawned = 0;
+	}
+
+    BTStatus BTSpawnMultipleTypes::Execute(BTContext& context) {
+        if (!context.Entity || !context.Scene) {
+            LOG_WARNING("BTSpawnMultipleTypes: No entity or scene in context");
+            return BTStatus::Failure;
+        }
+
+		//take note missing BOSS logic (if boss stage, skip wall check) TODO::M4 Add boss logic later
+
+        //int totalSpawned = 0;
+		int totalcount = m_LoveletterCount + m_TrojanCount + m_AdwareCount + m_WormsCount + m_BotnetCount;
+
+        auto& registry = context.Scene->GetRegistry();
+        auto view = registry.view<TagComponent>();
+        for (auto entityHandle : view) {
+
+            Entity entity(entityHandle, &registry);
+
+            //TODO:: FIX THE ROTATION SPAWNING
+            if (entity.HasComponent<TagComponent>() && entity.HasComponent<TransformComponent>()) {
+                auto& tag = entity.GetComponent<TagComponent>();
+                auto& transform = entity.GetComponent<TransformComponent>();
+				//glm::quat rotation;
+
+                if (m_WallA && tag.Tag == "Wall_A") {
+                    //rotation = LookRotation(glm::vec3(1, 0, 0));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation});//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                }
+                else if (m_WallB && tag.Tag == "Wall_B") {
+                    // Face backward (-Z)
+                    //rotation = LookRotation(glm::vec3(0, 0, 1));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                }
+                else if (m_WallC && tag.Tag == "Wall_C") {
+                    //rotation = LookRotation(glm::vec3(1, 0, 0));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                }
+                else if (m_WallD && tag.Tag == "Wall_D") {
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                }
+                else if (m_WallE && tag.Tag == "Wall_E") {
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, transform.Rotation });//glm::vec3{transform.Rotation.x, transform.Rotation.y, transform.Rotation.z} });
+                }
+            }
+        }
+
+        if (m_EnabledWalls.empty() && !m_Boss) {
+            LOG_WARNING("BTSpawnMultipleTypes: No walls enabled for spawning despite not boss stage");
+            return BTStatus::Failure;
+        }
+
+        LOG_INFO("BTSpawnMultipleTypes: Found ", m_EnabledWalls.size(), " enabled walls");
+
+        // ========================================================================
+        // 2. Spawn Loveletter at specific position (unchanged)
+		// TODO::SPAWN LOVELETTER AT A1,A2, etc
+        // ========================================================================
+        if (m_LoveletterCount > 0) {
+            for (int i = 0; i < m_LoveletterCount; ++i) {
+                Entity enemy = context.Scene->CreateEntity("loveletter");
+                auto& parentMesh = enemy.AddComponent<MeshRendererComponent>();
+
+                std::string meshName = "E005_loveletter_v001.fbx";
+                xresource::instance_guid inst_guid = AM.getAssetIdByFilename(meshName);
+                parentMesh.MeshGuid = inst_guid;
+                parentMesh.SubmeshIndex = 0;
+
+                enemy.AddComponent<RigidbodyComponent>();
+
+                if (enemy.HasComponent<TransformComponent>()) {
+                    auto& transform = enemy.GetComponent<TransformComponent>();
+                    transform.Position = m_LoveletterPos;
+                    transform.Scale = glm::vec3(0.002f);
+                    m_totalSpawned++;
+                }
+
+                const int submeshCount = 11;
+                for (int sub = 0; sub < submeshCount; ++sub) {
+                    Entity child = context.Scene->CreateEntity("loveletter_" + std::to_string(sub));
+                    auto& childMesh = child.AddComponent<MeshRendererComponent>();
+                    childMesh.MeshGuid = inst_guid;
+                    childMesh.SubmeshIndex = sub;
+
+                    auto& childTransform = child.AddComponent<TransformComponent>();
+                    childTransform.Position = glm::vec3(0.0f);
+                    childTransform.Scale = glm::vec3(1.0f);
+                    childTransform.Parent = enemy;
+
+                    if (enemy.HasComponent<TransformComponent>()) {
+                        auto& parentTransform = enemy.GetComponent<TransformComponent>();
+                        parentTransform.Children.push_back(child);
+                    }
+                }
+            }
+        }
+
+        // ========================================================================
+        // 3. Helper: Spawn single enemy at a random wall with offset
+        // TODO::Ensure that depending on the wall itself, the offset changes. 
+        // TODO::Ensure it is based off the wall size as well.
+        // ========================================================================
+        auto spawnAtRandomWall = [&](EnemyType type, const std::string& tag, const std::string& meshName) {
+            // Pick a random wall
+            int wallIndex = rand() % m_EnabledWalls.size();
+            const WallInfo& wall = m_EnabledWalls[wallIndex];
+
+            // Create enemy
+            Entity enemy = context.Scene->CreateEntity(tag);
+            auto& mesh = enemy.AddComponent<MeshRendererComponent>();
+            mesh.Material = 1;
+
+            xresource::instance_guid inst_guid = AM.getAssetIdByFilename(meshName);
+            mesh.MeshGuid = inst_guid;
+
+            //enemy.AddComponent<TransformComponent>();
+
+            if (enemy.HasComponent<TransformComponent>()) {
+                auto& transform = enemy.GetComponent<TransformComponent>();
+
+                // Generate random offset from wall center
+                // Offset range: -10 to +10 units in X and Z
+                float offsetX = ((rand() % 2000) - 1000) / 100.0f; // -10.0 to +10.0
+                float offsetZ = ((rand() % 2000) - 1000) / 100.0f; // -10.0 to +10.0
+
+                // Apply offset to wall position
+                transform.Position = wall.position + glm::vec3(offsetX, 0.0f, offsetZ);
+                transform.Rotation = wall.rotation;
+                LOG_INFO("BTSpawnMultipleTypes: Spawned '", tag,
+                    "' at wall '", wall.name,
+					"' position (", transform.Position.x, ", ", transform.Position.y, ", ", transform.Position.z, ")");
+				LOG_INFO("BTSpawnMultipleTypes: Wall rotation (", transform.Rotation.x, ", ", transform.Rotation.y, ", ", transform.Rotation.z, ")");
+                transform.Scale = glm::vec3(0.002f);
+                m_totalSpawned++;
+            }
+        };
+
+        // ========================================================================
+        // 4. Spawn each enemy type at random enabled walls
+        // ========================================================================
+
+        // Spawn Trojans
+        for (int i = 0; i < m_TrojanCount; ++i) {
+            spawnAtRandomWall(EnemyType::TROJAN, "Trojan", "E003_trojan_v001.fbx");
+        }
+
+        // Spawn Adware
+        for (int i = 0; i < m_AdwareCount; ++i) {
+            spawnAtRandomWall(EnemyType::ADWARE, "Adware", "E007_adware_v001.fbx");
+        }
+
+        // Spawn Worms
+        for (int i = 0; i < m_WormsCount; ++i) {
+            spawnAtRandomWall(EnemyType::WORMS, "Worm_host", "E001_worm_host_v001.fbx");
+        }
+
+        // Spawn Botnets
+        for (int i = 0; i < m_BotnetCount; ++i) {
+            spawnAtRandomWall(EnemyType::BOTNET, "Botnet", "E004_botnet_v001.fbx");
+        }
+
+        LOG_INFO("BTSpawnMultipleTypes: Spawned ", m_totalSpawned, " enemies total");
+        LOG_INFO("  Loveletter: ", m_LoveletterCount);
+        LOG_INFO("  Trojan: ", m_TrojanCount);
+        LOG_INFO("  Adware: ", m_AdwareCount);
+        LOG_INFO("  Worms: ", m_WormsCount);
+        LOG_INFO("  Botnet: ", m_BotnetCount);
+
+        return (m_totalSpawned == totalcount) ? BTStatus::Success : BTStatus::Failure;
+    }
+
+    void BTSpawnMultipleTypes::Reset() {
+        m_EnabledWalls.clear();
+        m_totalSpawned = 0;
+    }
+
+    //BTStatus BTSpawnMultipleTypes::Execute(BTContext& context) {
+    //    if (!context.Entity || !context.Scene) {
+    //        LOG_WARNING("BTSpawnMultipleTypes: No entity or scene in context");
+    //        return BTStatus::Failure;
+    //    }
+
+    //    // Get spawner position for non-loveletter enemies
+    //    auto& spawnerTransform = context.Entity->GetComponent<TransformComponent>();
+    //    glm::vec3 centerPos = spawnerTransform.Position;
+
+    //    int totalSpawned = 0;
+
+    //    // Spawn Loveletter at specific position
+    //    if (m_LoveletterCount > 0) {
+    //        for (int i = 0; i < m_LoveletterCount; ++i) {
+    //            Entity enemy = context.Scene->CreateEntity("loveletter");
+    //            auto& parentMesh = enemy.AddComponent<MeshRendererComponent>();
+
+				//std::string meshName = "E005_loveletter_v001.fbx";
+				//xresource::instance_guid inst_guid = AM.getAssetIdByFilename(meshName);
+				//parentMesh.MeshGuid = inst_guid;
+    //            parentMesh.SubmeshIndex = 0; //or whatever the "main" mesh is
+
+    //            enemy.AddComponent<RigidbodyComponent>();
+
+    //            if (enemy.HasComponent<TransformComponent>()) {
+    //                auto& transform = enemy.GetComponent<TransformComponent>();
+    //                transform.Position = m_LoveletterPos;
+				//	transform.Scale = glm::vec3(0.002f); // Scale down
+    //                totalSpawned++;
+    //            }
+
+				//const int submeshCount = 11; // Assuming loveletter has 10 submeshes
+
+    //            for (int sub = 0; sub < submeshCount; ++sub) {
+    //                Entity child = context.Scene->CreateEntity("loveletter_" + std::to_string(sub));
+
+    //                //mesh
+    //                auto& childMesh = child.AddComponent<MeshRendererComponent>();
+				//	childMesh.MeshGuid = inst_guid;
+    //                childMesh.SubmeshIndex = sub;
+
+    //                //transform
+    //                auto& childTransform = child.AddComponent<TransformComponent>();
+    //                childTransform.Position = glm::vec3(0.0f); // Local position
+    //                childTransform.Scale = glm::vec3(1.0f);
+
+    //                // Set parent-child relationship
+    //                childTransform.Parent = enemy;
+
+    //                if(enemy.HasComponent<TransformComponent>()) {
+    //                    auto& parentTransform = enemy.GetComponent<TransformComponent>();
+    //                    parentTransform.Children.push_back(child);
+				//	}
+    //            }
+    //        }
+    //    }
+
+    //    // Helper lambda to spawn enemies in a grid around current position
+    //    auto spawnInGrid = [&](EnemyType type, int count, glm::vec3& startPos) {
+    //        if (count <= 0) return;
+
+    //        int gridWidth = static_cast<int>(std::ceil(std::sqrt(static_cast<float>(count))));
+    //        int gridHeight = static_cast<int>(std::ceil(static_cast<float>(count) / gridWidth));
+
+    //        int enemyIndex = 0;
+    //        for (int row = 0; row < gridHeight && enemyIndex < count; ++row) {
+    //            for (int col = 0; col < gridWidth && enemyIndex < count; ++col) {
+				//	std::string meshName = "";
+    //                std::string tag = "Enemy";
+
+    //                if(type == EnemyType::BOTNET) {
+    //                    tag = "Botnet";
+    //                    meshName = "E004_botnet_v001.fbx";
+    //                }
+    //                else if (type == EnemyType::ADWARE) {
+				//		tag = "Adware";
+    //                    meshName = "E007_adware_v001.fbx";
+    //                }
+    //                else if (type == EnemyType::WORMS) {
+				//		tag = "Worm_host";
+				//		meshName = "E001_worm_host_v001.fbx";
+    //                }
+    //                else if (type == EnemyType::TROJAN) {
+				//		tag = "Trojan";
+    //                    meshName = "E003_trojan_v001.fbx";
+				//	}
+    //                Entity enemy = context.Scene->CreateEntity(tag);
+    //                auto& mesh = enemy.AddComponent<MeshRendererComponent>();
+    //                mesh.Material = 1; // Default material
+
+    //                xresource::instance_guid inst_guid = AM.getAssetIdByFilename(meshName);
+				//	mesh.MeshGuid = inst_guid;
+
+    //                enemy.AddComponent<RigidbodyComponent>();
+
+    //                if (enemy.HasComponent<TransformComponent>()) {
+    //                    auto& transform = enemy.GetComponent<TransformComponent>();
+
+    //                    float offsetX = (col - gridWidth / 2.0f) * m_Spacing;
+    //                    float offsetZ = (row - gridHeight / 2.0f) * m_Spacing;
+
+    //                    transform.Position = startPos + glm::vec3(offsetX, 0.0f, offsetZ);
+
+    //                    transform.Scale.x = 0.002f;
+				//		transform.Scale.y = 0.002f;
+				//		transform.Scale.z = 0.002f;
+
+    //                    totalSpawned++;
+    //                }
+    //                enemyIndex++;
+    //            }
+    //        }
+
+    //        // Offset the next type's spawn position
+    //        startPos.z += (gridHeight + 1) * m_Spacing;
+    //    };
+
+    //    // Spawn other types in sequence (grid pattern)
+    //    glm::vec3 currentPos = centerPos;
+
+    //    spawnInGrid(EnemyType::TROJAN, m_TrojanCount, currentPos);
+    //    spawnInGrid(EnemyType::ADWARE, m_AdwareCount, currentPos);
+    //    spawnInGrid(EnemyType::WORMS, m_WormsCount, currentPos);
+    //    
+    //    spawnInGrid(EnemyType::BOTNET, m_BotnetCount, currentPos);
+
+    //    LOG_INFO("BTSpawnMultipleTypes: Spawned ", totalSpawned, " enemies total");
+    //    LOG_INFO("  Loveletter: ", m_LoveletterCount);
+    //    LOG_INFO("  Trojan: ", m_TrojanCount);
+    //    LOG_INFO("  Adware: ", m_AdwareCount);
+    //    LOG_INFO("  Worms: ", m_WormsCount, " (", m_WormsCount * 4, " entities including children)");
+    //    LOG_INFO("  Botnet: ", m_BotnetCount);
+
+    //    return (totalSpawned > 0) ? BTStatus::Success : BTStatus::Failure;
+    //}
+
+    void BTSpawnMultipleTypes::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "LoveletterCount", std::to_string(m_LoveletterCount) });
+        properties.push_back({ "TrojanCount", std::to_string(m_TrojanCount) });
+        properties.push_back({ "AdwareCount", std::to_string(m_AdwareCount) });
+        properties.push_back({ "WormsCount", std::to_string(m_WormsCount) });
+        properties.push_back({ "BotnetCount", std::to_string(m_BotnetCount) });
+        properties.push_back({ "Spacing", std::to_string(m_Spacing) });
+        properties.push_back({ "LoveletterPos.x", std::to_string(m_LoveletterPos.x) });
+        properties.push_back({ "LoveletterPos.y", std::to_string(m_LoveletterPos.y) });
+        properties.push_back({ "LoveletterPos.z", std::to_string(m_LoveletterPos.z) });
+		properties.push_back({ "WallA", m_WallA ? "true" : "false" });
+		properties.push_back({ "WallB", m_WallB ? "true" : "false" });
+		properties.push_back({ "WallC", m_WallC ? "true" : "false" });
+		properties.push_back({ "WallD", m_WallD ? "true" : "false" });
+		properties.push_back({ "WallE", m_WallE ? "true" : "false" });
+		properties.push_back({ "Boss", m_Boss ? "true" : "false" });
+    }
+
+    void BTSpawnMultipleTypes::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "LoveletterCount") {
+            m_LoveletterCount = std::max(0, std::stoi(value));
+        }
+        else if (name == "TrojanCount") {
+            m_TrojanCount = std::max(0, std::stoi(value));
+        }
+        else if (name == "AdwareCount") {
+            m_AdwareCount = std::max(0, std::stoi(value));
+        }
+        else if (name == "WormsCount") {
+            m_WormsCount = std::max(0, std::stoi(value));
+        }
+        else if (name == "BotnetCount") {
+            m_BotnetCount = std::max(0, std::stoi(value));
+        }
+        else if (name == "Spacing") {
+            m_Spacing = std::max(0.1f, std::stof(value));
+        }
+        else if (name == "LoveletterPos.x") {
+            m_LoveletterPos.x = std::stof(value);
+        } else if (name == "LoveletterPos.y") {
+            m_LoveletterPos.y = std::stof(value);
+		}
+        else if (name == "LoveletterPos.z") {
+            m_LoveletterPos.z = std::stof(value);
+        } else if (name == "WallA") {
+            m_WallA = (value == "true" || value == "1");
+        } else if (name == "WallB") {
+            m_WallB = (value == "true" || value == "1");
+        } else if (name == "WallC") {
+            m_WallC = (value == "true" || value == "1");
+        } else if (name == "WallD") {
+            m_WallD = (value == "true" || value == "1");
+        } else if (name == "WallE") {
+            m_WallE = (value == "true" || value == "1");
+        } else if (name == "Boss") {
+            m_Boss = (value == "true" || value == "1");
+		}
+    }
 
 } // namespace Engine

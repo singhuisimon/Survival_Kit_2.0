@@ -12,6 +12,8 @@
 #include "BTNode.h"
 #include <functional>
 #include "Utility/Types.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace Engine {
 
@@ -683,6 +685,163 @@ namespace Engine {
         std::string m_CollidedIDKey;
 
     };
+    
 
+    /**
+     * @brief Spawns a configurable number of enemies at the spawner's position
+     * @details Simple spawn node that creates N enemies with specified tag and prefab
+     */
+    class BTSpawnEnemies : public BTNode {
+    public:
+        BTSpawnEnemies(int count = 1, const std::string& enemyTag = "Enemy");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        int m_SpawnCount;           // How many enemies to spawn
+        std::string m_EnemyTag;     // Tag for spawned enemies
+    };
+
+    /**
+     * @brief Spawns enemies in a grid pattern around the spawner
+     * @details Creates enemies with spacing for visual clarity
+     */
+    class BTSpawnEnemiesGrid : public BTNode {
+    public:
+        BTSpawnEnemiesGrid(
+            int count = 1,
+            float spacing = 2.0f,
+            const std::string& enemyTag = "Enemy"
+        );
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        int m_SpawnCount;
+        float m_Spacing;            // Distance between spawned enemies
+        std::string m_EnemyTag;
+    };
+
+    /**
+     * @brief Spawns an enemy at a specific world position
+     * @details For enemies like "loveletter" that spawn at fixed locations
+     */
+    class BTSpawnEnemyAt : public BTNode {
+    public:
+        BTSpawnEnemyAt(
+            const std::string& enemyTag = "Enemy",
+            const glm::vec3& position = glm::vec3(0.0f)
+        );
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_EnemyTag;
+        glm::vec3 m_SpawnPosition;  // World position to spawn at
+    };
+
+    /**
+     * @brief Spawns multiple enemy types with individual counts
+     * @details Configure different quantities for each enemy type:
+     *          - loveletter (spawns at specific point)
+     *          - trojan (sometimes)
+     *          - adware (sometimes)
+     *          - worms (sometimes)
+     *          - botnet (always, variable count)
+     */
+    class BTSpawnMultipleTypes : public BTNode {
+    public:
+        BTSpawnMultipleTypes();
+
+        const char* GetTypeName() const override;
+		void OnEnter(BTContext& context) override;
+        BTStatus Execute(BTContext& context) override;
+        void Reset() override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        enum class EnemyType{
+			LOVELETTER,
+			TROJAN,
+			ADWARE,
+			WORMS,
+			BOTNET
+        };
+
+        // Individual counts for each enemy type (0 = don't spawn)
+        int m_LoveletterCount;
+        int m_TrojanCount;
+        int m_AdwareCount;
+        int m_WormsCount;
+        int m_BotnetCount;
+
+        float m_Spacing;            // Grid spacing for spawned enemies
+        glm::vec3 m_LoveletterPos;  // Specific spawn position for loveletter
+
+        bool m_WallA = false;
+		bool m_WallB = false;
+		bool m_WallC = false;
+		bool m_WallD = false;
+		bool m_WallE = false;
+        bool m_Boss = false;
+
+    private:
+        struct WallInfo {
+            std::string name;
+            glm::vec3 position;
+            glm::quat rotation;
+		};
+
+		std::vector<WallInfo> m_EnabledWalls;
+
+		int m_totalSpawned = 0;
+
+        //glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0));
+
+        glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0)) {
+            glm::vec3 f = glm::normalize(forward);
+            glm::vec3 r = glm::normalize(glm::cross(up, f));
+            glm::vec3 u = glm::cross(f, r);
+
+            glm::mat3 rotMat(r, u, f);
+            return glm::quat_cast(rotMat);
+        }
+
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+    class BTCreateEntityByPrefab : public BTNode {
+    public:
+        BTCreateEntityByPrefab(const std::string& prefabName = "");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+		
+        std::string m_PrefabName;
+    };
 
 } // namespace Engine

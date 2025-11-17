@@ -377,6 +377,45 @@ namespace Engine {
             }
         );
 
+        // Multi-type spawner (for your 5 enemy types)
+        registry.RegisterNodeType<BTSpawnMultipleTypes>("Action", "Spawns all 5 enemy types with individual counts",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "LoveletterCount", m_LoveletterCount);
+                BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "TrojanCount", m_TrojanCount);
+                BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "AdwareCount", m_AdwareCount);
+                BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "WormsCount", m_WormsCount);
+                BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "BotnetCount", m_BotnetCount);
+                BT_REGISTER_FLOAT_PROPERTY(BTSpawnMultipleTypes, "Spacing", m_Spacing);
+                BT_REGISTER_VEC3_PROPERTY(BTSpawnMultipleTypes, "LoveletterPos", m_LoveletterPos);
+				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallA", m_WallA);
+				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallB", m_WallB);
+				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallC", m_WallC);
+				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallD", m_WallD);
+                BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallE", m_WallE);
+				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "Boss", m_Boss);
+            });
+
+        // Spawn single enemy at specific position
+        registry.RegisterNodeType<BTSpawnEnemyAt>("Action", "Spawns enemy at specific world position",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTSpawnEnemyAt, "EnemyTag", m_EnemyTag);
+                BT_REGISTER_VEC3_PROPERTY(BTSpawnEnemyAt, "SpawnPosition", m_SpawnPosition);
+            });
+
+        // Simple spawners
+        registry.RegisterNodeType<BTSpawnEnemies>("Action", "Spawns N enemies at spawner position",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTSpawnEnemies, "SpawnCount", m_SpawnCount);
+                BT_REGISTER_STRING_PROPERTY(BTSpawnEnemies, "EnemyTag", m_EnemyTag);
+            });
+
+        registry.RegisterNodeType<BTSpawnEnemiesGrid>("Action", "Spawns N enemies in a grid pattern",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTSpawnEnemiesGrid, "SpawnCount", m_SpawnCount);
+                BT_REGISTER_FLOAT_PROPERTY(BTSpawnEnemiesGrid, "Spacing", m_Spacing);
+                BT_REGISTER_STRING_PROPERTY(BTSpawnEnemiesGrid, "EnemyTag", m_EnemyTag);
+            });
+
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
 
