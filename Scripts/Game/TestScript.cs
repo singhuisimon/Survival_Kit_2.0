@@ -11,6 +11,19 @@ namespace Game
         private float fireCD = 0.0f;
         private float fireTimer = 0.1f;
 
+
+        [SerializeField]
+        private int health = 100;
+
+        [SerializeField("Run Speed")]
+        private float speed = 10.0f;
+
+        [SerializeField]
+        private bool isActive = true;
+
+        [SerializeField]
+        private string characterName = "Player";
+
         public void OnStart()
         {
             Engine.InternalCalls.Log("TestScript started!");
