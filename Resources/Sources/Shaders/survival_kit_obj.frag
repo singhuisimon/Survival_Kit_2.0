@@ -10,12 +10,13 @@
  */
 #version 460 core
 
-in vec3 Position;   // view-space position
-in vec3 Normal;     // view-space normal
-in vec3 Color;
-in vec2 TexCoord;
-in vec3 Tangent;
-in vec3 Bitangent;
+// ==== In/Outs ====
+in vec3 Position;   // World-space position
+in vec3 Normal;     // World-space normal
+in vec3 Color;      // Unused
+in vec2 TexCoord;   
+in vec3 Tangent;    // Currently unused
+in vec3 Bitangent;  // Currenty unused
 
 layout(location=0) out vec4 FragColor;
 
@@ -46,188 +47,215 @@ layout(std140, binding = 0) uniform LightsBlock {
     LightGPU lights[64];
 };
 
-// ===== Engine uniforms kept =====
-uniform mat4 V;               
-uniform bool isPBR;
+struct Material_
+{
+    vec3  albedo;
+    float metallic;
+    float roughness;
+    float ao;
+    float opacity;
+};
+
+uniform Material_ material_;
+
+
+// ===== Engine uniforms kept =====      
+uniform vec3 CamPos;       
 uniform bool isGamma;
 uniform bool isTexture;
 uniform bool useNormalMap;
+
 layout(binding = 0) uniform sampler2D Texture2D;
 layout(binding = 1) uniform sampler2D NormalMap;
 
 // ===== PBR constants =====
 const float PI = 3.14159265358979323846;
-const float ROUGH = 0.3f;
-const float METAL = 0.0f;
 
 // ===== Helpers =====
 float saturate(float x){ return clamp(x,0.0,1.0); }
 
 // Softer attenuation so point/spot reach further but still fade out at range
 float AttenuationSoft(float dist, float range) {
-    float r = max(range, 1e-4);        // never 0
-    float x = clamp(dist / r, 0.0, 1.0);  // 0..1 within range
-    // Soft rolloff that reaches 0 at d == range, with no 1/d^2 term
-    float smoothing = (1.0 - x);          // linear
-    return smoothing * smoothing;            // quadratic falloff
+    float r = max(range, 1e-4);
+    float x = clamp(dist / r, 0.0, 1.0);
+    float smoothing = (1.0 - x);
+    return smoothing * smoothing;
 }
 
-float SpotFade(vec3 Ldir_view, vec3 spotDir_view, float cosInner, float cosOuter)
+float SpotFade(vec3 LDir, vec3 SpotDir, float cosInner, float cosOuter)
 {
-    // Ldir_view is surface->light; compare opposite with axis (light->surface)
-    float cd = dot(-normalize(Ldir_view), normalize(spotDir_view));
+    float cd = dot(-normalize(LDir), normalize(SpotDir));
     return saturate(smoothstep(cosOuter, cosInner, cd));
 }
 
-// ===== GGX helpers =====
-float ggxDistribution(float nDotH)
+////////////////////////////////////////////////////////////////////
+// Distribution (GGX/Trowbridge-Reitz)
+////////////////////////////////////////////////////////////////////
+float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-    float a2 = ROUGH * ROUGH * ROUGH * ROUGH;
-    float d  = (nDotH * nDotH) * (a2 - 1.0f) + 1.0f;
-    return a2 / (PI * d * d);
-}
-float geomSmith(float nDotX)
-{
-    float k = (ROUGH + 1.0f) * (ROUGH + 1.0f) / 8.0f;
-    float denom = nDotX * (1.0f - k) + k;
-    return 1.0f / denom;
-}
-vec3 schlickFresnel(float lDotH)
-{
-    vec3 f0 = vec3(0.04f);
-    if (METAL == 1.0f) f0 = material.Kd;
-    return f0 + (1.0f - f0) * pow(1.0f - lDotH, 5.0f);
+    float a      = roughness*roughness;
+    float a2     = a*a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+	
+    float num   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return num / denom;
 }
 
-// ---- Single-light BRDFs in VIEW space  ----
-vec3 BRDF_BlinnPhong_View(vec3 N, vec3 L, vec3 Vview, vec3 albedo, float shininess, float specStrength)
+////////////////////////////////////////////////////////////////////
+// Geometry (Smith's Schlick-GGX)
+////////////////////////////////////////////////////////////////////
+float GeometrySchlickGGX(float NdotV, float roughness)
 {
-    
-    // Compute half vector of vector to light and view vector
-    vec3  H   = normalize(Vview + L);
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
 
-    // Compute radiant energy
-    float ndl = max(dot(N, L), 0.0);
-
-    // Compute specular
-    float ndh = max(dot(N, H), 0.0);
-    float spec = pow(ndh, shininess) * specStrength;
-
-    return albedo * ndl + vec3(spec);
+    float num   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return num / denom;
+}
+  
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
 }
 
-vec3 BRDF_Microfacet_View(vec3 N, vec3 Ldir, vec3 Vview, vec3 albedo)
+////////////////////////////////////////////////////////////////////
+// Fresnel (Schlick approximation)
+////////////////////////////////////////////////////////////////////
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-    vec3 H    = normalize(Vview + Ldir);
-    float nDotH = max(dot(N, H), 0.0);
-    float lDotH = max(dot(Ldir, H), 0.0);
-    float nDotL = max(dot(N, Ldir), 0.0);
-    float nDotV = max(dot(N, Vview), 0.0);
-
-    vec3  spec = 0.25f * ggxDistribution(nDotH) * schlickFresnel(lDotH)
-                           * geomSmith(nDotL) * geomSmith(nDotV);
-    return (albedo + PI * spec) * nDotL;
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 void main()
 {
+    // ===== Normal computation =====
     vec3 N;
     if (useNormalMap) {
-        // Construct TBN matrix in fragment shader
         mat3 TBN = mat3(normalize(Tangent), normalize(Bitangent), normalize(Normal));
-        
-        // Sample and remap normal map
         vec3 normalSample = texture(NormalMap, TexCoord).rgb;
         normalSample = normalSample * 2.0 - 1.0;
-        
-        // Transform to view space
         N = normalize(TBN * normalSample);
     } else {
         N = normalize(Normal);
     }
 
-    vec3 Vview  = normalize(-Position);   // camera at origin in view space
+    // ===== View direction =====
+    vec3 V = normalize(CamPos - Position);
 
-    // Albedo (linear)
-    vec3 albedo = material.Kd;
+    // ===== Material properties =====
+    vec3 albedo = material_.albedo;
     if (isTexture) {
         vec3 tex = texture(Texture2D, TexCoord).rgb;
-        if (isGamma) tex = pow(tex, vec3(2.2));   // sRGB -> linear
-        albedo = mix(material.Kd, tex, 0.85); // Material - Texture (0.0 - 1.0)
+        if (isGamma) {
+            tex = pow(tex, vec3(2.2)); // sRGB -> linear
+        }
+        albedo *= tex;
     }
-    float shininess    = material.shininess;
-    float specStrength = max(max(material.Ks.r, material.Ks.g), material.Ks.b);
+    
+    float roughness = material_.roughness;
+    float metallic = material_.metallic;
+    float ao = material_.ao;
 
-    // Ambient computation
-    vec3 accum = ambient_indirect.rgb * ambient_indirect.a;
+    // ===== F0 for Fresnel =====
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallic);
 
-    // Light loop
+    // ===== Reflectance equation =====
+    vec3 Lo = vec3(0.0);
+    
     uint lightCount = count.x;
-
-    // Include all lights in calculation
     for (uint i = 0u; i < lightCount; ++i)
     {
         LightGPU Lg = lights[i];
 
         vec3  color     = Lg.color_intensity.rgb;
         float intensity = Lg.color_intensity.a;
-
-        // World -> View (Get light direction and position in view space)
-        vec3 dir_view = normalize(mat3(V) * Lg.direction_type.xyz); 
-        vec3 pos_view = (V * vec4(Lg.position_range.xyz, 1.0)).xyz;
-
-        // Get light type
+        vec3 dir = normalize(Lg.direction_type.xyz); 
+        vec3 pos = Lg.position_range.xyz;
         uint type = uint(Lg.direction_type.w + 0.5);
 
-        // Light attributes
-        vec3 Ldir;              // Light direction
+        // ===== Light direction setup =====
+        vec3 L;
         float attenuation = 1.0;
-        float angular     = 1.0;
+        float angular = 1.0;
 
-        // Set up lights based on type
         if (type == LIGHT_DIRECTIONAL)
         {
-            // CPU stored light->scene direction; we need surface->light
-            Ldir = normalize(-dir_view);
-        } else {
+            L = normalize(-dir);
+        } 
+        else 
+        {
+            vec3 toLight = pos - Position;      
+            float distance = length(toLight);
+            
+            if (distance >= Lg.position_range.w) continue;
+            
+            L = toLight / max(distance, 1e-4);
+            attenuation = AttenuationSoft(distance, Lg.position_range.w);
 
-            // Surface -> light (view space)
-            vec3 toLight = pos_view - Position;      
-            float d = length(toLight);
-            if (d >= Lg.position_range.w) continue;  // Cull by light range
-            Ldir = toLight / max(d, 1e-4);
-
-            // Soft attenuation to create nicer falloff
-            attenuation = AttenuationSoft(d, Lg.position_range.w);
-
-            // Calculation of cone for spot light
             if (type == LIGHT_SPOT)
             {
                 float cosIn  = Lg.spot_cos_misc.x;
                 float cosOut = Lg.spot_cos_misc.y;
-                angular = SpotFade(Ldir, dir_view, cosIn, cosOut);
+                angular = SpotFade(L, dir, cosIn, cosOut);
                 if (angular <= 0.0) continue;
             }
         }
 
-        // Compute radiance for current light
-        vec3 radiance = color * intensity;
+        // ===== Cook-Torrance BRDF =====
+        vec3 H = normalize(V + L);
+        float NdotL = max(dot(N, L), 0.0);
+        
+        // Skip if light is below surface
+        if (NdotL <= 0.0) continue;
+        
+        float NdotV = max(dot(N, V), 0.0);
+        float HdotV = max(dot(H, V), 0.0);
 
-        // Determine accumulated BRDF with (1) radiance, (2) attenuation, (3) angular
-        if (isPBR) {
-            // PBR
-            accum += BRDF_Microfacet_View(N, Ldir, Vview, albedo) * radiance * attenuation * angular;
-        } else {
-            // Blinn-Phong
-            accum += BRDF_BlinnPhong_View(N, Ldir, Vview, albedo, shininess, specStrength) * radiance * attenuation * angular;
-        }
+        // Calculate radiance
+        vec3 radiance = color * intensity * attenuation * angular;
+
+        // Cook-Torrance BRDF components
+        float D = DistributionGGX(N, H, roughness);
+        float G = GeometrySmith(N, V, L, roughness);
+        vec3  F = fresnelSchlick(HdotV, F0);
+
+        // Energy conservation
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;
+
+        // Specular term
+        vec3 numerator = D * G * F;
+        float denominator = 4.0 * NdotV * NdotL + 0.0001;
+        vec3 specular = numerator / denominator;
+
+        // Add to outgoing radiance Lo
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
-    // === Gamma out ===
-    vec3 outColor = accum;
+    // ===== Ambient lighting =====
+    vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
+    vec3 color = ambient + Lo;
+
+    // ===== Tone mapping (Reinhard) =====
+    color = color / (color + vec3(1.0));
+
+    // ===== Gamma correction =====
     if (isGamma) {
-        outColor = pow(outColor, vec3(1.0/2.2));
+        color = pow(color, vec3(1.0/2.2));
     }
 
-    FragColor = vec4(outColor, 1.0);
+    FragColor = vec4(color, material_.opacity);
 }

@@ -22,29 +22,26 @@ namespace Engine {
 		m_cameralist.clear();
 		m_lightlist.clear();
 
+		// Save all visible geometry 
 		auto view = scene->GetRegistry().view<TransformComponent, MeshRendererComponent>();
-
 		for (auto entity : view) {
 			auto& renderable = view.get<MeshRendererComponent>(entity);
 			auto& transform = view.get<TransformComponent>(entity);
+
+			// Capture visible geometry information
+			if (!renderable.Visible) continue;
 			
-
-			// Only render visible meshes
-			if (renderable.Visible)
-			{
-				m_drawitems.push_back({
-					transform.WorldTransform,
-					static_cast<u32>(entity),
-					renderable.SubmeshIndex,
-					renderable.MeshType,
-					renderable.Material,
-					renderable.Texture,
-					renderable.MeshGuid,
-					renderable.MaterialGuid,
-					renderable.TextureGuid
-					});
-			}
-
+			m_drawitems.push_back({
+					.m_model_to_world_transform = transform.WorldTransform,
+					.m_entity_id = static_cast<u32>(entity),
+					.m_submesh_index = renderable.SubmeshIndex,
+					.m_default_mesh_handle = renderable.MeshType,
+					.m_default_material_handle = renderable.Material,
+					.m_default_u32texture_handle = renderable.Texture,
+					.m_mesh_guid = renderable.MeshGuid,
+					.m_material_guid = renderable.MaterialGuid,
+					.m_texture_guid = renderable.TextureGuid
+				});
 			
 		}
 
@@ -54,12 +51,14 @@ namespace Engine {
 
 			auto& camera = camView.get<CameraComponent>(cam);
 			if (!camera.Enabled) continue;
-			m_cameralist.emplace_back(camera);
 
+			// Capture camera information and it's position
+			auto& transform = camView.get<TransformComponent>(cam);
+			m_cameralist.emplace_back(std::make_pair(camera, transform.Position));
 		}
 
+		// Save all particle emitter information
 		auto particleView = scene->GetRegistry().view<ParticleComponent>();
-
 		for (auto entity : particleView) {
 			auto& emitter = particleView.get<ParticleComponent>(entity);
 
@@ -67,19 +66,20 @@ namespace Engine {
 
 				for (auto& particle : emitter.Particles) {
 
-					// Don't render dead particles
+					// Don't collect information about dead particles
 					if (!particle.Alive)
 						continue;
 
+					// Capture particle information
 					m_drawitems.push_back({
-						particle.Transform,
-						u32_max, // Particles are not associated with an entity for rendering purposes
-						0,
-						emitter.ParticleType,
-						0,
-						0,
-						0,
-						0
+						.m_model_to_world_transform = particle.Transform,
+						.m_entity_id = u32_max, // Particles are not associated with an entity for rendering purposes
+						.m_submesh_index = 0,
+						.m_default_mesh_handle = emitter.ParticleType,
+						.m_default_material_handle = 0,
+						.m_default_u32texture_handle = 0,
+						.m_mesh_guid = 0,
+						.m_material_guid = 0
 						});
 
 				}
@@ -120,7 +120,7 @@ namespace Engine {
 		}
 		
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());
-		std::span<CameraComponent> cameralist_span(m_cameralist.data(), m_cameralist.size());
+		std::span<std::pair<CameraComponent, glm::vec3>> cameralist_span(m_cameralist.data(), m_cameralist.size());
 		std::span<LightCPU>			light_span(m_lightlist.data(), m_lightlist.size());
 
 		renderer.render_frame(drawitem_span, cameralist_span, light_span);

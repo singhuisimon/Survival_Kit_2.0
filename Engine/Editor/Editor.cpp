@@ -908,31 +908,27 @@ namespace Engine
 							// Shader Name (read-only for now)
 							ImGui::Text("Shader: %s", material->shaderName.c_str());
 
-							// Texture Maps (stubs as requested)
+							// Texture Maps (PBR Metallic/Roughness)
 							if (ImGui::CollapsingHeader("Texture Maps"))
 							{
-								ImGui::Text("Diffuse Map: [Stub - ID: %u]", material->diffuseMap);
-								ImGui::Text("Normal Map: [Stub - ID: %u]", material->normalMap);
-								ImGui::Text("Specular Map: [Stub - ID: %u]", material->specularMap);
-								ImGui::Text("Emission Map: [Stub - ID: %u]", material->emissionMap);
-								ImGui::Text("Occlusion Map: [Stub - ID: %u]", material->occlusionMap);
+								// Displaying the 64-bit hex GUID from the m_Value
+								ImGui::Text("Base Map (Albedo): [Stub - ID: 0x%llx]", material->baseMap.m_Value);
+								ImGui::Text("Normal Map:         [Stub - ID: 0x%llx]", material->normalMap.m_Value);
+								ImGui::Text("Metallic Map:       [Stub - ID: 0x%llx]", material->metallicMap.m_Value);
+								ImGui::Text("Roughness Map:      [Stub - ID: 0x%llx]", material->roughnessMap.m_Value);
+								ImGui::Text("Emission Map:       [Stub - ID: 0x%llx]", material->emissionMap.m_Value);
+								ImGui::Text("Occlusion Map:      [Stub - ID: 0x%llx]", material->occlusionMap.m_Value);
 							}
 
 							// Color Properties
 							if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
 							{
-								// Diffuse Color with alpha
-								if (ImGui::ColorEdit4("Diffuse Color", material->diffuseColor.data(),
-									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
-								{
-									// Material updated - real-time changes will be visible (To do in M3)
-								}
 
-								// Specular Color (no alpha)
-								if (ImGui::ColorEdit3("Specular Color", material->specularColor.data(),
+								// Base Color (RGB) - no alpha, as opacity is separate
+								if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
 									ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
 								{
-									// Material updated (To do in M3)
+									// Material updated
 								}
 
 								// Emission Color
@@ -946,11 +942,22 @@ namespace Engine
 							// Material Properties
 							if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
 							{
-								// Shininess slider
-								if (ImGui::SliderFloat("Shininess", &material->shininess, 1.0f, 128.0f, "%.1f"))
+								// Metallic slider
+								if (ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0f, "%.2f"))
 								{
-									// Clamp to reasonable range
-									material->shininess = std::max(1.0f, std::min(128.0f, material->shininess));
+									// Material updated
+								}
+
+								// Roughness slider
+								if (ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f, "%.2f"))
+								{
+									// Material updated
+								}
+
+								// Opacity slider
+								if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f"))
+								{
+									// Material updated
 								}
 
 								// Emission Strength
@@ -964,9 +971,15 @@ namespace Engine
 								{
 									material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
 								}
+
+								// Alpha Threshold for ambient occlusion
+								if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f"))
+								{
+									material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
+								}
 							}
 
-							// UV Transform
+							// UV Transform (Unchanged)
 							if (ImGui::CollapsingHeader("UV Transform"))
 							{
 								// Tiling
@@ -985,7 +998,7 @@ namespace Engine
 							}
 
 							// Render Flags
-							if (ImGui::CollapsingHeader("Render Settings"))
+							if (ImGui::CollapsingHeader("Render Flags"))
 							{
 								ImGui::Checkbox("Enable Emission", &material->enableEmission);
 								ImGui::Checkbox("Alpha Test", &material->alphaTest);
