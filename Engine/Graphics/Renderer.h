@@ -84,9 +84,10 @@ namespace Engine {
 		/**
 		 * @brief Renders a complete frame with the given draw items
 		 * @param draw_items Collection of drawable objects to render
+		 * @param cameras Collection of active cameras in the scene
+		 * @param lights Collection of active lights in the scene
 		 */
-		void render_frame(std::span<const DrawItem> draw_items, std::span<const CameraComponent> camera_list, std::span<const LightCPU> lights);
-		//void render_frame(std::span<const DrawItem> draw_items, std::span<std::pair<CameraComponent, glm::vec3>> camera_list); NEW PBR
+		void render_frame(std::span<const DrawItem> draw_items, std::span<std::pair<CameraComponent, glm::vec3>> cameras, std::span<const LightCPU> lights);
 
 		/**
 		 * @brief Retrieves the OpenGL texture handle for ImGui rendering
@@ -164,13 +165,15 @@ namespace Engine {
 		 * @param draw_items Collection of objects to draw
 		 * @param v View matrix of the camera
 		 * @param p Projection matrix of the camera
+		 * @param cam_pos Position of the active camera
+		 * @param lights Collection of active lights in the scene
 		 */
-		void draw(RenderPass const& pass,
-			std::span<const DrawItem> draw_items,
-			const glm::mat4 v,
-			const glm::mat4 p,
-			std::span<const LightCPU> lights);
-		// void draw(RenderPass const& pass, std::span<const DrawItem> draw_items, const glm::mat4& v, const glm::mat4& p, const glm::vec3& campos); NEW PBR
+		void draw(RenderPass const& pass, 
+		          std::span<const DrawItem> draw_items, 
+		          const glm::mat4& v, 
+		          const glm::mat4& p, 
+		          const glm::vec3& cam_pos, 
+		          std::span<const LightCPU> lights);
 
 		/**
 		 * @brief Finalizes the render pass and performs cleanup
