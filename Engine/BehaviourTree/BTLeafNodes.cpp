@@ -2212,7 +2212,7 @@ namespace Engine {
                 }
 
                 transform.Rotation = wall.rotation;
-                transform.Scale = glm::vec3(0.002f);
+                //transform.Scale = glm::vec3(0.002f);
                 m_totalSpawned++;
 
                 //auto& transform = enemy.GetComponent<TransformComponent>();
