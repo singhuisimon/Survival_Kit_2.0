@@ -303,11 +303,37 @@ namespace Engine
 
 		if (exception)
 		{
-			// Log exception details
 			MonoClass *exceptionClass = mono_object_get_class(exception);
 			const char *exceptionName = mono_class_get_name(exceptionClass);
-			LOG_ERROR("Exception in C# method '", methodName, "': ", exceptionName);
+
+			MonoClass *objClass = mono_object_get_class(instance);
+			const char *className = mono_class_get_name(objClass);
+			const char *classNs = mono_class_get_namespace(objClass);
+
+			LOG_ERROR(
+				"Exception in script ",
+				(classNs ? classNs : ""),
+				(classNs && classNs[0] ? "." : ""),
+				className,
+				"::",
+				methodName,
+				" - ",
+				exceptionName
+			);
+
+			// Get full managed exception string (includes stack trace)
+			MonoString *excStr = mono_object_to_string(exception, nullptr);
+			if (excStr)
+			{
+				char *excCStr = mono_string_to_utf8(excStr);
+				if (excCStr)
+				{
+					LOG_ERROR("  Exception.ToString(): ", excCStr);
+					mono_free(excCStr);
+				}
+			}
 		}
+
 	}
 
 	void MonoScriptEngine::SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value)
@@ -393,6 +419,24 @@ namespace Engine
 		static void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel);
 		static void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta);
 
+		// ---- Rigidbody scalar properties ----
+		static float Rigidbody_GetMass(uint64_t entityID);
+		static void  Rigidbody_SetMass(uint64_t entityID, float mass);
+		static bool  Rigidbody_GetIsKinematic(uint64_t entityID);
+		static void  Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic);
+		static bool  Rigidbody_GetUseGravity(uint64_t entityID);
+		static void  Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity);
+
+		// ---- Rigidbody helpers ----
+		static float Rigidbody_GetSpeed(uint64_t entityID);
+		static bool  Rigidbody_IsMoving(uint64_t entityID);
+		static bool  Rigidbody_IsStatic(uint64_t entityID);
+
+		// ---- Rigidbody forces ----
+		static void  Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force);
+		static void  Rigidbody_Stop(uint64_t entityID);
+
+
 		// ---- Collision events (via PhysicsAPI only) ----
 		static void Physics_EnableCollisionEvents();
 		static void Physics_BeginCollisionFrame();
@@ -451,6 +495,22 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetVelocity", (void *)InternalCalls::Rigidbody_GetVelocity);
 		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetVelocity", (void *)InternalCalls::Rigidbody_SetVelocity);
 		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddVelocity", (void *)InternalCalls::Rigidbody_AddVelocity);
+
+		// Rigidbody scalar/flag bindings
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetMass", (void *)InternalCalls::Rigidbody_GetMass);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetMass", (void *)InternalCalls::Rigidbody_SetMass);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetIsKinematic", (void *)InternalCalls::Rigidbody_GetIsKinematic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetIsKinematic", (void *)InternalCalls::Rigidbody_SetIsKinematic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetUseGravity", (void *)InternalCalls::Rigidbody_GetUseGravity);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetUseGravity", (void *)InternalCalls::Rigidbody_SetUseGravity);
+
+		// Rigidbody helpers
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetSpeed", (void *)InternalCalls::Rigidbody_GetSpeed);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsMoving", (void *)InternalCalls::Rigidbody_IsMoving);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsStatic", (void *)InternalCalls::Rigidbody_IsStatic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddForce", (void *)InternalCalls::Rigidbody_AddForce);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_Stop", (void *)InternalCalls::Rigidbody_Stop);
+
 
 		// Physics collisions (keep using PhysicsAPI ONLY for this)
 		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
@@ -861,7 +921,7 @@ namespace Engine
 		void Entity_AddRigidBody(uint64_t entityID)
 		{
 			auto e = GetEntityOrNull(entityID);
-			if (!e)return;
+			if (!e) return;
 			e.AddComponent<RigidbodyComponent>();
 		}
 
@@ -886,6 +946,85 @@ namespace Engine
 			auto &rb{ e.GetComponent<RigidbodyComponent>() };
 			rb.SetVelocity(rb.GetVelocity() + *inVel);
 		}
+
+		float Rigidbody_GetMass(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.GetMass();
+		}
+
+		void Rigidbody_SetMass(uint64_t entityID, float mass)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.SetMass(mass);
+		}
+
+		bool Rigidbody_GetIsKinematic(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsKinematicBody();
+		}
+
+		void Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.SetKinematic(isKinematic);
+		}
+
+		bool Rigidbody_GetUseGravity(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsGravityEnabled();
+		}
+
+		void Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.SetGravityEnabled(useGravity);
+		}
+
+		float Rigidbody_GetSpeed(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.GetSpeed();
+		}
+
+		bool Rigidbody_IsMoving(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsMoving();
+		}
+
+		bool Rigidbody_IsStatic(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsStatic();
+		}
+
+		void Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!force) return;
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.AddForce(*force);
+		}
+
+		void Rigidbody_Stop(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.Stop();
+		}
+
 
 		// ==================================
 		// Collision events (via PhysicsAPI)

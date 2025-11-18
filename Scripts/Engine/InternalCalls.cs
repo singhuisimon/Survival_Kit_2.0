@@ -19,6 +19,7 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LogWarning(string message);
 
+        // Scene / entities
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
@@ -43,19 +44,54 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Entity_AddRigidBody(ulong entityID);
 
+        // Prefabs
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Prefab_Instantiate(string prefabPath);
 
-        [MethodImpl(MethodImplOptions.InternalCall)] 
+        // Rigidbody core properties
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rigidbody_GetVelocity(ulong entityID, out Vector3 vel);
 
-        [MethodImpl(MethodImplOptions.InternalCall)] 
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rigidbody_SetVelocity(ulong entityID, ref Vector3 vel);
 
-        [MethodImpl(MethodImplOptions.InternalCall)] 
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rigidbody_AddVelocity(ulong entityID, ref Vector3 delta);
 
-        // ---- Collision events
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float Rigidbody_GetMass(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Rigidbody_SetMass(ulong entityID, float mass);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Rigidbody_GetIsKinematic(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Rigidbody_SetIsKinematic(ulong entityID, bool isKinematic);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Rigidbody_GetUseGravity(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Rigidbody_SetUseGravity(ulong entityID, bool useGravity);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float Rigidbody_GetSpeed(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Rigidbody_IsMoving(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Rigidbody_IsStatic(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Rigidbody_AddForce(ulong entityID, ref Vector3 force);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Rigidbody_Stop(ulong entityID);
+
+        // ---- Collision events ----
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Physics_EnableCollisionEvents();
@@ -69,9 +105,7 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Physics_GetCollisionPair(int index, out uint a, out uint b);
 
-
         //[MethodImpl(MethodImplOptions.InternalCall)]
         //public static extern void Rigidbody_SetVelocity(uint entity, float x, float y, float z);
     }
-
 }
