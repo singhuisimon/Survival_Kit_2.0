@@ -800,6 +800,8 @@ namespace Engine {
             std::string name;
             glm::vec3 position;
             glm::quat rotation;
+			glm::vec3 scale;
+			glm::vec3 direction;
 		};
 
 		std::vector<WallInfo> m_EnabledWalls;
@@ -808,14 +810,14 @@ namespace Engine {
 
         //glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0));
 
-        glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0)) {
+        /*glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0)) {
             glm::vec3 f = glm::normalize(forward);
             glm::vec3 r = glm::normalize(glm::cross(up, f));
             glm::vec3 u = glm::cross(f, r);
 
             glm::mat3 rotMat(r, u, f);
             return glm::quat_cast(rotMat);
-        }
+        }*/
 
 
     };
@@ -831,7 +833,7 @@ namespace Engine {
 
 
 
-    class BTCreateEntityByPrefab : public BTNode {
+    /*class BTCreateEntityByPrefab : public BTNode {
     public:
         BTCreateEntityByPrefab(const std::string& prefabName = "");
 
@@ -842,6 +844,6 @@ namespace Engine {
         void SetProperty(const std::string& name, const std::string& value) override;
 		
         std::string m_PrefabName;
-    };
+    };*/
 
 } // namespace Engine
