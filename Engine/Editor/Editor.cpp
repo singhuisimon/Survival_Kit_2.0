@@ -2743,12 +2743,14 @@ namespace Engine
 					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
 						settings->outputFormat = std::string(formatBuffer);
+						descriptorEditor.MarkModified();
 					}
 
 					float meshScale = settings->scale;
 					if (ImGui::DragFloat("Scale", &meshScale))
 					{
 						settings->scale = meshScale;
+						descriptorEditor.MarkModified();
 					}
 					
 				}
