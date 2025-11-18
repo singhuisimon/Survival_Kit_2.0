@@ -23,6 +23,7 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/Texture.h"
 #include "../Editor/EditorPropertyPanel.h"
+#include "../Editor/EditorHierarchyPanel.h"
 
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
@@ -2069,55 +2070,6 @@ namespace Engine
 		ImGui::End();
 	}
 
-	void Editor::DrawEntityRecursive(Entity entity, entt::registry& registry)
-	{
-		// Updated drawing entity groups (entities with sub-meshes) for M3
-		auto& tag = entity.GetComponent<TagComponent>();
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-		// Check for selection
-		if (m_SelectedEntity == entity) {
-			flags |= ImGuiTreeNodeFlags_Selected;
-		}
-
-		// Check if entity has children
-		bool hasChildren = false;
-		auto view = registry.view<TransformComponent>();
-		for (auto childHandle : view)
-		{
-			auto& childTransform = view.get<TransformComponent>(childHandle);
-			if (childTransform.Parent == (uint32_t)entity)
-			{
-				hasChildren = true;
-				break;
-			}
-		}
-
-		if (!hasChildren) {
-			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-		}
-
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
-
-		if (ImGui::IsItemClicked()) {
-			m_SelectedEntity = entity;
-		}
-
-		if (opened && hasChildren)
-		{
-			for (auto childHandle : view)
-			{
-				auto& childTransform = view.get<TransformComponent>(childHandle);
-				if (childTransform.Parent == (uint32_t)entity)
-				{
-					Entity child(childHandle, &registry);
-					DrawEntityRecursive(child, registry);
-				}
-			}
-			ImGui::TreePop();
-		}
-	}
-
 	void Editor::displayHierarchyPanel()
 	{
 		if (!hierachyWindow)
@@ -2163,92 +2115,13 @@ namespace Engine
 				for (auto entityHandle : view)
 				{
 					Entity entity(entityHandle, &m_Scene->GetRegistry());
-					auto& tag = entity.GetComponent<TagComponent>();
-					/*auto& transform = entity.GetComponent<TransformComponent>();
-
+					auto& transform = entity.GetComponent<TransformComponent>();
 					if (transform.Parent == u32_max)
 					{
-						DrawEntityRecursive(entity, m_Scene->GetRegistry());
-					}*/
-
-					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-					if (m_SelectedEntity == entity)
-					{
-						flags |= ImGuiTreeNodeFlags_Selected;
+						EditorHierarchyHelper::DrawEntityParentAndChildern(entity, m_Scene, m_SelectedEntity, m_PickedID, 
+							m_CurrentPrefab, m_TemporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
 					}
-
-					ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
-
-					if (ImGui::IsItemClicked())
-					{
-						m_SelectedEntity = entity;
-
-						uint32_t newID = (uint32_t)entity; // uses your operator uint32_t()
-
-						LOG_DEBUG("Clicked entity ID = ", newID, " | old m_PickedID = ", m_PickedID);
-
-						m_PickedID = newID;
-
-						LOG_DEBUG("Updated m_PickedID to ", m_PickedID);
-					}
-
-					// Right-click context menu
-					if (ImGui::BeginPopupContextItem())
-					{
-						// ==================== Selected Entity Section =======================
-						if (ImGui::MenuItem("Delete Entity"))
-						{
-							// If this entity has a parent, unparent it first
-							if (entity.HasComponent<TransformComponent>()) {
-								TransformSystem::UnParent(m_Scene, entity);
-							}
-
-							m_Scene->DestroyEntity(entity);
-							if (m_SelectedEntity == entity)
-							{
-								m_SelectedEntity = Entity();
-							}
-						}
-
-						// ===================== Prefab Section ==========================
-						if (ImGui::BeginMenu("Prefabs"))
-						{
-							if (ImGui::MenuItem("Create Prefab"))
-							{
-								if (m_SelectedEntity)
-								{
-									std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-									auto prefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-									if (!prefab)
-									{
-										return;
-									}
-
-									auto prefabFolder = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
-
-									if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
-									{
-										PrefabRegistry::Get().RegisterPrefab(prefab);
-										m_CurrentPrefab = prefab.get();
-										currPrefabPath = prefabFolder;
-										m_TemporaryPrefabPaths.insert(prefabFolder);
-
-									}
-								}
-							}
-							if (ImGui::MenuItem("Replace Prefab"))
-							{
-								replacePrefabPending = true;
-								selectedPrefabPath = "";
-							}
-
-							ImGui::EndMenu(); // end prefab menu
-						}
-						
-						ImGui::EndPopup(); // end of the pop up context item
-
-					}
+					
 				}
 			}
 
