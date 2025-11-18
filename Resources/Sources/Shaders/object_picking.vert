@@ -10,15 +10,14 @@
  */
 #version 420 core
 
-layout(location = 0) in vec3 aPos;     // match your mesh layout
-layout(location = 1) in vec3 aNormal;  // unused
-layout(location = 2) in vec2 aUV;      // unused
+layout(location=0) in vec3 VertexPosition;
 
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
+uniform mat4 u_World;          // Model to world Matrix
+uniform mat4 u_ViewProjection; // View * Projection Matrix (This is 2 matrices concaneted)
 
 void main()
 {
-    gl_Position = P * V * M * vec4(aPos, 1.0);
+    // Transform positions and normals into world position for lighting calculation
+    vec3 Position = vec3(u_World * vec4(VertexPosition, 1.0));
+    gl_Position = u_ViewProjection * vec4(Position, 1.0);
 }

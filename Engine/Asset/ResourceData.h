@@ -71,20 +71,23 @@ namespace Engine {
         std::string shaderName; // Tells the material what shader to use
 
         // Texture Maps
-        xresource::instance_guid diffuseMap;
+		xresource::instance_guid baseMap;           // Albedo
 		xresource::instance_guid normalMap;         // For normal mapping
-		xresource::instance_guid specularMap;
-        xresource::instance_guid emissionMap;
-		xresource::instance_guid occlusionMap;      // Optional for ambient occlusion
+		xresource::instance_guid metallicMap;       
+        xresource::instance_guid roughnessMap;     
+        xresource::instance_guid emissionMap;       // If emission is enabled
+		xresource::instance_guid occlusionMap;      // Ambient Occlusion map
 
 		// Color properties
-        std::array<float, 4> diffuseColor =  { 1.0f, 1.0f, 1.0f, 1.0f };   // White, fully opaque
-        std::array<float, 3> specularColor = { 1.0f, 1.0f, 1.0f };        // White highlights
-        std::array<float, 3> emissionColor = { 0.0f, 0.0f, 0.0f };        // White (no emission)
+        std::array<float, 3> baseColor    =  { 1.0f, 1.0f, 1.0f };        // White, fully opaque
+        std::array<float, 3> emissionColor = { 0.0f, 0.0f, 0.0f };        // Black (no emission)
 
-        float                    shininess = 32.f;         // Specular shininess factor
+		float                    metallic = 0.f;
+        float                    roughness = 0.f;
         float                    emissionStrength = 1.f;  
 		float                    alphaThreshold   = 0.5f;	  // For alpha testing
+        float                    opacity          = 1.0f;
+		float                    ambientOcclusion = 0.5f;      // Ambient occlusion intensity
 
         // UV transforms
 		std::array<float, 2>     tiling = {1.f, 1.f};        // UV scale
