@@ -824,7 +824,14 @@ namespace Engine {
 			glm::vec3 direction;
 			int spawnPointCount;
 		};
-
+        /*struct WallInfo {
+            std::string name;
+            glm::vec3 position;
+            glm::quat rotation;
+            glm::vec3 scale;
+            glm::vec3 direction;
+            int spawnPointCount;
+        };*/
         
 
         std::unordered_map<std::string, WallInfo> m_Walls;

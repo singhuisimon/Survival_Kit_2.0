@@ -2074,7 +2074,44 @@ namespace Engine {
     void BTSpawnMultipleTypes::OnEnter(BTContext& context) {
         m_EnabledWalls.clear();
         m_totalSpawned = 0;
-        LOG_TRACE("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII:SIZE IS: ", m_EnabledWalls.size());
+
+        auto& registry = context.Scene->GetRegistry();
+        auto view = registry.view<TagComponent>();
+        for (auto entityHandle : view) {
+
+            Entity entity(entityHandle, &registry);
+
+            //TODO:: FIX THE ROTATION SPAWNING - I JUST DO IT THIS WAY AS I DON'T THINK THERE IS ANYTHING ELSE I SHOULD BE DOING FOR THIS. [SINCE IT'S INITIAL SPAWN]
+            if (entity.HasComponent<TagComponent>() && entity.HasComponent<TransformComponent>()) {
+                auto& tag = entity.GetComponent<TagComponent>();
+                auto& transform = entity.GetComponent<TransformComponent>();
+                glm::quat rotation;
+
+                if (m_WallA && tag.Tag == "Wall_A") {
+                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 90.0f, 0.0f)));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(0.0f, 0.0f, -1.0f), m_SpawnPointCountA });
+                }
+                else if (m_WallB && tag.Tag == "Wall_B") {
+                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 180.0f, 0.0f)));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(-1.0f,0.0f,0.0f), m_SpawnPointCountB });
+                }
+                else if (m_WallC && tag.Tag == "Wall_C") {
+                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 90.0f, 0.0f)));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(0.0f, 0.0f, -1.0f), m_SpawnPointCountC });
+                }
+                else if (m_WallD && tag.Tag == "Wall_D") {
+                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 180.0f, 0.0f)));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(-1.0f,0.0f,0.0f), m_SpawnPointCountD });
+                }
+                else if (m_WallE && tag.Tag == "Wall_E") {
+                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f)));
+                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(1.0f, 0.0f, 0.0f), m_SpawnPointCountE });
+                }
+
+            }
+        }
+        LOG_INFO("BTSpawnMultipleTypes: Found ", m_EnabledWalls.size(), " enabled walls");
+        //LOG_TRACE(": ", m_EnabledWalls.size());
 	}
 
     BTStatus BTSpawnMultipleTypes::Execute(BTContext& context) {
@@ -2087,50 +2124,50 @@ namespace Engine {
 
 		int totalcount = m_LoveletterCount + m_TrojanCount + m_AdwareCount + m_WormsCount + m_BotnetCount;
 
-        auto& registry = context.Scene->GetRegistry();
-        auto view = registry.view<TagComponent>();
-        for (auto entityHandle : view) {
+   //     auto& registry = context.Scene->GetRegistry();
+   //     auto view = registry.view<TagComponent>();
+   //     for (auto entityHandle : view) {
 
-            Entity entity(entityHandle, &registry);
+   //         Entity entity(entityHandle, &registry);
 
-			//TODO:: FIX THE ROTATION SPAWNING - I JUST DO IT THIS WAY AS I DON'T THINK THERE IS ANYTHING ELSE I SHOULD BE DOING FOR THIS. [SINCE IT'S INITIAL SPAWN]
-            if (entity.HasComponent<TagComponent>() && entity.HasComponent<TransformComponent>()) {
-                auto& tag = entity.GetComponent<TagComponent>();
-                auto& transform = entity.GetComponent<TransformComponent>();
-				glm::quat rotation;
+			////TODO:: FIX THE ROTATION SPAWNING - I JUST DO IT THIS WAY AS I DON'T THINK THERE IS ANYTHING ELSE I SHOULD BE DOING FOR THIS. [SINCE IT'S INITIAL SPAWN]
+   //         if (entity.HasComponent<TagComponent>() && entity.HasComponent<TransformComponent>()) {
+   //             auto& tag = entity.GetComponent<TagComponent>();
+   //             auto& transform = entity.GetComponent<TransformComponent>();
+			//	glm::quat rotation;
 
-                if (m_WallA && tag.Tag == "Wall_A") {
-                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 90.0f, 0.0f)));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(0.0f, 0.0f, -1.0f), m_SpawnPointCountA});
-                }
-                else if (m_WallB && tag.Tag == "Wall_B") {
-                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 180.0f, 0.0f)));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(-1.0f,0.0f,0.0f), m_SpawnPointCountB});
-                }
-                else if (m_WallC && tag.Tag == "Wall_C") {
-                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 90.0f, 0.0f)));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(0.0f, 0.0f, -1.0f), m_SpawnPointCountC});
-                }
-                else if (m_WallD && tag.Tag == "Wall_D") {
-                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 180.0f, 0.0f)));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(-1.0f,0.0f,0.0f), m_SpawnPointCountD});
-                }
-                else if (m_WallE && tag.Tag == "Wall_E") {
-                    rotation = glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f)));
-                    m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(1.0f, 0.0f, 0.0f), m_SpawnPointCountE});
-                }
+   //             if (m_WallA && tag.Tag == "Wall_A") {
+   //                 rotation = glm::quat(glm::radians(glm::vec3(0.0f, 90.0f, 0.0f)));
+   //                 m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(0.0f, 0.0f, -1.0f), m_SpawnPointCountA});
+   //             }
+   //             else if (m_WallB && tag.Tag == "Wall_B") {
+   //                 rotation = glm::quat(glm::radians(glm::vec3(0.0f, 180.0f, 0.0f)));
+   //                 m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(-1.0f,0.0f,0.0f), m_SpawnPointCountB});
+   //             }
+   //             else if (m_WallC && tag.Tag == "Wall_C") {
+   //                 rotation = glm::quat(glm::radians(glm::vec3(0.0f, 90.0f, 0.0f)));
+   //                 m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(0.0f, 0.0f, -1.0f), m_SpawnPointCountC});
+   //             }
+   //             else if (m_WallD && tag.Tag == "Wall_D") {
+   //                 rotation = glm::quat(glm::radians(glm::vec3(0.0f, 180.0f, 0.0f)));
+   //                 m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(-1.0f,0.0f,0.0f), m_SpawnPointCountD});
+   //             }
+   //             else if (m_WallE && tag.Tag == "Wall_E") {
+   //                 rotation = glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f)));
+   //                 m_EnabledWalls.push_back({ tag.Tag, transform.Position, rotation, transform.Scale, glm::vec3(1.0f, 0.0f, 0.0f), m_SpawnPointCountE});
+   //             }
 
-            }
-        }
+   //         }
+   //     }
 
         //walls should be enable if boss is disabled 
         //TODO::ADD IN CHECK TO SEE IF ITS PREP STAGE IF NEEDED IN FUTURE
         if (m_EnabledWalls.empty() && !m_Boss) {
-            //LOG_WARNING("BTSpawnMultipleTypes: No walls enabled for spawning despite not boss stage");
+            LOG_WARNING("BTSpawnMultipleTypes: No walls enabled for spawning despite not boss stage");
             return BTStatus::Failure;
         }
 
-        LOG_INFO("BTSpawnMultipleTypes: Found ", m_EnabledWalls.size(), " enabled walls");
+        //LOG_INFO("BTSpawnMultipleTypes: Found ", m_EnabledWalls.size(), " enabled walls");
 
         //TODO:: TAKE NOTE ENTITY CAN BE SEEN SPAWNING AT 0,0,0 BEFORE TELEPORTING TO THEIR RESPECTIVE POSITIONS
 		// NEED TO FIX THIS ISSUE (LIKELIHOOD EXPOSE THE FACT ONCE YOU CREATE THE ENTITY, THERE IS AN OPTION TO EXCLUDE TRANSFORM INITIALLY?)
