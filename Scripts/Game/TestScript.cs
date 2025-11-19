@@ -41,7 +41,10 @@ namespace Game
             frameCount++;
 
             // -------- Rigidbody WASD movement for Player (no System.Math) --------
-
+            if (frameCount % 60 == 0)
+            {
+                Engine.InternalCalls.Log("Health: " + health + " | Speed: " + speed + " | isActive: " + isActive + " | characterName: " + characterName);
+            }
             Engine.Vector3 inputDir = default;
 
             // Forward / backward (Z)

@@ -1884,6 +1884,20 @@ namespace Engine
 							{
 								ImGui::TextDisabled("(No script instance)");
 							}
+
+
+
+							if (ImGui::Button("Save Script Fields To JSON")) {
+								if (scriptComp.ScriptInstance)
+									SerializeScriptToDiskRapidJSON((MonoObject*)scriptComp.ScriptInstance, "SavedScriptFields.json");
+							}
+
+							// Similarly, add a load button to test deserialization:
+							ImGui::SameLine();
+							if (ImGui::Button("Load Script Fields From JSON")) {
+								if (scriptComp.ScriptInstance)
+									DeserializeScriptFromDiskRapidJSON((MonoObject*)scriptComp.ScriptInstance, "SavedScriptFields.json");
+							}
 							// ===== END NEW SERIALIZED FIELDS =====
 						}
 					}

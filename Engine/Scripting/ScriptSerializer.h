@@ -3,9 +3,11 @@
 
 #include <mono/metadata/class.h>
 #include <mono/metadata/object.h>
-
-#include <vector>
 #include <string>
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <vector>
 
 // ========================================
 // SerializedFieldInfo Structure
@@ -63,3 +65,9 @@ void SetFieldValue(MonoObject* instance, const SerializedFieldInfo& fieldInfo, c
  * Render serialized fields in ImGui editor
  */
 void RenderSerializedFieldsInImGui(MonoObject* scriptInstance);
+
+void SerializeScriptFieldsToRapidJSON(MonoObject* instance, rapidjson::Value& obj, rapidjson::Document::AllocatorType& allocator);
+void SerializeScriptToDiskRapidJSON(MonoObject* instance, const std::string& filePath);
+
+void DeserializeScriptFieldsFromRapidJSON(MonoObject* instance, const rapidjson::Value& obj);
+void DeserializeScriptFromDiskRapidJSON(MonoObject* instance, const std::string& filePath);

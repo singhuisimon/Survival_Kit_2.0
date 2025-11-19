@@ -14,7 +14,8 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/LightComponent.h"
 #include "../Prefab/BehaviourTreePrefab.h"
-
+#include "../Scripting/ScriptSerializer.h"
+#include "../Scripting/MonoScriptEngine.h"
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
 
@@ -372,6 +373,17 @@ namespace Engine {
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("ScriptClassName",
                     Value(script.ScriptClassName.c_str(), allocator), allocator);
+
+                if (script.ScriptInstance)
+                {
+                    rapidjson::Value fieldsObj(kObjectType);
+                    SerializeScriptFieldsToRapidJSON((MonoObject*)script.ScriptInstance, fieldsObj, allocator);
+                    propertiesObj.AddMember("Fields", fieldsObj, allocator);
+                }
+                // --- END BLOCK ---
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -776,10 +788,18 @@ namespace Engine {
                             emitter.Active = properties["Active"].GetBool();
                     }
                     else if (componentType == "ScriptComponent") {
-                        auto& script = entity.AddComponent<ScriptComponent>();
-
-                        if (properties.HasMember("ScriptClassName")) {
+                        auto script = entity.AddComponent<ScriptComponent>();
+                        if (properties.HasMember("ScriptClassName"))
                             script.ScriptClassName = properties["ScriptClassName"].GetString();
+
+                        // Your script system must actually create/instantiate the MonoObject here
+                        script.ScriptInstance = MonoScriptEngine::GetInstance().CreateScriptInstance(script.ScriptClassName);
+
+                        // Now, immediately restore field values
+                        if (properties.HasMember("Fields") && script.ScriptInstance)
+                        {
+                            const rapidjson::Value& fieldsObj = properties["Fields"];
+                            DeserializeScriptFieldsFromRapidJSON((MonoObject*)script.ScriptInstance, fieldsObj);
                         }
 
                     } else if (componentType == "LightComponent") {

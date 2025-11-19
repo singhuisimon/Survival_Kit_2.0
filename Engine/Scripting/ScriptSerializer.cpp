@@ -5,6 +5,8 @@
 #include <mono/metadata/attrdefs.h>
 #include <imgui.h>
 
+#include <fstream>
+#include <sstream>
 // ========================================
 // Get all fields marked with [SerializeField]
 // ========================================
@@ -259,4 +261,108 @@ void RenderSerializedFieldsInImGui(MonoObject* scriptInstance)
             SetFieldValue(scriptInstance, fieldInfo, value);
         }
     }
+}
+
+
+void SerializeScriptFieldsToRapidJSON(MonoObject* instance, rapidjson::Value& obj, rapidjson::Document::AllocatorType& allocator)
+{
+    auto fields = GetSerializedFields(instance);
+    for (const auto& fieldInfo : fields)
+    {
+        FieldValue value = GetFieldValue(instance, fieldInfo);
+        const std::string& name = fieldInfo.name;
+        switch (value.type)
+        {
+        case SerializedFieldInfo::FieldType::Int:
+            obj.AddMember(
+                rapidjson::Value(name.c_str(), allocator),              // Key
+                rapidjson::Value(value.intValue),                       // **Value converted to RapidJSON Value**
+                allocator);
+            break;
+        case SerializedFieldInfo::FieldType::Float:
+            obj.AddMember(rapidjson::Value(name.c_str(), allocator), rapidjson::Value(value.floatValue), allocator);
+            break;
+        case SerializedFieldInfo::FieldType::Bool:
+            obj.AddMember(rapidjson::Value(name.c_str(), allocator), rapidjson::Value(value.boolValue), allocator);
+            break;
+        case SerializedFieldInfo::FieldType::String:
+            obj.AddMember(
+                rapidjson::Value(name.c_str(), allocator),                            // key
+                rapidjson::Value(value.stringValue.c_str(), allocator),               // value as rapidjson::Value
+                allocator);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void SerializeScriptToDiskRapidJSON(MonoObject* instance, const std::string& filePath)
+{
+    rapidjson::Document doc;
+    doc.SetObject();
+    SerializeScriptFieldsToRapidJSON(instance, doc, doc.GetAllocator());
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);
+
+    std::ofstream outFile(filePath);
+    outFile << buffer.GetString();
+    outFile.close();
+}
+
+// ----------- DESERIALIZE FROM RAPIDJSON -----------
+void DeserializeScriptFieldsFromRapidJSON(MonoObject* instance, const rapidjson::Value& obj)
+{
+    auto fields = GetSerializedFields(instance);
+    for (const auto& fieldInfo : fields)
+    {
+        if (!obj.HasMember(fieldInfo.name.c_str()))
+            continue;
+
+        FieldValue value = GetFieldValue(instance, fieldInfo);
+
+        const rapidjson::Value& fieldValue = obj[fieldInfo.name.c_str()];
+
+        switch (value.type)
+        {
+        case SerializedFieldInfo::FieldType::Int:
+            if (fieldValue.IsInt())
+                value.intValue = fieldValue.GetInt();
+            break;
+        case SerializedFieldInfo::FieldType::Float:
+            if (fieldValue.IsNumber())
+                value.floatValue = static_cast<float>(fieldValue.GetDouble());
+            break;
+        case SerializedFieldInfo::FieldType::Bool:
+            if (fieldValue.IsBool())
+                value.boolValue = fieldValue.GetBool();
+            break;
+        case SerializedFieldInfo::FieldType::String:
+            if (fieldValue.IsString())
+                value.stringValue = fieldValue.GetString();
+            break;
+        default:
+            break;
+        }
+        SetFieldValue(instance, fieldInfo, value);
+    }
+}
+
+void DeserializeScriptFromDiskRapidJSON(MonoObject* instance, const std::string& filePath)
+{
+    std::ifstream inFile(filePath);
+    if (!inFile.is_open())
+        return;
+    std::stringstream buffer;
+    buffer << inFile.rdbuf();
+
+    rapidjson::Document doc;
+    doc.Parse(buffer.str().c_str());
+
+    if (!doc.IsObject())
+        return;
+
+    DeserializeScriptFieldsFromRapidJSON(instance, doc);
 }
