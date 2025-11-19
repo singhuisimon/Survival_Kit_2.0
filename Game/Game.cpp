@@ -545,6 +545,13 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Get input reference
     auto& input = GetInput();
+
+    // Add this somewhere in your input handling:
+    if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
+        m_EditorEnable = !m_EditorEnable;
+        LOG_INFO("Editor toggled: ", m_EditorEnable);
+    }
+
     Engine::ScriptReloader::GetInstance().Update();
 
     // Update scene (this will call all systems in priority order)
@@ -1014,7 +1021,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
-    m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+
+    if (m_EditorEnable) {
+        m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+    }
+
     m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
     m_TracyProfiler->OnUpdate();
 }
