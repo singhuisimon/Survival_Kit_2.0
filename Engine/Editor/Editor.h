@@ -301,16 +301,6 @@ namespace Engine
 
 		/**************************************************************************
 		* @brief
-		* 	Recursively draws an entity and all its children in an ImGui tree view.
-		* @param entity
-		*	The entity to draw.
-		* @param registry
-		*	The EnTT registry containing all entities and components.
-		**************************************************************************/
-		void DrawEntityRecursive(Entity entity, entt::registry& registry);
-
-		/**************************************************************************
-		* @brief
 		* 	Activate ImGuizmo to manipulate the selected entity's transformation,
 		*	rotate and scale in editor viewport. 
 		* @param entity
