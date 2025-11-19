@@ -652,6 +652,10 @@ namespace Engine {
 				prog.setUniform("material_.roughness", material_resource->roughness);
 				prog.setUniform("material_.ao", material_resource->ambientOcclusion);
 				prog.setUniform("material_.opacity", material_resource->opacity);
+				prog.setUniform("material_.emissionColor", glm::vec3(material_resource->emissionColor[0],
+																			material_resource->emissionColor[1],
+																			material_resource->emissionColor[2]));
+				prog.setUniform("material_.emissionStrength", material_resource->emissionStrength);
 
 				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
 				 	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));

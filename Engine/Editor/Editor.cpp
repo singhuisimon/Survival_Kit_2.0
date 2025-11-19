@@ -785,7 +785,7 @@ namespace Engine
 								}
 
 								// Emission Strength
-								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 10.0f, "%.2f"))
+								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
 								{
 									material->emissionStrength = std::max(0.0f, material->emissionStrength);
 								}
