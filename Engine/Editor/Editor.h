@@ -90,7 +90,8 @@ namespace Engine
 		std::string currFileName{}; // track file name
 		Prefab* m_CurrentPrefab = nullptr;
 		bool createEttFromPrfab = false;
-	
+		bool m_ShouldApplyOverrides = false;
+
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE; // for ImGuizmo 
 		bool m_PreviousEditorCamToggle = false; // track if is in camera mode
 	
@@ -348,6 +349,8 @@ namespace Engine
 		*	The size of the button used for removing the component.
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
+
+		void RevertSelectedEntityToPrefab();
 	};
 
 

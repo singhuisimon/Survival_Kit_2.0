@@ -165,7 +165,7 @@ namespace Engine
 
 									// Update the registry with the new prefab
 									PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-									m_TemporaryPrefabPaths.erase(currPrefabPath);
+									//m_TemporaryPrefabPaths.erase(currPrefabPath);
 								}
 							}
 
@@ -330,7 +330,37 @@ namespace Engine
 				}
 				
 				ImGui::Separator();
+				
+				// =========================== Display PrefabComponent ==============================
+				if (m_SelectedEntity.HasComponent<PrefabComponent>())
+				{
 
+					if (ImGui::CollapsingHeader("Prefab", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						ImGui::Text("Prefab GUID: %llu", prefabComp.PrefabGUID.m_Value);
+
+						if (!isPrefabEditor)
+						{
+							if (ImGui::Button("Revert to Prefab"))
+							{
+								RevertSelectedEntityToPrefab();
+								//PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Apply Overrides"))
+							{
+								m_ShouldApplyOverrides = true;
+
+							}
+
+						}
+					
+						
+					}
+				}
+			
 				// =========================== Display TransformComponent ===========================
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
 				{
@@ -1755,6 +1785,9 @@ namespace Engine
 					if (openLightComp)
 					{
 						auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
+						//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+				
+
 						ImGui::Checkbox("Enabled", &lightComp.Enabled);
 
 						// --- Light Type Dropdown ---
@@ -1771,6 +1804,8 @@ namespace Engine
 						if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
 						{
 							lightComp.SetColorLinear(color); // uses setter
+							std::string colorStr = std::to_string(color.r) + "," + std::to_string(color.g) + "," + std::to_string(color.b);
+							//prefabComp.AddPropertyOverride(prefabComp.ComponentGUID, "Color", colorStr);
 						}
 
 						
@@ -1779,6 +1814,7 @@ namespace Engine
 						if (ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, 100.0f, "%.2f"))
 						{
 							lightComp.SetIntensity(intensity); //  uses setter
+							//prefabComp.AddPropertyOverride(prefabComp.ComponentGUID, "Intensity", std::to_string(intensity));
 						}
 
 
@@ -2026,6 +2062,7 @@ namespace Engine
 						if (!hasLightComponent)
 						{
 							m_SelectedEntity.AddComponent<LightComponent>();
+
 						}
 					}
 					if (ImGui::IsItemHovered())
@@ -2067,6 +2104,34 @@ namespace Engine
 			}
 		}
 		ImGui::End();
+		// --------------------------------- Prefab testing ------------------------------------
+		if (m_ShouldApplyOverrides)
+		{
+			if (m_SelectedEntity && m_SelectedEntity.HasComponent<Engine::PrefabComponent>())
+			{
+				auto& prefabComp = m_SelectedEntity.GetComponent<Engine::PrefabComponent>();
+
+				auto prefab = Engine::PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
+				
+				if (prefab)
+				{
+					// Full overwrite of prefab from the current entity
+					std::string updatedJson =
+						Engine::PrefabSerializer::SerializeEntity(m_SelectedEntity, Entity{});
+
+					prefab->SetEntityData(updatedJson);
+					Engine::PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+
+					// Reset prefab modifications
+					prefabComp.ClearModifications();
+
+					LOG_INFO("Applied entity state to prefab file: ", prefab->GetSourcePath());
+					std::cout << ">>>>>>>>prefab->GetSourcePath():" << prefab->GetSourcePath() << "\n";
+				}
+			}
+
+			m_ShouldApplyOverrides = false;
+		}
 	}
 
 	void Editor::DrawEntityRecursive(Entity entity, entt::registry& registry)
@@ -2232,9 +2297,10 @@ namespace Engine
 										PrefabRegistry::Get().RegisterPrefab(prefab);
 										m_CurrentPrefab = prefab.get();
 										currPrefabPath = prefabFolder;
-										m_TemporaryPrefabPaths.insert(prefabFolder);
+										//m_TemporaryPrefabPaths.insert(prefabFolder);
 
 									}
+									std::cout << ">>>>>>m_CurrentPrefab: " << prefab.get() << "\n";
 								}
 							}
 							if (ImGui::MenuItem("Replace Prefab"))
@@ -2288,7 +2354,7 @@ namespace Engine
 						m_Scene,
 						prefab->GetGUID()
 					);
-
+					PrefabInstantiator::ApplyOverrides(newEntity, m_Scene);
 					m_SelectedEntity = newEntity;
 				}
 			}
@@ -2330,7 +2396,10 @@ namespace Engine
 						m_Scene,
 						prefab->GetGUID()
 					);
-					
+					// Apply prefab instance overrides to new entity
+					PrefabInstantiator::ApplyOverrides(newEntity, m_Scene);
+
+					std::cout << ">>>>>>m_CurrentPrefab: " << prefab.get() << "\n";
 					m_SelectedEntity = newEntity;
 					ImGui::CloseCurrentPopup();
 					break;
@@ -2618,7 +2687,7 @@ namespace Engine
 										if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
 										{
 											PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-											prefabComp.ClearModifications(); // Reset overrides 
+											//prefabComp.ClearModifications(); // Reset overrides 
 											LOG_INFO("Prefab updated: {}", prefabPath);
 											isPrefabEditor = false;
 										}
@@ -3816,4 +3885,46 @@ namespace Engine
 
 		}
 	}
+
+	void Editor::RevertSelectedEntityToPrefab()
+	{
+		if (!m_SelectedEntity ||
+			!m_SelectedEntity.HasComponent<PrefabComponent>())
+			return;
+
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+		// Load prefab data
+		auto prefab = PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
+		//LOG_INFO("Prefab lookup result: %p", prefab.get());
+		if (!prefab)
+		{
+			LOG_ERROR("Revert failed: Prefab not found!");
+			return;
+		}
+	
+		//std::cout << Get().RegisterPrefab(prefab)
+
+
+		// Remove the modified instance
+		Entity old = m_SelectedEntity;
+		m_Scene->DestroyEntity(old);
+
+		// Create fresh prefab instance — no overrides applied
+		Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+			m_Scene,
+			prefab->GetGUID()
+		);
+
+
+		// Clear modifications on the new PrefabComponent (optional safety)
+		if (newEntity.HasComponent<PrefabComponent>())
+			newEntity.GetComponent<PrefabComponent>().ClearModifications();
+
+		// Select it in the editor
+		m_SelectedEntity = newEntity;
+
+		LOG_INFO("Prefab instance reverted to original prefab state.");
+	}
+
 } // end of namespace Engine

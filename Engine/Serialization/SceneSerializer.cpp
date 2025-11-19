@@ -14,6 +14,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/LightComponent.h"
 #include "../Prefab/BehaviourTreePrefab.h"
+#include "../Component/PrefabComponent.h"
 
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
@@ -107,7 +108,33 @@ namespace Engine {
 
                 componentsArray.PushBack(componentObj, allocator);
             }
+            if (entity.HasComponent<PrefabComponent>())
+            {
+                LOG_TRACE("  - Serializing PrefabComponent");
+                auto& prefab = entity.GetComponent<PrefabComponent>();
 
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "PrefabComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+
+                // Prefab GUID
+                propertiesObj.AddMember(
+                    "PrefabGUID",
+                    Value(std::to_string(prefab.PrefabGUID.m_Value).c_str(), allocator),
+                    allocator
+                );
+
+                // Component GUID
+                propertiesObj.AddMember(
+                    "ComponentGUID",
+                    Value(std::to_string(prefab.ComponentGUID.m_Value).c_str(), allocator),
+                    allocator
+                );
+
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
             // Serialize TransformComponent
             if (entity.HasComponent<TransformComponent>()) {
                 LOG_TRACE("  - Serializing TransformComponent");
@@ -514,6 +541,24 @@ namespace Engine {
                     if (componentType == "TagComponent") {
                         auto& tag = entity.AddComponent<TagComponent>();
                         tag.Tag = properties["Tag"].GetString();
+                    }
+                    else if (componentType == "PrefabComponent")
+                    {
+                        auto& prefabComp = entity.AddComponent<PrefabComponent>();
+
+                        // --- Prefab GUID ---
+                        if (properties.HasMember("PrefabGUID"))
+                            prefabComp.PrefabGUID = xresource::instance_guid(
+                                std::stoull(properties["PrefabGUID"].GetString())
+                            );
+
+                        // --- PrefabComponent's own GUID ---
+                        if (properties.HasMember("ComponentGUID"))
+                            prefabComp.ComponentGUID = xresource::instance_guid(
+                                std::stoull(properties["ComponentGUID"].GetString())
+                            );
+
+                       
                     }
                     else if (componentType == "TransformComponent") {
                         auto& transform = entity.AddComponent<TransformComponent>();

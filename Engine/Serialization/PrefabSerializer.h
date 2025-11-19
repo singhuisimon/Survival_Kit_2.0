@@ -77,7 +77,6 @@ namespace Engine {
          */
         static std::shared_ptr<Prefab> DeserializePrefabFromString(const std::string& jsonString);
 
-    private:
         /**
          * @brief Serialize a single entity to JSON string
          * @param entity Entity to serialize
@@ -85,6 +84,9 @@ namespace Engine {
          * @return JSON string representation of the entity
          */
         static std::string SerializeEntity(Entity entity, Entity dummyEntity);
+
+    private:
+        
 
         /**
          * @brief Serialize multiple entities to JSON string (for scene prefabs)
