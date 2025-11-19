@@ -22,7 +22,9 @@
 #include "../Asset/ResourceManager.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Texture.h"
+#include "../Scripting/ScriptSerializer.h"
 #include "../Editor/EditorPropertyPanel.h"
+#include "../Editor/EditorHierarchyPanel.h"
 
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
@@ -783,7 +785,7 @@ namespace Engine
 								}
 
 								// Emission Strength
-								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 10.0f, "%.2f"))
+								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
 								{
 									material->emissionStrength = std::max(0.0f, material->emissionStrength);
 								}
@@ -1637,28 +1639,22 @@ namespace Engine
 					ImGui::Separator();
 					ImGui::Columns(2, nullptr, false);
 					ImGui::SetColumnWidth(0, 200.0f);
-					
+
 					bool openScriptComp = ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen);
 					bool removeScriptComp = false;
 
-
 					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
-					std::string scriptPath = getRepository() + "\\Scripts\\Game";
+					std::string scriptPath = getRepository();
 					auto scriptFiles = getAssetsInFolder(scriptPath);
-					
-					ImGui::NextColumn();
 
-					if (ImGui::Button("...###ScriptBtn", dotButtonSize))
-					{
+					ImGui::NextColumn();
+					if (ImGui::Button("...##ScriptBtn", dotButtonSize))
 						ImGui::OpenPopup("ScriptPopUp");
-					}
+
 					if (ImGui::BeginPopup("ScriptPopUp"))
 					{
 						if (ImGui::MenuItem("Remove Component"))
-						{
 							removeScriptComp = true;
-							//return;
-						}
 						ImGui::EndPopup();
 					}
 
@@ -1671,19 +1667,17 @@ namespace Engine
 
 						if (!scriptFiles.empty())
 						{
-							
 							if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
 							{
 								for (const auto& asset : scriptFiles)
 								{
 									std::string className = asset.name;
 									if (className.ends_with(".cs"))
-									{
 										className = className.substr(0, className.size() - 3); // remove extension
-									}			
-									std::string selectedClassName = "Game." + className;
 
-									bool isSelected = (scriptComp.ScriptClassName == selectedClassName);
+									std::string selectedClassName = "Game." + className;
+									bool isSelected = scriptComp.ScriptClassName == selectedClassName;
+
 									if (ImGui::Selectable(className.c_str(), isSelected))
 									{
 										// Destroy previous script instance if exists
@@ -1696,33 +1690,57 @@ namespace Engine
 
 										// Assign the new script class
 										scriptComp.ScriptClassName = selectedClassName;
-
 										scriptComp.ScriptInstance = MonoScriptEngine::GetInstance().CreateScriptInstance(scriptComp.ScriptClassName);
 
 										if (scriptComp.ScriptInstance)
 										{
-											MonoScriptEngine::GetInstance().SetFieldValue((MonoObject*)scriptComp.ScriptInstance, "EntityID", &m_SelectedEntity); // Or entity ID
+											//MonoScriptEngine::GetInstance().SetFieldValue((MonoObject*)scriptComp.ScriptInstance, "EntityID", m_SelectedEntity);
 											MonoScriptEngine::GetInstance().CallMethod((MonoObject*)scriptComp.ScriptInstance, "OnStart");
 											scriptComp.Started = true;
 										}
 									}
 
 									if (isSelected)
-									{
 										ImGui::SetItemDefaultFocus();
-									}
 								}
 								ImGui::EndCombo();
 							}
+
+							// ===== NEW: DISPLAY SERIALIZED FIELDS =====
+							ImGui::Separator();
+							ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), "Serialized Fields:");
+							ImGui::Separator();
+
+							// THIS IS THE KEY LINE - renders all [SerializeField] fields
+							if (scriptComp.ScriptInstance)
+							{
+								RenderSerializedFieldsInImGui((MonoObject*)scriptComp.ScriptInstance);
+							}
+							else
+							{
+								ImGui::TextDisabled("(No script instance)");
+							}
+
+
+
+							if (ImGui::Button("Save Script Fields To JSON")) {
+								if (scriptComp.ScriptInstance)
+									SerializeScriptToDiskRapidJSON((MonoObject*)scriptComp.ScriptInstance, "SavedScriptFields.json");
+							}
+
+							// Similarly, add a load button to test deserialization:
+							ImGui::SameLine();
+							if (ImGui::Button("Load Script Fields From JSON")) {
+								if (scriptComp.ScriptInstance)
+									DeserializeScriptFromDiskRapidJSON((MonoObject*)scriptComp.ScriptInstance, "SavedScriptFields.json");
+							}
+							// ===== END NEW SERIALIZED FIELDS =====
 						}
-
 					}
-					// ----------------------------- Remove Script Comp --------------------------------------
+
+					// Remove Script Component
 					if (removeScriptComp)
-					{
 						m_SelectedEntity.RemoveComponent<ScriptComponent>();
-					}
-
 				}
 				// ================================ Display Light Component ======================================
 				if (m_SelectedEntity.HasComponent<LightComponent>())
@@ -2069,55 +2087,6 @@ namespace Engine
 		ImGui::End();
 	}
 
-	void Editor::DrawEntityRecursive(Entity entity, entt::registry& registry)
-	{
-		// Updated drawing entity groups (entities with sub-meshes) for M3
-		auto& tag = entity.GetComponent<TagComponent>();
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-		// Check for selection
-		if (m_SelectedEntity == entity) {
-			flags |= ImGuiTreeNodeFlags_Selected;
-		}
-
-		// Check if entity has children
-		bool hasChildren = false;
-		auto view = registry.view<TransformComponent>();
-		for (auto childHandle : view)
-		{
-			auto& childTransform = view.get<TransformComponent>(childHandle);
-			if (childTransform.Parent == (uint32_t)entity)
-			{
-				hasChildren = true;
-				break;
-			}
-		}
-
-		if (!hasChildren) {
-			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-		}
-
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
-
-		if (ImGui::IsItemClicked()) {
-			m_SelectedEntity = entity;
-		}
-
-		if (opened && hasChildren)
-		{
-			for (auto childHandle : view)
-			{
-				auto& childTransform = view.get<TransformComponent>(childHandle);
-				if (childTransform.Parent == (uint32_t)entity)
-				{
-					Entity child(childHandle, &registry);
-					DrawEntityRecursive(child, registry);
-				}
-			}
-			ImGui::TreePop();
-		}
-	}
-
 	void Editor::displayHierarchyPanel()
 	{
 		if (!hierachyWindow)
@@ -2163,93 +2132,117 @@ namespace Engine
 				for (auto entityHandle : view)
 				{
 					Entity entity(entityHandle, &m_Scene->GetRegistry());
-					auto& tag = entity.GetComponent<TagComponent>();
-					/*auto& transform = entity.GetComponent<TransformComponent>();
-
+					auto& transform = entity.GetComponent<TransformComponent>();
 					if (transform.Parent == u32_max)
 					{
-						DrawEntityRecursive(entity, m_Scene->GetRegistry());
-					}*/
-
-					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-					if (m_SelectedEntity == entity)
-					{
-						flags |= ImGuiTreeNodeFlags_Selected;
+						EditorHierarchyHelper::DrawEntityParentAndChildren(entity, m_Scene, m_SelectedEntity, m_PickedID,
+							m_CurrentPrefab, m_TemporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
 					}
-
-					ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
-
-					if (ImGui::IsItemClicked())
-					{
-						m_SelectedEntity = entity;
-
-						uint32_t newID = (uint32_t)entity; // uses your operator uint32_t()
-
-						LOG_DEBUG("Clicked entity ID = ", newID, " | old m_PickedID = ", m_PickedID);
-
-						m_PickedID = newID;
-
-						LOG_DEBUG("Updated m_PickedID to ", m_PickedID);
-					}
-
-					// Right-click context menu
-					if (ImGui::BeginPopupContextItem())
-					{
-						// ==================== Selected Entity Section =======================
-						if (ImGui::MenuItem("Delete Entity"))
-						{
-							// If this entity has a parent, unparent it first
-							if (entity.HasComponent<TransformComponent>()) {
-								TransformSystem::UnParent(m_Scene, entity);
-							}
-
-							m_Scene->DestroyEntity(entity);
-							if (m_SelectedEntity == entity)
-							{
-								m_SelectedEntity = Entity();
-							}
-						}
-
-						// ===================== Prefab Section ==========================
-						if (ImGui::BeginMenu("Prefabs"))
-						{
-							if (ImGui::MenuItem("Create Prefab"))
-							{
-								if (m_SelectedEntity)
-								{
-									std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-									auto prefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
-
-									if (!prefab)
-									{
-										return;
-									}
-
-									auto prefabFolder = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
-
-									if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
-									{
-										PrefabRegistry::Get().RegisterPrefab(prefab);
-										m_CurrentPrefab = prefab.get();
-										currPrefabPath = prefabFolder;
-										m_TemporaryPrefabPaths.insert(prefabFolder);
-
-									}
-								}
-							}
-							if (ImGui::MenuItem("Replace Prefab"))
-							{
-								replacePrefabPending = true;
-								selectedPrefabPath = "";
-							}
-
-							ImGui::EndMenu(); // end prefab menu
-						}
-						
-						ImGui::EndPopup(); // end of the pop up context item
-
-					}
+					
 				}
+
+				if (EditorHierarchyHelper::openAttachEntityPopup)
+				{
+					ImGui::OpenPopup("Main Entity Selection");
+					EditorHierarchyHelper::openAttachEntityPopup = false;
+				}
+
+				if (EditorHierarchyHelper::openSubEntityFromPrefabPopup)
+				{
+					ImGui::OpenPopup("Select Prefab For Sub-Entity");
+					EditorHierarchyHelper::openSubEntityFromPrefabPopup = false;
+				}
+
+				//---------------------------------//
+				if (ImGui::BeginPopupModal("Main Entity Selection", nullptr, ImGuiWindowFlags_NoDocking))
+				{
+					ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
+
+					if (EditorHierarchyHelper::entityToAttach && EditorHierarchyHelper::entityToAttach.HasComponent<TagComponent>())
+					{
+						ImGui::Text("Select a main entity to attach '%s' to:",
+							EditorHierarchyHelper::entityToAttach.GetComponent<TagComponent>().Tag.c_str());
+					}
+					ImGui::Separator();
+
+					auto view = m_Scene->GetRegistry().view<TagComponent>();
+					for (auto entityHandle : view)
+					{
+						Entity entity(entityHandle, &m_Scene->GetRegistry());
+						auto& transform = entity.GetComponent<TransformComponent>();
+
+						// Only show main entities (no parent) that aren't the entity itself
+						if (transform.Parent == u32_max && entity != EditorHierarchyHelper::entityToAttach)
+						{
+							auto& tag = entity.GetComponent<TagComponent>();
+							if (ImGui::Selectable(tag.Tag.c_str()))
+							{
+								// Attach entityToAttach as child of selected entity
+								auto& parentTransform = entity.GetComponent<TransformComponent>();
+								parentTransform.Children.push_back((uint32_t)EditorHierarchyHelper::entityToAttach);
+
+								auto& childTransform = EditorHierarchyHelper::entityToAttach.GetComponent<TransformComponent>();
+								childTransform.SetParent(entity);
+
+								ImGui::CloseCurrentPopup();
+								break;
+							}
+						}
+					}
+
+					ImGui::Separator();
+					if (ImGui::Button("Cancel"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+				//-----------------------//
+
+				if (ImGui::BeginPopupModal("Select Prefab For Sub-Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+					for (auto& file : prefabFiles)
+					{
+						if (ImGui::Selectable(file.name.c_str()))
+						{
+							EditorHierarchyHelper::openSubEntityFromPrefabPopup = false;
+
+							auto prefab = PrefabSerializer::LoadPrefabFromFile(file.fullPath);
+							if (!prefab)
+							{
+								ImGui::CloseCurrentPopup();
+								break;
+							}
+
+							PrefabRegistry::Get().RegisterPrefab(prefab);
+							Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+								m_Scene,
+								prefab->GetGUID()
+							);
+
+							// Attach entityToAttach as child of selected entity
+							auto& parentTransform = EditorHierarchyHelper::parentOfPrefabEntity.GetComponent<TransformComponent>();
+							parentTransform.Children.push_back((uint32_t)newEntity);
+
+							auto& childTransform = newEntity.GetComponent<TransformComponent>();
+							childTransform.SetParent(EditorHierarchyHelper::parentOfPrefabEntity);
+
+							m_SelectedEntity = newEntity;
+							ImGui::CloseCurrentPopup();
+							break;
+						}
+					}
+
+					if (ImGui::Button("Cancel"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
 			}
 
 		}
@@ -2723,7 +2716,7 @@ namespace Engine
 			return;
 		}
 
-		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel, ImGuiWindowFlags_NoDocking)) {
 			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
 
 			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid()) {
@@ -2870,12 +2863,14 @@ namespace Engine
 					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
 					{
 						settings->outputFormat = std::string(formatBuffer);
+						descriptorEditor.MarkModified();
 					}
 
 					float meshScale = settings->scale;
 					if (ImGui::DragFloat("Scale", &meshScale))
 					{
 						settings->scale = meshScale;
+						descriptorEditor.MarkModified();
 					}
 					
 				}

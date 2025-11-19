@@ -71,6 +71,10 @@ file(GLOB_RECURSE BEHAVIOURTREE_HEADERS "${ENGINE_ROOT}/BehaviourTree/*.h")
 file(GLOB_RECURSE PARTICLESYSTEM_SOURCES "${ENGINE_ROOT}/ParticleSystem/*.cpp")
 file(GLOB_RECURSE PARTICLESYSTEM_HEADERS "${ENGINE_ROOT}/ParticleSystem/*.h")
 
+# Animation Module
+file(GLOB_RECURSE ANIMATION_SOURCES "${ENGINE_ROOT}/Animation/*.cpp")
+file(GLOB_RECURSE ANIMATION_HEADERS "${ENGINE_ROOT}/Animation/*.h")
+
 # Combine all files
 set(ENGINE_SOURCES
     ${CORE_SOURCES}
@@ -89,6 +93,7 @@ set(ENGINE_SOURCES
     ${SCRIPTING_SOURCES}
     ${BEHAVIOURTREE_SOURCES}
     ${PARTICLESYSTEM_SOURCES}
+    ${ANIMATION_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -108,6 +113,7 @@ set(ENGINE_HEADERS
     ${SCRIPTING_HEADERS}
     ${BEHAVIOURTREE_HEADERS}
     ${PARTICLESYSTEM_HEADERS}
+    ${ANIMATION_HEADERS}
 )
 
 # Create engine static library
@@ -192,6 +198,10 @@ source_group("BehaviourTree\\Source" FILES ${BEHAVIOURTREE_SOURCES})
 # ParticleSystem Module
 source_group("ParticleSystem\\Header" FILES ${PARTICLESYSTEM_HEADERS})
 source_group("ParticleSystem\\Source" FILES ${PARTICLESYSTEM_SOURCES})
+
+# Animation Module
+source_group("Animation\\Header" FILES ${ANIMATION_HEADERS})
+source_group("Animation\\Source" FILES ${ANIMATION_SOURCES})
 
 # Set target properties
 set_target_properties(EngineLib PROPERTIES
