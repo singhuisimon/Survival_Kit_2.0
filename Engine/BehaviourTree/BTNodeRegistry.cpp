@@ -385,8 +385,8 @@ namespace Engine {
                 BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "AdwareCount", m_AdwareCount);
                 BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "WormsCount", m_WormsCount);
                 BT_REGISTER_INT_PROPERTY(BTSpawnMultipleTypes, "BotnetCount", m_BotnetCount);
-                BT_REGISTER_FLOAT_PROPERTY(BTSpawnMultipleTypes, "Spacing", m_Spacing);
-                BT_REGISTER_VEC3_PROPERTY(BTSpawnMultipleTypes, "LoveletterPos", m_LoveletterPos);
+                //BT_REGISTER_FLOAT_PROPERTY(BTSpawnMultipleTypes, "Spacing", m_Spacing);
+                //BT_REGISTER_VEC3_PROPERTY(BTSpawnMultipleTypes, "LoveletterPos", m_LoveletterPos);
 				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallA", m_WallA);
 				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallB", m_WallB);
 				BT_REGISTER_BOOL_PROPERTY(BTSpawnMultipleTypes, "WallC", m_WallC);

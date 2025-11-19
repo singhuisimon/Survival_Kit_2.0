@@ -3,123 +3,31 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 2097160,
+            "ID": 16,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Core"
+                        "Tag": "E1"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -185.04345703125,
-                            -60.29704284667969,
-                            65.0457992553711
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            60.0,
-                            60.0,
-                            60.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2635802495591628855,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048583,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Ground"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            -179.37701416015625,
-                            333.7919006347656
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            2.0,
-                            2.0,
-                            2.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097156,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Wall_E"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            -559.44677734375,
+                            -700.0,
                             0.0,
                             350.0
                         ],
                         "Rotation": [
                             0.0,
-                            89.98021697998047,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
-                            250.0,
-                            150.0,
-                            1.0
+                            20.0,
+                            20.0,
+                            20.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -132,7 +40,7 @@
                         "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
@@ -141,12 +49,104 @@
             ]
         },
         {
-            "ID": 1048579,
+            "ID": 15,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Wall_D"
+                        "Tag": "D2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            700.0,
+                            10.0,
+                            20.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            20.0,
+                            20.0,
+                            20.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 2,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 14,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "D1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            700.0,
+                            10.0,
+                            145.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            20.0,
+                            20.0,
+                            20.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 2,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 13,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "C1"
                     }
                 },
                 {
@@ -154,18 +154,18 @@
                     "Properties": {
                         "Position": [
                             500.0,
-                            0.0,
-                            85.23712158203125
+                            5.916770935058594,
+                            415.0
                         ],
                         "Rotation": [
                             0.0,
-                            89.98021697998047,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
-                            250.0,
-                            150.0,
-                            1.0
+                            20.0,
+                            20.0,
+                            20.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -178,7 +178,7 @@
                         "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
@@ -187,12 +187,12 @@
             ]
         },
         {
-            "ID": 1048578,
+            "ID": 12,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Wall_C"
+                        "Tag": "B2"
                     }
                 },
                 {
@@ -200,8 +200,8 @@
                     "Properties": {
                         "Position": [
                             350.0,
-                            0.0,
-                            414.7528076171875
+                            -30.0,
+                            600.0
                         ],
                         "Rotation": [
                             0.0,
@@ -209,9 +209,9 @@
                             0.0
                         ],
                         "Scale": [
-                            250.0,
-                            150.0,
-                            1.0
+                            20.0,
+                            20.0,
+                            20.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -224,7 +224,7 @@
                         "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
@@ -233,31 +233,31 @@
             ]
         },
         {
-            "ID": 1048577,
+            "ID": 11,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Wall_B"
+                        "Tag": "B1"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            233.74392700195313,
-                            0.0,
-                            677.8114624023438
+                            350.0,
+                            -0.0,
+                            760.0
                         ],
                         "Rotation": [
                             0.0,
-                            89.98021697998047,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
-                            250.0,
-                            150.0,
-                            1.0
+                            20.0,
+                            20.0,
+                            20.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -270,7 +270,7 @@
                         "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
@@ -279,21 +279,21 @@
             ]
         },
         {
-            "ID": 1048576,
+            "ID": 10,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Wall_A"
+                        "Tag": "A1"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            0.0,
-                            0.0,
-                            987.49560546875
+                            50.0,
+                            25.0,
+                            1100.0
                         ],
                         "Rotation": [
                             0.0,
@@ -301,9 +301,9 @@
                             0.0
                         ],
                         "Scale": [
-                            250.0,
-                            150.0,
-                            1.0
+                            20.0,
+                            20.0,
+                            20.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -313,13 +313,108 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 0,
-                        "MaterialGuid": 13226140173411532803,
+                        "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048585,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "A2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -50.0,
+                            -30.0,
+                            1100.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            20.0,
+                            20.0,
+                            20.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 2,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048582,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Light"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            9.013620376586914,
+                            187.85958862304688,
+                            367.257080078125
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Type": 1,
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Intensity": 17.850000381469727,
+                        "Range": 1000.0,
+                        "SpotAngleDeg": 30.0,
+                        "IndirectMultiplier": 1.0
                     }
                 }
             ]
@@ -379,21 +474,21 @@
             ]
         },
         {
-            "ID": 1048582,
+            "ID": 1048576,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Light"
+                        "Tag": "Wall_A"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            9.013620376586914,
-                            187.85958862304688,
-                            367.257080078125
+                            0.0,
+                            0.0,
+                            1100.0
                         ],
                         "Rotation": [
                             0.0,
@@ -401,8 +496,8 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            250.0,
+                            150.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -410,19 +505,292 @@
                     }
                 },
                 {
-                    "Type": "LightComponent",
+                    "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Enabled": true,
-                        "Type": 1,
-                        "Color": [
-                            1.0,
-                            1.0,
+                        "MeshGuid": 0,
+                        "MaterialGuid": 13226140173411532803,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048577,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Wall_B"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            350.0,
+                            0.0,
+                            675.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            250.0,
+                            150.0,
                             1.0
                         ],
-                        "Intensity": 17.850000381469727,
-                        "Range": 1000.0,
-                        "SpotAngleDeg": 30.0,
-                        "IndirectMultiplier": 1.0
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048578,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Wall_C"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            500.0,
+                            0.0,
+                            415.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            250.0,
+                            150.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048579,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Wall_D"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            700.0,
+                            0.0,
+                            85.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            250.0,
+                            150.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097156,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Wall_E"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            0.0,
+                            350.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            250.0,
+                            150.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048583,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Ground"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            -179.37701416015625,
+                            333.7919006347656
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            2.0,
+                            2.0,
+                            2.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 18414286944142344193,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097160,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Core"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -185.04345703125,
+                            -60.29704284667969,
+                            65.0457992553711
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            60.0,
+                            60.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 0,
+                        "MaterialGuid": 2635802495591628855,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
                     }
                 }
             ]

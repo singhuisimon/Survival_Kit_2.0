@@ -785,8 +785,8 @@ namespace Engine {
         int m_WormsCount;
         int m_BotnetCount;
 
-        float m_Spacing;            // Grid spacing for spawned enemies
-        glm::vec3 m_LoveletterPos;  // Specific spawn position for loveletter
+        //float m_Spacing;            // Grid spacing for spawned enemies
+        //glm::vec3 m_LoveletterPos;  // Specific spawn position for loveletter
 
         bool m_WallA = false;
 		bool m_WallB = false;
@@ -795,14 +795,39 @@ namespace Engine {
 		bool m_WallE = false;
         bool m_Boss = false;
 
+        int m_SpawnPointCountA;
+		int m_SpawnPointCountB;
+		int m_SpawnPointCountC;
+		int m_SpawnPointCountD;
+		int m_SpawnPointCountE;
+
     private:
+        struct SpawnPoint {
+            glm::vec3 Position;
+            float CooldownTimer = 0.0f;       // counts down from 10 seconds
+        };
+
+  //      struct WallInfo {
+  //          std::string Tag;                 // "Wall_A"
+  //          glm::vec3 WallPosition;          // actual wall's transform position
+  //          glm::quat Rotation;              // facing rotation
+  //          glm::vec3 SpawnDirection;        // -Z, -X, +X, etc.
+  //          std::vector<SpawnPoint> Points;  // A1, A2, ...
+  //          int NextSpawnIndex = 0;          // to spawn 1 - 2 - 1 - 2
+		//};
+
         struct WallInfo {
             std::string name;
             glm::vec3 position;
             glm::quat rotation;
 			glm::vec3 scale;
 			glm::vec3 direction;
+			int spawnPointCount;
 		};
+
+        
+
+        std::unordered_map<std::string, WallInfo> m_Walls;
 
 		std::vector<WallInfo> m_EnabledWalls;
 
@@ -818,7 +843,6 @@ namespace Engine {
             glm::mat3 rotMat(r, u, f);
             return glm::quat_cast(rotMat);
         }*/
-
 
     };
 
