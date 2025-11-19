@@ -115,6 +115,8 @@ namespace Engine
 		xresource::instance_guid currentEditingGuid;
 		std::string editedAsset{};
 
+		bool isPlaying = true;
+
 	public:
 		/**************************************************************************
 		* @brief 
@@ -338,6 +340,8 @@ namespace Engine
 		*	The size of the button used for removing the component.
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
+
+		bool getIsPlaying() const { return isPlaying; }
 	};
 
 

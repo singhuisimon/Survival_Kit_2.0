@@ -24,6 +24,7 @@
 #include "../Graphics/Texture.h"
 #include "../Editor/EditorPropertyPanel.h"
 #include "../Editor/EditorHierarchyPanel.h"
+#include "../Editor/EditorViewportPanel.h"
 
 #include "../Asset/ResourceHelpers.h"
 // Include other necessary headers
@@ -3153,6 +3154,8 @@ namespace Engine
 
 		ImGui::Begin("Viewport");
 
+		ViewportPanelHelper::ViewportButtons(isPlaying, m_Scene, m_SelectedEntity, 
+											 currScenePath, currFileName, m_PickedID);
 		if (texhandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -3383,7 +3386,7 @@ namespace Engine
 
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
 						m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
-						currScenePath = defaultNewScenePath; // update current scene path
+						// currScenePath = defaultNewScenePath; // update current scene path
 						m_Scene->SetName(saveAsDefaultSceneName);
 						saveAsPanel = false; // to close pop up
 						isNewScene = false;

@@ -554,11 +554,33 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     Engine::ScriptReloader::GetInstance().Update();
 
-    // Update scene (this will call all systems in priority order)
-    m_Scene->OnUpdate(ts);  // Convert Timestep to float
+    // When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
+    if (!m_EditorEnable || (m_EditorEnable && m_Editor->getIsPlaying())) {
+        
+        // Update scene (this will call all systems in priority order)
+        m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
-    // Update audio manager if exists
-    m_AudioManager->OnUpdate(ts);
+        // Update audio manager if exists
+        m_AudioManager->OnUpdate(ts);
+    }
+    else { // When Editor is ON but gameplay is PLAYING: Update Transform, Camera and Render systems
+
+        auto& sceneSystems = m_Scene->GetSystemRegistry();
+
+        Engine::TransformSystem* transformSystem = sceneSystems.GetSystem<Engine::TransformSystem>();
+        transformSystem->OnUpdate(m_Scene.get(), ts);
+
+        // Bug: BT system does not load when updated; Quick fix is to uncomment the next lines let BT system run instead of stopping
+        /*Engine::BehaviourTreeSystem* BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
+        BTSystem->OnUpdate(m_Scene.get(), ts);*/
+
+        Engine::CameraSystem* camSystem = sceneSystems.GetSystem<Engine::CameraSystem>();
+        camSystem->OnUpdate(m_Scene.get(), ts);
+
+        Engine::RenderSystem* renderSystem = sceneSystems.GetSystem<Engine::RenderSystem>();
+        renderSystem->OnUpdate(m_Scene.get(), ts);
+
+    } 
 
     if (input.IsKeyJustPressed(GLFW_KEY_P)) {
         LOG_DEBUG("Testing Audio Playback");
