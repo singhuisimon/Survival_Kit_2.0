@@ -665,6 +665,12 @@ namespace Engine {
 				 		prog.setUniform("isGamma", false);
 				 	}
 				}
+
+				if (TextureResource* nm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap)))
+				{
+					glBindTextureUnit(1, static_cast<GLuint>(nm_texture_resource->textureID));
+					prog.setUniform("useNormalMap", true);
+				}
 			 }
 			 else
 			 {
