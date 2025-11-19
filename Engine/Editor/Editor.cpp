@@ -2118,11 +2118,114 @@ namespace Engine
 					auto& transform = entity.GetComponent<TransformComponent>();
 					if (transform.Parent == u32_max)
 					{
-						EditorHierarchyHelper::DrawEntityParentAndChildern(entity, m_Scene, m_SelectedEntity, m_PickedID, 
+						EditorHierarchyHelper::DrawEntityParentAndChildren(entity, m_Scene, m_SelectedEntity, m_PickedID,
 							m_CurrentPrefab, m_TemporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
 					}
 					
 				}
+
+				if (EditorHierarchyHelper::openAttachEntityPopup)
+				{
+					ImGui::OpenPopup("Main Entity Selection");
+					EditorHierarchyHelper::openAttachEntityPopup = false;
+				}
+
+				if (EditorHierarchyHelper::openSubEntityFromPrefabPopup)
+				{
+					ImGui::OpenPopup("Select Prefab For Sub-Entity");
+					EditorHierarchyHelper::openSubEntityFromPrefabPopup = false;
+				}
+
+				//---------------------------------//
+				if (ImGui::BeginPopupModal("Main Entity Selection", nullptr, ImGuiWindowFlags_NoDocking))
+				{
+					ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
+
+					if (EditorHierarchyHelper::entityToAttach && EditorHierarchyHelper::entityToAttach.HasComponent<TagComponent>())
+					{
+						ImGui::Text("Select a main entity to attach '%s' to:",
+							EditorHierarchyHelper::entityToAttach.GetComponent<TagComponent>().Tag.c_str());
+					}
+					ImGui::Separator();
+
+					auto view = m_Scene->GetRegistry().view<TagComponent>();
+					for (auto entityHandle : view)
+					{
+						Entity entity(entityHandle, &m_Scene->GetRegistry());
+						auto& transform = entity.GetComponent<TransformComponent>();
+
+						// Only show main entities (no parent) that aren't the entity itself
+						if (transform.Parent == u32_max && entity != EditorHierarchyHelper::entityToAttach)
+						{
+							auto& tag = entity.GetComponent<TagComponent>();
+							if (ImGui::Selectable(tag.Tag.c_str()))
+							{
+								// Attach entityToAttach as child of selected entity
+								auto& parentTransform = entity.GetComponent<TransformComponent>();
+								parentTransform.Children.push_back((uint32_t)EditorHierarchyHelper::entityToAttach);
+
+								auto& childTransform = EditorHierarchyHelper::entityToAttach.GetComponent<TransformComponent>();
+								childTransform.SetParent(entity);
+
+								ImGui::CloseCurrentPopup();
+								break;
+							}
+						}
+					}
+
+					ImGui::Separator();
+					if (ImGui::Button("Cancel"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+				//-----------------------//
+
+				if (ImGui::BeginPopupModal("Select Prefab For Sub-Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+					for (auto& file : prefabFiles)
+					{
+						if (ImGui::Selectable(file.name.c_str()))
+						{
+							EditorHierarchyHelper::openSubEntityFromPrefabPopup = false;
+
+							auto prefab = PrefabSerializer::LoadPrefabFromFile(file.fullPath);
+							if (!prefab)
+							{
+								ImGui::CloseCurrentPopup();
+								break;
+							}
+
+							PrefabRegistry::Get().RegisterPrefab(prefab);
+							Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+								m_Scene,
+								prefab->GetGUID()
+							);
+
+							// Attach entityToAttach as child of selected entity
+							auto& parentTransform = EditorHierarchyHelper::parentOfPrefabEntity.GetComponent<TransformComponent>();
+							parentTransform.Children.push_back((uint32_t)newEntity);
+
+							auto& childTransform = newEntity.GetComponent<TransformComponent>();
+							childTransform.SetParent(EditorHierarchyHelper::parentOfPrefabEntity);
+
+							m_SelectedEntity = newEntity;
+							ImGui::CloseCurrentPopup();
+							break;
+						}
+					}
+
+					if (ImGui::Button("Cancel"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
 			}
 
 		}
@@ -2596,7 +2699,7 @@ namespace Engine
 			return;
 		}
 
-		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel)) {
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel, ImGuiWindowFlags_NoDocking)) {
 			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
 
 			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid()) {

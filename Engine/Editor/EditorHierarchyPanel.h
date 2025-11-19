@@ -26,22 +26,30 @@ namespace Engine
 	{
 	public:
 
+		inline static bool openAttachEntityPopup = false;
+		inline static Entity entityToAttach = Entity();
+
+		inline static bool openSubEntityFromPrefabPopup = false;
+		inline static Entity parentOfPrefabEntity = Entity();
+
 		/**************************************************************************
 		* @brief
 		* 	Recursively draws an entity and all its children in an ImGui tree view.
 		**************************************************************************/
 
-		static void DrawEntityParentAndChildern(Entity& entity, Scene* scene,Entity& selectedEntity, uint32_t& pickedID, 
+		static void DrawEntityParentAndChildren(Entity& entity, Scene* scene,Entity& selectedEntity, uint32_t& pickedID, 
 										 Prefab* currentPrefab, std::unordered_set<std::string>& temporaryPrefabPaths, 
 										 std::string& currPrefabPath, bool& replacePrefabPending, std::string& selectedPrefabPath) {
 
 			auto& tag = entity.GetComponent<TagComponent>();
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 			
-			bool hasChildren = false;
+			bool hasChildren = false; // Only true for main entity
+			bool hasParent = false; // Only true for sub entities 
 			if (entity.HasComponent<TransformComponent>()) {
 				auto& transform = entity.GetComponent<TransformComponent>();
 				hasChildren = transform.Children.empty() ? false : true;
+				hasParent = transform.Parent == u32_max ? false : true;
 			}
 
 			if (!hasChildren) {
@@ -82,45 +90,95 @@ namespace Engine
 					}
 				}
 
-				// ===================== Prefab Section ==========================
-				if (ImGui::BeginMenu("Prefabs"))
-				{
-					if (ImGui::MenuItem("Create Prefab"))
+				// Temp Fix: Only handle prefabs for main entities WITHOUT children
+				if (!hasParent &&!hasChildren) {
+					// ===================== Prefab Section ==========================
+					if (ImGui::BeginMenu("Prefabs"))
 					{
-						if (selectedEntity)
+						if (ImGui::MenuItem("Create Prefab"))
 						{
-							std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
-							auto prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
-
-							if (!prefab)
+							if (selectedEntity)
 							{
-								ImGui::EndMenu();
-								ImGui::EndPopup();
-								if (opened && hasChildren) { 
-									ImGui::TreePop(); 
+								std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
+								auto prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
+
+								if (!prefab)
+								{
+									ImGui::EndMenu();
+									ImGui::EndPopup();
+									if (opened && hasChildren) {
+										ImGui::TreePop();
+									}
+									return;
 								}
-								return;
-							}
 
-							auto prefabFolder = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
+								auto prefabFolder = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 
-							if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
-							{
-								PrefabRegistry::Get().RegisterPrefab(prefab);
-								currentPrefab = prefab.get();
-								currPrefabPath = prefabFolder;
-								temporaryPrefabPaths.insert(prefabFolder);
+								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
+								{
+									PrefabRegistry::Get().RegisterPrefab(prefab);
+									currentPrefab = prefab.get();
+									currPrefabPath = prefabFolder;
+									temporaryPrefabPaths.insert(prefabFolder);
 
+								}
 							}
 						}
+						if (ImGui::MenuItem("Replace Prefab"))
+						{
+							replacePrefabPending = true;
+							selectedPrefabPath = "";
+						}
+
+						ImGui::EndMenu(); // end prefab menu
 					}
-					if (ImGui::MenuItem("Replace Prefab"))
+				}
+
+				ImGui::Separator();
+
+				if (!hasParent) { // For main entities
+
+					if (ImGui::BeginMenu("Add New Sub-Entity"))
 					{
-						replacePrefabPending = true;
-						selectedPrefabPath = "";
+						if (ImGui::MenuItem("Create New Sub-Entity"))
+						{
+							auto newEntity = scene->CreateEntity("New Entity");
+							newEntity.AddComponent<TagComponent>("New Entity");
+							newEntity.AddComponent<TransformComponent>();
+
+							if (entity.HasComponent<TransformComponent>()) {
+								auto& parentTransform = entity.GetComponent<TransformComponent>();
+								parentTransform.Children.push_back((uint32_t)newEntity);
+								auto& childTransform = newEntity.GetComponent<TransformComponent>();
+								childTransform.SetParent(entity);
+							}
+						}
+						ImGui::Separator();
+						if (ImGui::MenuItem("Create Sub-Entity With Prefab"))
+						{
+							openSubEntityFromPrefabPopup = true;
+							parentOfPrefabEntity = entity;
+						}
+
+						ImGui::EndMenu();
 					}
 
-					ImGui::EndMenu(); // end prefab menu
+					if (!hasChildren) {
+						if (ImGui::MenuItem("Attach as Sub-Entity"))
+						{
+							openAttachEntityPopup = true;
+							entityToAttach = entity;
+						}
+					}
+				}
+				else { // For sub-entities
+
+					if (ImGui::MenuItem("Detach Sub-Entity"))
+					{
+						if (entity.HasComponent<TransformComponent>()) {
+							TransformSystem::UnParent(scene, entity);
+						}
+					}
 				}
 				
 				ImGui::EndPopup(); // end of the pop up context item
@@ -132,7 +190,7 @@ namespace Engine
 				for (uint32_t childID : transform.Children)  //Directly iterate handles
 				{
 					Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
-					DrawEntityParentAndChildern(childEntity, scene, selectedEntity, pickedID, currentPrefab, 
+					DrawEntityParentAndChildren(childEntity, scene, selectedEntity, pickedID, currentPrefab,
 						temporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
 				}
 				ImGui::TreePop();
