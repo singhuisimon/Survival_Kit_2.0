@@ -114,6 +114,13 @@ namespace Engine
 		bool showDescriptorEditorPanel = false;
 		xresource::instance_guid currentEditingGuid;
 		std::string editedAsset{};
+		bool m_ShouldApplyOverrides = false;
+
+		std::unordered_map<xresource::instance_guid, std::vector<Entity>> m_PrefabEntities;
+
+		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
+		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
+
 
 	public:
 		/**************************************************************************
@@ -138,7 +145,7 @@ namespace Engine
 		* 	resources created during editing.
 		**************************************************************************/
 		~Editor() {
-			CleanupTemporaryPrefabs();
+			//CleanupTemporaryPrefabs();
 		};
 
 		/**************************************************************************
@@ -338,6 +345,17 @@ namespace Engine
 		*	The size of the button used for removing the component.
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
+
+		void RevertSelectedEntityToPrefab();
+
+		void LoadAllPrefabsIntoRegistry();
+		void UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity);
+		void CheckAndUpdatePrefabInstances();
+
+		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
+
+
+		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 	};
 
 
