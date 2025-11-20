@@ -827,6 +827,114 @@ namespace Engine {
 
 		int m_totalSpawned = 0;
 
+        //glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0));
+
+        glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0)) {
+            glm::vec3 f = glm::normalize(forward);
+            glm::vec3 r = glm::normalize(glm::cross(up, f));
+            glm::vec3 u = glm::cross(f, r);
+
+            glm::mat3 rotMat(r, u, f);
+            return glm::quat_cast(rotMat);
+        }
+
+
+    };
+
+
+
+    /*
+*   @brief Finds the nearest enemy entity within range
+*   @details Searches for entities with a specified tag and stores position + entity in blackboard
+*
+*/
+
+    class BTFindNearestEnemy : public BTNode {
+    public:
+        BTFindNearestEnemy(const std::string& enemyTag = "Enemy",
+            const std::string& targetPosKey = "TargetPosition",
+            const std::string& targetEntityKey = "TargetEnemy",
+            float maxRange = 1000.0f);
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_EnemyTag;             // Tag to search for
+        std::string m_TargetPosKey;         // Blackboard key to store target position (vec3)
+        std::string m_TargetEntityKey;      // Blackboard key to store target entity
+        float m_MaxRange;                   // Maximum search range
+    };
+
+    /*
+    *   @brief Shoots a bullet at target with cooldown timer
+    *   @details creates bullet entity and tracks firing cooldown
+    *
+    */
+
+    class BTShootBullet : public BTNode {
+    public:
+        BTShootBullet(const std::string& bulletTag = "Bullet",
+            float fireRate = 0.1f,
+            float bulletSpeed = 3000.0f);
+
+        const char* GetTypeName() const override;
+        void OnEnter(BTContext& context) override;
+        BTStatus Execute(BTContext& context) override;
+        void Reset() override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_BulletTag;            // Tag for bullet entity
+        float m_FireRate;                   // Time between shots (seconds)
+        float m_BulletSpeed;                // Bullet speed
+        float m_Cooldown;                   // Current cooldown timer
+    };
+
+    /*
+    *   @brief Checks if entity has a valid target in blackboard
+    *   @details Returns success if target exists and is valid, Failure otherwise
+    *
+    */
+
+    class BTHasValidTarget : public BTNode {
+    public:
+        BTHasValidTarget(const std::string& targetEntityKey = "TargetEnemy");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+
+        std::string m_TargetEntityKey;      // Blackboard key to check
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+    class BTCreateEntityByPrefab : public BTNode {
+    public:
+        BTCreateEntityByPrefab(const std::string& prefabName = "");
+
+        const char* GetTypeName() const override;
+        BTStatus Execute(BTContext& context) override;
+
+        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
+        void SetProperty(const std::string& name, const std::string& value) override;
+		
+        std::string m_PrefabName;
     };
 
 } // namespace Engine

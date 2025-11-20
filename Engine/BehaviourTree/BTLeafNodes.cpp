@@ -2501,4 +2501,277 @@ namespace Engine {
 		}
     }
 
+
+
+    BTFindNearestEnemy::BTFindNearestEnemy(const std::string& enemyTag,
+        const std::string& targetPosKey,
+        const std::string& targetEntityKey,
+        float maxRange) :
+        m_EnemyTag(enemyTag), m_TargetPosKey(targetPosKey),
+        m_TargetEntityKey(targetEntityKey), m_MaxRange(maxRange) {
+    }
+
+    const char* BTFindNearestEnemy::GetTypeName() const {
+        return "FindNearestEnemy";
+    }
+
+    BTStatus BTFindNearestEnemy::Execute(BTContext& context) {
+        if (!context.Scene || !context.Entity) {
+            LOG_WARNING("BTFindNearestEnemy: Missing scene or entity context");
+            return BTStatus::Failure;
+        }
+
+        Entity& self = *context.Entity;     // use reference
+        if (!self.HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        glm::vec3 myPosition = self.GetComponent<TransformComponent>().Position;
+
+        // Find all entities with the enemy tag
+        //auto view = context.Scene->GetRegistry().view<TagComponent, TransformComponent>();
+        //Entity* nearestEnemy = nullptr;
+        //float nearestDistance = m_MaxRange;
+        //glm::vec3 nearestPosition = glm::vec3(0.0f);
+
+        // Get self's entity handle for comparison
+        entt::entity selfHandle = static_cast<entt::entity>(self);
+
+        // find all entities with the enemy tag
+        auto& registry = context.Scene->GetRegistry();
+        //auto view = registry.view<TagComponent, TransformComponent>();
+
+        // check for TransformComponent inside the loop instead
+        const auto& view = registry.view<TagComponent>();
+        
+
+        Entity* nearestEnemy = nullptr;
+        float nearestDistance = m_MaxRange;
+        glm::vec3 nearestPosition = glm::vec3(0.0f);
+
+        for (auto entity : view) {
+            //Entity potentialEnemy = context.Scene->GetEntity(entity);
+
+            //check for TransformComponent
+            if (!registry.all_of<TransformComponent>(entity)) {
+                continue;
+            }
+
+            // Get components directly from registry
+            auto& tag = registry.get<TagComponent>(entity);
+            auto& transform = registry.get<TransformComponent>(entity);
+
+            // Skip if not the right tag
+            if (tag.Tag.find(m_EnemyTag) == std::string::npos) {
+                continue;
+            }
+
+            // Skip self
+            if (entity == selfHandle) {
+                continue;
+            }
+
+            glm::vec3 enemyPosition = transform.Position;
+            float distance = glm::distance(myPosition, enemyPosition);
+
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestPosition = enemyPosition;
+                nearestEnemy = new Entity(entity, &registry);
+            }
+        }
+
+        if (nearestEnemy) {
+            // Store both position (for BTLookAtSmooth) and entity (for validation)
+            context.Blackboard.Set<glm::vec3>(m_TargetPosKey, nearestPosition);
+            context.Blackboard.Set<Entity*>(m_TargetEntityKey, nearestEnemy);
+            return BTStatus::Success;
+        }
+
+        // No enemy found - clear targets
+        context.Blackboard.Set<Entity*>(m_TargetEntityKey, nullptr);
+        return BTStatus::Failure;
+    }
+
+    void BTFindNearestEnemy::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "EnemyTag", m_EnemyTag });
+        properties.push_back({ "TargetPosKey", m_TargetPosKey });
+        properties.push_back({ "TargetEntityKey", m_TargetEntityKey });
+        properties.push_back({ "MaxRange", std::to_string(m_MaxRange) });
+    }
+
+    void BTFindNearestEnemy::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "EnemyTag") {
+            m_EnemyTag = value;
+        }
+        else if (name == "TargetPosKey") {
+            m_TargetPosKey = value;
+        }
+        else if (name == "TargetEntityKey") {
+            m_TargetEntityKey = value;
+        }
+        else if (name == "MaxRange") {
+            m_MaxRange = std::stof(value);
+        }
+    }
+
+    BTHasValidTarget::BTHasValidTarget(const std::string& targetEntityKey)
+        : m_TargetEntityKey(m_TargetEntityKey) {
+    }
+
+    const char* BTHasValidTarget::GetTypeName() const {
+        return "HasValidTarget";
+    }
+
+    BTStatus BTHasValidTarget::Execute(BTContext& context) {
+        if (!context.Scene) {
+            return BTStatus::Failure;
+        }
+
+        // check if target entity exists in Blackboard
+        auto targetOpt = context.Blackboard.Get<Entity*>(m_TargetEntityKey);
+        if (!targetOpt) {
+            return BTStatus::Failure;
+        }
+
+        Entity* target = *targetOpt;
+        if (!target) {
+            return BTStatus::Failure;
+        }
+
+        // validate entity still exists in the registry
+        auto& registry = context.Scene->GetRegistry();
+        entt::entity targetHandle = static_cast<entt::entity>(*target);
+
+        if (!registry.valid(targetHandle)) {
+            //target was destroyed - clear from blackboard
+            context.Blackboard.Set<Entity*>(m_TargetEntityKey, nullptr);
+            return BTStatus::Failure;
+        }
+
+        return BTStatus::Success;
+
+    }
+
+    void BTHasValidTarget::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "TargetEntityKey", m_TargetEntityKey });
+    }
+
+    void BTHasValidTarget::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "TargetEntityKey") {
+            m_TargetEntityKey = value;
+        }
+    }
+
+    BTShootBullet::BTShootBullet(const std::string& bulletTag, float fireRate, float bulletSpeed)
+        : m_BulletTag(bulletTag)
+        , m_FireRate(fireRate)
+        , m_BulletSpeed(bulletSpeed)
+        , m_Cooldown(0.0f) {
+    }
+
+    const char* BTShootBullet::GetTypeName() const {
+        return "ShootBullet";
+    }
+
+    void BTShootBullet::OnEnter(BTContext& context) {
+        (void)context;
+        m_Cooldown = 0.0f;      // reset cooldown when entering
+    }
+
+    BTStatus BTShootBullet::Execute(BTContext& context) {
+        if (!context.Scene || !context.Entity) {
+            return BTStatus::Failure;
+        }
+
+        //update cooldown
+        m_Cooldown -= context.DeltaTime;
+        if (m_Cooldown > 0.0f) {
+            return BTStatus::Running;       // still cooling down
+        }
+
+        Entity& self = *context.Entity;
+        if (!self.HasComponent<TransformComponent>()) {
+            return BTStatus::Failure;
+        }
+
+        // Get target position from blackboard
+        auto targetPosOpt = context.Blackboard.Get<glm::vec3>("TargetPosition");
+        if (!targetPosOpt) {
+            LOG_WARNING("BTShootBullet: NO Target position in blackboard");
+            return BTStatus::Failure;
+        }
+
+        glm::vec3 targetPos = *targetPosOpt;
+        auto& selfTransform = self.GetComponent<TransformComponent>();
+        glm::vec3 selfPos = selfTransform.Position;
+
+        // calculate direction to target
+        glm::vec3 direction = targetPos - selfPos;
+        float distance = glm::length(direction);
+
+        if (distance < 0.001f) {
+            LOG_WARNING("BTShootBullet: Target too close to shooter");
+            return BTStatus::Failure;
+        }
+
+        direction = glm::normalize(direction);
+
+        // create bullet entity
+        Entity bullet = context.Scene->CreateEntity(m_BulletTag);
+
+        // add the required components
+        if (!bullet.HasComponent<TransformComponent>()) {
+            bullet.AddComponent<TransformComponent>();
+        }
+        if (!bullet.HasComponent<MeshRendererComponent>()) {
+            bullet.AddComponent<MeshRendererComponent>();
+        }
+        if (!bullet.HasComponent<RigidbodyComponent>()) {
+            bullet.AddComponent<RigidbodyComponent>();
+        }
+
+        // set bullet position (slightly offset from shooter
+        auto& bulletTransform = bullet.GetComponent<TransformComponent>();
+        bulletTransform.Position = selfPos + direction * 2.0f;  // spawn 2 units in front
+        bulletTransform.Scale = glm::vec3(0.5f);    // small bullet
+
+        // set bullet velocity using rigidbody
+        auto& bulletRB = bullet.GetComponent<RigidbodyComponent>();
+        bulletRB.IsKinematic = true;
+
+        // apply velocity
+        PhysicsAPI::AddLinearVelocity(bullet, direction * m_BulletSpeed);
+
+        // Reset cooldown
+        m_Cooldown = m_FireRate;
+
+        LOG_TRACE("BTShootBullet: Fired bullet towards (",
+            targetPos.x, ", ", targetPos.y, ", ", targetPos.z, ")");
+
+        return BTStatus::Success;
+    }
+
+    void BTShootBullet::Reset() {
+        m_Cooldown = 0.0f;
+    }
+
+    void BTShootBullet::GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const {
+        properties.push_back({ "BulletTag", m_BulletTag });
+        properties.push_back({ "FireRate", std::to_string(m_FireRate) });
+        properties.push_back({ "BulletSpeed", std::to_string(m_BulletSpeed) });
+    }
+
+    void BTShootBullet::SetProperty(const std::string& name, const std::string& value) {
+        if (name == "BulletTag") {
+            m_BulletTag = value;
+        }
+        else if (name == "FireRate") {
+            m_FireRate = std::stof(value);
+        }
+        else if (name == "BulletSpeed") {
+            m_BulletSpeed = std::stof(value);
+        }
+    }
+
 } // namespace Engine
