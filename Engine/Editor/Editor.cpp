@@ -4159,6 +4159,8 @@ namespace Engine
 			}
 		}
 
+		ViewportPanelHelper::CameraControl(m_Renderer);
+
 		ImGui::End();
 	}
 
