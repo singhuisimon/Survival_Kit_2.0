@@ -228,13 +228,13 @@ namespace Engine {
         else if (componentType == "TransformComponent") {
             auto& comp = entity.AddComponent<TransformComponent>();
 
-            if (properties.HasMember("Position") && properties["Position"].IsArray()) {
+            if (properties.HasMember("Position") && properties["Position"].IsArray() && properties["Position"].Size() >= 3) {
                 const auto& pos = properties["Position"];
                 comp.Position = glm::vec3(pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat());
             }
-            if (properties.HasMember("Rotation") && properties["Rotation"].IsArray()) {
+
+            if (properties.HasMember("Rotation") && properties["Rotation"].IsArray() && properties["Rotation"].Size() >= 4) {
                 const auto& rot = properties["Rotation"];
-                // Rotation is stored as quaternion (x, y, z, w)
                 comp.Rotation = glm::quat(rot[3].GetFloat(), rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat());
             }
             if (properties.HasMember("Scale") && properties["Scale"].IsArray()) {
@@ -540,5 +540,6 @@ namespace Engine {
         const std::string& componentType,
         const ::rapidjson::Value& properties
     );
+
 
 } // namespace Engine

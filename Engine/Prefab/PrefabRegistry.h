@@ -79,6 +79,9 @@ namespace Engine {
             return m_Prefabs;
         }
 
+        void UpdatePrefab(std::shared_ptr<Prefab> newPrefab);
+
+
     private:
         PrefabRegistry() = default;
         ~PrefabRegistry() = default;

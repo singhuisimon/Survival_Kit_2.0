@@ -33,6 +33,7 @@
 namespace Engine {
 
     std::shared_ptr<Prefab> PrefabSerializer::CreateEntityPrefab(Entity entity, const std::string& name) {
+
         if (!entity) {
             LOG_ERROR("PrefabSerializer: Cannot create prefab from invalid entity");
             return nullptr;
@@ -41,11 +42,9 @@ namespace Engine {
         auto prefab = std::make_shared<Prefab>(PrefabType::Entity);
         prefab->SetName(name);
 
-        // Get the entity's registry - need to access via the entity's internal pointer
-        // This is a workaround since Entity doesn't expose the registry directly
+     
         entt::registry* registry = nullptr;
 
-        // We'll use the entity to get components, which implicitly uses its registry
         std::string entityData = SerializeEntity(entity, entity);
         prefab->SetEntityData(entityData);
 
@@ -176,7 +175,6 @@ namespace Engine {
     std::shared_ptr<Prefab> PrefabSerializer::DeserializePrefabFromString(const std::string& jsonString) {
         rapidjson::Document doc;
         doc.Parse(jsonString.c_str());
-
         if (doc.HasParseError()) {
             LOG_ERROR("PrefabSerializer: JSON parse error");
             return nullptr;
@@ -187,32 +185,27 @@ namespace Engine {
             LOG_ERROR("PrefabSerializer: Missing Type field");
             return nullptr;
         }
-
         std::string typeStr = doc["Type"].GetString();
         PrefabType type = (typeStr == "Entity") ? PrefabType::Entity : PrefabType::Scene;
 
+        // Create prefab (constructor still generates temp GUID)
         auto prefab = std::make_shared<Prefab>(type);
 
-        // Read metadata
-        if (doc.HasMember("Name")) {
-            prefab->SetName(doc["Name"].GetString());
-        }
-
+        // Overwrite GUID from JSON
         if (doc.HasMember("GUID")) {
             uint64_t guidValue = std::stoull(doc["GUID"].GetString());
             prefab->SetGUID(xresource::instance_guid{ guidValue });
         }
 
-        // Read data
-        if (type == PrefabType::Entity) {
-            if (doc.HasMember("EntityData")) {
-                prefab->SetEntityData(doc["EntityData"].GetString());
-            }
+        // Metadata
+        if (doc.HasMember("Name")) prefab->SetName(doc["Name"].GetString());
+
+        // Entity/Scene data
+        if (type == PrefabType::Entity && doc.HasMember("EntityData")) {
+            prefab->SetEntityData(doc["EntityData"].GetString());
         }
-        else {
-            if (doc.HasMember("SceneData")) {
-                prefab->SetSceneData(doc["SceneData"].GetString());
-            }
+        else if (type == PrefabType::Scene) {
+            if (doc.HasMember("SceneData")) prefab->SetSceneData(doc["SceneData"].GetString());
             if (doc.HasMember("RootEntityGUID")) {
                 uint64_t rootGuid = std::stoull(doc["RootEntityGUID"].GetString());
                 prefab->SetRootEntityGUID(xresource::instance_guid{ rootGuid });

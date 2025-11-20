@@ -100,30 +100,77 @@ namespace Engine
 							if (selectedEntity)
 							{
 								std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
-								auto prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
+								auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 
-								if (!prefab)
+	
+								if (selectedEntity.HasComponent<PrefabComponent>())
 								{
+									auto& prefabComp = selectedEntity.GetComponent<PrefabComponent>();
+									
 									ImGui::EndMenu();
-									ImGui::EndPopup();
-									if (opened && hasChildren) {
-										ImGui::TreePop();
-									}
 									return;
 								}
 
-								auto prefabFolder = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 
-								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabFolder))
+								//  Check if prefab file already exists
+								std::shared_ptr<Prefab> prefab;
+								xresource::instance_guid existingGUID{};
+
+								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+								if (existingPrefab)
 								{
-									PrefabRegistry::Get().RegisterPrefab(prefab);
-									currentPrefab = prefab.get();
-									currPrefabPath = prefabFolder;
-									temporaryPrefabPaths.insert(prefabFolder);
+									
+									existingGUID = existingPrefab->GetGUID();
 
+									// update existing prefab instead of creating new one
+									prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
+									if (prefab)
+									{
+										
+										prefab->SetGUID(existingGUID);
+									
+									}
 								}
+								else
+								{
+									prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
+									
+								}
+
+								if (!prefab)
+								{
+									
+									ImGui::EndMenu();
+									return;
+								}
+
+
+								// Save prefab to disk
+								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabPath))
+								{
+									// Register/Update prefab in registry
+									auto existingInRegistry = PrefabRegistry::Get().GetPrefab(prefab->GetGUID());
+									if (!existingInRegistry)
+									{
+										PrefabRegistry::Get().RegisterPrefab(prefab);
+										
+									}
+									else
+									{
+										PrefabRegistry::Get().RegisterPrefab(prefab); 
+									
+									}
+
+									currentPrefab = prefab.get();
+									currPrefabPath = prefabPath;
+									temporaryPrefabPaths.insert(prefabPath);
+
+									
+								}
+								
 							}
 						}
+
 						if (ImGui::MenuItem("Replace Prefab"))
 						{
 							replacePrefabPending = true;
@@ -132,6 +179,7 @@ namespace Engine
 
 						ImGui::EndMenu(); // end prefab menu
 					}
+
 				}
 
 				ImGui::Separator();
