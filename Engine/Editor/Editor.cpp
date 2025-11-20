@@ -639,7 +639,6 @@ namespace Engine
 						// Display asset reference fields
 						DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
 						DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
-						DisplayAssetField("Texture", mesh.TextureGuid, ResourceType::TEXTURE);
 
 						if (showWrongType) {
 
