@@ -164,19 +164,19 @@ add_custom_target(CompileAssets
 - [x] Multi-threading placeholder
 - [ ] Basic logging system
 
-### Phase 2: Texture Compilation
-- [ ] Parse texture descriptor settings
-- [ ] Load source images (stb_image)
-- [ ] Implement compression (BC7, DXT5)
-- [ ] Generate mipmaps
-- [ ] Write custom `.texture` format
+### Phase 2: Texture Compilation 
+- [x] Parse texture descriptor settings
+- [x] Load source images (stb_image)
+- [x] Implement compression (BC7, DXT5)
+- [x] Generate mipmaps
+- [x] Write custom `.texture` format
 
-### Phase 3: Mesh Compilation
-- [ ] Parse mesh descriptor settings
-- [ ] Load source meshes (Assimp/OpenFBX)
-- [ ] Optimize vertex data
-- [ ] Generate normals if missing
-- [ ] Write custom `.mesh` format
+### Phase 3: Mesh Compilation (Done)
+- [x] Parse mesh descriptor settings
+- [x] Load source meshes (OpenFBX)
+- [x] Optimize vertex data
+- [x] Generate normals if missing
+- [x] Write custom `.mesh` format
 
 ### Phase 4: Audio Compilation
 - [ ] Parse audio descriptor settings

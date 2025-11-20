@@ -26,6 +26,8 @@
 #include "AssetDatabase.h"
 #include "../Utility/AssetPath.h"
 #include "../Utility/Logger.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace Engine {
 
@@ -73,8 +75,19 @@ namespace Engine {
 		//index format
 		std::string indexType = "UINT32"; //UINT16 or UINT32
 
-		//transform 
+		//scale 
 		float scale = 1.0f; //uniform scale
+
+		//position
+		float positionX = 0.0f;
+		float positionY = 0.0f;
+		float positionZ = 0.0f;
+
+		//rotation
+		float rotationX = 0.0f;
+		float rotationY = 0.0f;
+		float rotationZ = 0.0f;
+	
 
 		//optimizations 
 		bool optimizeVertices = true; //remove duplicates and optimize cache

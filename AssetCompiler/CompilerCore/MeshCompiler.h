@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace AssetCompiler {
 
@@ -74,6 +75,12 @@ namespace AssetCompiler {
 
 		//transform 
 		float scale = 1.0f;
+		float positionX = 0.0f; //x position offset
+		float positionY = 0.0f; //y position offset
+		float positionZ = 0.0f; //z position offset
+		float rotationX = 0.0f; //x rotation in degrees (-360 to 360)
+		float rotationY = 0.0f; //y rotation in degrees (-360 to 360)
+		float rotationZ = 0.0f; //z rotation in degrees (-360 to 360)
 
 		//optimization flags
 		bool optimizeVertices = true;
@@ -128,7 +135,12 @@ namespace AssetCompiler {
 		bool loadOBJMesh(const std::string& path, MeshData& meshData);
 
 		// === Processing ===
+		
+		//transform processing
 		void scaleMesh(MeshData& meshData, float scale);
+		void rotateMesh(MeshData& meshData, float rotX, float rotY, float rotZ);
+		void translateMesh(MeshData& meshData, float x, float y, float z);
+
 		void generateNormals(MeshData& meshData);
 		void flipUVs(MeshData& meshData);
 		void removeDegenerate(MeshData& meshData);
