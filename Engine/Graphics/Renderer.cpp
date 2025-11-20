@@ -660,6 +660,10 @@ namespace Engine {
 
 				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
 				 	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 				 	prog.setUniform("Texture2D", 0);
 				 	prog.setUniform("isTexture", true);
 
