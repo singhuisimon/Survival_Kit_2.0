@@ -68,6 +68,20 @@ namespace Engine
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
+		bool animatorWindow = false;			// Animator/dopesheet window toggle
+		bool m_FocusAnimatorNextFrame = false;	// Request Animator window focus next frame
+
+		// --- Animator / dopesheet editor state ---
+		enum class DopesheetTrackType
+		{
+			None,
+			Position,
+			Rotation,
+			Scale
+		};
+
+		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
+		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
 
 		// ImGui Top Menu Panel
 		bool openScenePanel = false; // for top menu open file 
@@ -114,6 +128,8 @@ namespace Engine
 		bool showDescriptorEditorPanel = false;
 		xresource::instance_guid currentEditingGuid;
 		std::string editedAsset{};
+
+		bool isPlaying = true;
 
 	public:
 		/**************************************************************************
@@ -201,6 +217,13 @@ namespace Engine
 		* 	objects, replace prefabs, and create a new prefab based on the selected entity.
 		**************************************************************************/
 		void displayHierarchyPanel();
+
+		/**************************************************************************
+		* @brief
+		*  Displays the Animator (dopesheet) panel for the selected entity.
+		*  Allows editing of animation clips & keyframes.
+		**************************************************************************/
+		void displayAnimatorPanel();            // <--- NEW
 
 		/**************************************************************************
 		* @brief 
@@ -338,6 +361,8 @@ namespace Engine
 		*	The size of the button used for removing the component.
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
+
+		bool getIsPlaying() const { return isPlaying; }
 	};
 
 

@@ -321,7 +321,7 @@ void Game::CreateDefaultScene() {
     
     // Animation clip 1 (Rotate)
     Engine::AnimationClip clip_1;
-    clip_1.name = "Rotate360in5s";
+    clip_1.name = "RotateAndMovein5s";
     clip_1.duration = 5.0f;
     clip_1.loop = true;
 
@@ -339,10 +339,13 @@ void Game::CreateDefaultScene() {
     clip_2.loop = true;
 
     // Create start and end keys for rotation
-    Engine::PositionKeyframe c2k0{ 0.0f, glm::vec3(-5.0, 0.0, 0.0)};
-    Engine::PositionKeyframe c2k1{ clip_2.duration, glm::vec3(5.0, 0.0, 0.0) };
+    Engine::PositionKeyframe c2k0{ 0.0f, glm::vec3(-2.5, 0.0, 0.0)};
+    Engine::PositionKeyframe c2k1{ 2.5f, glm::vec3(2.5, 0.0, 0.0) };
+    Engine::PositionKeyframe c2k2{ clip_2.duration, glm::vec3(-2.5, 0.0, 0.0) };
     clip_2.positionKeys.emplace_back(c2k0);
     clip_2.positionKeys.emplace_back(c2k1);
+    clip_2.positionKeys.emplace_back(c2k2);
+    clip_1.positionKeys = { c2k0, c2k1, c2k2 }; // Addition to the first clip
 
     // Animation clip 3 (Scale)
     Engine::AnimationClip clip_3;
@@ -616,13 +619,42 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Get input reference
     auto& input = GetInput();
+
+    // Add this somewhere in your input handling:
+    if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
+        m_EditorEnable = !m_EditorEnable;
+        LOG_INFO("Editor toggled: ", m_EditorEnable);
+    }
+
     Engine::ScriptReloader::GetInstance().Update();
 
-    // Update scene (this will call all systems in priority order)
-    m_Scene->OnUpdate(ts);  // Convert Timestep to float
+    // When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
+    if (!m_EditorEnable || (m_EditorEnable && m_Editor->getIsPlaying())) {
+        
+        // Update scene (this will call all systems in priority order)
+        m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
-    // Update audio manager if exists
-    m_AudioManager->OnUpdate(ts);
+        // Update audio manager if exists
+        m_AudioManager->OnUpdate(ts);
+    }
+    else { // When Editor is ON but gameplay is PLAYING: Update Transform, Camera and Render systems
+
+        auto& sceneSystems = m_Scene->GetSystemRegistry();
+
+        Engine::TransformSystem* transformSystem = sceneSystems.GetSystem<Engine::TransformSystem>();
+        transformSystem->OnUpdate(m_Scene.get(), ts);
+
+        // Bug: BT system does not load when updated; Quick fix is to uncomment the next lines let BT system run instead of stopping
+        /*Engine::BehaviourTreeSystem* BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
+        BTSystem->OnUpdate(m_Scene.get(), ts);*/
+
+        Engine::CameraSystem* camSystem = sceneSystems.GetSystem<Engine::CameraSystem>();
+        camSystem->OnUpdate(m_Scene.get(), ts);
+
+        Engine::RenderSystem* renderSystem = sceneSystems.GetSystem<Engine::RenderSystem>();
+        renderSystem->OnUpdate(m_Scene.get(), ts);
+
+    } 
 
     if (input.IsKeyJustPressed(GLFW_KEY_P)) {
         LOG_DEBUG("Testing Audio Playback");
@@ -1085,7 +1117,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
-    m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+
+    if (m_EditorEnable) {
+        m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+    }
+
     m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
     m_TracyProfiler->OnUpdate();
 }
