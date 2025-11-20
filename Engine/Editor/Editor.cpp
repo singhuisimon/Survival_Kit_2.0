@@ -746,13 +746,12 @@ namespace Engine
 							// Texture Maps (PBR Metallic/Roughness)
 							if (ImGui::CollapsingHeader("Texture Maps"))
 							{
-								// Displaying the 64-bit hex GUID from the m_Value
-								ImGui::Text("Base Map (Albedo): [Stub - ID: 0x%llx]", material->baseMap.m_Value);
-								ImGui::Text("Normal Map:         [Stub - ID: 0x%llx]", material->normalMap.m_Value);
-								ImGui::Text("Metallic Map:       [Stub - ID: 0x%llx]", material->metallicMap.m_Value);
-								ImGui::Text("Roughness Map:      [Stub - ID: 0x%llx]", material->roughnessMap.m_Value);
-								ImGui::Text("Emission Map:       [Stub - ID: 0x%llx]", material->emissionMap.m_Value);
-								ImGui::Text("Occlusion Map:      [Stub - ID: 0x%llx]", material->occlusionMap.m_Value);
+								DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE);
+								DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE);
+								DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE);
+								DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE);
+								DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE);
+								DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE);
 							}
 
 							// Color Properties
