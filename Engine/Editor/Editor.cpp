@@ -4028,6 +4028,7 @@ namespace Engine
 				}
 				else if (descriptorEditor.GetType() == ResourceType::MESH) {
 
+#if 0
 					MeshSettings* settings = descriptorEditor.GetMeshSettings();
 
 					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
@@ -4078,7 +4079,122 @@ namespace Engine
 						settings->scale = meshScale;
 						descriptorEditor.MarkModified();
 					}
+#endif
+					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+
+					// ========== TRANSFORM SECTION ==========
+					ImGui::SeparatorText("Transform");
+
+					// Scale
+					float meshScale = settings->scale;
+					if (ImGui::DragFloat("Scale", &meshScale, 0.001f, 0.0001f, 1000.0f, "%.4f")) {
+						settings->scale = meshScale;
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Uniform scale factor (e.g., 0.001 for mm to m)");
+					}
+
+					ImGui::Spacing();
+
+					// Position
+					ImGui::Text("Position Offset:");
+					float position[3] = { settings->positionX, settings->positionY, settings->positionZ };
+					if (ImGui::DragFloat3("Position", position, 0.1f)) {
+						settings->positionX = position[0];
+						settings->positionY = position[1];
+						settings->positionZ = position[2];
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Position offset in mesh units (X, Y, Z)");
+					}
+
+					ImGui::Spacing();
+
+					// Rotation
+					ImGui::Text("Rotation (Degrees):");
+					float rotation[3] = { settings->rotationX, settings->rotationY, settings->rotationZ };
+					if (ImGui::DragFloat3("Rotation", rotation, 1.0f, -180.0f, 180.0f)) {
+						settings->rotationX = rotation[0];
+						settings->rotationY = rotation[1];
+						settings->rotationZ = rotation[2];
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Rotation in degrees (X=Pitch, Y=Yaw, Z=Roll)");
+					}
+
 					
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== VERTEX DATA SECTION ==========
+					ImGui::SeparatorText("Vertex Data");
+
+					if (ImGui::Checkbox("Include Position", &settings->includePos)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords)) {
+						descriptorEditor.MarkModified();
+					}
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== OUTPUT SETTINGS SECTION ==========
+					ImGui::SeparatorText("Output Settings");
+
+					char formatBuffer[256];
+					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+						settings->outputFormat = std::string(formatBuffer);
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str())) {
+						for (auto& option : descriptorEditor.GetIndexTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->indexType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== OPTIMIZATION SECTION ==========
+					ImGui::SeparatorText("Optimization");
+
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices)) {
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Remove duplicate vertices and optimize for cache");
+					}
+
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Generate normals if missing");
+					}
+
 				}
 
 				if (!descriptorEditor.GetTags().empty()) {
