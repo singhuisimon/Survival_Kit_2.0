@@ -77,11 +77,6 @@ namespace Engine {
         size_t GetStackDepth() const;
 
     private:
-        /**
-         * @brief Process a composite node's execution logic
-         * @details This handles the node-specific logic for composites/decorators
-         */
-        BTStatus ProcessCompositeNode(BTStackFrame& frame, BTContext& context);
 
         std::shared_ptr<BTNode> m_RootNode;
         std::stack<BTStackFrame> m_ExecutionStack;

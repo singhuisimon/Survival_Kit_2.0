@@ -17,8 +17,17 @@
                     "AdwareCount": "1",
                     "WormsCount": "1",
                     "BotnetCount": "1",
-                    "Spacing": "50.000000",
-                    "LoveletterPos": "100.000000,20.000000,100.000000"
+                    "WallA": "false",
+                    "WallB": "false",
+                    "WallC": "false",
+                    "WallD": "false",
+                    "WallE": "false",
+                    "Boss": "false",
+                    "SpawnPointA": "2",
+                    "SpawnPointB": "2",
+                    "SpawnPointC": "1",
+                    "SpawnPointD": "2",
+                    "SpawnPointE": "1"
                 }
             },
             {

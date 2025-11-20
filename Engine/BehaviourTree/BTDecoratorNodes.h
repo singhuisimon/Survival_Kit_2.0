@@ -32,7 +32,12 @@ namespace Engine {
 
         void Reset() override;
 
+        // FIXED: Override these methods so decorator children can be found and removed
+        int FindChildIndex(const std::shared_ptr<BTNode>& child) const override;
+        int FindChildIndexByGUID(xresource::instance_guid guid) const override;
+
     protected:
+        bool m_ChildEntered = false;
         std::shared_ptr<BTNode> m_Child;
         mutable std::vector<std::shared_ptr<BTNode>> m_ChildVector; // For GetChildren interface
     };
