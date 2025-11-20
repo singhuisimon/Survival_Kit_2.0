@@ -84,8 +84,21 @@ namespace Engine
 			Scale
 		};
 
+		enum class AnimatorViewMode
+		{
+			Dopesheet,
+			Curves
+		};
+
+		// Helper to draw legend in Animator Curve display
+		static void DrawCurveLegendRow(const char* label,
+									   const char* c0Label, ImU32 c0,
+									   const char* c1Label, ImU32 c1,
+									   const char* c2Label, ImU32 c2);
+
 		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
-		int                m_DopesheetSelectedKey = -1;  // index into that track�s key array
+		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
+		AnimatorViewMode    m_AnimatorViewMode = AnimatorViewMode::Dopesheet;
 
 		// ImGui Top Menu Panel
 		bool openScenePanel = false; // for top menu open file 
@@ -231,10 +244,11 @@ namespace Engine
 
 		/**************************************************************************
 		* @brief
-		*  Displays the Animator (dopesheet) panel for the selected entity.
-		*  Allows editing of animation clips & keyframes.
+		*   Displays the Animator window.
+		*   Left side: entity/controller/clip, time and tracks.
+		*   Right side: dopesheet or curves (switchable).
 		**************************************************************************/
-		void displayAnimatorPanel();            // <--- NEW
+		void displayAnimatorPanel();
 
 		/**************************************************************************
 		* @brief 
