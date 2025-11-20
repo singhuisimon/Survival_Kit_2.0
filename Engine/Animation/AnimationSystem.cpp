@@ -64,9 +64,6 @@ namespace Engine {
 
 		auto& registry = scene->GetRegistry();
 		auto animView = registry.view<AnimatorComponent>();
-
-		std::cout << "Entered Animation System" << std::endl;
-
 		for (auto anim : animView) {
 
 			// Get entity's animator component
@@ -114,17 +111,17 @@ namespace Engine {
 					animator.playing = false;
 				}
 			}
-			std::cout << "Animator current time: " << animator.currentTime << std::endl;
+			//std::cout << "Animator current time: " << animator.currentTime << std::endl;
 
 			// Sample full transform (position, rotation, scale)
 			SampleClipAtTime(*clip, animator.currentTime, transform);
 			//glm::quat rot = SampleRotation(*clip, animator.currentTime);
 
-			glm::vec3 eulerDeg = glm::degrees(glm::eulerAngles(transform.Rotation));
-			std::cout << "Sphere euler: "
-				<< eulerDeg.x << ", "
-				<< eulerDeg.y << ", "
-				<< eulerDeg.z << std::endl;
+			//glm::vec3 eulerDeg = glm::degrees(glm::eulerAngles(transform.Rotation));
+			//std::cout << "Sphere euler: "
+			//	<< eulerDeg.x << ", "
+			//	<< eulerDeg.y << ", "
+			//	<< eulerDeg.z << std::endl;
 		}
 	}
 

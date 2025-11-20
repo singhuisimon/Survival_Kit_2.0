@@ -321,7 +321,7 @@ void Game::CreateDefaultScene() {
     
     // Animation clip 1 (Rotate)
     Engine::AnimationClip clip_1;
-    clip_1.name = "Rotate360in5s";
+    clip_1.name = "RotateAndMovein5s";
     clip_1.duration = 5.0f;
     clip_1.loop = true;
 
@@ -339,10 +339,13 @@ void Game::CreateDefaultScene() {
     clip_2.loop = true;
 
     // Create start and end keys for rotation
-    Engine::PositionKeyframe c2k0{ 0.0f, glm::vec3(-5.0, 0.0, 0.0)};
-    Engine::PositionKeyframe c2k1{ clip_2.duration, glm::vec3(5.0, 0.0, 0.0) };
+    Engine::PositionKeyframe c2k0{ 0.0f, glm::vec3(-2.5, 0.0, 0.0)};
+    Engine::PositionKeyframe c2k1{ 2.5f, glm::vec3(2.5, 0.0, 0.0) };
+    Engine::PositionKeyframe c2k2{ clip_2.duration, glm::vec3(-2.5, 0.0, 0.0) };
     clip_2.positionKeys.emplace_back(c2k0);
     clip_2.positionKeys.emplace_back(c2k1);
+    clip_2.positionKeys.emplace_back(c2k2);
+    clip_1.positionKeys = { c2k0, c2k1, c2k2 }; // Addition to the first clip
 
     // Animation clip 3 (Scale)
     Engine::AnimationClip clip_3;

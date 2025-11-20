@@ -28,6 +28,13 @@
 #include "../Editor/EditorViewportPanel.h"
 
 #include "../Asset/ResourceHelpers.h"
+
+// Animation system / storage for clips & controllers
+#include "ECS/Components.h"               // for AnimatorComponent
+#include "Animation/AnimationStorage.h"   // AnimationClip / AnimatorController / storage
+#include "Animation/AnimationSystem.h"    // optional, but handy for context
+
+
 // Include other necessary headers
 #include <GLFW/glfw3.h>
 #include <cctype>
@@ -106,6 +113,8 @@ namespace Engine
 		displayPropertiesPanel();
 
 		displayHierarchyPanel();
+
+		displayAnimatorPanel();
 
 		displayAssetsBrowserPanel();
 
@@ -247,6 +256,7 @@ namespace Engine
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &hierachyWindow);
 				ImGui::MenuItem("Properties", NULL, &inspectorWindow);
+				ImGui::MenuItem("Animator", NULL, &animatorWindow);          // <--- NEW
 				ImGui::MenuItem("Performance Profile", NULL, &performanceProfileWindow);
 				ImGui::EndMenu();
 			}
@@ -1836,6 +1846,78 @@ namespace Engine
 
 				// ============================ Display Camera Comp ===============================
 				displayCameraComp(dotButtonSize);
+
+				// =========================== Display Animator Component ===========================
+				if (m_SelectedEntity.HasComponent<AnimatorComponent>())
+				{
+					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openAnimatorComponent = ImGui::CollapsingHeader("Animator Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeAnimator = false;
+
+					// Column 2: "..." button to remove component
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###AnimatorBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("AnimatorPopUp");
+					}
+					if (ImGui::BeginPopup("AnimatorPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeAnimator = true;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openAnimatorComponent)
+					{
+						auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
+
+						ImGui::Text("Controller Handle: %u", animator.controller);
+
+						// Basic animator state controls
+						ImGui::Checkbox("Playing", &animator.playing);
+						ImGui::Checkbox("Respect Clip Loop", &animator.respectClipLoop);
+
+						ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f);
+						ImGui::DragInt("Current Clip Index", (int*)(&animator.currentClipIndex), 1.0f, 0, 100);
+						ImGui::DragFloat("Current Time", &animator.currentTime, 0.01f, 0.0f, 1000.0f);
+
+						if (ImGui::Button("Restart Clip"))
+						{
+							animator.currentTime = 0.0f;
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("Stop##AnimatorComp"))
+						{
+							animator.currentTime = 0.0f;
+							animator.playing = false;
+						}
+
+						ImGui::Separator();
+						ImGui::TextWrapped("Use the Animator window (View -> Animator) to edit "
+							"controllers, clips, and keyframes.");
+
+						// Convenience: open & focus Animator window from here
+						if (ImGui::Button("Open Animator Window"))
+						{
+							animatorWindow = true;
+							m_FocusAnimatorNextFrame = true;
+						}
+					}
+
+					if (removeAnimator)
+					{
+						m_SelectedEntity.RemoveComponent<AnimatorComponent>();
+					}
+				}
+
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -2072,6 +2154,26 @@ namespace Engine
 						if (!hasCameraComponent)
 						{
 							ImGui::SetTooltip("Add camera to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
+					// ------------------------ Add Animator Component ----------------------------
+					bool hasAnimatorComponent = m_SelectedEntity.HasComponent<AnimatorComponent>();
+					ImGui::BeginDisabled(hasAnimatorComponent);
+
+					if (ImGui::MenuItem("Animator Component"))
+					{
+						if (!hasAnimatorComponent)
+						{
+							m_SelectedEntity.AddComponent<AnimatorComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasAnimatorComponent)
+						{
+							ImGui::SetTooltip("Adds animation playback data (controller, clip index, time) to this object.");
 						}
 					}
 					ImGui::EndDisabled();
@@ -2341,6 +2443,756 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 	}
+
+	void Editor::displayAnimatorPanel()
+	{
+		if (!animatorWindow)
+			return;
+
+		// If requested, focus this window on the next frame
+		if (m_FocusAnimatorNextFrame)
+		{
+			ImGui::SetNextWindowFocus();
+			m_FocusAnimatorNextFrame = false;
+		}
+
+		if (!ImGui::Begin("Animator", &animatorWindow))
+		{
+			ImGui::End();
+			return;
+		}
+
+		if (!m_Scene)
+		{
+			ImGui::TextUnformatted("No scene loaded.");
+			ImGui::End();
+			return;
+		}
+
+		if (!m_SelectedEntity)
+		{
+			ImGui::TextUnformatted("No entity selected.");
+			ImGui::End();
+			return;
+		}
+
+		// Selected entity must have an AnimatorComponent
+		if (!m_SelectedEntity.HasComponent<AnimatorComponent>())
+		{
+			ImGui::TextUnformatted("Selected entity has no AnimatorComponent.");
+			ImGui::End();
+			return;
+		}
+
+		auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
+
+		// ---- Look up controller from global storage ----
+		auto ctrlIt = m_AnimatorControllerStorage.find(animator.controller);
+		if (ctrlIt == m_AnimatorControllerStorage.end())
+		{
+			ImGui::Text("AnimatorController handle %u is invalid.", animator.controller);
+			ImGui::End();
+			return;
+		}
+
+		AnimatorController& controller = ctrlIt->second;
+
+		if (controller.clips.empty())
+		{
+			ImGui::TextUnformatted("AnimatorController has no clips.");
+			ImGui::End();
+			return;
+		}
+
+		// Clamp current clip index
+		if (animator.currentClipIndex < 0 ||
+			animator.currentClipIndex >= static_cast<int>(controller.clips.size()))
+		{
+			animator.currentClipIndex = 0;
+		}
+
+		u32 clipHandle = controller.clips[static_cast<size_t>(animator.currentClipIndex)];
+
+		// Look up active clip
+		AnimationClip* clipPtr = nullptr;
+		{
+			auto clipIt = m_AnimationClipStorage.find(clipHandle);
+			if (clipIt != m_AnimationClipStorage.end())
+				clipPtr = &clipIt->second;
+		}
+
+		if (!clipPtr)
+		{
+			ImGui::Text("Active clip handle %u is invalid.", clipHandle);
+			ImGui::End();
+			return;
+		}
+
+		AnimationClip& clip = *clipPtr;
+
+		// -----------------------------------------------------------------
+		// Header: entity + controller + clip selection
+		// -----------------------------------------------------------------
+		ImGui::Text("Entity: %s", m_SelectedEntity.GetComponent<TagComponent>().Tag.c_str());
+		ImGui::Text("Controller: %s", controller.name.c_str());
+
+		// Clip combo
+		{
+			std::string previewName = clip.name.empty() ? "Unnamed Clip" : clip.name;
+
+			if (ImGui::BeginCombo("Clip", previewName.c_str()))
+			{
+				for (int i = 0; i < static_cast<int>(controller.clips.size()); ++i)
+				{
+					u32 h = controller.clips[static_cast<size_t>(i)];
+					auto it = m_AnimationClipStorage.find(h);
+
+					const char* name = "(missing)";
+					if (it != m_AnimationClipStorage.end() && !it->second.name.empty())
+						name = it->second.name.c_str();
+
+					bool selected = (i == animator.currentClipIndex);
+					if (ImGui::Selectable(name, selected))
+					{
+						animator.currentClipIndex = i;
+						animator.currentTime = 0.0f;
+						m_DopesheetSelectedTrack = DopesheetTrackType::None;
+						m_DopesheetSelectedKey = -1;
+					}
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+		}
+
+		//// -----------------------------------------------------------------
+		//// Animator State (playback flags)
+		//// -----------------------------------------------------------------
+		//ImGui::SeparatorText("Animator State");
+
+		//ImGui::Checkbox("Playing", &animator.playing);
+		//ImGui::SameLine();
+		//ImGui::Checkbox("Respect Clip Loop", &animator.respectClipLoop);
+
+		//ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f);
+
+		//if (ImGui::Button("Restart Clip##AnimPanel"))
+		//{
+		//	animator.currentTime = 0.0f;
+		//}
+		//ImGui::SameLine();
+		//if (ImGui::Button("Stop##AnimPanel"))
+		//{
+		//	animator.currentTime = 0.0f;
+		//	animator.playing = false;
+		//}
+
+		// -----------------------------------------------------------------
+		// Clip settings + time controls
+		// -----------------------------------------------------------------
+		ImGui::SeparatorText("Clip Settings");
+
+		// Clip name edit
+		{
+			char nameBuffer[128];
+			strncpy_s(nameBuffer, sizeof(nameBuffer), clip.name.c_str(), _TRUNCATE);
+
+			if (ImGui::InputText("Clip Name", nameBuffer, sizeof(nameBuffer),
+				ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				std::string newName = nameBuffer;
+				newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+				newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+				if (!newName.empty())
+				{
+					clip.name = newName;
+				}
+			}
+		}
+
+		ImGui::InputFloat("Duration (s)", &clip.duration);
+		if (clip.duration <= 0.0f) clip.duration = 0.001f;
+
+		ImGui::Checkbox("Loop", &clip.loop);
+
+		ImGui::SeparatorText("Time");
+
+		// Clamp animator time
+		animator.currentTime = glm::clamp(animator.currentTime, 0.0f, clip.duration);
+
+		float scrubTime = animator.currentTime;
+		if (ImGui::SliderFloat("Current Time", &scrubTime, 0.0f, clip.duration, "%.3f s"))
+		{
+			animator.currentTime = glm::clamp(scrubTime, 0.0f, clip.duration);
+		}
+
+		// -----------------------------------------------------------------
+		// Dopesheet timeline (per-track colors, legend, key selection)
+		// -----------------------------------------------------------------
+		ImGui::SeparatorText("Dopesheet");
+
+		// Colors per track
+		const ImU32 colPos = IM_COL32(80, 200, 120, 255);
+		const ImU32 colRot = IM_COL32(220, 100, 100, 255);
+		const ImU32 colScale = IM_COL32(100, 140, 230, 255);
+		const ImU32 colPosSel = IM_COL32(130, 255, 170, 255);
+		const ImU32 colRotSel = IM_COL32(255, 170, 170, 255);
+		const ImU32 colScaleSel = IM_COL32(160, 190, 255, 255);
+		const ImU32 colPlayhead = IM_COL32(255, 255, 50, 255);
+
+		// Legend
+		ImGui::Text("Legend:");
+		ImDrawList* legendList = ImGui::GetWindowDrawList();
+
+		auto drawLegendItem = [&](ImU32 col, const char* label)
+			{
+				ImVec2 p = ImGui::GetCursorScreenPos();
+				ImVec2 sz(12.0f, 12.0f);
+				legendList->AddRectFilled(p, ImVec2(p.x + sz.x, p.y + sz.y), col);
+				ImGui::Dummy(sz);
+				ImGui::SameLine();
+				ImGui::TextUnformatted(label);
+			};
+
+		drawLegendItem(colPos, "Position");
+		drawLegendItem(colRot, "Rotation");
+		drawLegendItem(colScale, "Scale");
+
+		// Timeline canvas
+		ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+		ImVec2 canvasSize = ImVec2(ImGui::GetContentRegionAvail().x, 80.0f);
+		ImVec2 canvasEnd = ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y);
+
+		ImGui::InvisibleButton("##DopesheetTimeline", canvasSize);
+		bool timelineHovered = ImGui::IsItemHovered();
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+		// Background
+		drawList->AddRectFilled(canvasPos, canvasEnd, IM_COL32(30, 30, 30, 255));
+		drawList->AddRect(canvasPos, canvasEnd, IM_COL32(80, 80, 80, 255));
+
+		float midY = (canvasPos.y + canvasEnd.y) * 0.5f;
+
+		// Horizontal mid line
+		drawList->AddLine(ImVec2(canvasPos.x, midY),
+			ImVec2(canvasEnd.x, midY),
+			IM_COL32(100, 100, 100, 255));
+
+		// Helper to map time in [0, duration] to X in [canvasPos.x, canvasEnd.x]
+		auto timeToX = [&](float t)
+			{
+				float u = (clip.duration > 0.0f) ? (t / clip.duration) : 0.0f;
+				u = glm::clamp(u, 0.0f, 1.0f);
+				return canvasPos.x + u * canvasSize.x;
+			};
+
+		// --- First pass: handle click selection on keys ---
+		const float keyRadius = 6.0f;
+		const float keyRadiusSq = keyRadius * keyRadius;
+		bool        clickedOnTimeline = timelineHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+		ImVec2      mousePos = ImGui::GetIO().MousePos;
+
+		if (clickedOnTimeline)
+		{
+			float bestDistSq = keyRadiusSq;
+			DopesheetTrackType bestTrack = DopesheetTrackType::None;
+			int bestIndex = -1;
+
+			auto testKeys = [&](const auto& keys,
+				DopesheetTrackType trackType,
+				float yOffset)
+				{
+					for (int i = 0; i < static_cast<int>(keys.size()); ++i)
+					{
+						float x = timeToX(keys[static_cast<size_t>(i)].time);
+						float y = midY + yOffset;
+
+						float dx = mousePos.x - x;
+						float dy = mousePos.y - y;
+						float d2 = dx * dx + dy * dy;
+
+						if (d2 < bestDistSq)
+						{
+							bestDistSq = d2;
+							bestTrack = trackType;
+							bestIndex = i;
+						}
+					}
+				};
+
+			// Position = slightly above line, Rotation on line, Scale below
+			testKeys(clip.positionKeys, DopesheetTrackType::Position, -12.0f);
+			testKeys(clip.rotationKeys, DopesheetTrackType::Rotation, 0.0f);
+			testKeys(clip.scaleKeys, DopesheetTrackType::Scale, +12.0f);
+
+			if (bestTrack != DopesheetTrackType::None)
+			{
+				// Select the nearest key and move playhead there
+				m_DopesheetSelectedTrack = bestTrack;
+				m_DopesheetSelectedKey = bestIndex;
+
+				float keyTime = 0.0f;
+				switch (bestTrack)
+				{
+				case DopesheetTrackType::Position:
+					keyTime = clip.positionKeys[static_cast<size_t>(bestIndex)].time;
+					break;
+				case DopesheetTrackType::Rotation:
+					keyTime = clip.rotationKeys[static_cast<size_t>(bestIndex)].time;
+					break;
+				case DopesheetTrackType::Scale:
+					keyTime = clip.scaleKeys[static_cast<size_t>(bestIndex)].time;
+					break;
+				default: break;
+				}
+				animator.currentTime = glm::clamp(keyTime, 0.0f, clip.duration);
+			}
+			else
+			{
+				// Clicked empty region: scrub time
+				float tNorm = (mousePos.x - canvasPos.x) / canvasSize.x;
+				tNorm = glm::clamp(tNorm, 0.0f, 1.0f);
+				animator.currentTime = tNorm * clip.duration;
+				m_DopesheetSelectedTrack = DopesheetTrackType::None;
+				m_DopesheetSelectedKey = -1;
+			}
+		}
+
+		// --- Second pass: draw keys with per-track colors and selection highlight ---
+		auto drawTrackKeys = [&](const auto& keys,
+			DopesheetTrackType trackType,
+			ImU32 col, ImU32 colSelected,
+			float yOffset)
+			{
+				for (int i = 0; i < static_cast<int>(keys.size()); ++i)
+				{
+					float x = timeToX(keys[static_cast<size_t>(i)].time);
+					float y = midY + yOffset;
+
+					bool selected = (m_DopesheetSelectedTrack == trackType &&
+						m_DopesheetSelectedKey == i);
+
+					ImU32 useCol = selected ? colSelected : col;
+					drawList->AddCircleFilled(ImVec2(x, y), keyRadius, useCol);
+				}
+			};
+
+		drawTrackKeys(clip.positionKeys, DopesheetTrackType::Position,
+			colPos, colPosSel, -12.0f);
+		drawTrackKeys(clip.rotationKeys, DopesheetTrackType::Rotation,
+			colRot, colRotSel, 0.0f);
+		drawTrackKeys(clip.scaleKeys, DopesheetTrackType::Scale,
+			colScale, colScaleSel, +12.0f);
+
+		// Playhead line
+		{
+			float x = timeToX(animator.currentTime);
+			drawList->AddLine(ImVec2(x, canvasPos.y),
+				ImVec2(x, canvasEnd.y),
+				colPlayhead, 2.0f);
+		}
+
+		// -----------------------------------------------------------------
+		// Simple curves view layered under the dopesheet
+		// -----------------------------------------------------------------
+		bool showCurves = true;
+		if (showCurves)
+		{
+			ImGui::SeparatorText("Curves (X component)");
+
+			ImVec2 cPos = ImGui::GetCursorScreenPos();
+			ImVec2 cSize = ImVec2(ImGui::GetContentRegionAvail().x, 120.0f);
+			ImVec2 cEnd = ImVec2(cPos.x + cSize.x, cPos.y + cSize.y);
+
+			ImGui::InvisibleButton("##AnimCurves", cSize);
+			ImDrawList* cDraw = ImGui::GetWindowDrawList();
+
+			cDraw->AddRectFilled(cPos, cEnd, IM_COL32(20, 20, 20, 255));
+			cDraw->AddRect(cPos, cEnd, IM_COL32(80, 80, 80, 255));
+
+			auto drawCurveForTrack = [&](const auto& keys,
+				auto getValueX,
+				ImU32 color)
+				{
+					if (keys.size() < 2) return;
+
+					// Compute min/max of X component
+					float minVal = getValueX(keys[0]);
+					float maxVal = minVal;
+					for (size_t i = 1; i < keys.size(); ++i)
+					{
+						float v = getValueX(keys[i]);
+						if (v < minVal) minVal = v;
+						if (v > maxVal) maxVal = v;
+					}
+					if (minVal == maxVal)
+					{
+						// Avoid div-by-zero; pad a bit
+						minVal -= 1.0f;
+						maxVal += 1.0f;
+					}
+
+					auto valToY = [&](float v)
+						{
+							float u = (v - minVal) / (maxVal - minVal); // 0..1
+							// 0 at bottom, 1 at top:
+							return cEnd.y - u * cSize.y;
+						};
+
+					ImVec2 prev;
+					bool hasPrev = false;
+
+					for (size_t i = 0; i < keys.size(); ++i)
+					{
+						float tNorm = (clip.duration > 0.0f) ? (keys[i].time / clip.duration) : 0.0f;
+						tNorm = glm::clamp(tNorm, 0.0f, 1.0f);
+
+						float x = cPos.x + tNorm * cSize.x;
+						float y = valToY(getValueX(keys[i]));
+
+						ImVec2 p(x, y);
+						if (hasPrev)
+						{
+							cDraw->AddLine(prev, p, color, 2.0f);
+						}
+						prev = p;
+						hasPrev = true;
+
+						// Small point at key
+						cDraw->AddCircleFilled(p, 3.0f, color);
+					}
+				};
+
+			// Position.X curve
+			drawCurveForTrack(
+				clip.positionKeys,
+				[](const PositionKeyframe& k) { return k.position.x; },
+				colPos);
+
+			// Rotation.X curve (Euler degrees)
+			drawCurveForTrack(
+				clip.rotationKeys,
+				[](const RotationKeyframe& k)
+				{
+					glm::vec3 eulerDeg = glm::degrees(glm::eulerAngles(k.rotation));
+					return eulerDeg.x;
+				},
+				colRot);
+
+			// Scale.X curve
+			drawCurveForTrack(
+				clip.scaleKeys,
+				[](const ScaleKeyframe& k) { return k.scale.x; },
+				colScale);
+		}
+
+		// -----------------------------------------------------------------
+		// Track editors (tables) - now synced with timeline selection
+		// -----------------------------------------------------------------
+		ImGui::SeparatorText("Tracks");
+
+		// Helper: sort by time after edits
+		auto sortByTime = [](auto& keys)
+			{
+				std::sort(keys.begin(), keys.end(),
+					[](const auto& a, const auto& b) { return a.time < b.time; });
+			};
+
+		// Position track
+		if (ImGui::CollapsingHeader("Position", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add Key##Pos"))
+			{
+				glm::vec3 defaultPos(0.0f);
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+					defaultPos = m_SelectedEntity.GetComponent<TransformComponent>().Position;
+
+				PositionKeyframe k;
+				k.time = animator.currentTime;
+				k.position = defaultPos;
+				clip.positionKeys.push_back(k);
+
+				sortByTime(clip.positionKeys);
+			}
+
+			if (ImGui::BeginTable("PosKeysTable", 6,
+				ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+			{
+				ImGui::TableSetupColumn("Index");
+				ImGui::TableSetupColumn("Time");
+				ImGui::TableSetupColumn("X##Pos");
+				ImGui::TableSetupColumn("Y##Pos");
+				ImGui::TableSetupColumn("Z##Pos");
+				ImGui::TableSetupColumn("Remove");
+				ImGui::TableHeadersRow();
+
+				for (int i = 0; i < static_cast<int>(clip.positionKeys.size()); ++i)
+				{
+					auto& k = clip.positionKeys[static_cast<size_t>(i)];
+					ImGui::PushID(i);
+
+					ImGui::TableNextRow();
+
+					bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::Position &&
+						m_DopesheetSelectedKey == i);
+
+					ImGui::TableSetColumnIndex(0);
+					if (isSelected)
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+					ImGui::Text("%d", i);
+					if (isSelected)
+						ImGui::PopStyleColor();
+
+					// Click index cell to select and jump playhead
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+						m_DopesheetSelectedKey = i;
+						animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+					}
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+						m_DopesheetSelectedKey = i;
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					ImGui::DragFloat("##X", &k.position.x, 0.1f);
+
+					ImGui::TableSetColumnIndex(3);
+					ImGui::DragFloat("##Y", &k.position.y, 0.1f);
+
+					ImGui::TableSetColumnIndex(4);
+					ImGui::DragFloat("##Z", &k.position.z, 0.1f);
+
+					ImGui::TableSetColumnIndex(5);
+					if (ImGui::SmallButton("X"))
+					{
+						clip.positionKeys.erase(clip.positionKeys.begin() + i);
+						if (m_DopesheetSelectedTrack == DopesheetTrackType::Position &&
+							m_DopesheetSelectedKey == i)
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						ImGui::PopID();
+						--i;
+						continue;
+					}
+
+					ImGui::PopID();
+				}
+
+				sortByTime(clip.positionKeys);
+				ImGui::EndTable();
+			}
+		}
+
+		// Rotation track
+		if (ImGui::CollapsingHeader("Rotation", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add Key##Rot"))
+			{
+				glm::quat defaultRot = glm::quat(1, 0, 0, 0);
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+					defaultRot = m_SelectedEntity.GetComponent<TransformComponent>().Rotation;
+
+				Engine::RotationKeyframe k;
+				k.time = animator.currentTime;
+				k.rotation = defaultRot;
+				clip.rotationKeys.push_back(k);
+				sortByTime(clip.rotationKeys);
+			}
+
+			if (ImGui::BeginTable("RotKeysTable", 6,
+				ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+			{
+				ImGui::TableSetupColumn("Index");
+				ImGui::TableSetupColumn("Time");
+				ImGui::TableSetupColumn("Pitch");
+				ImGui::TableSetupColumn("Yaw");
+				ImGui::TableSetupColumn("Roll");
+				ImGui::TableSetupColumn("Remove");
+				ImGui::TableHeadersRow();
+
+				for (int i = 0; i < static_cast<int>(clip.rotationKeys.size()); ++i)
+				{
+					auto& k = clip.rotationKeys[static_cast<size_t>(i)];
+					ImGui::PushID(1000 + i);
+
+					ImGui::TableNextRow();
+
+					bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::Rotation &&
+						m_DopesheetSelectedKey == i);
+
+					ImGui::TableSetColumnIndex(0);
+					if (isSelected)
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+					ImGui::Text("%d", i);
+					if (isSelected)
+						ImGui::PopStyleColor();
+
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+						m_DopesheetSelectedKey = i;
+						animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+					}
+
+					// Time
+					ImGui::TableSetColumnIndex(1);
+					ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+						m_DopesheetSelectedKey = i;
+					}
+
+					// --- quat -> Euler (deg) for UI ---
+					glm::vec3 eulerDeg = glm::degrees(glm::eulerAngles(k.rotation));
+
+					bool changed = false;
+
+					ImGui::TableSetColumnIndex(2);
+					changed |= ImGui::DragFloat("##Pitch", &eulerDeg.x, 1.0f);
+
+					ImGui::TableSetColumnIndex(3);
+					changed |= ImGui::DragFloat("##Yaw", &eulerDeg.y, 1.0f);
+
+					ImGui::TableSetColumnIndex(4);
+					changed |= ImGui::DragFloat("##Roll", &eulerDeg.z, 1.0f);
+
+					// --- Only write back if something actually changed ---
+					if (changed)
+					{
+						k.rotation = glm::quat(glm::radians(eulerDeg));
+					}
+
+					// Remove button
+					ImGui::TableSetColumnIndex(5);
+					if (ImGui::SmallButton("X"))
+					{
+						clip.rotationKeys.erase(clip.rotationKeys.begin() + i);
+						if (m_DopesheetSelectedTrack == DopesheetTrackType::Rotation &&
+							m_DopesheetSelectedKey == i)
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						ImGui::PopID();
+						--i;
+						continue;
+					}
+
+					ImGui::PopID();
+				}
+
+				sortByTime(clip.rotationKeys);
+				ImGui::EndTable();
+			}
+		}
+
+		// Scale track
+		if (ImGui::CollapsingHeader("Scale", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add Key##Scale"))
+			{
+				glm::vec3 defaultScale(1.0f);
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+					defaultScale = m_SelectedEntity.GetComponent<TransformComponent>().Scale;
+
+				ScaleKeyframe k;
+				k.time = animator.currentTime;
+				k.scale = defaultScale;
+				clip.scaleKeys.push_back(k);
+
+				sortByTime(clip.scaleKeys);
+			}
+
+			if (ImGui::BeginTable("ScaleKeysTable", 6,
+				ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+			{
+				ImGui::TableSetupColumn("Index");
+				ImGui::TableSetupColumn("Time");
+				ImGui::TableSetupColumn("X##Scale");
+				ImGui::TableSetupColumn("Y##Scale");
+				ImGui::TableSetupColumn("Z##Scale");
+				ImGui::TableSetupColumn("Remove");
+				ImGui::TableHeadersRow();
+
+				for (int i = 0; i < static_cast<int>(clip.scaleKeys.size()); ++i)
+				{
+					auto& k = clip.scaleKeys[static_cast<size_t>(i)];
+					ImGui::PushID(2000 + i);
+
+					ImGui::TableNextRow();
+
+					bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::Scale &&
+						m_DopesheetSelectedKey == i);
+
+					ImGui::TableSetColumnIndex(0);
+					if (isSelected)
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+					ImGui::Text("%d", i);
+					if (isSelected)
+						ImGui::PopStyleColor();
+
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+						m_DopesheetSelectedKey = i;
+						animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+					}
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+						m_DopesheetSelectedKey = i;
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					ImGui::DragFloat("##X", &k.scale.x, 0.1f);
+
+					ImGui::TableSetColumnIndex(3);
+					ImGui::DragFloat("##Y", &k.scale.y, 0.1f);
+
+					ImGui::TableSetColumnIndex(4);
+					ImGui::DragFloat("##Z", &k.scale.z, 0.1f);
+
+					ImGui::TableSetColumnIndex(5);
+					if (ImGui::SmallButton("X"))
+					{
+						clip.scaleKeys.erase(clip.scaleKeys.begin() + i);
+						if (m_DopesheetSelectedTrack == DopesheetTrackType::Scale &&
+							m_DopesheetSelectedKey == i)
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						ImGui::PopID();
+						--i;
+						continue;
+					}
+
+					ImGui::PopID();
+				}
+
+				sortByTime(clip.scaleKeys);
+				ImGui::EndTable();
+			}
+		}
+
+		ImGui::End();
+	}
+
+
 
 	void Editor::displayAssetsBrowserPanel()
 	{
