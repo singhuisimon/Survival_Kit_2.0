@@ -767,6 +767,8 @@ namespace Engine {
         BTStatus Execute(BTContext& context) override;
         void Reset() override;
 
+        void UpdateCooldowns(float deltaTime);  // Update spawn point cooldowns
+
         void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
         void SetProperty(const std::string& name, const std::string& value) override;
 
@@ -785,8 +787,8 @@ namespace Engine {
         int m_WormsCount;
         int m_BotnetCount;
 
-        float m_Spacing;            // Grid spacing for spawned enemies
-        glm::vec3 m_LoveletterPos;  // Specific spawn position for loveletter
+        //float m_Spacing;            // Grid spacing for spawned enemies
+        //glm::vec3 m_LoveletterPos;  // Specific spawn position for loveletter
 
         bool m_WallA = false;
 		bool m_WallB = false;
@@ -795,53 +797,36 @@ namespace Engine {
 		bool m_WallE = false;
         bool m_Boss = false;
 
+        int m_SpawnPointCountA;
+		int m_SpawnPointCountB;
+		int m_SpawnPointCountC;
+		int m_SpawnPointCountD;
+		int m_SpawnPointCountE;
+
     private:
+        struct SpawnPoint {
+            std::string Tag;
+            glm::vec3 Position;
+            float CooldownTimer = 0.0f;       // counts down from 10 seconds
+            bool IsAvailable = true;
+        };
+
         struct WallInfo {
             std::string name;
             glm::vec3 position;
             glm::quat rotation;
+			glm::vec3 scale;
+			glm::vec3 direction;
+			int spawnPointCount;
+            std::vector<SpawnPoint> spawnPoints;  // actual spawn point entities (A1, A2, etc.)
 		};
+
+        std::unordered_map<std::string, WallInfo> m_Walls;
 
 		std::vector<WallInfo> m_EnabledWalls;
 
 		int m_totalSpawned = 0;
 
-        //glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0));
-
-        glm::quat LookRotation(const glm::vec3& forward, const glm::vec3& up = glm::vec3(0, 1, 0)) {
-            glm::vec3 f = glm::normalize(forward);
-            glm::vec3 r = glm::normalize(glm::cross(up, f));
-            glm::vec3 u = glm::cross(f, r);
-
-            glm::mat3 rotMat(r, u, f);
-            return glm::quat_cast(rotMat);
-        }
-
-
-    };
-
-
-
-
-
-
-
-
-
-
-
-
-    class BTCreateEntityByPrefab : public BTNode {
-    public:
-        BTCreateEntityByPrefab(const std::string& prefabName = "");
-
-        const char* GetTypeName() const override;
-        BTStatus Execute(BTContext& context) override;
-
-        void GetProperties(std::vector<std::pair<std::string, std::string>>& properties) const override;
-        void SetProperty(const std::string& name, const std::string& value) override;
-		
-        std::string m_PrefabName;
     };
 
 } // namespace Engine

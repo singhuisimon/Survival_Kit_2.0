@@ -41,6 +41,7 @@ namespace Engine {
 
         //end of new functions - amanda
     protected:
+		std::vector<bool> m_ChildrenEntered; // Track if each child has been entered
         std::vector<std::shared_ptr<BTNode>> m_Children;
         size_t m_CurrentChildIndex = 0;
     };

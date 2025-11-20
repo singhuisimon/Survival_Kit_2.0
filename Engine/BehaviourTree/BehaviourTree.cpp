@@ -77,8 +77,6 @@ namespace Engine {
         }
 
         // CRITICAL CHANGE: Execute ONE step per frame instead of looping
-        // Changed from: while (!m_ExecutionStack.empty())
-        // Changed to:   if (!m_ExecutionStack.empty())
         // This allows the renderer to draw between node executions!
 
         if (!m_ExecutionStack.empty()) {
@@ -117,79 +115,39 @@ namespace Engine {
                 }
             }
 
-            // Check if this is a composite/decorator with children
-            auto& children = frame.Node->GetChildren();
-            BTStatus status;
+            // --- EXECUTE NODE (Leaf, Composite, or Decorator) ---
+            // All nodes handle their own execution logic internally
+            BTStatus status = frame.Node->Execute(context);
 
-            if (children.empty()) {
-                // --- LEAF NODE ---
-                status = frame.Node->Execute(context);
-
-                // --- CHECK IF ENTITY WAS DESTROYED ---
-                if (canValidate && context.Scene) {
-                    auto& registry = context.Scene->GetRegistry();
-                    if (!registry.valid(entityHandle)) {
-                        // Entity destroyed - abort immediately without cleanup
-                        LOG_TRACE("BehaviourTree: Entity destroyed during leaf execution");
-                        return BTStatus::Success;
-                    }
+            // --- CHECK IF ENTITY WAS DESTROYED DURING EXECUTION ---
+            if (canValidate && context.Scene) {
+                auto& registry = context.Scene->GetRegistry();
+                if (!registry.valid(entityHandle)) {
+                    // Entity destroyed - abort immediately without cleanup
+                    LOG_TRACE("BehaviourTree: Entity destroyed during node execution");
+                    return BTStatus::Success;
                 }
+            }
 
-                // Handle node completion
-                if (status != BTStatus::Running) {
-                    // Node completed - call OnExit and pop
-                    frame.Node->OnExit(context);
-                    m_ExecutionStack.pop();
-
-                    // If this was the root, we're done
-                    if (m_ExecutionStack.empty()) {
-                        return status;
-                    }
-
-                    // Update parent's last child status
-                    m_ExecutionStack.top().LastChildStatus = status;
-
-                    // Return Running to continue execution next frame
-                    return BTStatus::Running;
-                }
-
-                // Node is still running
+            // If node is still running, keep it on stack
+            if (status == BTStatus::Running) {
                 return BTStatus::Running;
             }
-            else {
-                // --- COMPOSITE/DECORATOR NODE ---
-                status = ProcessCompositeNode(frame, context);
 
-                // --- CHECK IF ENTITY WAS DESTROYED ---
-                if (canValidate && context.Scene) {
-                    auto& registry = context.Scene->GetRegistry();
-                    if (!registry.valid(entityHandle)) {
-                        // Entity destroyed - abort immediately without cleanup
-                        LOG_TRACE("BehaviourTree: Entity destroyed during composite execution");
-                        return BTStatus::Success;
-                    }
-                }
+            // Node completed - call OnExit and pop
+            frame.Node->OnExit(context);
+            m_ExecutionStack.pop();
 
-                // If node is still running, keep it on stack
-                if (status == BTStatus::Running) {
-                    return BTStatus::Running;
-                }
-
-                // Node completed - call OnExit and pop
-                frame.Node->OnExit(context);
-                m_ExecutionStack.pop();
-
-                // If this was the root, we're done
-                if (m_ExecutionStack.empty()) {
-                    return status;
-                }
-
-                // Update parent's last child status
-                m_ExecutionStack.top().LastChildStatus = status;
-
-                // Return Running to continue next frame
-                return BTStatus::Running;
+            // If this was the root, we're done
+            if (m_ExecutionStack.empty()) {
+                return status;
             }
+
+            // Update parent's last child status
+            m_ExecutionStack.top().LastChildStatus = status;
+
+            // Return Running to continue execution next frame
+            return BTStatus::Running;
         }
 
         return BTStatus::Failure;
@@ -215,60 +173,6 @@ namespace Engine {
      */
     size_t BehaviourTree::GetStackDepth() const {
         return m_ExecutionStack.size();
-    }
-
-    /**
-         * @brief Process a composite node's execution logic
-         * @details This handles the node-specific logic for composites/decorators
-         * EDITED !!!!
-         */
-    BTStatus BehaviourTree::ProcessCompositeNode(BTStackFrame& frame, BTContext& context) {
-        auto& children = frame.Node->GetChildren();
-
-        if(children.empty()) {
-            LOG_WARNING("ProcessCompositeNode: Composite node has no children");
-            return BTStatus::Failure;
-		}
-
-        // Sync frame's ChildIndex with composite's internal state
-        if (auto* composite = dynamic_cast<BTComposite*>(frame.Node.get())) {
-            frame.ChildIndex = composite->GetCurrentChildIndex();
-        }
-
-        // CRITICAL: Store entity handle to check validity after execution
-        entt::entity entityHandle = entt::null;
-        bool canValidate = (context.Entity && context.Scene);
-
-        if (canValidate) {
-            entityHandle = static_cast<entt::entity>(*context.Entity);
-        }
-
-        // Execute (entity might destroy itself here)
-        BTStatus status = frame.Node->Execute(context);
-
-        // SAFE sync-back: Check entity still exists
-        if (canValidate && context.Scene) {
-            auto& registry = context.Scene->GetRegistry();
-
-            // If entity was destroyed, don't sync back
-            if (!registry.valid(entityHandle)) {
-                LOG_TRACE("ProcessCompositeNode: Entity destroyed during execution");
-                return BTStatus::Success;
-            }
-
-            // Entity still valid - safe to sync back
-            if (auto* composite = dynamic_cast<BTComposite*>(frame.Node.get())) {
-                frame.ChildIndex = composite->GetCurrentChildIndex();
-            }
-        }
-        else {
-            // No entity context, do normal sync
-            if (auto* composite = dynamic_cast<BTComposite*>(frame.Node.get())) {
-                frame.ChildIndex = composite->GetCurrentChildIndex();
-            }
-        }
-
-        return status;
     }
 
 } // namespace Engine
