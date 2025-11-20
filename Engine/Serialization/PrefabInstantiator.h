@@ -63,19 +63,21 @@ namespace Engine {
          */
         static void ApplyOverrides(Entity entity, Scene* scene);
 
-    private:
         /**
-         * @brief Deserialize and create entity from JSON data
-         * @param scene Target scene
-         * @param entityJson JSON string of entity data
-         * @param entityId Specific entity ID to use (entt::null for auto)
-         * @return Created entity
-         */
+     * @brief Deserialize and create entity from JSON data
+     * @param scene Target scene
+     * @param entityJson JSON string of entity data
+     * @param entityId Specific entity ID to use (entt::null for auto)
+     * @return Created entity
+     */
         static Entity DeserializeEntity(
             Scene* scene,
             const std::string& entityJson,
             entt::entity entityId = entt::null
         );
+
+
+    private:
 
         /**
          * @brief Add a component to entity from JSON data

@@ -62,6 +62,10 @@ namespace Engine
 		Entity m_SelectedEntity{}; // track which entity is selected
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
+
+		static constexpr float m_DoublePickedTime = 0.5f;
+		float m_LastClickedTime = 0.f;
+		u32 m_LastClickedID = 0xFFFFFFFFu;
 		
 		// ImGui Window functionality
 		bool inspectorWindow = true;
@@ -81,7 +85,7 @@ namespace Engine
 		};
 
 		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
-		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
+		int                m_DopesheetSelectedKey = -1;  // index into that trackï¿½s key array
 
 		// ImGui Top Menu Panel
 		bool openScenePanel = false; // for top menu open file 
@@ -128,6 +132,13 @@ namespace Engine
 		bool showDescriptorEditorPanel = false;
 		xresource::instance_guid currentEditingGuid;
 		std::string editedAsset{};
+		bool m_ShouldApplyOverrides = false;
+
+		std::unordered_map<xresource::instance_guid, std::vector<Entity>> m_PrefabEntities;
+
+		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
+		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
+
 
 		bool isPlaying = true;
 
@@ -154,7 +165,7 @@ namespace Engine
 		* 	resources created during editing.
 		**************************************************************************/
 		~Editor() {
-			CleanupTemporaryPrefabs();
+			//CleanupTemporaryPrefabs();
 		};
 
 		/**************************************************************************
@@ -362,6 +373,16 @@ namespace Engine
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
 
+		void RevertSelectedEntityToPrefab();
+
+		void LoadAllPrefabsIntoRegistry();
+		void UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity);
+		void CheckAndUpdatePrefabInstances();
+
+		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
+
+
+		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
 	};
 

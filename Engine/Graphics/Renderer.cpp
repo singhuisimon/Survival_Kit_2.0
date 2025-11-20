@@ -655,10 +655,15 @@ namespace Engine {
 				prog.setUniform("material_.emissionColor", glm::vec3(material_resource->emissionColor[0],
 																			material_resource->emissionColor[1],
 																			material_resource->emissionColor[2]));
+
 				prog.setUniform("material_.emissionStrength", material_resource->emissionStrength);
 
 				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
 				 	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 				 	prog.setUniform("Texture2D", 0);
 				 	prog.setUniform("isTexture", true);
 
@@ -678,11 +683,20 @@ namespace Engine {
 			 }
 			 else
 			 {
-				//prog.setUniform("isTexture", false);
-				//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-				//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-				//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-				//prog.setUniform("material.shininess", test_material.getMaterialShininess());
+				 // New workflow has no ambient lighting
+				 prog.setUniform("material_.albedo", glm::vec3(m_defaultMaterial.baseColor[0],
+					 m_defaultMaterial.baseColor[1],
+					 m_defaultMaterial.baseColor[2]));
+
+				 prog.setUniform("material_.metallic", m_defaultMaterial.metallic);
+				 prog.setUniform("material_.roughness", m_defaultMaterial.roughness);
+				 prog.setUniform("material_.ao", m_defaultMaterial.ambientOcclusion);
+				 prog.setUniform("material_.opacity", m_defaultMaterial.opacity);
+				 prog.setUniform("material_.emissionColor", glm::vec3(m_defaultMaterial.emissionColor[0],
+					 m_defaultMaterial.emissionColor[1],
+					 m_defaultMaterial.emissionColor[2]));
+
+				 prog.setUniform("material_.emissionStrength", m_defaultMaterial.emissionStrength);
 			 }
 
 #pragma region TESTING UBO FOR LIGHTING
