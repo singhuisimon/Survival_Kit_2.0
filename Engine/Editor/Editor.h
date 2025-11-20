@@ -62,6 +62,10 @@ namespace Engine
 		Entity m_SelectedEntity{}; // track which entity is selected
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
+
+		static constexpr float m_DoublePickedTime = 0.5f;
+		float m_LastClickedTime = 0.f;
+		u32 m_LastClickedID = 0xFFFFFFFFu;
 		
 		// ImGui Window functionality
 		bool inspectorWindow = true;

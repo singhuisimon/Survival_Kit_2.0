@@ -257,6 +257,7 @@ namespace Engine {
         //float& getCamNear() { return nearPlane; }
         //float& getCamFar() { return farPlane; }
 
+        glm::vec3& getEditorCamTarget() { return target; }
         float& getEditorCamSpeed() { return editorCameraSpeed; }
         float& getEditorZoomSpeed() { return editorZoomSpeed; }
 
@@ -275,6 +276,8 @@ namespace Engine {
         //void setCamNear(float newNear) { nearPlane = newNear; }
         //void setCamFar(float newFar) { farPlane = newFar; }
 
+        void setEditorCamPosition(glm::vec3 newCamPos) { pos = newCamPos; }
+        void setEditorCamTarget(glm::vec3 newCamTarget) { target = newCamTarget; }
         void setEditorCamSpeed(float newCamSpeed) { editorCameraSpeed = newCamSpeed; }
         void setEditorZoomSpeed(float newZoomSpeed) { editorZoomSpeed = newZoomSpeed; }
     };

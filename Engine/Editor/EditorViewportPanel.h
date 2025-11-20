@@ -14,6 +14,7 @@
 // Include other necessary headers
 #include "../Editor/Editor.h"
 #include "../Utility/Logger.h"
+#include "../Graphics/Renderer.h"
 
 namespace Engine
 {
@@ -125,6 +126,58 @@ namespace Engine
 
 			ImGui::Separator();
 
+		}
+
+		static void ViewPortClickAndTeleport(uint32_t& pickedID, uint32_t& lastClickedID, 
+											 float& lastClickedTime, const float& doubleClickedTime, 
+											 Entity& selectedEntity, Renderer* renderer) {
+
+			double currentTime = ImGui::GetTime();
+			if (pickedID == lastClickedID && (currentTime - lastClickedTime) < doubleClickedTime) {
+
+				LOG_DEBUG("Double Clicked ID{", pickedID, "}");
+
+				if (selectedEntity.HasComponent<TransformComponent>()) {
+					TransformComponent& targetCamPos = selectedEntity.GetComponent<TransformComponent>();
+					Camera3D& editorCam = renderer->getEditorCamera();
+
+					glm::vec3 entityPos = targetCamPos.Position;
+					float offsetDistance = 5.f;
+
+					if (selectedEntity.HasComponent<MeshRendererComponent>()) {
+						glm::vec3 scale = targetCamPos.Scale;
+						float maxScale = glm::max(glm::max(scale.x, scale.y), scale.z);
+						offsetDistance = maxScale * 1.5f;
+					}
+
+					glm::vec3 cameraPos = editorCam.getCamPos();
+					glm::vec3 cameraTarget = editorCam.getEditorCamTarget();
+
+					glm::vec3 viewDir = cameraTarget - cameraPos;
+					if (glm::dot(viewDir, viewDir) < 1e-8f) {
+
+						viewDir = glm::vec3(0.0f, 0.0f, -1.0f);
+					}
+					else {
+						viewDir = glm::normalize(viewDir);
+					}
+
+					glm::vec3 newCamPos = entityPos - viewDir * offsetDistance;
+
+					editorCam.setEditorCamPosition(newCamPos);
+					editorCam.setEditorCamTarget(entityPos);
+
+					LOG_DEBUG("Moved to Clicked ID {", newCamPos.x, ", ", newCamPos.y, ", ", newCamPos.z, "}");
+
+				}
+
+				lastClickedTime = 0.0;
+				lastClickedID = 0xFFFFFFFFu;
+			}
+			else {
+				lastClickedTime = currentTime;
+				lastClickedID = pickedID;
+			}
 		}
 	};
 }

@@ -4137,11 +4137,14 @@ namespace Engine
 						{
 							LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
 							m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+							ViewportPanelHelper::ViewPortClickAndTeleport(m_PickedID, m_LastClickedID, m_LastClickedTime, m_DoublePickedTime, m_SelectedEntity, m_Renderer);
 						}
 						else
 						{
 							m_SelectedEntity = Entity{};
 							LOG_INFO("Deselected entity.");
+							m_LastClickedTime = 0.0;
+							m_LastClickedID = 0xFFFFFFFFu;
 						}
 					}
 					else
