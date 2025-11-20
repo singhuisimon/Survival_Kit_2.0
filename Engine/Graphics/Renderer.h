@@ -197,8 +197,11 @@ namespace Engine {
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
 
+		// Engine Provided Items
 		MeshGL m_skybox; // Default engine provided skybox
 		GLuint m_skybox_texture; // Will need to change
+
+		MaterialResource m_defaultMaterial; // Immutable material, shared across all meshes that DO NOT HAVE material attached to it
 
 		// Temp objects for object picking
 		GLuint temp_rbo = 0;				// Used for scene and GPU ID FBO
