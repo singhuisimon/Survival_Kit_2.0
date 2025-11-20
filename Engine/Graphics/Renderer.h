@@ -197,6 +197,9 @@ namespace Engine {
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
 
+		MeshGL m_skybox; // Default engine provided skybox
+		GLuint m_skybox_texture; // Will need to change
+
 		// Temp objects for object picking
 		GLuint temp_rbo = 0;				// Used for scene and GPU ID FBO
 		EditorViewport renderEditorVP;	// Editor viewport data

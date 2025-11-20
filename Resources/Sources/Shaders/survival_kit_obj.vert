@@ -36,5 +36,17 @@ void main()
     Color    = VertexColor;
     TexCoord = VertexTexCoords;
 
+    // Generate tangent space basis per-vertex
+    vec3 N = Normal;
+    
+    // Choose an arbitrary up vector that's not parallel to the normal
+    vec3 up = abs(N.y) > 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
+    
+    // Generate tangent perpendicular to normal
+    Tangent = normalize(cross(up, N));
+    
+    // Generate bitangent perpendicular to both
+    Bitangent = cross(N, Tangent);
+
     gl_Position = u_ViewProjection * vec4(Position, 1.0);
 }

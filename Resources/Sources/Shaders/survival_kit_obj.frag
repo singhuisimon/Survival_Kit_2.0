@@ -50,6 +50,8 @@ layout(std140, binding = 0) uniform LightsBlock {
 struct Material_
 {
     vec3  albedo;
+    vec3  emissionColor;
+    float emissionStrength;
     float metallic;
     float roughness;
     float ao;
@@ -247,7 +249,7 @@ void main()
 
     // ===== Ambient lighting =====
     vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
 
     // ===== Tone mapping (Reinhard) =====
     color = color / (color + vec3(1.0));

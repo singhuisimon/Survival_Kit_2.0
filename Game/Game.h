@@ -43,6 +43,7 @@ private:
     std::unique_ptr<Engine::Editor> m_Editor; 
     std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
     float m_ColorShift = 0.0f;
+    bool m_EditorEnable = true;
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
 

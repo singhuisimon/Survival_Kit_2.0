@@ -24,6 +24,7 @@
 #include "../Component/LightComponent.h"
 #include "../Utility/Logger.h"
 #include "../Component/ScriptComponent.h"
+#include "../Component/AnimatorComponent.h"
 
  // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -616,6 +617,49 @@ namespace Engine {
                 PropertyType::Float,
                 [](const LightComponent& c) { return c.IndirectMultiplier; },
                 [](LightComponent& c, const float& v) { c.IndirectMultiplier = v; }
+            );
+        }
+
+        // Register AnimatorComponent
+        {
+            auto& meta = REGISTER_COMPONENT(AnimatorComponent);
+
+            meta.AddProperty<AnimatorComponent, bool>(
+                "playing",
+                PropertyType::Bool,
+                [](const AnimatorComponent& c) { return c.playing; },
+                [](AnimatorComponent& c, const bool& v) { c.playing = v; }
+            );
+            // Enums as ints for editor/serialization
+            meta.AddProperty<AnimatorComponent, bool>(
+                "respectClipLoop",
+                PropertyType::Bool,
+                [](const AnimatorComponent& c) { return c.respectClipLoop; },
+                [](AnimatorComponent& c, const bool& v) { c.respectClipLoop = v; }
+            );
+            meta.AddProperty<AnimatorComponent, u32>(
+                "controller",
+                PropertyType::U32,
+                [](const AnimatorComponent& c) { return c.controller; },
+                [](AnimatorComponent& c, const u32& v) { c.controller = v; }
+            );
+            meta.AddProperty<AnimatorComponent, u32>(
+                "currentClipIndex",
+                PropertyType::U32,
+                [](const AnimatorComponent& c) { return c.currentClipIndex; },
+                [](AnimatorComponent& c, const u32& v) { c.currentClipIndex = v; }
+            );
+            meta.AddProperty<AnimatorComponent, float>(
+                "currentTime",
+                PropertyType::Float,
+                [](const AnimatorComponent& c) { return c.currentTime; },
+                [](AnimatorComponent& c, const float& v) { c.currentTime = v; }
+            );
+            meta.AddProperty<AnimatorComponent, float>(
+                "playbackSpeed",
+                PropertyType::Float,
+                [](const AnimatorComponent& c) { return c.playbackSpeed; },
+                [](AnimatorComponent& c, const float& v) { c.playbackSpeed = v; }
             );
         }
 

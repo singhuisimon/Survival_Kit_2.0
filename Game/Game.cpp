@@ -34,6 +34,7 @@
 #include "Scripting/ScriptReloader.h" 
 #include "BehaviourTree/BehaviourTreeSystem.h"
 #include "ParticleSystem/ParticleSystem.h"
+#include "Animation/AnimationSystem.h"
 
 // KENNY TESTING: FOR MAINCAMERA "SCRIPT"
 #include <glm/common.hpp>               // glm::clamp
@@ -308,12 +309,76 @@ void Game::AddAllSystems() {
     m_Scene->AddSystem<Engine::RenderSystem>(*m_Renderer);
     m_Scene->AddSystem<Engine::BehaviourTreeSystem>();
     m_Scene->AddSystem<Engine::ParticleSystem>();
+    m_Scene->AddSystem<Engine::AnimationSystem>();
 }
 
 void Game::CreateDefaultScene() {
     if (!m_Scene) {
         throw std::runtime_error("Scene is null in CreateDefaultScene");
     }
+
+    // Create hardcoded animation clips (3x; translate, scale, rotate) and animation controller (1x)
+    
+    // Animation clip 1 (Rotate)
+    Engine::AnimationClip clip_1;
+    clip_1.name = "RotateAndMovein5s";
+    clip_1.duration = 5.0f;
+    clip_1.loop = true;
+
+    // Create start and end keys for rotation
+    Engine::RotationKeyframe c1k0{ 0.0f, glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f))) };
+    Engine::RotationKeyframe c1k1{ clip_1.duration, glm::quat(glm::radians(glm::vec3(180.f, 0.0f, 0.0f)))}; // Rotate along X-axis
+    clip_1.rotationKeys.emplace_back(c1k0);
+    clip_1.rotationKeys.emplace_back(c1k1);
+    //clip_1.rotationKeys = { c1k0, c1k1 };
+
+    // Animation clip 2 (Movement)
+    Engine::AnimationClip clip_2;
+    clip_2.name = "Move10unitsin5s";
+    clip_2.duration = 5.0f;
+    clip_2.loop = true;
+
+    // Create start and end keys for rotation
+    Engine::PositionKeyframe c2k0{ 0.0f, glm::vec3(-2.5, 0.0, 0.0)};
+    Engine::PositionKeyframe c2k1{ 2.5f, glm::vec3(2.5, 0.0, 0.0) };
+    Engine::PositionKeyframe c2k2{ clip_2.duration, glm::vec3(-2.5, 0.0, 0.0) };
+    clip_2.positionKeys.emplace_back(c2k0);
+    clip_2.positionKeys.emplace_back(c2k1);
+    clip_2.positionKeys.emplace_back(c2k2);
+    clip_1.positionKeys = { c2k0, c2k1, c2k2 }; // Addition to the first clip
+
+    // Animation clip 3 (Scale)
+    Engine::AnimationClip clip_3;
+    clip_3.name = "ScaleOncein2s";
+    clip_3.duration = 2.0f;
+    clip_3.loop = false;
+
+    // Create start and end keys for rotation
+    Engine::ScaleKeyframe c3k0{ 0.0f, glm::vec3(1.0, 1.0, 1.0) };
+    Engine::ScaleKeyframe c3k1{ clip_3.duration, glm::vec3(2.0, 2.0, 2.0) };
+    clip_3.scaleKeys.emplace_back(c3k0);
+    clip_3.scaleKeys.emplace_back(c3k1);
+
+    // Store all clips into storage
+    Engine::m_AnimationClipStorage[0] = clip_1;
+    Engine::m_AnimationClipStorage[1] = clip_2;
+    Engine::m_AnimationClipStorage[2] = clip_3;
+
+    // Create animator controller and store it
+    Engine::AnimatorController controller;
+    controller.name = "MainAnimatorController";
+    for (int i = 0; i < Engine::m_AnimationClipStorage.size(); ++i) {
+        controller.clips.emplace_back(i);
+        std::cout << "Controller clip count: " << i << std::endl;
+    }
+    std::cout << "Controller clip size after initializing: " << controller.clips.size() << std::endl;
+    
+
+    Engine::m_AnimatorControllerStorage[0] = controller;
+
+
+
+
 
     LOG_TRACE("  Creating Player entity...");
     auto player = m_Scene->CreateEntity("Player");
@@ -428,7 +493,16 @@ void Game::CreateDefaultScene() {
     sphereRb.Velocity = glm::vec3(0, 0, 0);
 
     auto& spheremesh = sphere.AddComponent<Engine::MeshRendererComponent>();
-    spheremesh.MeshType = 2; // Sphere
+    spheremesh.MeshType = 0; // Sphere
+
+    auto& sphereAnimation = sphere.AddComponent<Engine::AnimatorComponent>();
+    sphereAnimation.playing = true;
+    sphereAnimation.respectClipLoop = true;
+    sphereAnimation.controller = 0;
+    sphereAnimation.currentClipIndex = 0;
+    sphereAnimation.currentTime = 0.0f;
+    sphereAnimation.playbackSpeed= 1.0f;
+
     LOG_TRACE("  -> Sphere created");
 
     LOG_TRACE("  Creating ReverbZone entity...");
@@ -545,13 +619,42 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
     // Get input reference
     auto& input = GetInput();
+
+    // Add this somewhere in your input handling:
+    if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
+        m_EditorEnable = !m_EditorEnable;
+        LOG_INFO("Editor toggled: ", m_EditorEnable);
+    }
+
     Engine::ScriptReloader::GetInstance().Update();
 
-    // Update scene (this will call all systems in priority order)
-    m_Scene->OnUpdate(ts);  // Convert Timestep to float
+    // When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
+    if (!m_EditorEnable || (m_EditorEnable && m_Editor->getIsPlaying())) {
+        
+        // Update scene (this will call all systems in priority order)
+        m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
-    // Update audio manager if exists
-    m_AudioManager->OnUpdate(ts);
+        // Update audio manager if exists
+        m_AudioManager->OnUpdate(ts);
+    }
+    else { // When Editor is ON but gameplay is PLAYING: Update Transform, Camera and Render systems
+
+        auto& sceneSystems = m_Scene->GetSystemRegistry();
+
+        Engine::TransformSystem* transformSystem = sceneSystems.GetSystem<Engine::TransformSystem>();
+        transformSystem->OnUpdate(m_Scene.get(), ts);
+
+        // Bug: BT system does not load when updated; Quick fix is to uncomment the next lines let BT system run instead of stopping
+        /*Engine::BehaviourTreeSystem* BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
+        BTSystem->OnUpdate(m_Scene.get(), ts);*/
+
+        Engine::CameraSystem* camSystem = sceneSystems.GetSystem<Engine::CameraSystem>();
+        camSystem->OnUpdate(m_Scene.get(), ts);
+
+        Engine::RenderSystem* renderSystem = sceneSystems.GetSystem<Engine::RenderSystem>();
+        renderSystem->OnUpdate(m_Scene.get(), ts);
+
+    } 
 
     if (input.IsKeyJustPressed(GLFW_KEY_P)) {
         LOG_DEBUG("Testing Audio Playback");
@@ -1014,7 +1117,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Update Editor To Do
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
-    m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+
+    if (m_EditorEnable) {
+        m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+    }
+
     m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
     m_TracyProfiler->OnUpdate();
 }

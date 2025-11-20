@@ -18,6 +18,9 @@
 #include "../Asset/ResourceHelpers.h"
 #include "../Asset/ResourceManager.h"
 
+// TESTING
+#include "../Graphics/stb_image.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 #include <GLFW/glfw3.h>
@@ -68,12 +71,15 @@ namespace {
 		std::string vertex_obj_picking_path{ Engine::getAssetFilePath("Sources/Shaders/object_picking.vert") };
 		std::string fragment_obj_picking_path{ Engine::getAssetFilePath("Sources/Shaders/object_picking.frag") };
 
+		std::string vertex_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.vert") };
+		std::string fragment_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.frag") };
 
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
 			std::make_pair(vertex_debug_path, fragment_debug_path),
-			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path)
+			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
+			std::make_pair(vertex_skybox_path, fragment_skybox_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
@@ -96,6 +102,39 @@ namespace {
 		ms.push_back(std::move(c));
 		ms.push_back(std::move(p));
 		ms.push_back(std::move(s));
+	}
+
+	unsigned int loadCubemap(std::vector<std::string> faces)
+	{
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+		int width, height, nrChannels;
+		for (unsigned int i = 0; i < faces.size(); i++)
+		{
+			unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+			if (data)
+			{
+				GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data
+				);
+				stbi_image_free(data);
+			}
+			else
+			{
+				std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+				stbi_image_free(data);
+			}
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		return textureID;
 	}
 
 }
@@ -138,6 +177,30 @@ namespace Engine {
 
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
+
+		// Create an engine provided skybox
+		MeshData skybox_cube = make_cube();
+		m_skybox = upload_mesh_data(skybox_cube);
+
+		//std::vector<std::string> faces = {
+		//	Engine::getAssetFilePath("Sources/Textures/pz.png"),
+		//	Engine::getAssetFilePath("Sources/Textures/nz.png"),
+		//	Engine::getAssetFilePath("Sources/Textures/py.png"),
+		//	Engine::getAssetFilePath("Sources/Textures/ny.png"),
+		//	Engine::getAssetFilePath("Sources/Textures/px.png"),
+		//	Engine::getAssetFilePath("Sources/Textures/nx.png")
+		//};
+
+		std::vector<std::string> faces = {
+	Engine::getAssetFilePath("Sources/Textures/right.jpg"),
+	Engine::getAssetFilePath("Sources/Textures/left.jpg"),
+	Engine::getAssetFilePath("Sources/Textures/top.jpg"),
+	Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
+	Engine::getAssetFilePath("Sources/Textures/front.jpg"),
+	Engine::getAssetFilePath("Sources/Textures/back.jpg")
+		};
+
+		m_skybox_texture = loadCubemap(faces);
 
 #pragma region TESTING LOADING UBO FOR MATERIALS
 		// -------- Materials UBO (binding = 1)  --------
@@ -577,89 +640,126 @@ namespace Engine {
 				prog.setUniform("useNormalMap", false);
 #pragma endregion
 
-				 // Check for material resource
-				 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
-				 {
-				 	// New workflow has no ambient lighting
-				 	prog.setUniform("material_.albedo", glm::vec3(material_resource->baseColor[0], 
-				 													       material_resource->baseColor[1], 
-				 													       material_resource->baseColor[2]));
+			 // Check for material resource
+			 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
+			 {
+				// New workflow has no ambient lighting
+				prog.setUniform("material_.albedo", glm::vec3(material_resource->baseColor[0], 
+				 												       material_resource->baseColor[1], 
+				 												       material_resource->baseColor[2]));
 
-				 	prog.setUniform("material_.metallic", material_resource->metallic);
-				 	prog.setUniform("material_.roughness", material_resource->roughness);
-				 	prog.setUniform("material_.ao", material_resource->ambientOcclusion);
-				 	prog.setUniform("material_.opacity", material_resource->opacity);
+				prog.setUniform("material_.metallic", material_resource->metallic);
+				prog.setUniform("material_.roughness", material_resource->roughness);
+				prog.setUniform("material_.ao", material_resource->ambientOcclusion);
+				prog.setUniform("material_.opacity", material_resource->opacity);
+				prog.setUniform("material_.emissionColor", glm::vec3(material_resource->emissionColor[0],
+																			material_resource->emissionColor[1],
+																			material_resource->emissionColor[2]));
+				prog.setUniform("material_.emissionStrength", material_resource->emissionStrength);
 
-				 	if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
-				 		glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
-				 		prog.setUniform("Texture2D", 0);
-				 		prog.setUniform("isTexture", true);
+				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->baseMap))) {
+				 	glBindTextureUnit(0, static_cast<GLuint>(texture_resource->textureID));
+				 	prog.setUniform("Texture2D", 0);
+				 	prog.setUniform("isTexture", true);
 
-				 		if (texture_resource->format == "sRGB") {
-				 			prog.setUniform("isGamma", true);
-				 		}
-				 		else {
-				 			prog.setUniform("isGamma", false);
-				 		}
+				 	if (texture_resource->format == "sRGB") {
+				 		prog.setUniform("isGamma", true);
 				 	}
-				 }
-				 else
-				 {
-				 	//prog.setUniform("isTexture", false);
-				 	//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
-				 	//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
-				 	//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
-				 	//prog.setUniform("material.shininess", test_material.getMaterialShininess());
-				 }
+				 	else {
+				 		prog.setUniform("isGamma", false);
+				 	}
+				}
+
+				if (TextureResource* nm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap)))
+				{
+					glBindTextureUnit(1, static_cast<GLuint>(nm_texture_resource->textureID));
+					prog.setUniform("useNormalMap", true);
+				}
+			 }
+			 else
+			 {
+				//prog.setUniform("isTexture", false);
+				//prog.setUniform("material.Ka", test_material.getMaterialAmbient());
+				//prog.setUniform("material.Kd", test_material.getMaterialDiffuse());
+				//prog.setUniform("material.Ks", test_material.getMaterialSpecular());
+				//prog.setUniform("material.shininess", test_material.getMaterialShininess());
+			 }
 
 #pragma region TESTING UBO FOR LIGHTING
-			// Per-object light culling + upload 
-			// Object center/radius (approx): extract translation; radius = heuristic
-				glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
-				const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
+		// Per-object light culling + upload 
+		// Object center/radius (approx): extract translation; radius = heuristic
+			glm::vec3 objCenter = glm::vec3(item.m_model_to_world_transform[3]);
+			const float objRadius = 1.0f; // Replace with mesh/submesh bounds radius if available
 
-				uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
-				(void)usedLights; // block is visible to shader via binding=0
+			uint32_t usedLights = buildAndUploadLightsForDraw(objCenter, objRadius, lights);
+			(void)usedLights; // block is visible to shader via binding=0
 #pragma endregion
 
-				size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+			size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
 
-				GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
-				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
-				GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+			GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
 
-				// Upload model to world transform
-				prog.setUniform("u_World", item.m_model_to_world_transform); 
+			// Upload model to world transform
+			prog.setUniform("u_World", item.m_model_to_world_transform); 
 
-				// Compute the normal matrix and upload it
-				glm::mat4 normal_matrix = glm::transpose(glm::inverse(item.m_model_to_world_transform));
-				prog.setUniform("u_NormalMatrix", normal_matrix); // Normal matrix
+			// Compute the normal matrix and upload it
+			glm::mat4 normal_matrix = glm::transpose(glm::inverse(item.m_model_to_world_transform));
+			prog.setUniform("u_NormalMatrix", normal_matrix); // Normal matrix
 
-				// Get the underlying mesh resource using its guid
-				if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(convertToMeshGuid(item.m_mesh_guid))) {
-					glBindVertexArray(mesh_resource->VAO);
+			// Get the underlying mesh resource using its guid
+			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(convertToMeshGuid(item.m_mesh_guid))) {
+				glBindVertexArray(mesh_resource->VAO);
 
-					// Get the submesh descriptor
-					const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
+				// Get the submesh descriptor
+				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
 
-					// Calculate byte offset into the index buffer
-					const void* indexOffset = reinterpret_cast<const void*>( submesh.startIndex * sizeof(unsigned int));
+				// Calculate byte offset into the index buffer
+				const void* indexOffset = reinterpret_cast<const void*>( submesh.startIndex * sizeof(unsigned int));
 
-					glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, indexOffset);
-					glBindVertexArray(0);
-				}
-				else { // Draws primitives
-					m_gl.m_mesh_storage[mesh_handle].vao.bind();
-					glDrawElements(primitive, draw_count, index_type, nullptr);
-					glBindVertexArray(0);
-				}
+				glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, indexOffset);
+				glBindVertexArray(0);
+			}
+			else { // Draws primitives
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, nullptr);
+				glBindVertexArray(0);
+			}
+
 		}
+
+		prog.programFree();
+
+		// Render skybox last
+		glDepthFunc(GL_LEQUAL);  // NOT GL_LESS - skybox is at max depth
+		glDepthMask(GL_FALSE);   // Don't write to depth buffer
+
+		// Need a separate projection view matrix for the skybox
+		glm::mat4 view = glm::mat4(glm::mat3(v)); // Strip camera matrix of translation component
+		glm::mat4 skybox_projection = p * view;
+
+		// Swap shader programs
+		size_t skybox_shader_program_idx = 3;
+		auto& skybox_prog = m_gl.m_shader_storage[skybox_shader_program_idx]; // Hardcoded 
+
+		skybox_prog.programUse();
+
+		skybox_prog.setUniform("u_SkyboxViewProjection", skybox_projection);
+
+		// Draw skybox and enable texture
+		m_skybox.vao.bind();
+		glBindTextureUnit(2, m_skybox_texture);
+		glDrawElements(m_skybox.primitive_type, m_skybox.draw_count, m_skybox.index_type, nullptr);
+		glBindVertexArray(0);
+
+		skybox_prog.programFree();
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
-		prog.programFree();
+		//prog.programFree();
 		glBindTextureUnit(0, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
