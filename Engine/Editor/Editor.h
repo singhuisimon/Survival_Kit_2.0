@@ -62,12 +62,30 @@ namespace Engine
 		Entity m_SelectedEntity{}; // track which entity is selected
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
+
+		static constexpr float m_DoublePickedTime = 0.5f;
+		float m_LastClickedTime = 0.f;
+		u32 m_LastClickedID = 0xFFFFFFFFu;
 		
 		// ImGui Window functionality
 		bool inspectorWindow = true;
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
+		bool animatorWindow = false;			// Animator/dopesheet window toggle
+		bool m_FocusAnimatorNextFrame = false;	// Request Animator window focus next frame
+
+		// --- Animator / dopesheet editor state ---
+		enum class DopesheetTrackType
+		{
+			None,
+			Position,
+			Rotation,
+			Scale
+		};
+
+		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
+		int                m_DopesheetSelectedKey = -1;  // index into that track�s key array
 
 		// ImGui Top Menu Panel
 		bool openScenePanel = false; // for top menu open file 
@@ -121,6 +139,8 @@ namespace Engine
 		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
 		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
 
+
+		bool isPlaying = true;
 
 	public:
 		/**************************************************************************
@@ -208,6 +228,13 @@ namespace Engine
 		* 	objects, replace prefabs, and create a new prefab based on the selected entity.
 		**************************************************************************/
 		void displayHierarchyPanel();
+
+		/**************************************************************************
+		* @brief
+		*  Displays the Animator (dopesheet) panel for the selected entity.
+		*  Allows editing of animation clips & keyframes.
+		**************************************************************************/
+		void displayAnimatorPanel();            // <--- NEW
 
 		/**************************************************************************
 		* @brief 
@@ -356,6 +383,7 @@ namespace Engine
 
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
+		bool getIsPlaying() const { return isPlaying; }
 	};
 
 

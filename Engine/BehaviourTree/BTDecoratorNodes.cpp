@@ -21,11 +21,13 @@ namespace Engine {
     
     void BTDecorator::AddChild(std::shared_ptr<BTNode> child) {
         m_Child = child;
+        m_ChildEntered = false;
     }
     
     void BTDecorator::RemoveChild(size_t index) {
         if (index == 0) {
             m_Child.reset();
+            m_ChildEntered = false;
         }
     }
     
@@ -46,9 +48,26 @@ namespace Engine {
     }
     
     void BTDecorator::Reset() {
+        m_ChildEntered = false;
         if (m_Child) {
             m_Child->Reset();
         }
+    }
+
+    // FIXED: Implement FindChildIndex for decorators
+    int BTDecorator::FindChildIndex(const std::shared_ptr<BTNode>& child) const {
+        if (m_Child && m_Child == child) {
+            return 0;
+        }
+        return -1;
+    }
+
+    // FIXED: Implement FindChildIndexByGUID for decorators
+    int BTDecorator::FindChildIndexByGUID(xresource::instance_guid guid) const {
+        if (m_Child && m_Child->GetGUID() == guid) {
+            return 0;
+        }
+        return -1;
     }
     
 
@@ -68,9 +87,26 @@ namespace Engine {
                 return BTStatus::Failure;
             }
         }
+
+        //testing/trying it out.
+        if (m_ChildEntered == false)
+        {
+            m_Child->OnEnter(context);
+            m_ChildEntered = true;
+        }
     
         BTStatus status = m_Child->Execute(context);
     
+
+		//need figure out if i need to set the child entered to false again
+		//as well as when to call onexit
+        // If child completed, call OnExit
+        if (status != BTStatus::Running) {
+            m_Child->OnExit(context);
+            m_ChildEntered = false;
+        }
+
+
         if (status == BTStatus::Success) {
             return BTStatus::Failure;
         }
@@ -90,8 +126,25 @@ namespace Engine {
             return BTStatus::Success;
         }
     
+        // Call OnEnter if this is the first time executing the child
+        if (!m_ChildEntered) {
+            m_Child->OnEnter(context);
+            m_ChildEntered = true;
+        }
+
         BTStatus status = m_Child->Execute(context);
-        return (status == BTStatus::Running) ? BTStatus::Running : BTStatus::Success;
+
+        // If child completed, call OnExit
+        if (status != BTStatus::Running) {
+            m_Child->OnExit(context);
+            m_ChildEntered = false;
+            // Always return success regardless of child result
+            return BTStatus::Success;
+        }
+
+
+        return BTStatus::Running;
+        //return (status == BTStatus::Running) ? BTStatus::Running : BTStatus::Success;
     }
     
 
@@ -99,12 +152,31 @@ namespace Engine {
     const char* BTFailer::GetTypeName() const { return "Failer"; }
     
     BTStatus BTFailer::Execute(BTContext& context) {
+
         if (!m_Child) {
             return BTStatus::Failure;
         }
+
+        // Call OnEnter if this is the first time executing the child
+        if (!m_ChildEntered) {
+            m_Child->OnEnter(context);
+            m_ChildEntered = true;
+        }
     
         BTStatus status = m_Child->Execute(context);
-        return (status == BTStatus::Running) ? BTStatus::Running : BTStatus::Failure;
+
+		//need to figure out if i need to set the child entered to false again as well as call onexit
+
+        // If child completed, call OnExit
+        if (status != BTStatus::Running) {
+            m_Child->OnExit(context);
+            m_ChildEntered = false;
+            // Always return failure regardless of child result
+            return BTStatus::Failure;
+        }
+
+        return BTStatus::Running;
+        //return (status == BTStatus::Running) ? BTStatus::Running : BTStatus::Failure;
     }
     
 
@@ -122,16 +194,27 @@ namespace Engine {
         // Infinite repeat (-1 or negative values)
         if (m_RepeatCount < 0) {
             LOG_INFO("REPEATER: INF REPEATING");
+
+            // Call OnEnter if this is the first time executing the child
+            if (!m_ChildEntered) {
+                m_Child->OnEnter(context);
+                m_ChildEntered = true;
+            }
+
             BTStatus status = m_Child->Execute(context);
 
             // If child completed (Success or Failure), reset it for next iteration
             if (status != BTStatus::Running) {
+
+                m_Child->OnExit(context);
+
                 // Check if entity still exists before resetting
                 if (context.Entity && context.Scene) {
                     auto& registry = context.Scene->GetRegistry();
                     entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
                     if (registry.valid(entityHandle)) {
                         m_Child->Reset(); // Reset for next iteration
+                        m_ChildEntered = false;  // Reset for next iteration
                     }
                 }
                 //m_Child->Reset();
@@ -141,9 +224,17 @@ namespace Engine {
             return BTStatus::Running;
         }
 
+        //if there is issue haha....
         // Limited repeat - Execute ONE iteration per frame (not all at once!)
         if (m_CurrentCount < m_RepeatCount) {
             LOG_INFO("REPEATER: EXECUTING ONE ITERATION PER FRAME, CURRENT: ", m_CurrentCount, " ,REPEATCOUNT: ", m_RepeatCount);
+            
+            // Call OnEnter if this is the first time executing the child
+            if (!m_ChildEntered) {
+                m_Child->OnEnter(context);
+                m_ChildEntered = true;
+            }
+
             // Execute the child node
             BTStatus status = m_Child->Execute(context);
 
@@ -151,6 +242,9 @@ namespace Engine {
             if (status == BTStatus::Running) {
                 return BTStatus::Running;
             }
+
+            // Child completed this iteration
+            m_Child->OnExit(context);
 
             // Child completed this iteration (Success or Failure)
             // Reset child for next iteration
@@ -166,6 +260,7 @@ namespace Engine {
 
             // Increment the counter
             m_CurrentCount++;
+            m_ChildEntered = false;
 
             // Check if we've completed all requested repeats
             if (m_CurrentCount >= m_RepeatCount) {
@@ -207,10 +302,20 @@ namespace Engine {
         if (!m_Child) {
             return BTStatus::Failure;
         }
+
+        // Call OnEnter if this is the first time executing the child
+        if (!m_ChildEntered) {
+            m_Child->OnEnter(context);
+            m_ChildEntered = true;
+        }
     
         BTStatus status = m_Child->Execute(context);
     
         if (status == BTStatus::Failure) {
+            // Child failed - exit and return success
+            m_Child->OnExit(context);
+            m_ChildEntered = false;
+
             // Check if entity still exists before resetting
             if (context.Entity && context.Scene) {
                 auto& registry = context.Scene->GetRegistry();
@@ -223,12 +328,16 @@ namespace Engine {
             return BTStatus::Success; // We succeed when child fails
         }
         else if (status == BTStatus::Success) {
+            // Child succeeded - call OnExit, reset, and call OnEnter for next iteration
+            m_Child->OnExit(context);
+
             // Check if entity still exists before resetting
             if (context.Entity && context.Scene) {
                 auto& registry = context.Scene->GetRegistry();
                 entt::entity entityHandle = static_cast<entt::entity>(*context.Entity);
                 if (registry.valid(entityHandle)) {
                     m_Child->Reset(); // Reset for next iteration
+                    m_ChildEntered = false;  // Will call OnEnter again next iteration
                 }
             }
             //m_Child->Reset(); // Reset for next iteration

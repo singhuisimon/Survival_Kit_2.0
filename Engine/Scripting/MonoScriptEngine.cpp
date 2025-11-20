@@ -303,11 +303,37 @@ namespace Engine
 
 		if (exception)
 		{
-			// Log exception details
 			MonoClass *exceptionClass = mono_object_get_class(exception);
 			const char *exceptionName = mono_class_get_name(exceptionClass);
-			LOG_ERROR("Exception in C# method '", methodName, "': ", exceptionName);
+
+			MonoClass *objClass = mono_object_get_class(instance);
+			const char *className = mono_class_get_name(objClass);
+			const char *classNs = mono_class_get_namespace(objClass);
+
+			LOG_ERROR(
+				"Exception in script ",
+				(classNs ? classNs : ""),
+				(classNs && classNs[0] ? "." : ""),
+				className,
+				"::",
+				methodName,
+				" - ",
+				exceptionName
+			);
+
+			// Get full managed exception string (includes stack trace)
+			MonoString *excStr = mono_object_to_string(exception, nullptr);
+			if (excStr)
+			{
+				char *excCStr = mono_string_to_utf8(excStr);
+				if (excCStr)
+				{
+					LOG_ERROR("  Exception.ToString(): ", excCStr);
+					mono_free(excCStr);
+				}
+			}
 		}
+
 	}
 
 	void MonoScriptEngine::SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value)
@@ -393,6 +419,24 @@ namespace Engine
 		static void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel);
 		static void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta);
 
+		// ---- Rigidbody scalar properties ----
+		static float Rigidbody_GetMass(uint64_t entityID);
+		static void  Rigidbody_SetMass(uint64_t entityID, float mass);
+		static bool  Rigidbody_GetIsKinematic(uint64_t entityID);
+		static void  Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic);
+		static bool  Rigidbody_GetUseGravity(uint64_t entityID);
+		static void  Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity);
+
+		// ---- Rigidbody helpers ----
+		static float Rigidbody_GetSpeed(uint64_t entityID);
+		static bool  Rigidbody_IsMoving(uint64_t entityID);
+		static bool  Rigidbody_IsStatic(uint64_t entityID);
+
+		// ---- Rigidbody forces ----
+		static void  Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force);
+		static void  Rigidbody_Stop(uint64_t entityID);
+
+
 		// ---- Collision events (via PhysicsAPI only) ----
 		static void Physics_EnableCollisionEvents();
 		static void Physics_BeginCollisionFrame();
@@ -404,6 +448,63 @@ namespace Engine
 		static void  Physics_BeginCollisionFrame();
 		static int   Physics_GetCollisionCount();
 		static void  Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b);
+
+		// ===== Entity / component adders =====
+		static void Entity_AddTag(uint64_t entityID);
+		static void Entity_AddCamera(uint64_t entityID);
+		static void Entity_AddAudio(uint64_t entityID);
+		static void Entity_AddMeshRenderer(uint64_t entityID);
+
+		// ===== TagComponent =====
+		static MonoString *Tag_GetTag(uint64_t entityID);
+		static void        Tag_SetTag(uint64_t entityID, MonoString *tag);
+
+		// ===== CameraComponent =====
+		static bool  Camera_GetEnabled(uint64_t entityID);
+		static void  Camera_SetEnabled(uint64_t entityID, bool enabled);
+		static bool  Camera_GetPrimary(uint64_t entityID);
+		static void  Camera_SetPrimary(uint64_t entityID, bool primary);
+		static float Camera_GetFOV(uint64_t entityID);
+		static void  Camera_SetFOV(uint64_t entityID, float fov);
+		static float Camera_GetNear(uint64_t entityID);
+		static void  Camera_SetNear(uint64_t entityID, float nearPlane);
+		static float Camera_GetFar(uint64_t entityID);
+		static void  Camera_SetFar(uint64_t entityID, float farPlane);
+		static void  Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget);
+		static void  Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget);
+
+		// ===== MeshRendererComponent =====
+		static bool MeshRenderer_GetVisible(uint64_t entityID);
+		static void MeshRenderer_SetVisible(uint64_t entityID, bool visible);
+		static bool MeshRenderer_GetShadowCast(uint64_t entityID);
+		static void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast);
+		static bool MeshRenderer_GetShadowReceive(uint64_t entityID);
+		static void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive);
+		static bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID);
+		static void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi);
+
+		// ===== AudioComponent =====
+		static void  Audio_Play(uint64_t entityID);
+		static void  Audio_Stop(uint64_t entityID);
+		static void  Audio_Pause(uint64_t entityID);
+
+		static float Audio_GetVolume(uint64_t entityID);
+		static void  Audio_SetVolume(uint64_t entityID, float volume);
+
+		static float Audio_GetPitch(uint64_t entityID);
+		static void  Audio_SetPitch(uint64_t entityID, float pitch);
+
+		static bool  Audio_GetLoop(uint64_t entityID);
+		static void  Audio_SetLoop(uint64_t entityID, bool loop);
+
+		static bool  Audio_GetMute(uint64_t entityID);
+		static void  Audio_SetMute(uint64_t entityID, bool mute);
+
+		static bool  Audio_GetIs3D(uint64_t entityID);
+		static void  Audio_SetIs3D(uint64_t entityID, bool is3d);
+
+		static void  Audio_SetFile(uint64_t entityID, MonoString *path);
+
 
 	}
 
@@ -447,10 +548,33 @@ namespace Engine
 		// Physics
 		mono_add_internal_call("Engine.InternalCalls::Entity_AddRigidBody", (void *)InternalCalls::Entity_AddRigidBody);
 
+		// Entity / components
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddTag", (void *)InternalCalls::Entity_AddTag);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddCamera", (void *)InternalCalls::Entity_AddCamera);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddAudio", (void *)InternalCalls::Entity_AddAudio);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddMeshRenderer", (void *)InternalCalls::Entity_AddMeshRenderer);
+
+
 		// Rigidbody (component-level velocity)
 		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetVelocity", (void *)InternalCalls::Rigidbody_GetVelocity);
 		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetVelocity", (void *)InternalCalls::Rigidbody_SetVelocity);
 		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddVelocity", (void *)InternalCalls::Rigidbody_AddVelocity);
+
+		// Rigidbody scalar/flag bindings
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetMass", (void *)InternalCalls::Rigidbody_GetMass);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetMass", (void *)InternalCalls::Rigidbody_SetMass);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetIsKinematic", (void *)InternalCalls::Rigidbody_GetIsKinematic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetIsKinematic", (void *)InternalCalls::Rigidbody_SetIsKinematic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetUseGravity", (void *)InternalCalls::Rigidbody_GetUseGravity);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetUseGravity", (void *)InternalCalls::Rigidbody_SetUseGravity);
+
+		// Rigidbody helpers
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetSpeed", (void *)InternalCalls::Rigidbody_GetSpeed);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsMoving", (void *)InternalCalls::Rigidbody_IsMoving);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsStatic", (void *)InternalCalls::Rigidbody_IsStatic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddForce", (void *)InternalCalls::Rigidbody_AddForce);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_Stop", (void *)InternalCalls::Rigidbody_Stop);
+
 
 		// Physics collisions (keep using PhysicsAPI ONLY for this)
 		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
@@ -464,6 +588,55 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
 		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
 
+		// Tag
+		mono_add_internal_call("Engine.InternalCalls::Tag_GetTag", (void *)InternalCalls::Tag_GetTag);
+		mono_add_internal_call("Engine.InternalCalls::Tag_SetTag", (void *)InternalCalls::Tag_SetTag);
+
+		// Camera
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetEnabled", (void *)InternalCalls::Camera_GetEnabled);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetEnabled", (void *)InternalCalls::Camera_SetEnabled);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetPrimary", (void *)InternalCalls::Camera_GetPrimary);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetPrimary", (void *)InternalCalls::Camera_SetPrimary);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetFOV", (void *)InternalCalls::Camera_GetFOV);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetFOV", (void *)InternalCalls::Camera_SetFOV);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetNear", (void *)InternalCalls::Camera_GetNear);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetNear", (void *)InternalCalls::Camera_SetNear);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetFar", (void *)InternalCalls::Camera_GetFar);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetFar", (void *)InternalCalls::Camera_SetFar);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetTarget", (void *)InternalCalls::Camera_GetTarget);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetTarget", (void *)InternalCalls::Camera_SetTarget);
+
+		// MeshRenderer
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetVisible", (void *)InternalCalls::MeshRenderer_GetVisible);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetVisible", (void *)InternalCalls::MeshRenderer_SetVisible);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowCast", (void *)InternalCalls::MeshRenderer_GetShadowCast);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowCast", (void *)InternalCalls::MeshRenderer_SetShadowCast);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowReceive", (void *)InternalCalls::MeshRenderer_GetShadowReceive);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowReceive", (void *)InternalCalls::MeshRenderer_SetShadowReceive);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_GetGlobalIlluminate);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_SetGlobalIlluminate);
+
+		// Audio
+		mono_add_internal_call("Engine.InternalCalls::Audio_Play", (void *)InternalCalls::Audio_Play);
+		mono_add_internal_call("Engine.InternalCalls::Audio_Stop", (void *)InternalCalls::Audio_Stop);
+		mono_add_internal_call("Engine.InternalCalls::Audio_Pause", (void *)InternalCalls::Audio_Pause);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetVolume", (void *)InternalCalls::Audio_GetVolume);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetVolume", (void *)InternalCalls::Audio_SetVolume);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetPitch", (void *)InternalCalls::Audio_GetPitch);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetPitch", (void *)InternalCalls::Audio_SetPitch);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetLoop", (void *)InternalCalls::Audio_GetLoop);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetLoop", (void *)InternalCalls::Audio_SetLoop);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetMute", (void *)InternalCalls::Audio_GetMute);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetMute", (void *)InternalCalls::Audio_SetMute);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetIs3D", (void *)InternalCalls::Audio_GetIs3D);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetIs3D", (void *)InternalCalls::Audio_SetIs3D);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -861,7 +1034,7 @@ namespace Engine
 		void Entity_AddRigidBody(uint64_t entityID)
 		{
 			auto e = GetEntityOrNull(entityID);
-			if (!e)return;
+			if (!e) return;
 			e.AddComponent<RigidbodyComponent>();
 		}
 
@@ -885,6 +1058,84 @@ namespace Engine
 			if (!inVel) return;
 			auto &rb{ e.GetComponent<RigidbodyComponent>() };
 			rb.SetVelocity(rb.GetVelocity() + *inVel);
+		}
+
+		float Rigidbody_GetMass(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.GetMass();
+		}
+
+		void Rigidbody_SetMass(uint64_t entityID, float mass)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.SetMass(mass);
+		}
+
+		bool Rigidbody_GetIsKinematic(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsKinematicBody();
+		}
+
+		void Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.SetKinematic(isKinematic);
+		}
+
+		bool Rigidbody_GetUseGravity(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsGravityEnabled();
+		}
+
+		void Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.SetGravityEnabled(useGravity);
+		}
+
+		float Rigidbody_GetSpeed(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.GetSpeed();
+		}
+
+		bool Rigidbody_IsMoving(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsMoving();
+		}
+
+		bool Rigidbody_IsStatic(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			return rb.IsStatic();
+		}
+
+		void Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!force) return;
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.AddForce(*force);
+		}
+
+		void Rigidbody_Stop(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &rb{ e.GetComponent<RigidbodyComponent>() };
+			rb.Stop();
 		}
 
 		// ==================================
@@ -915,6 +1166,309 @@ namespace Engine
 			*b = (uint32_t)evs[index].entB;
 		}
 
+		void Entity_AddTag(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			e.AddComponent<TagComponent>();
+		}
+
+		void Entity_AddCamera(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			e.AddComponent<CameraComponent>();
+		}
+
+		void Entity_AddAudio(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			e.AddComponent<AudioComponent>();
+		}
+
+		void Entity_AddMeshRenderer(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			e.AddComponent<MeshRendererComponent>();
+		}
+
+		MonoString *Tag_GetTag(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TagComponent>())
+				return mono_string_new(mono_domain_get(), "");
+
+			auto &tagComp = e.GetComponent<TagComponent>();
+			const std::string &tag = tagComp.GetTag();
+			return mono_string_new(mono_domain_get(), tag.c_str());
+		}
+
+		void Tag_SetTag(uint64_t entityID, MonoString *tagStr)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TagComponent>() || !tagStr)
+				return;
+
+			char *utf8 = mono_string_to_utf8(tagStr);
+			if (!utf8) return;
+
+			e.GetComponent<TagComponent>().SetTag(utf8);
+			mono_free(utf8);
+		}
+
+		bool Camera_GetEnabled(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			return cam.Enabled;
+		}
+
+		void Camera_SetEnabled(uint64_t entityID, bool enabled)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			cam.Enabled = enabled;
+			cam.isDirty = true;
+		}
+
+		bool Camera_GetPrimary(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			return cam.Primary;
+		}
+
+		void Camera_SetPrimary(uint64_t entityID, bool primary)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			cam.Primary = primary;
+			cam.isDirty = true;
+		}
+
+		float Camera_GetFOV(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			return cam.FOV;
+		}
+
+		void Camera_SetFOV(uint64_t entityID, float fov)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			cam.FOV = fov;
+			cam.isDirty = true;
+		}
+
+		float Camera_GetNear(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			return cam.NearPlane;
+		}
+
+		void Camera_SetNear(uint64_t entityID, float nearPlane)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			cam.NearPlane = nearPlane;
+			cam.isDirty = true;
+		}
+
+		float Camera_GetFar(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			return cam.FarPlane;
+		}
+
+		void Camera_SetFar(uint64_t entityID, float farPlane)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &cam = e.GetComponent<CameraComponent>();
+			cam.FarPlane = farPlane;
+			cam.isDirty = true;
+		}
+
+		void Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!outTarget) return;
+			auto &cam = e.GetComponent<CameraComponent>();
+			*outTarget = cam.Target;
+		}
+
+		void Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!inTarget) return;
+			auto &cam = e.GetComponent<CameraComponent>();
+			cam.SetTarget(*inTarget); // marks dirty internally
+		}
+
+		bool MeshRenderer_GetVisible(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			return mr.Visible;
+		}
+
+		void MeshRenderer_SetVisible(uint64_t entityID, bool visible)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			mr.Visible = visible;
+		}
+
+		bool MeshRenderer_GetShadowCast(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			return mr.ShadowCast;
+		}
+
+		void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			mr.ShadowCast = cast;
+		}
+
+		bool MeshRenderer_GetShadowReceive(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			return mr.ShadowReceive;
+		}
+
+		void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			mr.ShadowReceive = receive;
+		}
+
+		bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			return mr.GlobalIlluminate;
+		}
+
+		void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &mr = e.GetComponent<MeshRendererComponent>();
+			mr.GlobalIlluminate = gi;
+		}
+
+		void Audio_Play(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetState(PlayState::PLAY);
+		}
+
+		void Audio_Stop(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetState(PlayState::STOP);
+		}
+
+		void Audio_Pause(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetState(PlayState::PAUSE);
+		}
+
+		float Audio_GetVolume(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			return audio.Volume;
+		}
+
+		void Audio_SetVolume(uint64_t entityID, float volume)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetVolume(volume);
+		}
+
+		float Audio_GetPitch(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			return audio.Pitch;
+		}
+
+		void Audio_SetPitch(uint64_t entityID, float pitch)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetPitch(pitch);
+		}
+
+		bool Audio_GetLoop(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			return audio.Loop;
+		}
+
+		void Audio_SetLoop(uint64_t entityID, bool loop)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetLoop(loop);
+		}
+
+		bool Audio_GetMute(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			return audio.Mute;
+		}
+
+		void Audio_SetMute(uint64_t entityID, bool mute)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.SetMute(mute);
+		}
+
+		bool Audio_GetIs3D(uint64_t entityID)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			return audio.Is3D;
+		}
+
+		void Audio_SetIs3D(uint64_t entityID, bool is3d)
+		{
+			auto e = GetEntityOrNull(entityID);
+			auto &audio = e.GetComponent<AudioComponent>();
+			audio.Set3D(is3d);
+		}
+
+		void Audio_SetFile(uint64_t entityID, MonoString *path)
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!path) return;
+
+			auto &audio = e.GetComponent<AudioComponent>();
+
+			char *utf8 = mono_string_to_utf8(path);
+			if (!utf8) return;
+
+			audio.SetAudioFile(utf8);
+			mono_free(utf8);
+		}
 	} // namespace internalcalls
 
 	// Expose these functions for external use

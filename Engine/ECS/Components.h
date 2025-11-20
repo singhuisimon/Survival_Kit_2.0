@@ -15,6 +15,7 @@
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"
+#include "../Component/AnimatorComponent.h"
 
 namespace Engine {
     // All components are now defined in their respective headers

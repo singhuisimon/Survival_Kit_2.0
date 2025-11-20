@@ -50,10 +50,16 @@ layout(std140, binding = 0) uniform LightsBlock {
 struct Material_
 {
     vec3  albedo;
+    vec3  emissionColor;
+    float emissionStrength;
     float metallic;
     float roughness;
     float ao;
     float opacity;
+    float textureOffsetX;
+    float textureOffsetY;
+    float textureTileX;
+    float textureTileY;
 };
 
 uniform Material_ material_;
@@ -141,9 +147,11 @@ void main()
 {
     // ===== Normal computation =====
     vec3 N;
+    vec2 offset = vec2(material_.textureOffsetX, material_.textureOffsetY);
+    vec2 tiling = vec2(material_.textureTileX, material_.textureTileY);
     if (useNormalMap) {
         mat3 TBN = mat3(normalize(Tangent), normalize(Bitangent), normalize(Normal));
-        vec3 normalSample = texture(NormalMap, TexCoord).rgb;
+        vec3 normalSample = texture(NormalMap, TexCoord * tiling + offset).rgb;
         normalSample = normalSample * 2.0 - 1.0;
         N = normalize(TBN * normalSample);
     } else {
@@ -156,7 +164,8 @@ void main()
     // ===== Material properties =====
     vec3 albedo = material_.albedo;
     if (isTexture) {
-        vec3 tex = texture(Texture2D, TexCoord).rgb;
+
+        vec3 tex = texture(Texture2D, TexCoord * tiling + offset).rgb;
         if (isGamma) {
             tex = pow(tex, vec3(2.2)); // sRGB -> linear
         }
@@ -247,7 +256,7 @@ void main()
 
     // ===== Ambient lighting =====
     vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
 
     // ===== Tone mapping (Reinhard) =====
     color = color / (color + vec3(1.0));

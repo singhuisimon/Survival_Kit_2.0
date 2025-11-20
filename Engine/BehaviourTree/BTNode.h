@@ -205,6 +205,7 @@ namespace Engine {
         size_t ChildIndex = 0;          ///< Current child being processed
         BTStatus LastChildStatus = BTStatus::Success;
         bool HasEntered = false;        ///< Whether OnEnter was called
+		bool ChildPushed = false;       ///< Whether child node was pushed onto stack
 
         BTStackFrame(std::shared_ptr<BTNode> node)
             : Node(node) {
