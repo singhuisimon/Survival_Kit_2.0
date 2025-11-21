@@ -1,7 +1,7 @@
 {
   "id": 0,
-  "name": "Rotate360in2s",
-  "duration": 2,
+  "name": "Rotate360in10s",
+  "duration": 10,
   "loop": true,
   "positionInterp": "Linear",
   "rotationInterp": "Linear",
@@ -10,8 +10,8 @@
   ],
   "rotationKeys": [
     { "time": 0, "value": [1, 0, 0, 0] },
-    { "time": 1, "value": [-4.37114e-08, 1, 0, 0] },
-    { "time": 2, "value": [-1, -8.74228e-08, 0, -0] }
+    { "time": 5, "value": [-4.37114e-08, -1, 0, -0] },
+    { "time": 10, "value": [-1, 8.74228e-08, 0, 0] }
   ],
   "scaleKeys": [
   ]

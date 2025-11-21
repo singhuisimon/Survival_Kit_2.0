@@ -21,6 +21,7 @@
 #include "../Component/ParticleComponent.h"
 #include "../Component/ScriptComponent.h"
 #include "../Component/LightComponent.h"
+#include "../Component/AnimatorComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -523,6 +524,24 @@ namespace Engine {
             propertiesObj.AddMember("Range", light.Range, allocator);
             propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
             propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
+        // Serialize AnimatorComponent
+        if (entity.HasComponent<AnimatorComponent>()) {
+            const auto& animator = entity.GetComponent<AnimatorComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "AnimatorComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+            propertiesObj.AddMember("playing", animator.playing, allocator);
+            propertiesObj.AddMember("respectClipLoop", animator.respectClipLoop, allocator);
+            propertiesObj.AddMember("controller", animator.controller, allocator);
+            propertiesObj.AddMember("currentClipIndex", animator.currentClipIndex, allocator);
+            propertiesObj.AddMember("currentTime", animator.currentTime, allocator);
+            propertiesObj.AddMember("playbackSpeed", animator.playbackSpeed, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
