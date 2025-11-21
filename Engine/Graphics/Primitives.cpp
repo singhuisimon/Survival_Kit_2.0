@@ -206,10 +206,10 @@ namespace Engine {
 	MeshData2D make_quad() {
 		MeshData2D m;
 		m.positions = {
-			{-0.5f, -0.5f},  // bottom-left
-			{+0.5f, -0.5f},  // bottom-right
-			{+0.5f, +0.5f},  // top-right
-			{-0.5f, +0.5f}   // top-left
+			{-1.0f, -1.0f},  // Covers entire NDC space
+			{+1.0f, -1.0f},
+			{+1.0f, +1.0f},
+			{-1.0f, +1.0f}
 		};
 		m.colors = {
 			glm::vec3(1.0f),  // white

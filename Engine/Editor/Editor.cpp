@@ -127,6 +127,7 @@ namespace Engine
 
 		displayDescriptorEditorPanel();
 
+		displayHDRSettingsPanel();
 		
 		//Complete Imgui rendering for the frame
 		CompleteFrame();
@@ -5483,6 +5484,29 @@ namespace Engine
 		drawEntry(c2Label, c2);
 	}
 
+	void Editor::displayHDRSettingsPanel()
+	{
+		ImGui::Begin("HDR Settings");
 
+		// Exposure control
+		if (ImGui::SliderFloat("Exposure", &m_Renderer->m_exposure, 0.1f, 5.0f, "%.2f"))
+		{
+			// Exposure value changed
+		}
+
+		// Optional: Add a reset button
+		if (ImGui::Button("Reset to Default"))
+		{
+			m_Renderer->m_exposure = 1.0f;
+		}
+
+		// Optional: Add tooltip
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset exposure to default value (1.0)");
+		}
+
+		ImGui::End();
+	}
 
 } // end of namespace Engine

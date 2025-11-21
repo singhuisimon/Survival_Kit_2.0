@@ -395,6 +395,7 @@ namespace Engine
 
 		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
 
+		void displayHDRSettingsPanel();
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
