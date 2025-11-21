@@ -93,7 +93,7 @@ namespace Engine {
 		 * @brief Retrieves the OpenGL texture handle for ImGui rendering
 		 * @return GLuint handle to the first texture in storage
 		 */
-		inline GLuint get_imgui_texture() const { return static_cast<GLuint>(m_gl.m_textures[0].handle()); }
+		inline GLuint get_imgui_texture() const { return static_cast<GLuint>(m_gl.m_textures[2].handle()); }
 
 		/**
 		 * @brief Gets the number of meshes currently stored
@@ -151,6 +151,7 @@ namespace Engine {
 		 */
 		inline bool& getEditorCamToggle() { return isEditorCamOn; }
 
+		float m_exposure = 0.1;
 
 	private:
 		/**
@@ -180,6 +181,8 @@ namespace Engine {
 		 * @param pass The render pass to complete
 		 */
 		void endFrame(RenderPass const& pass);
+
+		void renderFinalPass(RenderPass& pass);
 
 		// Helper to build a per-draw light list and upload it (returns count)
 		uint32_t buildAndUploadLightsForDraw(const glm::vec3& objCenter, float objRadius,
@@ -213,6 +216,13 @@ namespace Engine {
 
 		// Temporary object
 		GraphicsLoader m_gl;
+
+		// Fullscreen Quad where the final output of the render is outputted to
+		MeshGL m_fullscreen_quad;
+
+		RenderPass m_finalpass;
+
+
 	};
 
 }

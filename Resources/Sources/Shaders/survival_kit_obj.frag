@@ -67,7 +67,6 @@ uniform Material_ material_;
 
 // ===== Engine uniforms kept =====      
 uniform vec3 CamPos;       
-uniform bool isGamma;
 uniform bool isTexture;
 uniform bool useNormalMap;
 
@@ -166,9 +165,6 @@ void main()
     if (isTexture) {
 
         vec3 tex = texture(Texture2D, TexCoord * tiling + offset).rgb;
-        if (isGamma) {
-            tex = pow(tex, vec3(2.2)); // sRGB -> linear
-        }
         albedo *= tex;
     }
     
@@ -257,14 +253,6 @@ void main()
     // ===== Ambient lighting =====
     vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
     vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
-
-    // ===== Tone mapping (Reinhard) =====
-    color = color / (color + vec3(1.0));
-
-    // ===== Gamma correction =====
-    if (isGamma) {
-        color = pow(color, vec3(1.0/2.2));
-    }
 
     FragColor = vec4(color, material_.opacity);
 }

@@ -74,12 +74,16 @@ namespace {
 		std::string vertex_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.vert") };
 		std::string fragment_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.frag") };
 
+		std::string vertex_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.vert") };
+		std::string fragment_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.frag") };
+
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
 			std::make_pair(vertex_debug_path, fragment_debug_path),
 			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
-			std::make_pair(vertex_skybox_path, fragment_skybox_path)
+			std::make_pair(vertex_skybox_path, fragment_skybox_path),
+			std::make_pair(vertex_hdr_path, fragment_hdr_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
@@ -164,13 +168,14 @@ namespace Engine {
 		}
 		else {
 			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
-		}
 
-		LOG_INFO("OpenGL initialized");
-		LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
-		LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
-		LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
-		LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+			// Load OpenGL information upon successfully load
+			LOG_INFO("OpenGL initialized");
+			LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
+			LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
+			LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
+			LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+		}
 
 		// Temporary functions, used for testing only
 		test_load_shaders(m_gl.m_shader_storage);
@@ -178,29 +183,25 @@ namespace Engine {
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
 
-		// Create an engine provided skybox
+		// Load skybox mesh
 		MeshData skybox_cube = make_cube();
 		m_skybox = upload_mesh_data(skybox_cube);
 
-		//std::vector<std::string> faces = {
-		//	Engine::getAssetFilePath("Sources/Textures/pz.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/nz.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/py.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/ny.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/px.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/nx.png")
-		//};
-
+		// Load skybox textures
 		std::vector<std::string> faces = {
-	Engine::getAssetFilePath("Sources/Textures/right.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/left.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/top.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/front.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/back.jpg")
+				Engine::getAssetFilePath("Sources/Textures/right.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/left.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/top.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/front.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/back.jpg")
 		};
 
 		m_skybox_texture = loadCubemap(faces);
+
+		// Create a fullscreen quad where the final render output is drawn onto
+		MeshData2D quad = make_quad();
+		m_fullscreen_quad = upload_mesh_data2D(quad);
 
 #pragma region TESTING LOADING UBO FOR MATERIALS
 		// -------- Materials UBO (binding = 1)  --------
@@ -243,7 +244,7 @@ namespace Engine {
 		// Set default editor camera toggle
 		isEditorCamOn = true;
 
-		// Create a framebuffer for ImGui editor and configure it's settings
+		// Create a framebuffer for ImGui editor and configure its settings
 		auto fp_fbo = FrameBuffer::create();
 		if (fp_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*fp_fbo));
@@ -253,7 +254,7 @@ namespace Engine {
 		}
 
 		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
-		auto fp_tex = Texture::alloc_storage_on_gpu(width, height);
+		auto fp_tex = Texture::alloc_storage_on_gpu(width, height, GL_RGBA16F);
 		if (fp_tex.has_value()) {
 			m_gl.m_textures.push_back(std::move(*fp_tex));
 		}
@@ -274,7 +275,6 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
-		// Create FBO for F
 		auto gpu_fbo = FrameBuffer::create();
 		if (gpu_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*gpu_fbo));
@@ -311,6 +311,33 @@ namespace Engine {
 			LOG_ERROR("Renderer::setup() - Failed to created GPU ID framebuffer!");
 		}
 
+		// Allocate a framebuffer for the final pass 
+		auto finalpass_fbo = FrameBuffer::create();
+		if (finalpass_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*finalpass_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create final pass framebuffer!");
+		}
+
+		auto finalpass_tex = Texture::alloc_storage_on_gpu(width, height);
+		if (finalpass_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*finalpass_tex));
+		}else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate texture for final pass!");
+		}
+
+		auto& finalpass_fbo_ = m_framebuffers[2];
+		auto& finalpass_tex_ = m_gl.m_textures[2];
+
+		// Use depth renderbuffer for attaching to editor
+		finalpass_fbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(finalpass_tex_.handle()));
+
+		if (!finalpass_fbo_.complete()) {
+			LOG_ERROR("Renderer::setup() - LDR FBO is incomplete!");
+			throw std::runtime_error("");
+		}
+
 		// Create a render pass for that framebuffer
 		RenderPass first_pass
 		{
@@ -325,48 +352,22 @@ namespace Engine {
 		// Register the pass with the renderer
 		m_passes.push_back(first_pass);
 
-
-#pragma region GPU_ID_OBJECT_PICKING_PASS
-
+		RenderPass gpu_id_pass
 		{
-			RenderPass gpu_id_pass
-			{
-				.pass_name = "GPU ID",
-				.fbo_handle = 1,			// Render into the GPU-ID FBO
-				.shdpgm_handle = 2,         // Object_picking shader program
-				.auto_aspect = true,
-				.clear_color = false,		// Use integer clear below
-				.clear_depth = true,		
-				.depth_test = true,
-				.depth_write = true,		
-				.blending = false,
-				.culling = true,
-				.passtype = PassType::GEOMETRY
-			};
+			.pass_name = "GPU ID",
+			.fbo_handle = 1,			// Render into the GPU-ID FBO
+			.shdpgm_handle = 2,         // Object_picking shader program
+			.auto_aspect = true,
+			.clear_color = false,		// Use integer clear below
+			.clear_depth = true,		
+			.depth_test = true,
+			.depth_write = true,		
+			.blending = false,
+			.culling = true,
+			.passtype = PassType::GEOMETRY
+		};
 
-			m_passes.push_back(gpu_id_pass);
-		}
-
-#pragma endregion
-
-#pragma region TEST_TO_SEE_TEXTURE_PASS_TEMP
-
-		{
-			RenderPass stub_pass
-			{
-				.pass_name = "Stub Pass",
-				.fbo_handle = 0,
-				.shdpgm_handle = 0,
-			};
-
-			//m_passes.push_back(stub_pass);
-		}
-
-#pragma endregion
-
-		if (isDebug) {
-
-		}
+		m_passes.push_back(gpu_id_pass);
 
 		RenderPass debug_pass
 		{
@@ -382,27 +383,16 @@ namespace Engine {
 
 		//m_passes.push_back(debug_pass);
 
-#if 0
-#pragma region TEXTURE_LOAD_TEMP
-		{
-
-			// Temporarily load textures 
-			for (const auto& entry : std::filesystem::directory_iterator(getAssetFilePath("Textures/"))) {
-				if (entry.is_regular_file()) {
-
-					auto path = entry.path();
-
-					if (path.extension() == ".png" || path.extension() == ".jpg" || path.extension() == ".jpeg") {
-						auto tex = Texture::load_from_file(path.string(), TextureDesc(false, false, true));
-						if (tex && tex->valid()) {
-							t_testing_textures.push_back(std::move(*tex));
-						}
-					}
-				}
-			}
-		}
-#pragma endregion
-#endif
+		m_finalpass = {
+			.pass_name = "Final Pass",
+			.fbo_handle = 2,
+			.shdpgm_handle = 4,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_write = false,
+			.culling = false,
+		};
 
 #pragma region MATERIAL_LOAD_TEMP
 		{
@@ -419,7 +409,7 @@ namespace Engine {
 	void Renderer::beginFrame(RenderPass const& pass) {
 
 		auto& fbo = m_framebuffers[pass.fbo_handle];
-		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle())); // Draw to ImGui FBO
+		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle())); 
 
 		auto& viewport = pass.view_port;
 		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y),
@@ -491,6 +481,7 @@ namespace Engine {
 
 	 		for (auto& pass : m_passes) {
 
+				// Skip debugging pass
 				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
 				// Update pass viewport if allowed
@@ -553,7 +544,7 @@ namespace Engine {
 			// For rendering all enabled camera displays
 			for (const auto& cam : camera_list) {
 
-				for (/*const*/ auto& pass : m_passes) {
+				for (auto& pass : m_passes) {
 
 					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
@@ -583,7 +574,8 @@ namespace Engine {
 				}
 			}
 		}
-		
+
+		renderFinalPass(m_finalpass);
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -667,12 +659,6 @@ namespace Engine {
 				 	prog.setUniform("Texture2D", 0);
 				 	prog.setUniform("isTexture", true);
 
-				 	if (texture_resource->format == "sRGB") {
-				 		prog.setUniform("isGamma", true);
-				 	}
-				 	else {
-				 		prog.setUniform("isGamma", false);
-				 	}
 				}
 
 				if (TextureResource* nm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap)))
@@ -784,16 +770,22 @@ namespace Engine {
 		if (!m_framebuffers[handle].complete()) return;
 
 		// For all other FBOs
-		if (handle != 1) {
+		if (handle == 0) {
 			// Allocate storage for a new texture on the GPU
-			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h);
-			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate RGBA8 ", w, " ", h, " storage on the GPU!"); }
+			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h, GL_RGBA16F);
+			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate GL_RGBA16F ", w, " ", h, " storage on the GPU!"); }
 			else { m_gl.m_textures[handle] = std::move(*fp_tex_new); }
 		}
-		else { // For GPU ID FBO
+		else if (handle == 1) { // For GPU ID FBO
 			// Allocate storage for a new texture on the GPU
 			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h, GL_R32UI);
 			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate GL_R32UI ", w, " ", h, " storage on the GPU!"); }
+			else { m_gl.m_textures[handle] = std::move(*fp_tex_new); }
+		}
+		else {
+			// Allocate storage for a new texture on the GPU
+			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h);
+			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate RGBA8 ", w, " ", h, " storage on the GPU!"); }
 			else { m_gl.m_textures[handle] = std::move(*fp_tex_new); }
 		}
 
@@ -898,4 +890,41 @@ namespace Engine {
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_lightsUBO);
 		return (uint32_t)picked.size();
 	}
+
+	void Renderer::renderFinalPass(RenderPass& pass) {
+
+
+		// Update pass viewport if allowed
+		if (pass.auto_aspect) {
+			int vp_w, vp_h;
+			glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
+
+			// Check if viewport needs update
+			if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+				pass.view_port.z = static_cast<float>(vp_w);
+				pass.view_port.w = static_cast<float>(vp_h);
+
+				// Resize FBO according to changes
+				resizeFBO(pass.fbo_handle, vp_w, vp_h);
+			}
+		}
+
+		beginFrame(pass);
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
+
+		// Bind the initial pass's texture to be sampled
+		glBindTextureUnit(4, m_gl.m_textures[0].handle());
+
+		prog.setUniform("exposure", m_exposure);
+
+		m_fullscreen_quad.vao.bind();
+		glDrawElements(m_fullscreen_quad.primitive_type, m_fullscreen_quad.draw_count, m_fullscreen_quad.index_type, nullptr);
+		glBindVertexArray(0);
+
+		
+		prog.programFree();
+		endFrame(pass);
+
+	}
+
 }

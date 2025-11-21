@@ -22,4 +22,6 @@ namespace Engine {
 	 */
 	MeshData make_sphere();
 
+	MeshData2D make_quad();
+
 }

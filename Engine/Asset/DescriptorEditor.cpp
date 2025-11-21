@@ -608,6 +608,24 @@ namespace Engine
 		if (ms.HasMember("scale") && ms["scale"].IsNumber())
 			settings.scale = ms["scale"].GetFloat();
 
+		if (ms.HasMember("positionX") && ms["positionX"].IsNumber())
+			settings.positionX = ms["positionX"].GetFloat();
+
+		if (ms.HasMember("positionY") && ms["positionY"].IsNumber())
+			settings.positionY = ms["positionY"].GetFloat();
+
+		if (ms.HasMember("positionZ") && ms["positionZ"].IsNumber())
+			settings.positionZ = ms["positionZ"].GetFloat();
+
+		if (ms.HasMember("rotationX") && ms["rotationX"].IsNumber())
+			settings.rotationX = ms["rotationX"].GetFloat();
+
+		if (ms.HasMember("rotationY") && ms["rotationY"].IsNumber())
+			settings.rotationY = ms["rotationY"].GetFloat();
+
+		if (ms.HasMember("rotationZ") && ms["rotationZ"].IsNumber())
+			settings.rotationZ = ms["rotationZ"].GetFloat();
+
 		if (ms.HasMember("optimizeVertices") && ms["optimizeVertices"].IsBool())
 			settings.optimizeVertices = ms["optimizeVertices"].GetBool();
 
@@ -743,6 +761,12 @@ namespace Engine
 		msObj.AddMember("includeTexCoords", settings->includeTexCoords, allocator);
 		msObj.AddMember("indexType", rapidjson::Value(settings->indexType.c_str(), allocator), allocator);
 		msObj.AddMember("scale", settings->scale, allocator);
+		msObj.AddMember("positionX", settings->positionX, allocator);
+		msObj.AddMember("positionY", settings->positionY, allocator);
+		msObj.AddMember("positionZ", settings->positionZ, allocator);
+		msObj.AddMember("rotationX", settings->rotationX, allocator);
+		msObj.AddMember("rotationY", settings->rotationY, allocator);
+		msObj.AddMember("rotationZ", settings->rotationZ, allocator);
 		msObj.AddMember("optimizeVertices", settings->optimizeVertices, allocator);
 		msObj.AddMember("generateNormals", settings->generateNormals, allocator);
 
