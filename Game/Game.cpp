@@ -317,68 +317,51 @@ void Game::CreateDefaultScene() {
         throw std::runtime_error("Scene is null in CreateDefaultScene");
     }
 
-    // Create hardcoded animation clips (3x; translate, scale, rotate) and animation controller (1x)
-    
-    // Animation clip 1 (Rotate)
-    Engine::AnimationClip clip_1;
-    clip_1.name = "RotateAndMovein5s";
-    clip_1.duration = 5.0f;
-    clip_1.loop = true;
+    namespace fs = std::filesystem;
+    Engine::m_AnimationClipStorage.clear();
+    Engine::m_AnimatorControllerStorage.clear();
 
-    // Create start and end keys for rotation
-    Engine::RotationKeyframe c1k0{ 0.0f, glm::quat(glm::radians(glm::vec3(0.0f, 0.0f, 0.0f))) };
-    Engine::RotationKeyframe c1k1{ clip_1.duration, glm::quat(glm::radians(glm::vec3(180.f, 0.0f, 0.0f)))}; // Rotate along X-axis
-    clip_1.rotationKeys.emplace_back(c1k0);
-    clip_1.rotationKeys.emplace_back(c1k1);
-    //clip_1.rotationKeys = { c1k0, c1k1 };
+    // ---------------------------------------------------------------------
+    // Load animation clips
+    // ---------------------------------------------------------------------
+    const std::string clipsDir = "../../Resources/Sources/AnimationClips";
 
-    // Animation clip 2 (Movement)
-    Engine::AnimationClip clip_2;
-    clip_2.name = "Move10unitsin5s";
-    clip_2.duration = 5.0f;
-    clip_2.loop = true;
+    if (fs::exists(clipsDir)) {
+        for (const auto& entry : fs::directory_iterator(clipsDir)) {
+            if (!entry.is_regular_file())
+                continue;
 
-    // Create start and end keys for rotation
-    Engine::PositionKeyframe c2k0{ 0.0f, glm::vec3(-2.5, 0.0, 0.0)};
-    Engine::PositionKeyframe c2k1{ 2.5f, glm::vec3(2.5, 0.0, 0.0) };
-    Engine::PositionKeyframe c2k2{ clip_2.duration, glm::vec3(-2.5, 0.0, 0.0) };
-    clip_2.positionKeys.emplace_back(c2k0);
-    clip_2.positionKeys.emplace_back(c2k1);
-    clip_2.positionKeys.emplace_back(c2k2);
-    clip_1.positionKeys = { c2k0, c2k1, c2k2 }; // Addition to the first clip
-
-    // Animation clip 3 (Scale)
-    Engine::AnimationClip clip_3;
-    clip_3.name = "ScaleOncein2s";
-    clip_3.duration = 2.0f;
-    clip_3.loop = false;
-
-    // Create start and end keys for rotation
-    Engine::ScaleKeyframe c3k0{ 0.0f, glm::vec3(1.0, 1.0, 1.0) };
-    Engine::ScaleKeyframe c3k1{ clip_3.duration, glm::vec3(2.0, 2.0, 2.0) };
-    clip_3.scaleKeys.emplace_back(c3k0);
-    clip_3.scaleKeys.emplace_back(c3k1);
-
-    // Store all clips into storage
-    Engine::m_AnimationClipStorage[0] = clip_1;
-    Engine::m_AnimationClipStorage[1] = clip_2;
-    Engine::m_AnimationClipStorage[2] = clip_3;
-
-    // Create animator controller and store it
-    Engine::AnimatorController controller;
-    controller.name = "MainAnimatorController";
-    for (int i = 0; i < Engine::m_AnimationClipStorage.size(); ++i) {
-        controller.clips.emplace_back(i);
-        std::cout << "Controller clip count: " << i << std::endl;
+            if (entry.path().extension() == ".animclip") {
+                Engine::AnimationClip clip;
+                if (Engine::DeserializeAnimationClip(entry.path().string(), clip)) {
+                    //Engine::u32 handle = static_cast<Engine::u32>(Engine::m_AnimationClipStorage.size());
+                    //clip.id = handle;
+                    Engine::m_AnimationClipStorage[clip.id] = clip;
+                }
+            }
+        }
     }
-    std::cout << "Controller clip size after initializing: " << controller.clips.size() << std::endl;
-    
 
-    Engine::m_AnimatorControllerStorage[0] = controller;
+    // ---------------------------------------------------------------------
+    // Load animator controllers
+    // ---------------------------------------------------------------------
+    const std::string ctrlDir = "../../Resources/Sources/AnimationControllers";
 
+    if (fs::exists(ctrlDir)) {
+        for (const auto& entry : fs::directory_iterator(ctrlDir)) {
+            if (!entry.is_regular_file())
+                continue;
 
-
-
+            if (entry.path().extension() == ".animcontroller") {
+                Engine::AnimatorController ctrl;
+                if (Engine::DeserializeAnimationController(entry.path().string(), ctrl)) {
+                    //Engine::u32 handle = static_cast<Engine::u32>(Engine::m_AnimatorControllerStorage.size());
+                    //ctrl.id = handle;
+                    Engine::m_AnimatorControllerStorage[ctrl.id] = ctrl;
+                }
+            }
+        }
+    }
 
     LOG_TRACE("  Creating Player entity...");
     auto player = m_Scene->CreateEntity("Player");

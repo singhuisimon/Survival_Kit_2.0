@@ -1976,13 +1976,84 @@ namespace Engine
 					{
 						auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
 
+						// -----------------------------------------------------------------
+						// Controller selection combo (from m_AnimatorControllerStorage)
+						// -----------------------------------------------------------------
+						std::vector<u32> controllerHandles;
+						controllerHandles.reserve(m_AnimatorControllerStorage.size());
+
+						std::vector<std::string> controllerLabels;
+						controllerLabels.reserve(m_AnimatorControllerStorage.size());
+
+						// Build a simple list of (handle, "Name (id)") pairs
+						for (const auto& kv : m_AnimatorControllerStorage)
+						{
+							u32 handle = kv.first;
+							const AnimatorController& ctrl = kv.second;
+
+							controllerHandles.push_back(handle);
+
+							std::string label;
+							if (!ctrl.name.empty())
+								label = ctrl.name + " (" + std::to_string(handle) + ")";
+							else
+								label = "Controller " + std::to_string(handle);
+
+							controllerLabels.push_back(label);
+						}
+
+						// Find the currently assigned controller in the list
+						int currentIndex = -1;
+						for (int i = 0; i < static_cast<int>(controllerHandles.size()); ++i)
+						{
+							if (controllerHandles[i] == animator.controller)
+							{
+								currentIndex = i;
+								break;
+							}
+						}
+
+						const char* previewLabel = "(None)";
+						if (currentIndex >= 0 && currentIndex < static_cast<int>(controllerLabels.size()))
+							previewLabel = controllerLabels[currentIndex].c_str();
+
+						ImGui::Text("Controller:");
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(200.0f);
+						if (ImGui::BeginCombo("##AnimatorControllerCombo", previewLabel))
+						{
+							for (int i = 0; i < static_cast<int>(controllerHandles.size()); ++i)
+							{
+								bool isSelected = (i == currentIndex);
+								const char* itemLabel = controllerLabels[i].c_str();
+
+								if (ImGui::Selectable(itemLabel, isSelected))
+								{
+									// Assign new controller to this AnimatorComponent
+									animator.controller = controllerHandles[i];
+									animator.currentClipIndex = 0;
+									animator.currentTime = 0.0f;
+								}
+
+								if (isSelected)
+									ImGui::SetItemDefaultFocus();
+							}
+							ImGui::EndCombo();
+						}
+
+						// Debug/info line for handle
 						ImGui::Text("Controller Handle: %u", animator.controller);
+
+						ImGui::SeparatorText("Playback");
 
 						// Basic animator state controls
 						ImGui::Checkbox("Playing", &animator.playing);
+						ImGui::SameLine();
 						ImGui::Checkbox("Respect Clip Loop", &animator.respectClipLoop);
 
 						ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f);
+
+						// We keep these for debugging / manual scrubbing
 						ImGui::DragInt("Current Clip Index", (int*)(&animator.currentClipIndex), 1.0f, 0, 100);
 						ImGui::DragFloat("Current Time", &animator.currentTime, 0.01f, 0.0f, 1000.0f);
 
@@ -2014,6 +2085,7 @@ namespace Engine
 						m_SelectedEntity.RemoveComponent<AnimatorComponent>();
 					}
 				}
+
 
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
@@ -2715,25 +2787,205 @@ namespace Engine
 
 		auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
 
-		// ---- Look up controller from global storage ----
+		// ---------------------------------------------------------------------
+		// Look up controller from storage (or allow user to create a new one)
+		// ---------------------------------------------------------------------
 		auto ctrlIt = m_AnimatorControllerStorage.find(animator.controller);
 		if (ctrlIt == m_AnimatorControllerStorage.end())
 		{
-			ImGui::Text("AnimatorController handle %u is invalid.", animator.controller);
+			ImGui::Text("Animator has no valid controller (handle %u).", animator.controller);
+			ImGui::Spacing();
+
+			if (ImGui::Button("Create New Controller"))
+			{
+				AnimatorController newCtrl{};
+				newCtrl.name = "NewController";
+				newCtrl.defaultClipIndex = 0;
+
+				u32 newHandle = static_cast<u32>(m_AnimatorControllerStorage.size());
+				newCtrl.id = newHandle;
+				m_AnimatorControllerStorage[newHandle] = newCtrl;
+
+				animator.controller = newHandle;
+				animator.currentClipIndex = 0;
+				animator.currentTime = 0.0f;
+				m_DopesheetSelectedTrack = DopesheetTrackType::None;
+				m_DopesheetSelectedKey = -1;
+			}
+
 			ImGui::End();
 			return;
 		}
 
 		AnimatorController& controller = ctrlIt->second;
 
-		if (controller.clips.empty())
-		{
-			ImGui::TextUnformatted("AnimatorController has no clips.");
+		// Static state for Controller "Save As" popup
+		static bool s_OpenCtrlSaveAsPopup = false;
+		static char s_CtrlFileNameBuf[128] = "NewController";
+
+		// NEW: static state for Add/Remove clip popups
+		static bool s_OpenAddClipPopup = false;
+		static int  s_AddClipSelectedIndex = 0;
+		static bool s_AddClipDuplicateWarning = false;
+
+		static bool s_OpenRemoveClipPopup = false;
+		static int  s_RemoveClipSelectedIndex = 0;
+
+		// Helper: controller file toolbar (New / Save / Save As)
+		bool newControllerCreated = false;
+		auto DrawControllerFileToolbar = [&](AnimatorController& controllerRef, AnimatorComponent& animatorRef)
+			{
+				ImGui::SeparatorText("Controller");
+
+				// Controller name edit
+				{
+					char ctrlNameBuf[128];
+					strncpy_s(ctrlNameBuf, sizeof(ctrlNameBuf), controllerRef.name.c_str(), _TRUNCATE);
+
+					if (ImGui::InputText("Controller Name", ctrlNameBuf, sizeof(ctrlNameBuf),
+						ImGuiInputTextFlags_EnterReturnsTrue))
+					{
+						std::string newName = ctrlNameBuf;
+
+						// Trim
+						newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+						if (!newName.empty())
+							newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+
+						if (!newName.empty())
+						{
+							controllerRef.name = newName;
+						}
+					}
+				}
+
+				// --- New Controller ---
+				if (ImGui::Button("New Controller"))
+				{
+					AnimatorController newCtrl{};
+					newCtrl.name = "NewController";
+					newCtrl.defaultClipIndex = 0;
+
+					u32 newHandle = static_cast<u32>(m_AnimatorControllerStorage.size());
+					newCtrl.id = newHandle;
+					m_AnimatorControllerStorage[newHandle] = newCtrl;
+
+					animatorRef.controller = newHandle;
+					animatorRef.currentClipIndex = 0;
+					animatorRef.currentTime = 0.0f;
+					m_DopesheetSelectedTrack = DopesheetTrackType::None;
+					m_DopesheetSelectedKey = -1;
+
+					newControllerCreated = true;
+				}
+
+				ImGui::SameLine();
+
+				// --- Save Controller ---
+				if (ImGui::Button("Save Controller"))
+				{
+					std::string fileName = controllerRef.name.empty() ? "NewController" : controllerRef.name;
+					std::string path1 = "../../Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
+					std::string path2 = "../bin/Debug/Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
+
+					SerializeAnimationController(controllerRef, path1);
+					SerializeAnimationController(controllerRef, path2);
+				}
+
+				ImGui::SameLine();
+
+				// --- Save Controller As ---
+				if (ImGui::Button("Save Controller As"))
+				{
+					s_OpenCtrlSaveAsPopup = true;
+					ImGui::OpenPopup("Save Controller As");
+				}
+
+				if (ImGui::BeginPopupModal("Save Controller As", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					if (s_OpenCtrlSaveAsPopup)
+					{
+						std::string initial = controllerRef.name.empty() ? "NewController" : controllerRef.name;
+						std::snprintf(s_CtrlFileNameBuf, sizeof(s_CtrlFileNameBuf), "%s", initial.c_str());
+						s_OpenCtrlSaveAsPopup = false;
+					}
+
+					ImGui::Text("File name (without extension):");
+					ImGui::InputText("##CtrlFileName", s_CtrlFileNameBuf, IM_ARRAYSIZE(s_CtrlFileNameBuf));
+
+					if (ImGui::Button("OK"))
+					{
+						std::string fileName = s_CtrlFileNameBuf;
+						if (fileName.empty())
+							fileName = "NewController";
+
+						controllerRef.name = fileName;
+
+						std::string path1 = "../../Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
+						std::string path2 = "../bin/Debug/Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
+
+						SerializeAnimationController(controllerRef, path1);
+						SerializeAnimationController(controllerRef, path2);
+
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+			};
+
+		// =====================================================================
+		// CASE 1: Controller exists but has NO clips yet.
+		// Show a simpler UI that lets you save the controller and create first clip.
+		// =====================================================================
+		if (controller.clips.empty()) {
+			ImGui::Text("Entity: %s", m_SelectedEntity.GetComponent<TagComponent>().Tag.c_str());
+			ImGui::Text("Controller: %s (handle %u)", controller.name.c_str(), controller.id);
+
+			DrawControllerFileToolbar(controller, animator);
+			if (newControllerCreated)
+			{
+				ImGui::End();
+				return;
+			}
+
+			ImGui::SeparatorText("Clips");
+			ImGui::TextUnformatted("This controller has no clips yet.");
+			ImGui::Spacing();
+
+			if (ImGui::Button("New Clip"))
+			{
+				AnimationClip newClip{};
+				newClip.name = "NewClip";
+				newClip.duration = 1.0f;
+				newClip.loop = true;
+
+				u32 newHandle = static_cast<u32>(m_AnimationClipStorage.size());
+				newClip.id = newHandle;
+				m_AnimationClipStorage[newHandle] = newClip;
+
+				controller.clips.push_back(newHandle);
+				controller.defaultClipIndex = 0;
+				animator.currentClipIndex = 0;
+				animator.currentTime = 0.0f;
+				m_DopesheetSelectedTrack = DopesheetTrackType::None;
+				m_DopesheetSelectedKey = -1;
+			}
+
 			ImGui::End();
 			return;
 		}
 
-		// Clamp current clip index
+		// =====================================================================
+		// CASE 2: Normal path – controller has at least one clip
+		// =====================================================================
 		if (animator.currentClipIndex < 0 ||
 			animator.currentClipIndex >= static_cast<int>(controller.clips.size()))
 		{
@@ -2780,6 +3032,18 @@ namespace Engine
 		ImGui::Text("Entity: %s", m_SelectedEntity.GetComponent<TagComponent>().Tag.c_str());
 		ImGui::Text("Controller: %s", controller.name.c_str());
 
+		// Controller toolbar (New / Save / Save As)
+		DrawControllerFileToolbar(controller, animator);
+		if (newControllerCreated)
+		{
+			ImGui::EndChild();
+			ImGui::End();
+			return;
+		}
+
+		// -----------------------------------------------------------------
+		// Clip selection
+		// -----------------------------------------------------------------
 		ImGui::SeparatorText("Clip");
 
 		// Clip dropdown
@@ -2810,6 +3074,209 @@ namespace Engine
 				}
 				ImGui::EndCombo();
 			}
+		}
+
+		// -----------------------------------------------------------------
+		// Add / Remove Clip popups
+		// -----------------------------------------------------------------
+		ImGui::Spacing();
+
+		if (ImGui::Button("Add Clip"))
+		{
+			s_OpenAddClipPopup = true;
+			s_AddClipSelectedIndex = 0;
+			s_AddClipDuplicateWarning = false;
+			ImGui::OpenPopup("Add Clip to Controller");
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Remove Clip"))
+		{
+			s_OpenRemoveClipPopup = true;
+			if (!controller.clips.empty())
+			{
+				s_RemoveClipSelectedIndex = glm::clamp((int)animator.currentClipIndex, 0, (int)controller.clips.size() - 1);
+			}
+			ImGui::OpenPopup("Remove Clip from Controller");
+		}
+
+		// --- Add Clip popup ---
+		if (ImGui::BeginPopupModal("Add Clip to Controller", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			// Build list of all clips in storage
+			std::vector<std::pair<u32, AnimationClip*>> allClips;
+			allClips.reserve(m_AnimationClipStorage.size());
+			for (auto& kv : m_AnimationClipStorage)
+			{
+				allClips.emplace_back(kv.first, &kv.second);
+			}
+
+			if (allClips.empty())
+			{
+				ImGui::TextUnformatted("No clips available in storage.");
+			}
+			else
+			{
+				if (s_AddClipSelectedIndex < 0 || s_AddClipSelectedIndex >= (int)allClips.size())
+					s_AddClipSelectedIndex = 0;
+
+				if (ImGui::BeginListBox("##AddClipList", ImVec2(350, 200)))
+				{
+					for (int i = 0; i < (int)allClips.size(); ++i)
+					{
+						u32 h = allClips[i].first;
+						AnimationClip* c = allClips[i].second;
+
+						std::string label = std::to_string(h) + " - " +
+							(c->name.empty() ? "Unnamed Clip" : c->name);
+
+						bool selected = (i == s_AddClipSelectedIndex);
+						if (ImGui::Selectable(label.c_str(), selected))
+							s_AddClipSelectedIndex = i;
+
+						if (selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndListBox();
+				}
+			}
+
+			if (s_AddClipDuplicateWarning)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f),
+					"This clip is already in the controller.");
+			}
+
+			if (ImGui::Button("Add"))
+			{
+				if (!allClips.empty())
+				{
+					u32 handleToAdd = allClips[s_AddClipSelectedIndex].first;
+					bool already = false;
+					for (u32 existing : controller.clips)
+					{
+						if (existing == handleToAdd)
+						{
+							already = true;
+							break;
+						}
+					}
+
+					if (already)
+					{
+						s_AddClipDuplicateWarning = true;
+					}
+					else
+					{
+						controller.clips.push_back(handleToAdd);
+						animator.currentClipIndex = (int)controller.clips.size() - 1;
+						animator.currentTime = 0.0f;
+						controller.defaultClipIndex = animator.currentClipIndex;
+						m_DopesheetSelectedTrack = DopesheetTrackType::None;
+						m_DopesheetSelectedKey = -1;
+
+						s_AddClipDuplicateWarning = false;
+						ImGui::CloseCurrentPopup();
+					}
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
+		// --- Remove Clip popup ---
+		if (ImGui::BeginPopupModal("Remove Clip from Controller", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			// Build list of clips currently in controller
+			std::vector<std::pair<u32, AnimationClip*>> controllerClipList;
+			controllerClipList.reserve(controller.clips.size());
+			for (u32 h : controller.clips)
+			{
+				auto it = m_AnimationClipStorage.find(h);
+				AnimationClip* c = (it != m_AnimationClipStorage.end()) ? &it->second : nullptr;
+				controllerClipList.emplace_back(h, c);
+			}
+
+			if (controllerClipList.empty())
+			{
+				ImGui::TextUnformatted("Controller has no clips.");
+			}
+			else
+			{
+				if (s_RemoveClipSelectedIndex < 0 ||
+					s_RemoveClipSelectedIndex >= (int)controllerClipList.size())
+				{
+					s_RemoveClipSelectedIndex = 0;
+				}
+
+				if (ImGui::BeginListBox("##RemoveClipList", ImVec2(350, 200)))
+				{
+					for (int i = 0; i < (int)controllerClipList.size(); ++i)
+					{
+						u32 h = controllerClipList[i].first;
+						AnimationClip* c = controllerClipList[i].second;
+
+						std::string label = std::to_string(h) + " - ";
+						if (c)
+							label += (c->name.empty() ? "Unnamed Clip" : c->name);
+						else
+							label += "(missing)";
+
+						bool selected = (i == s_RemoveClipSelectedIndex);
+						if (ImGui::Selectable(label.c_str(), selected))
+							s_RemoveClipSelectedIndex = i;
+						if (selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndListBox();
+				}
+			}
+
+			if (ImGui::Button("Remove"))
+			{
+				if (!controllerClipList.empty())
+				{
+					int removeIndex = s_RemoveClipSelectedIndex;
+					if (removeIndex >= 0 && removeIndex < (int)controller.clips.size())
+					{
+						controller.clips.erase(controller.clips.begin() + removeIndex);
+
+						if (controller.clips.empty())
+						{
+							animator.currentClipIndex = 0;
+							animator.currentTime = 0.0f;
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						else
+						{
+							if (animator.currentClipIndex >= (int)controller.clips.size())
+								animator.currentClipIndex = (int)controller.clips.size() - 1;
+							if (controller.defaultClipIndex >= (int)controller.clips.size())
+								controller.defaultClipIndex = (int)controller.clips.size() - 1;
+						}
+					}
+				}
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
 		}
 
 		// -----------------------------------------------------------------
@@ -2866,7 +3333,7 @@ namespace Engine
 					[](const auto& a, const auto& b) { return a.time < b.time; });
 			};
 
-		// Position track
+		// Position track 
 		if (ImGui::CollapsingHeader("Position", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (ImGui::Button("Add Key##Pos"))
@@ -2968,7 +3435,7 @@ namespace Engine
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
 					defaultRot = m_SelectedEntity.GetComponent<TransformComponent>().Rotation;
 
-				Engine::RotationKeyframe k;
+				RotationKeyframe k;
 				k.time = animator.currentTime;
 				k.rotation = defaultRot;
 				clip.rotationKeys.push_back(k);
@@ -3154,6 +3621,112 @@ namespace Engine
 				ImGui::EndTable();
 			}
 		}
+
+		// ---------------------------------------------------------------------
+		// File toolbar: New / Save / Save As (for the current clip)
+		// ---------------------------------------------------------------------
+		if (clipPtr)
+		{
+			ImGui::SeparatorText("File");
+
+			// ---- New Clip: create a brand-new asset and attach it ----
+			if (ImGui::Button("New Clip"))
+			{
+				AnimationClip newClip{};
+				newClip.name = "NewClip";
+				newClip.duration = 1.0f;
+				newClip.loop = true;
+
+				// Allocate new handle = current storage size (simple allocator)
+				u32 newHandle = static_cast<u32>(m_AnimationClipStorage.size());
+				newClip.id = newHandle;
+
+				m_AnimationClipStorage[newHandle] = newClip;
+
+				// Attach to controller and select it
+				controller.clips.push_back(newHandle);
+				animator.currentClipIndex = static_cast<int>(controller.clips.size() - 1);
+
+				// Reset selection
+				m_DopesheetSelectedTrack = DopesheetTrackType::None;
+				m_DopesheetSelectedKey = -1;
+			}
+
+			ImGui::SameLine();
+
+			// ---- Save: overwrite current clip file (same id/handle) ----
+			if (ImGui::Button("Save"))
+			{
+				std::string fileName = clip.name.empty() ? "UnnamedClip" : clip.name;
+				std::string path1 = "../../Resources/Sources/AnimationClips/" + fileName + ".animclip";
+				std::string path2 = "../bin/Debug/Resources/Sources/AnimationClips/" + fileName + ".animclip";
+
+				SerializeAnimationClip(clip, path1);
+				SerializeAnimationClip(clip, path2);
+			}
+
+			ImGui::SameLine();
+
+			// ---- Save As: clone current clip into a new asset + new id ----
+			static bool openSaveAsPopup = false;
+			if (ImGui::Button("Save As"))
+			{
+				openSaveAsPopup = true;
+				ImGui::OpenPopup("Save Clip As");
+			}
+
+			if (ImGui::BeginPopupModal("Save Clip As", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				static char fileNameBuf[128] = "NewClip";
+
+				// Pre-fill with current clip name when popup opens
+				if (openSaveAsPopup)
+				{
+					std::string initial = clip.name.empty() ? "NewClip" : clip.name;
+					std::snprintf(fileNameBuf, sizeof(fileNameBuf), "%s", initial.c_str());
+					openSaveAsPopup = false;
+				}
+
+				ImGui::Text("File name (without extension):");
+				ImGui::InputText("##ClipFileName", fileNameBuf, IM_ARRAYSIZE(fileNameBuf));
+
+				if (ImGui::Button("OK"))
+				{
+					std::string fileName = fileNameBuf;
+					if (fileName.empty())
+						fileName = "NewClip";
+
+					// Clone current clip into a new asset
+					AnimationClip newClip = clip;
+					newClip.name = fileName;
+
+					u32 newHandle = static_cast<u32>(m_AnimationClipStorage.size());
+					newClip.id = newHandle;
+
+					m_AnimationClipStorage[newHandle] = newClip;
+					controller.clips.push_back(newHandle);
+					animator.currentClipIndex = static_cast<int>(controller.clips.size() - 1);
+
+					std::string path1 = "../../Resources/Sources/AnimationClips/" + fileName + ".animclip";
+					std::string path2 = "../bin/Debug/Resources/Sources/AnimationClips/" + fileName + ".animclip";
+
+					SerializeAnimationClip(newClip, path1);
+					SerializeAnimationClip(newClip, path2);
+
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Cancel"))
+				{
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+
 		ImGui::EndChild(); // End of left pane
 
 		// =============================== RIGHT PANE ===========================
@@ -3499,8 +4072,6 @@ namespace Engine
 
 		ImGui::End();
 	}
-
-
 
 	void Editor::displayAssetsBrowserPanel()
 	{

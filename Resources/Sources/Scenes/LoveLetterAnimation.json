@@ -36,7 +36,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 3149221636613570589,
                         "TextureGuid": 11796132921164922911,
                         "Visible": true,
@@ -90,7 +90,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 18137201196503105573,
                         "TextureGuid": 13525515178075717671,
                         "Visible": true,
@@ -144,7 +144,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 12949054425772425261,
                         "TextureGuid": 11796132921165578287,
                         "Visible": true,
@@ -198,7 +198,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 16984279691896635445,
                         "TextureGuid": 7184446902738436151,
                         "Visible": true,
@@ -252,7 +252,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 16984279691896897597,
                         "TextureGuid": 8913829159648968767,
                         "Visible": true,
@@ -306,7 +306,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 4302143141221777477,
                         "TextureGuid": 14101975930379976775,
                         "Visible": true,
@@ -371,7 +371,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 10066750664256176205,
                         "TextureGuid": 8913829159649329231,
                         "Visible": true,
@@ -417,7 +417,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 16984279691897356373,
                         "TextureGuid": 11219672168863121495,
                         "Visible": true,
@@ -471,7 +471,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 15254897434987364445,
                         "TextureGuid": 3149221636615471199,
                         "Visible": true,
@@ -517,7 +517,7 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
+                        "MeshGuid": 1561377315146448923,
                         "MaterialGuid": 14101975930380648549,
                         "TextureGuid": 4878603893525872743,
                         "Visible": true,
@@ -571,7 +571,7 @@
           {
             "Type": "MeshRendererComponent",
             "Properties": {
-              "MeshGuid": 657086173731323931,
+              "MeshGuid": 1561377315146448923,
               "MaterialGuid": 7760907655043285101,
               "TextureGuid": 10066750664256979055,
               "Visible": true,
