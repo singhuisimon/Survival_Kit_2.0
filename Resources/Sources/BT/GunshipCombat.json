@@ -1,0 +1,76 @@
+{
+    "Name": "GunshipCombat",
+    "GUID": "2447091130316656029",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Selector",
+        "Name": "Root",
+        "GUID": "16282149185599994221",
+        "Children": [
+            {
+                "Type": "Sequence",
+                "Name": "CombatSequence",
+                "GUID": "11670463167173318833",
+                "Children": [
+                    {
+                        "Type": "FindNearestEnemy",
+                        "Name": "FindEnemy",
+                        "GUID": "17435070690208048585",
+                        "Properties": {
+                            "EnemyTag": "Enemy",
+                            "TargetPosKey": "TargetPosition",
+                            "TargetEntityKey": "TargetEnemy",
+                            "MaxRange": "600.000000"
+                        }
+                    },
+                    {
+                        "Type": "HasValidTarget",
+                        "Name": "ValidateTarget",
+                        "GUID": "3023551882623155495",
+                        "Properties": {
+                            "TargetEntityKey": "TargetEnemy"
+                        }
+                    },
+                    {
+                        "Type": "Parallel",
+                        "Name": "AimAndShoot",
+                        "GUID": "7058777148747915253",
+                        "Properties": {
+                            "SuccessPolicy": "RequireAll",
+                            "FailurePolicy": "RequireOne"
+                        },
+                        "Children": [
+                            {
+                                "Type": "LookAtSmooth",
+                                "Name": "AimAtEnemy",
+                                "GUID": "11094002414872807893",
+                                "Properties": {
+                                    "TargetKey": "TargetPosition",
+                                    "TurnSpeedDeg": "120.000008"
+                                }
+                            },
+                            {
+                                "Type": "ShootBullet",
+                                "Name": "FireWeapon",
+                                "GUID": "7635237901052946423",
+                                "Properties": {
+                                    "BulletTag": "AllyBullet",
+                                    "FireRate": "0.100000",
+                                    "BulletSpeed": "3000.000000"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "3600012634930606263",
+                "Properties": {
+                    "Duration": "0.500000"
+                }
+            }
+        ]
+    }
+}

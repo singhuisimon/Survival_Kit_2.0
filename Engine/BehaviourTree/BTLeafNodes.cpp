@@ -2684,6 +2684,8 @@ namespace Engine {
             return BTStatus::Failure;
         }
 
+        // code has been accommodated for lack of prefab system
+
         //update cooldown
         m_Cooldown -= context.DeltaTime;
         if (m_Cooldown > 0.0f) {
@@ -2717,7 +2719,7 @@ namespace Engine {
 
         direction = glm::normalize(direction);
 
-        // create bullet entity
+        // create bullet entity (currently, no prefab system
         Entity bullet = context.Scene->CreateEntity(m_BulletTag);
 
         // add the required components
