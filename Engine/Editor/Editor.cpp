@@ -3412,12 +3412,27 @@ namespace Engine
 
 						ImGui::TableSetColumnIndex(2);
 						ImGui::DragFloat("##X", &k.position.x, 0.1f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(3);
 						ImGui::DragFloat("##Y", &k.position.y, 0.1f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(4);
 						ImGui::DragFloat("##Z", &k.position.z, 0.1f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(5);
 						if (ImGui::SmallButton("X"))
@@ -3509,12 +3524,27 @@ namespace Engine
 
 						ImGui::TableSetColumnIndex(2);
 						changed |= ImGui::DragFloat("##Pitch", &eulerDeg.x, 1.0f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(3);
 						changed |= ImGui::DragFloat("##Yaw", &eulerDeg.y, 1.0f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(4);
 						changed |= ImGui::DragFloat("##Roll", &eulerDeg.z, 1.0f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// --- Only write back if something actually changed ---
 						if (changed)
@@ -3608,12 +3638,28 @@ namespace Engine
 
 						ImGui::TableSetColumnIndex(2);
 						ImGui::DragFloat("##X", &k.scale.x, 0.1f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(3);
 						ImGui::DragFloat("##Y", &k.scale.y, 0.1f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+							m_DopesheetSelectedKey = i;
+						}
 
 						ImGui::TableSetColumnIndex(4);
 						ImGui::DragFloat("##Z", &k.scale.z, 0.1f);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+							m_DopesheetSelectedKey = i;
+						}
+
 
 						ImGui::TableSetColumnIndex(5);
 						if (ImGui::SmallButton("X"))
@@ -3683,31 +3729,66 @@ namespace Engine
 
 						ImGui::TableNextRow();
 
+						bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::UVTiling &&
+							m_DopesheetSelectedKey == i);
+
 						// Index
 						ImGui::TableSetColumnIndex(0);
+						if (isSelected)
+							ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
 						ImGui::Text("%d", i);
+						if (isSelected)
+							ImGui::PopStyleColor();
+
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVTiling;
+							m_DopesheetSelectedKey = i;
+							animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+						}
 
 						// Time
 						ImGui::TableSetColumnIndex(1);
 						ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVTiling;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// U
 						ImGui::TableSetColumnIndex(2);
 						float u = k.value[0];
 						if (ImGui::DragFloat("##U", &u, 0.01f))
 							k.value[0] = u;
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVTiling;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// V
 						ImGui::TableSetColumnIndex(3);
 						float v = k.value[1];
 						if (ImGui::DragFloat("##V", &v, 0.01f))
 							k.value[1] = v;
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVTiling;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// Remove
 						ImGui::TableSetColumnIndex(4);
 						if (ImGui::SmallButton("X"))
 						{
 							clip.uvTilingKeys.erase(clip.uvTilingKeys.begin() + i);
+							if (m_DopesheetSelectedTrack == DopesheetTrackType::UVTiling &&
+								m_DopesheetSelectedKey == i)
+							{
+								m_DopesheetSelectedTrack = DopesheetTrackType::None;
+								m_DopesheetSelectedKey = -1;
+							}
 							ImGui::PopID();
 							--i;
 							continue;
@@ -3715,6 +3796,7 @@ namespace Engine
 
 						ImGui::PopID();
 					}
+
 
 					sortByTime(clip.uvTilingKeys);
 					ImGui::EndTable();
@@ -3756,31 +3838,66 @@ namespace Engine
 
 						ImGui::TableNextRow();
 
+						bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::UVOffset &&
+							m_DopesheetSelectedKey == i);
+
 						// Index
 						ImGui::TableSetColumnIndex(0);
+						if (isSelected)
+							ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
 						ImGui::Text("%d", i);
+						if (isSelected)
+							ImGui::PopStyleColor();
+
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVOffset;
+							m_DopesheetSelectedKey = i;
+							animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+						}
 
 						// Time
 						ImGui::TableSetColumnIndex(1);
 						ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVOffset;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// U
 						ImGui::TableSetColumnIndex(2);
 						float u = k.value[0];
 						if (ImGui::DragFloat("##U", &u, 0.01f))
 							k.value[0] = u;
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVOffset;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// V
 						ImGui::TableSetColumnIndex(3);
 						float v = k.value[1];
 						if (ImGui::DragFloat("##V", &v, 0.01f))
 							k.value[1] = v;
+						if (ImGui::IsItemClicked())
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::UVOffset;
+							m_DopesheetSelectedKey = i;
+						}
 
 						// Remove
 						ImGui::TableSetColumnIndex(4);
 						if (ImGui::SmallButton("X"))
 						{
 							clip.uvOffsetKeys.erase(clip.uvOffsetKeys.begin() + i);
+							if (m_DopesheetSelectedTrack == DopesheetTrackType::UVOffset &&
+								m_DopesheetSelectedKey == i)
+							{
+								m_DopesheetSelectedTrack = DopesheetTrackType::None;
+								m_DopesheetSelectedKey = -1;
+							}
 							ImGui::PopID();
 							--i;
 							continue;
@@ -3788,6 +3905,7 @@ namespace Engine
 
 						ImGui::PopID();
 					}
+
 
 					sortByTime(clip.uvOffsetKeys);
 					ImGui::EndTable();
@@ -3912,173 +4030,16 @@ namespace Engine
 
 		ImGui::Separator();
 
-		// Colors per track
-		const ImU32 colPos = IM_COL32(80, 200, 120, 255);
-		const ImU32 colRot = IM_COL32(220, 100, 100, 255);
-		const ImU32 colScale = IM_COL32(100, 140, 230, 255);
-		const ImU32 colPosSel = IM_COL32(130, 255, 170, 255);
-		const ImU32 colRotSel = IM_COL32(255, 170, 170, 255);
-		const ImU32 colScaleSel = IM_COL32(160, 190, 255, 255);
-		const ImU32 colPlayhead = IM_COL32(255, 255, 50, 255);
+		//// Colors per track
+		//const ImU32 colPos = IM_COL32(80, 200, 120, 255);
+		//const ImU32 colRot = IM_COL32(220, 100, 100, 255);
+		//const ImU32 colScale = IM_COL32(100, 140, 230, 255);
+		//const ImU32 colPosSel = IM_COL32(130, 255, 170, 255);
+		//const ImU32 colRotSel = IM_COL32(255, 170, 170, 255);
+		//const ImU32 colScaleSel = IM_COL32(160, 190, 255, 255);
+		//const ImU32 colPlayhead = IM_COL32(255, 255, 50, 255);
 
 		if (m_AnimatorViewMode == AnimatorViewMode::Dopesheet) {
-
-			//// Legend
-			//ImGui::Text("Legend:");
-			//ImDrawList* legendList = ImGui::GetWindowDrawList();
-
-			//auto drawLegendItem = [&](ImU32 col, const char* label)
-			//	{
-			//		ImVec2 p = ImGui::GetCursorScreenPos();
-			//		ImVec2 sz(12.0f, 12.0f);
-			//		legendList->AddRectFilled(p, ImVec2(p.x + sz.x, p.y + sz.y), col, 2.0f);
-			//		legendList->AddRect(p, ImVec2(p.x + sz.x, p.y + sz.y), IM_COL32(0, 0, 0, 255), 2.0f);
-			//		ImGui::Dummy(sz);
-			//		ImGui::SameLine();
-			//		ImGui::TextUnformatted(label);
-			//	};
-
-			//drawLegendItem(colPos, "Position");
-			//drawLegendItem(colRot, "Rotation");
-			//drawLegendItem(colScale, "Scale");
-
-			//ImGui::Spacing();
-
-			//// Timeline canvas
-			//ImVec2 canvasPos = ImGui::GetCursorScreenPos();
-			//ImVec2 canvasSize = ImGui::GetContentRegionAvail();
-			//if (canvasSize.x < 50.0f) canvasSize.x = 50.0f;
-			//if (canvasSize.y < 80.0f) canvasSize.y = 80.0f;
-			//ImVec2 canvasEnd = ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y);
-
-			//ImGui::InvisibleButton("##DopesheetTimeline", canvasSize);
-			//bool timelineHovered = ImGui::IsItemHovered();
-			//ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-			//// Background
-			//drawList->AddRectFilled(canvasPos, canvasEnd, IM_COL32(30, 30, 30, 255));
-			//drawList->AddRect(canvasPos, canvasEnd, IM_COL32(80, 80, 80, 255));
-
-			//float midY = (canvasPos.y + canvasEnd.y) * 0.5f;
-
-			//// Horizontal mid line
-			//drawList->AddLine(ImVec2(canvasPos.x, midY),
-			//	ImVec2(canvasEnd.x, midY),
-			//	IM_COL32(100, 100, 100, 255));
-
-			//// Helper to map time in [0, duration] to X in [canvasPos.x, canvasEnd.x]
-			//auto timeToX = [&](float t)
-			//	{
-			//		float u = (clip.duration > 0.0f) ? (t / clip.duration) : 0.0f;
-			//		u = glm::clamp(u, 0.0f, 1.0f);
-			//		return canvasPos.x + u * canvasSize.x;
-			//	};
-
-			//// --- First pass: handle click selection on keys ---
-			//const float keyRadius = 6.0f;
-			//const float keyRadiusSq = keyRadius * keyRadius;
-			//bool        clickedOnTimeline = timelineHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left);
-			//ImVec2      mousePos = ImGui::GetIO().MousePos;
-
-			//if (clickedOnTimeline)
-			//{
-			//	float bestDistSq = keyRadiusSq;
-			//	DopesheetTrackType bestTrack = DopesheetTrackType::None;
-			//	int bestIndex = -1;
-
-			//	auto testKeys = [&](const auto& keys,
-			//		DopesheetTrackType trackType,
-			//		float yOffset)
-			//		{
-			//			for (int i = 0; i < static_cast<int>(keys.size()); ++i)
-			//			{
-			//				float x = timeToX(keys[static_cast<size_t>(i)].time);
-			//				float y = midY + yOffset;
-
-			//				float dx = mousePos.x - x;
-			//				float dy = mousePos.y - y;
-			//				float d2 = dx * dx + dy * dy;
-
-			//				if (d2 < bestDistSq)
-			//				{
-			//					bestDistSq = d2;
-			//					bestTrack = trackType;
-			//					bestIndex = i;
-			//				}
-			//			}
-			//		};
-
-			//	// Position = slightly above line, Rotation on line, Scale below
-			//	testKeys(clip.positionKeys, DopesheetTrackType::Position, -12.0f);
-			//	testKeys(clip.rotationKeys, DopesheetTrackType::Rotation, 0.0f);
-			//	testKeys(clip.scaleKeys, DopesheetTrackType::Scale, +12.0f);
-
-			//	if (bestTrack != DopesheetTrackType::None)
-			//	{
-			//		// Select the nearest key and move playhead there
-			//		m_DopesheetSelectedTrack = bestTrack;
-			//		m_DopesheetSelectedKey = bestIndex;
-
-			//		float keyTime = 0.0f;
-			//		switch (bestTrack)
-			//		{
-			//		case DopesheetTrackType::Position:
-			//			keyTime = clip.positionKeys[static_cast<size_t>(bestIndex)].time;
-			//			break;
-			//		case DopesheetTrackType::Rotation:
-			//			keyTime = clip.rotationKeys[static_cast<size_t>(bestIndex)].time;
-			//			break;
-			//		case DopesheetTrackType::Scale:
-			//			keyTime = clip.scaleKeys[static_cast<size_t>(bestIndex)].time;
-			//			break;
-			//		default: break;
-			//		}
-			//		animator.currentTime = glm::clamp(keyTime, 0.0f, clip.duration);
-			//	}
-			//	else
-			//	{
-			//		// Clicked empty region: scrub time
-			//		float tNorm = (mousePos.x - canvasPos.x) / canvasSize.x;
-			//		tNorm = glm::clamp(tNorm, 0.0f, 1.0f);
-			//		animator.currentTime = tNorm * clip.duration;
-			//		m_DopesheetSelectedTrack = DopesheetTrackType::None;
-			//		m_DopesheetSelectedKey = -1;
-			//	}
-			//}
-
-			//// --- Second pass: draw keys with per-track colors and selection highlight ---
-			//auto drawTrackKeys = [&](const auto& keys,
-			//	DopesheetTrackType trackType,
-			//	ImU32 col, ImU32 colSelected,
-			//	float yOffset)
-			//	{
-			//		for (int i = 0; i < static_cast<int>(keys.size()); ++i)
-			//		{
-			//			float x = timeToX(keys[static_cast<size_t>(i)].time);
-			//			float y = midY + yOffset;
-
-			//			bool selected = (m_DopesheetSelectedTrack == trackType &&
-			//				m_DopesheetSelectedKey == i);
-
-			//			ImU32 useCol = selected ? colSelected : col;
-			//			drawList->AddCircleFilled(ImVec2(x, y), keyRadius, useCol);
-			//		}
-			//	};
-
-			//drawTrackKeys(clip.positionKeys, DopesheetTrackType::Position,
-			//	colPos, colPosSel, -12.0f);
-			//drawTrackKeys(clip.rotationKeys, DopesheetTrackType::Rotation,
-			//	colRot, colRotSel, 0.0f);
-			//drawTrackKeys(clip.scaleKeys, DopesheetTrackType::Scale,
-			//	colScale, colScaleSel, +12.0f);
-
-			//// Playhead line
-			//{
-			//	float x = timeToX(animator.currentTime);
-			//	drawList->AddLine(ImVec2(x, canvasPos.y),
-			//		ImVec2(x, canvasEnd.y),
-			//		colPlayhead, 2.0f);
-			//}
 
 			// Colors per track
 			const ImU32 colPos = IM_COL32(80, 200, 120, 255);
@@ -4131,9 +4092,16 @@ namespace Engine
 			ImVec2 canvasEnd = ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y);
 
 			ImGui::InvisibleButton("##AnimDopesheet", canvasSize);
+			bool  timelineHovered = ImGui::IsItemHovered();
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			// Background
 			drawList->AddRectFilled(canvasPos, canvasEnd, IM_COL32(20, 20, 20, 255));
 			drawList->AddRect(canvasPos, canvasEnd, IM_COL32(80, 80, 80, 255));
+
+			float midY = 0.5f * (canvasPos.y + canvasEnd.y);
+			float keyRadius = 4.0f;
+			float keyRadiusSq = keyRadius * keyRadius;
 
 			// Time -> X mapping
 			auto timeToX = [&](float t)
@@ -4144,10 +4112,90 @@ namespace Engine
 					return canvasPos.x + u * canvasSize.x;
 				};
 
-			float midY = 0.5f * (canvasPos.y + canvasEnd.y);
-			float keyRadius = 4.0f;
+			// ---------------- CLICK HANDLING (select nearest key or scrub) ----------------
+			if (timelineHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			{
+				ImVec2 mousePos = ImGui::GetIO().MousePos;
+				float bestDistSq = keyRadiusSq;
+				DopesheetTrackType bestTrack = DopesheetTrackType::None;
+				int bestIndex = -1;
 
-			// Generic track-key drawing (for vec3 *or* UV tracks)
+				auto testKeys = [&](const auto& keys,
+					DopesheetTrackType trackType,
+					float yOffset)
+					{
+						for (int i = 0; i < static_cast<int>(keys.size()); ++i)
+						{
+							float x = timeToX(keys[static_cast<size_t>(i)].time);
+							float y = midY + yOffset;
+
+							float dx = mousePos.x - x;
+							float dy = mousePos.y - y;
+							float d2 = dx * dx + dy * dy;
+
+							if (d2 < bestDistSq)
+							{
+								bestDistSq = d2;
+								bestTrack = trackType;
+								bestIndex = i;
+							}
+						}
+					};
+
+				if (m_SelectedComponentTrack == AnimatorComponentTrack::Transform)
+				{
+					testKeys(clip.positionKeys, DopesheetTrackType::Position, -12.0f);
+					testKeys(clip.rotationKeys, DopesheetTrackType::Rotation, 0.0f);
+					testKeys(clip.scaleKeys, DopesheetTrackType::Scale, +12.0f);
+				}
+				else if (m_SelectedComponentTrack == AnimatorComponentTrack::UVTransform)
+				{
+					testKeys(clip.uvTilingKeys, DopesheetTrackType::UVTiling, -6.0f);
+					testKeys(clip.uvOffsetKeys, DopesheetTrackType::UVOffset, +6.0f);
+				}
+
+				if (bestTrack != DopesheetTrackType::None)
+				{
+					// Select nearest key and jump playhead
+					m_DopesheetSelectedTrack = bestTrack;
+					m_DopesheetSelectedKey = bestIndex;
+
+					float keyTime = 0.0f;
+					switch (bestTrack)
+					{
+					case DopesheetTrackType::Position:
+						keyTime = clip.positionKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					case DopesheetTrackType::Rotation:
+						keyTime = clip.rotationKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					case DopesheetTrackType::Scale:
+						keyTime = clip.scaleKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					case DopesheetTrackType::UVTiling:
+						keyTime = clip.uvTilingKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					case DopesheetTrackType::UVOffset:
+						keyTime = clip.uvOffsetKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					default:
+						break;
+					}
+
+					animator.currentTime = glm::clamp(keyTime, 0.0f, clip.duration);
+				}
+				else
+				{
+					// Clicked empty region: scrub time
+					float tNorm = (mousePos.x - canvasPos.x) / canvasSize.x;
+					tNorm = glm::clamp(tNorm, 0.0f, 1.0f);
+					animator.currentTime = tNorm * clip.duration;
+					m_DopesheetSelectedTrack = DopesheetTrackType::None;
+					m_DopesheetSelectedKey = -1;
+				}
+			}
+
+			// ---------------- DRAW KEYS (with selection highlight) ----------------
 			auto drawTrackKeys = [&](auto& keys,
 				DopesheetTrackType trackType,
 				ImU32 col,
@@ -4167,7 +4215,6 @@ namespace Engine
 					}
 				};
 
-			// Draw only the tracks for the currently selected component type
 			if (m_SelectedComponentTrack == AnimatorComponentTrack::Transform)
 			{
 				drawTrackKeys(clip.positionKeys, DopesheetTrackType::Position,
@@ -4197,157 +4244,6 @@ namespace Engine
 		{
 			// Choose which track to display curves for
 			DopesheetTrackType track = m_DopesheetSelectedTrack;
-
-			//if (track == DopesheetTrackType::None)
-			//{
-			//	if (!clip.positionKeys.empty())      track = DopesheetTrackType::Position;
-			//	else if (!clip.rotationKeys.empty()) track = DopesheetTrackType::Rotation;
-			//	else if (!clip.scaleKeys.empty())    track = DopesheetTrackType::Scale;
-			//}
-
-			//if (track == DopesheetTrackType::None)
-			//{
-			//	ImGui::TextUnformatted("No keys to display curves for.");
-			//	ImGui::EndChild();
-			//	ImGui::End();
-			//	return;
-			//}
-
-			//const ImU32 COL_X = IM_COL32(230, 90, 90, 255);   // red
-			//const ImU32 COL_Y = IM_COL32(100, 220, 120, 255); // green
-			//const ImU32 COL_Z = IM_COL32(110, 160, 255, 255); // blue
-
-			//// Legend for X/Y/Z or Pitch/Yaw/Roll
-			//switch (track)
-			//{
-			//case DopesheetTrackType::Position:
-			//	DrawCurveLegendRow("Position", "X", COL_X, "Y", COL_Y, "Z", COL_Z);
-			//	break;
-			//case DopesheetTrackType::Rotation:
-			//	// wording: Pitch / Yaw / Roll
-			//	DrawCurveLegendRow("Rotation", "Pitch", COL_X, "Yaw", COL_Y, "Roll", COL_Z);
-			//	break;
-			//case DopesheetTrackType::Scale:
-			//	DrawCurveLegendRow("Scale", "X", COL_X, "Y", COL_Y, "Z", COL_Z);
-			//	break;
-			//default:
-			//	break;
-			//}
-
-			//ImGui::Separator();
-
-			//ImVec2 cPos = ImGui::GetCursorScreenPos();
-			//ImVec2 cSize = ImGui::GetContentRegionAvail();
-			//if (cSize.x < 50.0f) cSize.x = 50.0f;
-			//if (cSize.y < 80.0f) cSize.y = 80.0f;
-			//ImVec2 cEnd = ImVec2(cPos.x + cSize.x, cPos.y + cSize.y);
-
-			//ImGui::InvisibleButton("##AnimCurves", cSize);
-			//ImDrawList* cDraw = ImGui::GetWindowDrawList();
-
-			//cDraw->AddRectFilled(cPos, cEnd, IM_COL32(20, 20, 20, 255));
-			//cDraw->AddRect(cPos, cEnd, IM_COL32(80, 80, 80, 255));
-
-			//auto timeToXCurve = [&](float t)
-			//	{
-			//		float u = (clip.duration > 0.0f) ? (t / clip.duration) : 0.0f;
-			//		if (u < 0.0f) u = 0.0f;
-			//		if (u > 1.0f) u = 1.0f;
-			//		return cPos.x + u * cSize.x;
-			//	};
-
-			//auto drawVec3Curves = [&](const auto& keys, auto getVec)
-			//	{
-			//		if (keys.size() < 2)
-			//			return;
-
-			//		std::vector<glm::vec3> values;
-			//		values.reserve(keys.size());
-
-			//		float minVal = 0.0f, maxVal = 0.0f;
-			//		bool first = true;
-
-			//		for (size_t i = 0; i < keys.size(); ++i)
-			//		{
-			//			glm::vec3 v = getVec(keys[i]);
-			//			values.push_back(v);
-
-			//			float localMin = std::min(v.x, std::min(v.y, v.z));
-			//			float localMax = std::max(v.x, std::max(v.y, v.z));
-
-			//			if (first)
-			//			{
-			//				minVal = localMin;
-			//				maxVal = localMax;
-			//				first = false;
-			//			}
-			//			else
-			//			{
-			//				if (localMin < minVal) minVal = localMin;
-			//				if (localMax > maxVal) maxVal = localMax;
-			//			}
-			//		}
-
-			//		if (maxVal - minVal < 1e-3f)
-			//		{
-			//			maxVal += 0.5f;
-			//			minVal -= 0.5f;
-			//		}
-
-			//		auto valToY = [&](float v)
-			//			{
-			//				float u = (v - minVal) / (maxVal - minVal);
-			//				if (u < 0.0f) u = 0.0f;
-			//				if (u > 1.0f) u = 1.0f;
-			//				return cEnd.y - u * cSize.y;
-			//			};
-
-			//		auto drawAxis = [&](int axis, ImU32 color)
-			//			{
-			//				ImVec2 prev;
-			//				bool hasPrev = false;
-			//				for (size_t i = 0; i < keys.size(); ++i)
-			//				{
-			//					float t = keys[i].time;
-			//					float val = (axis == 0) ? values[i].x :
-			//						(axis == 1) ? values[i].y : values[i].z;
-
-			//					ImVec2 p(timeToXCurve(t), valToY(val));
-			//					if (hasPrev)
-			//						cDraw->AddLine(prev, p, color, 2.0f);
-			//					prev = p;
-			//					hasPrev = true;
-
-			//					cDraw->AddCircleFilled(p, 3.0f, color);
-			//				}
-			//			};
-
-			//		// X/Y/Z (or Pitch/Yaw/Roll for rotation)
-			//		drawAxis(0, COL_X);
-			//		drawAxis(1, COL_Y);
-			//		drawAxis(2, COL_Z);
-			//	};
-
-			//switch (track)
-			//{
-			//case DopesheetTrackType::Position:
-			//	drawVec3Curves(clip.positionKeys,
-			//		[](const PositionKeyframe& k) { return k.position; });
-			//	break;
-			//case DopesheetTrackType::Rotation:
-			//	drawVec3Curves(clip.rotationKeys,
-			//		[](const RotationKeyframe& k)
-			//		{
-			//			return glm::degrees(glm::eulerAngles(k.rotation));
-			//		});
-			//	break;
-			//case DopesheetTrackType::Scale:
-			//	drawVec3Curves(clip.scaleKeys,
-			//		[](const ScaleKeyframe& k) { return k.scale; });
-			//	break;
-			//default:
-			//	break;
-			//}
 
 			// If nothing explicitly selected, pick something sensible
 			if (track == DopesheetTrackType::None)
