@@ -213,6 +213,9 @@ namespace Engine {
 
 		// Temporary object
 		GraphicsLoader m_gl;
+
+		// Fullscreen Quad where the final output of the render is outputted to
+		MeshGL m_fullscreen_quad;
 	};
 
 }

@@ -74,12 +74,16 @@ namespace {
 		std::string vertex_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.vert") };
 		std::string fragment_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.frag") };
 
+		std::string vertex_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.vert") };
+		std::string fragment_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.frag") };
+
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
 			std::make_pair(vertex_debug_path, fragment_debug_path),
 			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
-			std::make_pair(vertex_skybox_path, fragment_skybox_path)
+			std::make_pair(vertex_skybox_path, fragment_skybox_path),
+			std::make_pair(vertex_hdr_path, fragment_hdr_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
@@ -164,13 +168,14 @@ namespace Engine {
 		}
 		else {
 			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
-		}
 
-		LOG_INFO("OpenGL initialized");
-		LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
-		LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
-		LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
-		LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+			// Load OpenGL information upon successfully load
+			LOG_INFO("OpenGL initialized");
+			LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
+			LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
+			LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
+			LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+		}
 
 		// Temporary functions, used for testing only
 		test_load_shaders(m_gl.m_shader_storage);
@@ -178,29 +183,25 @@ namespace Engine {
 		// Load a set of basic primitives: Cube, Plane, Sphere
 		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
 
-		// Create an engine provided skybox
+		// Load skybox mesh
 		MeshData skybox_cube = make_cube();
 		m_skybox = upload_mesh_data(skybox_cube);
 
-		//std::vector<std::string> faces = {
-		//	Engine::getAssetFilePath("Sources/Textures/pz.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/nz.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/py.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/ny.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/px.png"),
-		//	Engine::getAssetFilePath("Sources/Textures/nx.png")
-		//};
-
+		// Load skybox textures
 		std::vector<std::string> faces = {
-	Engine::getAssetFilePath("Sources/Textures/right.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/left.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/top.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/front.jpg"),
-	Engine::getAssetFilePath("Sources/Textures/back.jpg")
+				Engine::getAssetFilePath("Sources/Textures/right.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/left.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/top.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/front.jpg"),
+				Engine::getAssetFilePath("Sources/Textures/back.jpg")
 		};
 
 		m_skybox_texture = loadCubemap(faces);
+
+		// Create a fullscreen quad where the final render output is drawn onto
+		MeshData2D quad = make_quad();
+		m_fullscreen_quad = upload_mesh_data2D(quad);
 
 #pragma region TESTING LOADING UBO FOR MATERIALS
 		// -------- Materials UBO (binding = 1)  --------
@@ -253,7 +254,7 @@ namespace Engine {
 		}
 
 		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
-		auto fp_tex = Texture::alloc_storage_on_gpu(width, height);
+		auto fp_tex = Texture::alloc_storage_on_gpu(width, height, GL_RGBA16F);
 		if (fp_tex.has_value()) {
 			m_gl.m_textures.push_back(std::move(*fp_tex));
 		}
@@ -274,7 +275,6 @@ namespace Engine {
 		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
 		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
 
-		// Create FBO for F
 		auto gpu_fbo = FrameBuffer::create();
 		if (gpu_fbo.has_value()) {
 			m_framebuffers.push_back(std::move(*gpu_fbo));
@@ -325,48 +325,22 @@ namespace Engine {
 		// Register the pass with the renderer
 		m_passes.push_back(first_pass);
 
-
-#pragma region GPU_ID_OBJECT_PICKING_PASS
-
+		RenderPass gpu_id_pass
 		{
-			RenderPass gpu_id_pass
-			{
-				.pass_name = "GPU ID",
-				.fbo_handle = 1,			// Render into the GPU-ID FBO
-				.shdpgm_handle = 2,         // Object_picking shader program
-				.auto_aspect = true,
-				.clear_color = false,		// Use integer clear below
-				.clear_depth = true,		
-				.depth_test = true,
-				.depth_write = true,		
-				.blending = false,
-				.culling = true,
-				.passtype = PassType::GEOMETRY
-			};
+			.pass_name = "GPU ID",
+			.fbo_handle = 1,			// Render into the GPU-ID FBO
+			.shdpgm_handle = 2,         // Object_picking shader program
+			.auto_aspect = true,
+			.clear_color = false,		// Use integer clear below
+			.clear_depth = true,		
+			.depth_test = true,
+			.depth_write = true,		
+			.blending = false,
+			.culling = true,
+			.passtype = PassType::GEOMETRY
+		};
 
-			m_passes.push_back(gpu_id_pass);
-		}
-
-#pragma endregion
-
-#pragma region TEST_TO_SEE_TEXTURE_PASS_TEMP
-
-		{
-			RenderPass stub_pass
-			{
-				.pass_name = "Stub Pass",
-				.fbo_handle = 0,
-				.shdpgm_handle = 0,
-			};
-
-			//m_passes.push_back(stub_pass);
-		}
-
-#pragma endregion
-
-		if (isDebug) {
-
-		}
+		m_passes.push_back(gpu_id_pass);
 
 		RenderPass debug_pass
 		{
@@ -491,6 +465,7 @@ namespace Engine {
 
 	 		for (auto& pass : m_passes) {
 
+				// Skip debugging pass
 				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
 				// Update pass viewport if allowed
@@ -553,7 +528,7 @@ namespace Engine {
 			// For rendering all enabled camera displays
 			for (const auto& cam : camera_list) {
 
-				for (/*const*/ auto& pass : m_passes) {
+				for (auto& pass : m_passes) {
 
 					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
@@ -583,7 +558,6 @@ namespace Engine {
 				}
 			}
 		}
-		
 	}
 
 	void Renderer::draw(RenderPass const& pass,

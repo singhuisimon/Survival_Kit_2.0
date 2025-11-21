@@ -40,6 +40,13 @@ namespace Engine {
 		std::vector<uint32_t>  indices;
 	};
 
+	struct MeshData2D {
+		std::vector<glm::vec2> positions;
+		std::vector<glm::vec3> colors;
+		std::vector<glm::vec2> texcoords;
+		std::vector<uint32_t>  indices;
+	};
+
 	/**
 	 * @brief GPU-side mesh representation with OpenGL buffer objects
 	 * @details Move-only RAII wrapper containing VAO, VBO, and EBO handles.
@@ -71,5 +78,7 @@ namespace Engine {
 	 * @return MeshGL object containing OpenGL handles and draw information
 	 */
 	MeshGL   upload_mesh_data(MeshData& mesh);
+
+	MeshGL   upload_mesh_data2D(MeshData2D& mesh);
 
 }
