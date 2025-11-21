@@ -203,4 +203,31 @@ namespace Engine {
 		return m;
 	}
 
+	MeshData2D make_quad() {
+		MeshData2D m;
+		m.positions = {
+			{-1.0f, -1.0f},  // Covers entire NDC space
+			{+1.0f, -1.0f},
+			{+1.0f, +1.0f},
+			{-1.0f, +1.0f}
+		};
+		m.colors = {
+			glm::vec3(1.0f),  // white
+			glm::vec3(1.0f),
+			glm::vec3(1.0f),
+			glm::vec3(1.0f)
+		};
+		m.texcoords = {
+			{0, 0},  // bottom-left
+			{1, 0},  // bottom-right
+			{1, 1},  // top-right
+			{0, 1}   // top-left
+		};
+		m.indices = {
+			0, 2, 1,  // first triangle (bottom-left, top-right, bottom-right)
+			0, 3, 2   // second triangle (bottom-left, top-left, top-right)
+		};
+		return m;
+	}
+
 }

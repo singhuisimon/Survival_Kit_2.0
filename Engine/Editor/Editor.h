@@ -62,12 +62,43 @@ namespace Engine
 		Entity m_SelectedEntity{}; // track which entity is selected
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
+
+		static constexpr float m_DoublePickedTime = 0.5f;
+		float m_LastClickedTime = 0.f;
+		u32 m_LastClickedID = 0xFFFFFFFFu;
 		
 		// ImGui Window functionality
 		bool inspectorWindow = true;
 		bool hierachyWindow = true;
 		bool assetsWindow = true;
 		bool performanceProfileWindow = true;
+		bool animatorWindow = false;			// Animator/dopesheet window toggle
+		bool m_FocusAnimatorNextFrame = false;	// Request Animator window focus next frame
+
+		// --- Animator / dopesheet editor state ---
+		enum class DopesheetTrackType
+		{
+			None,
+			Position,
+			Rotation,
+			Scale
+		};
+
+		enum class AnimatorViewMode
+		{
+			Dopesheet,
+			Curves
+		};
+
+		// Helper to draw legend in Animator Curve display
+		static void DrawCurveLegendRow(const char* label,
+									   const char* c0Label, ImU32 c0,
+									   const char* c1Label, ImU32 c1,
+									   const char* c2Label, ImU32 c2);
+
+		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
+		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
+		AnimatorViewMode    m_AnimatorViewMode = AnimatorViewMode::Dopesheet;
 
 		// ImGui Top Menu Panel
 		bool openScenePanel = false; // for top menu open file 
@@ -114,6 +145,15 @@ namespace Engine
 		bool showDescriptorEditorPanel = false;
 		xresource::instance_guid currentEditingGuid;
 		std::string editedAsset{};
+		bool m_ShouldApplyOverrides = false;
+
+		std::unordered_map<xresource::instance_guid, std::vector<Entity>> m_PrefabEntities;
+
+		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
+		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
+
+
+		bool isPlaying = true;
 
 	public:
 		/**************************************************************************
@@ -138,7 +178,7 @@ namespace Engine
 		* 	resources created during editing.
 		**************************************************************************/
 		~Editor() {
-			CleanupTemporaryPrefabs();
+			//CleanupTemporaryPrefabs();
 		};
 
 		/**************************************************************************
@@ -201,6 +241,14 @@ namespace Engine
 		* 	objects, replace prefabs, and create a new prefab based on the selected entity.
 		**************************************************************************/
 		void displayHierarchyPanel();
+
+		/**************************************************************************
+		* @brief
+		*   Displays the Animator window.
+		*   Left side: entity/controller/clip, time and tracks.
+		*   Right side: dopesheet or curves (switchable).
+		**************************************************************************/
+		void displayAnimatorPanel();
 
 		/**************************************************************************
 		* @brief 
@@ -338,6 +386,19 @@ namespace Engine
 		*	The size of the button used for removing the component.
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
+
+		void RevertSelectedEntityToPrefab();
+
+		void LoadAllPrefabsIntoRegistry();
+		void UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity);
+		void CheckAndUpdatePrefabInstances();
+
+		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
+
+		void displayHDRSettingsPanel();
+
+		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
+		bool getIsPlaying() const { return isPlaying; }
 	};
 
 
