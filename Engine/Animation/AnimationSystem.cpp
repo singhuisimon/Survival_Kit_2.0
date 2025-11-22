@@ -12,6 +12,10 @@
 #include "../ECS/Scene.h"
 #include <GLFW/glfw3.h>
 
+// To access material data
+#include "../Asset/ResourceManager.h"
+#include "../Asset/ResourceHelpers.h"
+
  /*-------------------- Utility Helpers ----------------------*/
 namespace {
 	// Generic segment finder: returns indices [i0, i1] such that
@@ -49,6 +53,16 @@ namespace {
 	{
 		return glm::slerp(a, b, alpha);
 	}
+
+	inline std::array<float, 2> LerpUV(const std::array<float, 2>& a,
+									   const std::array<float, 2>& b,
+									   float t)
+	{
+		return {
+			std::lerp(a[0], b[0], t),
+			std::lerp(a[1], b[1], t)
+		};
+	}
 }
 /*-------------------- Utility Helpers ----------------------*/
 
@@ -82,9 +96,6 @@ namespace Engine {
 			if (!controller) continue;
 
 			// Get current clip; ensure current clip is not out of range
-			//std::cout << "Controller name: " << controller->name << std::endl;
-			//std::cout << "Controller clip size: " << controller->clips.size() << std::endl;
-			//std::cout << "Animator current clip index: " << animator.currentClipIndex << std::endl;
 			if (animator.currentClipIndex >= static_cast<u32>(controller->clips.size())) continue;
 
 			AnimationClip* clip = GetAnimationClip(controller->clips[animator.currentClipIndex]);
@@ -111,17 +122,54 @@ namespace Engine {
 					animator.playing = false;
 				}
 			}
-			//std::cout << "Animator current time: " << animator.currentTime << std::endl;
 
 			// Sample full transform (position, rotation, scale)
 			SampleClipAtTime(*clip, animator.currentTime, transform);
-			//glm::quat rot = SampleRotation(*clip, animator.currentTime);
 
-			//glm::vec3 eulerDeg = glm::degrees(glm::eulerAngles(transform.Rotation));
-			//std::cout << "Sphere euler: "
-			//	<< eulerDeg.x << ", "
-			//	<< eulerDeg.y << ", "
-			//	<< eulerDeg.z << std::endl;
+			// --- UV Tiling / Offset animation ------------------------------------
+			bool hasTilingTrack = !clip->uvTilingKeys.empty();
+			bool hasOffsetTrack = !clip->uvOffsetKeys.empty();
+
+			if (hasTilingTrack || hasOffsetTrack)
+			{
+				// Check if it has mesh component
+				if (!entity.HasComponent<MeshRendererComponent>())
+					continue;
+
+				auto& mesh = entity.GetComponent<MeshRendererComponent>();
+
+				// Get material reference
+				MaterialResource* material =
+					RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+
+				if (material)
+				{
+					// Use sensible defaults if track is missing before first key, etc.
+					// These defaults match typical UV expectations.
+					std::array<float, 2> tilingDefault{ 1.0f, 1.0f };
+					std::array<float, 2> offsetDefault{ 0.0f, 0.0f };
+
+					if (hasTilingTrack)
+					{
+						std::array<float, 2> uvTiling =
+							SampleUVTrack(clip->uvTilingKeys, animator.currentTime, tilingDefault);
+
+						// Prevent zero or negative tiling
+						material->tiling[0] = std::max(0.1f, uvTiling[0]);
+						material->tiling[1] = std::max(0.1f, uvTiling[1]);
+					}
+
+					if (hasOffsetTrack)
+					{
+						std::array<float, 2> uvOffset =
+							SampleUVTrack(clip->uvOffsetKeys, animator.currentTime, offsetDefault);
+
+						material->offset[0] = uvOffset[0];
+						material->offset[1] = uvOffset[1];
+					}
+				}
+			}
+
 		}
 	}
 
@@ -207,6 +255,29 @@ namespace Engine {
 		const float alpha = (dt > 0.0f) ? (t - K0.time) / dt : 0.0f;
 
 		return LerpVec3(K0.scale, K1.scale, alpha);
+	}
+
+	std::array<float, 2> AnimationSystem::SampleUVTrack(
+		const std::vector<Engine::UVKeyframe>& keys,
+		float localTime,
+		const std::array<float, 2>& defaultValue)
+	{
+		if (keys.empty())
+			return defaultValue;
+
+		if (keys.size() == 1)
+			return keys.front().value;
+
+		// Reuse your FindSegment utility (same as for position/scale)
+		auto [i0, i1] = FindSegment(keys, localTime);
+		if (i0 < 0) return defaultValue;
+		const auto& k0 = keys[i0];
+		const auto& k1 = keys[i1];
+
+		const float dt = (k1.time - k0.time);
+		const float t = (dt > 0.0f) ? (localTime - k0.time) / dt : 0.0f;
+
+		return LerpUV(k0.value, k1.value, std::clamp(t, 0.0f, 1.0f));
 	}
 
 	void AnimationSystem::SampleClipAtTime(const AnimationClip& clip, float t,

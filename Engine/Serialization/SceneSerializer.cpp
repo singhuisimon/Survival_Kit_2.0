@@ -15,6 +15,7 @@
 #include "../Component/LightComponent.h"
 #include "../Prefab/BehaviourTreePrefab.h"
 #include "../Component/PrefabComponent.h"
+#include "../Component/AnimatorComponent.h"
 
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"
@@ -437,6 +438,23 @@ namespace Engine {
                 propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
                 propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
 
+                componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);
+            }
+            // Serialize AnimatorComponent
+            if (entity.HasComponent<AnimatorComponent>()) {
+                LOG_TRACE("  - Serializing AnimatorComponent");
+                auto& animator = entity.GetComponent<AnimatorComponent>();
+                Value componentObj(kObjectType);
+                componentObj.AddMember("Type", "AnimatorComponent", allocator);
+
+                Value propertiesObj(kObjectType);
+                propertiesObj.AddMember("playing", animator.playing, allocator);
+                propertiesObj.AddMember("respectClipLoop", animator.respectClipLoop, allocator);
+                propertiesObj.AddMember("controller", animator.controller, allocator);
+                propertiesObj.AddMember("currentClipIndex", animator.currentClipIndex, allocator);
+                propertiesObj.AddMember("currentTime", animator.currentTime, allocator);
+                propertiesObj.AddMember("playbackSpeed", animator.playbackSpeed, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -874,6 +892,21 @@ namespace Engine {
                             light.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
                         if (properties.HasMember("IndirectMultiplier"))
                             light.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+                    } else if (componentType == "AnimatorComponent") {
+                        auto& animator = entity.AddComponent<AnimatorComponent>();
+
+                        if (properties.HasMember("playing"))
+                            animator.playing = properties["playing"].GetBool();
+                        if (properties.HasMember("respectClipLoop"))
+                            animator.respectClipLoop = properties["respectClipLoop"].GetBool();
+                        if (properties.HasMember("controller"))
+                            animator.controller = properties["controller"].GetUint();
+                        if (properties.HasMember("currentClipIndex"))
+                            animator.currentClipIndex = properties["currentClipIndex"].GetUint();
+                        if (properties.HasMember("currentTime"))
+                            animator.currentTime = properties["currentTime"].GetFloat();
+                        if (properties.HasMember("playbackSpeed"))
+                            animator.playbackSpeed = properties["playbackSpeed"].GetFloat();
                     }
                 }
             }

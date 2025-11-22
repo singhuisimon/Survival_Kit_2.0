@@ -81,13 +81,21 @@ namespace Engine
 			None,
 			Position,
 			Rotation,
-			Scale
+			Scale,
+			UVTiling,
+			UVOffset
 		};
 
 		enum class AnimatorViewMode
 		{
 			Dopesheet,
 			Curves
+		};
+
+		enum class AnimatorComponentTrack
+		{
+			Transform,
+			UVTransform
 		};
 
 		// Helper to draw legend in Animator Curve display
@@ -99,6 +107,7 @@ namespace Engine
 		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
 		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
 		AnimatorViewMode    m_AnimatorViewMode = AnimatorViewMode::Dopesheet;
+		AnimatorComponentTrack m_SelectedComponentTrack = AnimatorComponentTrack::Transform;
 
 		// ImGui Top Menu Panel
 		bool openScenePanel = false; // for top menu open file 

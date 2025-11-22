@@ -34,7 +34,7 @@ namespace Engine {
     struct AnimatorComponent {
 
         // Toggles
-        bool playing = true;
+        bool playing = false;
         bool respectClipLoop = true;   // you can override clip.loop if needed
 
         // Controller handle

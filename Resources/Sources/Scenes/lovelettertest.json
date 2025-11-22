@@ -2,44 +2,13 @@
     "Scene": "Main Scene",
     "Version": "1.0",
     "Entities": [
-      {
-        "ID": 11,
-        "Components": [
-          {
-            "Type": "TagComponent",
-            "Properties": {
-              "Tag": "Sunlight"
-            }
-          },
-          {
-            "Type": "TransformComponent",
-            "Properties": {
-              "Position": [ 0.0, 10.0, 0.0 ],
-              "Rotation": [ -100.0, 0.0, 0.0 ],
-              "Scale": [ 1.0, 1.0, 1.0 ]
-            }
-          },
-          {
-            "Type": "LightComponent",
-            "Properties": {
-              "Enabled": true,
-              "Type": 0,
-              "Color": [ 1.0, 1.0, 1.0 ],
-              "Intensity": 1.0,
-              "Range": 0.0,
-              "SpotAngleDeg": 0.0,
-              "IndirectMultiplier": 1.0
-            }
-          }
-        ]
-      },
-      {
-            "ID": 10,
+        {
+            "ID": 0,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "E006_logicbomb1"
+                        "Tag": "E006_logicbomb8"
                     }
                 },
                 {
@@ -67,382 +36,25 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 7760907655043285101,
-                        "TextureGuid": 10066750664256979055,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 10
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 9,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb4"
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 3149221636613570589,
+                      "TextureGuid": 11796132921164922911,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 0
                     }
                 },
                 {
-                    "Type": "TransformComponent",
+                    "Type": "AnimatorComponent",
                     "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 14101975930380648549,
-                        "TextureGuid": 4878603893525872743,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 9
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 8,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Fins"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 15254897434987364445,
-                        "TextureGuid": 3149221636615471199,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 8
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 7,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb9"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 16984279691897356373,
-                        "TextureGuid": 11219672168863121495,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 7
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 6,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Main"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.002,
-                            0.002,
-                            0.002
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [0, 1, 2, 3, 4, 5, 7, 8, 9, 10]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 10066750664256176205,
-                        "TextureGuid": 8913829159649329231,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 6
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 5,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb6"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 4302143141221777477,
-                        "TextureGuid": 14101975930379976775,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 5
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 4,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb7"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 16984279691896897597,
-                        "TextureGuid": 8913829159648968767,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 4
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 3,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb5"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 16984279691896635445,
-                        "TextureGuid": 7184446902738436151,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 3
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb2"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 12949054425772425261,
-                        "TextureGuid": 11796132921165578287,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 2
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -481,25 +93,37 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 18137201196503105573,
-                        "TextureGuid": 13525515178075717671,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 1
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 18137201196503105573,
+                      "TextureGuid": 13525515178075717671,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 1
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
                     }
                 }
+            
             ]
         },
         {
-            "ID": 0,
+            "ID": 2,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "E006_logicbomb8"
+                        "Tag": "E006_logicbomb2"
                     }
                 },
                 {
@@ -527,14 +151,530 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 657086173731323931,
-                        "MaterialGuid": 3149221636613570589,
-                        "TextureGuid": 11796132921164922911,
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 12949054425772425261,
+                      "TextureGuid": 11796132921165578287,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 2
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 16984279691896635445,
+                      "TextureGuid": 7184446902738436151,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 3
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb7"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+              {
+                  "Type": "MeshRendererComponent",
+                  "Properties": {
+                    "MeshGuid": 1561377315146448923,
+                    "MaterialGuid": 16984279691896897597,
+                    "TextureGuid": 8913829159648968767,
+                    "Visible": true,
+                    "MeshType": 0,
+                    "Material": 0,
+                    "Texture": 0,
+                    "SubmeshIndex": 4
+                  }
+              },
+              {
+                  "Type": "AnimatorComponent",
+                  "Properties": {
+                    "playing": true,
+                    "respectClipLoop": true,
+                    "controller": 0,
+                    "currentClipIndex": 0,
+                    "currentTime": 0.0,
+                    "playbackSpeed": 1.0
+                  }
+              }
+            ]
+        },
+        {
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 4302143141221777477,
+                      "TextureGuid": 14101975930379976775,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 5
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 6,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Main"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.0020000000949949026,
+                            0.0020000000949949026,
+                            0.0020000000949949026
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            7,
+                            8,
+                            9,
+                            10
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 1561377315146448923,
+                        "MaterialGuid": 10066750664256176205,
+                        "TextureGuid": 8913829159649329231,
                         "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
-                        "SubmeshIndex": 0
+                        "SubmeshIndex": 6
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": false,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 1,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 7,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb9"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 16984279691897356373,
+                      "TextureGuid": 11219672168863121495,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 7
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 8,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Fins"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 1561377315146448923,
+                        "MaterialGuid": 15254897434987364445,
+                        "TextureGuid": 3149221636615471199,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 8
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 9,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 14101975930380648549,
+                      "TextureGuid": 4878603893525872743,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 9
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 10,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -2.831725835800171,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                      "MeshGuid": 1561377315146448923,
+                      "MaterialGuid": 7760907655043285101,
+                      "TextureGuid": 10066750664256979055,
+                      "Visible": true,
+                      "MeshType": 0,
+                      "Material": 0,
+                      "Texture": 0,
+                      "SubmeshIndex": 10
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                      "playing": true,
+                      "respectClipLoop": true,
+                      "controller": 0,
+                      "currentClipIndex": 0,
+                      "currentTime": 0.0,
+                      "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 11,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Sunlight"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            10.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -99.99999237060547,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Type": 0,
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Intensity": 1.0,
+                        "Range": 0.0,
+                        "SpotAngleDeg": 0.0,
+                        "IndirectMultiplier": 1.0
                     }
                 }
             ]

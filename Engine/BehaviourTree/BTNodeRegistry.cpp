@@ -419,6 +419,29 @@ namespace Engine {
                 BT_REGISTER_STRING_PROPERTY(BTSpawnEnemiesGrid, "EnemyTag", m_EnemyTag);
             });
 
+        // Finding and targeting enemies
+        registry.RegisterNodeType<BTFindNearestEnemy>("Action", "Finds nearest enemy and stores in blackboard",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTFindNearestEnemy, "EnemyTag", m_EnemyTag);
+                BT_REGISTER_STRING_PROPERTY(BTFindNearestEnemy, "TargetPosKey", m_TargetPosKey);
+                BT_REGISTER_STRING_PROPERTY(BTFindNearestEnemy, "TargetEntityKey", m_TargetEntityKey);
+                BT_REGISTER_FLOAT_PROPERTY(BTFindNearestEnemy, "MaxRange", m_MaxRange);
+            });
+
+        // Target Validation
+        registry.RegisterNodeType<BTHasValidTarget>("Condition", "Checks if target entity is still valid",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTHasValidTarget, "TargetEntityKey", m_TargetEntityKey);
+            });
+
+        // Weapon, Attack, Combat, Shooting
+        registry.RegisterNodeType<BTShootBullet>("Action", "Shoots bullet at target with cooldown",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTShootBullet, "BulletTag", m_BulletTag);
+                BT_REGISTER_FLOAT_PROPERTY(BTShootBullet, "FireRate", m_FireRate);
+                BT_REGISTER_FLOAT_PROPERTY(BTShootBullet, "BulletSpeed", m_BulletSpeed);
+            });
+
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
     }
 

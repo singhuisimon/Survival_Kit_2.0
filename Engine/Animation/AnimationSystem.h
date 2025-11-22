@@ -30,6 +30,10 @@ namespace Engine {
 		glm::vec3 SamplePosition(const AnimationClip& clip, float t, const glm::vec3& defaultPosition);
 		glm::quat SampleRotation(const AnimationClip& clip, float t, const glm::quat& defaultRotation);
 		glm::vec3 SampleScale(const AnimationClip& clip, float t, const glm::vec3& defaultScale);
+		std::array<float, 2> SampleUVTrack(const std::vector<Engine::UVKeyframe>& keys,
+										   float localTime,
+										   const std::array<float, 2>& defaultValue);
+		
 
 		// Sample and apply an entire clip to a TransformComponent
 		void SampleClipAtTime(const AnimationClip& clip, float t, TransformComponent& transform);

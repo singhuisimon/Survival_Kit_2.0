@@ -23,6 +23,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"
+#include "../Component/AnimatorComponent.h"
 #include "../Utility/Logger.h"
 
 #include <rapidjson/document.h>
@@ -528,6 +529,29 @@ namespace Engine {
             }
             if (properties.HasMember("IndirectMultiplier")) {
                 comp.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+            }
+        }
+
+        else if (componentType == "AnimatorComponent") {
+            auto& comp = entity.AddComponent<AnimatorComponent>();
+
+            if (properties.HasMember("playing")) {
+                comp.playing = properties["playing"].GetBool();
+            }
+            if (properties.HasMember("respectClipLoop")) {
+                comp.respectClipLoop = properties["respectClipLoop"].GetBool();
+            }
+            if (properties.HasMember("controller")) {
+                comp.controller = properties["controller"].GetUint();
+            }
+            if (properties.HasMember("currentClipIndex")) {
+                comp.currentClipIndex = properties["currentClipIndex"].GetUint();
+            }
+            if (properties.HasMember("currentTime")) {
+                comp.currentTime = properties["currentTime"].GetFloat();
+            }
+            if (properties.HasMember("playbackSpeed")) {
+                comp.playbackSpeed = properties["playbackSpeed"].GetFloat();
             }
         }
     }
