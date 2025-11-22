@@ -117,10 +117,27 @@ namespace AssetCompiler {
             meshData.getVertexCount(), meshData.getIndexCount(), meshData.getTriangleCount());
 
         // Step 4: Apply processing based on settings
+
+        //scale first
         if (settings.scale != 1.0f) {
             scaleMesh(meshData, settings.scale);
             log("Applied scale: %.2f", settings.scale);
         }
+
+        //then rotate
+        if (settings.rotationX != 0.0f || settings.rotationY != 0.0f || settings.rotationZ != 0.0f) {
+            rotateMesh(meshData, settings.rotationX, settings.rotationY, settings.rotationZ);
+            log("Applied rotation: X=%.2f, Y=%.2f, Z=%.2f degrees", settings.rotationX, settings.rotationY, settings.rotationZ);
+        }
+
+        //lastly translate
+        if (settings.positionX != 0.0f || settings.positionY != 0.0f || settings.positionZ != 0.0f) {
+            translateMesh(meshData, settings.positionX, settings.positionY, settings.positionZ);
+            log("Applied translation: X=%.2f, Y=%.2f, Z=%.2f", settings.positionX, settings.positionY, settings.positionZ);
+        }
+
+
+
 
         if (settings.generateNormals) {
             generateNormals(meshData);
@@ -393,6 +410,43 @@ namespace AssetCompiler {
         }
     }
 
+    void MeshCompiler::rotateMesh(MeshData& meshData, float rotX, float rotY, float rotZ) {
+
+        //convert degrees to radians 
+        float radX = glm::radians(rotX);
+        float radY = glm::radians(rotY);
+        float radZ = glm::radians(rotZ);
+
+        //create rotation matrices for each axis
+        glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), radX, glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), radY, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), radZ, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        //combined rotation: Z * Y * X order
+        glm::mat4 rotationMatrix = rotationZ * rotationY * rotationX; 
+
+        //extract 3x3 rotation matrix for normals 
+        glm::mat3 normalMatrix = glm::mat3(rotationMatrix);
+
+        //apply rotation to positions 
+        for (auto& pos : meshData.positions) {
+            glm::vec4 rotatedPos = rotationMatrix * glm::vec4(pos, 1.0f);
+            pos = glm::vec3(rotatedPos);
+        }
+
+        //apply rotation to normals 
+        for (auto& normal : meshData.normals) {
+            normal = glm::normalize(normalMatrix * normal);
+        }
+    }
+
+    void MeshCompiler::translateMesh(MeshData& meshData, float x, float y, float z) {
+        glm::vec3 translation(x, y, z);
+        for (auto& pos : meshData.positions) {
+            pos += translation; 
+        }
+    }
+
     void MeshCompiler::generateNormals(MeshData& meshData) {
         meshData.normals.resize(meshData.positions.size(), glm::vec3(0.0f));
 
@@ -601,6 +655,12 @@ namespace AssetCompiler {
             if (ms.HasMember("includeTexCoords")) settings.includeTexCoords = ms["includeTexCoords"].GetBool();
             if (ms.HasMember("indexType")) settings.indexType = ms["indexType"].GetString();
             if (ms.HasMember("scale")) settings.scale = ms["scale"].GetFloat();
+            if (ms.HasMember("positionX")) settings.positionX = ms["positionX"].GetFloat();
+            if (ms.HasMember("positionY")) settings.positionY = ms["positionY"].GetFloat();
+            if (ms.HasMember("positionZ")) settings.positionZ = ms["positionZ"].GetFloat();
+            if (ms.HasMember("rotationX")) settings.rotationX = ms["rotationX"].GetFloat();
+            if (ms.HasMember("rotationY")) settings.rotationY = ms["rotationY"].GetFloat();
+            if (ms.HasMember("rotationZ")) settings.rotationZ = ms["rotationZ"].GetFloat();
             if (ms.HasMember("optimizeVertices")) settings.optimizeVertices = ms["optimizeVertices"].GetBool();
             if (ms.HasMember("generateNormals")) settings.generateNormals = ms["generateNormals"].GetBool();
             if (ms.HasMember("flipUVs")) settings.flipUVs = ms["flipUVs"].GetBool();

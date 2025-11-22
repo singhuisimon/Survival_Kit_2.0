@@ -28,6 +28,7 @@
 
 #include <cstdint>
 #include <unordered_set>
+#include <mutex>            // <-- for thread-safety of contact buffers
 
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyLock.h>
@@ -284,6 +285,7 @@ namespace Engine
 	 **************************************************************************/
 	static std::vector<ContactEvent>         s_frame_contacts{};
 	static std::unordered_set<std::uint64_t> s_dedupe{};
+	static std::mutex                        s_contact_mutex{};
 
 	/**************************************************************************
 	 * @brief
@@ -383,8 +385,13 @@ namespace Engine
 			if (ea == entt::null || eb == entt::null) return;
 
 			const std::uint64_t key{ PairKey(ea, eb) };
-			if (s_dedupe.insert(key).second)
-				s_frame_contacts.push_back(ContactEvent{ ea, eb });
+
+			// Protect shared contact buffers from concurrent access
+			{
+				std::lock_guard<std::mutex> lock(s_contact_mutex);
+				if (s_dedupe.insert(key).second)
+					s_frame_contacts.push_back(ContactEvent{ ea, eb });
+			}
 		}
 	};
 
@@ -409,6 +416,7 @@ namespace Engine
 	 **************************************************************************/
 	void PhysicsAPI::BeginCollisionFrame()
 	{
+		std::lock_guard<std::mutex> lock(s_contact_mutex);
 		s_frame_contacts.clear();
 		s_dedupe.clear();
 	}

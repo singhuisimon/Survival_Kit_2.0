@@ -52,8 +52,8 @@ namespace Engine {
         float nearPlane;         // Near clipping plane
         float farPlane;          // Far clipping plane
 
-        float editorCameraSpeed = 3.f;
-        float editorZoomSpeed = 3.f;
+        float editorCameraSpeed = 1.f;
+        float editorZoomSpeed = 1.f;
 
     public:
 
@@ -207,46 +207,38 @@ namespace Engine {
             glm::mat4 view = getLookAt(false);
 
             if (yoffset > 0.0) {
-                pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
-                target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+                pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorZoomSpeed;
+                target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorZoomSpeed;
             }
             else if (yoffset < 0.0) {
-                pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
-                target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+                pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorZoomSpeed;
+                target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorZoomSpeed;
             }
         }
 
         void moveCamForward() {
             glm::mat4 view = getLookAt(false);
-            // pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
-            // target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
-            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
-            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+            pos += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            target += glm::normalize(-glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
         }
 
         void moveCamLeft() {
             glm::mat4 view = getLookAt(false);
-            // pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
-            // target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
-            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
-            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
+            pos += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            target += glm::normalize(-glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
         }
 
         void moveCamBack() {
             glm::mat4 view = getLookAt(false);
-            // pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
-            // target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
-            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
-            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * 1.f;
+            pos += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
+            target += glm::normalize(glm::vec3(view[0][2], view[1][2], view[2][2])) * editorCameraSpeed;
 
         }
 
         void moveCamRight() {
             glm::mat4 view = getLookAt(false);
-            // pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
-            // target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
-            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
-            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * 1.f;
+            pos += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
+            target += glm::normalize(glm::vec3(view[0][0], view[1][0], view[2][0])) * editorCameraSpeed;
         }
 
         //// Getters for camera data
@@ -257,6 +249,7 @@ namespace Engine {
         //float& getCamNear() { return nearPlane; }
         //float& getCamFar() { return farPlane; }
 
+        glm::vec3& getEditorCamTarget() { return target; }
         float& getEditorCamSpeed() { return editorCameraSpeed; }
         float& getEditorZoomSpeed() { return editorZoomSpeed; }
 
@@ -275,6 +268,8 @@ namespace Engine {
         //void setCamNear(float newNear) { nearPlane = newNear; }
         //void setCamFar(float newFar) { farPlane = newFar; }
 
+        void setEditorCamPosition(glm::vec3 newCamPos) { pos = newCamPos; }
+        void setEditorCamTarget(glm::vec3 newCamTarget) { target = newCamTarget; }
         void setEditorCamSpeed(float newCamSpeed) { editorCameraSpeed = newCamSpeed; }
         void setEditorZoomSpeed(float newZoomSpeed) { editorZoomSpeed = newZoomSpeed; }
     };

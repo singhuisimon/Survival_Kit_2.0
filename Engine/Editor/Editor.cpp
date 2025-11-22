@@ -25,8 +25,16 @@
 #include "../Scripting/ScriptSerializer.h"
 #include "../Editor/EditorPropertyPanel.h"
 #include "../Editor/EditorHierarchyPanel.h"
+#include "../Editor/EditorViewportPanel.h"
 
 #include "../Asset/ResourceHelpers.h"
+
+// Animation system / storage for clips & controllers
+#include "ECS/Components.h"               // for AnimatorComponent
+#include "Animation/AnimationStorage.h"   // AnimationClip / AnimatorController / storage
+#include "Animation/AnimationSystem.h"    // optional, but handy for context
+
+
 // Include other necessary headers
 #include <GLFW/glfw3.h>
 #include <cctype>
@@ -82,7 +90,7 @@ namespace Engine
 
 		// Set default pickedID
 		m_PickedID = 0xFFFFFFFFu;
-		
+		LoadAllPrefabsIntoRegistry();
 		m_Initialized = true;
 	}
 
@@ -90,7 +98,12 @@ namespace Engine
 	{
 		if (!m_Initialized) return;
 
-
+		if (!isPrefabEditor)
+		{
+			std::cout << "=== CheckAndUpdatePrefabInstances CALLED ===" << std::endl;
+			// Check every frame (or you could throttle this if needed)
+			CheckAndUpdatePrefabInstances();
+		}
 		//Start the ImGui frame
 		StartImguiFrame();
 
@@ -106,12 +119,16 @@ namespace Engine
 
 		displayHierarchyPanel();
 
+		displayAnimatorPanel();
+
 		displayAssetsBrowserPanel();
 
 		displayPerformanceProfilePanel(ts);
 
 		displayDescriptorEditorPanel();
 
+		displayHDRSettingsPanel();
+		
 		//Complete Imgui rendering for the frame
 		CompleteFrame();
 	}
@@ -157,6 +174,52 @@ namespace Engine
 							{
 								Entity entity(*view.begin(), &m_Scene->GetRegistry());
 
+								// ============ ADD DEBUG HERE ============
+								std::cout << "=== DEBUG PREFAB SAVE ===" << std::endl;
+								std::cout << "Saving prefab: " << currPrefabPath << std::endl;
+								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+								xresource::instance_guid existingGUID{};
+								if (existingPrefab)
+								{
+									existingGUID = existingPrefab->GetGUID();
+									std::cout << "Found existing prefab with GUID: " << existingGUID.m_Value << std::endl;
+								}
+								else
+								{
+									std::cout << "No existing prefab found, creating new GUID" << std::endl;
+								}
+								// Create updated prefab from current entity
+								std::string entityName = entity.GetComponent<TagComponent>().Tag;
+								auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
+
+								if (updatedPrefab)
+								{
+									// ============ PRESERVE EXISTING GUID ============
+									if (existingGUID.m_Value != 0)
+									{
+										updatedPrefab->SetGUID(existingGUID);
+										std::cout << "Preserved existing GUID: " << updatedPrefab->GetGUID().m_Value << std::endl;
+									}
+									else
+									{
+										std::cout << "Using new GUID: " << updatedPrefab->GetGUID().m_Value << std::endl;
+									}
+									// ============ END PRESERVE ============
+
+									if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
+									{
+										LOG_INFO("Prefab saved: {}", currPrefabPath);
+
+										// Update the registry with the new prefab
+										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+										m_TemporaryPrefabPaths.erase(currPrefabPath);
+
+										std::cout << "Prefab saved successfully" << std::endl;
+									}
+								}
+								std::cout << "=== END DEBUG PREFAB SAVE ===" << std::endl;
+
+#if 0
 								// Create a new prefab from the current entity
 								std::string entityName = entity.GetComponent<TagComponent>().Tag;
 								auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
@@ -169,6 +232,8 @@ namespace Engine
 									PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
 									m_TemporaryPrefabPaths.erase(currPrefabPath);
 								}
+#endif
+
 							}
 
 						
@@ -246,6 +311,7 @@ namespace Engine
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &hierachyWindow);
 				ImGui::MenuItem("Properties", NULL, &inspectorWindow);
+				ImGui::MenuItem("Animator", NULL, &animatorWindow);          // <--- NEW
 				ImGui::MenuItem("Performance Profile", NULL, &performanceProfileWindow);
 				ImGui::EndMenu();
 			}
@@ -332,6 +398,50 @@ namespace Engine
 				}
 				
 				ImGui::Separator();
+				// =========================== Display PrefabComponent ==============================
+				if (m_SelectedEntity.HasComponent<PrefabComponent>())
+				{
+
+					if (ImGui::CollapsingHeader("Prefab", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						ImGui::Text("Prefab GUID: %llu", prefabComp.PrefabGUID.m_Value);
+
+						if (!isPrefabEditor)
+						{
+							if (ImGui::Button("Revert to Prefab"))
+							{
+								LoadAllPrefabsIntoRegistry();
+								RevertSelectedEntityToPrefab();
+								//PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Apply Overrides"))
+							{
+								LoadAllPrefabsIntoRegistry();
+								m_ShouldApplyOverrides = true;
+
+								auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+								auto prefabGUID = prefabComp.PrefabGUID;
+
+								PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+								UpdateAllInstancesOfPrefab(prefabGUID, m_SelectedEntity);
+								//auto& prefabs = Engine::PrefabRegistry::Get().GetAllPrefabs();
+								/*std::cout << "---------- Prefabs ----------\n";
+								for (const auto& [guid, prefab] : prefabs)
+								{
+									std::cout << "GUID: " << guid.m_Value
+										<< " | Valid: " << (prefab ? "Yes" : "No")
+										<< "\n";
+								}*/
+
+							}
+
+						}
+
+					}
+				}
 
 				// =========================== Display TransformComponent ===========================
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
@@ -628,7 +738,6 @@ namespace Engine
 						// Display asset reference fields
 						DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
 						DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
-						DisplayAssetField("Texture", mesh.TextureGuid, ResourceType::TEXTURE);
 
 						if (showWrongType) {
 
@@ -735,13 +844,12 @@ namespace Engine
 							// Texture Maps (PBR Metallic/Roughness)
 							if (ImGui::CollapsingHeader("Texture Maps"))
 							{
-								// Displaying the 64-bit hex GUID from the m_Value
-								ImGui::Text("Base Map (Albedo): [Stub - ID: 0x%llx]", material->baseMap.m_Value);
-								ImGui::Text("Normal Map:         [Stub - ID: 0x%llx]", material->normalMap.m_Value);
-								ImGui::Text("Metallic Map:       [Stub - ID: 0x%llx]", material->metallicMap.m_Value);
-								ImGui::Text("Roughness Map:      [Stub - ID: 0x%llx]", material->roughnessMap.m_Value);
-								ImGui::Text("Emission Map:       [Stub - ID: 0x%llx]", material->emissionMap.m_Value);
-								ImGui::Text("Occlusion Map:      [Stub - ID: 0x%llx]", material->occlusionMap.m_Value);
+								DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE);
+								DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE);
+								DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE);
+								DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE);
+								DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE);
+								DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE);
 							}
 
 							// Color Properties
@@ -785,7 +893,7 @@ namespace Engine
 								}
 
 								// Emission Strength
-								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 10.0f, "%.2f"))
+								if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
 								{
 									material->emissionStrength = std::max(0.0f, material->emissionStrength);
 								}
@@ -1835,6 +1943,78 @@ namespace Engine
 
 				// ============================ Display Camera Comp ===============================
 				displayCameraComp(dotButtonSize);
+
+				// =========================== Display Animator Component ===========================
+				if (m_SelectedEntity.HasComponent<AnimatorComponent>())
+				{
+					ImGui::Separator();
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 200.0f);
+
+					bool openAnimatorComponent = ImGui::CollapsingHeader("Animator Component", ImGuiTreeNodeFlags_DefaultOpen);
+					bool removeAnimator = false;
+
+					// Column 2: "..." button to remove component
+					ImGui::NextColumn();
+
+					if (ImGui::Button("... ###AnimatorBtn", dotButtonSize))
+					{
+						ImGui::OpenPopup("AnimatorPopUp");
+					}
+					if (ImGui::BeginPopup("AnimatorPopUp"))
+					{
+						if (ImGui::MenuItem("Remove Component"))
+						{
+							removeAnimator = true;
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::Columns(1);
+
+					if (openAnimatorComponent)
+					{
+						auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
+
+						ImGui::Text("Controller Handle: %u", animator.controller);
+
+						// Basic animator state controls
+						ImGui::Checkbox("Playing", &animator.playing);
+						ImGui::Checkbox("Respect Clip Loop", &animator.respectClipLoop);
+
+						ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f);
+						ImGui::DragInt("Current Clip Index", (int*)(&animator.currentClipIndex), 1.0f, 0, 100);
+						ImGui::DragFloat("Current Time", &animator.currentTime, 0.01f, 0.0f, 1000.0f);
+
+						if (ImGui::Button("Restart Clip"))
+						{
+							animator.currentTime = 0.0f;
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("Stop##AnimatorComp"))
+						{
+							animator.currentTime = 0.0f;
+							animator.playing = false;
+						}
+
+						ImGui::Separator();
+						ImGui::TextWrapped("Use the Animator window (View -> Animator) to edit "
+							"controllers, clips, and keyframes.");
+
+						// Convenience: open & focus Animator window from here
+						if (ImGui::Button("Open Animator Window"))
+						{
+							animatorWindow = true;
+							m_FocusAnimatorNextFrame = true;
+						}
+					}
+
+					if (removeAnimator)
+					{
+						m_SelectedEntity.RemoveComponent<AnimatorComponent>();
+					}
+				}
+
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
 				ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
@@ -2075,6 +2255,26 @@ namespace Engine
 					}
 					ImGui::EndDisabled();
 
+					// ------------------------ Add Animator Component ----------------------------
+					bool hasAnimatorComponent = m_SelectedEntity.HasComponent<AnimatorComponent>();
+					ImGui::BeginDisabled(hasAnimatorComponent);
+
+					if (ImGui::MenuItem("Animator Component"))
+					{
+						if (!hasAnimatorComponent)
+						{
+							m_SelectedEntity.AddComponent<AnimatorComponent>();
+						}
+					}
+					if (ImGui::IsItemHovered())
+					{
+						if (!hasAnimatorComponent)
+						{
+							ImGui::SetTooltip("Adds animation playback data (controller, clip index, time) to this object.");
+						}
+					}
+					ImGui::EndDisabled();
+
 					ImGui::EndPopup(); // end pop up for Add Component  
 				}
 
@@ -2085,6 +2285,55 @@ namespace Engine
 			}
 		}
 		ImGui::End();
+		// --------------------------------- Prefab testing ------------------------------------
+		if (m_ShouldApplyOverrides)
+		{
+			if (m_SelectedEntity && m_SelectedEntity.HasComponent<Engine::PrefabComponent>())
+			{
+				auto& prefabComp = m_SelectedEntity.GetComponent<Engine::PrefabComponent>();
+
+				auto prefab = Engine::PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
+				//std::cout << "prefab guid is:" << prefab.get()->GetGUID().m_Value << "\n";
+				//GUID originalGUID;
+
+				if (prefab)
+				{
+#if 0
+					// Full overwrite of prefab from the current entity
+					std::string updatedJson =
+						Engine::PrefabSerializer::SerializeEntity(m_SelectedEntity, Entity{});
+					prefab->SetEntityData(updatedJson);
+					Engine::PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+
+					// Reset prefab modifications
+					prefabComp.ClearModifications();
+
+					LOG_INFO("Applied entity state to prefab file: ", prefab->GetSourcePath());
+					std::cout << ">>>>>>>>prefab->GetSourcePath():" << prefab->GetSourcePath() << "\n";
+#endif
+
+					auto originalGUID = prefab->GetGUID();
+					std::string originalPath = prefab->GetSourcePath();
+
+					std::string updatedJson = Engine::PrefabSerializer::SerializeEntity(m_SelectedEntity, Entity{});
+					prefab->SetEntityData(updatedJson);
+					Engine::PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+
+					// Verify GUID didn't change
+					if (prefab->GetGUID() != originalGUID) {
+						LOG_ERROR("Prefab GUID changed during override application!");
+					}
+					if (prefab->GetSourcePath() != originalPath) {
+						LOG_ERROR("Prefab source path changed during override application!");
+					}
+
+					prefabComp.ClearModifications();
+					LOG_INFO("Applied entity state to prefab file: ", prefab->GetSourcePath());
+				}
+			}
+
+			m_ShouldApplyOverrides = false;
+		}
 	}
 
 	void Editor::displayHierarchyPanel()
@@ -2222,6 +2471,8 @@ namespace Engine
 								prefab->GetGUID()
 							);
 
+							
+
 							// Attach entityToAttach as child of selected entity
 							auto& parentTransform = EditorHierarchyHelper::parentOfPrefabEntity.GetComponent<TransformComponent>();
 							parentTransform.Children.push_back((uint32_t)newEntity);
@@ -2267,6 +2518,7 @@ namespace Engine
 					selectedPrefabPath = file.fullPath;
 					replacePrefabPending = false;
 
+#if 0
 					auto prefab = PrefabSerializer::LoadPrefabFromFile(selectedPrefabPath);
 					if (!prefab || !m_SelectedEntity)
 					{
@@ -2283,6 +2535,42 @@ namespace Engine
 					);
 
 					m_SelectedEntity = newEntity;
+#endif
+					auto& registry = PrefabRegistry::Get();
+					std::shared_ptr<Prefab> prefab = nullptr;
+
+					for (auto& [guid, regPrefab] : registry.GetAllPrefabs())
+					{
+						if (regPrefab && regPrefab->GetSourcePath() == selectedPrefabPath)
+						{
+							prefab = regPrefab;
+							break;
+						}
+					}
+					if (!prefab)
+					{
+						prefab = PrefabSerializer::LoadPrefabFromFile(selectedPrefabPath);
+						if (!prefab)
+						{
+							ImGui::CloseCurrentPopup();
+							return;
+						}
+						registry.RegisterPrefab(prefab);
+					}
+
+					Entity entityToReplace = m_SelectedEntity;
+					if (entityToReplace)
+					{
+						m_Scene->DestroyEntity(entityToReplace);
+						Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+							m_Scene,
+							prefab->GetGUID()
+						);
+						m_SelectedEntity = newEntity;
+					}
+					
+
+					ImGui::CloseCurrentPopup();
 				}
 			}
 
@@ -2318,12 +2606,53 @@ namespace Engine
 						break;
 					}
 
+					std::cout << "=== DEBUG INSTANTIATION ===" << std::endl;
+					std::cout << "Loaded prefab name: " << file.name << std::endl;
+					std::cout << "Loaded prefab GUID: " << prefab->GetGUID().m_Value << std::endl;
+					std::cout << "File path: " << file.fullPath << std::endl;
+
+
+					auto existingInRegistry = PrefabRegistry::Get().GetPrefab(prefab->GetGUID());
+					if (existingInRegistry)
+					{
+						std::cout << "Found existing prefab in registry with GUID: " << existingInRegistry->GetGUID().m_Value << std::endl;
+						if (existingInRegistry->GetGUID().m_Value != prefab->GetGUID().m_Value)
+						{
+							std::cout << "WARNING: Registry GUID mismatch!" << std::endl;
+						}
+					}
+					else
+					{
+						std::cout << "No existing prefab found in registry" << std::endl;
+					}
+
 					PrefabRegistry::Get().RegisterPrefab(prefab);
+					std::cout << "Registered prefab with GUID: " << prefab->GetGUID().m_Value << std::endl;
+
+
 					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
 						m_Scene,
 						prefab->GetGUID()
 					);
-					
+
+					if (newEntity.HasComponent<PrefabComponent>())
+					{
+						auto& prefabComp = newEntity.GetComponent<PrefabComponent>();
+						std::cout << "Instantiated entity has prefab GUID: " << prefabComp.PrefabGUID.m_Value << std::endl;
+
+						// Check if it matches what we expected
+						if (prefabComp.PrefabGUID.m_Value != prefab->GetGUID().m_Value)
+						{
+							std::cout << "ERROR: GUID MISMATCH! Expected: " << prefab->GetGUID().m_Value
+								<< " but got: " << prefabComp.PrefabGUID.m_Value << std::endl;
+						}
+					}
+					else
+					{
+						std::cout << "ERROR: Instantiated entity has NO PrefabComponent!" << std::endl;
+					}
+					std::cout << "=== END DEBUG INSTANTIATION ===" << std::endl;
+
 					m_SelectedEntity = newEntity;
 					ImGui::CloseCurrentPopup();
 					break;
@@ -2340,6 +2669,838 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 	}
+
+	void Editor::displayAnimatorPanel()
+	{
+		if (!animatorWindow)
+			return;
+
+		// First-time size
+		ImGui::SetNextWindowSize(ImVec2(1000.0f, 450.0f), ImGuiCond_FirstUseEver);
+
+		if (!ImGui::Begin("Animator", &animatorWindow))
+		{
+			ImGui::End();
+			return;
+		}
+
+		// If requested, focus this window on the next frame
+		if (m_FocusAnimatorNextFrame)
+		{
+			ImGui::SetWindowFocus();
+			m_FocusAnimatorNextFrame = false;
+		}
+
+		if (!m_Scene)
+		{
+			ImGui::TextUnformatted("No scene loaded.");
+			ImGui::End();
+			return;
+		}
+
+		if (!m_SelectedEntity)
+		{
+			ImGui::TextUnformatted("No entity selected.");
+			ImGui::End();
+			return;
+		}
+
+		// Selected entity must have an AnimatorComponent
+		if (!m_SelectedEntity.HasComponent<AnimatorComponent>())
+		{
+			ImGui::TextUnformatted("Selected entity has no AnimatorComponent.");
+			ImGui::End();
+			return;
+		}
+
+		auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
+
+		// ---- Look up controller from global storage ----
+		auto ctrlIt = m_AnimatorControllerStorage.find(animator.controller);
+		if (ctrlIt == m_AnimatorControllerStorage.end())
+		{
+			ImGui::Text("AnimatorController handle %u is invalid.", animator.controller);
+			ImGui::End();
+			return;
+		}
+
+		AnimatorController& controller = ctrlIt->second;
+
+		if (controller.clips.empty())
+		{
+			ImGui::TextUnformatted("AnimatorController has no clips.");
+			ImGui::End();
+			return;
+		}
+
+		// Clamp current clip index
+		if (animator.currentClipIndex < 0 ||
+			animator.currentClipIndex >= static_cast<int>(controller.clips.size()))
+		{
+			animator.currentClipIndex = 0;
+		}
+
+		u32 clipHandle = controller.clips[static_cast<size_t>(animator.currentClipIndex)];
+
+		// Look up active clip
+		AnimationClip* clipPtr = nullptr;
+		{
+			auto clipIt = m_AnimationClipStorage.find(clipHandle);
+			if (clipIt != m_AnimationClipStorage.end())
+				clipPtr = &clipIt->second;
+		}
+
+		if (!clipPtr)
+		{
+			ImGui::Text("Active clip handle %u is invalid.", clipHandle);
+			ImGui::End();
+			return;
+		}
+
+		AnimationClip& clip = *clipPtr;
+
+		// Compute left/right sizes
+		ImVec2 avail = ImGui::GetContentRegionAvail();
+		float leftWidth = glm::clamp(avail.x * 0.32f, 260.0f, avail.x * 0.5f);
+
+		// =====================================================================
+		// Split into LEFT (meta + tracks) and RIGHT (dopesheet/curves)
+		// =====================================================================
+		ImGui::BeginChild(
+			"Animator_LeftPanel",
+			ImVec2(leftWidth, 0.0f),          // full height, fixed width
+			true,
+			ImGuiWindowFlags_HorizontalScrollbar
+		);
+
+		// =============================== LEFT PANE ============================
+		// -----------------------------------------------------------------
+		// Header: entity + controller + clip selection
+		// -----------------------------------------------------------------
+		ImGui::Text("Entity: %s", m_SelectedEntity.GetComponent<TagComponent>().Tag.c_str());
+		ImGui::Text("Controller: %s", controller.name.c_str());
+
+		ImGui::SeparatorText("Clip");
+
+		// Clip dropdown
+		{
+			std::string previewName = clip.name.empty() ? "Unnamed Clip" : clip.name;
+
+			if (ImGui::BeginCombo("Clip", previewName.c_str()))
+			{
+				for (int i = 0; i < static_cast<int>(controller.clips.size()); ++i)
+				{
+					u32 h = controller.clips[static_cast<size_t>(i)];
+					auto it = m_AnimationClipStorage.find(h);
+
+					const char* name = "(missing)";
+					if (it != m_AnimationClipStorage.end() && !it->second.name.empty())
+						name = it->second.name.c_str();
+
+					bool selected = (i == animator.currentClipIndex);
+					if (ImGui::Selectable(name, selected))
+					{
+						animator.currentClipIndex = i;
+						animator.currentTime = 0.0f;
+						m_DopesheetSelectedTrack = DopesheetTrackType::None;
+						m_DopesheetSelectedKey = -1;
+					}
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+		}
+
+		// -----------------------------------------------------------------
+		// Clip settings + time controls
+		// -----------------------------------------------------------------
+		ImGui::SeparatorText("Clip Settings");
+
+		// Clip name edit
+		{
+			char nameBuffer[128];
+			strncpy_s(nameBuffer, sizeof(nameBuffer), clip.name.c_str(), _TRUNCATE);
+
+			if (ImGui::InputText("Clip Name", nameBuffer, sizeof(nameBuffer),
+				ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				std::string newName = nameBuffer;
+
+				// Trimming
+				newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+				newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+
+				if (!newName.empty())
+				{
+					clip.name = newName;
+				}
+			}
+		}
+
+		ImGui::InputFloat("Duration (s)", &clip.duration);
+		if (clip.duration <= 0.0f) clip.duration = 0.001f; // Ensure sane duration
+
+		ImGui::Checkbox("Loop", &clip.loop);
+
+		ImGui::SeparatorText("Time");
+
+		// Clamp animator time
+		animator.currentTime = glm::clamp(animator.currentTime, 0.0f, clip.duration);
+
+		float scrubTime = animator.currentTime;
+		if (ImGui::SliderFloat("Current Time", &scrubTime, 0.0f, clip.duration, "%.3f s"))
+		{
+			animator.currentTime = glm::clamp(scrubTime, 0.0f, clip.duration);
+		}
+
+		// -----------------------------------------------------------------
+		// Track editors (tables) - now synced with timeline selection
+		// -----------------------------------------------------------------
+		ImGui::SeparatorText("Tracks");
+
+		// Helper: sort by time after edits
+		auto sortByTime = [](auto& keys)
+			{
+				std::sort(keys.begin(), keys.end(),
+					[](const auto& a, const auto& b) { return a.time < b.time; });
+			};
+
+		// Position track
+		if (ImGui::CollapsingHeader("Position", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add Key##Pos"))
+			{
+				glm::vec3 defaultPos(0.0f);
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+					defaultPos = m_SelectedEntity.GetComponent<TransformComponent>().Position;
+
+				PositionKeyframe k;
+				k.time = animator.currentTime;
+				k.position = defaultPos;
+				clip.positionKeys.push_back(k);
+
+				sortByTime(clip.positionKeys);
+			}
+
+			if (ImGui::BeginTable("PosKeysTable", 6,
+				ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+			{
+				ImGui::TableSetupColumn("Index");
+				ImGui::TableSetupColumn("Time");
+				ImGui::TableSetupColumn("X##Pos");
+				ImGui::TableSetupColumn("Y##Pos");
+				ImGui::TableSetupColumn("Z##Pos");
+				ImGui::TableSetupColumn("Remove");
+				ImGui::TableHeadersRow();
+
+				for (int i = 0; i < static_cast<int>(clip.positionKeys.size()); ++i)
+				{
+					auto& k = clip.positionKeys[static_cast<size_t>(i)];
+					ImGui::PushID(i);
+
+					ImGui::TableNextRow();
+
+					bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::Position &&
+						m_DopesheetSelectedKey == i);
+
+					ImGui::TableSetColumnIndex(0);
+					if (isSelected)
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+					ImGui::Text("%d", i);
+					if (isSelected)
+						ImGui::PopStyleColor();
+
+					// Click index cell to select and jump playhead
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+						m_DopesheetSelectedKey = i;
+						animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+					}
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Position;
+						m_DopesheetSelectedKey = i;
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					ImGui::DragFloat("##X", &k.position.x, 0.1f);
+
+					ImGui::TableSetColumnIndex(3);
+					ImGui::DragFloat("##Y", &k.position.y, 0.1f);
+
+					ImGui::TableSetColumnIndex(4);
+					ImGui::DragFloat("##Z", &k.position.z, 0.1f);
+
+					ImGui::TableSetColumnIndex(5);
+					if (ImGui::SmallButton("X"))
+					{
+						clip.positionKeys.erase(clip.positionKeys.begin() + i);
+						if (m_DopesheetSelectedTrack == DopesheetTrackType::Position &&
+							m_DopesheetSelectedKey == i)
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						ImGui::PopID();
+						--i;
+						continue;
+					}
+
+					ImGui::PopID();
+				}
+
+				sortByTime(clip.positionKeys);
+				ImGui::EndTable();
+			}
+		}
+
+		// Rotation track
+		if (ImGui::CollapsingHeader("Rotation", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add Key##Rot"))
+			{
+				glm::quat defaultRot = glm::quat(1, 0, 0, 0);
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+					defaultRot = m_SelectedEntity.GetComponent<TransformComponent>().Rotation;
+
+				Engine::RotationKeyframe k;
+				k.time = animator.currentTime;
+				k.rotation = defaultRot;
+				clip.rotationKeys.push_back(k);
+				sortByTime(clip.rotationKeys);
+			}
+
+			if (ImGui::BeginTable("RotKeysTable", 6,
+				ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+			{
+				ImGui::TableSetupColumn("Index");
+				ImGui::TableSetupColumn("Time");
+				ImGui::TableSetupColumn("Pitch");
+				ImGui::TableSetupColumn("Yaw");
+				ImGui::TableSetupColumn("Roll");
+				ImGui::TableSetupColumn("Remove");
+				ImGui::TableHeadersRow();
+
+				for (int i = 0; i < static_cast<int>(clip.rotationKeys.size()); ++i)
+				{
+					auto& k = clip.rotationKeys[static_cast<size_t>(i)];
+					ImGui::PushID(1000 + i);
+
+					ImGui::TableNextRow();
+
+					bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::Rotation &&
+						m_DopesheetSelectedKey == i);
+
+					ImGui::TableSetColumnIndex(0);
+					if (isSelected)
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+					ImGui::Text("%d", i);
+					if (isSelected)
+						ImGui::PopStyleColor();
+
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+						m_DopesheetSelectedKey = i;
+						animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+					}
+
+					// Time
+					ImGui::TableSetColumnIndex(1);
+					ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Rotation;
+						m_DopesheetSelectedKey = i;
+					}
+
+					// --- quat -> Euler (deg) for UI ---
+					glm::vec3 eulerDeg = glm::degrees(glm::eulerAngles(k.rotation));
+
+					bool changed = false;
+
+					ImGui::TableSetColumnIndex(2);
+					changed |= ImGui::DragFloat("##Pitch", &eulerDeg.x, 1.0f);
+
+					ImGui::TableSetColumnIndex(3);
+					changed |= ImGui::DragFloat("##Yaw", &eulerDeg.y, 1.0f);
+
+					ImGui::TableSetColumnIndex(4);
+					changed |= ImGui::DragFloat("##Roll", &eulerDeg.z, 1.0f);
+
+					// --- Only write back if something actually changed ---
+					if (changed)
+					{
+						k.rotation = glm::quat(glm::radians(eulerDeg));
+					}
+
+					// Remove button
+					ImGui::TableSetColumnIndex(5);
+					if (ImGui::SmallButton("X"))
+					{
+						clip.rotationKeys.erase(clip.rotationKeys.begin() + i);
+						if (m_DopesheetSelectedTrack == DopesheetTrackType::Rotation &&
+							m_DopesheetSelectedKey == i)
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						ImGui::PopID();
+						--i;
+						continue;
+					}
+
+					ImGui::PopID();
+				}
+
+				sortByTime(clip.rotationKeys);
+				ImGui::EndTable();
+			}
+		}
+
+		// Scale track
+		if (ImGui::CollapsingHeader("Scale", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Add Key##Scale"))
+			{
+				glm::vec3 defaultScale(1.0f);
+				if (m_SelectedEntity.HasComponent<TransformComponent>())
+					defaultScale = m_SelectedEntity.GetComponent<TransformComponent>().Scale;
+
+				ScaleKeyframe k;
+				k.time = animator.currentTime;
+				k.scale = defaultScale;
+				clip.scaleKeys.push_back(k);
+
+				sortByTime(clip.scaleKeys);
+			}
+
+			if (ImGui::BeginTable("ScaleKeysTable", 6,
+				ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+			{
+				ImGui::TableSetupColumn("Index");
+				ImGui::TableSetupColumn("Time");
+				ImGui::TableSetupColumn("X##Scale");
+				ImGui::TableSetupColumn("Y##Scale");
+				ImGui::TableSetupColumn("Z##Scale");
+				ImGui::TableSetupColumn("Remove");
+				ImGui::TableHeadersRow();
+
+				for (int i = 0; i < static_cast<int>(clip.scaleKeys.size()); ++i)
+				{
+					auto& k = clip.scaleKeys[static_cast<size_t>(i)];
+					ImGui::PushID(2000 + i);
+
+					ImGui::TableNextRow();
+
+					bool isSelected = (m_DopesheetSelectedTrack == DopesheetTrackType::Scale &&
+						m_DopesheetSelectedKey == i);
+
+					ImGui::TableSetColumnIndex(0);
+					if (isSelected)
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+					ImGui::Text("%d", i);
+					if (isSelected)
+						ImGui::PopStyleColor();
+
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+						m_DopesheetSelectedKey = i;
+						animator.currentTime = glm::clamp(k.time, 0.0f, clip.duration);
+					}
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::DragFloat("##Time", &k.time, 0.01f, 0.0f, clip.duration);
+					if (ImGui::IsItemClicked())
+					{
+						m_DopesheetSelectedTrack = DopesheetTrackType::Scale;
+						m_DopesheetSelectedKey = i;
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					ImGui::DragFloat("##X", &k.scale.x, 0.1f);
+
+					ImGui::TableSetColumnIndex(3);
+					ImGui::DragFloat("##Y", &k.scale.y, 0.1f);
+
+					ImGui::TableSetColumnIndex(4);
+					ImGui::DragFloat("##Z", &k.scale.z, 0.1f);
+
+					ImGui::TableSetColumnIndex(5);
+					if (ImGui::SmallButton("X"))
+					{
+						clip.scaleKeys.erase(clip.scaleKeys.begin() + i);
+						if (m_DopesheetSelectedTrack == DopesheetTrackType::Scale &&
+							m_DopesheetSelectedKey == i)
+						{
+							m_DopesheetSelectedTrack = DopesheetTrackType::None;
+							m_DopesheetSelectedKey = -1;
+						}
+						ImGui::PopID();
+						--i;
+						continue;
+					}
+
+					ImGui::PopID();
+				}
+
+				sortByTime(clip.scaleKeys);
+				ImGui::EndTable();
+			}
+		}
+		ImGui::EndChild(); // End of left pane
+
+		// =============================== RIGHT PANE ===========================
+		ImGui::SameLine();
+
+		ImGui::BeginChild("Animator_RightPanel", ImVec2(0.0f, 0.0f), true);
+
+		// View mode buttons
+		ImGui::SeparatorText("View");
+		if (ImGui::RadioButton("Dopesheet", m_AnimatorViewMode == AnimatorViewMode::Dopesheet))
+			m_AnimatorViewMode = AnimatorViewMode::Dopesheet;
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Curves", m_AnimatorViewMode == AnimatorViewMode::Curves))
+			m_AnimatorViewMode = AnimatorViewMode::Curves;
+
+		ImGui::Separator();
+
+		// Colors per track
+		const ImU32 colPos = IM_COL32(80, 200, 120, 255);
+		const ImU32 colRot = IM_COL32(220, 100, 100, 255);
+		const ImU32 colScale = IM_COL32(100, 140, 230, 255);
+		const ImU32 colPosSel = IM_COL32(130, 255, 170, 255);
+		const ImU32 colRotSel = IM_COL32(255, 170, 170, 255);
+		const ImU32 colScaleSel = IM_COL32(160, 190, 255, 255);
+		const ImU32 colPlayhead = IM_COL32(255, 255, 50, 255);
+
+		if (m_AnimatorViewMode == AnimatorViewMode::Dopesheet) {
+
+			// Legend
+			ImGui::Text("Legend:");
+			ImDrawList* legendList = ImGui::GetWindowDrawList();
+
+			auto drawLegendItem = [&](ImU32 col, const char* label)
+				{
+					ImVec2 p = ImGui::GetCursorScreenPos();
+					ImVec2 sz(12.0f, 12.0f);
+					legendList->AddRectFilled(p, ImVec2(p.x + sz.x, p.y + sz.y), col, 2.0f);
+					legendList->AddRect(p, ImVec2(p.x + sz.x, p.y + sz.y), IM_COL32(0, 0, 0, 255), 2.0f);
+					ImGui::Dummy(sz);
+					ImGui::SameLine();
+					ImGui::TextUnformatted(label);
+				};
+
+			drawLegendItem(colPos, "Position");
+			drawLegendItem(colRot, "Rotation");
+			drawLegendItem(colScale, "Scale");
+
+			ImGui::Spacing();
+
+			// Timeline canvas
+			ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+			ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+			if (canvasSize.x < 50.0f) canvasSize.x = 50.0f;
+			if (canvasSize.y < 80.0f) canvasSize.y = 80.0f;
+			ImVec2 canvasEnd = ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y);
+
+			ImGui::InvisibleButton("##DopesheetTimeline", canvasSize);
+			bool timelineHovered = ImGui::IsItemHovered();
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			// Background
+			drawList->AddRectFilled(canvasPos, canvasEnd, IM_COL32(30, 30, 30, 255));
+			drawList->AddRect(canvasPos, canvasEnd, IM_COL32(80, 80, 80, 255));
+
+			float midY = (canvasPos.y + canvasEnd.y) * 0.5f;
+
+			// Horizontal mid line
+			drawList->AddLine(ImVec2(canvasPos.x, midY),
+				ImVec2(canvasEnd.x, midY),
+				IM_COL32(100, 100, 100, 255));
+
+			// Helper to map time in [0, duration] to X in [canvasPos.x, canvasEnd.x]
+			auto timeToX = [&](float t)
+				{
+					float u = (clip.duration > 0.0f) ? (t / clip.duration) : 0.0f;
+					u = glm::clamp(u, 0.0f, 1.0f);
+					return canvasPos.x + u * canvasSize.x;
+				};
+
+			// --- First pass: handle click selection on keys ---
+			const float keyRadius = 6.0f;
+			const float keyRadiusSq = keyRadius * keyRadius;
+			bool        clickedOnTimeline = timelineHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+			ImVec2      mousePos = ImGui::GetIO().MousePos;
+
+			if (clickedOnTimeline)
+			{
+				float bestDistSq = keyRadiusSq;
+				DopesheetTrackType bestTrack = DopesheetTrackType::None;
+				int bestIndex = -1;
+
+				auto testKeys = [&](const auto& keys,
+					DopesheetTrackType trackType,
+					float yOffset)
+					{
+						for (int i = 0; i < static_cast<int>(keys.size()); ++i)
+						{
+							float x = timeToX(keys[static_cast<size_t>(i)].time);
+							float y = midY + yOffset;
+
+							float dx = mousePos.x - x;
+							float dy = mousePos.y - y;
+							float d2 = dx * dx + dy * dy;
+
+							if (d2 < bestDistSq)
+							{
+								bestDistSq = d2;
+								bestTrack = trackType;
+								bestIndex = i;
+							}
+						}
+					};
+
+				// Position = slightly above line, Rotation on line, Scale below
+				testKeys(clip.positionKeys, DopesheetTrackType::Position, -12.0f);
+				testKeys(clip.rotationKeys, DopesheetTrackType::Rotation, 0.0f);
+				testKeys(clip.scaleKeys, DopesheetTrackType::Scale, +12.0f);
+
+				if (bestTrack != DopesheetTrackType::None)
+				{
+					// Select the nearest key and move playhead there
+					m_DopesheetSelectedTrack = bestTrack;
+					m_DopesheetSelectedKey = bestIndex;
+
+					float keyTime = 0.0f;
+					switch (bestTrack)
+					{
+					case DopesheetTrackType::Position:
+						keyTime = clip.positionKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					case DopesheetTrackType::Rotation:
+						keyTime = clip.rotationKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					case DopesheetTrackType::Scale:
+						keyTime = clip.scaleKeys[static_cast<size_t>(bestIndex)].time;
+						break;
+					default: break;
+					}
+					animator.currentTime = glm::clamp(keyTime, 0.0f, clip.duration);
+				}
+				else
+				{
+					// Clicked empty region: scrub time
+					float tNorm = (mousePos.x - canvasPos.x) / canvasSize.x;
+					tNorm = glm::clamp(tNorm, 0.0f, 1.0f);
+					animator.currentTime = tNorm * clip.duration;
+					m_DopesheetSelectedTrack = DopesheetTrackType::None;
+					m_DopesheetSelectedKey = -1;
+				}
+			}
+
+			// --- Second pass: draw keys with per-track colors and selection highlight ---
+			auto drawTrackKeys = [&](const auto& keys,
+				DopesheetTrackType trackType,
+				ImU32 col, ImU32 colSelected,
+				float yOffset)
+				{
+					for (int i = 0; i < static_cast<int>(keys.size()); ++i)
+					{
+						float x = timeToX(keys[static_cast<size_t>(i)].time);
+						float y = midY + yOffset;
+
+						bool selected = (m_DopesheetSelectedTrack == trackType &&
+							m_DopesheetSelectedKey == i);
+
+						ImU32 useCol = selected ? colSelected : col;
+						drawList->AddCircleFilled(ImVec2(x, y), keyRadius, useCol);
+					}
+				};
+
+			drawTrackKeys(clip.positionKeys, DopesheetTrackType::Position,
+				colPos, colPosSel, -12.0f);
+			drawTrackKeys(clip.rotationKeys, DopesheetTrackType::Rotation,
+				colRot, colRotSel, 0.0f);
+			drawTrackKeys(clip.scaleKeys, DopesheetTrackType::Scale,
+				colScale, colScaleSel, +12.0f);
+
+			// Playhead line
+			{
+				float x = timeToX(animator.currentTime);
+				drawList->AddLine(ImVec2(x, canvasPos.y),
+					ImVec2(x, canvasEnd.y),
+					colPlayhead, 2.0f);
+			}
+		}
+		else // ============================== CURVES VIEW ====================== 
+		{
+			// Choose which track to display curves for
+			DopesheetTrackType track = m_DopesheetSelectedTrack;
+
+			if (track == DopesheetTrackType::None)
+			{
+				if (!clip.positionKeys.empty())      track = DopesheetTrackType::Position;
+				else if (!clip.rotationKeys.empty()) track = DopesheetTrackType::Rotation;
+				else if (!clip.scaleKeys.empty())    track = DopesheetTrackType::Scale;
+			}
+
+			if (track == DopesheetTrackType::None)
+			{
+				ImGui::TextUnformatted("No keys to display curves for.");
+				ImGui::EndChild();
+				ImGui::End();
+				return;
+			}
+
+			const ImU32 COL_X = IM_COL32(230, 90, 90, 255);   // red
+			const ImU32 COL_Y = IM_COL32(100, 220, 120, 255); // green
+			const ImU32 COL_Z = IM_COL32(110, 160, 255, 255); // blue
+
+			// Legend for X/Y/Z or Pitch/Yaw/Roll
+			switch (track)
+			{
+			case DopesheetTrackType::Position:
+				DrawCurveLegendRow("Position", "X", COL_X, "Y", COL_Y, "Z", COL_Z);
+				break;
+			case DopesheetTrackType::Rotation:
+				// wording: Pitch / Yaw / Roll
+				DrawCurveLegendRow("Rotation", "Pitch", COL_X, "Yaw", COL_Y, "Roll", COL_Z);
+				break;
+			case DopesheetTrackType::Scale:
+				DrawCurveLegendRow("Scale", "X", COL_X, "Y", COL_Y, "Z", COL_Z);
+				break;
+			default:
+				break;
+			}
+
+			ImGui::Separator();
+
+			ImVec2 cPos = ImGui::GetCursorScreenPos();
+			ImVec2 cSize = ImGui::GetContentRegionAvail();
+			if (cSize.x < 50.0f) cSize.x = 50.0f;
+			if (cSize.y < 80.0f) cSize.y = 80.0f;
+			ImVec2 cEnd = ImVec2(cPos.x + cSize.x, cPos.y + cSize.y);
+
+			ImGui::InvisibleButton("##AnimCurves", cSize);
+			ImDrawList* cDraw = ImGui::GetWindowDrawList();
+
+			cDraw->AddRectFilled(cPos, cEnd, IM_COL32(20, 20, 20, 255));
+			cDraw->AddRect(cPos, cEnd, IM_COL32(80, 80, 80, 255));
+
+			auto timeToXCurve = [&](float t)
+				{
+					float u = (clip.duration > 0.0f) ? (t / clip.duration) : 0.0f;
+					if (u < 0.0f) u = 0.0f;
+					if (u > 1.0f) u = 1.0f;
+					return cPos.x + u * cSize.x;
+				};
+
+			auto drawVec3Curves = [&](const auto& keys, auto getVec)
+				{
+					if (keys.size() < 2)
+						return;
+
+					std::vector<glm::vec3> values;
+					values.reserve(keys.size());
+
+					float minVal = 0.0f, maxVal = 0.0f;
+					bool first = true;
+
+					for (size_t i = 0; i < keys.size(); ++i)
+					{
+						glm::vec3 v = getVec(keys[i]);
+						values.push_back(v);
+
+						float localMin = std::min(v.x, std::min(v.y, v.z));
+						float localMax = std::max(v.x, std::max(v.y, v.z));
+
+						if (first)
+						{
+							minVal = localMin;
+							maxVal = localMax;
+							first = false;
+						}
+						else
+						{
+							if (localMin < minVal) minVal = localMin;
+							if (localMax > maxVal) maxVal = localMax;
+						}
+					}
+
+					if (maxVal - minVal < 1e-3f)
+					{
+						maxVal += 0.5f;
+						minVal -= 0.5f;
+					}
+
+					auto valToY = [&](float v)
+						{
+							float u = (v - minVal) / (maxVal - minVal);
+							if (u < 0.0f) u = 0.0f;
+							if (u > 1.0f) u = 1.0f;
+							return cEnd.y - u * cSize.y;
+						};
+
+					auto drawAxis = [&](int axis, ImU32 color)
+						{
+							ImVec2 prev;
+							bool hasPrev = false;
+							for (size_t i = 0; i < keys.size(); ++i)
+							{
+								float t = keys[i].time;
+								float val = (axis == 0) ? values[i].x :
+									(axis == 1) ? values[i].y : values[i].z;
+
+								ImVec2 p(timeToXCurve(t), valToY(val));
+								if (hasPrev)
+									cDraw->AddLine(prev, p, color, 2.0f);
+								prev = p;
+								hasPrev = true;
+
+								cDraw->AddCircleFilled(p, 3.0f, color);
+							}
+						};
+
+					// X/Y/Z (or Pitch/Yaw/Roll for rotation)
+					drawAxis(0, COL_X);
+					drawAxis(1, COL_Y);
+					drawAxis(2, COL_Z);
+				};
+
+			switch (track)
+			{
+			case DopesheetTrackType::Position:
+				drawVec3Curves(clip.positionKeys,
+					[](const PositionKeyframe& k) { return k.position; });
+				break;
+			case DopesheetTrackType::Rotation:
+				drawVec3Curves(clip.rotationKeys,
+					[](const RotationKeyframe& k)
+					{
+						return glm::degrees(glm::eulerAngles(k.rotation));
+					});
+				break;
+			case DopesheetTrackType::Scale:
+				drawVec3Curves(clip.scaleKeys,
+					[](const ScaleKeyframe& k) { return k.scale; });
+				break;
+			default:
+				break;
+			}
+		}
+		ImGui::EndChild(); // End of right pane
+
+		ImGui::End();
+	}
+
+
 
 	void Editor::displayAssetsBrowserPanel()
 	{
@@ -2598,23 +3759,74 @@ namespace Engine
 							{
 								if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
 								{
+									//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+									//std::string prefabPath = currPrefabPath;
+
+									//if (!prefabPath.empty())
+									//{
+									//	// Create updated prefab from current entity state
+									//	std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+									//	auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+
+									//	if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+									//	{
+									//		PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+									//		prefabComp.ClearModifications(); // Reset overrides 
+									//		PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+									//		LOG_INFO("Prefab updated: {}", prefabPath);
+
+									//		isPrefabEditor = false;
+									//	}
+									//}
 									auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
 									std::string prefabPath = currPrefabPath;
 
 									if (!prefabPath.empty())
 									{
+										// ============ ADD DEBUG AND GUID PRESERVATION ============
+										std::cout << "=== DEBUG THUMBNAIL CLICK PREFAB SAVE ===" << std::endl;
+										std::cout << "Auto-saving prefab before switching to scene" << std::endl;
+
+										// Get existing prefab to preserve GUID
+										auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+										xresource::instance_guid existingGUID{};
+
+										if (existingPrefab)
+										{
+											existingGUID = existingPrefab->GetGUID();
+											std::cout << "Found existing prefab with GUID: " << existingGUID.m_Value << std::endl;
+										}
+										// ============ END DEBUG ============
+
 										// Create updated prefab from current entity state
 										std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
 										auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
 
-										if (updatedPrefab && PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+										if (updatedPrefab)
 										{
-											PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-											prefabComp.ClearModifications(); // Reset overrides 
-											LOG_INFO("Prefab updated: {}", prefabPath);
-											isPrefabEditor = false;
+											// ============ PRESERVE EXISTING GUID ============
+											if (existingGUID.m_Value != 0)
+											{
+												updatedPrefab->SetGUID(existingGUID);
+												std::cout << "Preserved existing GUID: " << updatedPrefab->GetGUID().m_Value << std::endl;
+											}
+											// ============ END PRESERVE ============
+
+											if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+											{
+												PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+												prefabComp.ClearModifications(); // Reset overrides 
+												PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+												LOG_INFO("Prefab updated: {}", prefabPath);
+
+												std::cout << "Prefab auto-saved successfully" << std::endl;
+											}
 										}
+
+										std::cout << "=== END DEBUG THUMBNAIL CLICK PREFAB SAVE ===" << std::endl;
+										isPrefabEditor = false;
 									}
 								}
 
@@ -2622,18 +3834,95 @@ namespace Engine
 
 							currScenePath = filePath; // update curr file path
 							currFileName = fileName; // store file name
+
+							LoadAllPrefabsIntoRegistry();
 							m_Scene->SetName(fileName);
 							if (m_Scene)
 							{
-
+								m_SelectedEntity = Entity{};
+								//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
+								auto view = m_Scene->GetRegistry().view<PrefabComponent>();
+								std::unordered_map<xresource::instance_guid, std::vector<Entity>> prefabInstances;
+#if 0
+								for (auto enttEntity : view)
+								{
+									Entity e(enttEntity, &m_Scene->GetRegistry());
+
+									auto& prefabComp = e.GetComponent<PrefabComponent>();
+									auto prefab = PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
+									if (!prefab) continue;
+
+									//Entity e(enttEntity, &m_Scene->GetRegistry());
+									m_Scene->DestroyEntity(e);
+									Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+									PrefabInstantiator::ApplyOverrides(newEntity, m_Scene);
+
+								}
+
+#endif
+								// Collect all prefab instances
+								for (auto enttEntity : view)
+								{
+									Entity e(enttEntity, &m_Scene->GetRegistry());
+									auto& prefabComp = e.GetComponent<PrefabComponent>();
+									prefabInstances[prefabComp.PrefabGUID].push_back(e);
+								}
+
+								// Update each prefab's instances
+								for (auto& [prefabGUID, instances] : prefabInstances)
+								{
+									auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
+									if (!prefab)
+									{
+										LOG_WARNING("Prefab not found for GUID: {}", prefabGUID.m_Value);
+										continue;
+									}
+
+									for (Entity oldEntity : instances)
+									{
+										// Store transform relationships
+										uint32_t parentID = u32_max;
+										std::vector<uint32_t> childrenIDs;
+
+										if (oldEntity.HasComponent<TransformComponent>())
+										{
+											auto& oldTransform = oldEntity.GetComponent<TransformComponent>();
+											parentID = oldTransform.Parent;
+											childrenIDs = oldTransform.Children;
+										}
+
+										entt::entity oldEntityID = static_cast<entt::entity>(oldEntity);
+
+										// Destroy and recreate with fresh prefab data
+										m_Scene->DestroyEntity(oldEntity);
+
+										Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+											m_Scene,
+											prefab->GetGUID(),
+											oldEntityID
+										);
+
+										// Restore relationships
+										if (newEntity.HasComponent<TransformComponent>())
+										{
+											auto& newTransform = newEntity.GetComponent<TransformComponent>();
+											newTransform.Parent = parentID;
+											newTransform.Children = childrenIDs;
+										}
+
+										if (newEntity.HasComponent<PrefabComponent>())
+										{
+											newEntity.GetComponent<PrefabComponent>().ClearModifications();
+										}
+									}
+								}
 								m_SelectedEntity = Entity{}; // resets
 								m_PickedID = 0xFFFFFFFFu;
-								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);				
 								isPrefabEditor = false;
 							}
-
 						}
 						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
@@ -2822,6 +4111,7 @@ namespace Engine
 				}
 				else if (descriptorEditor.GetType() == ResourceType::MESH) {
 
+#if 0
 					MeshSettings* settings = descriptorEditor.GetMeshSettings();
 
 					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
@@ -2872,7 +4162,122 @@ namespace Engine
 						settings->scale = meshScale;
 						descriptorEditor.MarkModified();
 					}
+#endif
+					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+
+					// ========== TRANSFORM SECTION ==========
+					ImGui::SeparatorText("Transform");
+
+					// Scale
+					float meshScale = settings->scale;
+					if (ImGui::DragFloat("Scale", &meshScale, 0.001f, 0.0001f, 1000.0f, "%.4f")) {
+						settings->scale = meshScale;
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Uniform scale factor (e.g., 0.001 for mm to m)");
+					}
+
+					ImGui::Spacing();
+
+					// Position
+					ImGui::Text("Position Offset:");
+					float position[3] = { settings->positionX, settings->positionY, settings->positionZ };
+					if (ImGui::DragFloat3("Position", position, 0.1f)) {
+						settings->positionX = position[0];
+						settings->positionY = position[1];
+						settings->positionZ = position[2];
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Position offset in mesh units (X, Y, Z)");
+					}
+
+					ImGui::Spacing();
+
+					// Rotation
+					ImGui::Text("Rotation (Degrees):");
+					float rotation[3] = { settings->rotationX, settings->rotationY, settings->rotationZ };
+					if (ImGui::DragFloat3("Rotation", rotation, 1.0f, -180.0f, 180.0f)) {
+						settings->rotationX = rotation[0];
+						settings->rotationY = rotation[1];
+						settings->rotationZ = rotation[2];
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Rotation in degrees (X=Pitch, Y=Yaw, Z=Roll)");
+					}
+
 					
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== VERTEX DATA SECTION ==========
+					ImGui::SeparatorText("Vertex Data");
+
+					if (ImGui::Checkbox("Include Position", &settings->includePos)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors)) {
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords)) {
+						descriptorEditor.MarkModified();
+					}
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== OUTPUT SETTINGS SECTION ==========
+					ImGui::SeparatorText("Output Settings");
+
+					char formatBuffer[256];
+					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+						settings->outputFormat = std::string(formatBuffer);
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str())) {
+						for (auto& option : descriptorEditor.GetIndexTypeOptions()) {
+							if (ImGui::Selectable(option.c_str())) {
+								settings->indexType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== OPTIMIZATION SECTION ==========
+					ImGui::SeparatorText("Optimization");
+
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices)) {
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Remove duplicate vertices and optimize for cache");
+					}
+
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Generate normals if missing");
+					}
+
 				}
 
 				if (!descriptorEditor.GetTags().empty()) {
@@ -3170,6 +4575,8 @@ namespace Engine
 
 		ImGui::Begin("Viewport");
 
+		ViewportPanelHelper::ViewportButtons(isPlaying, m_Scene, m_SelectedEntity, 
+											 currScenePath, currFileName, m_PickedID);
 		if (texhandle) {
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -3282,11 +4689,14 @@ namespace Engine
 						{
 							LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
 							m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
+							ViewportPanelHelper::ViewPortClickAndTeleport(m_PickedID, m_LastClickedID, m_LastClickedTime, m_DoublePickedTime, m_SelectedEntity, m_Renderer);
 						}
 						else
 						{
 							m_SelectedEntity = Entity{};
 							LOG_INFO("Deselected entity.");
+							m_LastClickedTime = 0.0;
+							m_LastClickedID = 0xFFFFFFFFu;
 						}
 					}
 					else
@@ -3300,6 +4710,8 @@ namespace Engine
 				m_WasOverGizmoLastFrame = isOverGizmoThisFrame;
 			}
 		}
+
+		ViewportPanelHelper::CameraControl(m_Renderer);
 
 		ImGui::End();
 	}
@@ -3400,7 +4812,7 @@ namespace Engine
 
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
 						m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
-						currScenePath = defaultNewScenePath; // update current scene path
+						// currScenePath = defaultNewScenePath; // update current scene path
 						m_Scene->SetName(saveAsDefaultSceneName);
 						saveAsPanel = false; // to close pop up
 						isNewScene = false;
@@ -3811,4 +5223,290 @@ namespace Engine
 
 		}
 	}
+
+	void Editor::RevertSelectedEntityToPrefab()
+	{
+		if (!m_SelectedEntity ||
+			!m_SelectedEntity.HasComponent<PrefabComponent>())
+			return;
+
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+		// Load prefab data
+		auto prefab = PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
+		//LOG_INFO("Prefab lookup result: %p", prefab.get());
+		if (!prefab)
+		{
+			LOG_ERROR("Revert failed: Prefab not found!");
+			return;
+		}
+
+		//std::cout << Get().RegisterPrefab(prefab)
+
+
+		// Remove the modified instance
+		Entity old = m_SelectedEntity;
+		m_Scene->DestroyEntity(old);
+
+		// Create fresh prefab instance no overrides applied
+		Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+			m_Scene,
+			prefab->GetGUID()
+		);
+
+
+		// Clear modifications on the new PrefabComponent (optional safety)
+		if (newEntity.HasComponent<PrefabComponent>())
+			newEntity.GetComponent<PrefabComponent>().ClearModifications();
+
+		// Select it in the editor
+		m_SelectedEntity = newEntity;
+
+		LOG_INFO("Prefab instance reverted to original prefab state.");
+	}
+
+	void Editor::LoadAllPrefabsIntoRegistry()
+	{
+		auto& registry = Engine::PrefabRegistry::Get();
+		std::string prefabDir = getAssetFilePath("Sources/Prefabs/");
+
+		if (!std::filesystem::exists(prefabDir))
+		{
+			LOG_WARNING("Prefab directory does not exist: {}", prefabDir);
+			return;
+		}
+
+		for (auto& entry : std::filesystem::directory_iterator(prefabDir))
+		{
+			if (entry.path().extension() == ".prefab")
+			{
+				auto prefab = Engine::PrefabSerializer::LoadPrefabFromFile(entry.path().string());
+				if (prefab)
+				{
+					registry.RegisterPrefab(prefab);
+				}
+				else
+				{
+					LOG_WARNING("Failed to load prefab: {}", entry.path().string());
+				}
+			}
+		}
+	}
+
+	void Editor::UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity)
+	{
+		auto it = m_PrefabEntities.find(prefabGUID);
+		if (it == m_PrefabEntities.end()) return;
+
+		std::vector<Entity> updatedEntities;
+
+		for (Entity e : it->second)
+		{
+			// Skip the entity that was just modified
+			if (e == modifiedEntity)
+			{
+				updatedEntities.push_back(e);
+				continue;
+			}
+
+			// Destroy old entity
+			m_Scene->DestroyEntity(e);
+
+			// Reload prefab from registry
+			auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
+			if (!prefab) continue;
+
+			// Instantiate a fresh prefab entity
+			Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+
+			if (newEntity.HasComponent<PrefabComponent>())
+				newEntity.GetComponent<PrefabComponent>().ClearModifications();
+
+			updatedEntities.push_back(newEntity);
+		}
+
+		// Replace the entity list in the map with updated entities
+		m_PrefabEntities[prefabGUID] = updatedEntities;
+	}
+
+	void Editor::CheckAndUpdatePrefabInstances()
+	{
+		std::string prefabDir = getAssetFilePath("Sources/Prefabs/");
+		if (!std::filesystem::exists(prefabDir)) return;
+
+		bool anyPrefabUpdated = false;
+		std::vector<xresource::instance_guid> updatedPrefabGUIDs;
+
+		// Check all prefab files for modifications
+		for (auto& entry : std::filesystem::directory_iterator(prefabDir))
+		{
+			if (entry.path().extension() != ".prefab") continue;
+
+			auto lastWriteTime = std::filesystem::last_write_time(entry.path());
+			auto fileTime = std::chrono::duration_cast<std::chrono::seconds>(
+				lastWriteTime.time_since_epoch()).count();
+
+			// Load prefab to get its GUID
+			auto prefab = PrefabSerializer::LoadPrefabFromFile(entry.path().string());
+			if (!prefab) continue;
+
+			xresource::instance_guid guid = prefab->GetGUID();
+
+			// Check if this is first time seeing this prefab or if it's been modified
+			auto it = m_PrefabLastModifiedTimes.find(guid);
+			if (it == m_PrefabLastModifiedTimes.end())
+			{
+				// First time - just record the time (silent)
+				m_PrefabLastModifiedTimes[guid] = fileTime;
+			}
+			else if (it->second < fileTime)
+			{
+				// Prefab was modified! - ONLY SHOW DEBUG WHEN MODIFIED
+				m_PrefabLastModifiedTimes[guid] = fileTime;
+				updatedPrefabGUIDs.push_back(guid);
+				anyPrefabUpdated = true;
+
+				// Re-register the updated prefab
+				PrefabRegistry::Get().UpdatePrefab(prefab);
+				//LOG_INFO("Detected prefab update: {}", entry.path().filename().string());
+			}
+		}
+
+		// Update all instances of modified prefabs
+		if (anyPrefabUpdated)
+		{
+			for (auto prefabGUID : updatedPrefabGUIDs)
+			{
+				UpdateAllPrefabInstancesInScene(prefabGUID);
+			}
+		}
+	}
+
+	void Editor::UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID)
+	{
+		if (!m_Scene) return;
+
+		auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
+		if (!prefab)
+		{
+			return;
+		}
+
+		std::vector<Entity> instancesToUpdate;
+		auto view = m_Scene->GetRegistry().view<PrefabComponent>();
+
+		for (auto entityHandle : view)
+		{
+			Entity entity(entityHandle, &m_Scene->GetRegistry());
+			auto& prefabComp = entity.GetComponent<PrefabComponent>();
+
+			if (prefabComp.PrefabGUID.m_Value == prefabGUID.m_Value)
+			{
+				if (entity == m_SelectedEntity && isPrefabEditor)
+					continue;
+
+				instancesToUpdate.push_back(entity);
+			}
+		}
+
+		// Update each instance
+		for (Entity oldEntity : instancesToUpdate)
+		{
+			// Store parent-child relationships if any
+			uint32_t parentID = u32_max;
+			std::vector<uint32_t> childrenIDs;
+
+			if (oldEntity.HasComponent<TransformComponent>())
+			{
+				auto& oldTransform = oldEntity.GetComponent<TransformComponent>();
+				parentID = oldTransform.Parent;
+				childrenIDs = oldTransform.Children;
+			}
+
+			// Store the entity ID to preserve it
+			entt::entity oldEntityID = static_cast<entt::entity>(oldEntity);
+
+			// Destroy the old entity
+			m_Scene->DestroyEntity(oldEntity);
+
+			// Create fresh instance with same entity ID
+			Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+				m_Scene,
+				prefab->GetGUID(),
+				oldEntityID  // Preserve the entity ID
+			);
+
+			// Restore parent-child relationships
+			if (newEntity.HasComponent<TransformComponent>())
+			{
+				auto& newTransform = newEntity.GetComponent<TransformComponent>();
+				newTransform.Parent = parentID;
+				newTransform.Children = childrenIDs;
+			}
+
+			// Clear any modifications (fresh instance)
+			if (newEntity.HasComponent<PrefabComponent>())
+			{
+				newEntity.GetComponent<PrefabComponent>().ClearModifications();
+			}
+
+			
+			//LOG_DEBUG("Updated prefab instance: Entity {}", static_cast<uint32_t>(newEntity));
+		}
+	}
+
+	void Editor::DrawCurveLegendRow(const char* label,
+								   const char* c0Label, ImU32 c0,
+								   const char* c1Label, ImU32 c1,
+								   const char* c2Label, ImU32 c2) 
+	{
+		ImGui::TextUnformatted(label);
+
+		auto drawEntry = [](const char* lbl, ImU32 col)
+			{
+				ImGui::SameLine();
+				ImGui::Dummy(ImVec2(10.0f, 0.0f)); // small gap
+				ImGui::SameLine();
+
+				ImVec2 p = ImGui::GetCursorScreenPos();
+				ImVec2 size(12.0f, 12.0f);
+				ImDrawList* dl = ImGui::GetWindowDrawList();
+				dl->AddRectFilled(p, ImVec2(p.x + size.x, p.y + size.y), col, 2.0f);
+				dl->AddRect(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(0, 0, 0, 255), 2.0f);
+
+				ImGui::Dummy(size);
+				ImGui::SameLine();
+				ImGui::TextUnformatted(lbl);
+			};
+
+		drawEntry(c0Label, c0);
+		drawEntry(c1Label, c1);
+		drawEntry(c2Label, c2);
+	}
+
+	void Editor::displayHDRSettingsPanel()
+	{
+		ImGui::Begin("HDR Settings");
+
+		// Exposure control
+		if (ImGui::SliderFloat("Exposure", &m_Renderer->m_exposure, 0.1f, 5.0f, "%.2f"))
+		{
+			// Exposure value changed
+		}
+
+		// Optional: Add a reset button
+		if (ImGui::Button("Reset to Default"))
+		{
+			m_Renderer->m_exposure = 1.0f;
+		}
+
+		// Optional: Add tooltip
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset exposure to default value (1.0)");
+		}
+
+		ImGui::End();
+	}
+
 } // end of namespace Engine

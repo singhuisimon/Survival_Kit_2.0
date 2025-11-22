@@ -219,7 +219,12 @@ namespace Engine {
         ss << "    \"includeTexCoords\": " << (settings.includeTexCoords ? "true" : "false") << ",\n";
         ss << "    \"indexType\": \"" << EscapeJson(settings.indexType) << "\",\n";
         ss << "    \"scale\": " << settings.scale << ",\n";
-        ss << "    \"optimizeVertices\": " << (settings.optimizeVertices ? "true" : "false") << ",\n";
+        ss << "    \"positionX\": " << settings.positionX << ",\n";
+        ss << "    \"positionY\": " << settings.positionY << ",\n";
+        ss << "    \"positionZ\": " << settings.positionZ << ",\n";
+        ss << "    \"rotationX\": " << settings.rotationX << ",\n";
+        ss << "    \"rotationY\": " << settings.rotationY << ",\n";
+        ss << "    \"rotationZ\": " << settings.rotationZ << ",\n";        ss << "    \"optimizeVertices\": " << (settings.optimizeVertices ? "true" : "false") << ",\n";
         ss << "    \"generateNormals\": " << (settings.generateNormals ? "true" : "false") << "\n";
         ss << "  }\n";
         ss << "}\n";

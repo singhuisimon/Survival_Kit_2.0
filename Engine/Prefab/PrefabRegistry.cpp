@@ -20,6 +20,7 @@ namespace Engine {
         }
 
         xresource::instance_guid guid = prefab->GetGUID();
+       
 
         // Check if already registered
         if (m_Prefabs.find(guid) != m_Prefabs.end()) {
@@ -29,6 +30,7 @@ namespace Engine {
 
         m_Prefabs[guid] = prefab;
         m_PrefabsByName[prefab->GetName()] = guid;
+       
 
         LOG_INFO("PrefabRegistry: Registered prefab '", prefab->GetName(),
             "' (GUID: 0x", std::hex, guid.m_Value, std::dec, ")");
@@ -72,6 +74,20 @@ namespace Engine {
         LOG_INFO("PrefabRegistry: Clearing all prefabs (", m_Prefabs.size(), " prefabs)");
         m_Prefabs.clear();
         m_PrefabsByName.clear();
+    }
+
+    void PrefabRegistry::UpdatePrefab(std::shared_ptr<Prefab> newPrefab)
+    {
+        xresource::instance_guid guid = newPrefab->GetGUID();
+        auto it = m_Prefabs.find(guid);
+        if (it != m_Prefabs.end())
+        {
+            it->second = newPrefab; // Replace the existing prefab
+        }
+        else
+        {
+            RegisterPrefab(newPrefab); // Fallback to register if not found
+        }
     }
 
 } // namespace Engine
