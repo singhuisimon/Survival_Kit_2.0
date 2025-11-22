@@ -1752,7 +1752,7 @@ namespace Engine
 					bool removeScriptComp = false;
 
 					auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
-					std::string scriptPath = getRepository();
+					std::string scriptPath = getRepository() + "\\Scripts\\Game";
 					auto scriptFiles = getAssetsInFolder(scriptPath);
 
 					ImGui::NextColumn();
@@ -6093,7 +6093,7 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
 			std::string scriptPath = getRepository() + "\\Scripts\\Game";
-			auto getScriptFiles = getAssetsInFolder(scriptPath);
+			auto getScriptFiles = getAssetsInFolder("Scripts\\Game");
 
 			ImGui::Text("Select a script to open:");
 			ImGui::Separator();
