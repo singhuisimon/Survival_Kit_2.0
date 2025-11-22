@@ -68,6 +68,28 @@ void printUsage() {
     std::cout << "  AssetCompiler --force --threads 8\n\n";
 }
 
+//command line helper function
+std::string reconstructQuotedArg(int& i, int argc, char* argv[]) {
+    std::string result = argv[i];
+
+    //if the arrangement starts with a quote, keep reading until we find the closing quote
+    if (!result.empty() && result[0] == '"') {
+        //remove the leading quote
+        result = result.substr(1);
+
+        //doesn't end with a quote, keep appending next args 
+        while (i < argc - 1 && (result.empty() || result.back() != '"')) {
+            result += " " + std::string(argv[++i]); 
+        }
+
+        //remove the trailing quote
+        if (!result.empty() && result.back() == '"') {
+            result.pop_back();
+        }
+    }
+    return result; 
+}
+
 bool parseArguments(int argc, char* argv[], CompilerConfig& config) {
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -77,10 +99,10 @@ bool parseArguments(int argc, char* argv[], CompilerConfig& config) {
             return false;
         }
         else if (arg == "--input" && i + 1 < argc) {
-            config.descriptorsPath = argv[++i];
+            config.descriptorsPath = reconstructQuotedArg(++i, argc, argv);
         }
         else if (arg == "--output" && i + 1 < argc) {
-            config.outputPath = argv[++i];
+            config.outputPath = reconstructQuotedArg(++i, argc, argv);
         }
         else if (arg == "--type" && i + 1 < argc) {
             config.resourceType = argv[++i];

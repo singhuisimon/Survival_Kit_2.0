@@ -462,17 +462,17 @@ namespace Engine {
 			LOG_ERROR("BUILD THE ASSET COMPILER"); 
 			return false;
 		}
-
+		command << "\"";
 		command << "\"" << compilerPath.string() << "\"";
 		//command << "\AssetCompiler";
 		command << " --guid " << guidString;
 		command << " --type " << resourceTypeFolder;
-		command << " --input " << descriptorPath ;  
-		command << " --output " << compiledPath;	
+		command << " --input \"" << descriptorPath << "\"";
+		command << " --output \"" << compiledPath << "\"";
 		if (verbose) {
 			command << " --verbose";
 		}
-		
+		command << "\"";
 		LOG_DEBUG("Running command: ", command.str());
 
 		// Execute the compiler
