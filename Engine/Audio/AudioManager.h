@@ -109,6 +109,13 @@ namespace Engine {
 		std::unordered_map<DSPEffectType, FMOD::DSP*> m_UIDSPs;
 
 		bool initialized = false;
+
+		// Define a mask that covers all rolloff modes
+		const FMOD_MODE RolloffMask =
+			FMOD_3D_INVERSEROLLOFF |
+			FMOD_3D_LINEARROLLOFF |
+			FMOD_3D_LINEARSQUAREROLLOFF |
+			FMOD_3D_CUSTOMROLLOFF;
     };
 
 } // namespace Engine

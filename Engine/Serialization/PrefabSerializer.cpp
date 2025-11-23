@@ -370,6 +370,9 @@ namespace Engine {
             propertiesObj.AddMember("MinDistance", audio.MinDistance, allocator);
             propertiesObj.AddMember("MaxDistance", audio.MaxDistance, allocator);
             propertiesObj.AddMember("ReverbProperties", audio.ReverbProperties, allocator);
+            propertiesObj.AddMember("RolloffMode", static_cast<int>(audio.RolloffMode), allocator);
+            propertiesObj.AddMember("DopplerLevel", audio.DopplerLevel, allocator);
+            propertiesObj.AddMember("Pan2D", audio.Pan2D, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);

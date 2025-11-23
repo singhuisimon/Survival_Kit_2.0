@@ -271,6 +271,9 @@ namespace Engine {
                 propertiesObj.AddMember("Is3D", audio.Is3D, allocator);
                 propertiesObj.AddMember("MinDistance", audio.MinDistance, allocator);
                 propertiesObj.AddMember("MaxDistance", audio.MaxDistance, allocator);
+                propertiesObj.AddMember("RolloffMode", static_cast<int>(audio.RolloffMode), allocator);
+                propertiesObj.AddMember("DopplerLevel", audio.DopplerLevel, allocator);
+                propertiesObj.AddMember("Pan2D", audio.Pan2D, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -724,6 +727,12 @@ namespace Engine {
                             audio.MinDistance = properties["MinDistance"].GetFloat();
                         if (properties.HasMember("MaxDistance"))
                             audio.MaxDistance = properties["MaxDistance"].GetFloat();
+                        if (properties.HasMember("RolloffMode"))
+                            audio.RolloffMode = static_cast<AudioRolloffMode>(properties["RolloffMode"].GetInt());
+                        if (properties.HasMember("DopplerLevel"))
+                            audio.DopplerLevel = properties["DopplerLevel"].GetFloat();
+                        if (properties.HasMember("Pan2D"))
+                            audio.Pan2D = properties["Pan2D"].GetFloat();
                     }
                     else if (componentType == "ListenerComponent") {
                         auto& listener = entity.AddComponent<ListenerComponent>();
