@@ -151,6 +151,12 @@ namespace Engine {
 		 */
 		inline bool& getEditorCamToggle() { return isEditorCamOn; }
 
+		/**
+		 * @brief Provide a reference to the toggle status of the editor
+		 * @return Reference to the toggle status of the editor
+		 */
+		inline bool& getEditorModeToggle() { return isEditorMode; }
+
 		float m_exposure = 0.1;
 
 	private:
@@ -213,6 +219,7 @@ namespace Engine {
 
 		// Temp toggle to check if editor camera is enabled
 		bool isEditorCamOn = true;
+		bool isEditorMode = true;
 
 		// Temporary object
 		GraphicsLoader m_gl;

@@ -606,10 +606,22 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Get input reference
     auto& input = GetInput();
 
+    // Get editor camera toggle and editor mode for renderer reference
+    auto& editorCamToggle = m_Renderer->getEditorCamToggle();
+    auto& editorModeToggle = m_Renderer->getEditorModeToggle();
+
     // Add this somewhere in your input handling:
     if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
-        m_EditorEnable = !m_EditorEnable;
+        m_EditorEnable = !m_EditorEnable; 
+        editorModeToggle = m_EditorEnable;
+        editorCamToggle = false;
         LOG_INFO("Editor toggled: ", m_EditorEnable);
+    }
+
+    // Editor camera toggle
+    if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable) {
+        editorCamToggle = !editorCamToggle;
+        LOG_INFO("Editor camera toggled: ", editorCamToggle);
     }
 
     Engine::ScriptReloader::GetInstance().Update();
@@ -707,17 +719,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
             GameCam = Engine::Entity(entityHandle, &registry);
             GameCamFound = true;
             break;
-        }
-    }
-
-    // Editor camera toggle
-    auto& editorCamToggle = m_Renderer->getEditorCamToggle();
-    if (input.IsKeyJustPressed(GLFW_KEY_TAB)) {
-        if (editorCamToggle == true) {
-            editorCamToggle = false;
-        }
-        else {
-            editorCamToggle = true;
         }
     }
 
