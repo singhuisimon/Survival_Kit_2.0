@@ -23,6 +23,10 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
+        // NEW: list of entities matching a tag
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint[] Scene_FindEntitiesByTag(string tag);
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_GetPosition(uint entityID, ref Vector3 position);
 
@@ -313,6 +317,5 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AudioManager_SetListenerAttributes(ref Vector3 position, ref Vector3 forward, ref Vector3 up, ref Vector3 velocity);
-
     }
 }
