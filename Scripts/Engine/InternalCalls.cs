@@ -27,11 +27,12 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint[] Scene_FindEntitiesByTag(string tag);
 
+        // CORRECT - GetPosition uses out, SetPosition uses ref
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetPosition(uint entityID, ref Vector3 position);
+        public static extern void Transform_GetPosition(uint entityID, out Vector3 position); 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
+        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position); 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_Move(uint entityID, float deltaX, float deltaY, float deltaZ);
