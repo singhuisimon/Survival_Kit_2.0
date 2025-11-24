@@ -1,6 +1,6 @@
 {
     "Name": "SpawnManager",
-    "GUID": "9479532309873115321",
+    "GUID": "514985322044418147",
     "Version": "1.0",
     "Root": {
         "Type": "Sequence",
@@ -13,11 +13,11 @@
                 "GUID": "5444307043749675197",
                 "Properties": {
                     "LoveletterCount": "1",
-                    "TrojanCount": "1",
-                    "AdwareCount": "1",
-                    "WormsCount": "1",
-                    "BotnetCount": "1",
-                    "WallA": "false",
+                    "TrojanCount": "0",
+                    "AdwareCount": "0",
+                    "WormsCount": "20",
+                    "BotnetCount": "4",
+                    "WallA": "true",
                     "WallB": "false",
                     "WallC": "false",
                     "WallD": "false",
@@ -44,6 +44,37 @@
                 "GUID": "7750150052964122817",
                 "Properties": {
                     "Message": "wave ended"
+                }
+            },
+            {
+                "Type": "SpawnMultipleTypes",
+                "Name": "Node",
+                "GUID": "1091446074345914231",
+                "Properties": {
+                    "LoveletterCount": "3",
+                    "TrojanCount": "0",
+                    "AdwareCount": "0",
+                    "WormsCount": "20",
+                    "BotnetCount": "4",
+                    "WallA": "true",
+                    "WallB": "false",
+                    "WallC": "false",
+                    "WallD": "true",
+                    "WallE": "false",
+                    "Boss": "false",
+                    "SpawnPointA": "2",
+                    "SpawnPointB": "2",
+                    "SpawnPointC": "1",
+                    "SpawnPointD": "2",
+                    "SpawnPointE": "1"
+                }
+            },
+            {
+                "Type": "Wait",
+                "Name": "Node",
+                "GUID": "14350043377325593773",
+                "Properties": {
+                    "Duration": "30.000000"
                 }
             }
         ]
