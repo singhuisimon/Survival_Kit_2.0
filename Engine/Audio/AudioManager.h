@@ -60,13 +60,13 @@ namespace Engine {
 		void SetGroupPitch(AudioType type, float pitch);
 		void MuteGroup(AudioType type, bool mute);
 
-		void GetMasterVolume(float& volume);
+		/*void GetMasterVolume(float& volume);
 		void GetMasterPitch(float& pitch);
 		bool IsMasterMuted();
 
 		void SetMasterVolume(float volume);
 		void SetMasterPitch(float pitch);
-		void MuteMaster(bool mute);
+		void MuteMaster(bool mute);*/
 
 		void SetListenerAttributes(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up, const glm::vec3& velocity);
 
@@ -76,7 +76,7 @@ namespace Engine {
 		void EnableDSP(AudioType group, DSPEffectType effect, bool enable);
 		FMOD::DSP* GetDSP(AudioType group, DSPEffectType effect);
 		void SetDSPParameter(AudioType group, DSPEffectType effect, int paramIndex, float value);
-		void ReleaseDSP(AudioType group, DSPEffectType effect);
+		void ReleaseSpecificDSPinGroup(AudioType group, DSPEffectType effect);
 		void ReleaseDSPByGroup(AudioType group);
 		void ReleaseAllDSPs();
 

@@ -130,6 +130,9 @@ void Game::OnInit() {
             LOG_CRITICAL("  -> Audio Manager initialization failed!");
             return;
         }
+
+        Engine::SetScriptingAudioManager(m_AudioManager.get());
+
         LOG_INFO("  -> Audio Manager initialized successfully");
     }
     catch (const std::exception& e) {

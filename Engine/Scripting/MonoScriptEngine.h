@@ -18,10 +18,15 @@ namespace Engine {
     class Scene;
     class Entity;
     class Input;
+    class AudioManager; //newly added in - amanda
 
     // Functions to set context for internal calls
     void SetScriptingCurrentScene(Scene* scene);
     void SetScriptingInputSystem(Input* input);
+
+    //newly added - amanda
+    void SetScriptingAudioManager(AudioManager* audiomManager);
+
     /**
      * @brief Manages the Mono runtime and C# script execution
      * @details Handles:
