@@ -24,7 +24,51 @@ namespace Engine {
 
     void BehaviourTreeSystem::OnInit(Scene* scene) {
         LOG_INFO("BehaviourTreeSystem: Initialized");
-        (void)scene;
+        //(void)scene;
+
+        if (scene) {
+            LoadBehaviourTrees(scene);
+        }
+    }
+
+    void BehaviourTreeSystem::LoadBehaviourTrees(Scene* scene) {
+        if (!scene) return;
+
+        auto& registry = scene->GetRegistry();
+        auto view = registry.view<BehaviourTreeComponent>();
+
+        int loadedCount = 0;
+        int failedCount = 0;
+
+        for (auto entity : view) {
+            Entity ent(entity, &registry);
+
+            if (!ent.HasComponent<BehaviourTreeComponent>()) {
+                continue;
+            }
+
+            auto& btComp = ent.GetComponent<BehaviourTreeComponent>();
+
+            // Load tree from file if needed
+            if (btComp.TreeInstance == nullptr && !btComp.TreeAssetPath.empty()) {
+                btComp.TreeInstance = Engine::BehaviourTreeSerializer::DeserializeFromFile(
+                    btComp.TreeAssetPath
+                );
+
+                if (btComp.TreeInstance) {
+                    LOG_INFO("BehaviourTreeSystem: Loaded tree from file ", btComp.TreeAssetPath);
+                    loadedCount++;
+                }
+                else {
+                    LOG_WARNING("BehaviourTreeSystem: Failed to load tree from ", btComp.TreeAssetPath);
+                    failedCount++;
+                }
+            }
+        }
+
+        if (loadedCount > 0 || failedCount > 0) {
+            LOG_INFO("BehaviourTreeSystem: Loaded ", loadedCount, " trees, ", failedCount, " failed");
+        }
     }
 
     void BehaviourTreeSystem::OnUpdate(Scene* scene, Timestep ts) {

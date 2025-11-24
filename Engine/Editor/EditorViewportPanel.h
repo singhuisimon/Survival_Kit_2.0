@@ -109,6 +109,7 @@ namespace Engine
 					pickedID = 0xFFFFFFFFu;
 					playing = false;
 					scene->LoadFromFile(currentScenePath);
+					scene->InitializeSystems();
 				}
 
 				ImGui::PopStyleColor(3);

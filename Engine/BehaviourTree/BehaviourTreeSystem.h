@@ -42,6 +42,8 @@ namespace Engine {
         const char* GetName() const override {
             return "BehaviourTreeSystem";
         }
+
+        void LoadBehaviourTrees(Scene* scene);
     };
 
 } // namespace Engine
