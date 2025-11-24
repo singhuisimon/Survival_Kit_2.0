@@ -133,6 +133,7 @@ namespace Engine {
 		m_SFXDSPs.clear();
 		m_UIDSPs.clear();
 
+
 		// Release channel groups
 		if (uigroup) {
 			uigroup->release();
@@ -146,13 +147,14 @@ namespace Engine {
 			sfxgroup->release();
 			sfxgroup = nullptr;
 		}
-		if (mastergroup) {
-			mastergroup = nullptr;
-		}
 
 		if (coresystem) {
 			coresystem->release();
 			coresystem = nullptr;
+		}
+
+		if (mastergroup) {
+			mastergroup = nullptr;
 		}
 
 		initialized = false;
@@ -241,10 +243,37 @@ namespace Engine {
 				}
 				channel->set3DAttributes(&pos, &vel);
 				channel->set3DMinMaxDistance(audio->MinDistance, audio->MaxDistance);
+
+				//NEW M3: Set Doppler effect level
+				channel->set3DDopplerLevel(audio->DopplerLevel);
+
+				//NEW: Apply rolloff mode
+				FMOD_MODE rolloffMode = FMOD_3D_INVERSEROLLOFF; //default
+				switch (audio->RolloffMode) {
+				case AudioRolloffMode::LINEAR:
+					rolloffMode = FMOD_3D_LINEARROLLOFF;
+					break;
+				case AudioRolloffMode::LINEARSQUARE:
+					rolloffMode = FMOD_3D_LINEARSQUAREROLLOFF;
+					break;
+				default:
+					rolloffMode = FMOD_3D_INVERSEROLLOFF;
+					break;
+				}
+
+				FMOD_MODE currentMode;
+				channel->getMode(&currentMode);
+
+				// Clear the rolloff bits, then set the one you want
+				FMOD_MODE newMode = (currentMode & ~RolloffMask) | rolloffMode;
+				channel->setMode(newMode);				
 			}
 			else {
-				FMOD_VECTOR pos = { 0.0f, 0.0f, 0.0f };
-				channel->set3DAttributes(&pos, nullptr);
+				//FMOD_VECTOR pos = { 0.0f, 0.0f, 0.0f };
+				//channel->set3DAttributes(&pos, nullptr);
+
+				//NEW M3
+				channel->setPan(audio->Pan2D);
 			}
 
 			channel->setPaused(false);
@@ -364,8 +393,11 @@ namespace Engine {
 			audio->Channel->addFadePoint(dspClock, current_volume);
 			audio->Channel->addFadePoint(dspClock + 44100, 0.0f); // 1 second fade
 			
-			audio->Channel->setVolume(0.0f);
-			audio->Channel->stop();
+			//add a way where i can immediate stop or not i think.
+			//thinking of using script for this
+
+			//audio->Channel->setVolume(0.0f);
+			//audio->Channel->stop();
 			LOG_INFO("AudioManager::StopSound - Stopped sound: ", audio->AudioFilePath);
 		}
 
@@ -411,6 +443,9 @@ namespace Engine {
 			}
 			channel->set3DAttributes(&pos, &vel);
 			channel->set3DMinMaxDistance(audio->MinDistance, audio->MaxDistance);
+
+			// Doppler is automatically calculated by FMOD when velocity is set
+			// DopplerLevel controls the intensity of the effect
 		}
 
 		//For tracing debug purpose.
@@ -590,7 +625,7 @@ namespace Engine {
 		}
 	}
 
-	void AudioManager::GetMasterVolume(float& volume) {
+	/*void AudioManager::GetMasterVolume(float& volume) {
 		if (!initialized || !mastergroup)
 			return;
 		mastergroup->getVolume(&volume);
@@ -626,7 +661,7 @@ namespace Engine {
 		bool mute = false;
 		mastergroup->getMute(&mute);
 		return mute;
-	}
+	}*/
 
 	void AudioManager::SetListenerAttributes(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up, const glm::vec3& velocity) {
 		if (!initialized || !coresystem)
@@ -682,6 +717,39 @@ namespace Engine {
 
 		// Reverb 
 		audio->Channel->setReverbProperties(0, audio->ReverbProperties);
+
+		//NEW M3
+		if (audio->Is3D) {
+			// --- Doppler level ---
+			audio->Channel->set3DDopplerLevel(audio->DopplerLevel);
+
+			// --- Choose rolloff flag ---
+			FMOD_MODE rolloffMode = FMOD_3D_INVERSEROLLOFF;
+			switch (audio->RolloffMode)
+			{
+			case AudioRolloffMode::LINEAR:
+				rolloffMode = FMOD_3D_LINEARROLLOFF;
+				break;
+
+			case AudioRolloffMode::LINEARSQUARE:
+				rolloffMode = FMOD_3D_LINEARSQUAREROLLOFF;
+				break;
+
+			default:
+				rolloffMode = FMOD_3D_INVERSEROLLOFF;
+				break;
+			}
+
+			// --- Apply new rolloff mode ---
+			FMOD_MODE currentMode;
+			audio->Channel->getMode(&currentMode);
+
+			FMOD_MODE newMode = (currentMode & ~RolloffMask) | rolloffMode;
+			audio->Channel->setMode(newMode);
+		}
+		else {
+			audio->Channel->setPan(audio->Pan2D);
+		}
 
 		audio->IsDirty = false; // synced
 	}
@@ -761,7 +829,7 @@ namespace Engine {
 		}
 	}
 
-	void AudioManager::ReleaseDSP(AudioType group, DSPEffectType effect) {
+	void AudioManager::ReleaseSpecificDSPinGroup(AudioType group, DSPEffectType effect) {
 		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
 					(group == AudioType::SFX) ? m_SFXDSPs :
 					(group == AudioType::BGM) ? m_BGMDSPs :

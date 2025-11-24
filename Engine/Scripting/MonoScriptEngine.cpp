@@ -8,6 +8,7 @@
 #include "../ECS/Components.h"
 #include "../Core/input.h"
 #include "Core/Application.h"
+#include "../Audio/AudioManager.h"
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
@@ -505,7 +506,41 @@ namespace Engine
 
 		static void  Audio_SetFile(uint64_t entityID, MonoString *path);
 
+		static float Audio_GetMinDistance(uint64_t entityID);
+		static void Audio_SetMinDistance(uint64_t entityID, float minDist);
+		static float Audio_GetMaxDistance(uint64_t entityID);
+		static void Audio_SetMaxDistance(uint64_t entityID, float maxDist);
+		static int Audio_GetRolloffMode(uint64_t entityID);
+		static void Audio_SetRolloffMode(uint64_t entityID, int mode);
+		static float Audio_GetDopplerLevel(uint64_t entityID);
+		static void Audio_SetDopplerLevel(uint64_t entityID, float level);
+		static float Audio_GetPan2D(uint64_t entityID);
+		static void Audio_SetPan2D(uint64_t entityID, float pan);
+		static float Audio_GetReverbMix(uint64_t entityID);
+		static void Audio_SetReverbMix(uint64_t entityID, float mix);
 
+		// ===== AudioManager =====
+		static void AudioManager_SetGroupVolume(int groupType, float volume);
+		static float AudioManager_GetGroupVolume(int groupType);
+		static void AudioManager_SetGroupPitch(int groupType, float pitch);
+		static float AudioManager_GetGroupPitch(int groupType);
+		static void AudioManager_MuteGroup(int groupType, bool mute);
+		static bool AudioManager_IsGroupMuted(int groupType);
+
+		static void AudioManager_PauseGroup(int groupType, bool pause);
+		static void AudioManager_PauseAll(bool pause);
+		static void AudioManager_StopByType(int groupType);
+		static void AudioManager_StopAll();
+
+		static void AudioManager_CreateDSP(int groupType, int effectType);
+		static void AudioManager_EnableDSP(int groupType, int effectType, bool enable);
+		static void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value);
+		static void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType);
+		static void AudioManager_ReleaseDSPByGroup(int groupType);
+		static void AudioManager_ReleaseAllDSPs();
+
+		static void AudioManager_SetListenerAttributes(glm::vec3* position, glm::vec3* forward,
+			glm::vec3* up, glm::vec3* velocity);
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -638,9 +673,70 @@ namespace Engine
 
 		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
 
+		// ===== NEW: AudioComponent Extensions =====
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetMinDistance",
+			(void*)InternalCalls::Audio_GetMinDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetMinDistance",
+			(void*)InternalCalls::Audio_SetMinDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetMaxDistance",
+			(void*)InternalCalls::Audio_GetMaxDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetMaxDistance",
+			(void*)InternalCalls::Audio_SetMaxDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetRolloffMode",
+			(void*)InternalCalls::Audio_GetRolloffMode);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetRolloffMode",
+			(void*)InternalCalls::Audio_SetRolloffMode);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetDopplerLevel",
+			(void*)InternalCalls::Audio_GetDopplerLevel);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetDopplerLevel",
+			(void*)InternalCalls::Audio_SetDopplerLevel);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetPan2D",
+			(void*)InternalCalls::Audio_GetPan2D);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetPan2D",
+			(void*)InternalCalls::Audio_SetPan2D);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetReverbMix",
+			(void*)InternalCalls::Audio_GetReverbMix);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetReverbMix",
+			(void*)InternalCalls::Audio_SetReverbMix);
 
+		// ===== NEW: AudioManager Global Controls =====
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetGroupVolume",
+			(void*)InternalCalls::AudioManager_SetGroupVolume);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_GetGroupVolume",
+			(void*)InternalCalls::AudioManager_GetGroupVolume);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetGroupPitch",
+			(void*)InternalCalls::AudioManager_SetGroupPitch);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_GetGroupPitch",
+			(void*)InternalCalls::AudioManager_GetGroupPitch);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_MuteGroup",
+			(void*)InternalCalls::AudioManager_MuteGroup);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_IsGroupMuted",
+			(void*)InternalCalls::AudioManager_IsGroupMuted);
 
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_PauseGroup",
+			(void*)InternalCalls::AudioManager_PauseGroup);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_PauseAll",
+			(void*)InternalCalls::AudioManager_PauseAll);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_StopByType",
+			(void*)InternalCalls::AudioManager_StopByType);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_StopAll",
+			(void*)InternalCalls::AudioManager_StopAll);
 
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_CreateDSP",
+			(void*)InternalCalls::AudioManager_CreateDSP);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_EnableDSP",
+			(void*)InternalCalls::AudioManager_EnableDSP);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetDSPParameter",
+			(void*)InternalCalls::AudioManager_SetDSPParameter);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_ReleaseDSP",
+			(void*)InternalCalls::AudioManager_ReleaseSpecificDSPinGroup);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_ReleaseDSPByGroup",
+			(void*)InternalCalls::AudioManager_ReleaseDSPByGroup);
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_ReleaseAllDSPs",
+			(void*)InternalCalls::AudioManager_ReleaseAllDSPs);
+
+		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetListenerAttributes",
+			(void*)InternalCalls::AudioManager_SetListenerAttributes);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -655,6 +751,8 @@ namespace Engine
 		static Scene *s_CurrentScene = nullptr;
 		//auto& input = GetInput();
 		static Input *s_InputSystem = nullptr;
+
+		static AudioManager* s_AudioManager = nullptr;
 
 		uint64_t Scene_CreateEntity(MonoString *nameStr)
 		{
@@ -874,6 +972,15 @@ namespace Engine
 		void SetInputSystem(Input *input)
 		{
 			s_InputSystem = input;
+		}
+
+		// ADD THESE:
+		void SetAudioManager(AudioManager* audioManager) {
+			s_AudioManager = audioManager;
+		}
+
+		AudioManager* GetAudioManager() {
+			return s_AudioManager;
 		}
 
 		void Log(MonoString *message)
@@ -1473,6 +1580,246 @@ namespace Engine
 			audio.SetAudioFile(utf8);
 			mono_free(utf8);
 		}
+
+		// ===== NEW AudioComponent Extensions =====
+
+		float Audio_GetMinDistance(uint64_t entityID) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return 1.0f;
+			auto& audio = e.GetComponent<AudioComponent>();
+			return audio.MinDistance;
+		}
+
+		void Audio_SetMinDistance(uint64_t entityID, float minDist) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			auto& audio = e.GetComponent<AudioComponent>();
+			audio.SetMinDistance(minDist);
+		}
+
+		float Audio_GetMaxDistance(uint64_t entityID) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return 10000.0f;
+			auto& audio = e.GetComponent<AudioComponent>();
+			return audio.MaxDistance;
+		}
+
+		void Audio_SetMaxDistance(uint64_t entityID, float maxDist) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			auto& audio = e.GetComponent<AudioComponent>();
+			audio.SetMaxDistance(maxDist);
+		}
+
+		int Audio_GetRolloffMode(uint64_t entityID) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return 0;
+			auto& audio = e.GetComponent<AudioComponent>();
+			return static_cast<int>(audio.RolloffMode);
+		}
+
+		void Audio_SetRolloffMode(uint64_t entityID, int mode) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			auto& audio = e.GetComponent<AudioComponent>();
+			audio.SetRolloffMode(static_cast<AudioRolloffMode>(mode));
+		}
+
+		float Audio_GetDopplerLevel(uint64_t entityID) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return 1.0f;
+			auto& audio = e.GetComponent<AudioComponent>();
+			return audio.DopplerLevel;
+		}
+
+		void Audio_SetDopplerLevel(uint64_t entityID, float level) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			auto& audio = e.GetComponent<AudioComponent>();
+			audio.SetDopplerLevel(level);
+		}
+
+		float Audio_GetPan2D(uint64_t entityID) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return 0.0f;
+			auto& audio = e.GetComponent<AudioComponent>();
+			return audio.Pan2D;
+		}
+
+		void Audio_SetPan2D(uint64_t entityID, float pan) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			auto& audio = e.GetComponent<AudioComponent>();
+			audio.SetPan(pan);
+		}
+
+		float Audio_GetReverbMix(uint64_t entityID) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return 0.0f;
+			auto& audio = e.GetComponent<AudioComponent>();
+			return audio.ReverbProperties;
+		}
+
+		void Audio_SetReverbMix(uint64_t entityID, float mix) {
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			auto& audio = e.GetComponent<AudioComponent>();
+			audio.SetReverbProperties(mix);
+		}
+
+		// ===== NEW AudioManager Global Controls =====
+
+		void AudioManager_SetGroupVolume(int groupType, float volume) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->SetGroupVolume(static_cast<AudioType>(groupType), volume);
+		}
+
+		float AudioManager_GetGroupVolume(int groupType) {
+			auto* am = GetAudioManager();
+			if (!am) return 0.0f;
+			float vol = 0.0f;
+			am->GetGroupVolume(static_cast<AudioType>(groupType), vol);
+			return vol;
+		}
+
+		void AudioManager_SetGroupPitch(int groupType, float pitch) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->SetGroupPitch(static_cast<AudioType>(groupType), pitch);
+		}
+
+		float AudioManager_GetGroupPitch(int groupType) {
+			auto* am = GetAudioManager();
+			if (!am) return 1.0f;
+			float pitch = 1.0f;
+			am->GetGroupPitch(static_cast<AudioType>(groupType), pitch);
+			return pitch;
+		}
+
+		void AudioManager_MuteGroup(int groupType, bool mute) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->MuteGroup(static_cast<AudioType>(groupType), mute);
+		}
+
+		bool AudioManager_IsGroupMuted(int groupType) {
+			auto* am = GetAudioManager();
+			if (!am) return false;
+			return am->IsGroupMuted(static_cast<AudioType>(groupType));
+		}
+
+		/*void AudioManager_SetMasterVolume(float volume) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->SetMasterVolume(volume);
+		}
+
+		float AudioManager_GetMasterVolume() {
+			auto* am = GetAudioManager();
+			if (!am) return 0.0f;
+			float vol = 0.0f;
+			am->GetMasterVolume(vol);
+			return vol;
+		}
+
+		void AudioManager_SetMasterPitch(float pitch) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->SetMasterPitch(pitch);
+		}
+
+		float AudioManager_GetMasterPitch() {
+			auto* am = GetAudioManager();
+			if (!am) return 1.0f;
+			float pitch = 1.0f;
+			am->GetMasterPitch(pitch);
+			return pitch;
+		}
+
+		void AudioManager_MuteMaster(bool mute) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->MuteMaster(mute);
+		}
+
+		bool AudioManager_IsMasterMuted() {
+			auto* am = GetAudioManager();
+			if (!am) return false;
+			return am->IsMasterMuted();
+		}*/
+
+		void AudioManager_PauseGroup(int groupType, bool pause) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->PauseGroup(static_cast<AudioType>(groupType), pause);
+		}
+
+		void AudioManager_PauseAll(bool pause) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->PauseAll(pause);
+		}
+
+		void AudioManager_StopByType(int groupType) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->StopByType(static_cast<AudioType>(groupType));
+		}
+
+		void AudioManager_StopAll() {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->StopAll();
+		}
+
+		void AudioManager_CreateDSP(int groupType, int effectType) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->CreateDSP(static_cast<DSPEffectType>(effectType),
+				static_cast<AudioType>(groupType));
+		}
+
+		void AudioManager_EnableDSP(int groupType, int effectType, bool enable) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->EnableDSP(static_cast<AudioType>(groupType),
+				static_cast<DSPEffectType>(effectType), enable);
+		}
+
+		void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->SetDSPParameter(static_cast<AudioType>(groupType),
+				static_cast<DSPEffectType>(effectType),
+				paramIndex, value);
+		}
+
+		void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->ReleaseSpecificDSPinGroup(static_cast<AudioType>(groupType),
+				static_cast<DSPEffectType>(effectType));
+		}
+
+		void AudioManager_ReleaseDSPByGroup(int groupType) {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->ReleaseDSPByGroup(static_cast<AudioType>(groupType));
+		}
+
+		void AudioManager_ReleaseAllDSPs() {
+			auto* am = GetAudioManager();
+			if (!am) return;
+			am->ReleaseAllDSPs();
+		}
+
+		void AudioManager_SetListenerAttributes(glm::vec3* position, glm::vec3* forward,
+			glm::vec3* up, glm::vec3* velocity) {
+			auto* am = GetAudioManager();
+			if (!am || !position || !forward || !up || !velocity) return;
+			am->SetListenerAttributes(*position, *forward, *up, *velocity);
+		}
 	} // namespace internalcalls
 
 	// Expose these functions for external use
@@ -1484,6 +1831,11 @@ namespace Engine
 	void SetScriptingCurrentScene(Scene *scene)
 	{
 		InternalCalls::SetCurrentScene(scene);
+	}
+
+	// ADD THIS:
+	void SetScriptingAudioManager(AudioManager* audioManager) {
+		InternalCalls::SetAudioManager(audioManager);
 	}
 
 } // namespace Engine

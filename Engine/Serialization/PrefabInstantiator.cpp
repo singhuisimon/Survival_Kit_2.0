@@ -358,6 +358,15 @@ namespace Engine {
             if (properties.HasMember("ReverbProperties")) {
                 comp.ReverbProperties = properties["ReverbProperties"].GetFloat();
             }
+            if (properties.HasMember("RolloffMode")) {
+                comp.RolloffMode = static_cast<AudioRolloffMode>(properties["RolloffMode"].GetInt());
+            }
+            if (properties.HasMember("DopplerLevel")) {
+                comp.DopplerLevel = properties["DopplerLevel"].GetFloat();
+            }
+            if (properties.HasMember("Pan2D")) {
+                comp.Pan2D = properties["Pan2D"].GetFloat();
+            }
 
             // Runtime fields are NOT deserialized (Channel, IsDirty, PreviousPath)
             // They will be initialized to their default values

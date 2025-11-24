@@ -130,6 +130,9 @@ void Game::OnInit() {
             LOG_CRITICAL("  -> Audio Manager initialization failed!");
             return;
         }
+
+        Engine::SetScriptingAudioManager(m_AudioManager.get());
+
         LOG_INFO("  -> Audio Manager initialized successfully");
     }
     catch (const std::exception& e) {
@@ -603,10 +606,22 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // Get input reference
     auto& input = GetInput();
 
+    // Get editor camera toggle and editor mode for renderer reference
+    auto& editorCamToggle = m_Renderer->getEditorCamToggle();
+    auto& editorModeToggle = m_Renderer->getEditorModeToggle();
+
     // Add this somewhere in your input handling:
     if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
-        m_EditorEnable = !m_EditorEnable;
+        m_EditorEnable = !m_EditorEnable; 
+        editorModeToggle = m_EditorEnable;
+        editorCamToggle = false;
         LOG_INFO("Editor toggled: ", m_EditorEnable);
+    }
+
+    // Editor camera toggle
+    if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable) {
+        editorCamToggle = !editorCamToggle;
+        LOG_INFO("Editor camera toggled: ", editorCamToggle);
     }
 
     Engine::ScriptReloader::GetInstance().Update();
@@ -704,17 +719,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
             GameCam = Engine::Entity(entityHandle, &registry);
             GameCamFound = true;
             break;
-        }
-    }
-
-    // Editor camera toggle
-    auto& editorCamToggle = m_Renderer->getEditorCamToggle();
-    if (input.IsKeyJustPressed(GLFW_KEY_TAB)) {
-        if (editorCamToggle == true) {
-            editorCamToggle = false;
-        }
-        else {
-            editorCamToggle = true;
         }
     }
 
@@ -1027,73 +1031,6 @@ void Game::OnUpdate(Engine::Timestep ts) {
             LOG_ERROR("Load failed!");
         }
     }
-
-    // === TEST BEHAVIOUR TREE SYSTEM ===
-
-    //if (input.IsKeyJustPressed(GLFW_KEY_F5)) {
-    //    LOG_INFO("=== [F5] Create a new Behaviour Tree file: change_position.json ===");
-
-    //    // Build: Sequence -> SetBlackboard(Key=TargetPosition, Type=Vec3, Value=1,2,3) -> Wait(Duration=2.0)
-    //    auto tree = std::make_shared<Engine::BehaviourTree>();
-    //    tree->SetName("ChangePositionTree");
-
-    //    auto root = std::make_shared<Engine::BTSequence>();
-    //    tree->SetRootNode(root);
-
-    //    // Set a position in the blackboard (stored as text; editor/runner can parse as needed)
-    //    auto setPos = std::make_shared<Engine::BTSetBlackboard>("TargetPosition", "1,2,3", "Vec3");
-    //    root->AddChild(setPos);
-
-    //    // Wait a bit
-    //    auto waitNode = std::make_shared<Engine::BTWait>(2.0f);
-    //    root->AddChild(waitNode);
-
-    //    // Save to file (project + output)
-    //    const std::string filePath = "change_position.json";
-    //    if (Engine::BehaviourTreeEditor::SaveTree(*tree, filePath)) {
-    //        LOG_INFO("[F5] Successfully created and saved: ", filePath);
-    //    }
-    //    else {
-    //        LOG_ERROR("[F5] Failed to save: ", filePath);
-    //    }
-    //}
-
-    //if (input.IsKeyJustPressed(GLFW_KEY_F6)) {
-    //    LOG_INFO("=== [F6] Rename BT file ===");
-    //    const std::string oldPath = "change_position.json";
-    //    const std::string newPath = "change_position_renamed.json";
-
-    //    // Pass m_Scene.get() if you want component references auto-updated
-    //    bool ok = Engine::BehaviourTreeEditor::RenameFile(oldPath, newPath, m_Scene.get());
-    //    if (ok) {
-    //        LOG_INFO("[F6] Renamed '", oldPath, "' -> '", newPath, "'");
-    //    }
-    //    else {
-    //        LOG_ERROR("[F6] Rename failed!");
-    //    }
-    //}
-
-    //if (input.IsKeyJustPressed(GLFW_KEY_F7)) {
-    //    LOG_INFO("=== [F7] SaveAs (duplicate file with new GUID) ===");
-
-    //    const std::string sourcePath = "change_position.json";
-    //    const std::string newPath = "change_position2.json";
-    //    const std::string newName = "ChangePosition_Copy"; // Optional new internal name
-
-    //    bool success = Engine::BehaviourTreeEditor::SaveAs(
-    //        sourcePath,
-    //        newPath,
-    //        newName,
-    //        /*generateNewGUID=*/true
-    //    );
-
-    //    if (success) {
-    //        LOG_INFO("[F7] Successfully saved a copy as '", newPath, "' with a new GUID!");
-    //    }
-    //    else {
-    //        LOG_ERROR("[F7] SaveAs failed!");
-    //    }
-    //}
 
     //m_Editor->StartImguiFrame();
 

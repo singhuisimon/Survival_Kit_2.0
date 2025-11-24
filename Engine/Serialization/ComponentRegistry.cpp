@@ -328,6 +328,24 @@ namespace Engine {
                 [](const AudioComponent& c) { return c.MaxDistance; },
                 [](AudioComponent& c, const float& v) { c.MaxDistance = v; }
             );
+            meta.AddProperty<AudioComponent, AudioRolloffMode>(
+                "RolloffMode",
+                PropertyType::Int,  // Enum stored as int
+                [](const AudioComponent& c) { return c.RolloffMode; },
+                [](AudioComponent& c, const AudioRolloffMode& v) { c.RolloffMode = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "DopplerLevel",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.DopplerLevel; },
+                [](AudioComponent& c, const float& v) { c.DopplerLevel = v; }
+            );
+            meta.AddProperty<AudioComponent, float>(
+                "Pan2D",
+                PropertyType::Float,
+                [](const AudioComponent& c) { return c.Pan2D; },
+                [](AudioComponent& c, const float& v) { c.Pan2D = v; }
+            );
         }
 
         //Register ListenerComponenet

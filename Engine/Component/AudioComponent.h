@@ -17,6 +17,7 @@ namespace Engine {
 
     enum class AudioType {MASTER, SFX, BGM, UI};
     enum class PlayState {PLAY, PAUSE, STOP};
+    enum class AudioRolloffMode{INVERSE, LINEAR, LINEARSQUARE};
 
     /**
      * @brief Audio playback component for SFX, BGM, and UI sounds
@@ -30,10 +31,17 @@ namespace Engine {
         float Pitch;                 // 0.5 - 2.0 (general range)
         bool Loop;                   // Loop playback
         bool Mute;                   // Mute toggle
+
         bool Is3D;                   // Enable 3D positional audio
         float MinDistance;           // 3D attenuation min
         float MaxDistance;           // 3D attenuation max
-        float ReverbProperties;      // Wet level for reverb itself
+        float ReverbProperties;      // Wet level for reverb zones
+
+        //NEW M3
+        float Pan2D;                 // Stereo: -1.0 for left to 1.0 for right
+        float DopplerLevel;          // Doppler effect intensity (0-5, default 1)
+        AudioRolloffMode RolloffMode;       // Inverse(default), Linear, Linearsquare
+
 
         // --- Runtime Only (Not Serialized) ---
         FMOD::Channel* Channel;      // Active FMOD channel instance
@@ -52,7 +60,10 @@ namespace Engine {
             , Is3D(true)
             , MinDistance(1.0f)
             , MaxDistance(100.0f)
+            , Pan2D(0.0f)
+            , DopplerLevel(1.0f)
             , ReverbProperties(1.0f)
+            , RolloffMode(AudioRolloffMode::INVERSE)
             , Channel(nullptr)
             , IsDirty(true)          // Initial push to FMOD on first update
             , PreviousPath("")
@@ -71,7 +82,10 @@ namespace Engine {
             , Is3D(true)
             , MinDistance(1.0f)
             , MaxDistance(100.0f)
+            , Pan2D(0.0f)
+            , DopplerLevel(1.0f)
             , ReverbProperties(1.0f)
+            , RolloffMode(AudioRolloffMode::INVERSE)
             , Channel(nullptr)
             , IsDirty(true)          // Initial push to FMOD on first update
             , PreviousPath("")
@@ -132,6 +146,22 @@ namespace Engine {
 
         void SetMaxDistance(float max){
             MaxDistance = max;
+            IsDirty = true;
+        }
+
+        void SetRolloffMode(AudioRolloffMode mode) {
+            RolloffMode = mode;
+            IsDirty = true;
+        }
+
+        void SetDopplerLevel(float level) {
+            DopplerLevel = level;
+            IsDirty = true;
+        }
+
+        void SetPan(float pan) {
+            //Clamp to valid range
+            Pan2D = (pan < -1.0f) ? -1.0f : (pan > 1.0f) ? 1.0f : pan;
             IsDirty = true;
         }
     };
