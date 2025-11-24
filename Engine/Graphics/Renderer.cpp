@@ -390,8 +390,10 @@ namespace Engine {
 			.auto_aspect = true,
 			.clear_color = false,
 			.clear_depth = false,
+			.depth_test = false,
 			.depth_write = false,
 			.culling = false,
+			.passtype = PassType::FULLSCREEN
 		};
 
 #pragma region MATERIAL_LOAD_TEMP
@@ -409,7 +411,16 @@ namespace Engine {
 	void Renderer::beginFrame(RenderPass const& pass) {
 
 		auto& fbo = m_framebuffers[pass.fbo_handle];
-		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle())); 
+
+		// Decide target framebuffer
+		if (pass.passtype == PassType::FULLSCREEN && !isEditorMode) {
+			// Enter fullscreen; final composite goes directly to back buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+		else {
+			// All other passes render into their configured FBOs
+			glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fbo.handle()));
+		}
 
 		auto& viewport = pass.view_port;
 		glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y),
@@ -547,6 +558,9 @@ namespace Engine {
 				for (auto& pass : m_passes) {
 
 					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+
+					// Skip GPU-ID pass in fullscreen game mode for efficiency
+					if (pass.shdpgm_handle == 2) { continue; }
 
 					// Update pass viewport if allowed
 					if (pass.auto_aspect) {
@@ -761,7 +775,11 @@ namespace Engine {
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 		//prog.programFree();
 		glBindTextureUnit(0, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// After the fullscreen pass, ensure we're back on default framebuffer
+		if (pass.passtype == PassType::FULLSCREEN) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 	}
 
 	void Renderer::resizeFBO(u32 handle, int w, int h) {
