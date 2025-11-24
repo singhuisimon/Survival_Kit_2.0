@@ -19,6 +19,8 @@ public:
         Engine::Logger::Get().Info("Game destructor called");
     }
 
+    Engine::AudioManager* GetAudioManager() { return m_AudioManager.get(); }
+
 protected:
     /**
      * @brief Initialize your game
