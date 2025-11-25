@@ -10,6 +10,11 @@
  */
 #version 460 core
 
+const float FOG_MINDIST = 5.0f;
+const float FOG_MAXDIST = 15.0f;
+const vec3 FOG_COLOR = vec3(0,0,0);
+
+
 // ==== In/Outs ====
 in vec3 Position;   // World-space position
 in vec3 Normal;     // World-space normal
@@ -262,5 +267,11 @@ void main()
         discard;
     }
 
+    // Compute fog factor and mix it into the background
+    float dist = length(Position - CamPos);
+    float fogFactor = clamp((dist - FOG_MINDIST) / (FOG_MAXDIST - FOG_MINDIST), 0.0f, 1.0f);
+    color = mix(color , FOG_COLOR, fogFactor);
+
     FragColor = vec4(color, finalAlpha);
+
 }
