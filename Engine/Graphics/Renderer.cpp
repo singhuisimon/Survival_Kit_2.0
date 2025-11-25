@@ -149,6 +149,44 @@ namespace {
 		return textureID;
 	}
 
+	unsigned int loadCubemapHDR(std::vector<std::string> faces)
+	{
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+		int width, height, nrChannels;
+		for (unsigned int i = 0; i < faces.size(); i++)
+		{
+			// Load as float data instead of unsigned char
+			float* data = stbi_loadf(faces[i].c_str(), &width, &height, &nrChannels, 0);
+			if (data)
+			{
+				// Use HDR internal format
+				GLenum internalFormat = (nrChannels == 4) ? GL_RGBA16F : GL_RGB16F;
+				GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0, internalFormat, width, height, 0, format, GL_FLOAT, data
+				);
+				stbi_image_free(data);
+			}
+			else
+			{
+				std::cout << "Cubemap HDR tex failed to load at path: " << faces[i] << std::endl;
+				stbi_image_free(data);
+			}
+		}
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		return textureID;
+	}
+
 }
 
 namespace Engine {
@@ -197,15 +235,15 @@ namespace Engine {
 
 		// Load skybox textures
 		std::vector<std::string> faces = {
-				Engine::getAssetFilePath("Sources/Textures/right.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/left.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/top.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/front.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/back.jpg")
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_001.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_002.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_003.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_004.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_005.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_006.png")
 		};
 
-		m_skybox_texture = loadCubemap(faces);
+		m_skybox_texture = loadCubemapHDR(faces);
 
 		// Create a fullscreen quad where the final render output is drawn onto
 		MeshData2D quad = make_quad();
