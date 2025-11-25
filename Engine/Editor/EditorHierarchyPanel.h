@@ -32,6 +32,8 @@ namespace Engine
 		inline static bool openSubEntityFromPrefabPopup = false;
 		inline static Entity parentOfPrefabEntity = Entity();
 
+		inline static std::vector<Entity> entitiesToDelete;
+
 		/**************************************************************************
 		* @brief
 		* 	Recursively draws an entity and all its children in an ImGui tree view.
@@ -78,16 +80,42 @@ namespace Engine
 				// ==================== Selected Entity Section =======================
 				if (ImGui::MenuItem("Delete Entity"))
 				{
-					// If this entity has a parent, unparent it first
-					if (entity.HasComponent<TransformComponent>()) {
-						TransformSystem::UnParent(scene, entity);
-					}
-
-					scene->DestroyEntity(entity);
 					if (selectedEntity == entity)
 					{
 						selectedEntity = Entity();
+						pickedID = 0xFFFFFFFFu;
 					}
+
+					entitiesToDelete.push_back(entity);
+
+					// If this entity has a parent, unparent it first
+					if (entity.HasComponent<TransformComponent>()) {
+						
+						if (hasParent) {
+							TransformSystem::UnParent(scene, entity);
+						}
+						
+						if (hasChildren) {
+							auto& transform = entity.GetComponent<TransformComponent>();
+							for (uint32_t childID : transform.Children)
+							{
+								Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
+								if (selectedEntity == childEntity)
+								{
+									selectedEntity = Entity();
+									pickedID = 0xFFFFFFFFu;
+								}
+								entitiesToDelete.push_back(childEntity);
+							}
+						}
+					}
+
+					ImGui::EndPopup();
+
+					if (opened && hasChildren) {
+						ImGui::TreePop();
+					}
+					return;	// Return early to prevent drawing (child) entities that are deleted
 				}
 
 				// Temp Fix: Only handle prefabs for main entities WITHOUT children
@@ -244,6 +272,13 @@ namespace Engine
 				ImGui::TreePop();
 			}
 
+		}
+
+		static void DeleteEntityParentAndChildren(Scene* scene) {
+			for (auto& entity : entitiesToDelete) {
+				scene->DestroyEntity(entity);
+			}
+			entitiesToDelete.clear();
 		}
 	};
 }
