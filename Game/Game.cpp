@@ -629,13 +629,20 @@ void Game::OnUpdate(Engine::Timestep ts) {
     // When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
     if (!m_EditorEnable || (m_EditorEnable && m_Editor->getIsPlaying())) {
         
+        if (m_EditorJustPaused) {
+            m_AudioManager->PauseAll(false);
+            m_EditorJustPaused = false;
+        }
+
         // Update scene (this will call all systems in priority order)
         m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
         // Update audio manager if exists
         m_AudioManager->OnUpdate(ts);
     }
-    else { // When Editor is ON but gameplay is PLAYING: Update Transform, Camera and Render systems
+    else { // When Editor is ON but gameplay is NOT PLAYING: Update Transform, Camera and Render systems
+
+        m_EditorJustPaused = true;
 
         auto& sceneSystems = m_Scene->GetSystemRegistry();
 
@@ -651,6 +658,8 @@ void Game::OnUpdate(Engine::Timestep ts) {
 
         Engine::RenderSystem* renderSystem = sceneSystems.GetSystem<Engine::RenderSystem>();
         renderSystem->OnUpdate(m_Scene.get(), ts);
+
+        m_AudioManager->PauseAll(true);
 
     } 
 
