@@ -23,7 +23,7 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetScale_Native(ulong entityID, ref Vector3 scale);
 
-        // Properties
+        // Instance properties (component-style)
         public Vector3 Position
         {
             get
@@ -83,6 +83,41 @@ namespace Engine
             float pitch = (float)System.Math.Asin(-direction.Y) * (180.0f / (float)System.Math.PI);
 
             Rotation = new Vector3(pitch, yaw, 0);
+        }
+
+        // ===== Static helpers for scripts that only have an entityID =====
+
+        public static Vector3 GetPosition(ulong entityID)
+        {
+            GetPosition_Native(entityID, out Vector3 position);
+            return position;
+        }
+
+        public static void SetPosition(ulong entityID, ref Vector3 position)
+        {
+            SetPosition_Native(entityID, ref position);
+        }
+
+        public static Vector3 GetRotation(ulong entityID)
+        {
+            GetRotation_Native(entityID, out Vector3 rotation);
+            return rotation;
+        }
+
+        public static void SetRotation(ulong entityID, ref Vector3 rotation)
+        {
+            SetRotation_Native(entityID, ref rotation);
+        }
+
+        public static Vector3 GetScale(ulong entityID)
+        {
+            GetScale_Native(entityID, out Vector3 scale);
+            return scale;
+        }
+
+        public static void SetScale(ulong entityID, ref Vector3 scale)
+        {
+            SetScale_Native(entityID, ref scale);
         }
     }
 }
