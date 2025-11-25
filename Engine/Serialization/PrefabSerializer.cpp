@@ -347,6 +347,26 @@ namespace Engine {
             velArray.PushBack(rb.Velocity.z, allocator);
             propertiesObj.AddMember("Velocity", velArray, allocator);
 
+            rapidjson::Value angVel(rapidjson::kArrayType);
+            angVel.PushBack(rb.AngularVelocity.x, allocator);
+            angVel.PushBack(rb.AngularVelocity.y, allocator);
+            angVel.PushBack(rb.AngularVelocity.z, allocator);
+            propertiesObj.AddMember("AngularVelocity", angVel, allocator);
+
+            propertiesObj.AddMember("LinearDamping", rb.LinearDamping, allocator);
+            propertiesObj.AddMember("AngularDamping", rb.AngularDamping, allocator);
+            propertiesObj.AddMember("Restitution", rb.Restitution, allocator);
+
+            propertiesObj.AddMember("CollideType", static_cast<int>(rb.Shape), allocator);
+
+            rapidjson::Value boxHalfExtent(rapidjson::kArrayType);
+            boxHalfExtent.PushBack(rb.Velocity.x, allocator);
+            boxHalfExtent.PushBack(rb.Velocity.y, allocator);
+            boxHalfExtent.PushBack(rb.Velocity.z, allocator);
+            propertiesObj.AddMember("BoxHalfExtent", boxHalfExtent, allocator);
+
+            propertiesObj.AddMember("SphereRadius", rb.SphereRadius, allocator);
+
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
         }

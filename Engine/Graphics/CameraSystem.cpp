@@ -32,7 +32,7 @@ namespace Engine {
 			// Check if it has transform component
 			if (!entity.HasComponent<TransformComponent>()) continue;
 			
-			if (camera.Enabled && camera.isDirty) {
+			if (camera.Enabled && camera.isDirty) { 
 
 				// Get transform component
 				auto& trans = entity.GetComponent<TransformComponent>();

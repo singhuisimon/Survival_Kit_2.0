@@ -157,7 +157,7 @@ namespace Engine {
 		 */
 		inline bool& getEditorModeToggle() { return isEditorMode; }
 
-		float m_exposure = 0.1;
+		float m_exposure = 1.0;
 
 	private:
 		/**

@@ -321,6 +321,29 @@ namespace Engine {
                 const auto& vel = properties["Velocity"];
                 comp.Velocity = glm::vec3(vel[0].GetFloat(), vel[1].GetFloat(), vel[2].GetFloat());
             }
+            if (properties.HasMember("AngularVelocity") && properties["AngularVelocity"].IsArray()) {
+                const auto& vel = properties["AngularVelocity"];
+                comp.AngularVelocity = glm::vec3(vel[0].GetFloat(), vel[1].GetFloat(), vel[2].GetFloat());
+            }
+            if (properties.HasMember("LinearDamping")) {
+                comp.LinearDamping = properties["LinearDamping"].GetFloat();
+            }
+            if (properties.HasMember("AngularDamping")) {
+                comp.AngularDamping = properties["AngularDamping"].GetFloat();
+            }
+            if (properties.HasMember("Restitution")) {
+                comp.Restitution = properties["Restitution"].GetFloat();
+            }
+            if (properties.HasMember("CollideType")) {
+                comp.Shape = static_cast<ColliderType>(properties["CollideType"].GetUint());
+            }
+            if (properties.HasMember("BoxHalfExtents") && properties["BoxHalfExtents"].IsArray()) {
+                const auto& vel = properties["BoxHalfExtents"];
+                comp.BoxHalfExtents = glm::vec3(vel[0].GetFloat(), vel[1].GetFloat(), vel[2].GetFloat());
+            }
+            if (properties.HasMember("SphereRadius")) {
+                comp.SphereRadius = properties["SphereRadius"].GetFloat();
+            }
         }
         else if (componentType == "AudioComponent") {
             auto& comp = entity.AddComponent<AudioComponent>();

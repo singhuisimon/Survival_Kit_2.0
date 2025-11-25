@@ -241,12 +241,33 @@ namespace Engine {
                 propertiesObj.AddMember("Mass", rb.Mass, allocator);
                 propertiesObj.AddMember("IsKinematic", rb.IsKinematic, allocator);
                 propertiesObj.AddMember("UseGravity", rb.UseGravity, allocator);
+              
 
                 Value velArray(kArrayType);
                 velArray.PushBack(rb.Velocity.x, allocator);
                 velArray.PushBack(rb.Velocity.y, allocator);
                 velArray.PushBack(rb.Velocity.z, allocator);
                 propertiesObj.AddMember("Velocity", velArray, allocator);
+
+                Value angVel(kArrayType);
+                angVel.PushBack(rb.AngularVelocity.x, allocator);
+                angVel.PushBack(rb.AngularVelocity.y, allocator);
+                angVel.PushBack(rb.AngularVelocity.z, allocator);
+                propertiesObj.AddMember("AngularVelocity", angVel, allocator);
+
+                propertiesObj.AddMember("LinearDamping", rb.LinearDamping, allocator);
+                propertiesObj.AddMember("AngularDamping", rb.AngularDamping, allocator);
+                propertiesObj.AddMember("Restitution", rb.Restitution, allocator);
+
+                propertiesObj.AddMember("CollideType", static_cast<int>(rb.Shape), allocator);
+
+                Value boxHalfExtent(kArrayType);
+                boxHalfExtent.PushBack(rb.Velocity.x, allocator);
+                boxHalfExtent.PushBack(rb.Velocity.y, allocator);
+                boxHalfExtent.PushBack(rb.Velocity.z, allocator);
+                propertiesObj.AddMember("BoxHalfExtent", boxHalfExtent, allocator);
+
+                propertiesObj.AddMember("SphereRadius", rb.SphereRadius, allocator);
 
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
@@ -701,6 +722,45 @@ namespace Engine {
                                 velArray[2].GetFloat()
                             );
                         }
+                        if (properties.HasMember("AngularVelocity"))
+                        {
+                            const Value& angVel = properties["AngularVelocity"];
+                            rb.AngularVelocity = glm::vec3(
+                                angVel[0].GetFloat(),
+                                angVel[1].GetFloat(),
+                                angVel[2].GetFloat()
+                            );
+                        }
+                        if (properties.HasMember("LinearDamping"))
+                        {
+                            rb.LinearDamping = properties["LinearDamping"].GetFloat();
+                        }
+                        if (properties.HasMember("AngularDamping"))
+                        {
+                            rb.AngularDamping = properties["AngularDamping"].GetFloat();
+                        }
+                        if (properties.HasMember("Restitution"))
+                        {
+                            rb.Restitution = properties["Restitution"].GetFloat();
+                        }
+                        if (properties.HasMember("CollideType"))
+                        {
+                            rb.Shape = static_cast<ColliderType>(properties["CollideType"].GetInt());
+                        }
+                        if (properties.HasMember("BoxHalfExtents"))
+                        {
+                            const Value& boxHalfExtents = properties["BoxHalfExtents"];
+                            rb.BoxHalfExtents = glm::vec3(
+                                boxHalfExtents[0].GetFloat(),
+                                boxHalfExtents[1].GetFloat(),
+                                boxHalfExtents[2].GetFloat()
+                            );
+                        }
+                        if (properties.HasMember("SphereRadius"))
+                        {
+                            rb.SphereRadius = properties["SphereRadius"].GetFloat();
+                        }
+
                     }
                     else if (componentType == "AudioComponent") {
                         auto& audio = entity.AddComponent<AudioComponent>();
