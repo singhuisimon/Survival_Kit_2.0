@@ -417,8 +417,8 @@ namespace Engine {
                 componentObj.AddMember("Properties", propertiesObj, allocator);
                 componentsArray.PushBack(componentObj, allocator);
 
-                componentObj.AddMember("Properties", propertiesObj, allocator);
-                componentsArray.PushBack(componentObj, allocator);
+                /*componentObj.AddMember("Properties", propertiesObj, allocator);
+                componentsArray.PushBack(componentObj, allocator);*/
             }
             // Serialize LightComponent
             if (entity.HasComponent<LightComponent>()) {

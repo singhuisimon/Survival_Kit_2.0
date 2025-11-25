@@ -145,6 +145,8 @@ namespace Engine
 				{
 					if (m_Scene)
 					{
+						m_SelectedEntity = Entity();
+						m_PickedID = 0xFFFFFFFFu;
 						m_Scene->GetRegistry().clear();
 						currScenePath = "";
 						isNewScene = true;
@@ -1002,6 +1004,17 @@ namespace Engine
 
 						ImGui::Separator();
 
+						if (audio.AudioFilePath.empty()) {
+							ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255)); // Red
+							ImGui::Text("No audio file loaded. Please select and audio file below.");
+							ImGui::PopStyleColor();
+						}
+						else {
+							ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+							ImGui::Text("Audio Filename: %s", audio.AudioFilePath.c_str());
+							ImGui::PopStyleColor();
+						}
+
 						// Get from Asset Manager
 						auto& db = AM.db();
 						auto allAssets = db.AllMutable();
@@ -1042,6 +1055,17 @@ namespace Engine
 						std::string label = "Filepath";
 						if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
 							audio.SetAudioFile(audioAssetNames[currentIndex]);
+						}
+
+						if (audio.AudioFilePath.empty()) {
+							ImGui::SameLine();
+							if (ImGui::Button("Load File")) {
+								audio.SetAudioFile(audioAssetNames[currentIndex]);
+							}
+						}
+
+						if (audio.AudioFilePath.empty()) {
+							ImGui::BeginDisabled();
 						}
 
 						ImGui::Text("Audio Type:");
@@ -1139,6 +1163,10 @@ namespace Engine
 						}
 
 						ImGui::EndDisabled();
+
+						if (audio.AudioFilePath.empty()) {
+							ImGui::EndDisabled();
+						}
 
 					}
 					// ---------------------- Remove Audio Component by ... -------------------------
