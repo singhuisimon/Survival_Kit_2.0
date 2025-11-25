@@ -77,35 +77,43 @@ namespace {
 		std::string vertex_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.vert") };
 		std::string fragment_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.frag") };
 
+		std::string vertex_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.vert") };
+		std::string fragment_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.frag") };
+
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
 			std::make_pair(vertex_debug_path, fragment_debug_path),
 			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
 			std::make_pair(vertex_skybox_path, fragment_skybox_path),
-			std::make_pair(vertex_hdr_path, fragment_hdr_path)
+			std::make_pair(vertex_hdr_path, fragment_hdr_path),
+			std::make_pair(vertex_ui_path, fragment_ui_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
 	}
 
-	inline void load_basic_primitives(std::vector<Engine::MeshGL>& ms, std::vector<Engine::MeshData>& md) {
+	inline void load_basic_primitives(std::vector<Engine::MeshGL>& ms, std::vector<Engine::MeshData>& md, std::vector<Engine::MeshData2D>& md2d) {
 
 		Engine::MeshData cd = Engine::make_cube();
 		Engine::MeshData pd = Engine::make_plane();
 		Engine::MeshData sd = Engine::make_sphere();
+		Engine::MeshData2D qd = Engine::make_quad();
 
 		md.push_back(cd);
 		md.push_back(pd);
 		md.push_back(sd);
+		md2d.push_back(qd);
 
 		Engine::MeshGL c = Engine::upload_mesh_data(cd);
 		Engine::MeshGL p = Engine::upload_mesh_data(pd);
 		Engine::MeshGL s = Engine::upload_mesh_data(sd);
+		Engine::MeshGL q = Engine::upload_mesh_data2D(qd);
 
 		ms.push_back(std::move(c));
 		ms.push_back(std::move(p));
 		ms.push_back(std::move(s));
+		ms.push_back(std::move(q));
 	}
 
 	unsigned int loadCubemap(std::vector<std::string> faces)
@@ -181,7 +189,7 @@ namespace Engine {
 		test_load_shaders(m_gl.m_shader_storage);
 
 		// Load a set of basic primitives: Cube, Plane, Sphere
-		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
+		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
 
 		// Load skybox mesh
 		MeshData skybox_cube = make_cube();
@@ -368,6 +376,20 @@ namespace Engine {
 		};
 
 		m_passes.push_back(gpu_id_pass);
+
+		RenderPass ui_pass
+		{
+			.pass_name = "UI Pass",
+			.fbo_handle = 0,
+			.shdpgm_handle = 5,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::GEOMETRY
+		};
 
 		RenderPass debug_pass
 		{
