@@ -23,11 +23,16 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
+        // NEW: list of entities matching a tag
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetPosition(uint entityID, ref Vector3 position);
+        public static extern uint[] Scene_FindEntitiesByTag(string tag);
+
+        // CORRECT - GetPosition uses out, SetPosition uses ref
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_GetPosition(uint entityID, out Vector3 position); 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
+        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position); 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_Move(uint entityID, float deltaX, float deltaY, float deltaZ);
@@ -313,6 +318,5 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AudioManager_SetListenerAttributes(ref Vector3 position, ref Vector3 forward, ref Vector3 up, ref Vector3 velocity);
-
     }
 }

@@ -459,6 +459,7 @@ namespace Engine
 		// ===== TagComponent =====
 		static MonoString *Tag_GetTag(uint64_t entityID);
 		static void        Tag_SetTag(uint64_t entityID, MonoString *tag);
+		static MonoArray *Scene_FindEntitiesByTag(MonoString *tagString);
 
 		// ===== CameraComponent =====
 		static bool  Camera_GetEnabled(uint64_t entityID);
@@ -626,6 +627,7 @@ namespace Engine
 		// Tag
 		mono_add_internal_call("Engine.InternalCalls::Tag_GetTag", (void *)InternalCalls::Tag_GetTag);
 		mono_add_internal_call("Engine.InternalCalls::Tag_SetTag", (void *)InternalCalls::Tag_SetTag);
+		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntitiesByTag",	(void *)InternalCalls::Scene_FindEntitiesByTag);
 
 		// Camera
 		mono_add_internal_call("Engine.InternalCalls::Camera_GetEnabled", (void *)InternalCalls::Camera_GetEnabled);
@@ -1819,6 +1821,67 @@ namespace Engine
 			auto* am = GetAudioManager();
 			if (!am || !position || !forward || !up || !velocity) return;
 			am->SetListenerAttributes(*position, *forward, *up, *velocity);
+		}
+
+		// NEW: return managed uint[] of all entities with a given tag
+		MonoArray *Scene_FindEntitiesByTag(MonoString *tagString)
+		{
+			MonoDomain *domain = mono_domain_get();
+			if (!domain)
+				return nullptr;
+
+			MonoClass *uintClass = mono_get_uint32_class();
+			if (!uintClass)
+				return nullptr;
+
+			auto make_empty = [&]() -> MonoArray *
+				{
+					return mono_array_new(domain, uintClass, 0);
+				};
+
+			if (!s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCall] Scene_FindEntitiesByTag: current scene is null");
+				return make_empty();
+			}
+
+			if (!tagString)
+			{
+				LOG_WARNING("[InternalCall] Scene_FindEntitiesByTag: tag string is null");
+				return make_empty();
+			}
+
+			char *tagCStr = mono_string_to_utf8(tagString);
+			if (!tagCStr)
+			{
+				LOG_ERROR("[InternalCall] Scene_FindEntitiesByTag: failed to convert tag string");
+				return make_empty();
+			}
+
+			std::string tag(tagCStr);
+			mono_free(tagCStr);
+
+			auto &registry = s_CurrentScene->GetRegistry();
+			std::vector<uint32_t> results;
+
+			auto view = registry.view<TagComponent>();
+			for (auto entity : view)
+			{
+				const auto &tagComp = view.get<TagComponent>(entity);
+				if (tagComp.GetTag() == tag)
+				{
+					results.push_back(static_cast<uint32_t>(entity));
+				}
+			}
+
+			MonoArray *resultArray = mono_array_new(domain, uintClass, (uintptr_t)results.size());
+			for (uintptr_t i = 0; i < results.size(); ++i)
+			{
+				uint32_t id = results[i];
+				mono_array_set(resultArray, uint32_t, i, id);
+			}
+
+			return resultArray;
 		}
 	} // namespace internalcalls
 
