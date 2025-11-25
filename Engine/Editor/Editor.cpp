@@ -600,6 +600,8 @@ namespace Engine
 					
 				}
 
+				EditorHierarchyHelper::DeleteEntityParentAndChildren(m_Scene);
+
 				if (EditorHierarchyHelper::openAttachEntityPopup)
 				{
 					ImGui::OpenPopup("Main Entity Selection");
