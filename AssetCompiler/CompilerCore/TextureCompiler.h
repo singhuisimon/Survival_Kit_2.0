@@ -37,7 +37,7 @@ namespace AssetCompiler {
 		float quality = 1.0f;  // Compression quality 0.0-1.0
 
 		// Channels to include
-		int forceChannels = 0;  // 0=auto, 3=RGB, 4=RGBA
+		int forceChannels = 4;  // 0=auto, 3=RGB, 4=RGBA
 
 		// Processing flags
 		bool flipVertical = false;  // Flip texture vertically (OpenGL convention)

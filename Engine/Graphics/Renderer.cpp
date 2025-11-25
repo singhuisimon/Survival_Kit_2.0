@@ -391,7 +391,9 @@ namespace Engine {
 			.fbo_handle = 0,
 			.shdpgm_handle = 0,
 			.auto_aspect = true,
-			.blending =  true,
+			.depth_test = true,
+			.depth_write = true,
+			.blending = true,
 			.culling = false
 		};
 
