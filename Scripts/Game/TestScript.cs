@@ -5,123 +5,176 @@ namespace Game
 {
     public class TestScript
     {
-        public int EntityID;
-        private int frameCount = 0;
-        private uint playerID = 99;
-        private float fireCD = 0.0f;
-        private float fireTimer = 0.1f;
+        // ===== Entity Reference =====
+        public int EntityID = 3 ;
+
+        // ===== Serialized Fields (Editable in Inspector) =====
+        [SerializeField]
+        private float moveSpeed = 1.0f;
 
         [SerializeField]
-        private int health = 100;
-
-        [SerializeField("Run Speed")]
-        private float speed = 0.1f;
+        private float maxSpeed = 1.0f;
 
         [SerializeField]
-        private bool isActive = true;
+        private float dashForce = 2.0f;
 
         [SerializeField]
-        private string characterName = "Player";
+        private bool moveAllowed = true;
 
+        // ===== Private Fields =====
+        private bool isDashing = false;
+        private float dashCooldown = 0.0f;
+        private const float DASH_COOLDOWN_TIME = 1.0f;
+
+        // ===== Lifecycle Methods =====
         public void OnStart()
         {
-            Engine.InternalCalls.Log("TestScript started!");
-            // Cache and set up the player entity + rigidbody once
-            if (playerID == 99)
-            {
-                playerID = Engine.InternalCalls.Scene_FindEntityByName("Player");
-                Engine.InternalCalls.Entity_AddRigidBody(playerID);
-                Engine.InternalCalls.Log("Player Rigidbody added/ensured.");
-                Engine.InternalCalls.Log("Player successfully set up");
-            }
+            Engine.InternalCalls.Log("=== PlayerMovement Started ===");
+            Engine.InternalCalls.Log("EntityID: " + EntityID);
+
+            // Ensure rigidbody exists and configure it
+            Engine.InternalCalls.Entity_AddRigidBody((uint)EntityID);
+            Engine.InternalCalls.Rigidbody_SetIsKinematic((uint)EntityID, false);
+            Engine.InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, true);
+            Engine.InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
+
+            Engine.InternalCalls.Log("Rigidbody configured successfully");
         }
 
         public void OnUpdate(float deltaTime)
         {
-            frameCount++;
+            if (!moveAllowed)
+                return;
 
-            // -------- Rigidbody WASD movement for Player (no System.Math) --------
-            if (frameCount % 60 == 0)
-            {
-                Engine.InternalCalls.Log("Health: " + health + " | Speed: " + speed + " | isActive: " + isActive + " | characterName: " + characterName);
-            }
-            Engine.Vector3 inputDir = default;
+            // Update dash cooldown
+            if (dashCooldown > 0)
+                dashCooldown -= deltaTime;
 
-            // Forward / backward (Z)
+            // ===== Get Current Velocity =====
+            Engine.Vector3 currentVel;
+            Engine.InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out currentVel);
+
+            // ===== WASD Input =====
+            float inputX = 0.0f;
+            float inputZ = 0.0f;
+
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.W))
-                inputDir.Z += 1.0f;
+                inputZ += 1.0f;
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.S))
-                inputDir.Z -= 1.0f;
-
-            // Right / left (X)
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.D))
-                inputDir.X += 1.0f;
+                inputZ -= 1.0f;
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.A))
-                inputDir.X -= 1.0f;
+                inputX -= 1.0f;
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.D))
+                inputX += 1.0f;
 
-            bool hasInput = (inputDir.X != 0.0f) || (inputDir.Z != 0.0f);
+            bool hasInput = (inputX != 0.0f) || (inputZ != 0.0f);
 
-            Engine.Vector3 vel;
-            Engine.InternalCalls.Rigidbody_GetVelocity(playerID, out vel);
-
-            if (hasInput)
+            // ===== Apply Movement =====
+            if (hasInput && !isDashing)
             {
-                // Normalize XZ manually for diagonals, without System.Math
-                float normX = inputDir.X;
-                float normZ = inputDir.Z;
-
-                // If moving diagonally (both X and Z non-zero), scale by 1/sqrt(2)
-                if (normX != 0.0f && normZ != 0.0f)
+                // Normalize diagonal movement
+                float inputLengthSq = inputX * inputX + inputZ * inputZ;
+                if (inputLengthSq > 1.0f)
                 {
-                    const float INV_SQRT2 = 0.70710678f; // ~1/sqrt(2)
-                    normX *= INV_SQRT2;
-                    normZ *= INV_SQRT2;
+                    float invLength = 1.0f / SimpleSqrt(inputLengthSq);
+                    inputX *= invLength;
+                    inputZ *= invLength;
                 }
 
-                // Set horizontal velocity; keep Y so gravity/jumps still work
-                vel.X += normX * speed;
-                vel.Z += normZ * speed;
-
-                // Apply velocity to the rigidbody
-                Engine.InternalCalls.Rigidbody_SetVelocity(playerID, ref vel);
-
-                // Log the current velocity
-                Engine.InternalCalls.Log(
-                    "Player velocity: X=" + vel.X +
-                    ", Y=" + vel.Y +
-                    ", Z=" + vel.Z
+                // Calculate desired velocity
+                Engine.Vector3 desiredVel = new Engine.Vector3(
+                    inputX * maxSpeed,
+                    currentVel.Y,  // Preserve Y velocity (gravity)
+                    inputZ * maxSpeed
                 );
+
+                // Calculate velocity change needed
+                Engine.Vector3 velChange = new Engine.Vector3(
+                    desiredVel.X - currentVel.X,
+                    0,
+                    desiredVel.Z - currentVel.Z
+                );
+
+                // Apply force (acceleration)
+                Engine.Vector3 force = new Engine.Vector3(
+                    velChange.X * moveSpeed,
+                    0,
+                    velChange.Z * moveSpeed
+                );
+
+                Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref force);
             }
 
-            // -------- Existing fire / bullet logic --------
-            fireCD -= deltaTime;
-            //Engine.InternalCalls.Log(string.Concat("FireCD: ", fireCD.ToString()));
-
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.Enter) && fireCD <= 0)
+            // ===== Dash Mechanic =====
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.Space) && !isDashing && dashCooldown <= 0)
             {
-                fireCD = fireTimer;
-
-                // Create bullet ent
-                uint bullet = Engine.InternalCalls.Scene_CreateEntity("Bullet");
-
-                // Add script to bullet
-                Engine.InternalCalls.Entity_AddScript(bullet, "Game.Projectile");
-                Engine.InternalCalls.Entity_AddRigidBody(bullet);
-
-                Engine.Vector3 v3 = default;
-                Engine.Vector3 spawn = new Engine.Vector3(v3.X, v3.Y, v3.Z + 0.5f);
-                Engine.InternalCalls.Transform_SetPosition(bullet, ref spawn);
-
-                Engine.Vector3 bulletVel = new Engine.Vector3(0, 0, 1400f);
-                Engine.InternalCalls.Rigidbody_SetVelocity(bullet, ref bulletVel);
-
-                Engine.InternalCalls.Log("Firing Bullet!");
+                Dash(inputX, inputZ);
             }
+        }
+
+        private void Dash(float inputX, float inputZ)
+        {
+            // Use current input direction, or dash forward if no input
+            if (inputX == 0.0f && inputZ == 0.0f)
+                inputZ = 1.0f;
+
+            // Normalize
+            float inputLengthSq = inputX * inputX + inputZ * inputZ;
+            if (inputLengthSq > 1.0f)
+            {
+                float invLength = 1.0f / SimpleSqrt(inputLengthSq);
+                inputX *= invLength;
+                inputZ *= invLength;
+            }
+
+            // Apply dash impulse
+            Engine.Vector3 dashImpulse = new Engine.Vector3(
+                inputX * dashForce,
+                0,
+                inputZ * dashForce
+            );
+
+            Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref dashImpulse);
+
+            isDashing = true;
+            dashCooldown = DASH_COOLDOWN_TIME;
+
+            Engine.InternalCalls.Log("DASH!");
+        }
+
+        // ===== Simple Square Root (No Dependencies) =====
+        private float SimpleSqrt(float value)
+        {
+            if (value <= 0.0f) return 0.0f;
+            if (value == 1.0f) return 1.0f;
+
+            // Newton-Raphson method (simple, no bit tricks)
+            float x = value;
+            float y = 1.0f;
+            float epsilon = 0.0001f;
+
+            // Just 3 iterations - enough for game physics
+            for (int i = 0; i < 3; i++)
+            {
+                y = (x + value / x) * 0.5f;
+                if ((x - y) < epsilon && (x - y) > -epsilon)
+                    break;
+                x = y;
+            }
+
+            return y;
+        }
+
+        public void Stop()
+        {
+            moveAllowed = false;
+            Engine.InternalCalls.Rigidbody_Stop((uint)EntityID);
+            Engine.InternalCalls.Log("Player movement stopped");
         }
 
         public void OnDestroy()
         {
-            Engine.InternalCalls.Log("TestScript destroyed!");
+            Engine.InternalCalls.Log("=== PlayerMovement Destroyed ===");
         }
     }
 }

@@ -625,7 +625,7 @@ namespace Engine {
 		}
 	}
 
-	void AudioManager::GetMasterVolume(float& volume) {
+	/*void AudioManager::GetMasterVolume(float& volume) {
 		if (!initialized || !mastergroup)
 			return;
 		mastergroup->getVolume(&volume);
@@ -661,7 +661,7 @@ namespace Engine {
 		bool mute = false;
 		mastergroup->getMute(&mute);
 		return mute;
-	}
+	}*/
 
 	void AudioManager::SetListenerAttributes(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up, const glm::vec3& velocity) {
 		if (!initialized || !coresystem)
@@ -829,7 +829,7 @@ namespace Engine {
 		}
 	}
 
-	void AudioManager::ReleaseDSP(AudioType group, DSPEffectType effect) {
+	void AudioManager::ReleaseSpecificDSPinGroup(AudioType group, DSPEffectType effect) {
 		auto& dspMap = (group == AudioType::MASTER) ? m_MasterDSPs :
 					(group == AudioType::SFX) ? m_SFXDSPs :
 					(group == AudioType::BGM) ? m_BGMDSPs :
