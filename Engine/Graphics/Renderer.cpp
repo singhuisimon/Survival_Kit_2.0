@@ -77,35 +77,43 @@ namespace {
 		std::string vertex_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.vert") };
 		std::string fragment_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.frag") };
 
+		std::string vertex_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.vert") };
+		std::string fragment_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.frag") };
+
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
 			std::make_pair(vertex_debug_path, fragment_debug_path),
 			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
 			std::make_pair(vertex_skybox_path, fragment_skybox_path),
-			std::make_pair(vertex_hdr_path, fragment_hdr_path)
+			std::make_pair(vertex_hdr_path, fragment_hdr_path),
+			std::make_pair(vertex_ui_path, fragment_ui_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
 	}
 
-	inline void load_basic_primitives(std::vector<Engine::MeshGL>& ms, std::vector<Engine::MeshData>& md) {
+	inline void load_basic_primitives(std::vector<Engine::MeshGL>& ms, std::vector<Engine::MeshData>& md, std::vector<Engine::MeshData2D>& md2d) {
 
 		Engine::MeshData cd = Engine::make_cube();
 		Engine::MeshData pd = Engine::make_plane();
 		Engine::MeshData sd = Engine::make_sphere();
+		Engine::MeshData2D qd = Engine::make_quad();
 
 		md.push_back(cd);
 		md.push_back(pd);
 		md.push_back(sd);
+		md2d.push_back(qd);
 
 		Engine::MeshGL c = Engine::upload_mesh_data(cd);
 		Engine::MeshGL p = Engine::upload_mesh_data(pd);
 		Engine::MeshGL s = Engine::upload_mesh_data(sd);
+		Engine::MeshGL q = Engine::upload_mesh_data2D(qd);
 
 		ms.push_back(std::move(c));
 		ms.push_back(std::move(p));
 		ms.push_back(std::move(s));
+		ms.push_back(std::move(q));
 	}
 
 	unsigned int loadCubemap(std::vector<std::string> faces)
@@ -132,6 +140,44 @@ namespace {
 				stbi_image_free(data);
 			}
 		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		return textureID;
+	}
+
+	unsigned int loadCubemapHDR(std::vector<std::string> faces)
+	{
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+		int width, height, nrChannels;
+		for (unsigned int i = 0; i < faces.size(); i++)
+		{
+			// Load as float data instead of unsigned char
+			float* data = stbi_loadf(faces[i].c_str(), &width, &height, &nrChannels, 0);
+			if (data)
+			{
+				// Use HDR internal format
+				GLenum internalFormat = (nrChannels == 4) ? GL_RGBA16F : GL_RGB16F;
+				GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0, internalFormat, width, height, 0, format, GL_FLOAT, data
+				);
+				stbi_image_free(data);
+			}
+			else
+			{
+				std::cout << "Cubemap HDR tex failed to load at path: " << faces[i] << std::endl;
+				stbi_image_free(data);
+			}
+		}
+
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -181,7 +227,7 @@ namespace Engine {
 		test_load_shaders(m_gl.m_shader_storage);
 
 		// Load a set of basic primitives: Cube, Plane, Sphere
-		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage);
+		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
 
 		// Load skybox mesh
 		MeshData skybox_cube = make_cube();
@@ -189,15 +235,15 @@ namespace Engine {
 
 		// Load skybox textures
 		std::vector<std::string> faces = {
-				Engine::getAssetFilePath("Sources/Textures/right.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/left.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/top.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/bottom.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/front.jpg"),
-				Engine::getAssetFilePath("Sources/Textures/back.jpg")
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_001.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_002.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_003.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_004.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_005.png"),
+				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_006.png")
 		};
 
-		m_skybox_texture = loadCubemap(faces);
+		m_skybox_texture = loadCubemapHDR(faces);
 
 		// Create a fullscreen quad where the final render output is drawn onto
 		MeshData2D quad = make_quad();
@@ -345,7 +391,9 @@ namespace Engine {
 			.fbo_handle = 0,
 			.shdpgm_handle = 0,
 			.auto_aspect = true,
-			.blending =  true,
+			.depth_test = true,
+			.depth_write = true,
+			.blending = true,
 			.culling = false
 		};
 
@@ -368,6 +416,20 @@ namespace Engine {
 		};
 
 		m_passes.push_back(gpu_id_pass);
+
+		RenderPass ui_pass
+		{
+			.pass_name = "UI Pass",
+			.fbo_handle = 0,
+			.shdpgm_handle = 5,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::GEOMETRY
+		};
 
 		RenderPass debug_pass
 		{

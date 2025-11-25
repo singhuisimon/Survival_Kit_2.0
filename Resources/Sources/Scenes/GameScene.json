@@ -210,7 +210,7 @@
                         ],
                         "Scale": [
                             100.0,
-                            60.0,
+                            100.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -233,11 +233,11 @@
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                        "playing": true,
+                        "playing": false,
                         "respectClipLoop": true,
                         "controller": 1,
                         "currentClipIndex": 0,
-                        "currentTime": 3.34661865234375,
+                        "currentTime": 2.1827468872070313,
                         "playbackSpeed": 1.0
                     }
                 }

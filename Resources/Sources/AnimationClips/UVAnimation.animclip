@@ -1,7 +1,7 @@
 {
   "id": 4,
   "name": "UVAnimation",
-  "duration": 5,
+  "duration": 40,
   "loop": true,
   "positionInterp": "Linear",
   "rotationInterp": "Linear",
@@ -16,6 +16,6 @@
   ],
   "uvOffsetKeys": [
     { "time": 0, "value": [0, 0] },
-    { "time": 5, "value": [-2, -2] }
+    { "time": 40, "value": [-2, -2] }
   ]
 }
