@@ -566,8 +566,8 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void *)InternalCalls::Prefab_Instantiate);
 
 		// Transform
-		mono_add_internal_call("Engine.Transform::GetPosition_Native", (void *)InternalCalls::Transform_GetPosition);
-		mono_add_internal_call("Engine.Transform::SetPosition_Native", (void *)InternalCalls::Transform_SetPosition);
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void*)InternalCalls::Transform_GetPosition);
+		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void*)InternalCalls::Transform_SetPosition);
 		mono_add_internal_call("Engine.Transform::GetRotation_Native", (void *)InternalCalls::Transform_GetRotation);
 		mono_add_internal_call("Engine.Transform::SetRotation_Native", (void *)InternalCalls::Transform_SetRotation);
 		mono_add_internal_call("Engine.Transform::GetScale_Native", (void *)InternalCalls::Transform_GetScale);

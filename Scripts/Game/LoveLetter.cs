@@ -3,176 +3,192 @@ using System;
 
 namespace Game
 {
-    public class EnemyE005
+    public class LoveLetter
     {
         // ===== Entity Reference =====
-        public int EntityID;
+        public int EntityID = 0;
 
-        // ===== Serialized Fields =====
+        // ===== Serialized Waypoint Entity IDs (Edit in Inspector) =====
         [SerializeField]
-        private bool isDead = false;
-
-        [SerializeField]
-        private float smoothTime = 0.5f;
+        private int waypoint0ID = 3;
 
         [SerializeField]
-        private float speed = 10f;
+        private int waypoint1ID = 4;
 
         [SerializeField]
-        private bool moving = false;
+        private int waypoint2ID = 5;
 
         [SerializeField]
-        private bool isStunned = false;
+        private int waypoint3ID = 6;
+
+        // ===== Movement Settings =====
+        [SerializeField]
+        private float moveSpeed = 2.0f;
 
         [SerializeField]
-        private float stunnedTime = 0.5f;
+        private float waypointReachedDistance = 0.5f;
 
         [SerializeField]
-        private int payloadsDestroyed = 0;
+        private float startDelay = 1.0f;
+
+        // ===== Status =====
+        [SerializeField]
+        private bool isMoving = false;
 
         [SerializeField]
-        private int payloadsOnBoard = 9;
-
-        [SerializeField]
-        private string pathGiven = "";
-
-        [SerializeField]
-        private float startActionsDelay = 0.5f;
+        private int currentWaypoint = 0;
 
         // ===== Private Fields =====
-        private Engine.Vector3 velocity;
-        private float stunTimer = 0.0f;
-        private int[] pathEntityIDs;
-        private int pathCurrent = 0;
-        private float actionDelayTimer = 0.0f;
+        private int[] waypoints;
+        private float delayTimer = 0.0f;
 
-        // ===== Lifecycle Methods =====
+        // ===== Lifecycle =====
         public void OnStart()
         {
-            Engine.InternalCalls.Log("=== EnemyE005 Started ===");
+            Engine.InternalCalls.Log("=== LoveLetter Started ===");
             Engine.InternalCalls.Log("EntityID: " + EntityID);
 
-            // Setup initial state
-            payloadsDestroyed = 0;
-            isDead = false;
-            isStunned = false;
-            moving = false;
-            actionDelayTimer = startActionsDelay;
-            velocity = new Engine.Vector3(0, 0, 0);
+            // Build waypoint array
+            waypoints = new int[4];
+            waypoints[0] = waypoint0ID;
+            waypoints[1] = waypoint1ID;
+            waypoints[2] = waypoint2ID;
+            waypoints[3] = waypoint3ID;
 
-            PathSetup();
+            // Log waypoints
+            Engine.InternalCalls.Log("Waypoints: " + waypoint0ID + ", " + waypoint1ID + ", " + waypoint2ID + ", " + waypoint3ID);
+
+            // Validate waypoints
+            if (waypoint0ID == 0 || waypoint1ID == 0 || waypoint2ID == 0 || waypoint3ID == 0)
+            {
+                Engine.InternalCalls.LogWarning("LoveLetter: Some waypoints not set!");
+                return;
+            }
+
+            // Start with delay
+            delayTimer = startDelay;
+            currentWaypoint = 0;
+
+            Engine.InternalCalls.Log("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
         }
 
         public void OnUpdate(float deltaTime)
         {
-            // Handle delayed start
-            if (actionDelayTimer > 0.0f)
+            // Handle start delay
+            if (delayTimer > 0.0f)
             {
-                actionDelayTimer -= deltaTime;
-                if (actionDelayTimer <= 0.0f)
-                {
-                    StartPathing();
-                }
-                return;
-            }
+                delayTimer -= deltaTime;
 
-            // Handle stun
-            if (isStunned)
-            {
-                stunTimer -= deltaTime;
-                if (stunTimer <= 0.0f)
+                if (delayTimer <= 0.0f)
                 {
-                    isStunned = false;
-                    moving = true;
-                    Engine.InternalCalls.Log("EnemyE005 recovered from stun!");
+                    Engine.InternalCalls.Log("Delay finished - calling StartMoving");
+                    StartMoving();
                 }
                 return;
             }
 
             // Move along path
-            if (moving && !isDead)
+            if (isMoving)
             {
-                MovePayload(deltaTime);
+                MoveTowardsWaypoint(deltaTime);
             }
         }
 
-        // ===== Path Management =====
-        private void PathSetup()
+        // ===== Movement System =====
+        private void StartMoving()
         {
-            // TODO: Find path waypoints by tag
-            // Example: pathEntityIDs = FindEntitiesByTag("PATH_" + pathGiven);
-            Engine.InternalCalls.Log("PathSetup called for: " + pathGiven);
-        }
+            Engine.InternalCalls.Log("=== StartMoving called ===");
 
-        private void StartPathing()
-        {
-            if (pathEntityIDs == null || pathEntityIDs.Length == 0)
+            if (waypoints == null || waypoints.Length == 0)
             {
-                Engine.InternalCalls.LogWarning("EnemyE005: No path waypoints set!");
+                Engine.InternalCalls.LogWarning("No waypoints!");
                 return;
             }
 
-            // Get first waypoint position (use OUT)
+            // Get waypoint 0 position
             Engine.Vector3 startPos;
-            Engine.InternalCalls.Transform_GetPosition((uint)pathEntityIDs[0], out startPos);
+            Engine.InternalCalls.Transform_GetPosition((uint)waypoints[0], out startPos);
 
-            // Set this entity's position (use REF)
+            Engine.InternalCalls.Log("Teleporting to waypoint 0: " + startPos.X + ", " + startPos.Y + ", " + startPos.Z);
+
+            // Teleport to first waypoint
             Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref startPos);
 
-            pathCurrent = 1;
-            moving = true;
+            currentWaypoint = 1;
+            isMoving = true;
 
-            Engine.InternalCalls.Log("EnemyE005 pathing started");
+            Engine.InternalCalls.Log("Movement started! Targeting waypoint 1");
         }
 
-        private void MovePayload(float deltaTime)
+        private void MoveTowardsWaypoint(float deltaTime)
         {
-            if (pathEntityIDs == null || pathCurrent >= pathEntityIDs.Length)
+            // Check if finished path
+            if (currentWaypoint >= waypoints.Length)
             {
-                moving = false;
-                Engine.InternalCalls.Log("EnemyE005 reached end of path");
+                isMoving = false;
+                Engine.InternalCalls.Log("Reached end of path!");
                 return;
             }
 
-            // Get current position (use OUT)
+            // Get current position
             Engine.Vector3 currentPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out currentPos);
 
-            // Get next waypoint position (use OUT)
-            Engine.Vector3 nextPathPos;
-            Engine.InternalCalls.Transform_GetPosition((uint)pathEntityIDs[pathCurrent], out nextPathPos);
+            // Get target waypoint position
+            Engine.Vector3 targetPos;
+            Engine.InternalCalls.Transform_GetPosition((uint)waypoints[currentWaypoint], out targetPos);
+
+            // Calculate direction
+            Engine.Vector3 direction = new Engine.Vector3(
+                targetPos.X - currentPos.X,
+                targetPos.Y - currentPos.Y,
+                targetPos.Z - currentPos.Z
+            );
+
+            // Calculate distance
+            float distance = CalculateDistance(currentPos, targetPos);
+
+            // Check if reached
+            if (distance < waypointReachedDistance)
+            {
+                Engine.InternalCalls.Log("Reached waypoint " + currentWaypoint);
+                currentWaypoint++;
+                return;
+            }
+
+            // Normalize direction
+            float dirLength = CalculateDistance(direction, new Engine.Vector3(0, 0, 0));
+            if (dirLength > 0.0f)
+            {
+                direction.X /= dirLength;
+                direction.Y /= dirLength;
+                direction.Z /= dirLength;
+            }
+            else
+            {
+                return;
+            }
+
+            // Calculate movement
+            Engine.Vector3 movement = new Engine.Vector3(
+                direction.X * moveSpeed * deltaTime,
+                direction.Y * moveSpeed * deltaTime,
+                direction.Z * moveSpeed * deltaTime
+            );
 
             // Calculate new position
-            float lerpSpeed = smoothTime * deltaTime * speed;
-            Engine.Vector3 newPos = Lerp(currentPos, nextPathPos, lerpSpeed);
+            Engine.Vector3 newPos = new Engine.Vector3(
+                currentPos.X + movement.X,
+                currentPos.Y + movement.Y,
+                currentPos.Z + movement.Z
+            );
 
-            // Set new position (use REF)
+            // Apply new position
             Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
-
-            // Check if reached waypoint
-            float dist = Distance(currentPos, nextPathPos);
-            if (dist < 0.5f)
-            {
-                pathCurrent++;
-                Engine.InternalCalls.Log("EnemyE005 reached waypoint " + pathCurrent);
-            }
         }
 
         // ===== Helper Functions =====
-        private Engine.Vector3 Lerp(Engine.Vector3 a, Engine.Vector3 b, float t)
-        {
-            // Clamp t
-            if (t < 0.0f) t = 0.0f;
-            if (t > 1.0f) t = 1.0f;
-
-            return new Engine.Vector3(
-                a.X + (b.X - a.X) * t,
-                a.Y + (b.Y - a.Y) * t,
-                a.Z + (b.Z - a.Z) * t
-            );
-        }
-
-        private float Distance(Engine.Vector3 a, Engine.Vector3 b)
+        private float CalculateDistance(Engine.Vector3 a, Engine.Vector3 b)
         {
             float dx = b.X - a.X;
             float dy = b.Y - a.Y;
@@ -186,62 +202,19 @@ namespace Game
             if (value == 1.0f) return 1.0f;
 
             float x = value;
-            float prev = 0.0f;
 
-            // Newton-Raphson with safety
             for (int i = 0; i < 6; i++)
             {
                 if (x <= 0.0f) break;
-                prev = x;
                 x = 0.5f * (x + value / x);
-
-                // Converged?
-                float diff = (x - prev);
-                if (diff < 0.0001f && diff > -0.0001f)
-                    break;
             }
 
             return x;
         }
 
-        // ===== Public API =====
-        public void Stun()
-        {
-            if (isDead) return;
-
-            isStunned = true;
-            stunTimer = stunnedTime;
-            moving = false;
-
-            Engine.InternalCalls.Log("EnemyE005 stunned for " + stunnedTime + " seconds!");
-        }
-
-        public void PayloadDestroyed()
-        {
-            if (isDead) return;
-
-            payloadsDestroyed++;
-            Engine.InternalCalls.Log("Payload destroyed (" + payloadsDestroyed + "/" + payloadsOnBoard + ")");
-
-            if (payloadsDestroyed >= payloadsOnBoard)
-            {
-                moving = false;
-                isDead = true;
-                Engine.InternalCalls.Log("EnemyE005 DESTROYED: All payloads eliminated!");
-
-                // TODO: Trigger death animation/VFX here
-            }
-        }
-
-        public void SetPath(int[] waypointEntityIDs)
-        {
-            pathEntityIDs = waypointEntityIDs;
-            Engine.InternalCalls.Log("EnemyE005 path set with " + waypointEntityIDs.Length + " waypoints");
-        }
-
         public void OnDestroy()
         {
-            Engine.InternalCalls.Log("=== EnemyE005 Destroyed ===");
+            Engine.InternalCalls.Log("=== LoveLetter Destroyed ===");
         }
     }
 }
