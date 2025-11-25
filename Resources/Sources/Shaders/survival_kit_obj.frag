@@ -11,7 +11,7 @@
 #version 460 core
 
 const float FOG_MINDIST = 5.0f;
-const float FOG_MAXDIST = 15.0f;
+const float FOG_MAXDIST = 5000.0f;
 const vec3 FOG_COLOR = vec3(0,0,0);
 
 
