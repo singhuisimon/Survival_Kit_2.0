@@ -47,6 +47,7 @@ private:
     float m_ColorShift = 0.0f;
     bool m_EditorEnable = true;
     bool m_EditorJustPaused = false;
+    bool m_IsFirstPausedFrame = true;
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
 

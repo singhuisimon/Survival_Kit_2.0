@@ -634,6 +634,10 @@ void Game::OnUpdate(Engine::Timestep ts) {
             m_EditorJustPaused = false;
         }
 
+        if (!m_IsFirstPausedFrame) {
+            m_IsFirstPausedFrame = true;
+        }
+
         // Update scene (this will call all systems in priority order)
         m_Scene->OnUpdate(ts);  // Convert Timestep to float
 
@@ -649,9 +653,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
         Engine::TransformSystem* transformSystem = sceneSystems.GetSystem<Engine::TransformSystem>();
         transformSystem->OnUpdate(m_Scene.get(), ts);
 
-        // Bug: BT system does not load when updated; Quick fix is to uncomment the next lines let BT system run instead of stopping
-        /*Engine::BehaviourTreeSystem* BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
-        BTSystem->OnUpdate(m_Scene.get(), ts);*/
+        if (m_IsFirstPausedFrame) {
+            Engine::BehaviourTreeSystem* BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
+            BTSystem->LoadBehaviourTrees(m_Scene.get());
+            m_IsFirstPausedFrame = false;
+        }
 
         Engine::CameraSystem* camSystem = sceneSystems.GetSystem<Engine::CameraSystem>();
         camSystem->OnUpdate(m_Scene.get(), ts);
