@@ -35,6 +35,7 @@ namespace Engine {
 	struct GraphicsLoader {
 		std::vector<MeshGL>                      m_mesh_storage;
 		std::vector<MeshData>                    m_mesh_data_storage;
+		std::vector<MeshData2D>					 m_mesh_data2d_storage;
 		std::vector<ShaderProgram>               m_shader_storage;
 		std::vector<Texture>                     m_textures;
 

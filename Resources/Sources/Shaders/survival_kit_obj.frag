@@ -162,10 +162,11 @@ void main()
 
     // ===== Material properties =====
     vec3 albedo = material_.albedo;
+    float texAlpha = 1.0;
     if (isTexture) {
-
-        vec3 tex = texture(Texture2D, TexCoord * tiling + offset).rgb;
-        albedo *= tex;
+        vec4 texSample = texture(Texture2D, TexCoord * tiling + offset);
+        albedo *= texSample.rgb;
+        texAlpha = texSample.a;
     }
     
     float roughness = material_.roughness;
@@ -254,5 +255,12 @@ void main()
     vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
     vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
 
-    FragColor = vec4(color, material_.opacity);
+    float finalAlpha = material_.opacity * texAlpha;
+
+    // Discard fully transparent fragments
+    if (finalAlpha <= 0.01) {
+        discard;
+    }
+
+    FragColor = vec4(color, finalAlpha);
 }
