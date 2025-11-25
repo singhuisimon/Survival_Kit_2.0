@@ -256,6 +256,48 @@ namespace Engine {
                 [](const RigidbodyComponent& c) { return c.Velocity; },
                 [](RigidbodyComponent& c, const glm::vec3& v) { c.Velocity = v; }
             );
+            meta.AddProperty<RigidbodyComponent, glm::vec3>(
+                "AngularVelocity",
+                PropertyType::Vec3,
+                [](const RigidbodyComponent& c) { return c.AngularVelocity; },
+                [](RigidbodyComponent& c, const glm::vec3& v) { c.AngularVelocity = v; }
+            );
+            meta.AddProperty<RigidbodyComponent, float>(
+                "LinearDamping",
+                PropertyType::Float,
+                [](const RigidbodyComponent& c) { return c.LinearDamping; },
+                [](RigidbodyComponent& c, const float& v) { c.LinearDamping = v; }
+            );
+            meta.AddProperty<RigidbodyComponent, float>(
+                "AngularDamping",
+                PropertyType::Float,
+                [](const RigidbodyComponent& c) { return c.AngularDamping; },
+                [](RigidbodyComponent& c, const float& v) { c.AngularDamping = v; }
+            );
+            meta.AddProperty<RigidbodyComponent, float>(
+                "AngularDamping",
+                PropertyType::Float,
+                [](const RigidbodyComponent& c) { return c.Restitution; },
+                [](RigidbodyComponent& c, const float& v) { c.Restitution = v; }
+            );
+            meta.AddProperty<RigidbodyComponent, ColliderType>(
+                "CollideType",
+                PropertyType::Int,
+                [](const RigidbodyComponent& c) { return c.Shape; },
+                [](RigidbodyComponent& c, const ColliderType& v) { c.Shape = v; }
+            );
+            meta.AddProperty<RigidbodyComponent, glm::vec3>(
+                "BoxHalfExtents",
+                PropertyType::Vec3,
+                [](const RigidbodyComponent& c) { return c.BoxHalfExtents; },
+                [](RigidbodyComponent& c, const glm::vec3& v) { c.BoxHalfExtents = v; }
+            );
+            meta.AddProperty<RigidbodyComponent, float>(
+                "SphereRadius",
+                PropertyType::Float,
+                [](const RigidbodyComponent& c) { return c.SphereRadius; },
+                [](RigidbodyComponent& c, const float& v) { c.SphereRadius = v; }
+            );
         }
 
         //Register AudioComponent
