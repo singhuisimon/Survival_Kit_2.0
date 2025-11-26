@@ -119,6 +119,7 @@ namespace Engine
 		// ImGui other helper variable
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+		std::string selectedFolder = ""; // for the selected folder in asset browser
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
 
 		// Prefab helper variables
@@ -133,6 +134,8 @@ namespace Engine
 	
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE; // for ImGuizmo 
 		bool m_PreviousEditorCamToggle = false; // track if is in camera mode
+
+		
 	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
@@ -394,6 +397,8 @@ namespace Engine
 		* @param buttonSize
 		*	The size of the button used for removing the component.
 		**************************************************************************/
+
+		void displayPrefabComp();
 		void displayCameraComp(ImVec2& buttonSize);
 
 

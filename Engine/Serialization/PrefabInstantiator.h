@@ -17,6 +17,7 @@
 #include "../ECS/Entity.h"
 #include <entt/entt.hpp>
 #include <string>
+#include <rapidjson/document.h>
 
  // Forward declare rapidjson types to avoid including full rapidjson in header
 namespace rapidjson {
@@ -76,7 +77,19 @@ namespace Engine {
             entt::entity entityId = entt::null
         );
 
+        static std::vector<Entity>CreateEntitiesAndBuildIDMap(
+            Scene* scene,
+            const rapidjson::Value& entitiesArray,
+            std::unordered_map<uint32_t, entt::entity>& idMapping,
+            Entity& rootEntity);
 
+        static void FixTransformHierarchy(
+            const std::vector<Entity>& entities,
+            const std::unordered_map<uint32_t, entt::entity>& idMapping);
+
+        static void ApplyPrefabComponentToAll(
+            const std::vector<Entity>& entities,
+            xresource::instance_guid prefabGUID);
     private:
 
         /**
