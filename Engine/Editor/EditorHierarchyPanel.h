@@ -99,11 +99,11 @@ namespace Engine
 
 					// If this entity has a parent, unparent it first
 					if (entity.HasComponent<TransformComponent>()) {
-
+						
 						if (hasParent) {
 							TransformSystem::UnParent(scene, entity);
 						}
-
+						
 						if (hasChildren) {
 							auto& transform = entity.GetComponent<TransformComponent>();
 							for (uint32_t childID : transform.Children)
@@ -124,8 +124,7 @@ namespace Engine
 					if (opened && hasChildren) {
 						ImGui::TreePop();
 					}
-					return;  // Return early to prevent drawing (child) entities that are deleted
-					
+					return;	// Return early to prevent drawing (child) entities that are deleted
 				}
 
 #if 0 // 25/11 4:38pm test prefab parent child entity
