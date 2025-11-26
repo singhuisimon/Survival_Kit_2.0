@@ -42,6 +42,8 @@ namespace Engine {
 			m_cfg = createDefaultConfig();
 		}
 
+		LOG_INFO("Asset Manager StartUp 1");
+
 		//create directories 
 		try {
 			
@@ -59,24 +61,34 @@ namespace Engine {
 			LOG_ERROR("Failed to create directories: ", e.what());
 			return -1;
 		}
+
+		LOG_INFO("Asset Manager StartUp 2");
+
 		// Configure scanner
 		m_scanner.setRoots(m_cfg.sourceRoots);
 		m_scanner.setExtensions(m_cfg.scanExtensions);
 		m_scanner.setIgnoreSubstrings(m_cfg.ignoreSubstrings);
 		m_scanner.setIncludeHidden(m_cfg.includeHidden);
 
+		LOG_INFO("Asset Manager StartUp 3");
+
 		// load snap shot AM.startUp()
 		if (!m_cfg.snapshotFile.empty())
 			m_scanner.LoadSnapshot(m_cfg.snapshotFile);
 
 		//RegisterDefaultImporters(m_importers);
+		LOG_INFO("Asset Manager StartUp 4");
 
 		// load database file AM.startUp();
 		if (!m_cfg.databaseFile.empty())
 			m_db.Load(m_cfg.databaseFile);
 
+		LOG_INFO("Asset Manager StartUp 5");
+
 		//set up the root for descriptor generator
 		m_descGen.SetOutputRoot(m_cfg.descriptorRoot);
+
+		LOG_INFO("Asset Manager StartUp 6");
 
 		return 0;
 	}

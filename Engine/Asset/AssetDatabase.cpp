@@ -95,6 +95,8 @@ namespace Engine {
 				std::getline(ss, needsRecompileStr);
 			}
 
+			LOG_INFO("Asset DB Load 1");
+
 			try {
 				AssetRecord rec;
 				rec.guid.m_Value = std::stoull(guidStr, nullptr, 16);
@@ -110,7 +112,7 @@ namespace Engine {
 					else if (pathWithoutResources.find("/Resources/") == 0) {
 						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 					}
-					std::string sourceRoot = AssetManager::GetSourceResourcesPath();
+					std::string sourceRoot = Engine::getAssetsPath();
 					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
 					//normalize here
@@ -148,6 +150,8 @@ namespace Engine {
 			catch (const std::exception& e) {
 				LOG_WARNING("Failed to parse database line ", lineNum, ": ", e.what());
 			}
+
+			LOG_INFO("Asset DB Load 2");
 		}
 
 		LOG_INFO("Loaded ", loadedCount, " asset records from database");

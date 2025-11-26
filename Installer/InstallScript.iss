@@ -20,7 +20,7 @@ AppSupportURL=http://www.digipen.edu/
 
 ; Default path to the file storage directory.
 ; {pf} is the default program files directory set by Windows
-DefaultDirName={pf}\DigiPen\GuardianOfTheMotherboard
+DefaultDirName={commonpf}\DigiPen\GuardianOfTheMotherboard
 
 ; Start menu directory
 DefaultGroupName=DigiPen\GuardianOfTheMotherboard
@@ -87,10 +87,10 @@ Source: .\REDIST\VC_redist.x64.exe; DestDir: {tmp}; Flags: ignoreversion
 ;   {group} is the start menu location that the game will install shortcuts to.
 ;   {commondesktop} is your Windows desktop directory.
 [Icons]
-Name: {group}\GuardianOfTheMotherboard; Filename: {app}\GuardianOfTheMotherboard.exe; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
+Name: {group}\GuardianOfTheMotherboard; Filename: {app}\GameEngine.exe; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
 Name: {group}\{cm:UninstallProgram,GuardianOfTheMotherboard}; Filename: {uninstallexe}
 Name: {group}\{cm:UninstallProgram,GuardianOfTheMotherboard}; Filename: {uninstallexe};  IconFilename: "{app}\Icon.ico"
-Name: {commondesktop}\GuardianOfTheMotherboard; Filename: {app}\GuardianOfTheMotherboard.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
+Name: {commondesktop}\GuardianOfTheMotherboard; Filename: {app}\GameEngine.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
 
 ; List of items to execute in the installer.
 ; Note that this will run all executables in their silent versions as required by the TCRs.
@@ -101,7 +101,7 @@ Name: {commondesktop}\GuardianOfTheMotherboard; Filename: {app}\GuardianOfTheMot
 ;Filename: {tmp}\vc_redist.x86.exe; Parameters: /q; StatusMsg: Installing Visual C++ 2015 Redistributable...
 Filename: {tmp}\VC_redist.x64.exe; Parameters: /q; StatusMsg: Installing Visual C++ 2022 Redistributable...
 ;Filename: {tmp}\dxwebsetup.exe; Parameters: /q; StatusMsg: Installing DirectX...
-Filename: {app}\GuardianOfTheMotherboard.exe; Description: {cm:LaunchProgram,GuardianOfTheMotherboard}; Flags: nowait postinstall skipifsilent
+Filename: {app}\GameEngine.exe; Description: {cm:LaunchProgram,GuardianOfTheMotherboard}; Flags: nowait postinstall skipifsilent
 
 
 ;To be able to run and generate the GuardianOfTheMotherboard_Setup.exe you need to download and install "Inno Setup" application, then open this file with the application.
