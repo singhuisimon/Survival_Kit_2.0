@@ -218,8 +218,8 @@ namespace Engine {
 		u32 pickedID = 0xFFFFFFFFu;
 
 		// Temp toggle to check if editor camera is enabled
-		bool isEditorCamOn = true;
-		bool isEditorMode = true;
+		bool isEditorCamOn = false;
+		bool isEditorMode = false;
 
 		// Temporary object
 		GraphicsLoader m_gl;

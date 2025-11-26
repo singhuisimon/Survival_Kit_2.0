@@ -431,6 +431,11 @@ namespace Engine
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
+
+		void setCurrScenePathAndFilename(std::string scenePath, std::string fileName) {
+			currScenePath = scenePath;
+			currFileName = fileName;
+		}
 	};
 
 

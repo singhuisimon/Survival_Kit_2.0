@@ -90,11 +90,11 @@ void Game::OnInit() {
     }
     else {
 
-        LOG_INFO("Performing initial asset scan...");
+        /*LOG_INFO("Performing initial asset scan...");
         Engine::AM.scanAndProcess();
 
         LOG_INFO("Initial asset scan complete - found ",
-            Engine::AM.db().Count(), " assets");
+            Engine::AM.db().Count(), " assets");*/
     }
 
     Engine::RM.startUp();
@@ -195,13 +195,18 @@ void Game::OnInit() {
     bool loadedFromFile = false;
 
     try {
-        loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+        loadedFromFile = m_Scene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/MainGameScene.json"));
 
         if (loadedFromFile) {
             LOG_INFO("  -> Scene loaded from file successfully");
         }
         else {
             LOG_WARNING("  -> Could not load scene file (file may not exist)");
+        }
+
+        if (m_Editor)
+        {
+            m_Editor->setCurrScenePathAndFilename(Engine::getAssetFilePath("Sources/Scenes/MainGameScene.json"), "MainGameScene.json");
         }
     }
     catch (const std::exception& e) {
@@ -611,18 +616,18 @@ void Game::OnUpdate(Engine::Timestep ts) {
     auto& editorModeToggle = m_Renderer->getEditorModeToggle();
 
     // Add this somewhere in your input handling:
-    if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
+    /*if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
         m_EditorEnable = !m_EditorEnable; 
         editorModeToggle = m_EditorEnable;
         editorCamToggle = false;
         LOG_INFO("Editor toggled: ", m_EditorEnable);
-    }
+    }*/
 
     // Editor camera toggle
-    if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable) {
+    /*if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable) {
         editorCamToggle = !editorCamToggle;
         LOG_INFO("Editor camera toggled: ", editorCamToggle);
-    }
+    }*/
 
     Engine::ScriptReloader::GetInstance().Update();
 
@@ -1053,10 +1058,11 @@ void Game::OnUpdate(Engine::Timestep ts) {
     //m_Editor->OnUpdate(Engine::Timestep ts);
     //m_Renderer->get_imgui_texture();
 
-    if (m_EditorEnable) {
+    /*if (m_EditorEnable) {
         m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
-    }
+    }*/
 
+    m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
     m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
     m_TracyProfiler->OnUpdate();
 }
