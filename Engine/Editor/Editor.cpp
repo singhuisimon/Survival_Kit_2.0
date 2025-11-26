@@ -722,12 +722,48 @@ namespace Engine
 					Entity entityToReplace = m_SelectedEntity;
 					if (entityToReplace)
 					{
-						m_Scene->DestroyEntity(entityToReplace);
-						Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
-							m_Scene,
-							prefab->GetGUID()
-						);
-						m_SelectedEntity = newEntity;
+						if (prefab->GetType() == PrefabType::Entity)
+						{
+
+							m_Scene->DestroyEntity(entityToReplace);
+							Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+								m_Scene,
+								prefab->GetGUID()
+							);
+							m_SelectedEntity = newEntity;
+						}
+						else // prefab with parent and child
+						{
+							auto& registry = m_Scene->GetRegistry();
+							entt::entity selectedEntt = (entt::entity)entityToReplace;
+
+							// Save the parent before deleting
+							entt::entity oldParent = entt::null;
+							if (registry.all_of<TransformComponent>(selectedEntt))
+							{
+								auto& t = registry.get<TransformComponent>(selectedEntt);
+								if (t.Parent != u32_max)
+									oldParent = (entt::entity)t.Parent;
+							}
+
+							m_Scene->DestroyEntity(entityToReplace);
+
+							Entity newRoot = PrefabInstantiator::InstantiateScenePrefab(
+								m_Scene, prefab->GetGUID()
+							);
+
+							if (oldParent != entt::null)
+							{
+								Entity parentEntity(oldParent, &registry);
+								auto& parentTransform = parentEntity.GetComponent<TransformComponent>();
+								parentTransform.Children.push_back((uint32_t)newRoot);
+
+								auto& newRootTransform = newRoot.GetComponent<TransformComponent>();
+								newRootTransform.Parent = (uint32_t)oldParent;
+							}
+
+							m_SelectedEntity = newRoot;
+						}
 					}
 					
 
