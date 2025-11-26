@@ -18,8 +18,8 @@ namespace Game
         [SerializeField]
         private float topSpeed = 30.0f;
 
-        [SerializeField]
-        private float rotateSpeed = 5.0f; // Currently unused - orientation not yet implemented
+        //[SerializeField]
+        //private float rotateSpeed = 5.0f; // Currently unused - orientation not yet implemented
 
         // Explosion properties
         [SerializeField]
@@ -28,8 +28,8 @@ namespace Game
         [SerializeField]
         private int blastDamage = 10;
 
-        [SerializeField]
-        private float blastImpulse = 0.0f; // Not used yet (no explicit AddExplosionForce API)
+        //[SerializeField]
+        //private float blastImpulse = 0.0f; // Not used yet (no explicit AddExplosionForce API)
 
         // Status effect
         [SerializeField]
@@ -66,8 +66,8 @@ namespace Game
         private bool isDead = false;
         private bool isExploding = false;
 
-        private float boostTimerCooldown = 0.0f; // Reserved for future "boost" feature
-        private float fuseTimerCooldown = 0.0f;  // Reserved for fuse/explode delay
+        //private float boostTimerCooldown = 0.0f; // Reserved for future "boost" feature
+        //private float fuseTimerCooldown = 0.0f;  // Reserved for fuse/explode delay
 
         private float stunTimer = 0.0f;
         private float chooseTargetTimer = 0.0f;
@@ -106,8 +106,8 @@ namespace Game
             isStunned = false;
             stunTimer = 0.0f;
 
-            boostTimerCooldown = 0.0f;
-            fuseTimerCooldown = 0.0f;
+            //boostTimerCooldown = 0.0f;
+            //fuseTimerCooldown = 0.0f;
 
             hasChosenInitialTarget = false;
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
