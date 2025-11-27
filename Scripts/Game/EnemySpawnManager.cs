@@ -4,6 +4,20 @@ using System.Collections;
 using Engine;
 
 namespace Game{
+
+    // Simple struct to hold spawn point transform data
+    public struct SpawnPointData
+    {
+        public Vector3 position;
+        public Vector3 rotation;
+        
+        public SpawnPointData(Vector3 pos, Vector3 rot)
+        {
+            position = pos;
+            rotation = rot;
+        }
+    }
+
     public class EnemySpawnManager : ScriptBehaviour
     {
         public static EnemySpawnManager instance;
@@ -48,16 +62,16 @@ namespace Game{
             "Enemy_Trojan",      // 3
             "Enemy_Adware",      // 4
         };
-        
+
         // Create spawn point of equal spacing based off wall scale
-        private List<Transform> spawnPointsA = new List<Transform>();
-        private List<Transform> spawnPointsB = new List<Transform>();
-        private List<Transform> spawnPointsC = new List<Transform>();
-        private List<Transform> spawnPointsD = new List<Transform>();
-        private List<Transform> spawnPointsE = new List<Transform>();
+        private List<SpawnPointData> spawnPointsA = new List<SpawnPointData>();
+        private List<SpawnPointData> spawnPointsB = new List<SpawnPointData>();
+        private List<SpawnPointData> spawnPointsC = new List<SpawnPointData>();
+        private List<SpawnPointData> spawnPointsD = new List<SpawnPointData>();
+        private List<SpawnPointData> spawnPointsE = new List<SpawnPointData>();
     
         // Current active spawn points for this wave
-        private List<Transform> activeSpawnPoints = new List<Transform>();
+        private List<SpawnPointData> activeSpawnPoints = new List<SpawnPointData>();
         
         // Loveletter routes for current wave
         private string[] loveletterRoutes;
@@ -199,9 +213,110 @@ namespace Game{
             // etc. for C, D, E
             */
 
+            Log("=== Initializing Spawn Points ===");
             
+            // Wall A spawn points - register each one
+            RegisterSpawnPointsForWall("A", spawnPointsA, new string[] {
+                "SpawnPointA_1",
+                "SpawnPointA_2",
+                "SpawnPointA_3",
+                "SpawnPointA_4",
+                "SpawnPointA_5",
+                "SpawnPointA_6",
+                "SpawnPointA_7",
+                "SpawnPointA_8",
+                "SpawnPointA_9",
+                "SpawnPointA_10",
+                "SpawnPointA_11",
+                "SpawnPointA_12",
+                "SpawnPointA_13",
+                "SpawnPointA_14",
+                "SpawnPointA_15",
+            });
+            
+            // TODO: Register spawn points for walls B, C, D, E
+            /*
+            RegisterSpawnPointsForWall("B", spawnPointsB, new string[] {
+                "SpawnPoint_B_1",
+                "SpawnPoint_B_2",
+                "SpawnPoint_B_3"
+            });
+            
+            RegisterSpawnPointsForWall("C", spawnPointsC, new string[] {
+                "SpawnPoint_C_1",
+                "SpawnPoint_C_2",
+                "SpawnPoint_C_3"
+            });
+            
+            RegisterSpawnPointsForWall("D", spawnPointsD, new string[] {
+                "SpawnPoint_D_1",
+                "SpawnPoint_D_2",
+                "SpawnPoint_D_3"
+            });
+            
+            RegisterSpawnPointsForWall("E", spawnPointsE, new string[] {
+                "SpawnPoint_E_1",
+                "SpawnPoint_E_2",
+                "SpawnPoint_E_3"
+            });*/
             
             Log("TODO: Initialize spawn points - find entities by name");
+        }
+
+        private void RegisterSpawnPointsForWall(string wallName, List<SpawnPointData> targetList, string[] spawnPointNames)
+        {
+            Log("Registering spawn points for Wall " + wallName);
+            int successCount = 0;
+            
+            foreach (string spawnPointName in spawnPointNames)
+            {
+                // Find the spawn point entity by name
+                ulong entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+                
+                if (entityID != 0)
+                {
+                    // Get transform data directly using native calls
+                    // We'll call the Transform native methods directly
+                    Vector3 spawnPosition;
+                    Vector3 spawnRotation;
+                    
+                    try
+                    {
+                        // Use the Transform class static methods via reflection/direct instantiation
+                        // Create a temporary entity wrapper
+                        Entity tempEntity = new Entity(entityID);
+                        Transform tempTransform = new Transform();
+                        tempTransform.Entity = tempEntity;
+                        
+                        // Now we can access the properties
+                        spawnPosition = tempTransform.Position;
+                        spawnRotation = tempTransform.Rotation;
+                        
+                        // Create spawn point data and add to list
+                        SpawnPointData spawnData = new SpawnPointData(spawnPosition, spawnRotation);
+                        targetList.Add(spawnData);
+                        successCount++;
+                        
+                        Log(spawnPointName + " registered at position (" + 
+                            spawnPosition.X + ", " + 
+                            spawnPosition.Y + ", " + 
+                            spawnPosition.Z + ") rotation (" +
+                            spawnRotation.X + ", " +
+                            spawnRotation.Y + ", " +
+                            spawnRotation.Z + ")");
+                    }
+                    catch (Exception e)
+                    {
+                        Log("ERROR getting transform for " + spawnPointName + ": " + e.Message);
+                    }
+                }
+                else
+                {
+                    Log("WARNING: Could not find spawn point: " + spawnPointName);
+                }
+            }
+            
+            Log("Wall " + wallName + " registered: " + successCount + "/" + spawnPointNames.Length + " spawn points");
         }
         
         private void InitializeWalls()
@@ -296,7 +411,7 @@ namespace Game{
                     SetEnemyCount(3, 13, 0, 0, 0);
                     //SetEnemyCount(3, 13, 6, 7, 0);
                     loveletterRoutes = new string[] {"A1", "A2", "D1", "D2"};
-                    activeSpawnPoints = new List<Transform>();
+                    activeSpawnPoints = new List<SpawnPointData>();
                     activeSpawnPoints.AddRange(spawnPointsA);
                     activeSpawnPoints.AddRange(spawnPointsD);
                     break;
@@ -304,7 +419,7 @@ namespace Game{
                     // not for this milestone
                     // SetEnemyCount{5, 16, 7, 0, 1};
                     // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
-                    // activeSpawnPoints = new List<Transform>();
+                    // activeSpawnPoints = new List<SpawnPointData>();
                     // activeSpawnPoints.AddRange(spawnPointsB);
                     // activeSpawnPoints.AddRange(spawnPointsC);
                     // activeSpawnPoints.AddRange(spawnPointsE);
@@ -441,11 +556,11 @@ namespace Game{
             }
             
             int spawnIndex = GetRandomInt(0, activeSpawnPoints.Count);
-            Transform spawnPoint = activeSpawnPoints[spawnIndex];
+            SpawnPointData spawnPoint = activeSpawnPoints[spawnIndex];
             
             // Get spawn position and rotation from the spawn point
-            Vector3 spawnPos = spawnPoint.Position;
-            Vector3 spawnRot = spawnPoint.Rotation; // Or use Euler angles
+            Vector3 spawnPos = spawnPoint.position;
+            Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
             
             // Create enemy from prefab
             string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
