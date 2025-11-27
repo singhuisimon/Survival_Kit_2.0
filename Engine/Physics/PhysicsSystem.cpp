@@ -295,7 +295,7 @@ namespace Engine
 					}
 				}
 
-				// Damping + restitution bindings
+				// Damping + restitution + trigger bindings
 				{
 					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
 					if (lock.Succeeded())
@@ -314,6 +314,13 @@ namespace Engine
 						float const targetRest = std::clamp(rb.Restitution, 0.0f, 1.0f);
 						if (!NearlyEqual(body.GetRestitution(), targetRest))
 							body.SetRestitution(targetRest);
+
+						// Trigger flag -> Jolt sensor state (no collision response, still contacts)
+						bool const isSensor = body.IsSensor();
+						if (rb.IsTrigger != isSensor)
+						{
+							body.SetIsSensor(rb.IsTrigger);
+						}
 					}
 				}
 
@@ -610,6 +617,9 @@ namespace Engine
 		settings.mRestitution = std::clamp(rb.Restitution, 0.0f, 1.0f);
 		settings.mLinearDamping = rb.LinearDamping;
 		settings.mAngularDamping = rb.AngularDamping;
+
+		// Trigger bodies -> Jolt sensors: no collision response, still callbacks
+		settings.mIsSensor = rb.IsTrigger;
 
 		JPH::BodyID const id = mBodyInterface->CreateAndAddBody(settings, JPH::EActivation::Activate);
 
