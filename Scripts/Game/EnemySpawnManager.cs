@@ -43,7 +43,7 @@ namespace Game{
         [SerializeField] private bool isSpawning = false;
         
         // Wave timers
-        [SerializeField] private float timeBetweenWave = 30.0f;
+        [SerializeField] private float timeBetweenWave = 5.0f;
         [SerializeField] private float timeWave = 60.0f;
         [SerializeField] private float timeCurrent = 10.0f;
         [SerializeField] private float timeNext = 0.0f;
@@ -562,6 +562,10 @@ namespace Game{
                 return;
             }
             
+            if(enemyType == 0){
+                //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
+            }
+
             int spawnIndex = GetRandomInt(0, activeSpawnPoints.Count);
             SpawnPointData spawnPoint = activeSpawnPoints[spawnIndex];
             
@@ -572,6 +576,21 @@ namespace Game{
             // Create enemy from prefab
             string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
             
+            uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+
+            if(enemyID != 0){
+                Entity tempEntity = new Entity(enemyID);
+                Transform tempTransform = new Transform();
+                tempTransform.Entity = tempEntity;
+                InternalCalls.Transform_SetPosition(enemyID, ref spawnPos);
+                tempTransform.Rotation = spawnRot;
+                Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
+                spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
+                spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
+            } else {
+                Log("INVALID ID FOR SPAWNING ENEMY");
+            }
+
             // MANUAL INSTANTIATION - adapt to your engine's PrefabInstantiator
             /*
             Entity enemy = PrefabRegistry.InstantiatePrefab(prefabName);
@@ -726,7 +745,6 @@ namespace Game{
                 }
                 else
                 {
-                    //Log("ERROR: Invalid inactive wall entity at index " + wallIndex);
                     Log(string.Concat("ERROR: Invalid inactive wall entity at index ", wallIndex.ToString()));
                 }
             }
@@ -747,7 +765,6 @@ namespace Game{
             */
             // Enable all inactive walls
             if(wallInactiveEntities != null){
-                //Log("Enabling " + wallInactiveEntities.Length + " inactive wall entities");
                 Log(string.Concat("Enabling ", wallInactiveEntities.Length.ToString(), " inactive wall entities"));
                 foreach(Entity wall in wallInactiveEntities){
                     if (wall.EntityID != 0)
@@ -766,7 +783,6 @@ namespace Game{
                 foreach (Entity wall in wallActiveEntities){
                     if (wall.EntityID != 0) // Extra safety check
                     {
-                        //Log("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: " + wall.EntityID);
                         Log(string.Concat("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: ", wall.EntityID.ToString()));
                         InternalCalls.MeshRenderer_SetVisible(wall.EntityID, false);
                     }
@@ -802,8 +818,6 @@ namespace Game{
                     lightCombat.SetActive(status);
             }
             */
-            
-            //Log("TODO: Handle lights - " + phase);
 
             Log(string.Concat("TODO: Handle lights - ", phase));
         }
@@ -835,17 +849,14 @@ namespace Game{
                 if (entityID != 0) // Only add valid entities
                 {
                     validEntities.Add(new Entity(entityID));
-                    //Log("Found entity: " + name + " (ID: " + entityID + ")");
                     Log(string.Concat("Found entity: ", name, " (ID: ", entityID.ToString(), ")"));
                 }
                 else
                 {
-                    //Log("WARNING: Entity not found: " + name);
                     Log(string.Concat("WARNING: Entity not found: ", name));
                 }
             }
-            
-            //Log("CreateValidEntityArray: " + validEntities.Count + " / " + entityNames.Length + " entities found");
+
             Log(string.Concat("CreateValidEntityArray: ", validEntities.Count.ToString(), 
                 " / ", entityNames.Length.ToString(), " entities found"));
             return validEntities.ToArray();
