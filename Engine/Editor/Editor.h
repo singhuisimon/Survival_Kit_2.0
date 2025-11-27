@@ -123,7 +123,7 @@ namespace Engine
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
 
 		// Prefab helper variables
-		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
+		//std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
 		std::string currPrefabPath{}; // track selected perfab path
 		bool isPrefabEditor = false; // track if is at prefab scenes
 		bool replacePrefabPending = false;
@@ -131,6 +131,7 @@ namespace Engine
 		std::string currFileName{}; // track file name
 		Prefab* m_CurrentPrefab = nullptr;
 		bool createEttFromPrfab = false;
+		//bool ApplyOverrideButtonTriggle = false;
 	
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE; // for ImGuizmo 
 		bool m_PreviousEditorCamToggle = false; // track if is in camera mode
@@ -436,6 +437,19 @@ namespace Engine
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
+
+		// for override prefab
+		void ApplyPrefabOverrides(Entity entity);
+
+
+		//void CollectChildEntities(Entity parentEntity, std::vector<Entity>& outEntities);
+
+		void CollectChildEntitiesIterative(Entity parentEntity, std::vector<Entity>& outEntities);
+		void UpdateEntityPrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
+
+		void UpdateScenePrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
+
+		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
 	};
 
 

@@ -41,7 +41,7 @@ namespace Engine
 		**************************************************************************/
 
 		static void DrawEntityParentAndChildren(Entity& entity, Scene* scene,Entity& selectedEntity, uint32_t& pickedID, 
-										 Prefab* currentPrefab, std::unordered_set<std::string>& temporaryPrefabPaths, 
+										 Prefab* currentPrefab,
 										 std::string& currPrefabPath, bool& replacePrefabPending, std::string& selectedPrefabPath) {
 
 			// validate entity before accessing compon 
@@ -296,7 +296,7 @@ namespace Engine
 
 									currentPrefab = prefab.get();
 									currPrefabPath = prefabPath;
-									temporaryPrefabPaths.insert(prefabPath);
+									//temporaryPrefabPaths.insert(prefabPath);
 
 
 								}
@@ -374,7 +374,7 @@ namespace Engine
 					}
 					Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
 					DrawEntityParentAndChildren(childEntity, scene, selectedEntity, pickedID, currentPrefab,
-						temporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
+						 currPrefabPath, replacePrefabPending, selectedPrefabPath);
 				}
 #endif
 
