@@ -327,8 +327,8 @@ void Game::CreateDefaultScene() {
     // ---------------------------------------------------------------------
     // Load animation clips
     // ---------------------------------------------------------------------
-    const std::string clipsDir = "../../Resources/Sources/AnimationClips";
-
+    const std::string clipsDir = Engine::getAssetFilePath("Sources/AnimationClips");
+    
     if (fs::exists(clipsDir)) {
         for (const auto& entry : fs::directory_iterator(clipsDir)) {
             if (!entry.is_regular_file())
@@ -348,7 +348,7 @@ void Game::CreateDefaultScene() {
     // ---------------------------------------------------------------------
     // Load animator controllers
     // ---------------------------------------------------------------------
-    const std::string ctrlDir = "../../Resources/Sources/AnimationControllers";
+    const std::string ctrlDir = Engine::getAssetFilePath("Sources/AnimationControllers");
 
     if (fs::exists(ctrlDir)) {
         for (const auto& entry : fs::directory_iterator(ctrlDir)) {
