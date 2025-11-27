@@ -6341,40 +6341,62 @@ namespace Engine
 	void Editor::RevertSelectedEntityToPrefab()
 	{
 		if (!m_SelectedEntity ||
-			!m_SelectedEntity.HasComponent<PrefabComponent>())
+			!m_SelectedEntity.HasComponent<PrefabComponent>() ||
+			m_SelectedEntity.GetComponent<TransformComponent>().Parent != u32_max) // If entity is a sub-entity; DO NOT REVERT BY ITSELF
 			return;
 
 		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
 		// Load prefab data
 		auto prefab = PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
-		//LOG_INFO("Prefab lookup result: %p", prefab.get());
+
 		if (!prefab)
 		{
 			LOG_ERROR("Revert failed: Prefab not found!");
 			return;
 		}
 
-		//std::cout << Get().RegisterPrefab(prefab)
+		auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
+		if (transform.Children.empty()) // For main entities with no children
+		{
+			// Remove the modified instance
+			Entity old = m_SelectedEntity;
+			m_Scene->DestroyEntity(old);
+
+			// Create fresh prefab instance no overrides applied
+			Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+				m_Scene,
+				prefab->GetGUID()
+			);
 
 
-		// Remove the modified instance
-		Entity old = m_SelectedEntity;
-		m_Scene->DestroyEntity(old);
+			// Clear modifications on the new PrefabComponent (optional safety)
+			if (newEntity.HasComponent<PrefabComponent>())
+				newEntity.GetComponent<PrefabComponent>().ClearModifications();
 
-		// Create fresh prefab instance no overrides applied
-		Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
-			m_Scene,
-			prefab->GetGUID()
-		);
+			// Select it in the editor
+			m_SelectedEntity = newEntity;
+		}
+		else { // For main entities with children
 
+			Entity old = m_SelectedEntity;
+			EditorHierarchyHelper::FillEntitiesWithChildrenToDelete(old, m_Scene, m_SelectedEntity, m_PickedID);
+			EditorHierarchyHelper::DeleteEntityParentAndChildren(m_Scene);
 
-		// Clear modifications on the new PrefabComponent (optional safety)
-		if (newEntity.HasComponent<PrefabComponent>())
-			newEntity.GetComponent<PrefabComponent>().ClearModifications();
+			// Create fresh prefab instance no overrides applied
+			Entity newEntity = PrefabInstantiator::InstantiateScenePrefab(
+				m_Scene,
+				prefab->GetGUID()
+			);
 
-		// Select it in the editor
-		m_SelectedEntity = newEntity;
+			// Clear modifications on the new PrefabComponent (optional safety)
+			if (newEntity.HasComponent<PrefabComponent>())
+				newEntity.GetComponent<PrefabComponent>().ClearModifications();
+
+			// Select it in the editor
+			m_SelectedEntity = newEntity;
+		}
+
 
 		LOG_INFO("Prefab instance reverted to original prefab state.");
 	}

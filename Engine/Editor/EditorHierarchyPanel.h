@@ -417,5 +417,37 @@ namespace Engine
 			entitiesToDelete.clear();
 		}
 
+		static void FillEntitiesWithChildrenToDelete(Entity& entity, Scene* scene,
+			Entity& selectedEntity, uint32_t& pickedID) {
+
+			if (selectedEntity == entity)
+			{
+				selectedEntity = Entity();
+				pickedID = 0xFFFFFFFFu;
+			}
+
+			entitiesToDelete.push_back(entity);
+
+			if (entity.HasComponent<TransformComponent>()) {
+
+				auto& transform = entity.GetComponent<TransformComponent>();
+				if (!transform.Children.empty()) {
+					for (uint32_t childID : transform.Children)
+					{
+						Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
+						if (selectedEntity == childEntity)
+						{
+							selectedEntity = Entity();
+							pickedID = 0xFFFFFFFFu;
+						}
+						entitiesToDelete.push_back(childEntity);
+					}
+				}
+			}
+
+			return;
+		}
+
+
 	};
 }
