@@ -396,6 +396,29 @@ namespace Engine
 		**************************************************************************/
 		void displayCameraComp(ImVec2& buttonSize);
 
+
+		void displayRigidBodyComp(ImVec2& buttonSize);
+
+		void displayMeshRendererComp(ImVec2& buttonSize);
+
+		void displayAudioComp(ImVec2& buttonSize);
+
+		void displayReverbZoneComp(ImVec2& buttonSize);
+
+		void displayListenerComp(ImVec2& buttonSize);
+
+		void displayBTComp(ImVec2& buttonSize);
+
+		void displayParticleComp(ImVec2& buttonSize);
+
+		void displayLightComp(ImVec2& buttonSize);
+
+		void displayScriptComp(ImVec2& buttonSize);
+
+		void displayAnimatorComp(ImVec2& buttonSize);
+
+		void addComponents();
+
 		void RevertSelectedEntityToPrefab();
 
 		void LoadAllPrefabsIntoRegistry();

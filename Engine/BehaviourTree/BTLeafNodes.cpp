@@ -74,6 +74,13 @@ namespace Engine {
     BTStatus BTWait::Execute(BTContext& context) {
         m_ElapsedTime += context.DeltaTime;
     
+        // Debug output every second
+        static float lastLogTime = 0.0f;
+        if (m_ElapsedTime - lastLogTime >= 1.0f) {
+            LOG_INFO("BTWait: ", m_ElapsedTime, "s / ", m_Duration, "s");
+            lastLogTime = m_ElapsedTime;
+        }
+
         if (m_ElapsedTime >= m_Duration) {
             return BTStatus::Success;
         }
@@ -105,13 +112,18 @@ namespace Engine {
         (void)context;
         // In real implementation, use your Logger system
         // LOG_INFO("BehaviourTree: ", m_Message);
-        accumulatedtime += context.DeltaTime;
+        /*accumulatedtime += context.DeltaTime;
         if (time > accumulatedtime) {
             LOG_INFO("LogNode: ", m_Message);
             accumulatedtime = 0.0f;
             return BTStatus::Success;
-        }
+        }*/
         
+        if (!m_Message.empty()) {
+            LOG_INFO("LogNode: ", m_Message);
+            return BTStatus::Success;
+        }
+
         return BTStatus::Running;
     }
     
@@ -572,8 +584,8 @@ namespace Engine {
             break;
         case Comparison::LessOrEqual:
             result = health <= m_Threshold;
-			LOG_INFO("BTCheckHealth result is", result ? "YES" : "NO");
-			LOG_INFO("BTCheckHealth: Health (", health, ") <= Threshold (", m_Threshold, ")");
+			//LOG_INFO("BTCheckHealth result is ", result ? "YES" : "NO");
+			//LOG_INFO("BTCheckHealth: Health (", health, ") <= Threshold (", m_Threshold, ")");
             break;
         }
 
@@ -1696,7 +1708,7 @@ namespace Engine {
         const auto& collisions = api.GetCollisionEvents();
 
         if (collisions.empty()) {
-			LOG_WARNING("BTCheckCollision: No collisions detected this frame");
+			//LOG_INFO("BTCheckCollision: No collisions detected this frame");
             return BTStatus::Failure;
         }
 

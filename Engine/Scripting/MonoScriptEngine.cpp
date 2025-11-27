@@ -525,7 +525,7 @@ namespace Engine
 		static float AudioManager_GetGroupVolume(int groupType);
 		static void AudioManager_SetGroupPitch(int groupType, float pitch);
 		static float AudioManager_GetGroupPitch(int groupType);
-		static void AudioManager_MuteGroup(int groupType, bool mute);
+		static void AudioManager_SetGroupMute(int groupType, bool mute);
 		static bool AudioManager_IsGroupMuted(int groupType);
 
 		static void AudioManager_PauseGroup(int groupType, bool pause);
@@ -702,42 +702,42 @@ namespace Engine
 			(void*)InternalCalls::Audio_SetReverbMix);
 
 		// ===== NEW: AudioManager Global Controls =====
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetGroupVolume",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupVolume",
 			(void*)InternalCalls::AudioManager_SetGroupVolume);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_GetGroupVolume",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupVolume",
 			(void*)InternalCalls::AudioManager_GetGroupVolume);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetGroupPitch",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupPitch",
 			(void*)InternalCalls::AudioManager_SetGroupPitch);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_GetGroupPitch",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupPitch",
 			(void*)InternalCalls::AudioManager_GetGroupPitch);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_MuteGroup",
-			(void*)InternalCalls::AudioManager_MuteGroup);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_IsGroupMuted",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupMute",
+			(void*)InternalCalls::AudioManager_SetGroupMute);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_IsGroupMuted",
 			(void*)InternalCalls::AudioManager_IsGroupMuted);
 
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_PauseGroup",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseGroup",
 			(void*)InternalCalls::AudioManager_PauseGroup);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_PauseAll",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseAll",
 			(void*)InternalCalls::AudioManager_PauseAll);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_StopByType",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_StopByType",
 			(void*)InternalCalls::AudioManager_StopByType);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_StopAll",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_StopAll",
 			(void*)InternalCalls::AudioManager_StopAll);
 
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_CreateDSP",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_CreateDSP",
 			(void*)InternalCalls::AudioManager_CreateDSP);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_EnableDSP",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_EnableDSP",
 			(void*)InternalCalls::AudioManager_EnableDSP);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetDSPParameter",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetDSPParameter",
 			(void*)InternalCalls::AudioManager_SetDSPParameter);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_ReleaseDSP",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
 			(void*)InternalCalls::AudioManager_ReleaseSpecificDSPinGroup);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_ReleaseDSPByGroup",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
 			(void*)InternalCalls::AudioManager_ReleaseDSPByGroup);
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_ReleaseAllDSPs",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
 			(void*)InternalCalls::AudioManager_ReleaseAllDSPs);
 
-		mono_add_internal_call("Engine.InternalCalls::AudioManager_SetListenerAttributes",
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
 			(void*)InternalCalls::AudioManager_SetListenerAttributes);
 
 		LOG_INFO("Internal calls registered");
@@ -1699,7 +1699,7 @@ namespace Engine
 			return pitch;
 		}
 
-		void AudioManager_MuteGroup(int groupType, bool mute) {
+		void AudioManager_SetGroupMute(int groupType, bool mute) {
 			auto* am = GetAudioManager();
 			if (!am) return;
 			am->MuteGroup(static_cast<AudioType>(groupType), mute);

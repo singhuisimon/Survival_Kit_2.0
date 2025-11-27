@@ -10,6 +10,11 @@
  */
 #version 460 core
 
+const float FOG_MINDIST = 5.0f;
+const float FOG_MAXDIST = 5000.0f;
+const vec3 FOG_COLOR = vec3(0,0,0);
+
+
 // ==== In/Outs ====
 in vec3 Position;   // World-space position
 in vec3 Normal;     // World-space normal
@@ -162,10 +167,11 @@ void main()
 
     // ===== Material properties =====
     vec3 albedo = material_.albedo;
+    float texAlpha = 1.0;
     if (isTexture) {
-
-        vec3 tex = texture(Texture2D, TexCoord * tiling + offset).rgb;
-        albedo *= tex;
+        vec4 texSample = texture(Texture2D, TexCoord * tiling + offset);
+        albedo *= texSample.rgb;
+        texAlpha = texSample.a;
     }
     
     float roughness = material_.roughness;
@@ -254,5 +260,18 @@ void main()
     vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
     vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
 
-    FragColor = vec4(color, material_.opacity);
+    float finalAlpha = material_.opacity * texAlpha;
+
+    // Discard fully transparent fragments
+    if (finalAlpha <= 0.01) {
+        discard;
+    }
+
+    // Compute fog factor and mix it into the background
+    float dist = length(Position - CamPos);
+    float fogFactor = clamp((dist - FOG_MINDIST) / (FOG_MAXDIST - FOG_MINDIST), 0.0f, 1.0f);
+    color = mix(color , FOG_COLOR, fogFactor);
+
+    FragColor = vec4(color, finalAlpha);
+
 }

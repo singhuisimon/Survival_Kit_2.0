@@ -45,58 +45,111 @@ namespace Engine
 
     public static class AudioManager
     {
-        // ===== Channel Group Volume Controls =====
+
+        //Audio Manager implementation - new amanda
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern float AudioManager_GetGroupVolume(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_SetGroupVolume(int groupType, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern float AudioManager_GetGroupPitch(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_SetGroupPitch(int groupType, float pitch);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool AudioManager_IsGroupMuted(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_SetGroupMute(int groupType, bool mute);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_PauseGroup(int groupType, bool pause);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_PauseAll(bool pause);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_StopByType(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_StopAll();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_CreateDSP(int groupType, int effectType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_EnableDSP(int groupType, int effectType, bool enable);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_ReleaseDSPByGroup(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_ReleaseAllDSPs();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AudioManager_SetListenerAttributes(ref Vector3 position, ref Vector3 forward, ref Vector3 up, ref Vector3 velocity);
+
+        // ===== Public Controls =====
 
         public static void SetGroupVolume(AudioType group, float volume)
         {
-            InternalCalls.AudioManager_SetGroupVolume((int)group, volume);
+            AudioManager_SetGroupVolume((int)group, volume);
         }
 
         public static float GetGroupVolume(AudioType group)
         {
-            return InternalCalls.AudioManager_GetGroupVolume((int)group);
+            return AudioManager_GetGroupVolume((int)group);
         }
 
         public static void SetGroupPitch(AudioType group, float pitch)
         {
-            InternalCalls.AudioManager_SetGroupPitch((int)group, pitch);
+            AudioManager_SetGroupPitch((int)group, pitch);
         }
 
         public static float GetGroupPitch(AudioType group)
         {
-            return InternalCalls.AudioManager_GetGroupPitch((int)group);
+            return AudioManager_GetGroupPitch((int)group);
         }
 
-        public static void MuteGroup(AudioType group, bool mute)
+        public static void SetMuteGroup(AudioType group, bool mute)
         {
-            InternalCalls.AudioManager_SetGroupMute((int)group, mute);
+            AudioManager_SetGroupMute((int)group, mute);
         }
 
         public static bool IsGroupMuted(AudioType group)
         {
-            return InternalCalls.AudioManager_IsGroupMuted((int)group);
+            return AudioManager_IsGroupMuted((int)group);
         }
 
         // ===== Group Pause/Stop Controls =====
 
         public static void PauseGroup(AudioType group, bool pause)
         {
-            InternalCalls.AudioManager_PauseGroup((int)group, pause);
+            AudioManager_PauseGroup((int)group, pause);
         }
 
         public static void PauseAll(bool pause)
         {
-            InternalCalls.AudioManager_PauseAll(pause);
+            AudioManager_PauseAll(pause);
         }
 
         public static void StopGroup(AudioType group)
         {
-            InternalCalls.AudioManager_StopByType((int)group);
+            AudioManager_StopByType((int)group);
         }
 
         public static void StopAll()
         {
-            InternalCalls.AudioManager_StopAll();
+            AudioManager_StopAll();
         }
 
         // ===== DSP Effect Management =====
@@ -107,7 +160,7 @@ namespace Engine
         /// </summary>
         public static void CreateDSP(AudioType group, DSPEffectType effect)
         {
-            InternalCalls.AudioManager_CreateDSP((int)group, (int)effect);
+            AudioManager_CreateDSP((int)group, (int)effect);
         }
 
         /// <summary>
@@ -115,7 +168,7 @@ namespace Engine
         /// </summary>
         public static void EnableDSP(AudioType group, DSPEffectType effect, bool enable)
         {
-            InternalCalls.AudioManager_EnableDSP((int)group, (int)effect, enable);
+            AudioManager_EnableDSP((int)group, (int)effect, enable);
         }
 
         /// <summary>
@@ -125,7 +178,7 @@ namespace Engine
         /// </summary>
         public static void SetDSPParameter(AudioType group, DSPEffectType effect, int paramIndex, float value)
         {
-            InternalCalls.AudioManager_SetDSPParameter((int)group, (int)effect, paramIndex, value);
+            AudioManager_SetDSPParameter((int)group, (int)effect, paramIndex, value);
         }
 
         /// <summary>
@@ -133,7 +186,7 @@ namespace Engine
         /// </summary>
         public static void ReleaseSpecificDSPinGroup(AudioType group, DSPEffectType effect)
         {
-            InternalCalls.AudioMaster_ReleaseSpecificDSPinGroup((int)group, (int)effect);
+            AudioManager_ReleaseSpecificDSPinGroup((int)group, (int)effect);
         }
 
         /// <summary>
@@ -141,7 +194,7 @@ namespace Engine
         /// </summary>
         public static void ReleaseDSPByGroup(AudioType group)
         {
-            InternalCalls.AudioManager_ReleaseDSPByGroup((int)group);
+            AudioManager_ReleaseDSPByGroup((int)group);
         }
 
         /// <summary>
@@ -149,7 +202,7 @@ namespace Engine
         /// </summary>
         public static void ReleaseAllDSPs()
         {
-            InternalCalls.AudioManager_ReleaseAllDSPs();
+            AudioManager_ReleaseAllDSPs();
         }
 
         // ===== Listener Controls (3D Audio) =====
@@ -160,7 +213,7 @@ namespace Engine
         /// </summary>
         public static void SetListenerPosition(Vector3 position, Vector3 forward, Vector3 up, Vector3 velocity)
         {
-            InternalCalls.AudioManager_SetListenerAttributes(
+            AudioManager_SetListenerAttributes(
                 ref position, 
                 ref forward, 
                 ref up, 
