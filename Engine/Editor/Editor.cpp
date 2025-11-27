@@ -4409,6 +4409,11 @@ namespace Engine
 	{
 		if (m_SelectedEntity.HasComponent<PrefabComponent>())
 		{
+			bool hasParent = true;
+			if (m_SelectedEntity.HasComponent<TransformComponent>()) {
+				auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
+				hasParent = transform.Parent == u32_max ? false : true;
+			}
 
 			if (ImGui::CollapsingHeader("Prefab", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -4418,6 +4423,10 @@ namespace Engine
 
 				if (!isPrefabEditor)
 				{
+					if (hasParent) {
+						ImGui::BeginDisabled();
+					}
+
 					if (ImGui::Button("Revert to Prefab"))
 					{
 						LoadAllPrefabsIntoRegistry();
@@ -4444,8 +4453,12 @@ namespace Engine
 						}
 
 #endif
-						//ApplyPrefabOverrides(m_SelectedEntity);
+						ApplyPrefabOverrides(m_SelectedEntity);
 
+					}
+
+					if (hasParent) {
+						ImGui::EndDisabled();
 					}
 
 				}
@@ -6984,7 +6997,7 @@ namespace Engine
 
 		if (!prefab)
 		{
-			//LOG_ERROR("Prefab not found");
+			LOG_ERROR("Prefab not found");
 			return;
 		}
 
@@ -6995,7 +7008,10 @@ namespace Engine
 		if (entity.HasComponent<TransformComponent>())
 		{
 			const auto& transform = entity.GetComponent<TransformComponent>();
-			hasChildren = !transform.Children.empty();
+
+			if (!transform.Children.empty()) {
+				hasChildren = true;
+			}
 		}
 
 		if (hasChildren)
@@ -7037,6 +7053,7 @@ namespace Engine
 					ent.GetComponent<PrefabComponent>().ClearModifications();
 				}
 			}
+
 			CheckAndUpdatePrefabInstances();
 
 			LOG_INFO("Successfully applied overrides to scene prefab: ", prefab->GetSourcePath());
