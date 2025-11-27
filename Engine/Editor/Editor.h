@@ -123,7 +123,7 @@ namespace Engine
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
 
 		// Prefab helper variables
-		//std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
+		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
 		std::string currPrefabPath{}; // track selected perfab path
 		bool isPrefabEditor = false; // track if is at prefab scenes
 		bool replacePrefabPending = false;

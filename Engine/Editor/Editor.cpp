@@ -394,7 +394,7 @@ namespace Engine
 									{
 										LOG_INFO("Prefab saved: {}", currPrefabPath);
 										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-										//m_TemporaryPrefabPaths.erase(currPrefabPath);
+										m_TemporaryPrefabPaths.erase(currPrefabPath);
 										LOG_INFO("=== PREFAB SAVE SUCCESS ===");
 									}
 									else
@@ -741,7 +741,7 @@ namespace Engine
 					if (transform.Parent == u32_max)
 					{
 						EditorHierarchyHelper::DrawEntityParentAndChildren(entity, m_Scene, m_SelectedEntity, m_PickedID,
-							m_CurrentPrefab, currPrefabPath, replacePrefabPending, selectedPrefabPath);
+							m_CurrentPrefab, m_TemporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
 					}
 				}
 
@@ -4163,7 +4163,7 @@ namespace Engine
 		return entries;
 	}
 
-	/*void Editor::CleanupTemporaryPrefabs()
+	void Editor::CleanupTemporaryPrefabs()
 	{
 		for (const auto& prefabPath : m_TemporaryPrefabPaths)
 		{
@@ -4174,7 +4174,7 @@ namespace Engine
 			}
 		}
 		m_TemporaryPrefabPaths.clear();
-	}*/
+	}
 
 	void Editor::ManipulateEntityTransform(Entity& entity)
 	{
