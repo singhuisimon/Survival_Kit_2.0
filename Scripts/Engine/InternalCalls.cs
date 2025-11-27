@@ -318,5 +318,9 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AudioManager_SetListenerAttributes(ref Vector3 position, ref Vector3 forward, ref Vector3 up, ref Vector3 velocity);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Event_Publish(string name, string payload);
+
     }
 }

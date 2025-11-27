@@ -119,7 +119,7 @@ namespace Engine {
     }
 
     std::shared_ptr<Prefab> PrefabSerializer::LoadPrefabFromFile(const std::string& filepath) {
-        LOG_INFO("PrefabSerializer: Loading prefab from ", filepath);
+        //LOG_INFO("PrefabSerializer: Loading prefab from ", filepath);
 
         std::ifstream file(filepath);
         if (!file.is_open()) {
@@ -134,7 +134,7 @@ namespace Engine {
         auto prefab = DeserializePrefabFromString(jsonString);
         if (prefab) {
             prefab->SetSourcePath(filepath);
-            LOG_INFO("PrefabSerializer: Prefab loaded successfully");
+            //LOG_INFO("PrefabSerializer: Prefab loaded successfully");
         }
 
         return prefab;

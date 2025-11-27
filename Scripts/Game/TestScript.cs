@@ -113,7 +113,7 @@ namespace Game
             if (hasInput)
             {
                 moveDirWorld = GetMoveDirectionInWorld(inputX, inputY, inputZ);
-                InternalCalls.Log("Moving in: " + moveDirWorld.X.ToString() + ", " + moveDirWorld.Y.ToString() + ", " + moveDirWorld.Z.ToString());
+                //InternalCalls.Log("Moving in: " + moveDirWorld.X.ToString() + ", " + moveDirWorld.Y.ToString() + ", " + moveDirWorld.Z.ToString());
             }
 
             // ===== Apply Movement (relative to facing direction) =====
@@ -176,6 +176,9 @@ namespace Game
 
                 Dash(dashDirWorld);
             }
+
+            SendPositionEvent();
+
         }
 
         // ===== World-Space Movement Direction (based on player rotation) =====
@@ -337,5 +340,23 @@ namespace Game
         {
             Engine.InternalCalls.Log("=== PlayerMovement Destroyed ===");
         }
+
+        // ===== Position Event Helper =====
+        private void SendPositionEvent()
+        {
+            // Get current world position from Transform
+            Engine.Vector3 pos = new Vector3 { };
+            InternalCalls.Transform_GetPosition((uint)EntityID, out pos);
+
+            string payload =
+                EntityID.ToString() + "|" +
+                pos.X.ToString() + "|" +
+                pos.Y.ToString() + "|" +
+                pos.Z.ToString();
+
+            Engine.EventSystem.Publish("PlayerPosition", payload);
+        }
+
+
     }
 }

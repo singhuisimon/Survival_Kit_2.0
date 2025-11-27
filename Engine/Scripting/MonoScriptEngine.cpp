@@ -9,6 +9,7 @@
 #include "../Core/input.h"
 #include "Core/Application.h"
 #include "../Audio/AudioManager.h"
+#include "../Event/EventSystem.h"
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
@@ -29,14 +30,38 @@
 
 namespace Engine
 {
-
-
 	MonoScriptEngine &MonoScriptEngine::GetInstance()
 	{
 		static MonoScriptEngine instance;
 		return instance;
 	}
 
+	// Pointer to Engine.EventSystem.RaiseFromNative(string, string)
+	static MonoMethod *s_EventSystemRaiseFromNative = nullptr;
+
+	// Refresh the managed event binding whenever the C# assembly is (re)loaded
+	static void RefreshEventBindings(MonoImage *appImage)
+	{
+		s_EventSystemRaiseFromNative = nullptr;
+
+		if (!appImage)
+			return;
+
+		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "EventSystem");
+		if (!eventSystemClass)
+		{
+			LOG_WARNING("[Mono] Engine.EventSystem class not found - script events will not be delivered to C#");
+			return;
+		}
+
+		s_EventSystemRaiseFromNative =
+			mono_class_get_method_from_name(eventSystemClass, "RaiseFromNative", 2);
+
+		if (!s_EventSystemRaiseFromNative)
+		{
+			LOG_WARNING("[Mono] Engine.EventSystem.RaiseFromNative(string,string) not found");
+		}
+	}
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
 	{
@@ -103,8 +128,27 @@ namespace Engine
 		// Register internal calls (C++ functions callable from C#)
 		RegisterInternalCalls();
 
+		// Hook native ScriptEvent channel into managed Engine.EventSystem
+		EventSystem::Instance().Subscribe<ScriptEvent>(
+			[](ScriptEvent const &ev)
+			{
+				if (!s_EventSystemRaiseFromNative)
+					return;
+
+				MonoDomain *domain = mono_domain_get();
+				if (!domain)
+					return;
+
+				MonoString *nameStr = mono_string_new(domain, ev.name.c_str());
+				MonoString *payloadStr = mono_string_new(domain, ev.payload.c_str());
+
+				void *args[2] = { nameStr, payloadStr };
+				mono_runtime_invoke(s_EventSystemRaiseFromNative, nullptr, args, nullptr);
+			});
+
 		s_Initialized = true;
 		LOG_INFO("Mono Script Engine initialized");
+
 	}
 
 
@@ -157,6 +201,9 @@ namespace Engine
 		}
 
 		LOG_INFO("Assembly loaded successfully");
+
+		// NEW: refresh event bindings to Engine.EventSystem
+		RefreshEventBindings(m_AppImage);
 	}
 
 	void MonoScriptEngine::UnloadAssembly()
@@ -408,6 +455,9 @@ namespace Engine
 		static bool Input_IsMouseButtonPressed(int button);
 		static void Input_GetMousePosition(glm::vec2 *outPosition);
 		//static Input* s_InputSystem = nullptr;  // Will be set later!
+
+		// Event System
+		static void Event_Publish(MonoString *nameStr, MonoString *payloadStr);
 
 		// Prefab instantiation
 		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr);
@@ -674,6 +724,8 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Audio_SetIs3D", (void *)InternalCalls::Audio_SetIs3D);
 
 		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
+
+		mono_add_internal_call("Engine.InternalCalls::Event_Publish", (void *)InternalCalls::Event_Publish);
 
 		// ===== NEW: AudioComponent Extensions =====
 		mono_add_internal_call("Engine.InternalCalls::Audio_GetMinDistance",
@@ -1709,6 +1761,33 @@ namespace Engine
 			auto* am = GetAudioManager();
 			if (!am) return false;
 			return am->IsGroupMuted(static_cast<AudioType>(groupType));
+		}
+
+		void Event_Publish(MonoString *nameStr, MonoString *payloadStr)
+		{
+			ScriptEvent ev;
+
+			if (nameStr)
+			{
+				char *cName = mono_string_to_utf8(nameStr);
+				if (cName)
+				{
+					ev.name = cName;
+					mono_free(cName);
+				}
+			}
+
+			if (payloadStr)
+			{
+				char *cPayload = mono_string_to_utf8(payloadStr);
+				if (cPayload)
+				{
+					ev.payload = cPayload;
+					mono_free(cPayload);
+				}
+			}
+
+			EventSystem::Instance().Queue(ev);
 		}
 
 		/*void AudioManager_SetMasterVolume(float volume) {
