@@ -271,7 +271,7 @@ namespace Game{
             foreach (string spawnPointName in spawnPointNames)
             {
                 // Find the spawn point entity by name
-                ulong entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+                uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
                 
                 if (entityID != 0)
                 {
@@ -289,7 +289,7 @@ namespace Game{
                         tempTransform.Entity = tempEntity;
                         
                         // Now we can access the properties
-                        spawnPosition = tempTransform.Position;
+                        InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
                         spawnRotation = tempTransform.Rotation;
                         
                         // Create spawn point data and add to list
