@@ -69,6 +69,9 @@ namespace Engine
 		/// Whether this body is kinematic (moved by code, not physics)
 		bool IsKinematic;
 
+		/// If true, this body behaves as a trigger (sensor) with no collision response.
+		bool IsTrigger;
+
 		/// Whether gravity affects this body
 		bool UseGravity;
 
@@ -110,6 +113,7 @@ namespace Engine
 			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
 			, Mass(1.0f)
 			, IsKinematic(false)
+			, IsTrigger(false)
 			, UseGravity(true)
 			, Velocity(0.0f, 0.0f, 0.0f)
 			, AngularVelocity(0.0f, 0.0f, 0.0f)
@@ -119,8 +123,7 @@ namespace Engine
 			, Shape(BOX)                                // default: simple box
 			, BoxHalfExtents(0.5f, 0.5f, 0.5f)
 			, SphereRadius(0.5f)
-		{
-		}
+		{}
 
 		/*****************************************************************************/
 		/*!
@@ -138,6 +141,7 @@ namespace Engine
 			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
 			, Mass(mass)
 			, IsKinematic(false)
+			, IsTrigger(false)
 			, UseGravity(true)
 			, Velocity(0.0f, 0.0f, 0.0f)
 			, AngularVelocity(0.0f, 0.0f, 0.0f)
@@ -147,19 +151,16 @@ namespace Engine
 			, Shape(BOX)
 			, BoxHalfExtents(0.5f, 0.5f, 0.5f)
 			, SphereRadius(0.5f)
-		{
-		}
-
-		// ---- existing helpers below unchanged ----
+		{}
 
 		/*****************************************************************************/
-		/*!
-		\brief  Sets the mass of the rigidbody.
+				/*!
+				\brief  Sets the mass of the rigidbody.
 
-		\param  mass
-				New mass value in kilograms.
-		*/
-		/*****************************************************************************/
+				\param  mass
+						New mass value in kilograms.
+				*/
+				/*****************************************************************************/
 		void SetMass(float mass)
 		{
 			Mass = mass;

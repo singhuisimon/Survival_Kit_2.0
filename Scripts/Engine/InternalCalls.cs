@@ -23,11 +23,16 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
+        // NEW: list of entities matching a tag
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetPosition(uint entityID, ref Vector3 position);
+        public static extern uint[] Scene_FindEntitiesByTag(string tag);
+
+        // CORRECT - GetPosition uses out, SetPosition uses ref
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_GetPosition(uint entityID, out Vector3 position); 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
+        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position); 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_Move(uint entityID, float deltaX, float deltaY, float deltaZ);
@@ -261,5 +266,57 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Audio_SetReverbMix(ulong entityID, float mix);
+
+        //Audio Manager implementation - new amanda
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float AudioManager_GetGroupVolume(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_SetGroupVolume(int groupType, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float AudioManager_GetGroupPitch(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_SetGroupPitch(int groupType, float pitch);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool AudioManager_IsGroupMuted(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_SetGroupMute(int groupType, bool mute);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_PauseGroup(int groupType, bool pause);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_PauseAll(bool pause);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_StopByType(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_StopAll();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_CreateDSP(int groupType, int effectType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_EnableDSP(int groupType, int effectType, bool enable);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioMaster_ReleaseSpecificDSPinGroup(int groupType, int effectType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_ReleaseDSPByGroup(int groupType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_ReleaseAllDSPs();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AudioManager_SetListenerAttributes(ref Vector3 position, ref Vector3 forward, ref Vector3 up, ref Vector3 velocity);
     }
 }

@@ -55,6 +55,20 @@
 
 #include "Utility/AssetPath.h"
 
+#ifndef DEBUG
+//this is for release
+Game::Game()
+    : Application("Guardian of The MotherBoard", 1280, 720)
+    , m_Scene(nullptr)
+    , m_Editor(nullptr)
+    , m_ColorShift(0.0f) {
+    LOG_INFO("Game constructor body executing");
+}
+
+#endif
+
+#ifndef NDEBUG
+//this is for debug
 Game::Game()
     : Application("Property-Based ECS Engine", 1280, 720)
     , m_Scene(nullptr)
@@ -62,6 +76,7 @@ Game::Game()
     , m_ColorShift(0.0f) {
     LOG_INFO("Game constructor body executing");
 }
+#endif
 
 void Game::OnInit() {
     LOG_INFO("=== Game::OnInit() STARTED ===");
@@ -327,8 +342,8 @@ void Game::CreateDefaultScene() {
     // ---------------------------------------------------------------------
     // Load animation clips
     // ---------------------------------------------------------------------
-    const std::string clipsDir = "../../Resources/Sources/AnimationClips";
-
+    const std::string clipsDir = Engine::getAssetFilePath("Sources/AnimationClips");
+    
     if (fs::exists(clipsDir)) {
         for (const auto& entry : fs::directory_iterator(clipsDir)) {
             if (!entry.is_regular_file())
@@ -348,7 +363,7 @@ void Game::CreateDefaultScene() {
     // ---------------------------------------------------------------------
     // Load animator controllers
     // ---------------------------------------------------------------------
-    const std::string ctrlDir = "../../Resources/Sources/AnimationControllers";
+    const std::string ctrlDir = Engine::getAssetFilePath("Sources/AnimationControllers");
 
     if (fs::exists(ctrlDir)) {
         for (const auto& entry : fs::directory_iterator(ctrlDir)) {
