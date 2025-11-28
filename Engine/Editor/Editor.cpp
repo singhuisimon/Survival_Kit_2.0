@@ -4504,42 +4504,104 @@ namespace Engine
 			if (openCameraComp)
 			{
 				auto& camComp = m_SelectedEntity.GetComponent<CameraComponent>();
-				bool changed = false;
 
-				changed |= ImGui::Checkbox("Enabled", &camComp.Enabled);
-				changed |= ImGui::Checkbox("Auto Aspect", &camComp.autoAspect);
+				// -------------------------------------------------
+				// Enabled
+				// -------------------------------------------------
+				ImGui::Checkbox("Enabled", &camComp.Enabled);
 
-				if (!camComp.autoAspect)
+				// Only show the rest when the camera is enabled
+				if (camComp.Enabled)
 				{
-					changed |= ImGui::DragFloat("Aspect", &camComp.Aspect, 0.01f, 0.1f, 10.0f);
-				}
+					ImGui::Separator();
 
-				changed |= ImGui::DragFloat("FOV", &camComp.FOV, 0.1f, 10.0f, 120.0f);
-				changed |= ImGui::DragFloat("Near Plane", &camComp.NearPlane, 0.01f, 0.01f, camComp.FarPlane - 0.01f);
-				changed |= ImGui::DragFloat("Far Plane", &camComp.FarPlane, 1.0f, camComp.NearPlane + 0.01f, 10000.0f);
+					// -------------------------------------------------
+					// Auto aspect
+					// -------------------------------------------------
+					ImGui::Checkbox("Auto Aspect", &camComp.autoAspect);
 
-				// For M3
-			/*	int depth = static_cast<int>(camComp.Depth);
-				if (ImGui::DragInt("Depth", &depth, 1, 0, 100))
-				{
-					camComp.Depth = static_cast<u32>(depth);
-					changed = true;
-				}*/
+					if (!camComp.autoAspect)
+					{
+						float aspect = camComp.Aspect;
+						if (ImGui::DragFloat("Aspect", &aspect, 0.01f, 0.1f, 10.0f))
+						{
+							camComp.SetAspect(aspect);   // rebuilds projection
+						}
+					}
 
-				/*changed |= ImGui::DragFloat3("Target", glm::value_ptr(camComp.Target), 0.1f);*/
+					// -------------------------------------------------
+					// Projection type (Perspective / Orthographic)
+					// -------------------------------------------------
+					int projIndex = camComp.Projection ? 1 : 0;     // 0 = Persp, 1 = Ortho
+					const char* projItems[] = { "Perspective", "Orthographic" };
+					if (ImGui::Combo("Projection", &projIndex, projItems, IM_ARRAYSIZE(projItems)))
+					{
+						bool isOrtho = (projIndex == 1);
+						camComp.SetProjection(isOrtho);             // rebuilds projection
+					}
 
-				if (changed)
-				{
-					camComp.isDirty = true;
+					// -------------------------------------------------
+					// FOV or Ortho Height (Size.y)
+					// -------------------------------------------------
+					if (!camComp.Projection)
+					{
+						// Perspective – show FOV
+						float fov = camComp.FOV;
+						if (ImGui::DragFloat("FOV", &fov, 0.1f, 10.0f, 120.0f))
+						{
+							camComp.SetFOV(fov);                    // rebuilds projection
+						}
+					}
+					else
+					{
+						// Orthographic – edit height only (Size.y)
+						float orthoHeight = camComp.Size.y;
+						if (ImGui::DragFloat("Ortho Height", &orthoHeight, 0.1f, 0.1f, 10000.0f))
+						{
+							camComp.SetSize({ camComp.Size.x, orthoHeight }); // x ignored, y used
+						}
+					}
 
+					// -------------------------------------------------
+					// Near / Far planes
+					// -------------------------------------------------
+					float nearPlane = camComp.NearPlane;
+					if (ImGui::DragFloat("Near Plane", &nearPlane, 0.01f, 0.01f, camComp.FarPlane - 0.01f))
+					{
+						camComp.SetNearPlane(nearPlane);           // rebuilds projection
+					}
+
+					float farPlane = camComp.FarPlane;
+					if (ImGui::DragFloat("Far Plane", &farPlane, 1.0f, camComp.NearPlane + 0.01f, 10000.0f))
+					{
+						camComp.SetFarPlane(farPlane);             // rebuilds projection
+					}
+
+					// -------------------------------------------------
+					// Target
+					// -------------------------------------------------
+					glm::vec3 target = camComp.Target;
+					if (ImGui::DragFloat3("Target", glm::value_ptr(target), 0.1f))
+					{
+						camComp.SetTarget(target);                 // only affects View
+					}
+
+					// For M3
+					/*
+					int depth = static_cast<int>(camComp.Depth);
+					if (ImGui::DragInt("Depth", &depth, 1, 0, 100))
+					{
+						camComp.Depth = static_cast<u32>(depth);
+					}
+					*/
 				}
 			}
+
 			// ---------------------- Remove Camera Comp ---------------------------
 			if (removeCameraComp)
 			{
 				m_SelectedEntity.RemoveComponent<CameraComponent>();
 			}
-
 		}
 	}
 

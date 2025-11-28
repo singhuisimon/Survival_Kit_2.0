@@ -451,6 +451,12 @@ namespace Engine {
                 uint64_t guidValue = std::stoull(properties["ComponentGUID"].GetString());
                 comp.ComponentGUID = xresource::instance_guid{ guidValue };
             }
+            if (properties.HasMember("Primary")) {
+                comp.Primary = properties["Primary"].GetBool();
+            }
+            if (properties.HasMember("Projection")) {
+                comp.Projection = properties["Projection"].GetBool();
+            }
             if (properties.HasMember("FOV")) {
                 comp.FOV = properties["FOV"].GetFloat();
             }
@@ -460,9 +466,7 @@ namespace Engine {
             if (properties.HasMember("FarPlane")) {
                 comp.FarPlane = properties["FarPlane"].GetFloat();
             }
-            if (properties.HasMember("Primary")) {
-                comp.Primary = properties["Primary"].GetBool();
-            }
+
         }
         else if (componentType == "MeshRendererComponent") {
             auto& comp = entity.AddComponent<MeshRendererComponent>();

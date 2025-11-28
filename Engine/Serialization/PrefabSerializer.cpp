@@ -301,10 +301,11 @@ namespace Engine {
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
             propertiesObj.AddMember("ComponentGUID",
                 rapidjson::Value(std::to_string(camera.ComponentGUID.m_Value).c_str(), allocator), allocator);
+            propertiesObj.AddMember("Primary", camera.Primary, allocator);
+            propertiesObj.AddMember("Projection", camera.Projection, allocator);
             propertiesObj.AddMember("FOV", camera.FOV, allocator);
             propertiesObj.AddMember("NearPlane", camera.NearPlane, allocator);
             propertiesObj.AddMember("FarPlane", camera.FarPlane, allocator);
-            propertiesObj.AddMember("Primary", camera.Primary, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);

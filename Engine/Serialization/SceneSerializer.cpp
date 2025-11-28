@@ -192,8 +192,14 @@ namespace Engine {
 
                 Value propertiesObj(kObjectType);
                 propertiesObj.AddMember("Enabled", camera.Enabled, allocator);
+                propertiesObj.AddMember("Primary", camera.Primary, allocator);
+                propertiesObj.AddMember("Projection", camera.Projection, allocator);
                 propertiesObj.AddMember("autoAspect", camera.autoAspect, allocator);
-                propertiesObj.AddMember("isDirty", camera.isDirty, allocator);
+
+                Value sizeArr(kArrayType);
+                sizeArr.PushBack(camera.Size.x, allocator);
+                sizeArr.PushBack(camera.Size.y, allocator);
+                propertiesObj.AddMember("Size", sizeArr, allocator);
                 propertiesObj.AddMember("Depth", camera.Depth, allocator);
                 propertiesObj.AddMember("Aspect", camera.Aspect, allocator);
                 propertiesObj.AddMember("FOV", camera.FOV, allocator);
@@ -668,10 +674,20 @@ namespace Engine {
 
                         if (properties.HasMember("Enabled"))
                             camera.Enabled = properties["Enabled"].GetBool();
+                        if (properties.HasMember("Primary"))
+                            camera.Primary = properties["Primary"].GetBool();
+                        if (properties.HasMember("Projection"))
+                            camera.Projection = properties["Projection"].GetBool();
                         if (properties.HasMember("autoAspect"))
                             camera.autoAspect = properties["autoAspect"].GetBool();
-                        if (properties.HasMember("isDirty"))
-                            camera.isDirty = properties["isDirty"].GetBool();
+
+                        if (properties.HasMember("Size")) {
+                            const Value& size = properties["Size"];
+                            camera.Size = glm::vec2(
+                                size[0].GetFloat(),
+                                size[1].GetFloat()
+                            );
+                        }
                         if (properties.HasMember("Depth"))
                             camera.Depth = properties["Depth"].GetUint();
                         if (properties.HasMember("Aspect"))
