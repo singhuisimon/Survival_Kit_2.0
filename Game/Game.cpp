@@ -616,12 +616,9 @@ void Game::OnUpdate(Engine::Timestep ts) {
     auto& editorModeToggle = m_Renderer->getEditorModeToggle();
 
     // Add this somewhere in your input handling:
-    /*if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
-        m_EditorEnable = !m_EditorEnable; 
-        editorModeToggle = m_EditorEnable;
-        editorCamToggle = false;
-        LOG_INFO("Editor toggled: ", m_EditorEnable);
-    }*/
+    if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
+        m_Editor->immediatelyCompile();
+    }
 
     // Editor camera toggle
     /*if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable) {
