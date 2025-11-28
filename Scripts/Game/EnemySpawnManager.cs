@@ -565,7 +565,7 @@ namespace Game{
             // Create enemy from prefab
             string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
             
-            if(enemyType == 0){
+            if(enemyType == 1){
                 //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
                 return;
             }
