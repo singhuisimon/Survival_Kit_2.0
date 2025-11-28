@@ -37,7 +37,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 5257170180447740591,
+                        "MaterialGuid": 14709733218137227273,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -67,7 +67,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -100,7 +100,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -133,7 +133,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -166,7 +166,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -199,7 +199,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -232,7 +232,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -265,7 +265,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -298,7 +298,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -331,7 +331,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -364,7 +364,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -379,12 +379,12 @@
             ]
         },
         {
-            "ID": 79,
+            "ID": 91,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "SoawnPointA_5"
+                        "Tag": "SpawnPointA_5"
                     }
                 },
                 {
@@ -397,7 +397,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -430,7 +430,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -463,7 +463,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -496,7 +496,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -529,7 +529,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -585,7 +585,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 1992262760686952559,
+                        "MaterialGuid": 4909900428979027975,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -638,7 +638,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 1992262760686952559,
+                        "MaterialGuid": 4909900428979027975,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -691,7 +691,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 1992262760686952559,
+                        "MaterialGuid": 4909900428979027975,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -744,7 +744,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 1992262760686952559,
+                        "MaterialGuid": 4909900428979027975,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -797,7 +797,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 1992262760686952559,
+                        "MaterialGuid": 4909900428979027975,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -843,7 +843,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 1992262760686952559,
+                        "MaterialGuid": 4909900428979027975,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -1789,7 +1789,7 @@
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -1884,11 +1884,11 @@
                         "Position": [
                             -42.65132141113281,
                             -99.11656951904297,
-                            -985.0
+                            -1000.0
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -1917,11 +1917,11 @@
                         "Position": [
                             110.03886413574219,
                             -82.88693237304688,
-                            -985.0
+                            -1000.0
                         ],
                         "Rotation": [
                             0.0,
-                            -0.0,
+                            -89.98021697998047,
                             0.0
                         ],
                         "Scale": [
@@ -1994,7 +1994,7 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.040464401245117,
+                            21.040462493896484,
                             38.87009811401367,
                             39.0
                         ],
@@ -2060,7 +2060,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 17362845978819992545,
+                        "MaterialGuid": 12403890208923533323,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -3888,7 +3888,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 0,
-                        "MaterialGuid": 5695127651147071489,
+                        "MaterialGuid": 12980350961226956805,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,

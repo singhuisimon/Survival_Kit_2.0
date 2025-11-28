@@ -73,6 +73,9 @@ namespace Engine {
             return !(*this == other);
         }
 
+        entt::registry* GetRegistry() const { return m_Registry; }
+
+
     private:
         entt::entity m_EntityHandle = entt::null;
         entt::registry* m_Registry = nullptr;

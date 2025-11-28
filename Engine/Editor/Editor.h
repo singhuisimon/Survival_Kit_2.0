@@ -119,6 +119,7 @@ namespace Engine
 		// ImGui other helper variable
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+		std::string selectedFolder = ""; // for the selected folder in asset browser
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
 
 		// Prefab helper variables
@@ -130,9 +131,12 @@ namespace Engine
 		std::string currFileName{}; // track file name
 		Prefab* m_CurrentPrefab = nullptr;
 		bool createEttFromPrfab = false;
+		//bool ApplyOverrideButtonTriggle = false;
 	
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE; // for ImGuizmo 
 		bool m_PreviousEditorCamToggle = false; // track if is in camera mode
+
+		
 	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
@@ -394,6 +398,8 @@ namespace Engine
 		* @param buttonSize
 		*	The size of the button used for removing the component.
 		**************************************************************************/
+
+		void displayPrefabComp();
 		void displayCameraComp(ImVec2& buttonSize);
 
 
@@ -431,6 +437,19 @@ namespace Engine
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
+
+		// for override prefab
+		void ApplyPrefabOverrides(Entity entity);
+
+
+		//void CollectChildEntities(Entity parentEntity, std::vector<Entity>& outEntities);
+
+		void CollectChildEntitiesIterative(Entity parentEntity, std::vector<Entity>& outEntities);
+		void UpdateEntityPrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
+
+		void UpdateScenePrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
+
+		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
 	};
 
 

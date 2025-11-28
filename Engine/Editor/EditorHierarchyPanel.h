@@ -19,6 +19,7 @@
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
 #include "../Serialization/PrefabInstantiator.h"
+#include "../Transform/TransformSystem.h"
 
 namespace Engine
 {
@@ -33,6 +34,7 @@ namespace Engine
 		inline static Entity parentOfPrefabEntity = Entity();
 
 		inline static std::vector<Entity> entitiesToDelete;
+		inline static std::vector<Entity> parentlessChildren;
 
 		/**************************************************************************
 		* @brief
@@ -42,6 +44,14 @@ namespace Engine
 		static void DrawEntityParentAndChildren(Entity& entity, Scene* scene,Entity& selectedEntity, uint32_t& pickedID, 
 										 Prefab* currentPrefab, std::unordered_set<std::string>& temporaryPrefabPaths, 
 										 std::string& currPrefabPath, bool& replacePrefabPending, std::string& selectedPrefabPath) {
+
+			// validate entity before accessing compon 
+			auto& registry = scene->GetRegistry();
+			entt::entity ent = (entt::entity)entity;
+			if (!registry.all_of<TagComponent>(ent))
+			{
+				return;
+			}
 
 			auto& tag = entity.GetComponent<TagComponent>();
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -118,6 +128,7 @@ namespace Engine
 					return;	// Return early to prevent drawing (child) entities that are deleted
 				}
 
+#if 0 // 25/11 4:38pm test prefab parent child entity
 				// Temp Fix: Only handle prefabs for main entities WITHOUT children
 				if (!hasParent &&!hasChildren) {
 					// ===================== Prefab Section ==========================
@@ -209,11 +220,101 @@ namespace Engine
 					}
 
 				}
+#endif
 
 				ImGui::Separator();
 
 				if (!hasParent) { // For main entities
+#if 1 // 25/11 4:42 Test prefab hierarchy panel
+					// ===================== Prefab Section ==========================
+					if (ImGui::BeginMenu("Prefabs"))
+					{
+						if (ImGui::MenuItem("Create Prefab"))
+						{
+							if (selectedEntity)
+							{
+								std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
+								auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 
+
+								//if (selectedEntity.HasComponent<PrefabComponent>())
+								//{
+								//	//auto& prefabComp = selectedEntity.GetComponent<PrefabComponent>();
+
+								//	ImGui::EndMenu();
+								//	return;
+								//}
+
+
+								//  Check if prefab file already exists
+								std::shared_ptr<Prefab> prefab;
+								xresource::instance_guid existingGUID{};
+
+								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+								if (existingPrefab)
+								{
+
+									existingGUID = existingPrefab->GetGUID();
+
+									// update existing prefab instead of creating new one
+									prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
+									if (prefab)
+									{
+
+										prefab->SetGUID(existingGUID);
+
+									}
+								}
+								else
+								{
+									prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
+
+								}
+
+								if (!prefab)
+								{
+
+									ImGui::EndMenu();
+									return;
+								}
+
+
+								// Save prefab to disk
+								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabPath))
+								{
+									// Register/Update prefab in registry
+									auto existingInRegistry = PrefabRegistry::Get().GetPrefab(prefab->GetGUID());
+									if (!existingInRegistry)
+									{
+										PrefabRegistry::Get().RegisterPrefab(prefab);
+
+									}
+									else
+									{
+										PrefabRegistry::Get().RegisterPrefab(prefab);
+
+									}
+
+									currentPrefab = prefab.get();
+									currPrefabPath = prefabPath;
+									temporaryPrefabPaths.insert(prefabPath);
+
+
+								}
+
+							}
+						}
+
+						if (ImGui::MenuItem("Replace Prefab"))
+						{
+							replacePrefabPending = true;
+							selectedPrefabPath = "";
+						}
+
+						ImGui::EndMenu(); // end prefab menu
+					}
+
+#endif
 					if (ImGui::BeginMenu("Add New Sub-Entity"))
 					{
 						if (ImGui::MenuItem("Create New Sub-Entity"))
@@ -262,16 +363,52 @@ namespace Engine
 			}
 
 			if (opened && hasChildren) {
+#if 1 // original code bfr modified 
+
 				auto& transform = entity.GetComponent<TransformComponent>();
 				for (uint32_t childID : transform.Children)  //Directly iterate handles
 				{
+					entt::entity childEntt = static_cast<entt::entity>(childID);
+					if ( !registry.all_of<TagComponent>(childEntt))
+					{
+						continue;
+					}
 					Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
 					DrawEntityParentAndChildren(childEntity, scene, selectedEntity, pickedID, currentPrefab,
 						temporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
 				}
+#endif
+
+#if 0
+				auto& transform = entity.GetComponent<TransformComponent>();
+				for (uint32_t childID : transform.Children) {
+					entt::entity childEntityID = static_cast<entt::entity>(childID);
+
+					// EXTRA DEFENSIVE: Check multiple conditions
+					if (scene->GetRegistry().valid(childEntityID) &&
+						scene->GetRegistry().all_of<TagComponent>(childEntityID) &&
+						scene->GetRegistry().all_of<TransformComponent>(childEntityID)) {
+
+						try {
+							Entity childEntity(childEntityID, &scene->GetRegistry());
+							DrawEntityParentAndChildren(childEntity, scene, selectedEntity, pickedID, currentPrefab,
+								temporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
+						}
+						catch (...) {
+							LOG_ERROR("Exception when drawing child entity: ", childID);
+						}
+					}
+					else {
+						LOG_WARNING("Skipping invalid child entity: ", childID);
+					}
+				}
+
+#endif 
+
 				ImGui::TreePop();
 			}
 
+			
 		}
 
 		static void DeleteEntityParentAndChildren(Scene* scene) {
@@ -280,5 +417,80 @@ namespace Engine
 			}
 			entitiesToDelete.clear();
 		}
+
+		static void FillEntitiesWithChildrenToDelete(Entity& entity, Scene* scene,
+			Entity& selectedEntity, uint32_t& pickedID) {
+
+			if (selectedEntity == entity)
+			{
+				selectedEntity = Entity();
+				pickedID = 0xFFFFFFFFu;
+			}
+
+			entitiesToDelete.push_back(entity);
+
+			if (entity.HasComponent<TransformComponent>()) {
+
+				auto& transform = entity.GetComponent<TransformComponent>();
+				if (!transform.Children.empty()) {
+					for (uint32_t childID : transform.Children)
+					{
+						Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
+						if (selectedEntity == childEntity)
+						{
+							selectedEntity = Entity();
+							pickedID = 0xFFFFFFFFu;
+						}
+						entitiesToDelete.push_back(childEntity);
+					}
+				}
+			}
+
+			return;
+		}
+
+		static void CheckForParentlessChildren(Scene* scene) {
+
+			std::vector<std::pair<Entity, u32>> childrenParentID;
+			std::vector<u32> parentsID;
+
+			if (scene)
+			{
+				auto view = scene->GetRegistry().view<TagComponent>();
+
+				for (auto entityHandle : view)
+				{
+					Entity checkEntity(entityHandle, &scene->GetRegistry());
+					auto& transform = checkEntity.GetComponent<TransformComponent>();
+					if (transform.Parent != u32_max) { // Child entities
+						childrenParentID.push_back(std::make_pair(checkEntity, transform.Parent));
+					}
+					else {
+						parentsID.push_back(static_cast<u32>(entityHandle));
+					}
+				}
+
+				for (auto& childAndParent : childrenParentID) {
+					
+					auto it = std::find(parentsID.begin(), parentsID.end(), childAndParent.second);
+
+					if (it == parentsID.end()) {
+						parentlessChildren.push_back(childAndParent.first);
+					}
+				}
+
+			}
+		}
+
+		static void ClearParentlessChildren(Scene* scene) {
+			if (!parentlessChildren.empty()) {
+				for (auto& entity : parentlessChildren) {
+					scene->DestroyEntity(entity);
+				}
+				parentlessChildren.clear();
+			}
+		}
+
+
 	};
 }
