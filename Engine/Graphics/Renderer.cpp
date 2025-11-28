@@ -80,6 +80,10 @@ namespace {
 		std::string vertex_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.vert") };
 		std::string fragment_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.frag") };
 
+		std::string fragment_bloom_downsample_path{ Engine::getAssetFilePath("Sources/Shaders/bloom_downsample.frag") };
+		std::string fragment_bloom_upsample_path{ Engine::getAssetFilePath("Sources/Shaders/bloom_upsample.frag") };
+
+
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
@@ -87,7 +91,9 @@ namespace {
 			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
 			std::make_pair(vertex_skybox_path, fragment_skybox_path),
 			std::make_pair(vertex_hdr_path, fragment_hdr_path),
-			std::make_pair(vertex_ui_path, fragment_ui_path)
+			std::make_pair(vertex_ui_path, fragment_ui_path),
+			std::make_pair(vertex_hdr_path, fragment_bloom_downsample_path),
+			std::make_pair(vertex_hdr_path, fragment_bloom_upsample_path)
 		};
 
 		shd = loadShaderPrograms(shader_files);
@@ -384,6 +390,9 @@ namespace Engine {
 			throw std::runtime_error("");
 		}
 
+		// Create bloom mip chain based on initial HDR size
+		initBloomMipChain(width, height);
+
 		// Create a render pass for that framebuffer
 		RenderPass first_pass
 		{
@@ -575,6 +584,12 @@ namespace Engine {
 				// Get camera perspective transform
 				glm::mat4 cam_perspective = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
 
+				// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
+				if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
+					m_lastView = cam_view;
+					m_lastProj = cam_perspective;
+				}
+
 				// Begin drawing frame
 				beginFrame(pass);
 				draw(pass, draw_items, cam_view, cam_perspective, cam_pos, lights);
@@ -637,6 +652,12 @@ namespace Engine {
 							// Resize FBO according to changes
 							resizeFBO(pass.fbo_handle, vp_w, vp_h);
 						}
+					}
+
+					// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
+					if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
+						m_lastView = cam.first.View;
+						m_lastProj = cam.first.Persp;
 					}
 
 					// Begin drawing frame
@@ -807,30 +828,6 @@ namespace Engine {
 		}
 
 		prog.programFree();
-
-		// Render skybox last
-		glDepthFunc(GL_LEQUAL);  // NOT GL_LESS - skybox is at max depth
-		glDepthMask(GL_FALSE);   // Don't write to depth buffer
-
-		// Need a separate projection view matrix for the skybox
-		glm::mat4 view = glm::mat4(glm::mat3(v)); // Strip camera matrix of translation component
-		glm::mat4 skybox_projection = p * view;
-
-		// Swap shader programs
-		size_t skybox_shader_program_idx = 3;
-		auto& skybox_prog = m_gl.m_shader_storage[skybox_shader_program_idx]; // Hardcoded 
-
-		skybox_prog.programUse();
-
-		skybox_prog.setUniform("u_SkyboxViewProjection", skybox_projection);
-
-		// Draw skybox and enable texture
-		m_skybox.vao.bind();
-		glBindTextureUnit(2, m_skybox_texture);
-		glDrawElements(m_skybox.primitive_type, m_skybox.draw_count, m_skybox.index_type, nullptr);
-		glBindVertexArray(0);
-
-		skybox_prog.programFree();
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
@@ -855,6 +852,9 @@ namespace Engine {
 			auto fp_tex_new = Texture::alloc_storage_on_gpu(w, h, GL_RGBA16F);
 			if (!fp_tex_new.has_value()) { LOG_ERROR("Renderer::resizeFBO() - Failed to allocate GL_RGBA16F ", w, " ", h, " storage on the GPU!"); }
 			else { m_gl.m_textures[handle] = std::move(*fp_tex_new); }
+
+			// Keep bloom mip chain resolution in sync with HDR scene resolution
+			resizeBloomMipChain(w, h);
 		}
 		else if (handle == 1) { // For GPU ID FBO
 			// Allocate storage for a new texture on the GPU
@@ -971,8 +971,54 @@ namespace Engine {
 		return (uint32_t)picked.size();
 	}
 
-	void Renderer::renderFinalPass(RenderPass& pass) {
+	void Renderer::renderSkyboxHDR()
+	{
+		// If we don't have any bloom initialized or framebuffers, bail early
+		if (m_framebuffers.empty()) return;
 
+		// Bind the HDR scene framebuffer explicitly (FBO 0)
+		auto& hdrFbo = m_framebuffers[0];
+		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(hdrFbo.handle()));
+
+		// Use the bloom source size (matches HDR resolution)
+		glViewport(0, 0,
+			static_cast<GLsizei>(m_bloomSrcSize.x),
+			static_cast<GLsizei>(m_bloomSrcSize.y));
+
+		// Depth settings for skybox
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);   // Skybox at max depth
+		glDepthMask(GL_FALSE);    // Don't write depth
+
+		// Build skybox view-projection: remove translation from last view
+		glm::mat4 viewNoTrans = glm::mat4(glm::mat3(m_lastView));
+		glm::mat4 skyboxVP = m_lastProj * viewNoTrans;
+
+		// Use skybox shader (index 3)
+		size_t skybox_shader_program_idx = 3;
+		auto& skybox_prog = m_gl.m_shader_storage[skybox_shader_program_idx];
+		skybox_prog.programUse();
+
+		skybox_prog.setUniform("u_SkyboxViewProjection", skyboxVP);
+
+		// Draw skybox cube
+		m_skybox.vao.bind();
+		glBindTextureUnit(2, m_skybox_texture);
+		glDrawElements(m_skybox.primitive_type,
+			m_skybox.draw_count,
+			m_skybox.index_type,
+			nullptr);
+		glBindVertexArray(0);
+
+		skybox_prog.programFree();
+
+		// Restore depth state
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+	}
+
+
+	void Renderer::renderFinalPass(RenderPass& pass) {
 
 		// Update pass viewport if allowed
 		if (pass.auto_aspect) {
@@ -984,18 +1030,37 @@ namespace Engine {
 				pass.view_port.z = static_cast<float>(vp_w);
 				pass.view_port.w = static_cast<float>(vp_h);
 
-				// Resize FBO according to changes
+				// Resize FBO (2) for final pass
 				resizeFBO(pass.fbo_handle, vp_w, vp_h);
+
+				// Also update bloom source size (HDR scene size)
+				m_bloomSrcSize = { vp_w, vp_h };
+				resizeBloomMipChain(vp_w, vp_h);
 			}
 		}
 
+		// Build bloom from HDR scene (texture 0)
+		renderBloomDownsamples();
+		renderBloomUpsamples(m_bloomFilterRadius);  // 0.005f as default, tweak as needed
+
+		// Render skybox into HDR FBO 0 after bloom is computed  
+		renderSkyboxHDR();
+
+		// Final composite: HDR scene + bloom -> LDR
 		beginFrame(pass);
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
-		// Bind the initial pass's texture to be sampled
+		// Bind the initial pass's texture to be sampled (HDR scene color buffer)
 		glBindTextureUnit(4, m_gl.m_textures[0].handle());
 
+		// Bloom texture is top mip (A')  
+		BloomMip& topMip = m_bloomMips[0]; 
+		glBindTextureUnit(5, m_gl.m_textures[topMip.texIndex].handle());
+
+		// Set Uniforms 
 		prog.setUniform("exposure", m_exposure);
+		prog.setUniform("bloomStrength", m_bloomStrength); 
+		prog.setUniform("useBloom", m_bloomOn);
 
 		m_fullscreen_quad.vao.bind();
 		glDrawElements(m_fullscreen_quad.primitive_type, m_fullscreen_quad.draw_count, m_fullscreen_quad.index_type, nullptr);
@@ -1006,5 +1071,192 @@ namespace Engine {
 		endFrame(pass);
 
 	}
+
+	void Renderer::initBloomMipChain(int srcWidth, int srcHeight)
+	{
+		if (m_bloomInitialized) return;
+
+		m_bloomSrcSize = { srcWidth, srcHeight };
+
+		int w = srcWidth;
+		int h = srcHeight;
+
+		for (int i = 0; i < BLOOM_MIP_COUNT; ++i) {
+			// Downscale by 2 each level
+			w = std::max(1, w / 2);
+			h = std::max(1, h / 2);
+
+			BloomMip& mip = m_bloomMips[i];
+			mip.size = glm::vec2(static_cast<float>(w),
+				static_cast<float>(h));
+			mip.texelSize = glm::vec2(1.0f / mip.size.x,
+				1.0f / mip.size.y);
+
+			// Create FBO
+			auto fbo = FrameBuffer::create();
+			if (!fbo.has_value()) {
+				LOG_ERROR("Bloom: Failed to create FBO for mip {}", i);
+				continue;
+			}
+			m_framebuffers.push_back(std::move(*fbo));
+			mip.fboIndex = static_cast<u32>(m_framebuffers.size() - 1);
+
+			// Create texture (HDR RGB; you may use RGBA16F or R11F_G11F_B10F)
+			auto tex = Texture::alloc_storage_on_gpu(w, h, GL_RGBA16F);
+			if (!tex.has_value()) {
+				LOG_ERROR("Bloom: Failed to create texture for mip {} ({}x{})", i, w, h);
+				continue;
+			}
+			m_gl.m_textures.push_back(std::move(*tex));
+			mip.texIndex = static_cast<u32>(m_gl.m_textures.size() - 1);
+
+			auto& fb = m_framebuffers[mip.fboIndex];
+			auto& texRef = m_gl.m_textures[mip.texIndex];
+
+			fb.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(texRef.handle()));
+			const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+			fb.set_draw_buffers(std::span<const GLenum>(bufs, 1));
+
+			if (!fb.complete()) {
+				LOG_ERROR("Bloom: mip {} FBO incomplete!", i);
+			}
+		}
+
+		m_bloomInitialized = true;
+	}
+
+	void Renderer::resizeBloomMipChain(int srcWidth, int srcHeight)
+	{
+		if (!m_bloomInitialized) {
+			initBloomMipChain(srcWidth, srcHeight);
+			return;
+		}
+
+		m_bloomSrcSize = { srcWidth, srcHeight };
+
+		int w = srcWidth;
+		int h = srcHeight;
+
+		for (int i = 0; i < BLOOM_MIP_COUNT; ++i) {
+			w = std::max(1, w / 2);
+			h = std::max(1, h / 2);
+
+			BloomMip& mip = m_bloomMips[i];
+			mip.size = glm::vec2(static_cast<float>(w),
+				static_cast<float>(h));
+			mip.texelSize = glm::vec2(1.0f / mip.size.x,
+				1.0f / mip.size.y);
+
+			auto newTex = Texture::alloc_storage_on_gpu(w, h, GL_RGBA16F);
+			if (!newTex.has_value()) {
+				LOG_ERROR("Bloom: Failed to reallocate texture for mip {} to {}x{}", i, w, h);
+				continue;
+			}
+
+			m_gl.m_textures[mip.texIndex] = std::move(*newTex);
+
+			auto& fb = m_framebuffers[mip.fboIndex];
+			auto& texRef = m_gl.m_textures[mip.texIndex];
+
+			fb.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(texRef.handle()));
+			const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+			fb.set_draw_buffers(std::span<const GLenum>(bufs, 1));
+		}
+	}
+
+	void Renderer::renderBloomDownsamples()
+	{
+		if (!m_bloomInitialized) return;
+
+		auto& mipChain = m_bloomMips;
+
+		auto& downProg = m_gl.m_shader_storage[6]; // bloom_downsample
+		downProg.programUse();
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glDepthMask(GL_FALSE);
+
+		// Start with HDR scene texture as source
+		glm::vec2 srcRes = glm::vec2(
+			static_cast<float>(m_bloomSrcSize.x),
+			static_cast<float>(m_bloomSrcSize.y)
+		);
+		downProg.setUniform("srcResolution", srcRes);
+		glBindTextureUnit(4, m_gl.m_textures[0].handle()); // HDR scene
+
+		for (int i = 0; i < BLOOM_MIP_COUNT; ++i) {
+			BloomMip& mip = mipChain[i];
+
+			auto& fb = m_framebuffers[mip.fboIndex];
+			glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fb.handle()));
+			glViewport(0, 0,
+				static_cast<GLsizei>(mip.size.x),
+				static_cast<GLsizei>(mip.size.y));
+
+			m_fullscreen_quad.vao.bind();
+			glDrawElements(m_fullscreen_quad.primitive_type,
+				m_fullscreen_quad.draw_count,
+				m_fullscreen_quad.index_type,
+				nullptr);
+			glBindVertexArray(0);
+
+			// Next iteration uses this mip as source
+			srcRes = mip.size;
+			downProg.setUniform("srcResolution", srcRes);
+			glBindTextureUnit(4, m_gl.m_textures[mip.texIndex].handle());
+		}
+
+		downProg.programFree();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void Renderer::renderBloomUpsamples(float filterRadius)
+	{
+		if (!m_bloomInitialized) return;
+
+		auto& mipChain = m_bloomMips;
+		auto& upProg = m_gl.m_shader_storage[7]; // bloom_upsample
+
+		upProg.programUse();
+		upProg.setUniform("filterRadius", filterRadius);
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glDepthMask(GL_FALSE);
+
+		// Enable additive blending: dst = dst + src
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glBlendEquation(GL_FUNC_ADD);
+
+		// Work from smallest mip up to mip 0
+		for (int i = BLOOM_MIP_COUNT - 1; i > 0; --i) {
+			BloomMip& mip = mipChain[i];
+			BloomMip& nextMip = mipChain[i - 1];
+
+			// Source: current mip (lower resolution)
+			glBindTextureUnit(4, m_gl.m_textures[mip.texIndex].handle());
+
+			// Target: next higher mip
+			auto& fb = m_framebuffers[nextMip.fboIndex];
+			glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(fb.handle()));
+			glViewport(0, 0,
+				static_cast<GLsizei>(nextMip.size.x),
+				static_cast<GLsizei>(nextMip.size.y));
+
+			m_fullscreen_quad.vao.bind();
+			glDrawElements(m_fullscreen_quad.primitive_type,
+				m_fullscreen_quad.draw_count,
+				m_fullscreen_quad.index_type,
+				nullptr);
+			glBindVertexArray(0);
+		}
+
+		glDisable(GL_BLEND);
+		upProg.programFree();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 
 }
