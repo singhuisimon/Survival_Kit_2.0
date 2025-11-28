@@ -20,19 +20,19 @@ namespace Engine {
             // Check if file's state is good for reading
             std::string shader_source;
             if (!readShaderFile(file.second, shader_source)) {
-                //LM.writeLog("ShaderProgram::compileShader: File %s has error.", file.second.c_str());
+                LOG_INFO("ShaderProgram::compileShader: File ", file.second.c_str(), " has error.");
                 return GL_FALSE;
             }
-            //LM.writeLog("ShaderProgram::compileShader: File %s is good for reading.", file.second.c_str());
+            LOG_INFO("ShaderProgram::compileShader: File ", file.second.c_str(), " is good for reading.");
 
             // Create shader program
             if (program_handle <= 0) {
                 program_handle = glCreateProgram();
                 if (program_handle == 0) {
-                    //LM.writeLog("ShaderProgram::compileShader: Cannot create program handle");
+                    LOG_INFO("ShaderProgram::compileShader: Cannot create program handle");
                     return GL_FALSE;
                 }
-                //LM.writeLog("ShaderProgram::compileShader: Program handle %u created", program_handle);
+                LOG_INFO("ShaderProgram::compileShader: Program handle ", program_handle, " created.");
             }
 
             // Create shader object and load shader code with it
@@ -44,7 +44,7 @@ namespace Engine {
                 shader_obj = glCreateShader(GL_FRAGMENT_SHADER);
             }
             else {
-                //LM.writeLog("ShaderProgram::compileShader: Invalid shader type.");
+                LOG_INFO("ShaderProgram::compileShader: Invalid shader type.");
                 return GL_FALSE;
             }
             const GLchar* shader_code[] = { shader_source.c_str() };
@@ -55,13 +55,24 @@ namespace Engine {
             GLint compile_status;
             glGetShaderiv(shader_obj, GL_COMPILE_STATUS, &compile_status);
             if (compile_status == GL_FALSE) {
-                //LM.writeLog("ShaderProgram::compileShader: Shader from file %s compilation fail.", file.second.c_str());
 
+                GLint logLength = 0;
+                glGetShaderiv(shader_obj, GL_INFO_LOG_LENGTH, &logLength);
+
+                std::string log;
+                log.resize(logLength > 0 ? logLength : 1);
+
+                GLsizei written = 0;
+                glGetShaderInfoLog(shader_obj, logLength, &written, log.data());
+
+                LOG_INFO("Shader compile failed for ", file.second.c_str(), ": ", log.c_str());
+
+                glDeleteShader(shader_obj);
                 return GL_FALSE;
             }
             else {
+                LOG_INFO("Shader compile successfully for ", file.second.c_str());
                 glAttachShader(program_handle, shader_obj);
-                //LM.writeLog("ShaderProgram::compileShader: Shader from file %s compilation successful.", file.second.c_str());
             }
         }
 
@@ -71,11 +82,11 @@ namespace Engine {
             GLint status;
             glGetProgramiv(program_handle, GL_LINK_STATUS, &status); 
             if (status == GL_FALSE) {
-                //LM.writeLog("ShaderProgram::compileShader: Compiled shaders failed to link.");
+                LOG_INFO("ShaderProgram::compileShader: Compiled shaders failed to link.");
                 return GL_FALSE;
             }
             link_status = GL_TRUE;
-            //LM.writeLog("ShaderProgram::compileShader: Compiled shaders are linked successfully.");
+            LOG_INFO("ShaderProgram::compileShader: Compiled shaders are linked successfully.");
         }
 
         // Check if the program created can be executed in current OpenGL state
@@ -83,10 +94,10 @@ namespace Engine {
         GLint validate_status;
         glGetProgramiv(program_handle, GL_VALIDATE_STATUS, &validate_status);
         if (validate_status == GL_FALSE) {
-            //LM.writeLog("ShaderProgram::compileShader: Shader program is invalid in current OpenGL state.");
+            LOG_INFO("ShaderProgram::compileShader: Shader program is invalid in current OpenGL state.");
             return GL_FALSE;
         }
-        //LM.writeLog("ShaderProgram::compileShader: Shader program is validated and ready to execute in current OpenGL state.");
+        LOG_INFO("ShaderProgram::compileShader: Shader program is validated and ready to execute in current OpenGL state.");
         return GL_TRUE;
 
     }
@@ -96,7 +107,7 @@ namespace Engine {
         // Check if file's state is good for reading
         std::ifstream input_file(file_path); 
         if (input_file.good() == GL_FALSE) {
-            //LM.writeLog("ShaderProgram::readShaderFile: File %s has error.", file_path.c_str());
+            LOG_INFO("ShaderProgram::readShaderFile: File ", file_path.c_str(), " has error.");
             return false;
         }
 
@@ -106,7 +117,16 @@ namespace Engine {
         input_file.close();
 
         shader_source = ss.str();
-        //LM.writeLog("ShaderProgram::readShaderFile: Successfully read shader file %s", file_path.c_str());
+
+        // Strip UTF-8 BOM if present (0xEF, 0xBB, 0xBF)
+        if (shader_source.size() >= 3 &&
+            static_cast<unsigned char>(shader_source[0]) == 0xEF &&
+            static_cast<unsigned char>(shader_source[1]) == 0xBB &&
+            static_cast<unsigned char>(shader_source[2]) == 0xBF)
+        {
+            shader_source.erase(0, 3);
+        }
+        LOG_INFO("ShaderProgram::readShaderFile: Successfully read shader file ", file_path.c_str());
         return true;
     }
 
