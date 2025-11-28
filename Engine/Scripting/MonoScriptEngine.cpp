@@ -659,12 +659,10 @@ namespace Engine
 		// Transform
 		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void*)InternalCalls::Transform_GetPosition);
 		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void*)InternalCalls::Transform_SetPosition);
-		mono_add_internal_call("Engine.Transform::GetRotation_Native", (void *)InternalCalls::Transform_GetRotation);
-		mono_add_internal_call("Engine.Transform::SetRotation_Native", (void *)InternalCalls::Transform_SetRotation);
-		mono_add_internal_call("Engine.Transform::GetScale_Native", (void *)InternalCalls::Transform_GetScale);
-		mono_add_internal_call("Engine.Transform::SetScale_Native", (void *)InternalCalls::Transform_SetScale);
-		mono_add_internal_call("Engine.InternalCalls::Transform_Move", (void *)InternalCalls::Transform_Move);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void *)InternalCalls::Transform_SetPosition);
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetRotation", (void *)InternalCalls::Transform_GetRotation);
+		mono_add_internal_call("Engine.InternalCalls::Transform_SetRotation", (void *)InternalCalls::Transform_SetRotation);
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetScale", (void *)InternalCalls::Transform_GetScale);
+		mono_add_internal_call("Engine.InternalCalls::Transform_SetScale", (void *)InternalCalls::Transform_SetScale);
 
 		// Input
 		mono_add_internal_call("Engine.Input::IsKeyPressed_Native", (void *)InternalCalls::Input_IsKeyPressed);
