@@ -3,6 +3,7 @@
 
 #include "MonoScriptEngine.h"
 #include "../Utility/Logger.h"
+#include "../Utility/AssetPath.h"
 #include "../ECS/Scene.h"
 #include "../ECS/Entity.h"
 #include "../ECS/Components.h"
@@ -978,7 +979,11 @@ namespace Engine
 			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
 
 			// Load prefab from file
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+			std::string prefabfullpath = getAssetFilePath(prefabPath);
+
+
+			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
 			if (!prefab)
 			{
 				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to load prefab from ", prefabPath);

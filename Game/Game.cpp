@@ -57,6 +57,20 @@
 
 #include "Utility/AssetPath.h"
 
+#ifndef DEBUG
+//this is for release
+Game::Game()
+    : Application("Guardian of The MotherBoard", 1280, 720)
+    , m_Scene(nullptr)
+    , m_Editor(nullptr)
+    , m_ColorShift(0.0f) {
+    LOG_INFO("Game constructor body executing");
+}
+
+#endif
+
+#ifndef NDEBUG
+//this is for debug
 Game::Game()
 	: Application("Property-Based ECS Engine", 1280, 720)
 	, m_Scene(nullptr)
@@ -65,6 +79,7 @@ Game::Game()
 {
 	LOG_INFO("Game constructor body executing");
 }
+#endif
 
 void Game::OnInit()
 {

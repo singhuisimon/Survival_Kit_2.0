@@ -157,6 +157,10 @@ namespace Engine {
 		 */
 		inline bool& getEditorModeToggle() { return isEditorMode; }
 
+		inline bool& getBloomToggle() { return m_bloomOn; }
+		inline float& getBloomStrength() { return m_bloomStrength; }
+		inline float& getBloomFilterRadius() { return m_bloomFilterRadius; }
+
 		float m_exposure = 1.0;
 
 	private:
@@ -206,9 +210,39 @@ namespace Engine {
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
 
+		/*------------------- BLOOM PROPERTIES/DATA ------------------*/
+		// Number of bloom mip levels (multi-scale)
+		static constexpr int BLOOM_MIP_COUNT = 5;
+
+		struct BloomMip {
+			glm::vec2 size{};       // width, height of this mip
+			glm::vec2 texelSize{};  // 1.0 / size
+			u32 fboIndex = 0;       // index into m_framebuffers
+			u32 texIndex = 0;       // index into m_gl.m_textures
+		};
+
+		std::array<BloomMip, BLOOM_MIP_COUNT> m_bloomMips{};
+		bool  m_bloomInitialized = false;
+		bool  m_bloomOn = false;
+
+		// Physically-based bloom strength (mix factor in final pass; reco ~0.03-0.15)
+		float m_bloomStrength = 0.04f;  
+		float m_bloomFilterRadius = 0.005f;
+
+		// Cached scene size for bloom
+		glm::ivec2 m_bloomSrcSize{ 1280, 720 };
+
+		// Helpers
+		void initBloomMipChain(int srcWidth, int srcHeight);
+		void resizeBloomMipChain(int srcWidth, int srcHeight);
+		void renderBloomDownsamples();
+		void renderBloomUpsamples(float filterRadius);
+		/*------------------- BLOOM PROPERTIES/DATA ------------------*/
+
 		// Engine Provided Items
 		MeshGL m_skybox; // Default engine provided skybox
 		GLuint m_skybox_texture; // Will need to change
+		void renderSkyboxHDR();
 
 		MaterialResource m_defaultMaterial; // Immutable material, shared across all meshes that DO NOT HAVE material attached to it
 
@@ -220,6 +254,10 @@ namespace Engine {
 		// Temp toggle to check if editor camera is enabled
 		bool isEditorCamOn = true;
 		bool isEditorMode = true;
+
+		// Last camera used for the main HDR pass (FBO 0)
+		glm::mat4 m_lastView{};
+		glm::mat4 m_lastProj{};
 
 		// Temporary object
 		GraphicsLoader m_gl;
