@@ -443,7 +443,37 @@ namespace Engine {
             });
 
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
-    }
+    
+
+        // Key codes: SPACE=32, ENTER=257, ESCAPE=256, E=69, F=70, 1=49, 2=50...
+        registry.RegisterNodeType<BTCheckKeyPressed>("Input", "Checks if a keyboard key is pressed",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTCheckKeyPressed, "KeyCode", m_KeyCode);
+            });
+
+        // Mouse buttons: 0=Left, 1=Right, 2=Middle
+        registry.RegisterNodeType<BTCheckMouseButtonPressed>("Input", "Checks if a mouse button is pressed",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_INT_PROPERTY(BTCheckMouseButtonPressed, "MouseButton", m_MouseButton);
+            });
+
+        registry.RegisterNodeType<BTGetMousePosition>("Input", "Stores mouse position in blackboard",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTGetMousePosition, "PositionKey", m_PositionKey);
+            });
+
+        registry.RegisterNodeType<BTSetCameraEnabled>("Camera", "Enable or disable a camera by tag",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTSetCameraEnabled, "CameraTag", m_CameraTag);
+                BT_REGISTER_BOOL_PROPERTY(BTSetCameraEnabled, "Enabled", m_Enabled);
+            });
+
+        registry.RegisterNodeType<BTSwitchCamera>("Camera", "Switch between two cameras",
+            [](BTNodeMetadata& metadata) {
+                BT_REGISTER_STRING_PROPERTY(BTSwitchCamera, "DisableCameraTag", m_DisableCameraTag);
+                BT_REGISTER_STRING_PROPERTY(BTSwitchCamera, "EnableCameraTag", m_EnableCameraTag);
+            });
+}
 
 
 } // namespace Engine
