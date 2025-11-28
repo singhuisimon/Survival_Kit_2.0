@@ -34,6 +34,7 @@ namespace Engine
 		inline static Entity parentOfPrefabEntity = Entity();
 
 		inline static std::vector<Entity> entitiesToDelete;
+		inline static std::vector<Entity> parentlessChildren;
 
 		/**************************************************************************
 		* @brief
@@ -446,6 +447,48 @@ namespace Engine
 			}
 
 			return;
+		}
+
+		static void CheckForParentlessChildren(Scene* scene) {
+
+			std::vector<std::pair<Entity, u32>> childrenParentID;
+			std::vector<u32> parentsID;
+
+			if (scene)
+			{
+				auto view = scene->GetRegistry().view<TagComponent>();
+
+				for (auto entityHandle : view)
+				{
+					Entity checkEntity(entityHandle, &scene->GetRegistry());
+					auto& transform = checkEntity.GetComponent<TransformComponent>();
+					if (transform.Parent != u32_max) { // Child entities
+						childrenParentID.push_back(std::make_pair(checkEntity, transform.Parent));
+					}
+					else {
+						parentsID.push_back(static_cast<u32>(entityHandle));
+					}
+				}
+
+				for (auto& childAndParent : childrenParentID) {
+					
+					auto it = std::find(parentsID.begin(), parentsID.end(), childAndParent.second);
+
+					if (it == parentsID.end()) {
+						parentlessChildren.push_back(childAndParent.first);
+					}
+				}
+
+			}
+		}
+
+		static void ClearParentlessChildren(Scene* scene) {
+			if (!parentlessChildren.empty()) {
+				for (auto& entity : parentlessChildren) {
+					scene->DestroyEntity(entity);
+				}
+				parentlessChildren.clear();
+			}
 		}
 
 

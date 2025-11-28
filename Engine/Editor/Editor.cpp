@@ -747,6 +747,9 @@ namespace Engine
 
 				EditorHierarchyHelper::DeleteEntityParentAndChildren(m_Scene);
 
+				EditorHierarchyHelper::CheckForParentlessChildren(m_Scene);
+				EditorHierarchyHelper::ClearParentlessChildren(m_Scene);
+
 				if (EditorHierarchyHelper::openAttachEntityPopup)
 				{
 					ImGui::OpenPopup("Main Entity Selection");
