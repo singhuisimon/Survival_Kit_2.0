@@ -57,7 +57,7 @@ namespace Game{
         private string[] enemyPrefabNames = new string[]
         {
             "Enemy_Botnet",      // 0
-            "Enemy_Loveletter",  // 1  
+            "Enemy_LoveLetter",  // 1  
             "Enemy_Worm",        // 2
             "Enemy_Trojan",      // 3
             "Enemy_Adware",      // 4
@@ -120,10 +120,10 @@ namespace Game{
             InitializeWalls();
             
             // Find light entities
-            InitializeLights();
+            //InitializeLights();
             
             // Setup lights for prep phase
-            SetupLights();
+            //SetupLights();
             
             // Setup walls for initial state
             WallSetup_DisableActiveWalls();
@@ -231,34 +231,66 @@ namespace Game{
                 "SpawnPointA_12",
                 "SpawnPointA_13",
                 "SpawnPointA_14",
-                "SpawnPointA_15",
+                "SpawnPointA_15"
             });
-            
-            // TODO: Register spawn points for walls B, C, D, E
-            /*
+
+            // Wall B spawn points - register each one
             RegisterSpawnPointsForWall("B", spawnPointsB, new string[] {
-                "SpawnPoint_B_1",
-                "SpawnPoint_B_2",
-                "SpawnPoint_B_3"
+                "SpawnPointB_1",
+                "SpawnPointB_2",
+                "SpawnPointB_3",
+                "SpawnPointB_4",
+                "SpawnPointB_5",
+                "SpawnPointB_6",
+                "SpawnPointB_7",
+                "SpawnPointB_8",
+                "SpawnPointB_9",
+                "SpawnPointB_10",
+                "SpawnPointB_11",
+                "SpawnPointB_12",
+                "SpawnPointB_13",
+                "SpawnPointB_14",
+                "SpawnPointB_15"
             });
-            
+
+            // Wall C spawn points - register each one
             RegisterSpawnPointsForWall("C", spawnPointsC, new string[] {
-                "SpawnPoint_C_1",
-                "SpawnPoint_C_2",
-                "SpawnPoint_C_3"
+                "SpawnPointC_1",
+                "SpawnPointC_2",
+                "SpawnPointC_3",
+                "SpawnPointC_4",
+                "SpawnPointC_5",
+                "SpawnPointC_6"
             });
-            
+
+            // Wall D spawn points - register each one
             RegisterSpawnPointsForWall("D", spawnPointsD, new string[] {
-                "SpawnPoint_D_1",
-                "SpawnPoint_D_2",
-                "SpawnPoint_D_3"
+                "SpawnPointD_1",
+                "SpawnPointD_2",
+                "SpawnPointD_3",
+                "SpawnPointD_4",
+                "SpawnPointD_5",
+                "SpawnPointD_6",
+                "SpawnPointD_7",
+                "SpawnPointD_8",
+                "SpawnPointD_9",
+                "SpawnPointD_10",
+                "SpawnPointD_11",
+                "SpawnPointD_12",
+                "SpawnPointD_13",
+                "SpawnPointD_14",
+                "SpawnPointD_15"
             });
-            
+
+            // Wall E spawn points - register each one
             RegisterSpawnPointsForWall("E", spawnPointsE, new string[] {
-                "SpawnPoint_E_1",
-                "SpawnPoint_E_2",
-                "SpawnPoint_E_3"
-            });*/
+                "SpawnPointB_1",
+                "SpawnPointB_2",
+                "SpawnPointB_3",
+                "SpawnPointB_4",
+                "SpawnPointB_5",
+                "SpawnPointB_6"
+            });
             
             Log("TODO: Initialize spawn points - find entities by name");
         }
@@ -385,14 +417,14 @@ namespace Game{
             Log(string.Concat("Found ", wallInactiveEntities.Length.ToString(), " inactive walls"));
         }
         
-        private void InitializeLights()
-        {
-            // Find light entities
-            // lightPrep = Entity.FindByName("Light_Prep");
-            // lightCombat = Entity.FindByName("Light_Combat");
+        // private void InitializeLights()
+        // {
+        //     // Find light entities
+        //     // lightPrep = Entity.FindByName("Light_Prep");
+        //     // lightCombat = Entity.FindByName("Light_Combat");
             
-            Log("TODO: Initialize light entities");
-        }
+        //     Log("TODO: Initialize light entities");
+        // }
         
         private void SetupWaveSpawning()
         {
@@ -419,7 +451,8 @@ namespace Game{
                     break;
                 case 3:
                     // not for this milestone
-                    // SetEnemyCount{5, 16, 7, 0, 1};
+                    //SetEnemyCount{5, 16, 7, 0, 1};
+                    // SetEnemyCount{5, 16, 0, 0, 0};
                     // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
                     // activeSpawnPoints = new List<SpawnPointData>();
                     // activeSpawnPoints.AddRange(spawnPointsB);
@@ -459,7 +492,7 @@ namespace Game{
             timeNext = elapsedTime + timeWave;
             timeCurrent = timeWave;
             
-            HandleLights("COMBAT", true);
+            //HandleLights("COMBAT", true);
             
             spawningAllowed = true;
             spawnRateNext = elapsedTime + spawnRate;
@@ -476,7 +509,7 @@ namespace Game{
             timeNext = elapsedTime + timeBetweenWave;
             timeCurrent = timeBetweenWave;
             
-            HandleLights( "BREAK", true);
+            //HandleLights( "BREAK", true);
             
             spawningAllowed = false;
             
@@ -567,6 +600,8 @@ namespace Game{
             
             if(enemyType == 1){
                 //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
+                Log("HI LOVELETTER HERE");
+                SpawnLoveLetter(prefabpath);
                 return;
             }
 
@@ -624,7 +659,7 @@ namespace Game{
             //Log("TODO: Spawn " + prefabpath + " at position " + spawnPos);
 
             // Log with safe string concatenation
-            Log(string.Concat("TODO: Spawn ", prefabpath, " at position (", 
+            Log(string.Concat("Spawn ", prefabpath, " at position (", 
                 spawnPos.X.ToString(), ", ", spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), ")"));
         }
 
@@ -634,43 +669,66 @@ namespace Game{
 
             // Find the spawn point entity by name
             uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+
+            Log("Spawn point name is: " + spawnPointName);
             
             // Get transform data directly using native calls
             // We'll call the Transform native methods directly
             Vector3 spawnPosition;
             Vector3 spawnRotation;
 
-            if (entityID != 0)
-            {
-                try
-                {
-                    // Use the Transform class static methods via reflection/direct instantiation
-                    // Create a temporary entity wrapper
-                    Entity tempEntity = new Entity(entityID);
-                    Transform tempTransform = new Transform();
-                    tempTransform.Entity = tempEntity;
-                    
-                    // Now we can access the properties
-                    InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
-                    spawnRotation = tempTransform.Rotation;
-                    
-                    
-                    Log(string.Concat("Found ", spawnPointName, " registered at position (", 
-                        spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(), 
-                        ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ")"));
-                }
-                catch (Exception ex)
-                {
-                    Log(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
-                }
-            }
-            else
-            {
-                Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName, 
-                    " (EntityID: ", entityID.ToString(), ")"));
-            }
+            InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
+            Entity spawnent = new Entity(entityID);
+            Transform spawnentrans = new Transform();
+            spawnentrans.Entity = spawnent;
+            spawnRotation = spawnentrans.Rotation;
 
             uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+
+            if(enemyID != 0){
+                Entity tempEntity = new Entity(enemyID);
+                Transform tempTransform = new Transform();
+                tempTransform.Entity = tempEntity;
+                InternalCalls.Transform_SetPosition(enemyID, ref spawnPosition);
+                tempTransform.Rotation = spawnRotation;
+                Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", " ,
+                spawnPosition.Y.ToString(), ", " , spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", " ,
+                spawnRotation.Y.ToString(), ", " , spawnRotation.Z.ToString()));
+            } else {
+                Log("INVALID ID FOR SPAWNING ENEMY");
+            }
+
+            // if (entityID != 0)
+            // {
+            //     try
+            //     {
+            //         // Use the Transform class static methods via reflection/direct instantiation
+            //         // Create a temporary entity wrapper
+            //         Entity tempEntity = new Entity(entityID);
+            //         Transform tempTransform = new Transform();
+            //         tempTransform.Entity = tempEntity;
+                    
+            //         // Now we can access the properties
+            //         InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
+            //         spawnRotation = tempTransform.Rotation;
+                    
+                    
+            //         Log(string.Concat("Found ", spawnPointName, " registered at position (", 
+            //             spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(), 
+            //             ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ")"));
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         Log(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
+            //     }
+            // }
+            // else
+            // {
+            //     Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName, 
+            //         " (EntityID: ", entityID.ToString(), ")"));
+            // }
+
+            // uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
 
             //Find and retrieve the parent of this loveletter and then change the rotation
             //as well as the transform of that parent.
@@ -856,32 +914,32 @@ namespace Game{
         }
         
         // Light management
-        private void SetupLights()
-        {
-            HandleLights( "BREAK", true);
-        }
+        // private void SetupLights()
+        // {
+        //     HandleLights( "BREAK", true);
+        // }
         
-        private void HandleLights(string phase, bool status)
-        {
-            /*
-            if (phase ==  BREAK")
-            {
-                if (lightPrep.IsValid())
-                    lightPrep.SetActive(status);
-                if (lightCombat.IsValid())
-                    lightCombat.SetActive(!status);
-            }
-            else if (phase == "COMBAT")
-            {
-                if (lightPrep.IsValid())
-                    lightPrep.SetActive(!status);
-                if (lightCombat.IsValid())
-                    lightCombat.SetActive(status);
-            }
-            */
+        // private void HandleLights(string phase, bool status)
+        // {
+        //     /*
+        //     if (phase ==  BREAK")
+        //     {
+        //         if (lightPrep.IsValid())
+        //             lightPrep.SetActive(status);
+        //         if (lightCombat.IsValid())
+        //             lightCombat.SetActive(!status);
+        //     }
+        //     else if (phase == "COMBAT")
+        //     {
+        //         if (lightPrep.IsValid())
+        //             lightPrep.SetActive(!status);
+        //         if (lightCombat.IsValid())
+        //             lightCombat.SetActive(status);
+        //     }
+        //     */
 
-            Log(string.Concat("TODO: Handle lights - ", phase));
-        }
+        //     Log(string.Concat("TODO: Handle lights - ", phase));
+        // }
 
         #endregion
         
