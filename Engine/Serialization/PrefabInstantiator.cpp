@@ -48,7 +48,11 @@ namespace Engine {
             LOG_ERROR("PrefabInstantiator: Prefab not found in registry (GUID: 0x",
                 std::hex, prefabGUID.m_Value, std::dec, ")");
             return Entity();
-        }
+        } 
+
+
+#if 1 // original code bfr modified
+
 
         if (prefab->GetType() != PrefabType::Entity) {
             LOG_ERROR("PrefabInstantiator: Prefab is not an entity prefab");
@@ -70,8 +74,136 @@ namespace Engine {
             "' (Entity ID: ", static_cast<uint32_t>(entity), ")");
 
         return entity;
+
+#endif 
     }
 
+#if 1// original code bfr modified 26/11
+    Entity PrefabInstantiator::InstantiateScenePrefab(
+        Scene* scene,
+        xresource::instance_guid prefabGUID) {
+
+        if (!scene) {
+            LOG_ERROR("PrefabInstantiator: Cannot instantiate into null scene");
+            return Entity();
+        }
+
+        // Get prefab from registry
+        auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
+        if (!prefab) {
+            LOG_ERROR("PrefabInstantiator: Prefab not found in registry (GUID: 0x",
+                std::hex, prefabGUID.m_Value, std::dec, ")");
+            return Entity();
+        }
+
+        if (prefab->GetType() != PrefabType::Scene) {
+            LOG_ERROR("PrefabInstantiator: Prefab is not a scene prefab");
+            return Entity();
+        }
+
+        // Parse scene data
+        ::rapidjson::Document doc;
+        doc.Parse(prefab->GetSceneData().c_str());
+
+        if (doc.HasParseError() || !doc.HasMember("Entities")) {
+            LOG_ERROR("PrefabInstantiator: Invalid scene prefab data");
+            return Entity();
+        }
+
+        const auto& entitiesArray = doc["Entities"];
+        Entity rootEntity;
+
+        std::unordered_map<uint32_t, entt::entity> idMapping;
+        std::vector<Entity> createdEntities = CreateEntitiesAndBuildIDMap(
+            scene,
+            entitiesArray,
+            idMapping,
+            rootEntity
+        );
+
+        FixTransformHierarchy(createdEntities, idMapping);
+
+        // ===== CRITICAL: Add prefab components =====
+        ApplyPrefabComponentToAll(createdEntities, prefabGUID);
+
+        LOG_INFO("PrefabInstantiator: Instantiated scene prefab '{}' with {} entities",
+            prefab->GetName(), createdEntities.size());
+
+#if 0 // original code bfr modified 26/11
+        // Instantiate each entity
+        for (::rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
+            const ::rapidjson::Value& entityObj = entitiesArray[i];
+
+            // Convert entity object to JSON string
+            ::rapidjson::StringBuffer buffer;
+            ::rapidjson::Writer<::rapidjson::StringBuffer> writer(buffer);
+            entityObj.Accept(writer);
+            std::string entityJson = buffer.GetString();
+
+            // Deserialize entity
+            Entity entity = DeserializeEntity(scene, entityJson);
+            if (entity) {
+                // Add PrefabComponent
+                entity.AddComponent<PrefabComponent>(prefabGUID);
+
+                // Track root entity (first entity)
+                if (i == 0) {
+                    rootEntity = entity;
+                }
+            }
+        }
+
+        LOG_INFO("PrefabInstantiator: Instantiated scene prefab '", prefab->GetName(),
+            "' (Root Entity ID: ", static_cast<uint32_t>(rootEntity), ")");
+#endif
+
+#if 1// to test the updated code for showing prefab entity part
+        // old id to new id mapping
+     /*   std::unordered_map<uint32_t, entt::entity> idMapping;
+        std::vector<Entity> createdEntities = CreateEntitiesAndBuildIDMap(scene, entitiesArray, idMapping, rootEntity);
+
+        FixTransformHierarchy(createdEntities, idMapping);
+
+        ApplyPrefabComponentToAll(createdEntities, prefabGUID);*/
+        //std::vector<Entity> allCreatedEntities;
+        //for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++)
+        //{
+        //    const auto& entityObj = entitiesArray[i];
+
+        //    rapidjson::StringBuffer buffer;
+        //    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        //    entityObj.Accept(writer);
+        //    std::string entityJson = buffer.GetString();
+
+        //    Entity entity = DeserializeEntity(scene, entityJson);
+        //    if (entity)
+        //    {
+        //        // ===== CRITICAL: Add PrefabComponent with SAME GUID to ALL entities =====
+        //        entity.AddComponent<PrefabComponent>(prefabGUID);
+
+        //        allCreatedEntities.push_back(entity);
+
+        //        if (i == 0)
+        //        {
+        //            rootEntity = entity;
+        //        }
+
+        //        LOG_DEBUG("Instantiated entity from scene prefab, added PrefabComponent with GUID: {}",
+        //            prefabGUID.m_Value);
+        //    }
+        //}
+
+        //LOG_INFO("PrefabInstantiator: Instantiated scene prefab with {} entities, "
+        //    "all with PrefabGUID: {}", allCreatedEntities.size(), prefabGUID.m_Value);
+
+
+#endif
+        return rootEntity;
+    }
+
+#endif
+
+#if 0// modified code for showing sub entity in prefab
     Entity PrefabInstantiator::InstantiateScenePrefab(
         Scene* scene,
         xresource::instance_guid prefabGUID) {
@@ -106,9 +238,16 @@ namespace Engine {
         const ::rapidjson::Value& entitiesArray = doc["Entities"];
         Entity rootEntity;
 
-        // Instantiate each entity
+        // Map old entity IDs to new entity IDs
+        std::unordered_map<uint32_t, entt::entity> idMapping;
+
+        // Create all entities and build ID mapping
+        std::vector<Entity> createdEntities;
         for (::rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
             const ::rapidjson::Value& entityObj = entitiesArray[i];
+
+            // Get old ID
+            uint32_t oldID = entityObj["ID"].GetUint();
 
             // Convert entity object to JSON string
             ::rapidjson::StringBuffer buffer;
@@ -116,11 +255,17 @@ namespace Engine {
             entityObj.Accept(writer);
             std::string entityJson = buffer.GetString();
 
-            // Deserialize entity
+            // Deserialize entity (creates new entity with auto-generated ID)
             Entity entity = DeserializeEntity(scene, entityJson);
+
             if (entity) {
-                // Add PrefabComponent
-                entity.AddComponent<PrefabComponent>(prefabGUID);
+                createdEntities.push_back(entity);
+
+                // Map old ID to new ID
+                uint32_t newID = static_cast<uint32_t>(entity);
+                idMapping[oldID] = static_cast<entt::entity>(newID);
+
+                LOG_INFO("PrefabInstantiator: Mapped old ID ", oldID, " -> new ID ", newID);
 
                 // Track root entity (first entity)
                 if (i == 0) {
@@ -129,39 +274,81 @@ namespace Engine {
             }
         }
 
+        // SECOND PASS: Update Parent and Children references
+        for (Entity entity : createdEntities) {
+            if (entity.HasComponent<TransformComponent>()) {
+                auto& transform = entity.GetComponent<TransformComponent>();
+
+                // Update Parent reference
+                if (transform.Parent != 0xFFFFFFFF) { // Not a root entity
+                    auto it = idMapping.find(transform.Parent);
+                    if (it != idMapping.end()) {
+                        transform.Parent = static_cast<uint32_t>(it->second);
+                        LOG_INFO("PrefabInstantiator: Updated parent reference for entity ",
+                            static_cast<uint32_t>(entity));
+                    }
+                    else {
+                        LOG_WARNING("PrefabInstantiator: Parent ID not found in mapping: ", transform.Parent);
+                    }
+                }
+
+                // Update Children references
+                std::vector<u32> newChildren;
+                for (u32 oldChildID : transform.Children) {
+                    auto it = idMapping.find(oldChildID);
+                    if (it != idMapping.end()) {
+                        newChildren.push_back(static_cast<u32>(it->second));
+                    }
+                    else {
+                        LOG_WARNING("PrefabInstantiator: Child ID not found in mapping: ", oldChildID);
+                    }
+                }
+                transform.Children = newChildren;
+
+                LOG_INFO("PrefabInstantiator: Updated ", newChildren.size(),
+                    " child references for entity ", static_cast<uint32_t>(entity));
+            }
+
+            // Add PrefabComponent
+            entity.AddComponent<PrefabComponent>(prefabGUID);
+        }
+
         LOG_INFO("PrefabInstantiator: Instantiated scene prefab '", prefab->GetName(),
-            "' (Root Entity ID: ", static_cast<uint32_t>(rootEntity), ")");
+            "' with ", createdEntities.size(), " entities (Root Entity ID: ",
+            static_cast<uint32_t>(rootEntity), ")");
 
         return rootEntity;
     }
 
-    void PrefabInstantiator::ApplyOverrides(Entity entity, Scene* scene) {
-        if (!entity.HasComponent<PrefabComponent>()) {
-            LOG_WARNING("PrefabInstantiator: Entity does not have PrefabComponent");
-            return;
-        }
+#endif
 
-        const auto& prefabComp = entity.GetComponent<PrefabComponent>();
+    //void PrefabInstantiator::ApplyOverrides(Entity entity, Scene* scene) {
+    //    if (!entity.HasComponent<PrefabComponent>()) {
+    //        LOG_WARNING("PrefabInstantiator: Entity does not have PrefabComponent");
+    //        return;
+    //    }
 
-        // Apply property overrides
-        for (const auto& override : prefabComp.OverriddenProperties) {
-            // Find component by GUID and apply override
-            // This is a simplified version - full implementation would need
-            // to iterate through all components and match by GUID
-            LOG_DEBUG("PrefabInstantiator: Applying override - Property: ",
-                override.PropertyPath, ", Value: ", override.Value);
-        }
+    //    const auto& prefabComp = entity.GetComponent<PrefabComponent>();
 
-        // Handle added components
-        // (Components not in original prefab - already added during instantiation)
+    //    // Apply property overrides
+    //    for (const auto& override : prefabComp.OverriddenProperties) {
+    //        // Find component by GUID and apply override
+    //        // This is a simplified version - full implementation would need
+    //        // to iterate through all components and match by GUID
+    //        LOG_DEBUG("PrefabInstantiator: Applying override - Property: ",
+    //            override.PropertyPath, ", Value: ", override.Value);
+    //    }
 
-        // Handle deleted components
-        for (const auto& deletedGUID : prefabComp.DeletedComponents) {
-            // Remove component with matching GUID
-            LOG_DEBUG("PrefabInstantiator: Removing deleted component (GUID: 0x",
-                std::hex, deletedGUID.m_Value, std::dec, ")");
-        }
-    }
+    //    // Handle added components
+    //    // (Components not in original prefab - already added during instantiation)
+
+    //    // Handle deleted components
+    //    for (const auto& deletedGUID : prefabComp.DeletedComponents) {
+    //        // Remove component with matching GUID
+    //        LOG_DEBUG("PrefabInstantiator: Removing deleted component (GUID: 0x",
+    //            std::hex, deletedGUID.m_Value, std::dec, ")");
+    //    }
+    //}
 
     Entity PrefabInstantiator::DeserializeEntity(
         Scene* scene,
@@ -188,6 +375,7 @@ namespace Engine {
             entity = scene->CreateEntity();
         }
 
+
         // Deserialize components
         if (doc.HasMember("Components") && doc["Components"].IsArray()) {
             const ::rapidjson::Value& componentsArray = doc["Components"];
@@ -195,9 +383,12 @@ namespace Engine {
             for (::rapidjson::SizeType i = 0; i < componentsArray.Size(); i++) {
                 const ::rapidjson::Value& componentObj = componentsArray[i];
 
+#if 1 // original code  bfr modified -> it crash here 
                 if (!componentObj.HasMember("Type") || !componentObj.HasMember("Properties")) {
                     continue;
                 }
+#endif 
+
 
                 std::string componentType = componentObj["Type"].GetString();
                 const ::rapidjson::Value& properties = componentObj["Properties"];
@@ -299,6 +490,9 @@ namespace Engine {
             }
             if (properties.HasMember("Texture")) {
                 comp.Texture = properties["Texture"].GetUint();
+            }
+            if (properties.HasMember("SubmeshIndex")) {
+                comp.SubmeshIndex = properties["SubmeshIndex"].GetUint();
             }
         }
         else if (componentType == "RigidbodyComponent") {
@@ -596,6 +790,136 @@ namespace Engine {
         const std::string& componentType,
         const ::rapidjson::Value& properties
     );
+  
+#if 1 // Added code use it in InstantiatorScenePrefab
+   std::vector<Entity> PrefabInstantiator::CreateEntitiesAndBuildIDMap(
+        Scene* scene,
+        const rapidjson::Value& entitiesArray,
+        std::unordered_map<uint32_t, entt::entity>& idMapping,
+        Entity& rootEntity)
+    {
+       std::vector<Entity> createdEntities;
+       createdEntities.reserve(entitiesArray.Size());
+
+       for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
+           const auto& entityObj = entitiesArray[i];
+
+           // Get old ID from JSON
+           uint32_t oldID = 0;
+           if (entityObj.HasMember("ID")) {
+               oldID = entityObj["ID"].GetUint();
+           }
+           else {
+               LOG_WARNING("PrefabInstantiator: Entity {} has no ID in JSON", i);
+               continue;
+           }
+
+           // Convert entity JSON back to string
+           ::rapidjson::StringBuffer buffer;
+           ::rapidjson::Writer<::rapidjson::StringBuffer> writer(buffer);
+           entityObj.Accept(writer);
+           std::string jsonStr = buffer.GetString();
+
+           // Create entity in scene
+           Entity newEntity = DeserializeEntity(scene, jsonStr);
+           if (!newEntity) {
+               LOG_WARNING("PrefabInstantiator: Failed to deserialize entity {} (old ID: {})", i, oldID);
+               continue;
+           }
+
+           createdEntities.push_back(newEntity);
+
+           // Build ID mapping: oldID newEntity
+           uint32_t newID = static_cast<uint32_t>(newEntity);
+           idMapping[oldID] = static_cast<entt::entity>(newID);
+
+           LOG_DEBUG("PrefabInstantiator: Entity ID mapping ", oldID ,"->" ,newID);
+
+           // Track root entity (first entity)
+           if (i == 0) {
+               rootEntity = newEntity;
+               LOG_DEBUG("PrefabInstantiator: Set root entity ID: {}", newID);
+           }
+       }
+
+       LOG_INFO("PrefabInstantiator: Created {} entities with ID mapping", createdEntities.size());
+       return createdEntities;
+    }
+
+
+   void PrefabInstantiator::FixTransformHierarchy(
+       const std::vector<Entity>& entities,
+       const std::unordered_map<uint32_t, entt::entity>& idMapping)
+   {
+       for (Entity entity : entities) {
+           if (!entity.HasComponent<TransformComponent>())
+               continue;
+
+           auto& transform = entity.GetComponent<TransformComponent>();
+           uint32_t entityID = static_cast<uint32_t>(entity);
+
+           // ===== Fix parent ID =====
+           if (transform.Parent != 0xFFFFFFFF) {
+               auto parentIt = idMapping.find(transform.Parent);
+               if (parentIt != idMapping.end()) {
+                   uint32_t newParentID = static_cast<uint32_t>(parentIt->second);
+                   LOG_DEBUG("PrefabInstantiator: Entity {} parent remapped {} ->{}",
+                       entityID, transform.Parent, newParentID);
+                   transform.Parent = newParentID;
+               }
+               else {
+                   LOG_WARNING("PrefabInstantiator: Parent ID {} not found in mapping for entity {}",
+                       transform.Parent, entityID);
+               }
+           }
+
+           // ===== Fix children IDs =====
+           std::vector<uint32_t> newChildren;
+           newChildren.reserve(transform.Children.size());
+
+           for (uint32_t oldChildID : transform.Children) {
+               auto childIt = idMapping.find(oldChildID);
+               if (childIt != idMapping.end()) {
+                   uint32_t newChildID = static_cast<uint32_t>(childIt->second);
+                   newChildren.push_back(newChildID);
+                  // LOG_DEBUG("PrefabInstantiator: Entity: ", entityID, "child remapped: ", ,
+                       //entityID, oldChildID, newChildID);
+               }
+               else {
+                   LOG_WARNING("PrefabInstantiator: Child ID {} not found in mapping for entity {}",
+                       oldChildID, entityID);
+               }
+           }
+           transform.Children = newChildren;
+
+           if (newChildren.size() != transform.Children.size()) {
+               LOG_INFO("PrefabInstantiator: Entity {} has {} children (mapped from {})",
+                   entityID, newChildren.size(), transform.Children.size());
+           }
+       }
+
+       LOG_INFO("PrefabInstantiator: Fixed transform hierarchy for {} entities", entities.size());
+   }
+   void PrefabInstantiator::ApplyPrefabComponentToAll(
+       const std::vector<Entity>& entities,
+       xresource::instance_guid prefabGUID)
+   {
+       for (Entity entity : entities) {
+           if (!entity.HasComponent<PrefabComponent>()) {
+               entity.AddComponent<PrefabComponent>(prefabGUID);
+               LOG_DEBUG("PrefabInstantiator: Added PrefabComponent (GUID: {}) to entity {}",
+                   prefabGUID.m_Value, static_cast<uint32_t>(entity));
+           }
+       }
+
+       LOG_INFO("PrefabInstantiator: Applied PrefabComponent to {} entities", entities.size());
+   }
+
+
+
+#endif
+
+
 
 
 } // namespace Engine
