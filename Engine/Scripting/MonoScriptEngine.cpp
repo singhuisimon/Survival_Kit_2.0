@@ -412,6 +412,7 @@ namespace Engine
 
 		// Prefab instantiation
 		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr);
+		static uint64_t Prefab_InstantiateScene(MonoString* prefabPathStr);
 
 		//Physics bindings
 		static void Entity_AddRigidBody(uint64_t entityID);
@@ -565,6 +566,7 @@ namespace Engine
 
 		// Prefab
 		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void *)InternalCalls::Prefab_Instantiate);
+		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateScene", (void *)InternalCalls::Prefab_InstantiateScene);
 
 		// Transform
 		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void*)InternalCalls::Transform_GetPosition);
@@ -915,6 +917,66 @@ namespace Engine
 
 			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
 			LOG_INFO("[InternalCall] Successfully instantiated prefab - Entity ID: ", entityID);
+
+			return entityID;
+		}
+
+		static uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr)
+		{
+			if (!InternalCalls::s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: current scene is null");
+				return 0;
+			}
+
+			if (!prefabPathStr)
+			{
+				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: prefab path is null");
+				return 0;
+			}
+
+			// Convert MonoString to C++ string
+			char *c = mono_string_to_utf8(prefabPathStr);
+			std::string prefabPath = c ? c : "";
+			if (c) mono_free(c);
+
+			if (prefabPath.empty())
+			{
+				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: empty prefab path");
+				return 0;
+			}
+
+			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
+
+			// Load prefab from file
+			std::string prefabfullpath = getAssetFilePath(prefabPath);
+
+
+			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
+			if (!prefab)
+			{
+				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to load prefab from ", prefabPath);
+				return 0;
+			}
+
+			// Register prefab
+			PrefabRegistry::Get().RegisterPrefab(prefab);
+
+			// Instantiate entity from prefab
+			Entity entity = PrefabInstantiator::InstantiateScenePrefab(
+				InternalCalls::s_CurrentScene,
+				prefab->GetGUID()
+			);
+
+			if (!entity)
+			{
+				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to instantiate entity");
+				return 0;
+			}
+
+			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
+			LOG_INFO("[InternalCall] Successfully instantiated scene prefab - root Entity ID: ", entityID);
 
 			return entityID;
 		}

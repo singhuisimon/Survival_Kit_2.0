@@ -683,7 +683,7 @@ namespace Game{
             spawnentrans.Entity = spawnent;
             spawnRotation = spawnentrans.Rotation;
 
-            uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+            uint enemyID = InternalCalls.Prefab_InstantiateScene(prefabpath);
 
             if(enemyID != 0){
                 Entity tempEntity = new Entity(enemyID);

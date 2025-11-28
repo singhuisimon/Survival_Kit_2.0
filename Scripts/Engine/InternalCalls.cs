@@ -53,6 +53,9 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Prefab_Instantiate(string prefabPath);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Prefab_InstantiateScene(string prefabPath);
+
         // Rigidbody core properties
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rigidbody_GetVelocity(ulong entityID, out Vector3 vel);
