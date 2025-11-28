@@ -5197,7 +5197,7 @@ namespace Engine
 					audio.SetReverbProperties(reverb);
 				}
 
-				ImGui::Separator();
+				ImGui::SeparatorText("Only for 3D");
 
 				std::string advice = "Max Distance needs to be higher than Min Distance to have attenuation";
 				ImGui::TextDisabled("(i)");
@@ -5231,6 +5231,48 @@ namespace Engine
 					else {
 						audio.SetMaxDistance(10.f);
 					}
+				}
+
+				ImGui::EndDisabled();
+
+				ImGui::Separator();
+
+				float dopplerLevel = audio.DopplerLevel;
+				if (ImGui::SliderFloat("Doppler", &dopplerLevel, 0.f, 5.f)) {
+					audio.SetDopplerLevel(dopplerLevel);
+				}
+
+				ImGui::Text("RollOff Mode:");
+				AudioRolloffMode mode = audio.RolloffMode;
+
+				if (ImGui::RadioButton("INVERSE", mode == AudioRolloffMode::INVERSE)) {
+					audio.SetRolloffMode(AudioRolloffMode::INVERSE);
+				}
+				if (ImGui::RadioButton("LINEAR", mode == AudioRolloffMode::LINEAR)) {
+					audio.SetRolloffMode(AudioRolloffMode::LINEAR);
+				}
+				if (ImGui::RadioButton("LINEARSQUARE", mode == AudioRolloffMode::LINEARSQUARE)) {
+					audio.SetRolloffMode(AudioRolloffMode::LINEARSQUARE);
+				}
+
+				ImGui::SeparatorText("Only for 2D");
+
+				std::string advice2D = "Only for 2D sounds (not 3D). Controls where 2D sound is being played (From the left, right or both speakers).";
+				ImGui::TextDisabled("(i)");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted(advice2D.c_str());
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::BeginDisabled(is_3d);
+
+				float pan = audio.Pan2D;
+				if (ImGui::SliderFloat("Pan", &pan, -1.f, 1.f)) {
+					audio.SetPan(pan);
 				}
 
 				ImGui::EndDisabled();
