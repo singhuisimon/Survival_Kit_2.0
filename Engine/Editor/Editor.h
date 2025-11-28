@@ -169,7 +169,8 @@ namespace Engine
 		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
 		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
 
-
+		std::unordered_set<xresource::instance_guid> m_UpdatedPrefabsThisSession;
+		std::unordered_map<std::string, std::unordered_set<xresource::instance_guid>> m_SceneUpdateHistory;
 		bool isPlaying = true;
 
 	public:
@@ -438,6 +439,11 @@ namespace Engine
 		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
 
 		void displayHDRSettingsPanel();
+
+		void MarkPrefabAsUpdated(xresource::instance_guid prefabGUID)
+		{
+			m_UpdatedPrefabsThisSession.insert(prefabGUID);
+		}
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
