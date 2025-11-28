@@ -137,8 +137,8 @@ namespace Engine {
             tree->SetRootNode(rootNode);
         }
     
-        LOG_INFO("BehaviourTreeSerializer: Loaded tree '", tree->GetName(), ", ",
-            std::hex, tree->GetGUID().m_Value, std::dec, "')");
+       /* LOG_INFO("BehaviourTreeSerializer: Loaded tree '", tree->GetName(), ", ",
+            std::hex, tree->GetGUID().m_Value, std::dec, "')");*/
         return tree;
     }
     

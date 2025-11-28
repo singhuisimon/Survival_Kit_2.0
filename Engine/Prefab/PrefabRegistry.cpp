@@ -34,6 +34,9 @@ namespace Engine {
 
         LOG_INFO("PrefabRegistry: Registered prefab '", prefab->GetName(),
             "' (GUID: 0x", std::hex, guid.m_Value, std::dec, ")");
+        //LOG_DEBUG("PrefabRegistry: Registered prefab ", prefab->GetName());
+        //std::cout <<"GetRootEntityGUID: " << prefab->GetRootEntityGUID().m_Value << "\n";
+        LOG_DEBUG("==== End of PrefabRegistry::RegisterPrefab ====");
     }
 
     void PrefabRegistry::UnregisterPrefab(xresource::instance_guid guid) {

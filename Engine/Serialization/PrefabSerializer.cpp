@@ -38,28 +38,14 @@ namespace Engine {
         if (!entity) {
             LOG_ERROR("PrefabSerializer: Cannot create prefab from invalid entity");
             return nullptr;
-        }
-
-#if 1 // to check if entity has children, if got, create a scene prefab instead and also show the sub entities in prefab file
-        if (entity.HasComponent<TransformComponent>()) {
-            const auto& transform = entity.GetComponent<TransformComponent>();
-            if (!transform.Children.empty()) {
-                LOG_INFO("PrefabSerializer: Entity has children, creating Scene prefab instead");
-                return CreateEntityWithChildrenPrefab(entity, name);
-            }
-        }
-
-#endif
+        }        
         auto prefab = std::make_shared<Prefab>(PrefabType::Entity);
         prefab->SetName(name);
-
-     
-        //entt::registry* registry = nullptr;
-
         std::string entityData = SerializeEntity(entity, entity);
         prefab->SetEntityData(entityData);
-
+        
         LOG_INFO("PrefabSerializer: Created entity prefab '", name, "'");
+
         return prefab;
     }
 
@@ -622,55 +608,5 @@ namespace Engine {
         return buffer.GetString();
     }
 
-#if 1 // to show sub entities in prefab file 26/11 
-    std::shared_ptr<Prefab> PrefabSerializer::CreateEntityWithChildrenPrefab(Entity rootEntity, const std::string& name) {
-        if (!rootEntity) {
-            LOG_ERROR("PrefabSerializer: Cannot create prefab from invalid entity");
-            return nullptr;
-        }
-
-        entt::registry* registry = rootEntity.GetRegistry();
-        if (!registry) {
-            LOG_ERROR("PrefabSerializer: Entity has no valid registry");
-            return nullptr;
-        }
-
-        // Collect all entities in the hierarchy
-        std::vector<Entity> allEntities;
-        std::stack<Entity> toProcess;
-        toProcess.push(rootEntity);
-
-        while (!toProcess.empty()) {
-            Entity current = toProcess.top();
-            toProcess.pop();
-            allEntities.push_back(current);
-
-            if (current.HasComponent<TransformComponent>()) {
-                const auto& transform = current.GetComponent<TransformComponent>();
-                for (u32 childId : transform.Children) {
-                    Entity childEntity(static_cast<entt::entity>(childId), registry);
-                    toProcess.push(childEntity);
-                }
-            }
-        }
-
-        LOG_INFO("PrefabSerializer: Collected ", allEntities.size(), " entities in hierarchy");
-
-        // Create Scene prefab with all entities
-        auto prefab = std::make_shared<Prefab>(PrefabType::Scene);
-        prefab->SetName(name);
-
-        // Serialize all entities
-        std::string sceneData = SerializeEntities(allEntities, *registry);
-        prefab->SetSceneData(sceneData);
-
-        // Set root entity
-        uint32_t entityID = static_cast<uint32_t>(rootEntity);
-        prefab->SetRootEntityGUID(xresource::instance_guid{ static_cast<uint64_t>(entityID) });
-
-        LOG_INFO("PrefabSerializer: Created scene prefab '", name, "' with ", allEntities.size(), " entities");
-        return prefab;
-    }
-#endif
 
 } // namespace Engine

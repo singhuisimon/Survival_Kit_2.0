@@ -381,19 +381,19 @@ namespace Engine {
 
         // CRITICAL FIX: Validate DeltaTime
         if (context.DeltaTime <= 0.0f || std::isnan(context.DeltaTime) || std::isinf(context.DeltaTime)) {
-            LOG_WARNING("BTMoveToTarget: Invalid DeltaTime (", context.DeltaTime, ")");
+            //LOG_WARNING("BTMoveToTarget: Invalid DeltaTime (", context.DeltaTime, ")");
             return BTStatus::Running;  // Keep running, wait for valid delta
         }
 
         // Check if arrived
         if (distance <= m_ArrivalDistance) {
-            LOG_TRACE("BTMoveToTarget: Arrived at target: x", targetPos.x, " y: ", targetPos.y, " z: ", targetPos.z);
+            //LOG_TRACE("BTMoveToTarget: Arrived at target: x", targetPos.x, " y: ", targetPos.y, " z: ", targetPos.z);
             return BTStatus::Success;
         }
 
         // CRITICAL FIX: Ensure direction is not zero length
         if (distance < 0.0001f) {
-            LOG_WARNING("BTMoveToTarget: Target too close to current position");
+            //LOG_WARNING("BTMoveToTarget: Target too close to current position");
             return BTStatus::Success;  // Consider arrived
         }
 
@@ -2725,7 +2725,7 @@ namespace Engine {
         float distance = glm::length(direction);
 
         if (distance < 0.001f) {
-            LOG_WARNING("BTShootBullet: Target too close to shooter");
+            //LOG_WARNING("BTShootBullet: Target too close to shooter");
             return BTStatus::Failure;
         }
 

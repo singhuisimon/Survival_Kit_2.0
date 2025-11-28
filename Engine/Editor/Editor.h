@@ -121,6 +121,7 @@ namespace Engine
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		std::string selectedFolder = ""; // for the selected folder in asset browser
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+		ResourceType selectedType = ResourceType::UNKNOWN;//for the selected index in the assets browser
 
 		// Prefab helper variables
 		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
@@ -137,6 +138,9 @@ namespace Engine
 		bool m_PreviousEditorCamToggle = false; // track if is in camera mode
 
 		
+		// helper for saveAsPanel()
+	/*	bool m_ShouldRefreshAssets = false;
+		std::string m_SceneToSelect = "";*/
 	
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
@@ -450,6 +454,8 @@ namespace Engine
 		void UpdateScenePrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
 
 		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
+
+		
 	};
 
 

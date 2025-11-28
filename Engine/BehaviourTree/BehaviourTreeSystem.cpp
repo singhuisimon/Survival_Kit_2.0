@@ -56,7 +56,7 @@ namespace Engine {
                 );
 
                 if (btComp.TreeInstance) {
-                    LOG_INFO("BehaviourTreeSystem: Loaded tree from file ", btComp.TreeAssetPath);
+                    //LOG_INFO("BehaviourTreeSystem: Loaded tree from file ", btComp.TreeAssetPath);
                     loadedCount++;
                 }
                 else {
@@ -106,10 +106,10 @@ namespace Engine {
             // Load tree from file if needed
             if (btComp.TreeInstance == nullptr && !btComp.TreeAssetPath.empty()) {
                 btComp.TreeInstance = Engine::BehaviourTreeSerializer::DeserializeFromFile(btComp.TreeAssetPath);
-                if (btComp.TreeInstance)
-                    LOG_INFO("BehaviourTreeSystem: Loaded tree from file ", btComp.TreeAssetPath);
-                else
-                    LOG_WARNING("BehaviourTreeSystem: Failed to load tree from ", btComp.TreeAssetPath);
+                //if (btComp.TreeInstance)
+                //    //LOG_INFO("BehaviourTreeSystem: Loaded tree from file ", btComp.TreeAssetPath);
+                //else
+                //    LOG_WARNING("BehaviourTreeSystem: Failed to load tree from ", btComp.TreeAssetPath);
             }
 
             // Skip if not active or invalid
