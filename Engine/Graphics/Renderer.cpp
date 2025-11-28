@@ -657,15 +657,17 @@ namespace Engine {
 					// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
 					if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
 						m_lastView = cam.first.View;
-						m_lastProj = cam.first.Persp;
+						m_lastProj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
 					}
+
+					glm::mat4 proj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
 
 					// Begin drawing frame
 					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
 
 					// cam.first is the actual underlying camera object
 					// cam.second is the camera's position using the transform component
-					draw(pass, draw_items, cam.first.View, cam.first.Persp, cam.second, lights);
+					draw(pass, draw_items, cam.first.View, proj, cam.second, lights);
 
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
@@ -831,7 +833,7 @@ namespace Engine {
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
-		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
+		//auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 		//prog.programFree();
 		glBindTextureUnit(0, 0);
 

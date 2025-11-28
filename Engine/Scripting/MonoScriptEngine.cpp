@@ -1440,7 +1440,6 @@ namespace Engine
 			auto e = GetEntityOrNull(entityID);
 			auto &cam = e.GetComponent<CameraComponent>();
 			cam.Enabled = enabled;
-			cam.isDirty = true;
 		}
 
 		bool Camera_GetPrimary(uint64_t entityID)
@@ -1455,7 +1454,6 @@ namespace Engine
 			auto e = GetEntityOrNull(entityID);
 			auto &cam = e.GetComponent<CameraComponent>();
 			cam.Primary = primary;
-			cam.isDirty = true;
 		}
 
 		float Camera_GetFOV(uint64_t entityID)
@@ -1470,7 +1468,6 @@ namespace Engine
 			auto e = GetEntityOrNull(entityID);
 			auto &cam = e.GetComponent<CameraComponent>();
 			cam.FOV = fov;
-			cam.isDirty = true;
 		}
 
 		float Camera_GetNear(uint64_t entityID)
@@ -1485,7 +1482,6 @@ namespace Engine
 			auto e = GetEntityOrNull(entityID);
 			auto &cam = e.GetComponent<CameraComponent>();
 			cam.NearPlane = nearPlane;
-			cam.isDirty = true;
 		}
 
 		float Camera_GetFar(uint64_t entityID)
@@ -1500,7 +1496,6 @@ namespace Engine
 			auto e = GetEntityOrNull(entityID);
 			auto &cam = e.GetComponent<CameraComponent>();
 			cam.FarPlane = farPlane;
-			cam.isDirty = true;
 		}
 
 		void Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget)

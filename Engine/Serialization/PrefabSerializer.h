@@ -19,6 +19,7 @@
 #include <vector>
 #include <memory>
 #include <entt/entt.hpp>
+#include <rapidjson/document.h>
 
 namespace Engine {
 
@@ -83,8 +84,8 @@ namespace Engine {
         * @return JSON string representation of the entity
         */
         static std::string SerializeEntity(Entity entity, Entity dummyEntity);
-    private:
-       
+
+        static std::shared_ptr<Prefab> CreateEntityWithChildrenPrefab(Entity rootEntity, const std::string& name);
 
         /**
          * @brief Serialize multiple entities to JSON string (for scene prefabs)
@@ -93,6 +94,11 @@ namespace Engine {
          * @return JSON string representation of the entities
          */
         static std::string SerializeEntities(const std::vector<Entity>& entities, entt::registry& registry);
+
+    private:
+       
+
+        
     };
 
 } // namespace Engine

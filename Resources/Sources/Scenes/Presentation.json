@@ -286,6 +286,7 @@
                     "Type": "CameraComponent",
                     "Properties": {
                         "Enabled": true,
+                        "Projection": false,
                         "autoAspect": true,
                         "isDirty": false,
                         "Depth": 0,

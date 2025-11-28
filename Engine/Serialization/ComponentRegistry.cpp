@@ -97,16 +97,22 @@ namespace Engine {
                 [](CameraComponent& c, const bool& v) { c.Enabled = v; }
             );
             meta.AddProperty<CameraComponent, bool>(
+                "Projection",
+                PropertyType::Bool,
+                [](const CameraComponent& c) { return c.Projection; },
+                [](CameraComponent& c, const bool& v) { c.Projection = v; }
+            );
+            meta.AddProperty<CameraComponent, bool>(
                 "autoAspect",
                 PropertyType::Bool,
                 [](const CameraComponent& c) { return c.autoAspect; },
                 [](CameraComponent& c, const bool& v) { c.autoAspect = v; }
             );
-            meta.AddProperty<CameraComponent, bool>(
-                "isDirty",
-                PropertyType::Bool,
-                [](const CameraComponent& c) { return c.isDirty; },
-                [](CameraComponent& c, const bool& v) { c.isDirty = v; }
+            meta.AddProperty<CameraComponent, glm::vec2>(
+                "Size",
+                PropertyType::Vec2,
+                [](const CameraComponent& c) { return c.Size; },
+                [](CameraComponent& c, const glm::vec2& v) { c.Size = v; }
             );
             meta.AddProperty<CameraComponent, u32>(
                 "Depth",

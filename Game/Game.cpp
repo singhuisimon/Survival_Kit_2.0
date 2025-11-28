@@ -499,20 +499,42 @@ void Game::CreateDefaultScene()
 	camTransform.Rotation = glm::vec3(-15, 0, 0);
 	camTransform.Scale = glm::vec3(1, 1, 1);
 
-	auto &camComponent = camera.AddComponent<Engine::CameraComponent>();
-	camComponent.Enabled = true;
-	camComponent.autoAspect = true;
-	camComponent.Depth = 0; // 0 is the main camera
-	camComponent.Aspect = static_cast<float>(GetWidth() / GetHeight());
-	camComponent.FOV = 45.0f;
-	camComponent.NearPlane = 0.5f;
-	camComponent.FarPlane = 100.0f;
-	camComponent.Target = { 0.0f, 0.0f, 0.0f };
-	LOG_TRACE("  -> Camera created");
+    auto& camComponent = camera.AddComponent<Engine::CameraComponent>();
+    camComponent.Enabled = true;
+    camComponent.autoAspect = true;
+    camComponent.SetProjection(false);
+    camComponent.Depth = 0; // 0 is the main camera
+    camComponent.SetAspect(static_cast<float>(GetWidth()) / static_cast<float>(GetHeight()));
+    camComponent.SetFOV(45.0f);
+    camComponent.SetNearPlane(0.5f);
+    camComponent.SetFarPlane(100.0f);
+    camComponent.SetTarget(glm::vec3(0.0f));
+    LOG_TRACE("  -> Camera created");
 
-	auto &listener = camera.AddComponent<Engine::ListenerComponent>();
-	listener.Active = true;
-	LOG_TRACE("  -> Camera created with listenerComponent");
+    LOG_TRACE("  Creating Camera entity...");
+    auto cam2 = m_Scene->CreateEntity("SecondCamera");
+    cam2.AddComponent<Engine::TagComponent>("SecondCamera");
+
+    auto& cam2Transform = cam2.AddComponent<Engine::TransformComponent>();
+    cam2Transform.Position = glm::vec3(0, 5, 5);
+    cam2Transform.Rotation = glm::vec3(-15, 0, 0);
+    cam2Transform.Scale = glm::vec3(1, 1, 1);
+
+    auto& cam2Component = cam2.AddComponent<Engine::CameraComponent>();
+    cam2Component.Enabled = true;
+    cam2Component.autoAspect = true;
+    cam2Component.SetProjection(true);
+    cam2Component.Depth = 1; // 0 is the main camera
+    cam2Component.SetAspect(static_cast<float>(GetWidth()) / static_cast<float>(GetHeight()));
+    cam2Component.SetFOV(45.0f);
+    cam2Component.SetNearPlane(0.5f);
+    cam2Component.SetFarPlane(100.0f);
+    cam2Component.SetTarget(glm::vec3(0.0f));
+    LOG_TRACE("  -> SecondCamera created");
+
+    auto& listener = camera.AddComponent<Engine::ListenerComponent>();
+    listener.Active = true;
+    LOG_TRACE("  -> Camera created with listenerComponent");
 
 	LOG_TRACE("  Creating Ground entity...");
 	auto ground = m_Scene->CreateEntity("Ground");
