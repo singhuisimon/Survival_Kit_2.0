@@ -85,8 +85,6 @@ namespace Engine {
         */
         static std::string SerializeEntity(Entity entity, Entity dummyEntity);
 
-        static std::shared_ptr<Prefab> CreateEntityWithChildrenPrefab(Entity rootEntity, const std::string& name);
-
         /**
          * @brief Serialize multiple entities to JSON string (for scene prefabs)
          * @param entities Entities to serialize

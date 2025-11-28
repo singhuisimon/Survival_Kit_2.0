@@ -454,6 +454,8 @@ namespace Engine
 		void UpdateScenePrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
 
 		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
+
+		
 	};
 
 

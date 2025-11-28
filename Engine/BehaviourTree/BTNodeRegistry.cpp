@@ -66,7 +66,7 @@ namespace Engine {
 
         auto node = it->second.Factory();
         if (node) {
-            LOG_TRACE("BTNodeRegistry: Created node of type '", typeName, "'");
+            //LOG_TRACE("BTNodeRegistry: Created node of type '", typeName, "'");
         }
         return node;
     }

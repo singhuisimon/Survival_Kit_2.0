@@ -102,7 +102,7 @@ namespace Engine
 
 				if (!script.ScriptInstance)
 				{
-					LOG_ERROR("[ScriptSystem] Failed to create script instance: ", script.ScriptClassName);
+					//LOG_ERROR("[ScriptSystem] Failed to create script instance: ", script.ScriptClassName);
 					continue;
 				}
 
