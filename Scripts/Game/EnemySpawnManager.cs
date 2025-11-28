@@ -561,9 +561,13 @@ namespace Game{
                 Log("ERROR: No active spawn points!");
                 return;
             }
+
+            // Create enemy from prefab
+            string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
             
             if(enemyType == 0){
                 //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
+                return;
             }
 
             int spawnIndex = GetRandomInt(0, activeSpawnPoints.Count);
@@ -572,10 +576,7 @@ namespace Game{
             // Get spawn position and rotation from the spawn point
             Vector3 spawnPos = spawnPoint.position;
             Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
-            
-            // Create enemy from prefab
-            string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
-            
+
             uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
 
             if(enemyID != 0){
@@ -625,6 +626,66 @@ namespace Game{
             // Log with safe string concatenation
             Log(string.Concat("TODO: Spawn ", prefabpath, " at position (", 
                 spawnPos.X.ToString(), ", ", spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), ")"));
+        }
+
+        private void SpawnLoveLetter(string prefabpath){
+            int spawnIndex = GetRandomInt(0, loveletterRoutes.Length);
+            string spawnPointName = loveletterRoutes[spawnIndex];
+
+            // Find the spawn point entity by name
+            uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+            
+            // Get transform data directly using native calls
+            // We'll call the Transform native methods directly
+            Vector3 spawnPosition;
+            Vector3 spawnRotation;
+
+            if (entityID != 0)
+            {
+                try
+                {
+                    // Use the Transform class static methods via reflection/direct instantiation
+                    // Create a temporary entity wrapper
+                    Entity tempEntity = new Entity(entityID);
+                    Transform tempTransform = new Transform();
+                    tempTransform.Entity = tempEntity;
+                    
+                    // Now we can access the properties
+                    InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
+                    spawnRotation = tempTransform.Rotation;
+                    
+                    
+                    Log(string.Concat("Found ", spawnPointName, " registered at position (", 
+                        spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(), 
+                        ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ")"));
+                }
+                catch (Exception ex)
+                {
+                    Log(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
+                }
+            }
+            else
+            {
+                Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName, 
+                    " (EntityID: ", entityID.ToString(), ")"));
+            }
+
+            uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+
+            //Find and retrieve the parent of this loveletter and then change the rotation
+            //as well as the transform of that parent.
+            // if(enemyID != 0){
+            //     Entity tempEntity = new Entity(enemyID);
+            //     Transform tempTransform = new Transform();
+            //     tempTransform.Entity = tempEntity;
+            //     InternalCalls.Transform_SetPosition(enemyID, ref spawnPos);
+            //     tempTransform.Rotation = spawnRot;
+            //     Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
+            //     spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
+            //     spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
+            // } else {
+            //     Log("INVALID ID FOR SPAWNING ENEMY");
+            // }
         }
         
         private void CheckForEnemiesLeft()
