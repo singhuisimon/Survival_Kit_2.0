@@ -12,10 +12,10 @@ namespace Engine
         private static extern void SetPosition_Native(ulong entityID, ref Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void GetRotation_Native(ulong entityID, out Vector3 rotation);
+        public static extern void GetRotation_Native(ulong entityID, out Vector3 rotation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void SetRotation_Native(ulong entityID, ref Vector3 rotation);
+        public static extern void SetRotation_Native(ulong entityID, ref Vector3 rotation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void GetScale_Native(ulong entityID, out Vector3 scale);

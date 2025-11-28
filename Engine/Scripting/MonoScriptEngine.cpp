@@ -10,6 +10,7 @@
 #include "Core/Application.h"
 #include "../Audio/AudioManager.h"
 #include "../Event/EventSystem.h"
+#include "ScriptReloader.h"
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
@@ -35,6 +36,30 @@ namespace Engine
 		static MonoScriptEngine instance;
 		return instance;
 	}
+
+	bool MonoScriptEngine::IsValidMonoObject(MonoObject* instance)
+	{
+		if (!instance)
+			return false;
+
+		MonoDomain* currentDomain = mono_domain_get();
+		if (!currentDomain)
+		{
+			LOG_WARNING("IsValidMonoObject: No current Mono domain");
+			return false;
+		}
+
+		// If not, it's from an old unloaded domain
+		MonoDomain* instanceDomain = mono_object_get_domain(instance);
+		if (!instanceDomain || instanceDomain != currentDomain)
+		{
+			LOG_WARNING("IsValidMonoObject: Instance is from a different/unloaded domain");
+			return false;
+		}
+
+		return true;
+	}
+
 
 	// Pointer to Engine.EventSystem.RaiseFromNative(string, string)
 	static MonoMethod *s_EventSystemRaiseFromNative = nullptr;
@@ -213,20 +238,30 @@ namespace Engine
 		m_AppAssembly = nullptr;
 	}
 
-	void MonoScriptEngine::ReloadAssembly()
-	{
-		LOG_INFO("Reloading assembly...");
-		UnloadAssembly();
+	void MonoScriptEngine::ReloadAssembly() {
+		LOG_INFO("Hot-reload: Starting...");
+		ClearAllInstances();
+		LOG_INFO("Hot-reload: Cleared instance tracking");
 
-		// Recreate app domain
+		UnloadAssembly();
 		mono_domain_set(m_RootDomain, false);
 		mono_domain_unload(m_AppDomain);
-		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+
+		LOG_INFO("Hot-reload: Domain unloaded");
+
+		ScriptReloader::GetInstance().FinalizeDllSwap();
+		LOG_INFO("Hot-reload: DLL swapped");
+
+		m_AppDomain = mono_domain_create_appdomain(const_cast<char*>("EngineAppDomain"), nullptr);
 		mono_domain_set(m_AppDomain, true);
 
 		LoadAssembly(m_AssemblyPath);
 		RegisterInternalCalls();
+
+		LOG_INFO("Hot-reload: Domain reloaded");
+		LOG_INFO("Hot-reload: Complete!");
 	}
+
 
 	MonoClass *MonoScriptEngine::GetScriptClass(const std::string &className)
 	{
@@ -336,6 +371,11 @@ namespace Engine
 			return;
 		}
 
+		if (!IsValidMonoObject(instance))
+		{
+			LOG_WARNING("CallMethod: Instance is from unloaded domain, skipping ", methodName);
+			return;
+		}
 		MonoClass *klass = mono_object_get_class(instance);
 		MonoMethod *method = GetMethod(klass, methodName, paramCount);
 

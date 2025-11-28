@@ -298,11 +298,19 @@ void Game::OnInit()
 			LOG_INFO("  -> Mono Scripting Engine initialized successfully");
 		}
 
-		// NEW: Initialize hot-reload system
+		WCHAR exePath[MAX_PATH] = { 0 };
+		GetModuleFileNameW(NULL, exePath, MAX_PATH);
+		std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
+
+		std::filesystem::path projectRoot = exeDir.parent_path().parent_path().parent_path();
+		std::filesystem::path scriptSourcePath = projectRoot / "Scripts" / "Game";
+		std::filesystem::path scriptProjectPath = projectRoot / "Scripts" / "GameScripts.csproj";
+		std::string outputDllPath = (exeDir / "GameScripts.dll").string();
+
 		Engine::ScriptReloader::GetInstance().Initialize(
-			"../../../../Scripts",                      // 
-			"../../../../Scripts/GameScripts.csproj",   // 
-			"GameScripts.dll"                                 // Output DLL path
+			scriptSourcePath.string(),
+			scriptProjectPath.string(),
+			outputDllPath
 		);
 	}
 	catch (const std::exception &e)
@@ -675,6 +683,30 @@ void Game::OnUpdate(Engine::Timestep ts)
 	}
 
 	Engine::ScriptReloader::GetInstance().Update();
+
+	if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
+	{
+		LOG_INFO("[Game] Hot-reload requested, clearing script instances...");
+
+		if (m_Scene)
+		{
+			auto& registry = m_Scene->GetRegistry();
+			auto view = registry.view<Engine::ScriptComponent>();
+
+			for (auto entity : view)
+			{
+				auto& script = registry.get<Engine::ScriptComponent>(entity);
+				script.ScriptInstance = nullptr;  // ✅ NULL the pointer
+			}
+
+			LOG_INFO("[Game] Cleared all script instances");
+		}
+
+		// NOW reload safely - no stale pointers exist
+		Engine::MonoScriptEngine::GetInstance().ReloadAssembly();
+		Engine::ScriptReloader::GetInstance().ClearReloadFlag();
+		LOG_INFO("[Game] Hot-reload complete!");
+	}
 
 	// When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
 	if (!m_EditorEnable || (m_EditorEnable && m_Editor->getIsPlaying()))

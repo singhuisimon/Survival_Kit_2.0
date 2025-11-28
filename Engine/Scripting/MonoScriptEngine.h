@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
-
+#include <unordered_set>
 
 // Forward declarations for Mono types
 typedef struct _MonoDomain MonoDomain;
@@ -48,6 +48,7 @@ namespace Engine {
         MonoObject* CreateScriptInstance(const std::string& className);
         void DestroyScriptInstance(MonoObject* instance);
 
+        bool IsValidMonoObject(MonoObject* instance);
         // Script method invocation
         void CallMethod(MonoObject* instance, const std::string& methodName);
         void CallMethod(MonoObject* instance, const std::string& methodName, void** params, int paramCount);
@@ -68,11 +69,29 @@ namespace Engine {
         MonoAssembly* GetAssembly() const { return m_AppAssembly; }
         MonoImage* GetImage() const { return m_AppImage; }
 
+
+        void RegisterInstance(MonoObject* instance) {
+            if (instance) m_ValidInstances.insert(instance);
+        }
+
+        void UnregisterInstance(MonoObject* instance) {
+            m_ValidInstances.erase(instance);
+        }
+
+        bool IsValidInstance(MonoObject* instance) {
+            return m_ValidInstances.find(instance) != m_ValidInstances.end();
+        }
+
+        void ClearAllInstances() {
+            m_ValidInstances.clear();
+        }
+
     private:
         MonoScriptEngine() = default;
         ~MonoScriptEngine() = default;
         MonoScriptEngine(const MonoScriptEngine&) = delete;
         MonoScriptEngine& operator=(const MonoScriptEngine&) = delete;
+        std::unordered_set<MonoObject*> m_ValidInstances;
 
         void RegisterInternalCalls();
         void LoadAssembly(const std::string& path);
@@ -83,7 +102,6 @@ namespace Engine {
         MonoDomain* m_AppDomain = nullptr;
         MonoAssembly* m_AppAssembly = nullptr;
         MonoImage* m_AppImage = nullptr;
-        
         std::string m_AssemblyPath;
         std::unordered_map<std::string, MonoClass*> m_ClassCache;
     };
