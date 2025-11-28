@@ -142,13 +142,22 @@ namespace Engine
 				// --------------- New Scene -------------------
 				if (ImGui::MenuItem("New Scene"))
 				{
+					
 					if (m_Scene)
 					{
+						if (isPrefabEditor)
+						{
+							isPrefabEditor = false;
+							currPrefabPath.clear();
+							//LOG_INFO("Exited prefab editor mode for new scene");
+						}
 						m_SelectedEntity = Entity();
 						m_PickedID = 0xFFFFFFFFu;
 						m_Scene->GetRegistry().clear();
 						currScenePath = "";
 						isNewScene = true;
+
+						m_Scene->SetName("New Scene");
 					}
 				}
 				if (ImGui::IsItemHovered())
@@ -2795,7 +2804,7 @@ namespace Engine
 		{
 			ImGui::Columns(2, nullptr, true);
 			//static std::string selectedFolder = "";
-			static ResourceType selectedType = ResourceType::UNKNOWN;
+			//static ResourceType selectedType = ResourceType::UNKNOWN;
 
 			// ================= Left column panel display all the resources folder ========================
 			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
@@ -4013,6 +4022,11 @@ namespace Engine
 								break;
 							}
 						}
+						LOG_DEBUG("Asset browser state:");
+						LOG_DEBUG("  selectedFolder: {}", selectedFolder);
+						LOG_DEBUG("  raw_asset: {}", raw_asset);
+						LOG_DEBUG("  selectedType: {}", static_cast<int>(selectedType));
+						LOG_DEBUG("  selectedResourcesIndex: {}", selectedResourcesIndex);
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -4067,11 +4081,53 @@ namespace Engine
 
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
 						m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
-						// currScenePath = defaultNewScenePath; // update current scene path
+						currScenePath = defaultNewScenePath; // update current scene path
 						m_Scene->SetName(saveAsDefaultSceneName);
+						
+						if (isPrefabEditor)
+						{
+							isPrefabEditor = false;
+							currPrefabPath.clear();
+							//LOG_INFO("Exited prefab editor mode after saving scene");
+						}
+
+						LoadAllPrefabsIntoRegistry();
+
+						m_Scene->GetRegistry().clear();
+						m_Scene->LoadFromFile(defaultNewScenePath);
+						currFileName = m_Scene->GetName();
+						// update asset browser
+						
+						selectedFolder = getAssetFilePath("Sources/Scenes");
+					
+						selectedResourcesIndex = -1;
+						auto assetsList = getAssetsInFolder(selectedFolder);
+						for (size_t i = 0; i < assetsList.size(); ++i)
+						{
+							if (assetsList[i].fullPath == currScenePath)
+							{
+								selectedResourcesIndex = static_cast<int>(i);
+								break;
+							}
+						}
+						raw_asset = false;
+						selectedType = ResourceType::UNKNOWN;
+
+						// Clear current selection
+						m_SelectedEntity = Entity{};
+						m_PickedID = 0xFFFFFFFFu;
+						m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+
+						memset(saveAsDefaultSceneName, 0, sizeof(saveAsDefaultSceneName));
 						saveAsPanel = false; // to close pop up
 						isNewScene = false;
 						ImGui::CloseCurrentPopup();
+
+						LOG_DEBUG("Setting asset browser selection:");
+						LOG_DEBUG("  selectedFolder: {}", selectedFolder);
+						LOG_DEBUG("  raw_asset: {}", raw_asset);
+						LOG_DEBUG("  selectedType: {}", static_cast<int>(selectedType));
+						LOG_DEBUG("  selectedResourcesIndex: {}", selectedResourcesIndex);
 
 					}
 				}
