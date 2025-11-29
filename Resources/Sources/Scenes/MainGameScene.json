@@ -3,6 +3,67 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 1048644,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CORE"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            159.5101318359375,
+                            -150.0,
+                            -65.0
+                        ],
+                        "Rotation": [
+                            0.5731440782546997,
+                            -0.0001301042066188529,
+                            0.0008651245152577758
+                        ],
+                        "Scale": [
+                            75.0,
+                            75.0,
+                            75.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
             "ID": 180,
             "Components": [
                 {
@@ -2078,7 +2139,7 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.040462493896484,
+                            21.040464401245117,
                             38.87009811401367,
                             39.0
                         ],
@@ -2141,11 +2202,28 @@
                     }
                 },
                 {
-                    "Type": "BehaviourTreeComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "Active": false,
-                        "ResetOnComplete": false,
-                        "TreeAssetPath": "SpawnManager.json"
+                        "FilePath": "COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav",
+                        "Type": 2,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ScriptClassName": ""
                     }
                 }
             ]
@@ -3291,8 +3369,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 3,
                         "BoxHalfExtent": [
@@ -3372,8 +3450,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 3,
                         "BoxHalfExtent": [
@@ -3407,13 +3485,13 @@
                     "Properties": {
                         "Position": [
                             42.06632614135742,
-                            -127.7842788696289,
+                            -127.78427124023438,
                             -335.31158447265625
                         ],
                         "Rotation": [
-                            179.91400146484375,
-                            -40.82346725463867,
-                            -179.88357543945313
+                            179.9147186279297,
+                            -40.823486328125,
+                            -179.884521484375
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -3453,8 +3531,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 3,
                         "BoxHalfExtent": [
@@ -3534,8 +3612,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 3,
                         "BoxHalfExtent": [
@@ -3573,9 +3651,9 @@
                             -335.31048583984375
                         ],
                         "Rotation": [
-                            179.9161376953125,
-                            -40.8259162902832,
-                            -179.8854217529297
+                            179.91590881347656,
+                            -40.82592010498047,
+                            -179.88516235351563
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -3615,8 +3693,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 3,
                         "BoxHalfExtent": [
@@ -3696,8 +3774,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 3,
                         "BoxHalfExtent": [
@@ -3735,9 +3813,9 @@
                             -476.30120849609375
                         ],
                         "Rotation": [
-                            -180.0,
+                            180.0,
                             -21.81399917602539,
-                            -180.0
+                            180.0
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -3759,6 +3837,34 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 70000.0,
+                        "AngularDamping": 70000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]
@@ -4162,7 +4268,7 @@
                     "Properties": {
                         "FilePath": "COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav",
                         "Type": 2,
-                        "State": 2,
+                        "State": 1,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -6124,14 +6230,14 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            160.0,
+                            160.4898681640625,
                             -150.0,
                             -65.0
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            0.5731140375137329,
+                            0.0001564017147757113,
+                            -0.0008267310331575572
                         ],
                         "Scale": [
                             75.0,
@@ -6153,6 +6259,34 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 1881.050048828125,
+                        "AngularDamping": 1388.050048828125,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]
@@ -7759,7 +7893,7 @@
                         ],
                         "Rotation": [
                             166.34278869628906,
-                            -4.315533638000488,
+                            -4.315534591674805,
                             -102.34841918945313
                         ],
                         "Scale": [

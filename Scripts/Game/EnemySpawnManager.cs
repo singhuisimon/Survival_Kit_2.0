@@ -99,6 +99,8 @@ namespace Game{
         // Simple pseudo-random number generator
         private uint rngSeed;
 
+        bool started = false;
+
         // Time tracking (since we don't have Time.time)
         [SerializeField]
         private float elapsedTime = 0f;
@@ -149,11 +151,12 @@ namespace Game{
             if(Input.IsKeyPressed(KeyCode.Semicolon) && !isActive){
                 isActive = true;
                 PlayGameBGM();
+                started = true;
             }
 
             if (!isActive){
 
-                if(BREAK && enemiesLeft <= 0){
+                if(started && (BREAK && enemiesLeft <= 0)){
                     StopBGM();
                     Log("====== EnemySpawnManager - All enemies died =====");
                 } 
@@ -536,9 +539,6 @@ namespace Game{
             
             spawningAllowed = false;
 
-            WallSetup_DisableActiveWalls();
-            WallSetup_InactiveWalls();
-            
             // Setup next wave
             if (CURRENT_WAVE < 2)
             {
@@ -549,8 +549,8 @@ namespace Game{
                 Log("=== ALL WAVES COMPLETE ===");
                 Log("=== AWAITING FOR PLAYERS TO KILL ALL ENEMIES");
                 isActive = false;
-                // WallSetup_DisableActiveWalls();
-                // WallSetup_InactiveWalls();
+                WallSetup_DisableActiveWalls();
+                WallSetup_InactiveWalls();
 
             }
         }
