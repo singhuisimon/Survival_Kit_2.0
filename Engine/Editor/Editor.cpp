@@ -2905,14 +2905,14 @@ namespace Engine
 								// check for update 
 								//LOG_DEBUG("Before CheckAndUpdatePrefabInstances - isPrefabEditor: ", isPrefabEditor);
 
-								CheckAndUpdatePrefabInstances();
+							/*	CheckAndUpdatePrefabInstances();
 
 								if (!m_UpdatedPrefabsThisSession.empty())
 								{
 									m_Scene->SaveToFile(filePath);
 									m_Scene->SaveToFile(convertAssetPathToRootResources(filePath));
 									LOG_DEBUG("Scene auto-saved after prefab updates");
-								}
+								}*/
 
 								//m_Scene->SaveToFile(filePath);
 								m_SelectedEntity = Entity{}; // resets
@@ -4220,10 +4220,6 @@ namespace Engine
 					}
 
 				}
-				/*else
-				{
-					CheckAndUpdatePrefabInstances();
-				}*/
 
 			}
 		}
@@ -6791,13 +6787,21 @@ namespace Engine
 		{
 			// Handle Entity Prefab (single entity)
 			// Handle Scene Prefab (with hierarchy)
-			LOG_DEBUG(" ========== Start Apply Override =========");
+			LOG_DEBUG(" ========== Start Apply Override Entity Prefab =========");
 			std::string updatedJson = PrefabSerializer::SerializeEntity(entity, {});
+			LOG_DEBUG("Serialized entity JSON size: ", updatedJson.size(), "bytes");
 			prefab->SetEntityData(updatedJson);
-			PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+			prefab->SetType(PrefabType::Entity);
 
+			LOG_DEBUG("Prefab entity date set, new size: ", prefab->GetEntityData().size());
+			// PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+			if (!PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath()))
+			{
+				LOG_ERROR("Failed to save prefab file: ", prefab->GetSourcePath());
+				return;
+			}
 			entity.GetComponent<PrefabComponent>().ClearModifications();
-			CheckAndUpdatePrefabInstances();
+			//CheckAndUpdatePrefabInstances();
 			LOG_INFO("Applied overrides to entity prefab: ", prefab->GetSourcePath());
 
 		}
