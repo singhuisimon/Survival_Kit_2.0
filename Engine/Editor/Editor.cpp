@@ -4114,8 +4114,8 @@ namespace Engine
 		{
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
-			std::string scriptPath = getRepository() + "\\Scripts\\Game";
-			auto getScriptFiles = getAssetsInFolder("Scripts\\Game");
+			std::string scriptPath = getRepository() + "/Scripts/Game";
+			auto getScriptFiles = getAssetsInFolder(scriptPath);
 
 			ImGui::Text("Select a script to open:");
 			ImGui::Separator();
