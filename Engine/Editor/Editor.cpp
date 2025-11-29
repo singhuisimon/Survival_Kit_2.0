@@ -2905,14 +2905,14 @@ namespace Engine
 								// check for update 
 								//LOG_DEBUG("Before CheckAndUpdatePrefabInstances - isPrefabEditor: ", isPrefabEditor);
 
-								CheckAndUpdatePrefabInstances();
+							/*	CheckAndUpdatePrefabInstances();
 
 								if (!m_UpdatedPrefabsThisSession.empty())
 								{
 									m_Scene->SaveToFile(filePath);
 									m_Scene->SaveToFile(convertAssetPathToRootResources(filePath));
 									LOG_DEBUG("Scene auto-saved after prefab updates");
-								}
+								}*/
 
 								//m_Scene->SaveToFile(filePath);
 								m_SelectedEntity = Entity{}; // resets
@@ -4115,7 +4115,7 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
 			std::string scriptPath = getRepository() + "/Scripts/Game";
-			auto getScriptFiles = getAssetsInFolder(scriptPath);
+      		auto getScriptFiles = getAssetsInFolder(scriptPath);
 
 			ImGui::Text("Select a script to open:");
 			ImGui::Separator();
@@ -4211,7 +4211,7 @@ namespace Engine
 					if (ImGui::Button("Apply Overrides"))
 					{
 
-						//ApplyPrefabOverrides(m_SelectedEntity);
+						ApplyPrefabOverrides(m_SelectedEntity);
 
 					}
 
@@ -4220,10 +4220,6 @@ namespace Engine
 					}
 
 				}
-				/*else
-				{
-					CheckAndUpdatePrefabInstances();
-				}*/
 
 			}
 		}
@@ -4300,7 +4296,7 @@ namespace Engine
 					// -------------------------------------------------
 					if (!camComp.Projection)
 					{
-						// Perspective – show FOV
+						// Perspective ï¿½ show FOV
 						float fov = camComp.FOV;
 						if (ImGui::DragFloat("FOV", &fov, 0.1f, 10.0f, 120.0f))
 						{
@@ -4309,7 +4305,7 @@ namespace Engine
 					}
 					else
 					{
-						// Orthographic – edit height only (Size.y)
+						// Orthographic ï¿½ edit height only (Size.y)
 						float orthoHeight = camComp.Size.y;
 						if (ImGui::DragFloat("Ortho Height", &orthoHeight, 0.1f, 0.1f, 10000.0f))
 						{
@@ -4430,6 +4426,12 @@ namespace Engine
 				if (ImGui::DragFloat("LinearDamping", &linearDamping))
 				{
 					rigidBody.LinearDamping = linearDamping;
+				}
+
+				float angularDamping = rigidBody.AngularDamping;
+				if (ImGui::DragFloat("AngularDamping", &angularDamping))
+				{
+					rigidBody.AngularDamping = angularDamping;
 				}
 
 				float restitution = rigidBody.Restitution;
@@ -6623,16 +6625,14 @@ namespace Engine
 	{
 		ImGui::Begin("HDR Settings");
 
-		// ======================
-		// Exposure
-		// ======================
+		// Exposure control
 		if (ImGui::SliderFloat("Exposure", &m_Renderer->m_exposure, 0.1f, 5.0f, "%.2f"))
 		{
 			// Exposure value changed
 		}
 
 		// Optional: Add a reset button
-		if (ImGui::Button("Reset to Default##Exposure"))
+		if (ImGui::Button("Reset to Default"))
 		{
 			m_Renderer->m_exposure = 1.0f;
 		}
@@ -6778,7 +6778,7 @@ namespace Engine
 				}
 			}
 
-			CheckAndUpdatePrefabInstances();
+			//CheckAndUpdatePrefabInstances();
 
 			LOG_INFO("Successfully applied overrides to scene prefab: ", prefab->GetSourcePath());
 
@@ -6787,13 +6787,21 @@ namespace Engine
 		{
 			// Handle Entity Prefab (single entity)
 			// Handle Scene Prefab (with hierarchy)
-			LOG_DEBUG(" ========== Start Apply Override =========");
+			LOG_DEBUG(" ========== Start Apply Override Entity Prefab =========");
 			std::string updatedJson = PrefabSerializer::SerializeEntity(entity, {});
+			LOG_DEBUG("Serialized entity JSON size: ", updatedJson.size(), "bytes");
 			prefab->SetEntityData(updatedJson);
-			PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+			prefab->SetType(PrefabType::Entity);
 
+			LOG_DEBUG("Prefab entity date set, new size: ", prefab->GetEntityData().size());
+			// PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
+			if (!PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath()))
+			{
+				LOG_ERROR("Failed to save prefab file: ", prefab->GetSourcePath());
+				return;
+			}
 			entity.GetComponent<PrefabComponent>().ClearModifications();
-			CheckAndUpdatePrefabInstances();
+			//CheckAndUpdatePrefabInstances();
 			LOG_INFO("Applied overrides to entity prefab: ", prefab->GetSourcePath());
 
 		}
