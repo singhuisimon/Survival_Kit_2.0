@@ -5,7 +5,7 @@ namespace Game
 {
     public class StartGameButton : ScriptBehaviour
     {
-        // ===== SERIALIZED FIELDS =====
+        // serialization fields
         [SerializeField]
         private string mainMenuCameraName = "MainMenuCamera";
         
@@ -19,19 +19,34 @@ namespace Game
         private float buttonWidth = 2.4f;    // Set this to match your button scale
         
         [SerializeField]
-        private float buttonHeight = 0.1f;   // Set this to match your button scale
+        private float buttonHeight = 0.8f;   // Set this to match your button scale
 
-        // ===== PRIVATE FIELDS =====
+        [SerializeField]
+        private string buttonEntityName = "Install_Btn";   // entity name of button
+
+
+        // private fields
         private ulong mainMenuCameraID;
         private ulong gameCameraID;
         private bool camerasInitialized = false;
         private bool isShowingMainMenu;
 
-        // ===== LIFECYCLE METHODS =====
-        
+        private uint buttonEntityID;    // for entity
+        private bool wasMouseButtonPressed = false;
+
         public override void OnStart()
         {
             Log("StartGameButton: Initializing...");
+
+            // Find the actual button entity by name
+            buttonEntityID = InternalCalls.Scene_FindEntityByName(buttonEntityName);
+
+            // checking if it exists
+            if (buttonEntityID == 0)
+            {
+                LogError("StartGameButton: Button entity not found: " + buttonEntityName);
+                return;
+            }
             
             isShowingMainMenu = showMainMenuInitially;
             
@@ -52,47 +67,62 @@ namespace Game
 
         public override void OnUpdate(float deltaTime) 
         {
-            // Retry initialization if it failed
-            if (!camerasInitialized)
+            if (!camerasInitialized) 
             {
-                InitializeCameras();
-                if (camerasInitialized)
-                {
-                    UpdateCameraStates();
-                }
                 return;
             }
 
+            //Vector2 mousePos = Input.GetMousePosition();
+
+            // Retry initialization if it failed
+            // if (!camerasInitialized)
+            // {
+            //     InitializeCameras();
+            //     if (camerasInitialized)
+            //     {
+            //         UpdateCameraStates();
+            //     }
+            //     return;
+            // }
+
             // === DEBUG: Log mouse position constantly ===
-            Vector2 mousePos = Input.GetMousePosition();
-            Log("Mouse: ({mousePos.X:F2}, {mousePos.Y:F2})");
+            //Vector2 mousePos = Input.GetMousePosition();
+
+           bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
             
-            // === DEBUG: Log on click ===
-            if (Input.IsMouseButtonPressed(0))
+            //if (Input.IsMouseButtonPressed(MouseButton.Left))
+            if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
             {
-                Vector3 buttonPos = Transform.Position;
+                //Vector3 buttonPos = Transform.Position;
                 
                 Log("===================");
                 Log("CLICK DETECTED!");
-                Log("Mouse: ({mousePos.X}, {mousePos.Y})");
-                Log("Button: ({buttonPos.X}, {buttonPos.Y}, {buttonPos.Z})");
-                Log("Button Width: {buttonWidth}, Height: {buttonHeight}");
-                
-                float minX = buttonPos.X - (buttonWidth / 2f);
-                float maxX = buttonPos.X + (buttonWidth / 2f);
-                float minY = buttonPos.Y - (buttonHeight / 2f);
-                float maxY = buttonPos.Y + (buttonHeight / 2f);
-                
-                Log("Button Bounds X: {minX} to {maxX}");
-                Log("Button Bounds Y: {minY} to {maxY}");
-                Log("Is Over: {IsMouseOverButton()}");
                 Log("===================");
+
+                // check if the mouse is over the button (detecting the button entity?)
+                if (IsMouseOverButton()) 
+                {
+                    Log("Click was over the button!");
+                    OnButtonClicked();
+                }
+                else 
+                {
+                    Log("Click was NOT over the button");
+                }
+                
+                // float minX = buttonPos.X - (buttonWidth / 2f);
+                // float maxX = buttonPos.X + (buttonWidth / 2f);
+                // float minY = buttonPos.Y - (buttonHeight / 2f);
+                // float maxY = buttonPos.Y + (buttonHeight / 2f);
                 
                 // Try to switch anyway for testing
-                OnButtonClicked();
+                //OnButtonClicked();
             }
+
+            // update previous state for next frame
+            wasMouseButtonPressed = isMouseLeftButtonPressed;
             
-            // Keyboard shortcut for testing camera switching
+            // Space to immediately test if Camera can toggle (debug, comment during actual gameplay)
             if (Input.IsKeyPressed(KeyCode.Space))
             {
                 Log("Space key pressed - toggling camera");
@@ -104,29 +134,44 @@ namespace Game
         {
             Log("StartGameButton: Destroyed");
         }
-
-        // ===== HELPER METHODS =====
         
-        // Check if mouse cursor is within button bounds, uses simple AABB collision
         private bool IsMouseOverButton()
         {
             // Get mouse position (in screen/window coordinates)
             Vector2 mousePos = Input.GetMousePosition();
             
-            // Get button center position (from this entity's transform)
-            Vector3 buttonPos = Transform.Position;
+            // getting button world position directly from engine
+            Vector3 buttonPos;
+            InternalCalls.Transform_GetPosition(buttonEntityID, out buttonPos);
+
+            Log("Checking bounds...");
+            Log("Mouse pos: " + mousePos.X + ", " + mousePos.Y);
+            Log("Button pos: " + buttonPos.X + ", " + buttonPos.Y);
             
             // Calculate button bounds
-            float minX = buttonPos.X - (buttonWidth / 2f);
-            float maxX = buttonPos.X + (buttonWidth / 2f);
-            float minY = buttonPos.Y - (buttonHeight / 2f);
-            float maxY = buttonPos.Y + (buttonHeight / 2f);
+
+            float halfW = buttonWidth * 0.5f;
+            float halfH = buttonHeight * 0.5f;
+
+            float minX = buttonPos.X - halfW;
+            float maxX = buttonPos.X + halfW;
+            float minY = buttonPos.Y - halfH;
+            float maxY = buttonPos.Y + halfH;
             
+            // Check if mouse is within bounds
+            Log("Bounds X: " + minX + " to " + maxX);
+            Log("Bounds Y: " + minY + " to " + maxY);
+
             // Check if mouse is within bounds
             bool withinX = mousePos.X >= minX && mousePos.X <= maxX;
             bool withinY = mousePos.Y >= minY && mousePos.Y <= maxY;
+
+            Log("Within X: " + withinX + ", Within Y: " + withinY);
+
+            bool hit = withinX && withinY;
+            Log("IsMouseOverButton result: " + hit);
             
-            return withinX && withinY;
+            return hit;
         }
 
         // Handle button click - to toggle between cameras
@@ -147,7 +192,7 @@ namespace Game
         // Find camera entities by name
         private void InitializeCameras()
         {
-            // Find entities by name
+            // Find entities by name (MainMenuCamera and GameCamera)
             uint mainMenuID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
             uint gameID = InternalCalls.Scene_FindEntityByName(gameCameraName);
             
@@ -158,20 +203,20 @@ namespace Game
             // Check if both cameras were found
             if (mainMenuID == 0)
             {
-                LogError("StartGameButton: Camera not found: '{mainMenuCameraName}'");
+                LogError("StartGameButton: Camera not found: " + mainMenuCameraName);
             }
             
             if (gameID == 0)
             {
-                LogError("StartGameButton: Camera not found: '{gameCameraName}'");
+                LogError("StartGameButton: Camera not found: " + gameCameraName);
             }
             
-            // Mark as initialized only if both cameras exist
+            // put it as initialized only if both MainMenuCamera and GameCamera exists
             camerasInitialized = (mainMenuID != 0 && gameID != 0);
             
             if (camerasInitialized)
             {
-                Log("StartGameButton: Cameras found - MainMenu ID: {mainMenuCameraID}, Game ID: {gameCameraID}");
+                Log("StartGameButton: Cameras found - MainMenu ID: " + mainMenuCameraID + ", Game ID: " + gameCameraID);
             }
         }
 
