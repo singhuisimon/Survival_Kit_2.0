@@ -142,13 +142,29 @@ namespace Engine
 				// --------------- New Scene -------------------
 				if (ImGui::MenuItem("New Scene"))
 				{
-					if (m_Scene)
+					/*if (m_Scene)
 					{
 						m_SelectedEntity = Entity();
 						m_PickedID = 0xFFFFFFFFu;
 						m_Scene->GetRegistry().clear();
 						currScenePath = "";
 						isNewScene = true;
+					}*/
+					if (m_Scene)
+					{
+						if (isPrefabEditor)
+						{
+							isPrefabEditor = false;
+							currPrefabPath.clear();
+							//LOG_INFO("Exited prefab editor mode for new scene");
+						}
+						m_SelectedEntity = Entity();
+						m_PickedID = 0xFFFFFFFFu;
+						m_Scene->GetRegistry().clear();
+						currScenePath = "";
+						isNewScene = true;
+
+						//m_Scene->SetName("New Scene");
 					}
 				}
 				if (ImGui::IsItemHovered())
@@ -165,258 +181,350 @@ namespace Engine
 				// --------------- Save Scene -------------------
 				if (ImGui::MenuItem("Save Scene"))
 				{
+//					if (isPrefabEditor)
+//					{
+//						if (!currPrefabPath.empty())
+//						{
+//#if 0 // origina; code
+//							// Save the current prefab directly from the scene
+//							auto view = m_Scene->GetRegistry().view<TagComponent>();
+//							if (view.begin() != view.end())
+//							{
+//								Entity entity(*view.begin(), &m_Scene->GetRegistry());
+//
+//								
+//								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+//								xresource::instance_guid existingGUID{};
+//								if (existingPrefab)
+//								{
+//									existingGUID = existingPrefab->GetGUID();
+//								}
+//
+//
+//								
+//								// Create updated prefab from current entity
+//								std::string entityName = entity.GetComponent<TagComponent>().Tag;
+//								auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
+//
+//								if (updatedPrefab)
+//								{
+//									// ============ PRESERVE EXISTING GUID ============
+//									if (existingGUID.m_Value != 0)
+//									{
+//										updatedPrefab->SetGUID(existingGUID);
+//									}
+//									
+//								
+//									if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
+//									{
+//										LOG_INFO("Prefab saved: {}", currPrefabPath);
+//
+//										// Update the registry with the new prefab
+//										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+//										m_TemporaryPrefabPaths.erase(currPrefabPath);
+//
+//
+//									}
+//								}
+//								
+//							}
+//#endif
+//
+//#if 1 //updated code to differentiate prefab scene or entity
+//							LOG_INFO("=== PREFAB SAVE START ===");
+//
+//							// ===== DEBUG: List ALL entities in the scene =====
+//							auto allView = m_Scene->GetRegistry().view<TagComponent>();
+//							LOG_INFO("Total entities in scene: {}", allView.size());
+//							for (auto entityHandle : allView)
+//							{
+//								Entity e(entityHandle, &m_Scene->GetRegistry());
+//								uint32_t eID = static_cast<uint32_t>(e);
+//								std::string eName = e.GetComponent<TagComponent>().Tag;
+//
+//								uint32_t parentID = 0xFFFFFFFF;
+//								int numChildren = 0;
+//
+//								if (e.HasComponent<TransformComponent>())
+//								{
+//									const auto& transform = e.GetComponent<TransformComponent>();
+//									parentID = transform.Parent;
+//									numChildren = transform.Children.size();
+//								}
+//
+//								LOG_DEBUG("  Entity ID: {}, Name: '{}', Parent: {}, Children: {}",
+//									eID, eName, (parentID == 0xFFFFFFFF ? -1 : (int)parentID), numChildren);
+//							}
+//
+//							LOG_INFO("Searching for root entity (entity with no parent)...");
+//
+//							Entity rootEntity;
+//							int rootCount = 0;
+//
+//							for (auto entityHandle : allView)
+//							{
+//								Entity candidate(entityHandle, &m_Scene->GetRegistry());
+//								uint32_t candidateID = static_cast<uint32_t>(candidate);
+//								std::string candidateName = candidate.GetComponent<TagComponent>().Tag;
+//
+//								if (candidate.HasComponent<TransformComponent>())
+//								{
+//									const auto& transform = candidate.GetComponent<TransformComponent>();
+//
+//									if (transform.Parent == 0xFFFFFFFF)
+//									{
+//										rootEntity = candidate;
+//										rootCount++;
+//										LOG_INFO("  Found root candidate: ID={}, Name='{}'",
+//											candidateID, candidateName);
+//									}
+//								}
+//								else
+//								{
+//									// No TransformComponent, treat as potential root
+//									LOG_WARNING("  Entity '{}' (ID: {}) has no TransformComponent",
+//										candidateName, candidateID);
+//									if (!rootEntity)
+//									{
+//										rootEntity = candidate;
+//										rootCount++;
+//									}
+//								}
+//							}
+//
+//							if (rootCount > 1)
+//							{
+//								LOG_WARNING("Found {} root entities! Using first one.", rootCount);
+//							}
+//
+//							if (!rootEntity)
+//							{
+//								LOG_ERROR("Cannot find root entity!");
+//								LOG_INFO("=== PREFAB SAVE FAILED ===");
+//							}
+//							else
+//							{
+//								uint32_t rootID = static_cast<uint32_t>(rootEntity);
+//								std::string rootName = "UNKNOWN";
+//								if (rootEntity.HasComponent<TagComponent>())
+//								{
+//									rootName = rootEntity.GetComponent<TagComponent>().Tag;
+//								}
+//
+//
+//								LOG_INFO("=== ROOT ENTITY FOUND ===");
+//								LOG_INFO("Root ID:", rootID, "Name: ",  rootName);
+//								bool hasChildren = false;
+//								std::vector<uint32_t> childrenList;
+//								if (rootEntity.HasComponent<TransformComponent>())
+//								{
+//									const auto& transform = rootEntity.GetComponent<TransformComponent>();
+//									hasChildren = !transform.Children.empty();
+//									childrenList = transform.Children;
+//
+//									LOG_INFO("Root transform.Parent: {}",
+//										(transform.Parent == 0xFFFFFFFF ? "NONE" : std::to_string(transform.Parent)));
+//									LOG_INFO("Root transform.Children.size(): {}", transform.Children.size());
+//
+//									for (size_t i = 0; i < childrenList.size(); ++i)
+//									{
+//										uint32_t childID = childrenList[i];
+//
+//										// Try to find this child's name
+//										std::string childName = "???";
+//										auto childHandle = static_cast<entt::entity>(childID);
+//										auto& registry = m_Scene->GetRegistry();
+//
+//										if (registry.valid(childHandle))
+//										{
+//											Entity childEnt(childHandle, &registry);
+//											if (childEnt.HasComponent<TagComponent>())
+//											{
+//												childName = childEnt.GetComponent<TagComponent>().Tag;
+//											}
+//										}
+//
+//										LOG_DEBUG("  Child[{}]: ID={}, Name='{}'", i, childID, childName);
+//									}
+//
+//								}
+//								else
+//								{
+//									LOG_WARNING("Root entity has no TransformComponent!");
+//								}
+//								LOG_INFO("Root entity has children: {}", hasChildren);
+//
+//								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+//								xresource::instance_guid existingGUID{};
+//								if (existingPrefab)
+//								{
+//									existingGUID = existingPrefab->GetGUID();
+//									LOG_INFO("Loaded existing prefab with GUID: {}", existingGUID.m_Value);
+//								}
+//
+//								std::shared_ptr<Prefab> updatedPrefab;
+//								if (hasChildren)
+//								{
+//									LOG_INFO("Saving as Scene Prefab (root + children)");
+//
+//									std::vector<Entity> allEntities;
+//									allEntities.push_back(rootEntity);
+//
+//									LOG_INFO("Added root entity to save list");
+//									CollectChildEntitiesIterative(rootEntity, allEntities);
+//
+//									LOG_INFO("Collected {} total entities for scene prefab", allEntities.size());
+//
+//									for (size_t i = 0; i < allEntities.size(); ++i)
+//									{
+//										Entity e = allEntities[i];
+//										std::string eName = "UNKNOWN";
+//										if (e.HasComponent<TagComponent>())
+//										{
+//											eName = e.GetComponent<TagComponent>().Tag;
+//										}
+//										LOG_DEBUG("  [{}] Entity: {}", i, eName);
+//									}
+//
+//									updatedPrefab = PrefabSerializer::CreateScenePrefab(
+//										m_Scene,
+//										allEntities,
+//										rootName
+//									);
+//								}
+//								else
+//								{
+//									LOG_INFO("Saving as Entity Prefab (single entity, no children detected)");
+//									updatedPrefab = PrefabSerializer::CreateEntityPrefab(rootEntity, rootName);
+//								}
+//
+//								if (updatedPrefab)
+//								{
+//									if (existingGUID.m_Value != 0)
+//									{
+//										updatedPrefab->SetGUID(existingGUID);
+//										LOG_INFO("Preserved existing GUID: {}", existingGUID.m_Value);
+//									}
+//
+//									if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
+//									{
+//										LOG_INFO("Prefab saved: {}", currPrefabPath);
+//										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+//										m_TemporaryPrefabPaths.erase(currPrefabPath);
+//										LOG_INFO("=== PREFAB SAVE SUCCESS ===");
+//									}
+//									else
+//									{
+//										LOG_ERROR("Failed to save prefab to file");
+//										LOG_INFO("=== PREFAB SAVE FAILED ===");
+//									}
+//								}
+//								else
+//								{
+//									LOG_ERROR("Failed to create prefab object");
+//									LOG_INFO("=== PREFAB SAVE FAILED ===");
+//								}
+//							}
+//
+//
+//#endif
+//
+//						} // end of !currPrefabPath
+//					}
+//					else
+//					{
+//						if (!currScenePath.empty())
+//						{
+//							m_Scene->SaveToFile(currScenePath);
+//							m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
+//
+//						}
+//						else
+//						{
+//							saveAsPanel = true;
+//						}
+//					}
 					if (isPrefabEditor)
 					{
 						if (!currPrefabPath.empty())
 						{
-#if 0 // origina; code
-							// Save the current prefab directly from the scene
-							auto view = m_Scene->GetRegistry().view<TagComponent>();
-							if (view.begin() != view.end())
+							LOG_DEBUG("======= Start Prefab Save Scene =====");
+
+							auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+							if (!existingPrefab)
 							{
-								Entity entity(*view.begin(), &m_Scene->GetRegistry());
+								LOG_ERROR("Cannot update - failed to load existing prefab: ", currPrefabPath);
+								return;
+							}
 
-								
-								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-								xresource::instance_guid existingGUID{};
-								if (existingPrefab)
+							if (existingPrefab->GetType() == PrefabType::Entity)
+							{
+								LOG_DEBUG("Updating Entity Prefab");
+								if (m_SelectedEntity)
 								{
-									existingGUID = existingPrefab->GetGUID();
-								}
+									auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(
+										m_SelectedEntity,
+										existingPrefab->GetName()
+									);
 
-
-								
-								// Create updated prefab from current entity
-								std::string entityName = entity.GetComponent<TagComponent>().Tag;
-								auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(entity, entityName);
-
-								if (updatedPrefab)
-								{
-									// ============ PRESERVE EXISTING GUID ============
-									if (existingGUID.m_Value != 0)
-									{
-										updatedPrefab->SetGUID(existingGUID);
-									}
-									
-								
+									updatedPrefab->SetGUID(existingPrefab->GetGUID());
 									if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
 									{
-										LOG_INFO("Prefab saved: {}", currPrefabPath);
-
-										// Update the registry with the new prefab
-										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-										m_TemporaryPrefabPaths.erase(currPrefabPath);
-
-
+										PrefabRegistry::Get().UpdatePrefab(updatedPrefab);
+										MarkPrefabAsUpdated(updatedPrefab->GetGUID());
+										//PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+										LOG_DEBUG("Entity Prefab updated successfully: ", currPrefabPath);
 									}
 								}
-								
-							}
-#endif
-
-#if 1 //updated code to differentiate prefab scene or entity
-							LOG_INFO("=== PREFAB SAVE START ===");
-
-							// ===== DEBUG: List ALL entities in the scene =====
-							auto allView = m_Scene->GetRegistry().view<TagComponent>();
-							LOG_INFO("Total entities in scene: {}", allView.size());
-							for (auto entityHandle : allView)
-							{
-								Entity e(entityHandle, &m_Scene->GetRegistry());
-								uint32_t eID = static_cast<uint32_t>(e);
-								std::string eName = e.GetComponent<TagComponent>().Tag;
-
-								uint32_t parentID = 0xFFFFFFFF;
-								int numChildren = 0;
-
-								if (e.HasComponent<TransformComponent>())
-								{
-									const auto& transform = e.GetComponent<TransformComponent>();
-									parentID = transform.Parent;
-									numChildren = transform.Children.size();
-								}
-
-								LOG_DEBUG("  Entity ID: {}, Name: '{}', Parent: {}, Children: {}",
-									eID, eName, (parentID == 0xFFFFFFFF ? -1 : (int)parentID), numChildren);
-							}
-
-							LOG_INFO("Searching for root entity (entity with no parent)...");
-
-							Entity rootEntity;
-							int rootCount = 0;
-
-							for (auto entityHandle : allView)
-							{
-								Entity candidate(entityHandle, &m_Scene->GetRegistry());
-								uint32_t candidateID = static_cast<uint32_t>(candidate);
-								std::string candidateName = candidate.GetComponent<TagComponent>().Tag;
-
-								if (candidate.HasComponent<TransformComponent>())
-								{
-									const auto& transform = candidate.GetComponent<TransformComponent>();
-
-									if (transform.Parent == 0xFFFFFFFF)
-									{
-										rootEntity = candidate;
-										rootCount++;
-										LOG_INFO("  Found root candidate: ID={}, Name='{}'",
-											candidateID, candidateName);
-									}
-								}
-								else
-								{
-									// No TransformComponent, treat as potential root
-									LOG_WARNING("  Entity '{}' (ID: {}) has no TransformComponent",
-										candidateName, candidateID);
-									if (!rootEntity)
-									{
-										rootEntity = candidate;
-										rootCount++;
-									}
-								}
-							}
-
-							if (rootCount > 1)
-							{
-								LOG_WARNING("Found {} root entities! Using first one.", rootCount);
-							}
-
-							if (!rootEntity)
-							{
-								LOG_ERROR("Cannot find root entity!");
-								LOG_INFO("=== PREFAB SAVE FAILED ===");
 							}
 							else
 							{
-								uint32_t rootID = static_cast<uint32_t>(rootEntity);
-								std::string rootName = "UNKNOWN";
-								if (rootEntity.HasComponent<TagComponent>())
+								LOG_DEBUG("=== Start Scene Entity Prefab ===");
+
+
+								std::vector<Entity> allEntities;
+								auto view = m_Scene->GetRegistry().view<TagComponent>();
+								for (auto entityHandle : view)
 								{
-									rootName = rootEntity.GetComponent<TagComponent>().Tag;
+									Entity entity(entityHandle, &m_Scene->GetRegistry());
+									allEntities.push_back(entity);
+								}
+								auto updatedPrefab = PrefabSerializer::CreateScenePrefab(
+									m_Scene,
+									allEntities,
+									existingPrefab->GetName()
+								);
+
+								if (!updatedPrefab)
+								{
+									LOG_ERROR("Failed to create updated scene prefab");
+									return;
 								}
 
+								updatedPrefab->SetGUID(existingPrefab->GetGUID());
 
-								LOG_INFO("=== ROOT ENTITY FOUND ===");
-								LOG_INFO("Root ID:", rootID, "Name: ",  rootName);
-								bool hasChildren = false;
-								std::vector<uint32_t> childrenList;
-								if (rootEntity.HasComponent<TransformComponent>())
+								if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
 								{
-									const auto& transform = rootEntity.GetComponent<TransformComponent>();
-									hasChildren = !transform.Children.empty();
-									childrenList = transform.Children;
-
-									LOG_INFO("Root transform.Parent: {}",
-										(transform.Parent == 0xFFFFFFFF ? "NONE" : std::to_string(transform.Parent)));
-									LOG_INFO("Root transform.Children.size(): {}", transform.Children.size());
-
-									for (size_t i = 0; i < childrenList.size(); ++i)
-									{
-										uint32_t childID = childrenList[i];
-
-										// Try to find this child's name
-										std::string childName = "???";
-										auto childHandle = static_cast<entt::entity>(childID);
-										auto& registry = m_Scene->GetRegistry();
-
-										if (registry.valid(childHandle))
-										{
-											Entity childEnt(childHandle, &registry);
-											if (childEnt.HasComponent<TagComponent>())
-											{
-												childName = childEnt.GetComponent<TagComponent>().Tag;
-											}
-										}
-
-										LOG_DEBUG("  Child[{}]: ID={}, Name='{}'", i, childID, childName);
-									}
-
+									PrefabRegistry::Get().UpdatePrefab(updatedPrefab);
+									MarkPrefabAsUpdated(updatedPrefab->GetGUID());
+									//PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+									LOG_DEBUG("Scene Prefab updated successfully: ", currPrefabPath);
+									//ClearPrefabInstances(existingPrefab->GetGUID());
 								}
 								else
 								{
-									LOG_WARNING("Root entity has no TransformComponent!");
+									LOG_ERROR("Failed to save scene prefab to file");
 								}
-								LOG_INFO("Root entity has children: {}", hasChildren);
-
-								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-								xresource::instance_guid existingGUID{};
-								if (existingPrefab)
-								{
-									existingGUID = existingPrefab->GetGUID();
-									LOG_INFO("Loaded existing prefab with GUID: {}", existingGUID.m_Value);
-								}
-
-								std::shared_ptr<Prefab> updatedPrefab;
-								if (hasChildren)
-								{
-									LOG_INFO("Saving as Scene Prefab (root + children)");
-
-									std::vector<Entity> allEntities;
-									allEntities.push_back(rootEntity);
-
-									LOG_INFO("Added root entity to save list");
-									CollectChildEntitiesIterative(rootEntity, allEntities);
-
-									LOG_INFO("Collected {} total entities for scene prefab", allEntities.size());
-
-									for (size_t i = 0; i < allEntities.size(); ++i)
-									{
-										Entity e = allEntities[i];
-										std::string eName = "UNKNOWN";
-										if (e.HasComponent<TagComponent>())
-										{
-											eName = e.GetComponent<TagComponent>().Tag;
-										}
-										LOG_DEBUG("  [{}] Entity: {}", i, eName);
-									}
-
-									updatedPrefab = PrefabSerializer::CreateScenePrefab(
-										m_Scene,
-										allEntities,
-										rootName
-									);
-								}
-								else
-								{
-									LOG_INFO("Saving as Entity Prefab (single entity, no children detected)");
-									updatedPrefab = PrefabSerializer::CreateEntityPrefab(rootEntity, rootName);
-								}
-
-								if (updatedPrefab)
-								{
-									if (existingGUID.m_Value != 0)
-									{
-										updatedPrefab->SetGUID(existingGUID);
-										LOG_INFO("Preserved existing GUID: {}", existingGUID.m_Value);
-									}
-
-									if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
-									{
-										LOG_INFO("Prefab saved: {}", currPrefabPath);
-										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-										m_TemporaryPrefabPaths.erase(currPrefabPath);
-										LOG_INFO("=== PREFAB SAVE SUCCESS ===");
-									}
-									else
-									{
-										LOG_ERROR("Failed to save prefab to file");
-										LOG_INFO("=== PREFAB SAVE FAILED ===");
-									}
-								}
-								else
-								{
-									LOG_ERROR("Failed to create prefab object");
-									LOG_INFO("=== PREFAB SAVE FAILED ===");
-								}
+								LOG_DEBUG("=== End Scene Entity Prefab ===");
 							}
 
-
-#endif
+							LOG_DEBUG("======= End Save Prefab Scene =====");
 
 						} // end of !currPrefabPath
 					}
 					else
 					{
+
 						if (!currScenePath.empty())
 						{
 							m_Scene->SaveToFile(currScenePath);
@@ -428,6 +536,7 @@ namespace Engine
 							saveAsPanel = true;
 						}
 					}
+
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Save current scene.");
@@ -3039,154 +3148,280 @@ namespace Engine
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
 						if (extension == ".json" && folderName != "BT") // For scene, not BT
 						{
-							if (isPrefabEditor)
-							{
-								if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
-								{
-									
-									auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							//if (isPrefabEditor)
+							//{
+							//	if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>())
+							//	{
+							//		
+							//		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-									std::string prefabPath = currPrefabPath;
+							//		std::string prefabPath = currPrefabPath;
 
-									if (!prefabPath.empty())
-									{
-										
-										// Get existing prefab to preserve GUID
-										auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
-										xresource::instance_guid existingGUID{};
+							//		if (!prefabPath.empty())
+							//		{
+							//			
+							//			// Get existing prefab to preserve GUID
+							//			auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+							//			xresource::instance_guid existingGUID{};
 
-										if (existingPrefab)
-										{
-											existingGUID = existingPrefab->GetGUID();
+							//			if (existingPrefab)
+							//			{
+							//				existingGUID = existingPrefab->GetGUID();
 						
-										}
-										// ============ END DEBUG ============
+							//			}
+							//			// ============ END DEBUG ============
 
-										// Create updated prefab from current entity state
-										std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
-										auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
+							//			// Create updated prefab from current entity state
+							//			std::string entityName = m_SelectedEntity.GetComponent<TagComponent>().Tag;
+							//			auto updatedPrefab = PrefabSerializer::CreateEntityPrefab(m_SelectedEntity, entityName);
 
-										if (updatedPrefab)
-										{
-											// ============ PRESERVE EXISTING GUID ============
-											if (existingGUID.m_Value != 0)
-											{
-												updatedPrefab->SetGUID(existingGUID);
-							
-											}
-											// ============ END PRESERVE ============
+							//			if (updatedPrefab)
+							//			{
+							//				// ============ PRESERVE EXISTING GUID ============
+							//				if (existingGUID.m_Value != 0)
+							//				{
+							//					updatedPrefab->SetGUID(existingGUID);
+							//
+							//				}
+							//				// ============ END PRESERVE ============
 
-											if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
-											{
-												PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
-												prefabComp.ClearModifications(); // Reset overrides 
-												//PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
-											
-											}
-										}
+							//				if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, prefabPath))
+							//				{
+							//					PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
+							//					prefabComp.ClearModifications(); // Reset overrides 
+							//					//PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+							//				
+							//				}
+							//			}
 
-										isPrefabEditor = false;
-									}
-								}
+							//			isPrefabEditor = false;
+							//		}
+							//	}
 
-							}
+							//}
+						//	LOG_DEBUG("===== Start of loading scene =======", fileName);
+						//	currScenePath = filePath; // update curr file path
+						//	currFileName = fileName; // store file name
 
-							currScenePath = filePath; // update curr file path
-							currFileName = fileName; // store file name
+						//	//LoadAllPrefabsIntoRegistry();
+						//	//m_Scene->SetName(fileName);
+						//	LOG_DEBUG("m_Scene->SetName(fileName)", fileName);
+						//	//LOG_DEBUG("Prefab file path in scene now", currPrefabPath);
+						//	if (m_Scene)
+						//	{
+						//		m_SelectedEntity = Entity{};
+						//		//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						//		isPrefabEditor = false;
+						//		LoadAllPrefabsIntoRegistry();
+						//		m_Scene->GetRegistry().clear();
+						//		m_Scene->LoadFromFile(filePath);
+						//		// check for update 
+						//		//LOG_DEBUG("Before CheckAndUpdatePrefabInstances - isPrefabEditor: ", isPrefabEditor);
 
-							LoadAllPrefabsIntoRegistry();
-							m_Scene->SetName(fileName);
-							if (m_Scene)
-							{
-								m_SelectedEntity = Entity{};
-								//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-								m_Scene->GetRegistry().clear();
-								m_Scene->LoadFromFile(filePath);
-								auto view = m_Scene->GetRegistry().view<PrefabComponent>();
-								std::unordered_map<xresource::instance_guid, std::vector<Entity>> prefabInstances;
+						//		CheckAndUpdatePrefabInstances();
 
-								// Collect all prefab instances
-								for (auto enttEntity : view)
-								{
-									Entity e(enttEntity, &m_Scene->GetRegistry());
-									auto& prefabComp = e.GetComponent<PrefabComponent>();
-									prefabInstances[prefabComp.PrefabGUID].push_back(e); 
+						//		if (!m_UpdatedPrefabsThisSession.empty())
+						//		{
+						//			m_Scene->SaveToFile(currScenePath);
+						//		}
+						//		auto& prefabRegistry = PrefabRegistry::Get().GetAllPrefabs();
 
-								}
-								
-								// Update each prefab's instances
-								for (auto& [prefabGUID, instances] : prefabInstances)
-								{
-									auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
-									if (!prefab)
-									{
-										
-										continue;
-									}
-									if (prefab->GetType() == PrefabType::Entity)
-									{
+						//		LOG_DEBUG("=== Prefabs used in scene: {} ===", fileName);
 
-										for (Entity oldEntity : instances)
-										{
-											// Store transform relationships
-											uint32_t parentID = u32_max;
-											std::vector<uint32_t> childrenIDs;
+						//		auto view = m_Scene->GetRegistry().view<PrefabComponent>();
+						//		std::unordered_set<xresource::instance_guid> usedPrefabGUIDs;
 
-											if (oldEntity.HasComponent<TransformComponent>())
-											{
-												auto& oldTransform = oldEntity.GetComponent<TransformComponent>();
-												parentID = oldTransform.Parent;
-												childrenIDs = oldTransform.Children;
-											}
+						//		for (auto entity : view) {
+						//			auto& prefabComp = m_Scene->GetRegistry().get<PrefabComponent>(entity);
+						//			usedPrefabGUIDs.insert(prefabComp.PrefabGUID);
+						//		}
 
-											entt::entity oldEntityID = static_cast<entt::entity>(oldEntity);
+						//		LOG_DEBUG("Total prefabs used in scene: ", usedPrefabGUIDs.size());
 
-											// Destroy and recreate with fresh prefab data
-											m_Scene->DestroyEntity(oldEntity);
-
-											Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
-												m_Scene,
-												prefab->GetGUID(),
-												oldEntityID
-											);
+						//		for (auto guid : usedPrefabGUIDs) {
+						//			auto prefab = PrefabRegistry::Get().GetPrefab(guid);
+						//			if (prefab) {
+						//				LOG_DEBUG("Used prefab: ", prefab->GetName(), " , GUID: ", guid.m_Value);
+						//			}
+						//			else {
+						//				LOG_DEBUG("Missing prefab with GUID: ", guid.m_Value);
+						//			}
+						//		}
 
 
-											// Restore relationships
-											if (newEntity.HasComponent<TransformComponent>())
-											{
-												auto& newTransform = newEntity.GetComponent<TransformComponent>();
-												newTransform.Parent = parentID;
-												newTransform.Children = childrenIDs;
-											}
+						//		//m_Scene->SaveToFile(filePath);
+						//		m_SelectedEntity = Entity{}; // resets
+						//		m_PickedID = 0xFFFFFFFFu;
+						//		m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+						//		LOG_DEBUG("Oudside after m_UpdatedPrefabsThisSession.empty:  ", m_UpdatedPrefabsThisSession.size());
+						//		LOG_DEBUG("===== End of loading scene =======", fileName);
+						//	}
 
-											if (newEntity.HasComponent<PrefabComponent>())
-											{
-												newEntity.GetComponent<PrefabComponent>().ClearModifications();
-											}
-										}
-									}
-									else // if there is multiple prefab (parent & child) to avoid crash when change scene
-									{
-										for (Entity oldEntity : instances)
-										{
-											// Only destroy root entities to avoid double destroy
-											auto& transform = oldEntity.GetComponent<TransformComponent>();
-											if (transform.Parent == u32_max)
-											{
-												m_Scene->DestroyEntity(oldEntity);
-											}
-										}
-										Entity newRoot = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
-									}
-								}
-								m_SelectedEntity = Entity{}; // resets
-								m_PickedID = 0xFFFFFFFFu;
-								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);				
-								isPrefabEditor = false;
-							}
-						}
+						//	currScenePath = filePath; // update curr file path
+						//	currFileName = fileName; // store file name
+
+						//	LoadAllPrefabsIntoRegistry();
+						//	m_Scene->SetName(fileName);
+						//	if (m_Scene)
+						//	{
+						//		m_SelectedEntity = Entity{};
+						//		//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						//		m_Scene->GetRegistry().clear();
+						//		m_Scene->LoadFromFile(filePath);
+						//		auto view = m_Scene->GetRegistry().view<PrefabComponent>();
+						//		std::unordered_map<xresource::instance_guid, std::vector<Entity>> prefabInstances;
+
+						//		// Collect all prefab instances
+						//		for (auto enttEntity : view)
+						//		{
+						//			Entity e(enttEntity, &m_Scene->GetRegistry());
+						//			auto& prefabComp = e.GetComponent<PrefabComponent>();
+						//			prefabInstances[prefabComp.PrefabGUID].push_back(e); 
+
+						//		}
+						//		
+						//		// Update each prefab's instances
+						//		for (auto& [prefabGUID, instances] : prefabInstances)
+						//		{
+						//			auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
+						//			if (!prefab)
+						//			{
+						//				
+						//				continue;
+						//			}
+						//			if (prefab->GetType() == PrefabType::Entity)
+						//			{
+
+						//				for (Entity oldEntity : instances)
+						//				{
+						//					// Store transform relationships
+						//					uint32_t parentID = u32_max;
+						//					std::vector<uint32_t> childrenIDs;
+
+						//					if (oldEntity.HasComponent<TransformComponent>())
+						//					{
+						//						auto& oldTransform = oldEntity.GetComponent<TransformComponent>();
+						//						parentID = oldTransform.Parent;
+						//						childrenIDs = oldTransform.Children;
+						//					}
+
+						//					entt::entity oldEntityID = static_cast<entt::entity>(oldEntity);
+
+						//					// Destroy and recreate with fresh prefab data
+						//					m_Scene->DestroyEntity(oldEntity);
+
+						//					Entity newEntity = PrefabInstantiator::InstantiateEntityPrefab(
+						//						m_Scene,
+						//						prefab->GetGUID(),
+						//						oldEntityID
+						//					);
+
+
+						//					// Restore relationships
+						//					if (newEntity.HasComponent<TransformComponent>())
+						//					{
+						//						auto& newTransform = newEntity.GetComponent<TransformComponent>();
+						//						newTransform.Parent = parentID;
+						//						newTransform.Children = childrenIDs;
+						//					}
+
+						//					if (newEntity.HasComponent<PrefabComponent>())
+						//					{
+						//						newEntity.GetComponent<PrefabComponent>().ClearModifications();
+						//					}
+						//				}
+						//			}
+						//			else // if there is multiple prefab (parent & child) to avoid crash when change scene
+						//			{
+						//				for (Entity oldEntity : instances)
+						//				{
+						//					// Only destroy root entities to avoid double destroy
+						//					auto& transform = oldEntity.GetComponent<TransformComponent>();
+						//					if (transform.Parent == u32_max)
+						//					{
+						//						m_Scene->DestroyEntity(oldEntity);
+						//					}
+						//				}
+						//				Entity newRoot = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
+						//			}
+						//		}
+						//		m_SelectedEntity = Entity{}; // resets
+						//		m_PickedID = 0xFFFFFFFFu;
+						//		m_Operation = static_cast<ImGuizmo::OPERATION>(-1);				
+						//		isPrefabEditor = false;
+						//	}
+						//}
+//						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
+//						{
+//							if (!isPrefabEditor)
+//							{
+//								if (!currScenePath.empty())
+//								{
+//									m_Scene->SaveToFile(currScenePath);
+//									m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
+//									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
+//								}
+//							}
+//							currPrefabPath = filePath;
+//							m_Scene->SetName("Prefab");
+//							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+//							if (prefab)
+//							{
+//								m_Scene->GetRegistry().clear();
+//								//PrefabRegistry::Get().RegisterPrefab(prefab);
+//
+//
+//#if 0 // original code bfr modified for parent child prefab file
+//								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+//
+//								m_SelectedEntity = Entity{};
+//								m_PickedID = 0xFFFFFFFFu;
+//
+//								if (!currScenePath.empty())
+//								{
+//									currScenePath.clear();
+//								}
+//								m_SelectedEntity = Entity(); //reset entity
+//								m_PickedID = 0xFFFFFFFFu;
+//								isPrefabEditor = true;
+//
+//
+//								LOG_INFO("Now editing prefab:", currPrefabPath);
+//
+//#endif 
+//
+//#if 1 // added code for the parent child prefab file to work
+//								Entity entity;
+//								if (prefab->GetType() == PrefabType::Scene) {
+//									//LOG_INFO("Loading Scene prefab with hierarchy");
+//									entity = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
+//								}
+//								else {
+//									//LOG_INFO("Loading single Entity prefab");
+//									entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+//								}
+//
+//								m_SelectedEntity = Entity{};
+//								m_PickedID = 0xFFFFFFFFu;
+//
+//								if (!currScenePath.empty())
+//								{
+//									currScenePath.clear();
+//								}
+//								m_SelectedEntity = Entity(); //reset entity
+//								m_PickedID = 0xFFFFFFFFu;
+//								isPrefabEditor = true;
+//
+//
+//								LOG_INFO("Now editing prefab:", currPrefabPath);
+//
+//#endif
+//							}
+//						}
+}
 						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
+							LOG_DEBUG("=====Start Load Prefab File=========");
 							if (!isPrefabEditor)
 							{
 								if (!currScenePath.empty())
@@ -3197,57 +3432,42 @@ namespace Engine
 								}
 							}
 							currPrefabPath = filePath;
-							m_Scene->SetName("Prefab");
+
+							//m_Scene->SetName("Prefab");
 							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+							auto& registry = PrefabRegistry::Get();
+							PrefabRegistry::Get().RegisterPrefab(prefab);
+
 							if (prefab)
 							{
 								m_Scene->GetRegistry().clear();
 								//PrefabRegistry::Get().RegisterPrefab(prefab);
 
-
-#if 0 // original code bfr modified for parent child prefab file
-								Entity entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-
-								m_SelectedEntity = Entity{};
-								m_PickedID = 0xFFFFFFFFu;
-
-								if (!currScenePath.empty())
-								{
-									currScenePath.clear();
-								}
-								m_SelectedEntity = Entity(); //reset entity
-								m_PickedID = 0xFFFFFFFFu;
-								isPrefabEditor = true;
-
-
-								LOG_INFO("Now editing prefab:", currPrefabPath);
-
-#endif 
-
 #if 1 // added code for the parent child prefab file to work
 								Entity entity;
 								if (prefab->GetType() == PrefabType::Scene) {
-									//LOG_INFO("Loading Scene prefab with hierarchy");
+
+									LOG_INFO("Loading Scene prefab with hierarchy");
 									entity = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
 								}
 								else {
-									//LOG_INFO("Loading single Entity prefab");
+									LOG_INFO("Loading single Entity prefab");
 									entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
 								}
 
-								m_SelectedEntity = Entity{};
-								m_PickedID = 0xFFFFFFFFu;
 
 								if (!currScenePath.empty())
 								{
 									currScenePath.clear();
 								}
+
 								m_SelectedEntity = Entity(); //reset entity
 								m_PickedID = 0xFFFFFFFFu;
 								isPrefabEditor = true;
 
 
 								LOG_INFO("Now editing prefab:", currPrefabPath);
+								LOG_DEBUG("=====End Load Prefab File=========");
 
 #endif
 							}
@@ -3976,7 +4196,6 @@ namespace Engine
 			// list all scene files
 			for (auto& scenesAsset : sceneFiles)
 			{
-
 				if (ImGui::Selectable(scenesAsset.name.c_str()))
 				{
 					if (!m_Scene)
@@ -3984,12 +4203,12 @@ namespace Engine
 						LOG_ERROR("No active scene exists to load into!");
 						continue;
 					}
-					
+
 					// clear current scene
 					m_Scene->GetRegistry().clear();
 					m_SelectedEntity = Entity();
 					m_PickedID = 0xFFFFFFFFu;
-				
+
 					// load the selected scene file
 					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
 					{
@@ -4013,6 +4232,11 @@ namespace Engine
 								break;
 							}
 						}
+						LOG_DEBUG("Asset browser state:");
+						LOG_DEBUG("  selectedFolder: {}", selectedFolder);
+						LOG_DEBUG("  raw_asset: {}", raw_asset);
+						LOG_DEBUG("  selectedType: {}", static_cast<int>(selectedType));
+						LOG_DEBUG("  selectedResourcesIndex: {}", selectedResourcesIndex);
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -4066,12 +4290,55 @@ namespace Engine
 					{
 
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
-						m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
-						// currScenePath = defaultNewScenePath; // update current scene path
 						m_Scene->SetName(saveAsDefaultSceneName);
+						m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
+						currScenePath = defaultNewScenePath; // update current scene path
+						LOG_DEBUG("m_Scene->SetName(saveAsDefaultSceneName): ", saveAsDefaultSceneName);
+
+						if (isPrefabEditor)
+						{
+							isPrefabEditor = false;
+							currPrefabPath.clear();
+							//LOG_INFO("Exited prefab editor mode after saving scene");
+						}
+
+						//LoadAllPrefabsIntoRegistry();
+
+						m_Scene->GetRegistry().clear();
+						m_Scene->LoadFromFile(defaultNewScenePath);
+						currFileName = m_Scene->GetName();
+						// update asset browser
+
+						selectedFolder = getAssetFilePath("Sources/Scenes");
+
+						selectedResourcesIndex = -1;
+						auto assetsList = getAssetsInFolder(selectedFolder);
+						for (size_t i = 0; i < assetsList.size(); ++i)
+						{
+							if (assetsList[i].fullPath == currScenePath)
+							{
+								selectedResourcesIndex = static_cast<int>(i);
+								break;
+							}
+						}
+						raw_asset = false;
+						selectedType = ResourceType::UNKNOWN;
+
+						// Clear current selection
+						m_SelectedEntity = Entity{};
+						m_PickedID = 0xFFFFFFFFu;
+						m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+
+						memset(saveAsDefaultSceneName, 0, sizeof(saveAsDefaultSceneName));
 						saveAsPanel = false; // to close pop up
 						isNewScene = false;
 						ImGui::CloseCurrentPopup();
+
+						LOG_DEBUG("Setting asset browser selection:");
+						LOG_DEBUG("  selectedFolder: {}", selectedFolder);
+						LOG_DEBUG("  raw_asset: {}", raw_asset);
+						LOG_DEBUG("  selectedType: {}", static_cast<int>(selectedType));
+						LOG_DEBUG("  selectedResourcesIndex: {}", selectedResourcesIndex);
 
 					}
 				}
@@ -4130,6 +4397,104 @@ namespace Engine
 
 			ImGui::EndPopup(); // end pop up for save as scene panel
 		}
+		//if (saveAsPanel)
+		//{
+		//	ImGui::OpenPopup("Save As Panel");
+		//}
+		//if (ImGui::BeginPopupModal("Save As Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		//{
+
+		//	ImGui::InputText("File name", saveAsDefaultSceneName, IM_ARRAYSIZE(saveAsDefaultSceneName));
+
+		//	// ------------------ Select save button to save new scene --------------------
+		//	if (ImGui::Button("Save", ImVec2(120, 0)))
+		//	{
+		//		if (strlen(saveAsDefaultSceneName) == 0) // validate that file name is not empty
+		//		{
+		//			ImGui::OpenPopup("Empty Filename");
+		//		}
+		//		else
+		//		{
+		//			// default new scene path 
+		//			std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
+
+		//			if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
+
+		//				defaultNewScenePath += ".json"; // ensure .json extension
+		//			}
+
+		//			if (std::filesystem::exists(defaultNewScenePath))
+		//			{
+		//				ImGui::OpenPopup("Confirm Overwrite"); // if save as name repeat, open confirmation panel for overwrite it
+		//			}
+		//			else
+		//			{
+
+		//				m_Scene->SaveToFile(defaultNewScenePath); // save scene file
+		//				m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
+		//				// currScenePath = defaultNewScenePath; // update current scene path
+		//				m_Scene->SetName(saveAsDefaultSceneName);
+		//				saveAsPanel = false; // to close pop up
+		//				isNewScene = false;
+		//				ImGui::CloseCurrentPopup();
+
+		//			}
+		//		}
+		//	}
+
+		//	// ------------------- Cancel save as button ---------------------
+		//	ImGui::SameLine();
+		//	if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		//	{
+		//		saveAsPanel = false; // reset to close pop up
+		//		ImGui::CloseCurrentPopup();
+		//	}
+
+		//	// ----------------------- Overwrite Existing Save as Scene File -------------------
+		//	if (ImGui::BeginPopupModal("Confirm Overwrite", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		//	{
+		//		ImGui::Text("File %s already exists.\nDo you want to replace it?", saveAsDefaultSceneName);
+
+		//		ImGui::Separator();
+
+		//		if (ImGui::Button("Yes", ImVec2(120, 0)))
+		//		{
+		//			// default new scene path 
+		//			std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
+		//			if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
+		//				defaultNewScenePath += ".json"; // ensure .json extension
+		//			}
+		//			m_Scene->SaveToFile(defaultNewScenePath);
+		//			m_Scene->SaveToFile(convertAssetPathToRootResources(defaultNewScenePath));
+		//			currScenePath = defaultNewScenePath;
+
+		//			saveAsPanel = false;
+		//			isNewScene = false;
+		//			ImGui::CloseCurrentPopup(); // close save as panel
+		//		}
+
+		//		ImGui::SameLine();
+		//		if (ImGui::Button("No", ImVec2(120, 0)))
+		//		{
+		//			ImGui::CloseCurrentPopup();
+		//		}
+		//		ImGui::EndPopup(); // end pop up confirm overwrite panel
+		//	}
+
+		//	// ---------------- If is Emty Filename Warning -------------------
+		//	if (ImGui::BeginPopupModal("Empty Filename", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		//	{
+		//		ImGui::Text("Please enter a file name.");
+
+		//		if (ImGui::Button("OK", ImVec2(120, 0)))
+		//		{
+		//			ImGui::CloseCurrentPopup();
+		//		}
+		//		ImGui::EndPopup();
+		//	}
+
+		//	ImGui::EndPopup(); // end pop up for save as scene panel
+		//}
 	}
 
 	void Editor::CompleteFrame()
@@ -4467,7 +4832,7 @@ namespace Engine
 				}
 				else
 				{
-					CheckAndUpdatePrefabInstances();
+					//CheckAndUpdatePrefabInstances();
 				}
 
 			}
@@ -6893,55 +7258,119 @@ namespace Engine
 
 	void Editor::CheckAndUpdatePrefabInstances()
 	{
-		std::string prefabDir = getAssetFilePath("Sources/Prefabs/");
-		if (!std::filesystem::exists(prefabDir)) return;
+		//std::string prefabDir = getAssetFilePath("Sources/Prefabs/");
+		//if (!std::filesystem::exists(prefabDir)) return;
 
-		bool anyPrefabUpdated = false;
-		std::vector<xresource::instance_guid> updatedPrefabGUIDs;
+		//bool anyPrefabUpdated = false;
+		//std::vector<xresource::instance_guid> updatedPrefabGUIDs;
 
-		// Check all prefab files for modifications
-		for (auto& entry : std::filesystem::directory_iterator(prefabDir))
+		//// Check all prefab files for modifications
+		//for (auto& entry : std::filesystem::directory_iterator(prefabDir))
+		//{
+		//	if (entry.path().extension() != ".prefab") continue;
+
+		//	auto lastWriteTime = std::filesystem::last_write_time(entry.path());
+		//	auto fileTime = std::chrono::duration_cast<std::chrono::seconds>(
+		//		lastWriteTime.time_since_epoch()).count();
+
+		//	// Load prefab to get its GUID
+		//	auto prefab = PrefabSerializer::LoadPrefabFromFile(entry.path().string());
+		//	if (!prefab) continue;
+
+		//	xresource::instance_guid guid = prefab->GetGUID();
+
+		//	// Check if this is first time seeing this prefab or if it's been modified
+		//	auto it = m_PrefabLastModifiedTimes.find(guid);
+		//	if (it == m_PrefabLastModifiedTimes.end())
+		//	{
+		//		// First time - just record the time (silent)
+		//		m_PrefabLastModifiedTimes[guid] = fileTime;
+		//	}
+		//	else if (it->second < fileTime)
+		//	{
+		//		// Prefab was modified! - ONLY SHOW DEBUG WHEN MODIFIED
+		//		m_PrefabLastModifiedTimes[guid] = fileTime;
+		//		updatedPrefabGUIDs.push_back(guid);
+		//		anyPrefabUpdated = true;
+
+		//		// Re-register the updated prefab
+		//		PrefabRegistry::Get().UpdatePrefab(prefab);
+		//		//LOG_INFO("Detected prefab update: {}", entry.path().filename().string());
+		//	}
+		//}
+
+		//// Update all instances of modified prefabs
+		//if (anyPrefabUpdated)
+		//{
+		//	for (auto prefabGUID : updatedPrefabGUIDs)
+		//	{
+		//		UpdateAllPrefabInstancesInScene(prefabGUID);
+		//	}
+		//}
+		if (!m_Scene || m_UpdatedPrefabsThisSession.empty())
 		{
-			if (entry.path().extension() != ".prefab") continue;
+			LOG_DEBUG("Skipping CheckAndUpdatePrefabInstances - Scene: {}, Updated prefabs: {}",
+				(m_Scene != nullptr), m_UpdatedPrefabsThisSession.size());
+			return;
+		}
 
-			auto lastWriteTime = std::filesystem::last_write_time(entry.path());
-			auto fileTime = std::chrono::duration_cast<std::chrono::seconds>(
-				lastWriteTime.time_since_epoch()).count();
+		LOG_DEBUG("===== Start of CheckAndUpdatePrefabInstances ====");
+		LOG_DEBUG("Auto-updating instances for {} modified prefabs", m_UpdatedPrefabsThisSession.size());
 
-			// Load prefab to get its GUID
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(entry.path().string());
-			if (!prefab) continue;
-
-			xresource::instance_guid guid = prefab->GetGUID();
-
-			// Check if this is first time seeing this prefab or if it's been modified
-			auto it = m_PrefabLastModifiedTimes.find(guid);
-			if (it == m_PrefabLastModifiedTimes.end())
+		// Process each modified prefab
+		for (auto prefabGUID : m_UpdatedPrefabsThisSession)
+		{
+			auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
+			if (!prefab)
 			{
-				// First time - just record the time (silent)
-				m_PrefabLastModifiedTimes[guid] = fileTime;
+				LOG_WARNING("Prefab not found in registry: {}", prefabGUID.m_Value);
+				continue;
 			}
-			else if (it->second < fileTime)
-			{
-				// Prefab was modified! - ONLY SHOW DEBUG WHEN MODIFIED
-				m_PrefabLastModifiedTimes[guid] = fileTime;
-				updatedPrefabGUIDs.push_back(guid);
-				anyPrefabUpdated = true;
 
-				// Re-register the updated prefab
-				PrefabRegistry::Get().UpdatePrefab(prefab);
-				//LOG_INFO("Detected prefab update: {}", entry.path().filename().string());
+			LOG_DEBUG("Processing prefab: {} (Type: {})",
+				prefab->GetName(),
+				(prefab->GetType() == PrefabType::Scene ? "Scene" : "Entity"));
+
+			// Count how many instances exist
+			int instanceCount = 0;
+			auto view = m_Scene->GetRegistry().view<PrefabComponent>();
+			for (auto entityHandle : view)
+			{
+				auto& prefabComp = m_Scene->GetRegistry().get<PrefabComponent>(entityHandle);
+				if (prefabComp.PrefabGUID.m_Value == prefabGUID.m_Value)
+				{
+					// Skip if this is the prefab being edited in prefab editor
+					Entity entity(entityHandle, &m_Scene->GetRegistry());
+					if (m_SelectedEntity == entity && isPrefabEditor)
+					{
+						LOG_DEBUG("Skipping instance {} (currently being edited)",
+							static_cast<uint32_t>(entityHandle));
+						continue;
+					}
+					instanceCount++;
+				}
+			}
+
+			LOG_DEBUG("Found ", instanceCount, " instances of prefab ", prefab->GetName());
+
+			if (instanceCount > 0)
+			{
+				// Call the appropriate update function based on prefab type
+				if (prefab->GetType() == PrefabType::Scene)
+				{
+					UpdateScenePrefabInstances(prefabGUID, prefab);
+				}
+				else
+				{
+					UpdateEntityPrefabInstances(prefabGUID, prefab);
+				}
 			}
 		}
 
-		// Update all instances of modified prefabs
-		if (anyPrefabUpdated)
-		{
-			for (auto prefabGUID : updatedPrefabGUIDs)
-			{
-				UpdateAllPrefabInstancesInScene(prefabGUID);
-			}
-		}
+		// Clear after processing
+		LOG_DEBUG("Clearing, ", m_UpdatedPrefabsThisSession.size(), " updated prefabs from session");
+		m_UpdatedPrefabsThisSession.clear();
+		LOG_DEBUG("===== End of CheckAndUpdatePrefabInstances ====");
 	}
 
 	void Editor::UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID)
@@ -7229,7 +7658,7 @@ namespace Engine
 				}
 			}
 
-			CheckAndUpdatePrefabInstances();
+			//CheckAndUpdatePrefabInstances();
 
 			LOG_INFO("Successfully applied overrides to scene prefab: ", prefab->GetSourcePath());
 			
@@ -7243,7 +7672,7 @@ namespace Engine
 			PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
 
 			entity.GetComponent<PrefabComponent>().ClearModifications();
-			CheckAndUpdatePrefabInstances();
+			//CheckAndUpdatePrefabInstances();
 			LOG_INFO("Applied overrides to entity prefab: ", prefab->GetSourcePath());
 		
 		}

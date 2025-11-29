@@ -121,6 +121,7 @@ namespace Engine
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
 		std::string selectedFolder = ""; // for the selected folder in asset browser
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+		ResourceType selectedType = ResourceType::UNKNOWN;//for the selected index in the assets browser
 
 		// Prefab helper variables
 		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
@@ -165,6 +166,7 @@ namespace Engine
 		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
 		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
 
+		std::unordered_set<xresource::instance_guid> m_UpdatedPrefabsThisSession;
 
 		bool isPlaying = true;
 
@@ -434,6 +436,11 @@ namespace Engine
 		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
 
 		void displayHDRSettingsPanel();
+
+		void MarkPrefabAsUpdated(xresource::instance_guid prefabGUID)
+		{
+			m_UpdatedPrefabsThisSession.insert(prefabGUID);
+		}
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
