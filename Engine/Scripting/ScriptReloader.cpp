@@ -2,6 +2,7 @@
 #include "../Utility/Logger.h"
 #include <filesystem>
 #include <fstream>
+#include <unordered_set>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -10,7 +11,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "../Core/Timestep.h"
-
 #endif
 
 namespace Engine
@@ -101,6 +101,8 @@ namespace Engine
 
 	void ScriptReloader::Update()
 	{
+
+
 		// Debug: Log every 5 seconds
 		static int updateCount = 0;
 		updateCount++;
@@ -260,7 +262,7 @@ namespace Engine
 			if (exitCode == 0)
 			{
 				LOG_INFO("[Hot-Reload] Build succeeded!");
-				CopyDllToOutput();
+				CopyDllToOutput();  // 
 				m_ReloadRequested = true;
 			}
 			else
@@ -344,20 +346,97 @@ namespace Engine
 
 		try
 		{
-			// Copy to TEMP file (avoid locking issues with Mono)
 			std::string tempDllPath = m_OutputDllPath + ".tmp";
+			LOG_INFO("[Hot-Reload] Source DLL: ", sourceDll.string());
+			LOG_INFO("[Hot-Reload] Temp path: ", tempDllPath);
+			LOG_INFO("[Hot-Reload] Output DLL: ", m_OutputDllPath);
+
 			std::filesystem::copy_file(sourceDll, tempDllPath,
 				std::filesystem::copy_options::overwrite_existing);
 
-			LOG_INFO("[Hot-Reload] DLL copied to temp: ", tempDllPath);
+			// Verify copy worked
+			if (std::filesystem::exists(tempDllPath)) {
+				LOG_INFO("[Hot-Reload] Temp DLL created successfully");
+			}
+			else {
+				LOG_ERROR("[Hot-Reload] Temp DLL NOT created!");
+			}
 
-			// Store temp path for swapping AFTER assembly unload
 			m_TempDllPath = tempDllPath;
 			
 		}
 		catch (const std::exception &e)
 		{
 			LOG_ERROR("[Hot-Reload] Failed to copy DLL: ", e.what());
+		}
+	}
+
+	void ScriptReloader::FinalizeDllSwap()
+	{
+		if (m_TempDllPath.empty())
+		{
+			LOG_WARNING("[Hot-Reload] No temp DLL to swap");
+			return;
+		}
+
+		try
+		{
+			// Verify temp file exists
+			if (!std::filesystem::exists(m_TempDllPath))
+			{
+				LOG_ERROR("[Hot-Reload] Temp DLL not found: ", m_TempDllPath);
+				m_TempDllPath.clear();
+				return;
+			}
+
+			LOG_INFO("[Hot-Reload] Temp DLL exists: ", m_TempDllPath);
+
+			// Delete old DLL if it exists
+			if (std::filesystem::exists(m_OutputDllPath))
+			{
+				try
+				{
+					std::filesystem::remove(m_OutputDllPath);
+					LOG_INFO("[Hot-Reload] Removed old DLL: ", m_OutputDllPath);
+				}
+				catch (const std::exception& e)
+				{
+					LOG_ERROR("[Hot-Reload] Failed to remove old DLL: ", e.what());
+					return;
+				}
+			}
+
+			// Rename temp to actual
+			try
+			{
+				std::filesystem::rename(m_TempDllPath, m_OutputDllPath);
+				LOG_INFO("[Hot-Reload] DLL swapped successfully: ", m_OutputDllPath);
+				m_TempDllPath.clear();
+			}
+			catch (const std::exception& e)
+			{
+				LOG_ERROR("[Hot-Reload] Failed to rename DLL: ", e.what());
+				LOG_INFO("[Hot-Reload] Attempting copy instead...");
+
+				// Fallback: copy instead of rename
+				try
+				{
+					std::filesystem::copy_file(m_TempDllPath, m_OutputDllPath,
+						std::filesystem::copy_options::overwrite_existing);
+					LOG_INFO("[Hot-Reload] DLL copied as fallback: ", m_OutputDllPath);
+					std::filesystem::remove(m_TempDllPath);
+					m_TempDllPath.clear();
+				}
+				catch (const std::exception& e2)
+				{
+					LOG_ERROR("[Hot-Reload] Copy fallback also failed: ", e2.what());
+				}
+			}
+		}
+		catch (const std::exception& e)
+		{
+			LOG_ERROR("[Hot-Reload] Unexpected error in FinalizeDllSwap: ", e.what());
+			m_TempDllPath.clear();
 		}
 	}
 
