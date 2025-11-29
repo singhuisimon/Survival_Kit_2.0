@@ -1029,6 +1029,18 @@ namespace Engine {
 			return entity.HasComponent<Engine::CameraComponent>();
 		}
 
+		static int Transform_GetParent(uint32_t entityID)
+		{
+			auto& registry = s_CurrentScene->GetRegistry();
+			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+
+			if (!registry.valid(entity) || !entity.HasComponent<Engine::TransformComponent>())
+				return 0;
+
+			auto& transform = registry.get<TransformComponent>(entity);
+			return transform.GetParentEntity();
+		}
+
 		bool EntityHasRigidBody(uint64_t entityID)
 		{
 			if (!s_CurrentScene)
