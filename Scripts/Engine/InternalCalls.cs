@@ -282,6 +282,12 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Audio_SetReverbMix(uint entityID, float mix);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool EntityHasCamera(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool EntityHasRigidBody(ulong entityID);
+
         //Audio Manager implementation - new amanda
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float AudioManager_GetGroupVolume(int groupType);

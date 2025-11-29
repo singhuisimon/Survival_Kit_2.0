@@ -793,8 +793,12 @@ namespace Engine {
 		static void AudioManager_ReleaseDSPByGroup(int groupType);
 		static void AudioManager_ReleaseAllDSPs();
 
-		static void AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
-													   glm::vec3 *up, glm::vec3 *velocity);
+		static void AudioManager_SetListenerAttributes(glm::vec3* position, glm::vec3* forward,
+			glm::vec3* up, glm::vec3* velocity);
+
+
+		static bool EntityHasCamera(uint64_t entityID);
+		static bool EntityHasRigidBody(uint64_t entityID);
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls() {
@@ -994,6 +998,9 @@ namespace Engine {
 		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
 							   (void *)InternalCalls::AudioManager_SetListenerAttributes);
 
+		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void*)InternalCalls::EntityHasCamera);
+		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void*)InternalCalls::EntityHasRigidBody);
+
 		LOG_INFO("Internal calls registered");
 	}
 
@@ -1009,8 +1016,47 @@ namespace Engine {
 
 		static AudioManager *s_AudioManager = nullptr;
 
-		uint64_t Scene_CreateEntity(MonoString *nameStr) {
-			if(!InternalCalls::s_CurrentScene) {
+
+		bool EntityHasCamera(uint64_t entityID)
+		{
+			if (!s_CurrentScene)
+				return false;
+
+			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+			if (!entity)
+				return false;
+
+			return entity.HasComponent<Engine::CameraComponent>();
+		}
+
+		static int Transform_GetParent(uint32_t entityID)
+		{
+			auto& registry = s_CurrentScene->GetRegistry();
+			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+
+			if (!registry.valid(entity) || !entity.HasComponent<Engine::TransformComponent>())
+				return 0;
+
+			auto& transform = registry.get<TransformComponent>(entity);
+			return transform.GetParentEntity();
+		}
+
+		bool EntityHasRigidBody(uint64_t entityID)
+		{
+			if (!s_CurrentScene)
+				return false;
+
+			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+			if (!entity)
+				return false;
+
+			return entity.HasComponent<Engine::RigidbodyComponent>();
+		}
+
+		uint64_t Scene_CreateEntity(MonoString *nameStr)
+		{
+			if (!InternalCalls::s_CurrentScene)
+			{
 				LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
 				return 0;
 			}
@@ -1544,10 +1590,19 @@ namespace Engine {
 		}
 
 
-		void Input_GetMousePosition(glm::vec2 *outPosition) {
-			if(!outPosition) return;
-			// Access your input system
-			// Example: *outPosition = Input::GetMousePosition();
+		void Input_GetMousePosition(glm::vec2* outPosition)
+		{
+			if (!outPosition) return;
+
+			if (!s_InputSystem)
+			{
+				LOG_WARNING("[InternalCall] Input system not initialized");
+				*outPosition = glm::vec2(0.0f, 0.0f);
+				return;
+			}
+
+			// Call the Input system's GetMousePosition method
+			*outPosition = s_InputSystem->GetMousePosition();
 		}
 
 		// Helper to fetch entity from current scene
