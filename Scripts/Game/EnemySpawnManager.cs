@@ -44,15 +44,21 @@ namespace Game{
         
         // Wave timers
         [SerializeField] private float timeBetweenWave = 5.0f;
-        [SerializeField] private float timeWave = 60.0f;
+
+        //time per wave
+        [SerializeField] private float timeWave = 180.0f;
+
+        //shows the current time it is waiting for (180 for wave, 10 for start, 5 for between)
         [SerializeField] private float timeCurrent = 10.0f;
-        [SerializeField] private float timeNext = 0.0f;
+        [SerializeField] private float timeNext = 10.0f;
+
+        //state
         [SerializeField] private bool BREAK = true;
         [SerializeField] private bool COMBAT = false;
         
         // Enemy counting
         [SerializeField] private int enemiesLeft = 0;
-        
+
         // Prefab names 
         private string[] enemyPrefabNames = new string[]
         {
@@ -87,13 +93,14 @@ namespace Game{
         private Entity[] wallInactiveEntities;
         
         // Light entities
-        private Entity lightPrep;
-        private Entity lightCombat;
+        //private Entity lightPrep;
+        //private Entity lightCombat;
         
         // Simple pseudo-random number generator
         private uint rngSeed;
 
         // Time tracking (since we don't have Time.time)
+        [SerializeField]
         private float elapsedTime = 0f;
         
         public override void OnStart()
@@ -130,18 +137,30 @@ namespace Game{
             WallSetup_InactiveWalls();
             
             // Start at wave 1
-            SetupWaveSpawning();
-            
-            isActive = true;
+            //SetupWaveSpawning();
             
             Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
         }
         
         public override void OnUpdate(float deltaTime)
         {
-            if (!isActive)
+
+            //check for the trigger to start
+            if(Input.IsKeyPressed(KeyCode.Semicolon) && !isActive){
+                isActive = true;
+                PlayGameBGM();
+            }
+
+            if (!isActive){
+
+                if(BREAK && enemiesLeft <= 0){
+                    StopBGM();
+                    Log("====== EnemySpawnManager - All enemies died =====");
+                } 
+
                 return;
-            
+            }
+
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
             
@@ -150,6 +169,9 @@ namespace Game{
             {
                 if  (BREAK)
                 {
+                    if(CURRENT_WAVE == 0){
+                        SetupWaveSpawning();
+                    }
                     StartCombat();
                 }
                 else if (COMBAT)
@@ -179,12 +201,12 @@ namespace Game{
             }
             
             // CHEAT CODE - K to kill all enemies
-            if (Input.IsKeyPressed(KeyCode.K))
-            {
-                enemiesLeft = 0;
-                // Would destroy all enemy entities here
-                Log("CHEAT: All enemies killed");
-            }
+            // if (Input.IsKeyPressed(KeyCode.K))
+            // {
+            //     enemiesLeft = 0;
+            //     // Would destroy all enemy entities here
+            //     Log("CHEAT: All enemies killed");
+            // }
         }
         
         private void InitializeSpawnPoints()
@@ -466,7 +488,7 @@ namespace Game{
             
             // Calculate total enemies to spawn
             waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet + E001_worm_host + E003_trojan;
-            enemiesLeft = waveEnemiesLeftToSpawn;
+            //enemiesLeft += waveEnemiesLeftToSpawn;
             
             //Log("Total enemies to spawn: " + waveEnemiesLeftToSpawn);
             Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
@@ -489,7 +511,8 @@ namespace Game{
             BREAK = false;
             COMBAT = true;
             
-            timeNext = elapsedTime + timeWave;
+            //calculate when is the next time (Accumulated) for wave
+            timeNext = elapsedTime + timeWave; 
             timeCurrent = timeWave;
             
             //HandleLights("COMBAT", true);
@@ -521,14 +544,19 @@ namespace Game{
             else
             {
                 Log("=== ALL WAVES COMPLETE ===");
+                Log("=== AWAITING FOR PLAYERS TO KILL ALL ENEMIES");
                 isActive = false;
+                WallSetup_DisableActiveWalls();
+                WallSetup_InactiveWalls();
+
             }
         }
         
         private void SpawnEnemyByWaves()
         {
-            if (elapsedTime < spawnRateNext)
+            if (elapsedTime < spawnRateNext){
                 return;
+            }
             
             isSpawning = true;
             spawnRateNext = elapsedTime + spawnRate;
@@ -657,7 +685,7 @@ namespace Game{
             Vector3 spawnPosition;
             Vector3 spawnRotation;
 
-            InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
+            InternalCalls.Transform_GetPosition((uint)entityID, out spawnPosition);
             Entity spawnent = new Entity(entityID);
             Transform spawnentrans = new Transform();
             spawnentrans.Entity = spawnent;
@@ -697,23 +725,43 @@ namespace Game{
         {
             // Count enemies by tag or some other method
             // For now, just track the counter
+
+            uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
+            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("Enemy_Botnet");
+            uint[] trojan = InternalCalls.Scene_FindEntitiesByTag("Enemy_Trojan");
+            uint[] adware = InternalCalls.Scene_FindEntitiesByTag("Enemy_Adware");
+            uint[] worm = InternalCalls.Scene_FindEntitiesByTag("Enemy_Worm");
+
+            int totalenemiesleft = 0;
+
+            if(loveletter != null && loveletter.Length != 0){
+                totalenemiesleft += loveletter.Length;
+            } else if (botnet != null && botnet.Length != 0){
+                totalenemiesleft += botnet.Length;
+            } else if (trojan != null && trojan.Length != 0){
+                totalenemiesleft += trojan.Length;
+            } else if (adware != null && adware.Length != 0){
+                totalenemiesleft += adware.Length;
+            } else if (worm != null && worm.Length != 0){
+                totalenemiesleft += worm.Length;
+            }
             
-            if (enemiesLeft <= 0 && waveEnemiesLeftToSpawn <= 0)
-            {
+            if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
                 enemiesLeft = 0;
-                // End combat early if all enemies defeated
+
+                //End Combat early if all enemies defeated
                 EndTime();
+            } else {
+                enemiesLeft = totalenemiesleft;
             }
-        }
-        
-        public void EnemyDestroyed()
-        {
-            if (COMBAT)
-            {
-                enemiesLeft--;
-                //Log("Enemy destroyed - Remaining: " + enemiesLeft);
-                Log(string.Concat("Enemy destroyed - Remaining: ", enemiesLeft.ToString()));
-            }
+
+            // old code
+            // if (enemiesLeft <= 0 && waveEnemiesLeftToSpawn <= 0)
+            // {
+            //     enemiesLeft = 0;
+            //     // End combat early if all enemies defeated
+            //     EndTime();
+            // }
         }
         
         private void EndTime()
@@ -793,7 +841,7 @@ namespace Game{
             foreach(Entity entity in entities){
                 if (entity.EntityID != 0) // Extra safety check
                 {
-                    InternalCalls.MeshRenderer_SetVisible(entity.EntityID, true);
+                    InternalCalls.MeshRenderer_SetVisible((uint)entity.EntityID, true);
                 }
                 else
                 {
@@ -807,7 +855,7 @@ namespace Game{
                 uint id = wallInactiveEntities[wallIndex].EntityID;
                 if (id != 0) // Extra safety check
                 {
-                    InternalCalls.MeshRenderer_SetVisible(id, false);
+                    InternalCalls.MeshRenderer_SetVisible((uint)id, false);
                 }
                 else
                 {
@@ -835,7 +883,7 @@ namespace Game{
                 foreach(Entity wall in wallInactiveEntities){
                     if (wall.EntityID != 0)
                     {
-                        InternalCalls.MeshRenderer_SetVisible(wall.EntityID, true);
+                        InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, true);
                     }
                 }
                 Log("All inactive walls enabled");
@@ -850,7 +898,7 @@ namespace Game{
                     if (wall.EntityID != 0) // Extra safety check
                     {
                         Log(string.Concat("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: ", wall.EntityID.ToString()));
-                        InternalCalls.MeshRenderer_SetVisible(wall.EntityID, false);
+                        InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, false);
                     }
                     else
                     {
@@ -927,6 +975,34 @@ namespace Game{
                 " / ", entityNames.Length.ToString(), " entities found"));
             return validEntities.ToArray();
         }
+
+        private void PlayGameBGM(){
+            InternalCalls.Audio_Play((uint)EntityID);
+        }
+
+        //FOR FUTURE PURPOSE
+        private void PauseBGM(){
+            InternalCalls.Audio_Pause((uint)EntityID);
+        }
+
+        private void StopBGM(){
+            InternalCalls.Audio_Stop((uint)EntityID);
+        }
+
+        #endregion
+
+        #region public
+
+        
+        // public void EnemyDestroyed()
+        // {
+        //     if (COMBAT)
+        //     {
+        //         enemiesLeft--;
+        //         //Log("Enemy destroyed - Remaining: " + enemiesLeft);
+        //         Log(string.Concat("Enemy destroyed - Remaining: ", enemiesLeft.ToString()));
+        //     }
+        // }
 
         #endregion
     }
