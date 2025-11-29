@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <unordered_set>
+#include <cstdint>   // <-- add this
 
 // Forward declarations for Mono types
 typedef struct _MonoDomain MonoDomain;
@@ -15,95 +16,98 @@ typedef struct _MonoClassField MonoClassField;
 
 namespace Engine {
 
-    class Scene;
-    class Entity;
-    class Input;
-    class AudioManager; //newly added in - amanda
+	class Scene;
+	class Entity;
+	class Input;
+	class AudioManager; //newly added in - amanda
 
-    // Functions to set context for internal calls
-    void SetScriptingCurrentScene(Scene* scene);
-    void SetScriptingInputSystem(Input* input);
+	// Functions to set context for internal calls
+	void SetScriptingCurrentScene(Scene *scene);
+	void SetScriptingInputSystem(Input *input);
 
-    //newly added - amanda
-    void SetScriptingAudioManager(AudioManager* audiomManager);
+	//newly added - amanda
+	void SetScriptingAudioManager(AudioManager *audiomManager);
 
-    /**
-     * @brief Manages the Mono runtime and C# script execution
-     * @details Handles:
-     *  - Mono runtime initialization
-     *  - Loading and compiling C# assemblies
-     *  - Creating script instances
-     *  - Calling script methods (OnStart, OnUpdate, OnDestroy)
-     *  - Exposing C++ API to C# via internal calls
-     */
-    class MonoScriptEngine {
-    public:
-        static MonoScriptEngine& GetInstance();
+	class MonoScriptEngine {
+	public:
+		static MonoScriptEngine &GetInstance();
 
-        // Initialization and cleanup
-        void Initialize(const std::string& assemblyPath);
-        void Shutdown();
+		// Initialization and cleanup
+		void Initialize(const std::string &assemblyPath);
+		void Shutdown();
 
-        // Script instance management
-        MonoObject* CreateScriptInstance(const std::string& className);
-        void DestroyScriptInstance(MonoObject* instance);
+		// Script instance management
+		MonoObject *CreateScriptInstance(const std::string &className);
+		void DestroyScriptInstance(MonoObject *instance);
 
-        bool IsValidMonoObject(MonoObject* instance);
-        // Script method invocation
-        void CallMethod(MonoObject* instance, const std::string& methodName);
-        void CallMethod(MonoObject* instance, const std::string& methodName, void** params, int paramCount);
+		bool IsValidMonoObject(MonoObject *instance);
 
-        // Class and method lookup
-        MonoClass* GetScriptClass(const std::string& className);
-        MonoMethod* GetMethod(MonoClass* klass, const std::string& methodName, int paramCount = 0);
-        
-        // Field access
-        void SetFieldValue(MonoObject* instance, const std::string& fieldName, void* value);
-        void* GetFieldValue(MonoObject* instance, const std::string& fieldName);
+		// Script method invocation
+		void CallMethod(MonoObject *instance, const std::string &methodName);
+		void CallMethod(MonoObject *instance, const std::string &methodName,
+						void **params, int paramCount);
 
-        // Hot reload support
-        void ReloadAssembly();
+		// Class and method lookup
+		MonoClass *GetScriptClass(const std::string &className);
+		MonoMethod *GetMethod(MonoClass *klass, const std::string &methodName,
+							  int paramCount = 0);
 
-        // Getters
-        MonoDomain* GetDomain() const { return m_RootDomain; }
-        MonoAssembly* GetAssembly() const { return m_AppAssembly; }
-        MonoImage* GetImage() const { return m_AppImage; }
+		// Field access
+		void SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value);
+		void *GetFieldValue(MonoObject *instance, const std::string &fieldName);
 
+		// NEW: convenience helper to bind the native entity ID to a script
+		void BindEntityID(MonoObject *instance, std::uint32_t entityID);
 
-        void RegisterInstance(MonoObject* instance) {
-            if (instance) m_ValidInstances.insert(instance);
-        }
+		// Hot reload support
+		void ReloadAssembly();
 
-        void UnregisterInstance(MonoObject* instance) {
-            m_ValidInstances.erase(instance);
-        }
+		// Getters
+		MonoDomain *GetDomain() const {
+			return m_RootDomain;
+		}
+		MonoAssembly *GetAssembly() const {
+			return m_AppAssembly;
+		}
+		MonoImage *GetImage() const {
+			return m_AppImage;
+		}
 
-        bool IsValidInstance(MonoObject* instance) {
-            return m_ValidInstances.find(instance) != m_ValidInstances.end();
-        }
+		void RegisterInstance(MonoObject *instance) {
+			if(instance) m_ValidInstances.insert(instance);
+		}
 
-        void ClearAllInstances() {
-            m_ValidInstances.clear();
-        }
+		void UnregisterInstance(MonoObject *instance) {
+			m_ValidInstances.erase(instance);
+		}
 
-    private:
-        MonoScriptEngine() = default;
-        ~MonoScriptEngine() = default;
-        MonoScriptEngine(const MonoScriptEngine&) = delete;
-        MonoScriptEngine& operator=(const MonoScriptEngine&) = delete;
-        std::unordered_set<MonoObject*> m_ValidInstances;
+		bool IsValidInstance(MonoObject *instance) {
+			return m_ValidInstances.find(instance) != m_ValidInstances.end();
+		}
 
-        void RegisterInternalCalls();
-        void LoadAssembly(const std::string& path);
-        void UnloadAssembly();
+		void ClearAllInstances() {
+			m_ValidInstances.clear();
+		}
 
-    private:
-        MonoDomain* m_RootDomain = nullptr;
-        MonoDomain* m_AppDomain = nullptr;
-        MonoAssembly* m_AppAssembly = nullptr;
-        MonoImage* m_AppImage = nullptr;
-        std::string m_AssemblyPath;
-        std::unordered_map<std::string, MonoClass*> m_ClassCache;
-    };
+	private:
+		MonoScriptEngine() = default;
+		~MonoScriptEngine() = default;
+		MonoScriptEngine(const MonoScriptEngine &) = delete;
+		MonoScriptEngine &operator=(const MonoScriptEngine &) = delete;
+
+		std::unordered_set<MonoObject *> m_ValidInstances;
+
+		void RegisterInternalCalls();
+		void LoadAssembly(const std::string &path);
+		void UnloadAssembly();
+
+	private:
+		MonoDomain *m_RootDomain = nullptr;
+		MonoDomain *m_AppDomain = nullptr;
+		MonoAssembly *m_AppAssembly = nullptr;
+		MonoImage *m_AppImage = nullptr;
+		std::string   m_AssemblyPath;
+		std::unordered_map<std::string, MonoClass *> m_ClassCache;
+	};
 
 } // namespace Engine
