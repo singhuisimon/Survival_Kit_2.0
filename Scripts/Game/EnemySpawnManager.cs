@@ -535,6 +535,9 @@ namespace Game{
             //HandleLights( "BREAK", true);
             
             spawningAllowed = false;
+
+            WallSetup_DisableActiveWalls();
+            WallSetup_InactiveWalls();
             
             // Setup next wave
             if (CURRENT_WAVE < 2)
@@ -546,8 +549,8 @@ namespace Game{
                 Log("=== ALL WAVES COMPLETE ===");
                 Log("=== AWAITING FOR PLAYERS TO KILL ALL ENEMIES");
                 isActive = false;
-                WallSetup_DisableActiveWalls();
-                WallSetup_InactiveWalls();
+                // WallSetup_DisableActiveWalls();
+                // WallSetup_InactiveWalls();
 
             }
         }
