@@ -60,9 +60,14 @@ file(GLOB_RECURSE PREFAB_HEADERS "${ENGINE_ROOT}/Prefab/*.h")
 file(GLOB_RECURSE PROFILER_SOURCES "${ENGINE_ROOT}/Profiler/*.cpp")
 file(GLOB_RECURSE PROFILER_HEADERS "${ENGINE_ROOT}/Profiler/*.h")
 
-# Scripting Module (NEW!)
+# Scripting Module
 file(GLOB_RECURSE SCRIPTING_SOURCES "${ENGINE_ROOT}/Scripting/*.cpp")
 file(GLOB_RECURSE SCRIPTING_HEADERS "${ENGINE_ROOT}/Scripting/*.h")
+
+# EventSystem Module
+file(GLOB_RECURSE EVENT_SOURCES "${ENGINE_ROOT}/Event/*.cpp")
+file(GLOB_RECURSE EVENT_HEADERS "${ENGINE_ROOT}/Event/*.h")
+
 # BehaviourTree Module
 file(GLOB_RECURSE BEHAVIOURTREE_SOURCES "${ENGINE_ROOT}/BehaviourTree/*.cpp")
 file(GLOB_RECURSE BEHAVIOURTREE_HEADERS "${ENGINE_ROOT}/BehaviourTree/*.h")
@@ -94,6 +99,7 @@ set(ENGINE_SOURCES
     ${BEHAVIOURTREE_SOURCES}
     ${PARTICLESYSTEM_SOURCES}
     ${ANIMATION_SOURCES}
+    ${EVENT_SOURCES}
 )
 
 set(ENGINE_HEADERS
@@ -114,6 +120,7 @@ set(ENGINE_HEADERS
     ${BEHAVIOURTREE_HEADERS}
     ${PARTICLESYSTEM_HEADERS}
     ${ANIMATION_HEADERS}
+    ${EVENT_HEADERS}
 )
 
 # Create engine static library
@@ -188,9 +195,14 @@ source_group("Prefab\\Source" FILES ${PREFAB_SOURCES})
 source_group("Profiler\\Header" FILES ${PROFILER_HEADERS})
 source_group("Profiler\\Source" FILES ${PROFILER_SOURCES})
 
-# Scripting Module (NEW!)
+# Scripting Module
 source_group("Scripting\\Header" FILES ${SCRIPTING_HEADERS})
 source_group("Scripting\\Source" FILES ${SCRIPTING_SOURCES})
+
+# Event Module
+source_group("Event\\Header" FILES ${EVENT_HEADERS})
+source_group("Event\\Source" FILES ${EVENT_SOURCES})
+
 # BehaviourTree Module
 source_group("BehaviourTree\\Header" FILES ${BEHAVIOURTREE_HEADERS})
 source_group("BehaviourTree\\Source" FILES ${BEHAVIOURTREE_SOURCES})

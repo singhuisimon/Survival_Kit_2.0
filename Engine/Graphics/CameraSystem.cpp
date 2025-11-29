@@ -29,31 +29,32 @@ namespace Engine {
 			Entity entity(cam, &registry);
 			auto& camera = entity.GetComponent<CameraComponent>();
 
+			// Camera must be enabled to proceed
+			if (!camera.Enabled) { continue; }
+
 			// Check if it has transform component
 			if (!entity.HasComponent<TransformComponent>()) continue;
 			
-			if (camera.Enabled && camera.isDirty) { 
+			// Get transform component
+			auto& trans = entity.GetComponent<TransformComponent>();
 
-				// Get transform component
-				auto& trans = entity.GetComponent<TransformComponent>();
+			// Update aspect ratio if autoAspect is on 
+			if (camera.autoAspect) {
+				int vp_w = 0, vp_h = 0;
+				glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
 
-				// Update aspect ratio if autoAspect is on 
-				if (camera.autoAspect) {
-					int vp_w, vp_h;
-					glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
-					camera.Aspect = static_cast<float>(vp_w) / static_cast<float>(vp_h);
+				if (vp_w > 0 && vp_h > 0) {
+					float newAspect = static_cast<float>(vp_w) / static_cast<float>(vp_h);
+
+					// Only touch projection if aspect actually changed
+					if (newAspect != camera.Aspect) {
+						camera.SetAspect(newAspect);   // also RebuildProjection()
+					}
 				}
-
-				// Build transforms
-				camera.View = glm::lookAt(trans.Position, camera.Target, { 0.0f, 1.0f, 0.0f }); // Default up is 0.0f, 1.0f, 0.0f
-				camera.Persp = (glm::perspective(
-					glm::radians(camera.FOV),
-					camera.Aspect,
-					camera.NearPlane,
-					camera.FarPlane));
-
-				camera.isDirty = false;
 			}
+
+			// Always build view transform
+			camera.View = glm::lookAt(trans.Position, camera.Target, { 0.0f, 1.0f, 0.0f }); // Default up is 0.0f, 1.0f, 0.0f
 		}
 	}
 

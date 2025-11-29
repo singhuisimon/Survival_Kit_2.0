@@ -56,10 +56,11 @@
 				{
 					"Type": "CameraComponent",
 					"Properties": {
+						"Enabled": true,
+						"Projection": false,
 						"FOV": 75.0,
 						"NearPlane": 0.1,
-						"FarPlane": 500.0,
-						"Primary": true
+						"FarPlane": 500.0
 					}
 				}
 			]

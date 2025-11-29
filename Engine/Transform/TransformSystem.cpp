@@ -117,13 +117,23 @@ namespace Engine {
 			entt::entity current_entity = process_stack.top();
 			process_stack.pop();
 
+			// verify if current entity exists and has transform component
+			if (!registry.any_of<TransformComponent>(current_entity))
+			{
+				continue;
+			}
+
 			auto& current_transform = registry.get<TransformComponent>(current_entity);
 
 			// for each of its children, apply propagate transformation
 			for (auto ce : current_transform.Children) {
 
+				entt::entity childEnt = static_cast<entt::entity>(ce);
+				if (!registry.any_of<TransformComponent>(childEnt))
+				{
+					continue;
+				}
 				auto& child = registry.get<TransformComponent>(static_cast<entt::entity>(ce));
-
 				glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), child.Position);
 				glm::mat4 rotation_matrix = glm::toMat4(child.Rotation);
 				glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), child.Scale);

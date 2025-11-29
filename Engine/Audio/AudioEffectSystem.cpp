@@ -242,7 +242,7 @@ namespace Engine {
 
 	void AudioEffectSystem::DestroyReverbZones() {
 		if (!m_AudioManager || !m_AudioManager->GetSystem()) {
-			LOG_WARNING("Skipping reverb zone destruction - FMOD System alerady release");
+			LOG_WARNING("Skipping reverb zone destruction - FMOD System already released");
 			reverbzones.clear();
 			return;
 		}
@@ -256,31 +256,46 @@ namespace Engine {
 
 		int successCount = 0, failCount = 0;
 
-		for (auto& [entity, zone] : reverbzones) {
-			if (zone) {
-				//First deactivate
-				FMOD_RESULT activeCheck = zone->setActive(false);
-				if (activeCheck != FMOD_OK) {
-					LOG_WARNING("Failed to deactivate reverb zone: ", FMOD_ErrorString(activeCheck));
+		for (auto it = reverbzones.begin(); it != reverbzones.end(); ) {
+			auto& [entity, zone] = *it;
+
+			// CHECK 1: Null pointer check
+			if (!zone) {
+				LOG_WARNING("Reverb zone pointer is null for entity ", (uint32_t)entity);
+				it = reverbzones.erase(it);
+				failCount++;
+				continue;
+			}
+
+			try {
+				// JUST DEACTIVATE - Don't release (already released in UpdateReverbZones or OnReverbComponentRemoved)
+				FMOD_RESULT deactivateResult = zone->setActive(false);
+				if (deactivateResult != FMOD_OK) {
+					LOG_WARNING("Failed to deactivate reverb zone: ", FMOD_ErrorString(deactivateResult));
 				}
 
-				//Then release
-				FMOD_RESULT result = zone->release();
-				if (result != FMOD_OK) {
-					LOG_WARNING("Failed to release reverb zone for entity ", (uint32_t)entity,
-						": ", FMOD_ErrorString(result));
-					failCount++;
-				}
-				else {
-					LOG_INFO("[DestroyReverbZones] Released zone for entity ", (uint32_t)entity);
-					successCount++;
-				}
+				LOG_INFO("[DestroyReverbZones] Deactivated zone for entity ", (uint32_t)entity);
+				successCount++;
+
+				it = reverbzones.erase(it);
+			}
+			catch (const std::exception& e) {
+				LOG_ERROR("Exception while destroying reverb zone for entity ", (uint32_t)entity,
+					": ", e.what());
+				it = reverbzones.erase(it);
+				failCount++;
+			}
+			catch (...) {
+				LOG_ERROR("Unknown exception while destroying reverb zone for entity ", (uint32_t)entity);
+				it = reverbzones.erase(it);
+				failCount++;
 			}
 		}
 
-		reverbzones.clear();
-		LOG_INFO("[DestroyReverbZones] Cleanup complete: ", successCount, " released, ", failCount, " failed");
+		LOG_INFO("[DestroyReverbZones] Cleanup complete: ", successCount, " deactivated, ", failCount, " failed");
 	}
+
+
 
 	void AudioEffectSystem::OnReverbComponentRemoved(entt::registry& registry, entt::entity entity) {
 		// Find and remove the reverb zone

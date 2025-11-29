@@ -27,13 +27,17 @@ namespace Engine {
 
         // Check if build is in progress
         bool IsBuilding() const { return m_IsBuilding; }
-
+        void FinalizeDllSwap();  //
         std::string GetTempDllPath() const { return m_TempDllPath; }
         void ClearTempDllPath() { m_TempDllPath.clear(); }
+
+
+        void ClearReloadFlag() { m_ReloadRequested = false; }
     private:
         ScriptReloader() = default;
         ~ScriptReloader() = default;
         std::string m_TempDllPath;  // NEW: Store temp DLL path
+        bool m_ReloadRequested = false;  // Add this if not already there
 
         void CheckForFileChanges();
         void StartBuild();
@@ -49,7 +53,6 @@ namespace Engine {
 
         // Build state
         bool m_IsBuilding = false;
-        bool m_ReloadRequested = false;
         float m_BuildStartTime = 0.0f;
 
         // Process handle for async build (platform-specific)

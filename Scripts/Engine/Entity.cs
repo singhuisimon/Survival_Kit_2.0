@@ -12,19 +12,19 @@ namespace Engine
         /// <summary>
         /// The native entity ID (entt::entity)
         /// </summary>
-        public ulong EntityID { get; internal set; }
+        public uint EntityID { get; internal set; }
 
-        public Entity(ulong entityID)
+        public Entity(uint entityID)
         {
             EntityID = entityID;
         }
 
         // Entity methods
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern ulong GetEntityID_Native(Entity entity);
+        private static extern uint GetEntityID_Native(Entity entity);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool HasComponent_Native(ulong entityID, Type componentType);
+        private static extern bool HasComponent_Native(uint entityID, Type componentType);
 
         public bool HasComponent<T>() where T : Component
         {

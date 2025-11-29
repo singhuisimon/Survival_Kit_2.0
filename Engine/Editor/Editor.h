@@ -59,7 +59,7 @@ namespace Engine
 		GLFWwindow* m_Window = nullptr;
 		bool m_Initialized = false;
 		ImGuiIO* io;
-		Scene* m_Scene; 
+		Scene* m_Scene;
 		Entity m_SelectedEntity{}; // track which entity is selected
 		std::weak_ptr<TracyProfiler> m_Profiler;
 		u32 m_PickedID = 0xFFFFFFFFu;
@@ -67,7 +67,7 @@ namespace Engine
 		static constexpr float m_DoublePickedTime = 0.5f;
 		float m_LastClickedTime = 0.f;
 		u32 m_LastClickedID = 0xFFFFFFFFu;
-		
+
 		// ImGui Window functionality
 		bool inspectorWindow = true;
 		bool hierachyWindow = true;
@@ -101,9 +101,9 @@ namespace Engine
 
 		// Helper to draw legend in Animator Curve display
 		static void DrawCurveLegendRow(const char* label,
-									   const char* c0Label, ImU32 c0,
-									   const char* c1Label, ImU32 c1,
-									   const char* c2Label, ImU32 c2);
+			const char* c0Label, ImU32 c0,
+			const char* c1Label, ImU32 c1,
+			const char* c2Label, ImU32 c2);
 
 		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
 		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
@@ -120,7 +120,9 @@ namespace Engine
 		// ImGui other helper variable
 		std::string currScenePath{}; // to store current scene path 
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+		std::string selectedFolder = ""; // for the selected folder in asset browser
 		int selectedResourcesIndex = -1; // for the selected index in the assets browser
+		ResourceType selectedType = ResourceType::UNKNOWN;//for the selected index in the assets browser
 
 		// Prefab helper variables
 		std::unordered_set<std::string> m_TemporaryPrefabPaths; // only save the prefab file if save the scene 
@@ -131,10 +133,16 @@ namespace Engine
 		std::string currFileName{}; // track file name
 		Prefab* m_CurrentPrefab = nullptr;
 		bool createEttFromPrfab = false;
-	
+		//bool ApplyOverrideButtonTriggle = false;
+
 		ImGuizmo::OPERATION m_Operation = ImGuizmo::TRANSLATE; // for ImGuizmo 
 		bool m_PreviousEditorCamToggle = false; // track if is in camera mode
-	
+
+
+		// helper for saveAsPanel()
+	/*	bool m_ShouldRefreshAssets = false;
+		std::string m_SceneToSelect = "";*/
+
 		// Helper struct to get resources folder/files 
 		struct AssetEntry
 		{
@@ -162,14 +170,15 @@ namespace Engine
 		std::unordered_map<xresource::instance_guid, std::time_t> m_PrefabLastModifiedTimes;
 		std::unordered_map<std::string, std::filesystem::file_time_type> m_PrefabFileTimes;
 
-
+		std::unordered_set<xresource::instance_guid> m_UpdatedPrefabsThisSession;
+		std::unordered_map<std::string, std::unordered_set<xresource::instance_guid>> m_SceneUpdateHistory;
 		bool isPlaying = true;
 
 	public:
 		/**************************************************************************
-		* @brief 
+		* @brief
 		* 	Constructs an Editor instance with a GLFW window reference.
-		* @param window 
+		* @param window
 		* 	Pointer to the GLFW window.
 		**************************************************************************/
 		Editor(GLFWwindow* window) : m_Window(window), io(nullptr), m_Scene(nullptr) {};
@@ -204,7 +213,7 @@ namespace Engine
 		* 	Pointer to Scene.
 		**************************************************************************/
 		void SetScene(Engine::Scene* scene);
-		
+
 		/**************************************************************************
 		* @brief
 		* 	Initialise Editor.
@@ -214,7 +223,7 @@ namespace Engine
 		/**************************************************************************
 		* @brief
 		* 	Update Editor for each frame.
-		* @param ts 
+		* @param ts
 		* 	Delta time of the current frame.
 		* @param texhandle
 		* 	OpenGL texture handle used during rendering
@@ -230,24 +239,24 @@ namespace Engine
 
 		/**************************************************************************
 		* @brief
-		* 	Displays top menu bar of the Editor. The menu provides options such as 
-		* 	saving and opening scenes, creating new scene or script, editing 
+		* 	Displays top menu bar of the Editor. The menu provides options such as
+		* 	saving and opening scenes, creating new scene or script, editing
 		* 	existing script and exiting the Editor.
 		**************************************************************************/
 		void displayTopMenu();
 
 		/**************************************************************************
 		* @brief
-		* 	Displays the property panel for the selected game object. The panel 
+		* 	Displays the property panel for the selected game object. The panel
 		* 	allows users to view and edit component properties, adding and removing
-		* 	existing components. 
+		* 	existing components.
 		**************************************************************************/
 		void displayPropertiesPanel();
 
 		/**************************************************************************
-		* @brief 
+		* @brief
 		* 	Displays the hierarchy panel for all created game objects.
-		* 	The panel allows users to view all existing game objects, create new game 
+		* 	The panel allows users to view all existing game objects, create new game
 		* 	objects, replace prefabs, and create a new prefab based on the selected entity.
 		**************************************************************************/
 		void displayHierarchyPanel();
@@ -261,15 +270,15 @@ namespace Engine
 		void displayAnimatorPanel();
 
 		/**************************************************************************
-		* @brief 
+		* @brief
 		* 	Displays the assets browser panel.
-		* 	The panel allows users to view all existing files, edit files, switch 
-		* 	between scenes and prefabs, edit asset descriptor through asset pipeline. 
+		* 	The panel allows users to view all existing files, edit files, switch
+		* 	between scenes and prefabs, edit asset descriptor through asset pipeline.
 		**************************************************************************/
 		void displayAssetsBrowserPanel();
 
 		/**************************************************************************
-		* @brief 
+		* @brief
 		* 	Displays the descriptor panel.
 		* 	The panel allows users to view and edit the properties of a selected
 		* 	asset's descriptor, including settings, tags, and validation options.
@@ -277,7 +286,7 @@ namespace Engine
 		void displayDescriptorEditorPanel();
 
 		/**************************************************************************
-		* @brief 
+		* @brief
 		* 	Displays the performance profile panel.
 		* 	The panel allows users to view the performance details and launch tracy.
 		* @param ts
@@ -307,13 +316,13 @@ namespace Engine
 		**************************************************************************/
 		void saveAsScenePanel();
 
-		
+
 		/**************************************************************************
 		* @brief
 		* 	Helper function for searching a folder and returning its contents.
 		* @param folderPath
 		* 	The path of the folder to search.
-		* @return 
+		* @return
 		*	Vector of AssetEntry representing the files/folders found in the folder.
 		**************************************************************************/
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
@@ -339,7 +348,7 @@ namespace Engine
 		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
 			m_Profiler = profiler; // still increases refcount, no extra copy on call
 		}
-		
+
 		/**************************************************************************
 		* @brief
 		* 	Copies the editor viewport data to the provided EditorViewport reference.
@@ -359,7 +368,7 @@ namespace Engine
 		/**************************************************************************
 		* @brief
 		* 	Activate ImGuizmo to manipulate the selected entity's transformation,
-		*	rotate and scale in editor viewport. 
+		*	rotate and scale in editor viewport.
 		* @param entity
 		*	Reference to the entity.
 		**************************************************************************/
@@ -367,7 +376,7 @@ namespace Engine
 
 		/**************************************************************************
 		* @brief
-		* 	Display the create script panel when top menu "New Script" being selected. 
+		* 	Display the create script panel when top menu "New Script" being selected.
 		**************************************************************************/
 		void CreateScriptPanel();
 
@@ -390,13 +399,15 @@ namespace Engine
 
 		/**************************************************************************
 		* @brief
-		* 	Display the camera component when camera component is added to the 
-		*	selected entity. 
+		* 	Display the camera component when camera component is added to the
+		*	selected entity.
 		* @param buttonSize
 		*	The size of the button used for removing the component.
 		**************************************************************************/
-		void displayCameraComp(ImVec2& buttonSize);
 
+		void displayPrefabComp();
+
+		void displayCameraComp(ImVec2& buttonSize);
 
 		void displayRigidBodyComp(ImVec2& buttonSize);
 
@@ -426,9 +437,14 @@ namespace Engine
 		void UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity);
 		void CheckAndUpdatePrefabInstances();
 
-		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
+		//void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
 
 		void displayHDRSettingsPanel();
+
+		void MarkPrefabAsUpdated(xresource::instance_guid prefabGUID)
+		{
+			m_UpdatedPrefabsThisSession.insert(prefabGUID);
+		}
 
 		//void ApplyPrefabUpdatesToScene(Scene* scene, xresource::instance_guid prefabGUID);
 		bool getIsPlaying() const { return isPlaying; }
@@ -441,6 +457,20 @@ namespace Engine
 		void immediatelyCompile() {
 			AM.CompileAllAsset(0);
 		}
+		// for override prefab
+		void ApplyPrefabOverrides(Entity entity);
+
+
+		//void CollectChildEntities(Entity parentEntity, std::vector<Entity>& outEntities);
+
+		void CollectChildEntitiesIterative(Entity parentEntity, std::vector<Entity>& outEntities);
+		void UpdateEntityPrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
+
+		void UpdateScenePrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab);
+
+		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
+
+
 	};
 
 
