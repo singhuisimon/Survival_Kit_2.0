@@ -3,12 +3,19 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 90,
+            "ID": 2097222,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Ground_Below"
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "PrefabGUID": "16738692809979045151",
+                        "ComponentGUID": "14716022426034717189"
                     }
                 },
                 {
@@ -16,18 +23,18 @@
                     "Properties": {
                         "Position": [
                             0.0,
-                            -251.0,
-                            -300.0
+                            -79.38986206054688,
+                            0.0
                         ],
                         "Rotation": [
-                            180.0,
+                            0.0,
                             -0.0,
-                            180.0
+                            0.0
                         ],
                         "Scale": [
-                            2.0,
-                            2.0,
-                            2.0
+                            0.05000000074505806,
+                            0.05000000074505806,
+                            0.05000000074505806
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -36,8 +43,8 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 14709733218137227273,
+                        "MeshGuid": 985224451753541643,
+                        "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -544,6 +551,52 @@
             ]
         },
         {
+            "ID": 90,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Ground_Below"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            -251.0,
+                            -300.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.996999979019165,
+                            1.996999979019165,
+                            1.996999979019165
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "MeshGuid": 18414286944142344193,
+                        "MaterialGuid": 12364562878370054197,
+                        "TextureGuid": 0,
+                        "Visible": true,
+                        "MeshType": 0,
+                        "Material": 0,
+                        "Texture": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
             "ID": 74,
             "Components": [
                 {
@@ -556,21 +609,21 @@
                     "Type": "PrefabComponent",
                     "Properties": {
                         "PrefabGUID": "16738692809979045151",
-                        "ComponentGUID": "13279928296166692507"
+                        "ComponentGUID": "3763268132269670901"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            145.65248107910156,
-                            -216.04562377929688,
-                            -476.30120849609375
+                            0.0,
+                            -79.38986206054688,
+                            0.0
                         ],
                         "Rotation": [
-                            180.0,
-                            -21.81399917602539,
-                            180.0
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -585,7 +638,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
+                        "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -609,21 +662,21 @@
                     "Type": "PrefabComponent",
                     "Properties": {
                         "PrefabGUID": "16738692809979045151",
-                        "ComponentGUID": "4056556259309852485"
+                        "ComponentGUID": "5492650389179941369"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            155.1648712158203,
-                            -152.86585998535156,
-                            -239.3316650390625
+                            0.0,
+                            -79.38986206054688,
+                            0.0
                         ],
                         "Rotation": [
-                            180.0,
-                            -28.783000946044922,
-                            180.0
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -638,7 +691,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
+                        "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -662,21 +715,21 @@
                     "Type": "PrefabComponent",
                     "Properties": {
                         "PrefabGUID": "16738692809979045151",
-                        "ComponentGUID": "5785938516219492135"
+                        "ComponentGUID": "10680797159910752765"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            42.065818786621094,
-                            -128.27423095703125,
-                            -335.31103515625
+                            0.0,
+                            -79.38986206054688,
+                            0.0
                         ],
                         "Rotation": [
-                            180.0,
-                            -41.40201187133789,
-                            180.0
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -691,7 +744,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
+                        "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -715,20 +768,20 @@
                     "Type": "PrefabComponent",
                     "Properties": {
                         "PrefabGUID": "16738692809979045151",
-                        "ComponentGUID": "1174252497790402741"
+                        "ComponentGUID": "3763268132269670913"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -9.5367431640625e-7,
-                            -142.38784790039063,
-                            -132.943603515625
+                            0.0,
+                            -79.38986206054688,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
-                            -69.3619384765625,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
@@ -744,60 +797,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097222,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Gunship"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "PrefabGUID": "16738692809979045151",
-                        "ComponentGUID": "15009310553071083331"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            -92.88660430908203,
-                            -177.08407592773438,
-                            -184.72254943847656
-                        ],
-                        "Rotation": [
-                            -180.0,
-                            -86.98968505859375,
-                            -180.0
-                        ],
-                        "Scale": [
-                            0.05000000074505806,
-                            0.05000000074505806,
-                            0.05000000074505806
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
+                        "MaterialGuid": 0,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -2060,7 +2060,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 12403890208923533323,
+                        "MaterialGuid": 16399788144494018615,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -3941,6 +3941,1392 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 79,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -60.0,
+                            50.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 92,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -60.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 93,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -60.0,
+                            -50.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 94,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -60.0,
+                            -100.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 95,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -60.0,
+                            -150.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 96,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -90.0,
+                            50.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 97,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_7"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -90.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 98,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_8"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -90.0,
+                            -50.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 99,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_9"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -90.0,
+                            -100.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 100,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_10"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -90.0,
+                            -150.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 101,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_11"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -120.0,
+                            50.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 102,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_12"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -120.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 103,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_13"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -120.0,
+                            -50.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 104,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_14"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -120.0,
+                            -100.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 105,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointD_15"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -700.0,
+                            -120.0,
+                            -150.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 106,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointC_1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -580.0,
+                            -70.0,
+                            -435.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 107,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointC_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -540.0,
+                            -70.0,
+                            -435.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 108,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointC_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -500.0,
+                            -70.0,
+                            -435.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 109,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointC_4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -580.0,
+                            -110.0,
+                            -435.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 110,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointC_5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -540.0,
+                            -110.0,
+                            -435.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 111,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointC_6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -500.0,
+                            -110.0,
+                            -435.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 112,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -60.0,
+                            -600.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 113,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -60.0,
+                            -650.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 114,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -60.0,
+                            -700.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 115,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -60.0,
+                            -750.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 116,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -60.0,
+                            -800.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 117,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -90.0,
+                            -600.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 118,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_7"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -90.0,
+                            -650.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 119,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_8"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -90.0,
+                            -700.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 120,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_9"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -90.0,
+                            -750.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 121,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_10"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -90.0,
+                            -800.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 122,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_11"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -120.0,
+                            -600.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 123,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_12"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -120.0,
+                            -650.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 124,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_13"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -120.0,
+                            -700.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 125,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_14"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -120.0,
+                            -750.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 126,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointB_15"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -350.0,
+                            -120.0,
+                            -800.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 127,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointE_1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            650.0,
+                            -70.0,
+                            -160.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 128,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointE_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            650.0,
+                            -70.0,
+                            -100.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 129,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointE_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            650.0,
+                            -70.0,
+                            -60.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 130,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointE_4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            650.0,
+                            -110.0,
+                            -140.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 131,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointE_5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            650.0,
+                            -110.0,
+                            -100.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 132,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SpawnPointE_6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            650.0,
+                            -110.0,
+                            -60.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            180.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
                     }
                 }
             ]
