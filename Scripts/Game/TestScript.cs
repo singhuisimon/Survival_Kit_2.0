@@ -8,10 +8,10 @@ namespace Game
     /// Handles: Movement (WASD), Camera Orbit (Mouse), Dash (Space)
     ///          Weapons (J=Primary, K=Secondary, R=Reload)
     /// </summary>
-    public class TestScript
+    public class TestScript : ScriptBehaviour
     {
         // ===== Entity Reference =====
-        private int EntityID = 0;
+        // int EntityID = 0;
 
         // ===== Camera Orbit Settings =====
         [SerializeField]
