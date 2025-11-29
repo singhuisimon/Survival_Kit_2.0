@@ -20,7 +20,7 @@ namespace Game{
 
     public class EnemySpawnManager : ScriptBehaviour
     {
-        public static EnemySpawnManager instance;
+        //public static EnemySpawnManager instance;
     
         // Basic toggles
         [SerializeField] private bool isActive = false;
@@ -98,17 +98,17 @@ namespace Game{
         
         public override void OnStart()
         {
-            // Singleton setup
-            if (instance == null)
-            {
-                instance = this;
-            }
-            else
-            {
-                Log("DUPLICATE EnemySpawnManager. DELETING");
-                // In custom engine, you'd destroy this entity
-                return;
-            }
+            // // Singleton setup
+            // if (instance == null)
+            // {
+            //     instance = this;
+            // }
+            // else
+            // {
+            //     Log("DUPLICATE EnemySpawnManager. DELETING");
+            //     // In custom engine, you'd destroy this entity
+            //     return;
+            // }
             
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
@@ -611,52 +611,32 @@ namespace Game{
             // Get spawn position and rotation from the spawn point
             Vector3 spawnPos = spawnPoint.position;
             Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
+            Vector3 spawnScale = new Vector3(0.006f, 0.006f, 0.006f);
 
-            uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPos, ref spawnRot, ref spawnScale, false);
 
-            if(enemyID != 0){
-                Entity tempEntity = new Entity(enemyID);
-                Transform tempTransform = new Transform();
-                tempTransform.Entity = tempEntity;
-                InternalCalls.Transform_SetPosition(enemyID, ref spawnPos);
-                tempTransform.Rotation = spawnRot;
+            if(enemyID == 0){
+                Log("INVALID ID FOR SPAWNING");
+            } else {
                 Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
                 spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
                 spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
-            } else {
-                Log("INVALID ID FOR SPAWNING ENEMY");
             }
 
-            // MANUAL INSTANTIATION - adapt to your engine's PrefabInstantiator
-            /*
-            Entity enemy = PrefabRegistry.InstantiatePrefab(prefabName);
-            
-            if (enemy.IsValid())
-            {
-                // Manually set transform
-                enemy.Transform.Position = spawnPos;
-                enemy.Transform.Rotation = spawnRot;
-                
-                // If it's a loveletter, set its route
-                if (enemyType == 1 && loveletterRoutes.Length > 0)
-                {
-                    // Get random route
-                    int routeIndex = GetRandomInt(0, loveletterRoutes.Length);
-                    string route = loveletterRoutes[routeIndex];
-                    
-                    // Set the route on the enemy script
-                    // enemy.GetComponent<EnemyLoveletterScript>().SetPathID(route);
-                }
-                
-                Log("Spawned " + prefabName + " at position " + spawnPos);
-            }
-            else
-            {
-                Log("ERROR: Failed to instantiate " + prefabName);
-            }
-            */
-            
-            //Log("TODO: Spawn " + prefabpath + " at position " + spawnPos);
+            // uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+
+            // if(enemyID != 0){
+            //     Entity tempEntity = new Entity(enemyID);
+            //     Transform tempTransform = new Transform();
+            //     tempTransform.Entity = tempEntity;
+            //     InternalCalls.Transform_SetPosition(enemyID, ref spawnPos);
+            //     tempTransform.Rotation = spawnRot;
+            //     Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
+            //     spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
+            //     spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
+            // } else {
+            //     Log("INVALID ID FOR SPAWNING ENEMY");
+            // }
 
             // Log with safe string concatenation
             Log(string.Concat("Spawn ", prefabpath, " at position (", 
@@ -683,67 +663,34 @@ namespace Game{
             spawnentrans.Entity = spawnent;
             spawnRotation = spawnentrans.Rotation;
 
-            uint enemyID = InternalCalls.Prefab_InstantiateScene(prefabpath);
+            Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
 
-            if(enemyID != 0){
-                Entity tempEntity = new Entity(enemyID);
-                Transform tempTransform = new Transform();
-                tempTransform.Entity = tempEntity;
-                InternalCalls.Transform_SetPosition(enemyID, ref spawnPosition);
-                tempTransform.Rotation = spawnRotation;
+            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true);
+
+            if(enemyID == 0){
+                Log("LOVELETTERSPAWN FAIL");
+            } else {
                 Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", " ,
                 spawnPosition.Y.ToString(), ", " , spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", " ,
                 spawnRotation.Y.ToString(), ", " , spawnRotation.Z.ToString()));
-            } else {
-                Log("INVALID ID FOR SPAWNING ENEMY");
             }
 
-            // if (entityID != 0)
-            // {
-            //     try
-            //     {
-            //         // Use the Transform class static methods via reflection/direct instantiation
-            //         // Create a temporary entity wrapper
-            //         Entity tempEntity = new Entity(entityID);
-            //         Transform tempTransform = new Transform();
-            //         tempTransform.Entity = tempEntity;
-                    
-            //         // Now we can access the properties
-            //         InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
-            //         spawnRotation = tempTransform.Rotation;
-                    
-                    
-            //         Log(string.Concat("Found ", spawnPointName, " registered at position (", 
-            //             spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(), 
-            //             ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ")"));
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         Log(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
-            //     }
-            // }
-            // else
-            // {
-            //     Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName, 
-            //         " (EntityID: ", entityID.ToString(), ")"));
-            // }
+            // uint enemyID = InternalCalls.Prefab_InstantiateScene(prefabpath);
 
-            // uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
-
-            //Find and retrieve the parent of this loveletter and then change the rotation
-            //as well as the transform of that parent.
             // if(enemyID != 0){
             //     Entity tempEntity = new Entity(enemyID);
             //     Transform tempTransform = new Transform();
             //     tempTransform.Entity = tempEntity;
-            //     InternalCalls.Transform_SetPosition(enemyID, ref spawnPos);
-            //     tempTransform.Rotation = spawnRot;
-            //     Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
-            //     spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
-            //     spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
+            //     InternalCalls.Transform_SetPosition(enemyID, ref spawnPosition);
+            //     tempTransform.Rotation = spawnRotation;
+            //     Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", " ,
+            //     spawnPosition.Y.ToString(), ", " , spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", " ,
+            //     spawnRotation.Y.ToString(), ", " , spawnRotation.Z.ToString()));
             // } else {
             //     Log("INVALID ID FOR SPAWNING ENEMY");
             // }
+
+
         }
         
         private void CheckForEnemiesLeft()
