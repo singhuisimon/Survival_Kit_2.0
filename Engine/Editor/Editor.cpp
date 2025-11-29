@@ -4211,7 +4211,7 @@ namespace Engine
 					if (ImGui::Button("Apply Overrides"))
 					{
 
-						//ApplyPrefabOverrides(m_SelectedEntity);
+						ApplyPrefabOverrides(m_SelectedEntity);
 
 					}
 
@@ -6776,7 +6776,7 @@ namespace Engine
 				}
 			}
 
-			CheckAndUpdatePrefabInstances();
+			//CheckAndUpdatePrefabInstances();
 
 			LOG_INFO("Successfully applied overrides to scene prefab: ", prefab->GetSourcePath());
 
