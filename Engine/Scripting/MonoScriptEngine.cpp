@@ -633,6 +633,10 @@ namespace Engine
 
 		static void AudioManager_SetListenerAttributes(glm::vec3* position, glm::vec3* forward,
 			glm::vec3* up, glm::vec3* velocity);
+
+
+		static bool EntityHasCamera(uint64_t entityID);
+		static bool EntityHasRigidBody(uint64_t entityID);
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -831,6 +835,9 @@ namespace Engine
 		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
 			(void*)InternalCalls::AudioManager_SetListenerAttributes);
 
+		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void*)InternalCalls::EntityHasCamera);
+		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void*)InternalCalls::EntityHasRigidBody);
+
 		LOG_INFO("Internal calls registered");
 	}
 
@@ -846,6 +853,31 @@ namespace Engine
 		static Input *s_InputSystem = nullptr;
 
 		static AudioManager* s_AudioManager = nullptr;
+
+
+		bool EntityHasCamera(uint64_t entityID)
+		{
+			if (!s_CurrentScene)
+				return false;
+
+			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+			if (!entity)
+				return false;
+
+			return entity.HasComponent<Engine::CameraComponent>();
+		}
+
+		bool EntityHasRigidBody(uint64_t entityID)
+		{
+			if (!s_CurrentScene)
+				return false;
+
+			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
+			if (!entity)
+				return false;
+
+			return entity.HasComponent<Engine::RigidbodyComponent>();
+		}
 
 		uint64_t Scene_CreateEntity(MonoString *nameStr)
 		{
@@ -1223,11 +1255,19 @@ namespace Engine
 		}
 
 
-		void Input_GetMousePosition(glm::vec2 *outPosition)
+		void Input_GetMousePosition(glm::vec2* outPosition)
 		{
 			if (!outPosition) return;
-			// Access your input system
-			// Example: *outPosition = Input::GetMousePosition();
+
+			if (!s_InputSystem)
+			{
+				LOG_WARNING("[InternalCall] Input system not initialized");
+				*outPosition = glm::vec2(0.0f, 0.0f);
+				return;
+			}
+
+			// Call the Input system's GetMousePosition method
+			*outPosition = s_InputSystem->GetMousePosition();
 		}
 
 		// Helper to fetch entity from current scene

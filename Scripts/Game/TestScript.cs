@@ -4,31 +4,28 @@ using Engine;
 namespace Game
 {
     /// <summary>
-    /// Spaceship player controller with third-person camera orbit
-    /// - Spaceship entity has visual model (visible in camera)
-    /// - Camera orbits around spaceship (third-person view)
-    /// - Player rotates to face camera direction (yaw only)
-    /// - WASD applies forces relative to spaceship's current rotation
-    /// - Proper 3D rotation-based movement
+    /// TestScript - Combined Player Controller
+    /// Handles: Movement (WASD), Camera Orbit (Mouse), Dash (Space)
+    ///          Weapons (J=Primary, K=Secondary, R=Reload)
     /// </summary>
     public class TestScript
     {
         // ===== Entity Reference =====
-        public int EntityID = 3;                 // Player spaceship entity
+        public int EntityID = 0;
 
         // ===== Camera Orbit Settings =====
         [SerializeField]
         private float orbitRadius = 7.5f;
         [SerializeField]
-        private float orbitPitch = 0.25f;  // Initial pitch angle (radians)
+        private float orbitPitch = 0.25f;
         [SerializeField]
-        private float orbitYaw = 0.0f;     // Initial yaw angle (radians)
+        private float orbitYaw = 0.0f;
         [SerializeField]
-        private float mouseSensitivity = 0.05f;
+        private float mouseSensitivity = 0.0025f;
         [SerializeField]
-        private float aimHeightOffset = 2.0f;  // Player head position
+        private float aimHeightOffset = 2.0f;
 
-        // ===== Movement Settings (Force-Based) =====
+        // ===== Movement Settings =====
         [SerializeField]
         private float moveSpeed = 1.0f;
         [SerializeField]
@@ -43,19 +40,49 @@ namespace Game
         private float dashCooldown = 0.0f;
         private const float DASH_COOLDOWN_TIME = 1.0f;
 
+        // ===== Weapon Settings =====
+        [SerializeField]
+        public string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
+        [SerializeField]
+        public string SecondaryBulletPrefab = "Sources/Prefabs/SecondaryBullet.prefab";
+        [SerializeField]
+        public int PrimaryMaxAmmo = 100;
+        [SerializeField]
+        public float PrimaryReloadTime = 1.5f;
+        [SerializeField]
+        public float PrimaryFireRate = 0.3f;
+        [SerializeField]
+        public int SecondaryMaxAmmo = 5;
+        [SerializeField]
+        public float SecondaryReloadTime = 3.0f;
+        [SerializeField]
+        public float SecondaryFireRate = 0.8f;
+
+        private enum WeaponType { Primary, Secondary }
+        private enum WeaponState { Idle, Shooting, Reloading }
+
+        private WeaponType currentWeapon = WeaponType.Primary;
+        private WeaponState currentState = WeaponState.Idle;
+        private int primaryCurrentAmmo = 100;
+        private int secondaryCurrentAmmo = 5;
+        private float primaryFireCooldown = 0.0f;
+        private float secondaryFireCooldown = 0.0f;
+        private float reloadTimer = 0.0f;
+        private bool isReloading = false;
+        private bool isShooting = false;
+
         // ===== Constants =====
         private const float DEG2RAD = 0.0174532924f;
         private const float RAD2DEG = 57.2957795f;
         private const float PI = 3.14159265359f;
         private const float HALF_PI = 1.5707963268f;
 
-        // ===== Previous mouse position (for delta tracking) =====
         private Engine.Vector2 previousMousePos = new Engine.Vector2(0.0f, 0.0f);
 
         // ===== Lifecycle Methods =====
         public void OnStart()
         {
-            Engine.InternalCalls.Log("=== PlayerMovement Started ===");
+            Engine.InternalCalls.Log("=== PlayerController Started ===");
             Engine.InternalCalls.Log("PlayerID: " + EntityID);
 
             // Add camera component to player entity
@@ -77,6 +104,17 @@ namespace Game
             Engine.InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, false);
             Engine.InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
             Engine.InternalCalls.Log("Rigidbody configured for spaceship physics");
+
+            // Initialize weapon ammo
+            primaryCurrentAmmo = PrimaryMaxAmmo;
+            secondaryCurrentAmmo = SecondaryMaxAmmo;
+            currentState = WeaponState.Idle;
+            currentWeapon = WeaponType.Primary;
+
+            // Initialize mouse pos so first frame doesn't spin
+            previousMousePos = Engine.Input.GetMousePosition();
+
+            Engine.InternalCalls.Log("=== PlayerController fully initialized ===");
         }
 
         public void OnUpdate(float deltaTime)
@@ -95,8 +133,18 @@ namespace Game
                 }
             }
 
+            // ===== Handle Weapon Cooldowns =====
+            if (primaryFireCooldown > 0) primaryFireCooldown -= deltaTime;
+            if (secondaryFireCooldown > 0) secondaryFireCooldown -= deltaTime;
+
+            // ===== Update Reload =====
+            if (isReloading)
+            {
+                UpdateReload(deltaTime);
+                return;
+            }
+
             // ===== Get Current Spaceship Position and Rotation =====
-            // THIS is the spaceship body position - DO NOT MODIFY
             Engine.Vector3 shipPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out shipPos);
 
@@ -110,19 +158,17 @@ namespace Game
             );
 
             // ===== Handle Mouse Input for Camera Orbit =====
-            // TODO: If your Input system has GetMousePosition, get current mouse pos
-            // For now, we'll keep orbit angles static
+            Engine.Vector2 currentMousePos = Engine.Input.GetMousePosition();
 
-            // Example: Manual mouse delta calculation (if you have GetMousePosition)
-            // Engine.Vector2 currentMousePos = Engine.Input.GetMousePosition();
-            // float xOffset = currentMousePos.X - previousMousePos.X;
-            // float yOffset = currentMousePos.Y - previousMousePos.Y;
-            // previousMousePos = currentMousePos;
-            // 
-            // if (xOffset != 0.0f || yOffset != 0.0f) {
-            //     orbitYaw += (xOffset < 0.0f) ? mouseSensitivity : (xOffset > 0.0f ? -mouseSensitivity : 0.0f);
-            //     orbitPitch += (yOffset > 0.0f) ? -mouseSensitivity : (yOffset < 0.0f ? mouseSensitivity : 0.0f);
-            // }
+            float xOffset = currentMousePos.X - previousMousePos.X;
+            float yOffset = currentMousePos.Y - previousMousePos.Y;
+            previousMousePos = currentMousePos;
+
+            // Horizontal mouse (X) -> yaw: move right = turn right
+            orbitYaw += xOffset * mouseSensitivity;
+
+            // Vertical mouse (Y) -> pitch: move up = look up
+            orbitPitch -= yOffset * mouseSensitivity;
 
             // Clamp pitch to avoid flipping
             if (orbitPitch > HALF_PI - 0.01f)
@@ -131,20 +177,17 @@ namespace Game
                 orbitPitch = -HALF_PI + 0.01f;
 
             // ===== Calculate Camera Position (orbit around spaceship) =====
-            // Spherical coordinates to Cartesian
             float cosPitch = SimpleCos(orbitPitch);
             float sinPitch = SimpleSin(orbitPitch);
             float cosYaw = SimpleCos(orbitYaw);
             float sinYaw = SimpleSin(orbitYaw);
 
-            // Direction from aim point
             Engine.Vector3 orbitDir = new Engine.Vector3(
                 cosPitch * sinYaw,
                 sinPitch,
                 cosPitch * cosYaw
             );
 
-            // Camera position (orbit radius away from aim target)
             Engine.Vector3 cameraPos = new Engine.Vector3(
                 aimTarget.X + orbitDir.X * orbitRadius,
                 aimTarget.Y + orbitDir.Y * orbitRadius,
@@ -152,14 +195,16 @@ namespace Game
             );
 
             // ===== Update Camera Target to spaceship center =====
-            // Camera looks at aimTarget from cameraPos (calculated above for reference)
             Engine.InternalCalls.Camera_SetTarget((uint)EntityID, ref aimTarget);
 
             // ===== Rotate Spaceship to Face Camera Direction (Yaw Only) =====
-            // Calculate rotation to face the camera's yaw direction
+            float normalizedYaw = orbitYaw;
+            while (normalizedYaw > PI) normalizedYaw -= 2.0f * PI;
+            while (normalizedYaw < -PI) normalizedYaw += 2.0f * PI;
+
             Engine.Vector3 newShipRot = new Engine.Vector3(
                 shipRot.X,
-                orbitYaw * RAD2DEG,  // Convert yaw to degrees for rotation
+                normalizedYaw * RAD2DEG,
                 shipRot.Z
             );
             Engine.Transform.SetRotation((uint)EntityID, ref newShipRot);
@@ -168,22 +213,10 @@ namespace Game
             float inputZ = 0.0f;
             float inputY = 0.0f;
 
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.W))
-            {
-                inputZ += 1.0f;
-            }
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.S))
-            {
-                inputZ -= 1.0f;
-            }
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.A))
-            {
-                inputX -= 1.0f;
-            }
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.D))
-            {
-                inputX += 1.0f;
-            }
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.W)) inputZ += 1.0f;
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.S)) inputZ -= 1.0f;
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.A)) inputX -= 1.0f;
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.D)) inputX += 1.0f;
 
             bool hasInput = (inputX != 0.0f) || (inputZ != 0.0f) || (inputY != 0.0f);
 
@@ -201,21 +234,18 @@ namespace Game
             // ===== Apply Movement Forces (Spaceship Physics) =====
             if (hasInput && !isDashing)
             {
-                // Desired velocity in movement direction
                 Engine.Vector3 desiredVel = new Engine.Vector3(
                     moveDirWorld.X * maxSpeed,
                     moveDirWorld.Y * maxSpeed,
                     moveDirWorld.Z * maxSpeed
                 );
 
-                // Calculate velocity change needed
                 Engine.Vector3 velChange = new Engine.Vector3(
                     desiredVel.X - currentVel.X,
                     desiredVel.Y - currentVel.Y,
                     desiredVel.Z - currentVel.Z
                 );
 
-                // Apply force proportional to velocity change
                 Engine.Vector3 force = new Engine.Vector3(
                     velChange.X * moveSpeed,
                     velChange.Y * moveSpeed,
@@ -231,31 +261,315 @@ namespace Game
                 Engine.Vector3 dashDirWorld;
 
                 if (hasInput)
-                {
-                    // Dash in the current movement direction
                     dashDirWorld = moveDirWorld;
-                }
                 else
-                {
-                    // No input: dash straight forward in the direction player is facing
-                    // Local forward is (0, 0, 1)
                     dashDirWorld = GetMoveDirectionInWorld(0.0f, 0.0f, 1.0f, newShipRot);
-                }
 
                 PerformDash(dashDirWorld);
             }
 
+            // ===== Handle Weapon Input =====
+            HandleWeaponInput(deltaTime);
+            CheckAutoReload();
+
             SendPositionEvent(shipPos);
         }
 
-        // ===== World-Space Movement Direction (based on spaceship rotation) =====
+        // ===== WEAPON SYSTEM =====
+        private void HandleWeaponInput(float deltaTime)
+        {
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.R))
+            {
+                TryReload();
+                return;
+            }
+
+            bool primaryFirePressed = Engine.Input.IsKeyPressed(Engine.KeyCode.J);
+            bool secondaryFirePressed = Engine.Input.IsKeyPressed(Engine.KeyCode.K);
+
+            if (primaryFirePressed && !secondaryFirePressed)
+            {
+                TryShootPrimary();
+            }
+            else if (secondaryFirePressed && !primaryFirePressed)
+            {
+                TryShootSecondary();
+            }
+            else
+            {
+                isShooting = false;
+                currentState = WeaponState.Idle;
+            }
+        }
+
+        private void TryShootPrimary()
+        {
+            if (isReloading) return;
+            if (primaryFireCooldown > 0) return;
+            if (primaryCurrentAmmo <= 0) return;
+
+            currentWeapon = WeaponType.Primary;
+            currentState = WeaponState.Shooting;
+            isShooting = true;
+
+            ShootPrimary();
+            primaryFireCooldown = PrimaryFireRate;
+        }
+
+        private void TryShootSecondary()
+        {
+            if (isReloading) return;
+            if (secondaryFireCooldown > 0) return;
+            if (secondaryCurrentAmmo <= 0) return;
+
+            currentWeapon = WeaponType.Secondary;
+            currentState = WeaponState.Shooting;
+            isShooting = true;
+
+            ShootSecondary();
+            secondaryFireCooldown = SecondaryFireRate;
+        }
+
+        private void ShootPrimary()
+        {
+            primaryCurrentAmmo--;
+            Engine.InternalCalls.Log("=================================================");
+            Engine.InternalCalls.Log("PRIMARY FIRE! Ammo: " + primaryCurrentAmmo + "/" + PrimaryMaxAmmo);
+            Engine.InternalCalls.Log("=================================================");
+            SpawnBullet(PrimaryBulletPrefab);
+        }
+
+        private void ShootSecondary()
+        {
+            secondaryCurrentAmmo--;
+            Engine.InternalCalls.Log("=================================================");
+            Engine.InternalCalls.Log("SECONDARY FIRE! Ammo: " + secondaryCurrentAmmo + "/" + SecondaryMaxAmmo);
+            Engine.InternalCalls.Log("=================================================");
+            SpawnBullet(SecondaryBulletPrefab);
+        }
+
+        private float Sqrt(float x)
+        {
+            if (x <= 0.0f) return 0.0f;
+
+            float guess = x;
+            float epsilon = 0.00001f;
+
+            for (int i = 0; i < 10; i++)
+            {
+                float newGuess = (guess + x / guess) * 0.5f;
+                float diff = newGuess - guess;
+                if (diff < 0) diff = -diff;
+
+                if (diff < epsilon)
+                    return newGuess;
+                guess = newGuess;
+            }
+
+            return guess;
+        }
+
+        private void SpawnBullet(string prefabPath)
+        {
+            try
+            {
+                uint playerEntityID = (uint)EntityID;
+
+                Engine.Vector3 playerPosition;
+                Engine.InternalCalls.Transform_GetPosition(playerEntityID, out playerPosition);
+
+                Engine.InternalCalls.Log("=== BULLET SPAWN DEBUG ===");
+                Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
+
+                // Get camera from player entity
+                Engine.Vector3 shootDirection;
+                bool foundCamera = false;
+
+                Entity playerEntity = new Entity(playerEntityID);
+
+                if (playerEntity.HasComponent<Camera>())
+                {
+                    Camera cam = playerEntity.GetComponent<Camera>();
+                    Engine.Vector3 cameraTarget = cam.Target;
+
+                    Engine.InternalCalls.Log("Camera target: " + cameraTarget.X + ", " + cameraTarget.Y + ", " + cameraTarget.Z);
+
+                    shootDirection = new Engine.Vector3(
+                        cameraTarget.X - playerPosition.X,
+                        cameraTarget.Y - playerPosition.Y,
+                        cameraTarget.Z - playerPosition.Z
+                    );
+
+                    float lengthSquared = shootDirection.X * shootDirection.X +
+                                         shootDirection.Y * shootDirection.Y +
+                                         shootDirection.Z * shootDirection.Z;
+
+                    float length = Sqrt(lengthSquared);
+
+                    if (length > 0.0001f)
+                    {
+                        shootDirection = new Engine.Vector3(
+                            shootDirection.X / length,
+                            shootDirection.Y / length,
+                            shootDirection.Z / length
+                        );
+                        foundCamera = true;
+                    }
+                    else
+                    {
+                        Engine.InternalCalls.LogWarning("Camera target too close to player, using default forward");
+                        shootDirection = new Engine.Vector3(0, 0, 1);
+                    }
+                }
+                else
+                {
+                    Engine.InternalCalls.LogWarning("Player has no Camera component");
+                    shootDirection = new Engine.Vector3(0, 0, 1);
+                }
+
+                Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
+
+                Engine.Vector3 shipRot = Engine.Transform.GetRotation(playerEntityID);
+
+                // Player faces forward along Z-axis in their local space
+                // Convert player's facing direction to world space based on yaw rotation
+                float yawRad = shipRot.Y * DEG2RAD;
+                float cosYaw = SimpleCos(yawRad);
+                float sinYaw = SimpleSin(yawRad);
+
+                // Forward direction in player's local space: (0, 0, 1)
+                // Rotate by yaw to get world space direction
+                Engine.Vector3 playerForward = new Engine.Vector3(
+                    sinYaw,      // X component
+                    0.0f,        // Y component (no pitch, only yaw)
+                    cosYaw       // Z component
+                );
+
+                // Spawn from player position plus small offset in front
+                float spawnDistance = 2.0f;
+                float heightOffset = 0.5f;
+
+                Engine.Vector3 firingPosition = new Engine.Vector3(
+                    playerPosition.X + (playerForward.X * spawnDistance),
+                    playerPosition.Y + heightOffset,
+                    playerPosition.Z + (playerForward.Z * spawnDistance)
+                );
+
+                uint bulletEntityID = Engine.InternalCalls.Prefab_Instantiate(prefabPath);
+
+                if (bulletEntityID == 0)
+                {
+                    Engine.InternalCalls.LogError("Failed to instantiate bullet prefab!");
+                    return;
+                }
+
+                Engine.InternalCalls.Log("Bullet entity created: ID = " + bulletEntityID);
+
+                Engine.InternalCalls.Transform_SetPosition(bulletEntityID, ref firingPosition);
+
+                float bulletSpeed = prefabPath.Contains("Primary") ? 15.0f : 10.0f;
+                Engine.Vector3 velocity = new Engine.Vector3(
+                    playerForward.X * bulletSpeed,
+                    playerForward.Y * bulletSpeed,
+                    playerForward.Z * bulletSpeed
+                );
+
+                Engine.InternalCalls.Rigidbody_SetVelocity(bulletEntityID, ref velocity);
+
+                Engine.InternalCalls.Log("=== BULLET SPAWNED SUCCESSFULLY ===");
+            }
+            catch (Exception e)
+            {
+                Engine.InternalCalls.LogError("=== ERROR SPAWNING BULLET ===");
+                Engine.InternalCalls.LogError("Error: " + e.Message);
+            }
+        }
+
+        private void TryReload()
+        {
+            if (isReloading) return;
+            if (isShooting) return;
+
+            if (currentWeapon == WeaponType.Primary)
+            {
+                if (primaryCurrentAmmo >= PrimaryMaxAmmo)
+                {
+                    Engine.InternalCalls.Log("Primary weapon already full!");
+                    return;
+                }
+                StartReload(WeaponType.Primary, PrimaryReloadTime);
+            }
+            else
+            {
+                if (secondaryCurrentAmmo >= SecondaryMaxAmmo)
+                {
+                    Engine.InternalCalls.Log("Secondary weapon already full!");
+                    return;
+                }
+                StartReload(WeaponType.Secondary, SecondaryReloadTime);
+            }
+        }
+
+        private void StartReload(WeaponType weapon, float reloadTime)
+        {
+            isReloading = true;
+            currentState = WeaponState.Reloading;
+            reloadTimer = reloadTime;
+
+            string weaponName = weapon == WeaponType.Primary ? "Primary" : "Secondary";
+            Engine.InternalCalls.Log("Reloading " + weaponName + " weapon...");
+        }
+
+        private void UpdateReload(float deltaTime)
+        {
+            reloadTimer -= deltaTime;
+            if (reloadTimer <= 0.0f)
+            {
+                CompleteReload();
+            }
+        }
+
+        private void CompleteReload()
+        {
+            isReloading = false;
+            currentState = WeaponState.Idle;
+
+            if (currentWeapon == WeaponType.Primary)
+            {
+                primaryCurrentAmmo = PrimaryMaxAmmo;
+                Engine.InternalCalls.Log("Primary reloaded!");
+            }
+            else
+            {
+                secondaryCurrentAmmo = SecondaryMaxAmmo;
+                Engine.InternalCalls.Log("Secondary reloaded!");
+            }
+        }
+
+        private void CheckAutoReload()
+        {
+            if (primaryCurrentAmmo <= 0 && currentWeapon == WeaponType.Primary && !isReloading && !isShooting)
+            {
+                StartReload(WeaponType.Primary, PrimaryReloadTime);
+            }
+
+            if (secondaryCurrentAmmo <= 0 && currentWeapon == WeaponType.Secondary && !isReloading && !isShooting)
+            {
+                StartReload(WeaponType.Secondary, SecondaryReloadTime);
+            }
+        }
+
+        public int GetPrimaryAmmo() => primaryCurrentAmmo;
+        public int GetSecondaryAmmo() => secondaryCurrentAmmo;
+        public bool IsReloading() => isReloading;
+        public bool IsShooting() => isShooting;
+
+        // ===== Movement Helpers =====
         private Engine.Vector3 GetMoveDirectionInWorld(float inputX, float inputY, float inputZ, Engine.Vector3 rotation)
         {
-            // Local input direction
             if (inputX == 0.0f && inputY == 0.0f && inputZ == 0.0f)
                 return new Engine.Vector3(0.0f, 0.0f, 0.0f);
 
-            // Normalize local input (so diagonals aren't faster)
             float lenSq = inputX * inputX + inputY * inputY + inputZ * inputZ;
             if (lenSq > 1.0f)
             {
@@ -265,52 +579,17 @@ namespace Game
                 inputZ *= invLen;
             }
 
-            // Use spaceship rotation (in degrees) - convert to radians
-            float pitchRad = rotation.X * DEG2RAD;  // Pitch (X rotation)
-            float yawRad = rotation.Y * DEG2RAD;     // Yaw (Y rotation)
-            float rollRad = rotation.Z * DEG2RAD;    // Roll (Z rotation)
-
-            // Calculate sin/cos for each axis
-            float sinPitch = SimpleSin(pitchRad);
-            float cosPitch = SimpleCos(pitchRad);
+            float yawRad = rotation.Y * DEG2RAD;
             float sinYaw = SimpleSin(yawRad);
             float cosYaw = SimpleCos(yawRad);
-            float sinRoll = SimpleSin(rollRad);
-            float cosRoll = SimpleCos(rollRad);
 
-            // Full 3D rotation matrix (YXZ order - yaw, then pitch, then roll)
-            // This transforms local space (where +Z is forward, +X is right, +Y is up)
-            // to world space based on spaceship's orientation
-
-            // Rotate by yaw (Y axis)
-            float x1 = inputX * cosYaw + inputZ * sinYaw;
-            float y1 = inputY;
-            float z1 = -inputX * sinYaw + inputZ * cosYaw;
-
-            // Rotate by pitch (X axis)
-            float x2 = x1;
-            float y2 = y1 * cosPitch - z1 * sinPitch;
-            float z2 = y1 * sinPitch + z1 * cosPitch;
-
-            // Rotate by roll (Z axis)
-            float wx = x2 * cosRoll - y2 * sinRoll;
-            float wy = x2 * sinRoll + y2 * cosRoll;
-            float wz = z2;
-
-            // Normalize world-space direction
-            float worldLenSq = wx * wx + wy * wy + wz * wz;
-            if (worldLenSq > 0.000001f)
-            {
-                float invWorldLen = 1.0f / SimpleSqrt(worldLenSq);
-                wx *= invWorldLen;
-                wy *= invWorldLen;
-                wz *= invWorldLen;
-            }
+            float wx = inputX * cosYaw + inputZ * sinYaw;
+            float wy = inputY;
+            float wz = -inputX * sinYaw + inputZ * cosYaw;
 
             return new Engine.Vector3(wx, wy, wz);
         }
 
-        // ===== Dash Implementation =====
         private void PerformDash(Engine.Vector3 dashDirWorld)
         {
             float lenSq = dashDirWorld.X * dashDirWorld.X +
@@ -327,7 +606,6 @@ namespace Game
                 dashDirWorld.Z * invLen
             );
 
-            // Apply dash impulse
             Engine.Vector3 dashImpulse = new Engine.Vector3(
                 dir.X * dashForce,
                 dir.Y * dashForce,
@@ -344,7 +622,6 @@ namespace Game
         // ===== Math Helpers =====
         private float SimpleSin(float x)
         {
-            // Normalize to [-PI, PI]
             while (x > PI) x -= 2.0f * PI;
             while (x < -PI) x += 2.0f * PI;
 
@@ -358,7 +635,6 @@ namespace Game
 
         private float SimpleCos(float x)
         {
-            // Normalize to [-PI, PI]
             while (x > PI) x -= 2.0f * PI;
             while (x < -PI) x += 2.0f * PI;
 
@@ -376,9 +652,7 @@ namespace Game
 
             float x = value;
             for (int i = 0; i < 3; i++)
-            {
                 x = 0.5f * (x + value / x);
-            }
 
             return x;
         }
@@ -393,7 +667,7 @@ namespace Game
 
         public void OnDestroy()
         {
-            Engine.InternalCalls.Log("=== PlayerMovement Destroyed ===");
+            Engine.InternalCalls.Log("=== PlayerController Destroyed ===");
         }
 
         // ===== Event Helper =====
