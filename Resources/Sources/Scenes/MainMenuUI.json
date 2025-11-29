@@ -37,7 +37,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 0,
-                        "MaterialGuid": 4682222355309173565,
+                        "MaterialGuid": 8767488598308356261,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -83,7 +83,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 0,
-                        "MaterialGuid": 877621852111634767,
+                        "MaterialGuid": 6461645589094662317,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -178,7 +178,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "MeshGuid": 0,
-                        "MaterialGuid": 2030543356733463649,
+                        "MaterialGuid": 6461645589094662301,
                         "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
@@ -188,9 +188,45 @@
                     }
                 },
                 {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": ""
+                        "ScriptClassName": "Game.StartGameButton",
+                        "Fields": {
+                            "mainMenuCameraName": "MainMenuCamera",
+                            "gameCameraName": "GameCamera",
+                            "showMainMenuInitially": true,
+                            "buttonWidth": 2.4000000953674316,
+                            "buttonHeight": 0.800000011920929,
+                            "buttonEntityName": "Install_Btn"
+                        }
                     }
                 }
             ]
@@ -230,11 +266,16 @@
                     "Type": "CameraComponent",
                     "Properties": {
                         "Enabled": true,
+                        "Primary": false,
+                        "Projection": false,
                         "autoAspect": true,
-                        "isDirty": false,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
-                        "FOV": 50.0,
+                        "Aspect": 1.5382286310195923,
+                        "FOV": 59.0,
                         "NearPlane": 0.5,
                         "FarPlane": 1000.0,
                         "Target": [
@@ -281,8 +322,13 @@
                     "Type": "CameraComponent",
                     "Properties": {
                         "Enabled": false,
+                        "Primary": false,
+                        "Projection": false,
                         "autoAspect": true,
-                        "isDirty": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
                         "Depth": 0,
                         "Aspect": 1.9190404415130615,
                         "FOV": 45.0,

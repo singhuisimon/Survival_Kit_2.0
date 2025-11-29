@@ -26,8 +26,8 @@ namespace Game
 
 
         // private fields
-        private ulong mainMenuCameraID;
-        private ulong gameCameraID;
+        private uint mainMenuCameraID;
+        private uint gameCameraID;
         private bool camerasInitialized = false;
         private bool isShowingMainMenu;
 
@@ -197,8 +197,8 @@ namespace Game
             uint gameID = InternalCalls.Scene_FindEntityByName(gameCameraName);
             
             // Convert to ulong (EntityID is ulong in the engine)
-            mainMenuCameraID = (ulong)mainMenuID;
-            gameCameraID = (ulong)gameID;
+            mainMenuCameraID = mainMenuID;
+            gameCameraID = gameID;
             
             // Check if both cameras were found
             if (mainMenuID == 0)
