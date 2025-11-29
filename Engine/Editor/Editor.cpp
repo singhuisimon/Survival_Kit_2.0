@@ -4432,6 +4432,12 @@ namespace Engine
 					rigidBody.LinearDamping = linearDamping;
 				}
 
+				float angularDamping = rigidBody.AngularDamping;
+				if (ImGui::DragFloat("AngularDamping", &angularDamping))
+				{
+					rigidBody.AngularDamping = angularDamping;
+				}
+
 				float restitution = rigidBody.Restitution;
 				if (ImGui::DragFloat("Restitution", &restitution))
 				{
