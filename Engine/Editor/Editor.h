@@ -405,8 +405,8 @@ namespace Engine
 		**************************************************************************/
 
 		void displayPrefabComp();
-		void displayCameraComp(ImVec2& buttonSize);
 
+		void displayCameraComp(ImVec2& buttonSize);
 
 		void displayRigidBodyComp(ImVec2& buttonSize);
 
@@ -436,7 +436,7 @@ namespace Engine
 		void UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity);
 		void CheckAndUpdatePrefabInstances();
 
-		void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
+		//void UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID);
 
 		void displayHDRSettingsPanel();
 
