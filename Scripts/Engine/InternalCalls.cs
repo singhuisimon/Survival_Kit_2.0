@@ -29,13 +29,22 @@ namespace Engine
 
         // CORRECT - GetPosition uses out, SetPosition uses ref
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetPosition(uint entityID, out Vector3 position); 
+        public static extern void Transform_GetPosition(uint entityID, out Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position); 
+        public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_Move(uint entityID, float deltaX, float deltaY, float deltaZ);
+        public static extern void Transform_GetRotation(uint entityID, out Vector3 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_SetRotation(uint entityID, ref Vector3 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_GetScale(uint entityID, out Vector3 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_SetScale(uint entityID, ref Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_CreateEntity(string name);
@@ -47,7 +56,7 @@ namespace Engine
         public static extern void Entity_AddScript(uint entity, string managedClassFullName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Entity_AddRigidBody(ulong entityID);
+        public static extern void Entity_AddRigidBody(uint entityID);
 
         // Prefabs
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -55,46 +64,46 @@ namespace Engine
 
         // Rigidbody core properties
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_GetVelocity(ulong entityID, out Vector3 vel);
+        public static extern void Rigidbody_GetVelocity(uint entityID, out Vector3 vel);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_SetVelocity(ulong entityID, ref Vector3 vel);
+        public static extern void Rigidbody_SetVelocity(uint entityID, ref Vector3 vel);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_AddVelocity(ulong entityID, ref Vector3 delta);
+        public static extern void Rigidbody_AddVelocity(uint entityID, ref Vector3 delta);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Rigidbody_GetMass(ulong entityID);
+        public static extern float Rigidbody_GetMass(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_SetMass(ulong entityID, float mass);
+        public static extern void Rigidbody_SetMass(uint entityID, float mass);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Rigidbody_GetIsKinematic(ulong entityID);
+        public static extern bool Rigidbody_GetIsKinematic(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_SetIsKinematic(ulong entityID, bool isKinematic);
+        public static extern void Rigidbody_SetIsKinematic(uint entityID, bool isKinematic);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Rigidbody_GetUseGravity(ulong entityID);
+        public static extern bool Rigidbody_GetUseGravity(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_SetUseGravity(ulong entityID, bool useGravity);
+        public static extern void Rigidbody_SetUseGravity(uint entityID, bool useGravity);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Rigidbody_GetSpeed(ulong entityID);
+        public static extern float Rigidbody_GetSpeed(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Rigidbody_IsMoving(ulong entityID);
+        public static extern bool Rigidbody_IsMoving(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Rigidbody_IsStatic(ulong entityID);
+        public static extern bool Rigidbody_IsStatic(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_AddForce(ulong entityID, ref Vector3 force);
+        public static extern void Rigidbody_AddForce(uint entityID, ref Vector3 force);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rigidbody_Stop(ulong entityID);
+        public static extern void Rigidbody_Stop(uint entityID);
 
         // ---- Collision events ----
 
@@ -111,161 +120,161 @@ namespace Engine
         public static extern void Physics_GetCollisionPair(int index, out uint a, out uint b);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Entity_AddTag(ulong entityID);
+        public static extern void Entity_AddTag(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Entity_AddCamera(ulong entityID);
+        public static extern void Entity_AddCamera(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Entity_AddAudio(ulong entityID);
+        public static extern void Entity_AddAudio(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Entity_AddMeshRenderer(ulong entityID);
+        public static extern void Entity_AddMeshRenderer(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string Tag_GetTag(ulong entityID);
+        public static extern string Tag_GetTag(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Tag_SetTag(ulong entityID, string tag);
+        public static extern void Tag_SetTag(uint entityID, string tag);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Camera_GetEnabled(ulong entityID);
+        public static extern bool Camera_GetEnabled(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_SetEnabled(ulong entityID, bool enabled);
+        public static extern void Camera_SetEnabled(uint entityID, bool enabled);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Camera_GetPrimary(ulong entityID);
+        public static extern bool Camera_GetPrimary(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_SetPrimary(ulong entityID, bool primary);
+        public static extern void Camera_SetPrimary(uint entityID, bool primary);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Camera_GetFOV(ulong entityID);
+        public static extern float Camera_GetFOV(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_SetFOV(ulong entityID, float fov);
+        public static extern void Camera_SetFOV(uint entityID, float fov);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Camera_GetNear(ulong entityID);
+        public static extern float Camera_GetNear(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_SetNear(ulong entityID, float nearPlane);
+        public static extern void Camera_SetNear(uint entityID, float nearPlane);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Camera_GetFar(ulong entityID);
+        public static extern float Camera_GetFar(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_SetFar(ulong entityID, float farPlane);
+        public static extern void Camera_SetFar(uint entityID, float farPlane);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_GetTarget(ulong entityID, out Vector3 target);
+        public static extern void Camera_GetTarget(uint entityID, out Vector3 target);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Camera_SetTarget(ulong entityID, ref Vector3 target);
+        public static extern void Camera_SetTarget(uint entityID, ref Vector3 target);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool MeshRenderer_GetVisible(ulong entityID);
+        public static extern bool MeshRenderer_GetVisible(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void MeshRenderer_SetVisible(ulong entityID, bool visible);
+        public static extern void MeshRenderer_SetVisible(uint entityID, bool visible);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool MeshRenderer_GetShadowCast(ulong entityID);
+        public static extern bool MeshRenderer_GetShadowCast(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void MeshRenderer_SetShadowCast(ulong entityID, bool cast);
+        public static extern void MeshRenderer_SetShadowCast(uint entityID, bool cast);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool MeshRenderer_GetShadowReceive(ulong entityID);
+        public static extern bool MeshRenderer_GetShadowReceive(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void MeshRenderer_SetShadowReceive(ulong entityID, bool receive);
+        public static extern void MeshRenderer_SetShadowReceive(uint entityID, bool receive);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool MeshRenderer_GetGlobalIlluminate(ulong entityID);
+        public static extern bool MeshRenderer_GetGlobalIlluminate(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void MeshRenderer_SetGlobalIlluminate(ulong entityID, bool gi);
+        public static extern void MeshRenderer_SetGlobalIlluminate(uint entityID, bool gi);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_Play(ulong entityID);
+        public static extern void Audio_Play(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_Stop(ulong entityID);
+        public static extern void Audio_Stop(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_Pause(ulong entityID);
+        public static extern void Audio_Pause(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetVolume(ulong entityID);
+        public static extern float Audio_GetVolume(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetVolume(ulong entityID, float volume);
+        public static extern void Audio_SetVolume(uint entityID, float volume);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetPitch(ulong entityID);
+        public static extern float Audio_GetPitch(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetPitch(ulong entityID, float pitch);
+        public static extern void Audio_SetPitch(uint entityID, float pitch);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Audio_GetLoop(ulong entityID);
+        public static extern bool Audio_GetLoop(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetLoop(ulong entityID, bool loop);
+        public static extern void Audio_SetLoop(uint entityID, bool loop);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Audio_GetMute(ulong entityID);
+        public static extern bool Audio_GetMute(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetMute(ulong entityID, bool mute);
+        public static extern void Audio_SetMute(uint entityID, bool mute);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Audio_GetIs3D(ulong entityID);
+        public static extern bool Audio_GetIs3D(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetIs3D(ulong entityID, bool is3d);
+        public static extern void Audio_SetIs3D(uint entityID, bool is3d);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetFile(ulong entityID, string path);
+        public static extern void Audio_SetFile(uint entityID, string path);
 
         //Added new functions -amanda
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetMinDistance(ulong entityID);
+        public static extern float Audio_GetMinDistance(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetMinDistance(ulong entityID, float minDist);
+        public static extern void Audio_SetMinDistance(uint entityID, float minDist);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetMaxDistance(ulong entityID);
+        public static extern float Audio_GetMaxDistance(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetMaxDistance(ulong entityID, float maxDist);
+        public static extern void Audio_SetMaxDistance(uint entityID, float maxDist);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int Audio_GetRolloffMode(ulong entityID);
+        public static extern int Audio_GetRolloffMode(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetRolloffMode(ulong entityID, int mode);
+        public static extern void Audio_SetRolloffMode(uint entityID, int mode);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetDopplerLevel(ulong entityID);
+        public static extern float Audio_GetDopplerLevel(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetDopplerLevel(ulong entityID, float level);
+        public static extern void Audio_SetDopplerLevel(uint entityID, float level);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetPan2D(ulong entityID);
+        public static extern float Audio_GetPan2D(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetPan2D(ulong entityID, float pan);
+        public static extern void Audio_SetPan2D(uint entityID, float pan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float Audio_GetReverbMix(ulong entityID);
+        public static extern float Audio_GetReverbMix(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Audio_SetReverbMix(ulong entityID, float mix);
+        public static extern void Audio_SetReverbMix(uint entityID, float mix);
 
         //Audio Manager implementation - new amanda
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -318,5 +327,9 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AudioManager_SetListenerAttributes(ref Vector3 position, ref Vector3 forward, ref Vector3 up, ref Vector3 velocity);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Event_Publish(string name, string payload);
+
     }
 }

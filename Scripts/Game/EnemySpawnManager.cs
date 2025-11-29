@@ -799,7 +799,7 @@ namespace Game{
             //deactivate the inactive wall of the walls that are spawning
             if (wallInactiveEntities != null && wallIndex < wallInactiveEntities.Length)
             {
-                ulong id = wallInactiveEntities[wallIndex].EntityID;
+                uint id = wallInactiveEntities[wallIndex].EntityID;
                 if (id != 0) // Extra safety check
                 {
                     InternalCalls.MeshRenderer_SetVisible(id, false);
@@ -906,7 +906,7 @@ namespace Game{
             
             foreach (string name in entityNames)
             {
-                ulong entityID = InternalCalls.Scene_FindEntityByName(name);
+                uint entityID = InternalCalls.Scene_FindEntityByName(name);
                 if (entityID != 0) // Only add valid entities
                 {
                     validEntities.Add(new Entity(entityID));

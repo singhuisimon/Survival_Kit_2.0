@@ -1,54 +1,82 @@
 using System;
-using System.Threading;
 using Engine;
 
 namespace Game
 {
+    /// <summary>
+    /// Spaceship player controller with third-person camera orbit
+    /// - Spaceship entity has visual model (visible in camera)
+    /// - Camera orbits around spaceship (third-person view)
+    /// - Player rotates to face camera direction (yaw only)
+    /// - WASD applies forces relative to spaceship's current rotation
+    /// - Proper 3D rotation-based movement
+    /// </summary>
     public class TestScript
     {
         // ===== Entity Reference =====
-        public int EntityID = 3;
+        public int EntityID = 3;                 // Player spaceship entity
 
-        // ===== Serialized Fields (Editable in Inspector) =====
+        // ===== Camera Orbit Settings =====
+        [SerializeField]
+        private float orbitRadius = 7.5f;
+        [SerializeField]
+        private float orbitPitch = 0.25f;  // Initial pitch angle (radians)
+        [SerializeField]
+        private float orbitYaw = 0.0f;     // Initial yaw angle (radians)
+        [SerializeField]
+        private float mouseSensitivity = 0.05f;
+        [SerializeField]
+        private float aimHeightOffset = 2.0f;  // Player head position
+
+        // ===== Movement Settings (Force-Based) =====
         [SerializeField]
         private float moveSpeed = 1.0f;
-
         [SerializeField]
         private float maxSpeed = 1.0f;
-
-        [SerializeField]
-        private float dashForce = 2.0f;
-
         [SerializeField]
         private bool moveAllowed = true;
 
+        // ===== Dash Settings =====
         [SerializeField]
-        private bool use3DMovement = true;
-
-        [SerializeField]
-        private float verticalSpeed = 1.0f;
-
-        // ===== Private Fields =====
+        private float dashForce = 2.0f;
         private bool isDashing = false;
         private float dashCooldown = 0.0f;
         private const float DASH_COOLDOWN_TIME = 1.0f;
 
+        // ===== Constants =====
         private const float DEG2RAD = 0.0174532924f;
+        private const float RAD2DEG = 57.2957795f;
         private const float PI = 3.14159265359f;
+        private const float HALF_PI = 1.5707963268f;
+
+        // ===== Previous mouse position (for delta tracking) =====
+        private Engine.Vector2 previousMousePos = new Engine.Vector2(0.0f, 0.0f);
 
         // ===== Lifecycle Methods =====
         public void OnStart()
         {
             Engine.InternalCalls.Log("=== PlayerMovement Started ===");
-            Engine.InternalCalls.Log("EntityID: " + EntityID);
+            Engine.InternalCalls.Log("PlayerID: " + EntityID);
 
-            // Ensure rigidbody exists and configure it
+            // Add camera component to player entity
+            Engine.InternalCalls.Entity_AddCamera((uint)EntityID);
+            Engine.InternalCalls.Log("Camera component added to player");
+
+            // Set camera as primary
+            Engine.InternalCalls.Camera_SetPrimary((uint)EntityID, true);
+            Engine.InternalCalls.Camera_SetEnabled((uint)EntityID, true);
+
+            // Set initial camera properties
+            Engine.InternalCalls.Camera_SetFOV((uint)EntityID, 60.0f);
+            Engine.InternalCalls.Camera_SetNear((uint)EntityID, 0.1f);
+            Engine.InternalCalls.Camera_SetFar((uint)EntityID, 1000.0f);
+
+            // Add rigidbody for physics
             Engine.InternalCalls.Entity_AddRigidBody((uint)EntityID);
             Engine.InternalCalls.Rigidbody_SetIsKinematic((uint)EntityID, false);
-            Engine.InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, !use3DMovement); // Disable gravity for 3D movement
+            Engine.InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, false);
             Engine.InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
-
-            Engine.InternalCalls.Log("Rigidbody configured successfully");
+            Engine.InternalCalls.Log("Rigidbody configured for spaceship physics");
         }
 
         public void OnUpdate(float deltaTime)
@@ -56,7 +84,7 @@ namespace Game
             if (!moveAllowed)
                 return;
 
-            // ===== Dash cooldown =====
+            // ===== Handle Dash Cooldown =====
             if (dashCooldown > 0.0f)
             {
                 dashCooldown -= deltaTime;
@@ -67,11 +95,75 @@ namespace Game
                 }
             }
 
-            // ===== Get Current Velocity =====
-            Engine.Vector3 currentVel;
-            Engine.InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out currentVel);
+            // ===== Get Current Spaceship Position and Rotation =====
+            // THIS is the spaceship body position - DO NOT MODIFY
+            Engine.Vector3 shipPos;
+            Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out shipPos);
 
-            // ===== WASD Input (local space) =====
+            Engine.Vector3 shipRot = Engine.Transform.GetRotation((uint)EntityID);
+
+            // ===== Camera Aim Target (spaceship center) =====
+            Engine.Vector3 aimTarget = new Engine.Vector3(
+                shipPos.X,
+                shipPos.Y + aimHeightOffset,
+                shipPos.Z
+            );
+
+            // ===== Handle Mouse Input for Camera Orbit =====
+            // TODO: If your Input system has GetMousePosition, get current mouse pos
+            // For now, we'll keep orbit angles static
+
+            // Example: Manual mouse delta calculation (if you have GetMousePosition)
+            // Engine.Vector2 currentMousePos = Engine.Input.GetMousePosition();
+            // float xOffset = currentMousePos.X - previousMousePos.X;
+            // float yOffset = currentMousePos.Y - previousMousePos.Y;
+            // previousMousePos = currentMousePos;
+            // 
+            // if (xOffset != 0.0f || yOffset != 0.0f) {
+            //     orbitYaw += (xOffset < 0.0f) ? mouseSensitivity : (xOffset > 0.0f ? -mouseSensitivity : 0.0f);
+            //     orbitPitch += (yOffset > 0.0f) ? -mouseSensitivity : (yOffset < 0.0f ? mouseSensitivity : 0.0f);
+            // }
+
+            // Clamp pitch to avoid flipping
+            if (orbitPitch > HALF_PI - 0.01f)
+                orbitPitch = HALF_PI - 0.01f;
+            if (orbitPitch < -HALF_PI + 0.01f)
+                orbitPitch = -HALF_PI + 0.01f;
+
+            // ===== Calculate Camera Position (orbit around spaceship) =====
+            // Spherical coordinates to Cartesian
+            float cosPitch = SimpleCos(orbitPitch);
+            float sinPitch = SimpleSin(orbitPitch);
+            float cosYaw = SimpleCos(orbitYaw);
+            float sinYaw = SimpleSin(orbitYaw);
+
+            // Direction from aim point
+            Engine.Vector3 orbitDir = new Engine.Vector3(
+                cosPitch * sinYaw,
+                sinPitch,
+                cosPitch * cosYaw
+            );
+
+            // Camera position (orbit radius away from aim target)
+            Engine.Vector3 cameraPos = new Engine.Vector3(
+                aimTarget.X + orbitDir.X * orbitRadius,
+                aimTarget.Y + orbitDir.Y * orbitRadius,
+                aimTarget.Z + orbitDir.Z * orbitRadius
+            );
+
+            // ===== Update Camera Target to spaceship center =====
+            // Camera looks at aimTarget from cameraPos (calculated above for reference)
+            Engine.InternalCalls.Camera_SetTarget((uint)EntityID, ref aimTarget);
+
+            // ===== Rotate Spaceship to Face Camera Direction (Yaw Only) =====
+            // Calculate rotation to face the camera's yaw direction
+            Engine.Vector3 newShipRot = new Engine.Vector3(
+                shipRot.X,
+                orbitYaw * RAD2DEG,  // Convert yaw to degrees for rotation
+                shipRot.Z
+            );
+            Engine.Transform.SetRotation((uint)EntityID, ref newShipRot);
+            // ===== Get Input =====
             float inputX = 0.0f;
             float inputZ = 0.0f;
             float inputY = 0.0f;
@@ -93,71 +185,47 @@ namespace Game
                 inputX += 1.0f;
             }
 
-            // Vertical movement (Q/E for up/down)
-            if (use3DMovement)
-            {
-                if (Engine.Input.IsKeyPressed(Engine.KeyCode.Q))
-                {
-                    inputY -= 1.0f;
-                }
-                if (Engine.Input.IsKeyPressed(Engine.KeyCode.E))
-                {
-                    inputY += 1.0f;
-                }
-            }
-
             bool hasInput = (inputX != 0.0f) || (inputZ != 0.0f) || (inputY != 0.0f);
 
-            // ===== Convert local input to world-space based on player rotation =====
+            // ===== Convert local input to world-space based on SPACESHIP rotation =====
             Engine.Vector3 moveDirWorld = new Engine.Vector3(0.0f, 0.0f, 0.0f);
             if (hasInput)
             {
-                moveDirWorld = GetMoveDirectionInWorld(inputX, inputY, inputZ);
-                InternalCalls.Log("Moving in: " + moveDirWorld.X.ToString() + ", " + moveDirWorld.Y.ToString() + ", " + moveDirWorld.Z.ToString());
+                moveDirWorld = GetMoveDirectionInWorld(inputX, inputY, inputZ, newShipRot);
             }
 
-            // ===== Apply Movement (relative to facing direction) =====
+            // ===== Get Current Velocity =====
+            Engine.Vector3 currentVel;
+            Engine.InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out currentVel);
+
+            // ===== Apply Movement Forces (Spaceship Physics) =====
             if (hasInput && !isDashing)
             {
-                Engine.Vector3 desiredVel;
+                // Desired velocity in movement direction
+                Engine.Vector3 desiredVel = new Engine.Vector3(
+                    moveDirWorld.X * maxSpeed,
+                    moveDirWorld.Y * maxSpeed,
+                    moveDirWorld.Z * maxSpeed
+                );
 
-                if (use3DMovement)
-                {
-                    // Full 3D movement (no gravity influence)
-                    desiredVel = new Engine.Vector3(
-                        moveDirWorld.X * maxSpeed,
-                        moveDirWorld.Y * verticalSpeed,
-                        moveDirWorld.Z * maxSpeed
-                    );
-                }
-                else
-                {
-                    // 2D movement with gravity
-                    desiredVel = new Engine.Vector3(
-                        moveDirWorld.X * maxSpeed,
-                        currentVel.Y,  // preserve vertical velocity (gravity)
-                        moveDirWorld.Z * maxSpeed
-                    );
-                }
-
-                // Velocity change needed
+                // Calculate velocity change needed
                 Engine.Vector3 velChange = new Engine.Vector3(
                     desiredVel.X - currentVel.X,
-                    use3DMovement ? (desiredVel.Y - currentVel.Y) : 0.0f,
+                    desiredVel.Y - currentVel.Y,
                     desiredVel.Z - currentVel.Z
                 );
 
                 // Apply force proportional to velocity change
                 Engine.Vector3 force = new Engine.Vector3(
                     velChange.X * moveSpeed,
-                    use3DMovement ? (velChange.Y * moveSpeed) : 0.0f,
+                    velChange.Y * moveSpeed,
                     velChange.Z * moveSpeed
                 );
 
                 Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref force);
             }
 
-            // ===== Dash Mechanic (relative to facing direction) =====
+            // ===== Handle Dash =====
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.Space) && !isDashing && dashCooldown <= 0.0f)
             {
                 Engine.Vector3 dashDirWorld;
@@ -171,15 +239,17 @@ namespace Game
                 {
                     // No input: dash straight forward in the direction player is facing
                     // Local forward is (0, 0, 1)
-                    dashDirWorld = GetMoveDirectionInWorld(0.0f, 0.0f, 1.0f);
+                    dashDirWorld = GetMoveDirectionInWorld(0.0f, 0.0f, 1.0f, newShipRot);
                 }
 
-                Dash(dashDirWorld);
+                PerformDash(dashDirWorld);
             }
+
+            SendPositionEvent(shipPos);
         }
 
-        // ===== World-Space Movement Direction (based on player rotation) =====
-        private Engine.Vector3 GetMoveDirectionInWorld(float inputX, float inputY, float inputZ)
+        // ===== World-Space Movement Direction (based on spaceship rotation) =====
+        private Engine.Vector3 GetMoveDirectionInWorld(float inputX, float inputY, float inputZ, Engine.Vector3 rotation)
         {
             // Local input direction
             if (inputX == 0.0f && inputY == 0.0f && inputZ == 0.0f)
@@ -195,8 +265,7 @@ namespace Game
                 inputZ *= invLen;
             }
 
-            // Get player rotation (Euler angles in degrees)
-            Engine.Vector3 rotation = Engine.Transform.GetRotation((ulong)EntityID);
+            // Use spaceship rotation (in degrees) - convert to radians
             float pitchRad = rotation.X * DEG2RAD;  // Pitch (X rotation)
             float yawRad = rotation.Y * DEG2RAD;     // Yaw (Y rotation)
             float rollRad = rotation.Z * DEG2RAD;    // Roll (Z rotation)
@@ -211,7 +280,7 @@ namespace Game
 
             // Full 3D rotation matrix (YXZ order - yaw, then pitch, then roll)
             // This transforms local space (where +Z is forward, +X is right, +Y is up)
-            // to world space based on player's orientation
+            // to world space based on spaceship's orientation
 
             // Rotate by yaw (Y axis)
             float x1 = inputX * cosYaw + inputZ * sinYaw;
@@ -241,8 +310,8 @@ namespace Game
             return new Engine.Vector3(wx, wy, wz);
         }
 
-        // ===== Dash (uses world-space direction) =====
-        private void Dash(Engine.Vector3 dashDirWorld)
+        // ===== Dash Implementation =====
+        private void PerformDash(Engine.Vector3 dashDirWorld)
         {
             float lenSq = dashDirWorld.X * dashDirWorld.X +
                           dashDirWorld.Y * dashDirWorld.Y +
@@ -254,14 +323,14 @@ namespace Game
             float invLen = 1.0f / SimpleSqrt(lenSq);
             Engine.Vector3 dir = new Engine.Vector3(
                 dashDirWorld.X * invLen,
-                0.0f,
+                dashDirWorld.Y * invLen,
                 dashDirWorld.Z * invLen
             );
 
             // Apply dash impulse
             Engine.Vector3 dashImpulse = new Engine.Vector3(
                 dir.X * dashForce,
-                0.0f,
+                dir.Y * dashForce,
                 dir.Z * dashForce
             );
 
@@ -269,11 +338,10 @@ namespace Game
 
             isDashing = true;
             dashCooldown = DASH_COOLDOWN_TIME;
-
             Engine.InternalCalls.Log("DASH!");
         }
 
-        // ===== Simple Sine (Taylor Series Approximation) =====
+        // ===== Math Helpers =====
         private float SimpleSin(float x)
         {
             // Normalize to [-PI, PI]
@@ -288,7 +356,6 @@ namespace Game
             return x - (x3 / 6.0f) + (x5 / 120.0f) - (x7 / 5040.0f);
         }
 
-        // ===== Simple Cosine (Taylor Series Approximation) =====
         private float SimpleCos(float x)
         {
             // Normalize to [-PI, PI]
@@ -302,30 +369,21 @@ namespace Game
             return 1.0f - (x2 / 2.0f) + (x4 / 24.0f) - (x6 / 720.0f);
         }
 
-        // ===== Simple Square Root (No Dependencies) =====
         private float SimpleSqrt(float value)
         {
             if (value <= 0.0f) return 0.0f;
             if (value == 1.0f) return 1.0f;
 
-            // Newton-Raphson method (simple, no bit tricks)
             float x = value;
-            float y = 1.0f;
-            float epsilon = 0.0001f;
-
-            // Just 3 iterations - enough for game physics
             for (int i = 0; i < 3; i++)
             {
-                y = (x + value / x) * 0.5f;
-                float diff = x - y;
-                if (diff < epsilon && diff > -epsilon)
-                    break;
-                x = y;
+                x = 0.5f * (x + value / x);
             }
 
-            return y;
+            return x;
         }
 
+        // ===== Control Methods =====
         public void Stop()
         {
             moveAllowed = false;
@@ -336,6 +394,18 @@ namespace Game
         public void OnDestroy()
         {
             Engine.InternalCalls.Log("=== PlayerMovement Destroyed ===");
+        }
+
+        // ===== Event Helper =====
+        private void SendPositionEvent(Engine.Vector3 shipPos)
+        {
+            string payload =
+                EntityID.ToString() + "|" +
+                shipPos.X.ToString() + "|" +
+                shipPos.Y.ToString() + "|" +
+                shipPos.Z.ToString();
+
+            Engine.EventSystem.Publish("PlayerPosition", payload);
         }
     }
 }

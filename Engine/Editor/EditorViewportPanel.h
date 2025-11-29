@@ -21,9 +21,9 @@ namespace Engine
 	class ViewportPanelHelper
 	{
 	public:
-		static void ViewportButtons(bool& playing, Scene* scene, Entity& selectedEntity, 
-									std::string& currentScenePath, std::string& currentFileName, 
-									uint32_t& pickedID) {
+		static void ViewportButtons(bool& playing, Scene* scene, Entity& selectedEntity,
+			std::string& currentScenePath, std::string& currentFileName,
+			uint32_t& pickedID) {
 			if (playing) {
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
 				ImGui::Text("PLAYING");
@@ -129,9 +129,9 @@ namespace Engine
 
 		}
 
-		static void ViewPortClickAndTeleport(uint32_t& pickedID, uint32_t& lastClickedID, 
-											 float& lastClickedTime, const float& doubleClickedTime, 
-											 Entity& selectedEntity, Renderer* renderer) {
+		static void ViewPortClickAndTeleport(uint32_t& pickedID, uint32_t& lastClickedID,
+			float& lastClickedTime, const float& doubleClickedTime,
+			Entity& selectedEntity, Renderer* renderer) {
 
 			double currentTime = ImGui::GetTime();
 			if (pickedID == lastClickedID && (currentTime - lastClickedTime) < doubleClickedTime) {
@@ -181,7 +181,7 @@ namespace Engine
 			}
 		}
 
-		static void CameraControl(Renderer* renderer){
+		static void CameraControl(Renderer* renderer) {
 			ImGui::SeparatorText("Camera Controls");
 
 			Camera3D& editorCam = renderer->getEditorCamera();
