@@ -11,7 +11,7 @@ namespace Game
     public class TestScript
     {
         // ===== Entity Reference =====
-        public int EntityID = 0;
+        private int EntityID = 0;
 
         // ===== Camera Orbit Settings =====
         [SerializeField]
@@ -375,86 +375,42 @@ namespace Game
             {
                 uint playerEntityID = (uint)EntityID;
 
+                // Get player position
                 Engine.Vector3 playerPosition;
                 Engine.InternalCalls.Transform_GetPosition(playerEntityID, out playerPosition);
 
-                Engine.InternalCalls.Log("=== BULLET SPAWN DEBUG ===");
-                Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
+                // Get player rotation (Y is in degrees)
+                Engine.Vector3 playerRot = Engine.Transform.GetRotation(playerEntityID);
 
-                // Get camera from player entity
-                Engine.Vector3 shootDirection;
-                bool foundCamera = false;
+                Engine.InternalCalls.Log("Player rotation Y (degrees): " + playerRot.Y);
 
-                Entity playerEntity = new Entity(playerEntityID);
+                // Convert Y rotation to radians
+                float yawRad = playerRot.Y * DEG2RAD;
 
-                if (playerEntity.HasComponent<Camera>())
-                {
-                    Camera cam = playerEntity.GetComponent<Camera>();
-                    Engine.Vector3 cameraTarget = cam.Target;
-
-                    Engine.InternalCalls.Log("Camera target: " + cameraTarget.X + ", " + cameraTarget.Y + ", " + cameraTarget.Z);
-
-                    shootDirection = new Engine.Vector3(
-                        cameraTarget.X - playerPosition.X,
-                        cameraTarget.Y - playerPosition.Y,
-                        cameraTarget.Z - playerPosition.Z
-                    );
-
-                    float lengthSquared = shootDirection.X * shootDirection.X +
-                                         shootDirection.Y * shootDirection.Y +
-                                         shootDirection.Z * shootDirection.Z;
-
-                    float length = Sqrt(lengthSquared);
-
-                    if (length > 0.0001f)
-                    {
-                        shootDirection = new Engine.Vector3(
-                            shootDirection.X / length,
-                            shootDirection.Y / length,
-                            shootDirection.Z / length
-                        );
-                        foundCamera = true;
-                    }
-                    else
-                    {
-                        Engine.InternalCalls.LogWarning("Camera target too close to player, using default forward");
-                        shootDirection = new Engine.Vector3(0, 0, 1);
-                    }
-                }
-                else
-                {
-                    Engine.InternalCalls.LogWarning("Player has no Camera component");
-                    shootDirection = new Engine.Vector3(0, 0, 1);
-                }
-
-                Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
-
-                Engine.Vector3 shipRot = Engine.Transform.GetRotation(playerEntityID);
-
-                // Player faces forward along Z-axis in their local space
-                // Convert player's facing direction to world space based on yaw rotation
-                float yawRad = shipRot.Y * DEG2RAD;
-                float cosYaw = SimpleCos(yawRad);
+                // Forward vector: (sin(yaw), 0, cos(yaw))
+                // This matches standard forward-facing along +Z
                 float sinYaw = SimpleSin(yawRad);
+                float cosYaw = SimpleCos(yawRad);
 
-                // Forward direction in player's local space: (0, 0, 1)
-                // Rotate by yaw to get world space direction
                 Engine.Vector3 playerForward = new Engine.Vector3(
-                    sinYaw,      // X component
-                    0.0f,        // Y component (no pitch, only yaw)
-                    cosYaw       // Z component
+                    sinYaw,
+                    0.0f,
+                    cosYaw
                 );
 
-                // Spawn from player position plus small offset in front
-                float spawnDistance = 2.0f;
-                float heightOffset = 0.5f;
+                Engine.InternalCalls.Log("Player forward: " + playerForward.X + ", " + playerForward.Y + ", " + playerForward.Z);
 
+                // Spawn position: player position + forward offset
+                float spawnDistance = 2.0f;
                 Engine.Vector3 firingPosition = new Engine.Vector3(
                     playerPosition.X + (playerForward.X * spawnDistance),
-                    playerPosition.Y + heightOffset,
+                    playerPosition.Y,
                     playerPosition.Z + (playerForward.Z * spawnDistance)
                 );
 
+                Engine.InternalCalls.Log("Firing position: " + firingPosition.X + ", " + firingPosition.Y + ", " + firingPosition.Z);
+
+                // Instantiate bullet
                 uint bulletEntityID = Engine.InternalCalls.Prefab_Instantiate(prefabPath);
 
                 if (bulletEntityID == 0)
@@ -463,10 +419,9 @@ namespace Game
                     return;
                 }
 
-                Engine.InternalCalls.Log("Bullet entity created: ID = " + bulletEntityID);
-
                 Engine.InternalCalls.Transform_SetPosition(bulletEntityID, ref firingPosition);
 
+                // Bullet velocity
                 float bulletSpeed = prefabPath.Contains("Primary") ? 15.0f : 10.0f;
                 Engine.Vector3 velocity = new Engine.Vector3(
                     playerForward.X * bulletSpeed,
@@ -476,14 +431,15 @@ namespace Game
 
                 Engine.InternalCalls.Rigidbody_SetVelocity(bulletEntityID, ref velocity);
 
-                Engine.InternalCalls.Log("=== BULLET SPAWNED SUCCESSFULLY ===");
+                Engine.InternalCalls.Log("=== BULLET SPAWNED ===");
             }
             catch (Exception e)
             {
-                Engine.InternalCalls.LogError("=== ERROR SPAWNING BULLET ===");
-                Engine.InternalCalls.LogError("Error: " + e.Message);
+                Engine.InternalCalls.LogError("ERROR: " + e.Message);
             }
         }
+    
+
 
         private void TryReload()
         {
