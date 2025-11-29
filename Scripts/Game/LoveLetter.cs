@@ -46,10 +46,7 @@ namespace Game
 
             // Initialize cores alive
             coresAlive = totalCores;
-        
 
-            // Subscribe to CoreDestroyed event
-            Engine.EventSystem.Subscribe("CoreDestroyed", OnCoreDestroyedEvent);
             // Get spawn position
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out startPosition);
             Engine.InternalCalls.Log("Spawn position: " + startPosition.X + ", " + startPosition.Y + ", " + startPosition.Z);
@@ -186,13 +183,7 @@ namespace Game
             // Apply new position
             Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
         }
-        private void OnCoreDestroyedEvent(string eventName, string payload)
-        {
-            if (int.TryParse(payload, out int parentID) && parentID == EntityID)
-            {
-                OnCoreDestroyed();
-            }
-        }
+
         /// <summary>
         /// Rotate entity to face target position
         /// </summary>
