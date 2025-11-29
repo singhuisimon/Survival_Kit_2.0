@@ -31,8 +31,17 @@ namespace Engine
 
         while ((field = mono_class_get_fields(klass, &iter)))
         {
+            // Skip static and private fields (only get public and serialized)
+            int flags = mono_field_get_flags(field);
+
+            // Skip if it's static
+            if (flags & MONO_FIELD_ATTR_STATIC)
+                continue;
+
             // Get field attributes
             MonoCustomAttrInfo* attrInfo = mono_custom_attrs_from_field(klass, field);
+
+            bool hasSerializeField = false;
 
             if (attrInfo)
             {
@@ -40,52 +49,64 @@ namespace Engine
                 for (int i = 0; i < attrInfo->num_attrs; i++)
                 {
                     MonoMethod* ctor = attrInfo->attrs[i].ctor;
+                    if (!ctor) continue;  // Safety check
+
                     MonoClass* attrClass = mono_method_get_class(ctor);
+                    if (!attrClass) continue;  // Safety check
+
                     const char* attrName = mono_class_get_name(attrClass);
+                    if (!attrName) continue;  // Safety check
 
                     // Check if this is our SerializeField attribute
                     if (strcmp(attrName, "SerializeFieldAttribute") == 0)
                     {
-                        SerializedFieldInfo info;
-                        info.name = mono_field_get_name(field);
-                        info.field = field;
-                        info.type = mono_field_get_type(field);
-
-                        // Determine field type for easier ImGui rendering
-                        int typeEnum = mono_type_get_type(info.type);
-                        switch (typeEnum)
-                        {
-                        case MONO_TYPE_I4:  // int32
-                            info.fieldType = SerializedFieldInfo::FieldType::Int;
-                            break;
-                        case MONO_TYPE_R4:  // float
-                            info.fieldType = SerializedFieldInfo::FieldType::Float;
-                            break;
-                        case MONO_TYPE_BOOLEAN:
-                            info.fieldType = SerializedFieldInfo::FieldType::Bool;
-                            break;
-                        case MONO_TYPE_STRING:
-                            info.fieldType = SerializedFieldInfo::FieldType::String;
-                            break;
-                        default:
-                            info.fieldType = SerializedFieldInfo::FieldType::Unknown;
-                            break;
-                        }
-
-                        // Get DisplayName property from attribute if set
-                        info.displayName = info.name; // Default to field name
-
-                        serializedFields.push_back(info);
+                        hasSerializeField = true;
                         break;
                     }
                 }
 
                 mono_custom_attrs_free(attrInfo);
             }
+
+            // Only add if it has SerializeField attribute
+            if (hasSerializeField)
+            {
+                SerializedFieldInfo info;
+                info.name = mono_field_get_name(field);
+                info.field = field;
+                info.type = mono_field_get_type(field);
+
+                // Determine field type for easier ImGui rendering
+                int typeEnum = mono_type_get_type(info.type);
+                switch (typeEnum)
+                {
+                case MONO_TYPE_I4:  // int32
+                    info.fieldType = SerializedFieldInfo::FieldType::Int;
+                    break;
+                case MONO_TYPE_R4:  // float
+                    info.fieldType = SerializedFieldInfo::FieldType::Float;
+                    break;
+                case MONO_TYPE_BOOLEAN:
+                    info.fieldType = SerializedFieldInfo::FieldType::Bool;
+                    break;
+                case MONO_TYPE_STRING:
+                    info.fieldType = SerializedFieldInfo::FieldType::String;
+                    break;
+                default:
+                    info.fieldType = SerializedFieldInfo::FieldType::Unknown;
+                    break;
+                }
+
+                // Get DisplayName property from attribute if set
+                info.displayName = info.name; // Default to field name
+
+                serializedFields.push_back(info);
+            }
         }
 
         return serializedFields;
     }
+
 
     // ========================================
     // Get field value from Mono instance

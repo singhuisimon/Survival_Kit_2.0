@@ -799,6 +799,8 @@ namespace Engine {
 
 		static bool EntityHasCamera(uint64_t entityID);
 		static bool EntityHasRigidBody(uint64_t entityID);
+		static int  Transform_GetParent(uint64_t entityID);
+
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls() {
@@ -808,6 +810,9 @@ namespace Engine {
 		mono_add_internal_call("Engine.InternalCalls::Scene_CreateEntity", (void *)InternalCalls::Scene_CreateEntity);
 		mono_add_internal_call("Engine.InternalCalls::Entity_AddScript", (void *)InternalCalls::Entity_AddScript);
 		mono_add_internal_call("Engine.InternalCalls::Scene_DestroyEntity", (void *)InternalCalls::Scene_DestroyEntity);
+
+
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetParent", (void*)InternalCalls::Transform_GetParent);
 
 		// Logging
 		mono_add_internal_call("Engine.InternalCalls::Log", (void *)InternalCalls::Log);
@@ -1001,6 +1006,7 @@ namespace Engine {
 		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void*)InternalCalls::EntityHasCamera);
 		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void*)InternalCalls::EntityHasRigidBody);
 
+
 		LOG_INFO("Internal calls registered");
 	}
 
@@ -1017,6 +1023,8 @@ namespace Engine {
 		static AudioManager *s_AudioManager = nullptr;
 
 
+
+
 		bool EntityHasCamera(uint64_t entityID)
 		{
 			if (!s_CurrentScene)
@@ -1029,8 +1037,10 @@ namespace Engine {
 			return entity.HasComponent<Engine::CameraComponent>();
 		}
 
-		static int Transform_GetParent(uint32_t entityID)
+		int Transform_GetParent(uint64_t entityID)
 		{
+			 if (!s_CurrentScene)
+				 return false;
 			auto& registry = s_CurrentScene->GetRegistry();
 			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
 

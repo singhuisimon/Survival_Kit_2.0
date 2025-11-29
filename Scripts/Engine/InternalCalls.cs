@@ -23,6 +23,9 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Transform_GetParent(uint entityID);
+
         // NEW: list of entities matching a tag
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint[] Scene_FindEntitiesByTag(string tag);
