@@ -1,0 +1,36 @@
+{
+    "Name": "SwitchCamera",
+    "GUID": "8403567840037719787",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Selector",
+        "Name": "Node",
+        "GUID": "9556489344645609581",
+        "Children": [
+            {
+                "Type": "Sequence",
+                "Name": "Node",
+                "GUID": "7250646335432007375",
+                "Children": [
+                    {
+                        "Type": "CheckMouseButtonPressed",
+                        "Name": "Node",
+                        "GUID": "9556489344645936753",
+                        "Properties": {
+                            "MouseButton": "0"
+                        }
+                    },
+                    {
+                        "Type": "SwitchCamera",
+                        "Name": "Node",
+                        "GUID": "17626939876894499491",
+                        "Properties": {
+                            "DisableCameraTag": "MainMenuCamera",
+                            "EnableCameraTag": "GameCamera"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

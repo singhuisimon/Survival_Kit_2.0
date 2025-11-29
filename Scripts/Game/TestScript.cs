@@ -59,23 +59,23 @@ namespace Game
             Engine.InternalCalls.Log("PlayerID: " + EntityID);
 
             // Add camera component to player entity
-            Engine.InternalCalls.Entity_AddCamera((ulong)EntityID);
+            Engine.InternalCalls.Entity_AddCamera((uint)EntityID);
             Engine.InternalCalls.Log("Camera component added to player");
 
             // Set camera as primary
-            Engine.InternalCalls.Camera_SetPrimary((ulong)EntityID, true);
-            Engine.InternalCalls.Camera_SetEnabled((ulong)EntityID, true);
+            Engine.InternalCalls.Camera_SetPrimary((uint)EntityID, true);
+            Engine.InternalCalls.Camera_SetEnabled((uint)EntityID, true);
 
             // Set initial camera properties
-            Engine.InternalCalls.Camera_SetFOV((ulong)EntityID, 60.0f);
-            Engine.InternalCalls.Camera_SetNear((ulong)EntityID, 0.1f);
-            Engine.InternalCalls.Camera_SetFar((ulong)EntityID, 1000.0f);
+            Engine.InternalCalls.Camera_SetFOV((uint)EntityID, 60.0f);
+            Engine.InternalCalls.Camera_SetNear((uint)EntityID, 0.1f);
+            Engine.InternalCalls.Camera_SetFar((uint)EntityID, 1000.0f);
 
             // Add rigidbody for physics
-            Engine.InternalCalls.Entity_AddRigidBody((ulong)EntityID);
-            Engine.InternalCalls.Rigidbody_SetIsKinematic((ulong)EntityID, false);
-            Engine.InternalCalls.Rigidbody_SetUseGravity((ulong)EntityID, false);
-            Engine.InternalCalls.Rigidbody_SetMass((ulong)EntityID, 1.0f);
+            Engine.InternalCalls.Entity_AddRigidBody((uint)EntityID);
+            Engine.InternalCalls.Rigidbody_SetIsKinematic((uint)EntityID, false);
+            Engine.InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, false);
+            Engine.InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
             Engine.InternalCalls.Log("Rigidbody configured for spaceship physics");
         }
 
@@ -100,8 +100,7 @@ namespace Game
             Engine.Vector3 shipPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out shipPos);
 
-            Engine.Vector3 shipRot;
-            Engine.Transform.GetRotation_Native((ulong)EntityID, out shipRot);
+            Engine.Vector3 shipRot = Engine.Transform.GetRotation((uint)EntityID);
 
             // ===== Camera Aim Target (spaceship center) =====
             Engine.Vector3 aimTarget = new Engine.Vector3(
@@ -154,7 +153,7 @@ namespace Game
 
             // ===== Update Camera Target to spaceship center =====
             // Camera looks at aimTarget from cameraPos (calculated above for reference)
-            Engine.InternalCalls.Camera_SetTarget((ulong)EntityID, ref aimTarget);
+            Engine.InternalCalls.Camera_SetTarget((uint)EntityID, ref aimTarget);
 
             // ===== Rotate Spaceship to Face Camera Direction (Yaw Only) =====
             // Calculate rotation to face the camera's yaw direction
@@ -163,8 +162,7 @@ namespace Game
                 orbitYaw * RAD2DEG,  // Convert yaw to degrees for rotation
                 shipRot.Z
             );
-            Engine.Transform.SetRotation_Native((ulong)EntityID, ref newShipRot);
-
+            Engine.Transform.SetRotation((uint)EntityID, ref newShipRot);
             // ===== Get Input =====
             float inputX = 0.0f;
             float inputZ = 0.0f;
@@ -198,7 +196,7 @@ namespace Game
 
             // ===== Get Current Velocity =====
             Engine.Vector3 currentVel;
-            Engine.InternalCalls.Rigidbody_GetVelocity((ulong)EntityID, out currentVel);
+            Engine.InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out currentVel);
 
             // ===== Apply Movement Forces (Spaceship Physics) =====
             if (hasInput && !isDashing)
@@ -224,7 +222,7 @@ namespace Game
                     velChange.Z * moveSpeed
                 );
 
-                Engine.InternalCalls.Rigidbody_AddForce((ulong)EntityID, ref force);
+                Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref force);
             }
 
             // ===== Handle Dash =====
@@ -336,7 +334,7 @@ namespace Game
                 dir.Z * dashForce
             );
 
-            Engine.InternalCalls.Rigidbody_AddForce((ulong)EntityID, ref dashImpulse);
+            Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref dashImpulse);
 
             isDashing = true;
             dashCooldown = DASH_COOLDOWN_TIME;
@@ -389,7 +387,7 @@ namespace Game
         public void Stop()
         {
             moveAllowed = false;
-            Engine.InternalCalls.Rigidbody_Stop((ulong)EntityID);
+            Engine.InternalCalls.Rigidbody_Stop((uint)EntityID);
             Engine.InternalCalls.Log("Player movement stopped");
         }
 

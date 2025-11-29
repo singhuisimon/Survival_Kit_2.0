@@ -12,14 +12,17 @@ namespace Game
     {
         // ===== Serialized Fields (Editable in Inspector) =====
 
+        // Movement
         [SerializeField]
         private float acceleration = 50.0f;
 
         [SerializeField]
         private float topSpeed = 30.0f;
 
-        //[SerializeField]
-        //private float rotateSpeed = 5.0f; // Currently unused - orientation not yet implemented
+        // In Unity this controls how fast the bot turns towards the target.
+        // Rotation/orientation is not yet wired in this engine-side port.
+        [SerializeField]
+        private float rotateSpeed = 5.0f;
 
         // Explosion properties
         [SerializeField]
@@ -28,10 +31,12 @@ namespace Game
         [SerializeField]
         private int blastDamage = 10;
 
-        //[SerializeField]
-        //private float blastImpulse = 0.0f; // Not used yet (no explicit AddExplosionForce API)
+        // In Unity this was used for AddExplosionForce, which isn't exposed here yet.
+        // Kept for completeness but not used.
+        [SerializeField]
+        private float blastImpulse = 0.0f;
 
-        // Status effect
+        // Status effects
         [SerializeField]
         private bool isStunned = false;
 
@@ -42,7 +47,7 @@ namespace Game
         [SerializeField]
         private float bruteForceAttackSpeed = 300.0f;
 
-        // Target selection timing
+        // Target selection timing (Unity used Invoke + Random.Range)
         [SerializeField]
         private float minInitialTargetDelay = 0.5f;
 
@@ -59,21 +64,28 @@ namespace Game
         [SerializeField]
         private string deathExplosionPrefab = string.Empty;
 
+        // Health component – damage system will drive this down to 0
+        [SerializeField("Health Component")]
+        private Health health;
+
         // ===== Private Runtime State =====
 
-        private uint targetID = 0;
+        // Sentinel for "no entity" – 0 is a VALID ECS id in your engine
+        private const uint INVALID_ENTITY = 0xffffffffu;
+
+        // Target this bot is currently chasing.
+        private uint targetID = INVALID_ENTITY;
+
         private bool isMoving = false;
         private bool isDead = false;
         private bool isExploding = false;
 
-        //private float boostTimerCooldown = 0.0f; // Reserved for future "boost" feature
-        //private float fuseTimerCooldown = 0.0f;  // Reserved for fuse/explode delay
-
+        // Timers
         private float stunTimer = 0.0f;
         private float chooseTargetTimer = 0.0f;
         private bool hasChosenInitialTarget = false;
 
-        // Random state (simple LCG to avoid System.Random / System.Math)
+        // Simple script-side RNG state (xorshift32)
         private static uint s_RngState = 0x12345678u;
 
         // Tags used by this enemy (match tags configured on entities)
@@ -87,27 +99,25 @@ namespace Game
 
         public override void OnStart()
         {
-            Log("=== Botnet enemy started ===");
+            Log("=== Botnet started (EntityID = " + EntityID + ") ===");
 
             // Seed RNG with entity ID so different instances behave differently
             s_RngState ^= (uint)EntityID * 747796405u + 2891336453u;
 
             // Ensure rigidbody exists and is configured
-            InternalCalls.Entity_AddRigidBody((ulong)EntityID);
-            InternalCalls.Rigidbody_SetIsKinematic((ulong)EntityID, false);
-            InternalCalls.Rigidbody_SetUseGravity((ulong)EntityID, false); // These enemies fly / ignore gravity
-            InternalCalls.Rigidbody_SetMass((ulong)EntityID, 1.0f);
+            InternalCalls.Entity_AddRigidBody((uint)EntityID);
+            InternalCalls.Rigidbody_SetIsKinematic((uint)EntityID, false);
+            InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, false); // Botnets fly / ignore gravity
+            InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
 
+            // Reset runtime state
             isDead = false;
             isExploding = false;
             isMoving = false;
-            targetID = 0;
+            targetID = INVALID_ENTITY;
 
             isStunned = false;
             stunTimer = 0.0f;
-
-            //boostTimerCooldown = 0.0f;
-            //fuseTimerCooldown = 0.0f;
 
             hasChosenInitialTarget = false;
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
@@ -118,28 +128,34 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            if (isDead)
-                return;
-
-            // Update stun status
-            if (isStunned)
+            // Death driven by Health + damage system
+            if (!isDead && health != null && health.IsDead)
             {
-                UpdateStun(deltaTime);
-                // While stunned we don't move or process targeting
+                Explode();
                 return;
             }
 
-            // Initial target selection / retargeting timer
+            if (isDead)
+                return;
+
+            // Update stun status. While stunned we do not move or target.
+            if (isStunned)
+            {
+                UpdateStun(deltaTime);
+                return;
+            }
+
+            // Target selection / lock-on logic
             UpdateTargetSelectionTimer(deltaTime);
 
             // If we have a valid target, update movement
-            if (isMoving && targetID != 0)
+            if (isMoving && targetID != INVALID_ENTITY)
             {
                 MoveTowardsTarget(deltaTime);
                 ClampSpeed();
             }
 
-            // Handle collision-triggered explosion
+            // Handle collision-triggered explosion (kamikaze behaviour)
             HandleCollisionTriggers();
 
             if (isExploding)
@@ -156,26 +172,26 @@ namespace Game
         /// </summary>
         public void Stunned()
         {
-            Log("Botnet stunned");
+            Log("Botnet (EntityID = " + EntityID + ") stunned");
             isStunned = true;
             stunTimer = stunnedTime;
 
             // Stop movement immediately
-            InternalCalls.Rigidbody_Stop((ulong)EntityID);
+            InternalCalls.Rigidbody_Stop((uint)EntityID);
         }
 
         /// <summary>
         /// Brute force / rage mode: dramatically increase top speed and
-        /// force target to SEMICONDUCTOR.
+        /// force target to SEMICONDUCTOR. (IBruteForceAttack in Unity)
         /// </summary>
         public void BruteForceAttack()
         {
-            Log("Botnet entering brute force attack mode");
+            Log("Botnet (EntityID = " + EntityID + ") entering brute force attack mode");
 
             topSpeed = bruteForceAttackSpeed;
 
             uint semi = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
-            if (semi != 0)
+            if (semi != INVALID_ENTITY)
             {
                 targetID = semi;
                 isMoving = true;
@@ -194,42 +210,63 @@ namespace Game
             {
                 isStunned = false;
                 stunTimer = 0.0f;
-                Log("Botnet stun ended");
+                Log("Botnet (EntityID = " + EntityID + ") stun ended");
             }
         }
 
+        /// <summary>
+        /// Target selection logic.
+        /// - If we already have a valid target, stay locked and only check if it still exists.
+        /// - If we lose our target or never had one, use the timer to pick a new one.
+        /// </summary>
         private void UpdateTargetSelectionTimer(float deltaTime)
         {
-            chooseTargetTimer -= deltaTime;
-            if (chooseTargetTimer <= 0.0f)
+            // If we already have a target, just verify that it still exists.
+            if (targetID != INVALID_ENTITY)
             {
-                ChooseTarget();
+                EnsureTargetStillValid();
 
-                if (!hasChosenInitialTarget)
-                {
-                    hasChosenInitialTarget = true;
-                }
+                // Still valid? Stay locked on, do NOT re-randomise.
+                if (targetID != INVALID_ENTITY)
+                    return;
 
-                // Schedule next retarget if current target becomes invalid later
-                chooseTargetTimer = RandomRangeFloat(minRetargetDelay, maxRetargetDelay);
+                // Target vanished -> schedule immediate retarget.
+                chooseTargetTimer = 0.0f;
             }
 
-            // If current target died / was removed, attempt to get a new one on next tick
-            if (targetID == 0 && hasChosenInitialTarget)
+            // At this point we have no target; run the selection timer.
+            chooseTargetTimer -= deltaTime;
+            if (chooseTargetTimer > 0.0f)
+                return;
+
+            ChooseTarget();
+
+            if (!hasChosenInitialTarget)
+                hasChosenInitialTarget = true;
+
+            if (targetID != INVALID_ENTITY)
             {
-                chooseTargetTimer = 0.0f;
+                // Successfully locked onto something.
+                isMoving = true;
+                chooseTargetTimer = RandomRangeFloat(minRetargetDelay, maxRetargetDelay);
+            }
+            else
+            {
+                // Still nothing to chase – retry after a short delay.
+                chooseTargetTimer = RandomRangeFloat(0.5f, 1.0f);
             }
         }
 
         private void ChooseTarget()
         {
-            // 0: PLAYER
-            // 1: SEMICONDUCTOR
-            // 2: EMPLACEMENT
-            // 3: random ALLIES
+            // If for some reason we still have a target, don't change it here.
+            if (targetID != INVALID_ENTITY)
+                return;
+
+            // 0: Player, 1: SEMICONDUCTOR, 2: EMPLACEMENT, 3: random ALLIES
             int choice = RandomRangeInt(0, 4);
 
-            uint chosen = 0;
+            uint chosen = INVALID_ENTITY;
 
             switch (choice)
             {
@@ -250,31 +287,55 @@ namespace Game
                     break;
             }
 
-            if (chosen != 0)
+            if (chosen != INVALID_ENTITY)
             {
                 targetID = chosen;
                 isMoving = true;
-                Log("Botnet chose target " + targetID + " (choice " + choice + ")");
+                Log("Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
             }
             else
             {
-                // Couldn't find a target of this type - try again later
-                targetID = 0;
+                targetID = INVALID_ENTITY;
                 isMoving = false;
-                Log("Botnet failed to find target for choice " + choice + ")");
+                Log("Botnet (EntityID = " + EntityID + ") failed to find target for choice " + choice + ")");
             }
         }
 
-        private void MoveTowardsTarget(float deltaTime)
+        /// <summary>
+        /// Checks if current target is still valid. If destroyed / removed,
+        /// schedule a new ChooseTarget().
+        /// </summary>
+        private void EnsureTargetStillValid()
         {
-            if (targetID == 0)
+            if (targetID == INVALID_ENTITY)
                 return;
 
-            // Get positions
-            Vector3 myPos = Transform.Position;
+            // Heuristic: if tag lookup returns null/empty, assume entity is gone.
+            string tag = InternalCalls.Tag_GetTag(targetID);
+            if (string.IsNullOrEmpty(tag))
+            {
+                Log("Botnet (EntityID = " + EntityID + ") target " + targetID + " appears to be destroyed, scheduling new target");
+                targetID = INVALID_ENTITY;
+                isMoving = false;
+                chooseTargetTimer = 0.0f; // pick a new target on the next update
+            }
+        }
 
-            Vector3 targetPos;
-            InternalCalls.Transform_GetPosition(targetID, out targetPos);
+        /// <summary>
+        /// Step 1: Get my ID -> EntityID
+        /// Step 2: Get targetID -> targetID
+        /// Step 3: Move towards target using rigid body (AddForce)
+        /// </summary>
+        private void MoveTowardsTarget(float deltaTime)
+        {
+            if (targetID == INVALID_ENTITY)
+                return;
+
+            // Self position via Transform static helper
+            Vector3 myPos = Transform.GetPosition((uint)EntityID);
+
+            // Target position via Transform static helper
+            Vector3 targetPos = Transform.GetPosition((uint)targetID);
 
             // Direction to target
             Vector3 dir = new Vector3(
@@ -293,25 +354,28 @@ namespace Game
             dir.Y *= invLen;
             dir.Z *= invLen;
 
-            // Apply acceleration along direction
+            // Apply acceleration along direction via rigidbody
             Vector3 force = new Vector3(
                 dir.X * acceleration,
                 dir.Y * acceleration,
                 dir.Z * acceleration
             );
 
-            InternalCalls.Rigidbody_AddForce((ulong)EntityID, ref force);
+            InternalCalls.Rigidbody_AddForce((uint)EntityID, ref force);
+
+            // Optional rotation: if you want to face the target you can
+            // compute a yaw/pitch and use Transform.SetRotation here.
         }
 
         private void ClampSpeed()
         {
-            float speed = InternalCalls.Rigidbody_GetSpeed((ulong)EntityID);
+            float speed = InternalCalls.Rigidbody_GetSpeed((uint)EntityID);
             if (speed <= topSpeed || topSpeed <= 0.0f)
                 return;
 
             // Pull velocity back to topSpeed
             Vector3 vel;
-            InternalCalls.Rigidbody_GetVelocity((ulong)EntityID, out vel);
+            InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out vel);
 
             float lenSq = vel.X * vel.X + vel.Y * vel.Y + vel.Z * vel.Z;
             if (lenSq <= 0.0001f)
@@ -327,7 +391,7 @@ namespace Game
             vel.Y *= scale;
             vel.Z *= scale;
 
-            InternalCalls.Rigidbody_SetVelocity((ulong)EntityID, ref vel);
+            InternalCalls.Rigidbody_SetVelocity((uint)EntityID, ref vel);
         }
 
         // ===== Collision & Explosion =====
@@ -345,6 +409,7 @@ namespace Game
                 uint a, b;
                 InternalCalls.Physics_GetCollisionPair(i, out a, out b);
 
+                // We only care about collisions involving this bot
                 if (a != self && b != self)
                     continue;
 
@@ -371,7 +436,7 @@ namespace Game
             isDead = true;
             isExploding = false;
 
-            Log("Botnet exploding!");
+            Log("Botnet (EntityID = " + EntityID + ") exploding!");
 
             // Approximate Unity's Physics.OverlapSphere by checking all
             // entities of relevant tags and applying damage if within radius.
@@ -386,11 +451,11 @@ namespace Game
                 uint explosionID = InternalCalls.Prefab_Instantiate(deathExplosionPrefab);
 
                 // Move spawned prefab to this enemy's position
-                Vector3 myPos = Transform.Position;
-                InternalCalls.Transform_SetPosition(explosionID, ref myPos);
+                Vector3 myPos = Transform.GetPosition((uint)EntityID);
+                Transform.SetPosition((uint)explosionID, ref myPos);
             }
 
-            // Destroy this entity
+            // Destroy this entity (Unity: EnemyHealth.TakeDamage(9999) + Destroy(gameObject))
             InternalCalls.Scene_DestroyEntity((uint)EntityID);
         }
 
@@ -400,7 +465,8 @@ namespace Game
             if (entities == null || entities.Length == 0)
                 return;
 
-            Vector3 myPos = Transform.Position;
+            Vector3 myPos = Transform.GetPosition((uint)EntityID);
+            float radiusSq = blastRadius * blastRadius;
 
             for (int i = 0; i < entities.Length; ++i)
             {
@@ -408,36 +474,47 @@ namespace Game
                 if (id == (uint)EntityID)
                     continue;
 
-                Vector3 targetPos;
-                InternalCalls.Transform_GetPosition(id, out targetPos);
+                Vector3 targetPos = Transform.GetPosition((uint)id);
 
                 float dx = targetPos.X - myPos.X;
                 float dy = targetPos.Y - myPos.Y;
                 float dz = targetPos.Z - myPos.Z;
 
                 float distSq = dx * dx + dy * dy + dz * dz;
-                float radiusSq = blastRadius * blastRadius;
 
                 if (distSq <= radiusSq)
                 {
-                    // Here is where you'd apply damage to the entity.
-                    // The engine currently doesn't expose a generic "damage" API
-                    // from C#, so we simply log for now.
-                    Log($"Blast would hit entity {id} (tag {tag}) for {blastDamage} damage");
+                    // Apply damage through the event-driven damage system.
+                    // Any entity that has a DamageReceiver + Health attached
+                    // will consume this event and reduce its health.
+                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }
 
-        // ===== Helpers =====
+        // ===== RNG Helpers (xorshift32) =====
+
+        private static uint NextUInt()
+        {
+            uint x = s_RngState;
+            if (x == 0)
+                x = 0x12345678u; // avoid zero lock
+
+            x ^= x << 13;
+            x ^= x >> 17;
+            x ^= x << 5;
+            s_RngState = x;
+            return x;
+        }
 
         private static int RandomRangeInt(int minInclusive, int maxExclusive)
         {
             if (maxExclusive <= minInclusive)
                 return minInclusive;
 
-            s_RngState = 1664525u * s_RngState + 1013904223u;
             uint range = (uint)(maxExclusive - minInclusive);
-            return minInclusive + (int)(s_RngState % range);
+            uint r = NextUInt();
+            return minInclusive + (int)(r % range);
         }
 
         private static float RandomRangeFloat(float minInclusive, float maxInclusive)
@@ -445,13 +522,12 @@ namespace Game
             if (maxInclusive <= minInclusive)
                 return minInclusive;
 
-            s_RngState = 1664525u * s_RngState + 1013904223u;
-            // Take upper 24 bits to build a [0,1) float
-            uint r = (s_RngState >> 8) & 0x00FFFFFFu;
-            float t = r / 16777215.0f; // 2^24 - 1
-
+            uint r = NextUInt() & 0x00FFFFFFu; // 24 bits
+            float t = r / 16777215.0f;        // [0,1)
             return minInclusive + (maxInclusive - minInclusive) * t;
         }
+
+        // ===== Math & Search Helpers =====
 
         private static float SimpleSqrt(float value)
         {
@@ -481,7 +557,7 @@ namespace Game
         {
             uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
-                return 0;
+                return INVALID_ENTITY;
 
             return entities[0];
         }
@@ -490,7 +566,7 @@ namespace Game
         {
             uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
-                return 0;
+                return INVALID_ENTITY;
 
             if (entities.Length == 1)
                 return entities[0];

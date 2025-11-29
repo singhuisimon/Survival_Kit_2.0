@@ -20,7 +20,7 @@ namespace Game{
 
     public class EnemySpawnManager : ScriptBehaviour
     {
-        public static EnemySpawnManager instance;
+        //public static EnemySpawnManager instance;
     
         // Basic toggles
         [SerializeField] private bool isActive = false;
@@ -44,20 +44,26 @@ namespace Game{
         
         // Wave timers
         [SerializeField] private float timeBetweenWave = 5.0f;
-        [SerializeField] private float timeWave = 60.0f;
+
+        //time per wave
+        [SerializeField] private float timeWave = 180.0f;
+
+        //shows the current time it is waiting for (180 for wave, 10 for start, 5 for between)
         [SerializeField] private float timeCurrent = 10.0f;
-        [SerializeField] private float timeNext = 0.0f;
+        [SerializeField] private float timeNext = 10.0f;
+
+        //state
         [SerializeField] private bool BREAK = true;
         [SerializeField] private bool COMBAT = false;
         
         // Enemy counting
         [SerializeField] private int enemiesLeft = 0;
-        
+
         // Prefab names 
         private string[] enemyPrefabNames = new string[]
         {
             "Enemy_Botnet",      // 0
-            "Enemy_Loveletter",  // 1  
+            "Enemy_LoveLetter",  // 1  
             "Enemy_Worm",        // 2
             "Enemy_Trojan",      // 3
             "Enemy_Adware",      // 4
@@ -87,28 +93,29 @@ namespace Game{
         private Entity[] wallInactiveEntities;
         
         // Light entities
-        private Entity lightPrep;
-        private Entity lightCombat;
+        //private Entity lightPrep;
+        //private Entity lightCombat;
         
         // Simple pseudo-random number generator
         private uint rngSeed;
 
         // Time tracking (since we don't have Time.time)
+        [SerializeField]
         private float elapsedTime = 0f;
         
         public override void OnStart()
         {
-            // Singleton setup
-            if (instance == null)
-            {
-                instance = this;
-            }
-            else
-            {
-                Log("DUPLICATE EnemySpawnManager. DELETING");
-                // In custom engine, you'd destroy this entity
-                return;
-            }
+            // // Singleton setup
+            // if (instance == null)
+            // {
+            //     instance = this;
+            // }
+            // else
+            // {
+            //     Log("DUPLICATE EnemySpawnManager. DELETING");
+            //     // In custom engine, you'd destroy this entity
+            //     return;
+            // }
             
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
@@ -120,28 +127,40 @@ namespace Game{
             InitializeWalls();
             
             // Find light entities
-            InitializeLights();
+            //InitializeLights();
             
             // Setup lights for prep phase
-            SetupLights();
+            //SetupLights();
             
             // Setup walls for initial state
             WallSetup_DisableActiveWalls();
             WallSetup_InactiveWalls();
             
             // Start at wave 1
-            SetupWaveSpawning();
-            
-            isActive = true;
+            //SetupWaveSpawning();
             
             Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
         }
         
         public override void OnUpdate(float deltaTime)
         {
-            if (!isActive)
+
+            //check for the trigger to start
+            if(Input.IsKeyPressed(KeyCode.Semicolon) && !isActive){
+                isActive = true;
+                PlayGameBGM();
+            }
+
+            if (!isActive){
+
+                if(BREAK && enemiesLeft <= 0){
+                    StopBGM();
+                    Log("====== EnemySpawnManager - All enemies died =====");
+                } 
+
                 return;
-            
+            }
+
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
             
@@ -150,6 +169,9 @@ namespace Game{
             {
                 if  (BREAK)
                 {
+                    if(CURRENT_WAVE == 0){
+                        SetupWaveSpawning();
+                    }
                     StartCombat();
                 }
                 else if (COMBAT)
@@ -179,12 +201,12 @@ namespace Game{
             }
             
             // CHEAT CODE - K to kill all enemies
-            if (Input.IsKeyPressed(KeyCode.K))
-            {
-                enemiesLeft = 0;
-                // Would destroy all enemy entities here
-                Log("CHEAT: All enemies killed");
-            }
+            // if (Input.IsKeyPressed(KeyCode.K))
+            // {
+            //     enemiesLeft = 0;
+            //     // Would destroy all enemy entities here
+            //     Log("CHEAT: All enemies killed");
+            // }
         }
         
         private void InitializeSpawnPoints()
@@ -231,34 +253,66 @@ namespace Game{
                 "SpawnPointA_12",
                 "SpawnPointA_13",
                 "SpawnPointA_14",
-                "SpawnPointA_15",
+                "SpawnPointA_15"
             });
-            
-            // TODO: Register spawn points for walls B, C, D, E
-            /*
+
+            // Wall B spawn points - register each one
             RegisterSpawnPointsForWall("B", spawnPointsB, new string[] {
-                "SpawnPoint_B_1",
-                "SpawnPoint_B_2",
-                "SpawnPoint_B_3"
+                "SpawnPointB_1",
+                "SpawnPointB_2",
+                "SpawnPointB_3",
+                "SpawnPointB_4",
+                "SpawnPointB_5",
+                "SpawnPointB_6",
+                "SpawnPointB_7",
+                "SpawnPointB_8",
+                "SpawnPointB_9",
+                "SpawnPointB_10",
+                "SpawnPointB_11",
+                "SpawnPointB_12",
+                "SpawnPointB_13",
+                "SpawnPointB_14",
+                "SpawnPointB_15"
             });
-            
+
+            // Wall C spawn points - register each one
             RegisterSpawnPointsForWall("C", spawnPointsC, new string[] {
-                "SpawnPoint_C_1",
-                "SpawnPoint_C_2",
-                "SpawnPoint_C_3"
+                "SpawnPointC_1",
+                "SpawnPointC_2",
+                "SpawnPointC_3",
+                "SpawnPointC_4",
+                "SpawnPointC_5",
+                "SpawnPointC_6"
             });
-            
+
+            // Wall D spawn points - register each one
             RegisterSpawnPointsForWall("D", spawnPointsD, new string[] {
-                "SpawnPoint_D_1",
-                "SpawnPoint_D_2",
-                "SpawnPoint_D_3"
+                "SpawnPointD_1",
+                "SpawnPointD_2",
+                "SpawnPointD_3",
+                "SpawnPointD_4",
+                "SpawnPointD_5",
+                "SpawnPointD_6",
+                "SpawnPointD_7",
+                "SpawnPointD_8",
+                "SpawnPointD_9",
+                "SpawnPointD_10",
+                "SpawnPointD_11",
+                "SpawnPointD_12",
+                "SpawnPointD_13",
+                "SpawnPointD_14",
+                "SpawnPointD_15"
             });
-            
+
+            // Wall E spawn points - register each one
             RegisterSpawnPointsForWall("E", spawnPointsE, new string[] {
-                "SpawnPoint_E_1",
-                "SpawnPoint_E_2",
-                "SpawnPoint_E_3"
-            });*/
+                "SpawnPointB_1",
+                "SpawnPointB_2",
+                "SpawnPointB_3",
+                "SpawnPointB_4",
+                "SpawnPointB_5",
+                "SpawnPointB_6"
+            });
             
             Log("TODO: Initialize spawn points - find entities by name");
         }
@@ -385,14 +439,14 @@ namespace Game{
             Log(string.Concat("Found ", wallInactiveEntities.Length.ToString(), " inactive walls"));
         }
         
-        private void InitializeLights()
-        {
-            // Find light entities
-            // lightPrep = Entity.FindByName("Light_Prep");
-            // lightCombat = Entity.FindByName("Light_Combat");
+        // private void InitializeLights()
+        // {
+        //     // Find light entities
+        //     // lightPrep = Entity.FindByName("Light_Prep");
+        //     // lightCombat = Entity.FindByName("Light_Combat");
             
-            Log("TODO: Initialize light entities");
-        }
+        //     Log("TODO: Initialize light entities");
+        // }
         
         private void SetupWaveSpawning()
         {
@@ -419,7 +473,8 @@ namespace Game{
                     break;
                 case 3:
                     // not for this milestone
-                    // SetEnemyCount{5, 16, 7, 0, 1};
+                    //SetEnemyCount{5, 16, 7, 0, 1};
+                    // SetEnemyCount{5, 16, 0, 0, 0};
                     // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
                     // activeSpawnPoints = new List<SpawnPointData>();
                     // activeSpawnPoints.AddRange(spawnPointsB);
@@ -433,7 +488,7 @@ namespace Game{
             
             // Calculate total enemies to spawn
             waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet + E001_worm_host + E003_trojan;
-            enemiesLeft = waveEnemiesLeftToSpawn;
+            //enemiesLeft += waveEnemiesLeftToSpawn;
             
             //Log("Total enemies to spawn: " + waveEnemiesLeftToSpawn);
             Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
@@ -456,10 +511,11 @@ namespace Game{
             BREAK = false;
             COMBAT = true;
             
-            timeNext = elapsedTime + timeWave;
+            //calculate when is the next time (Accumulated) for wave
+            timeNext = elapsedTime + timeWave; 
             timeCurrent = timeWave;
             
-            HandleLights("COMBAT", true);
+            //HandleLights("COMBAT", true);
             
             spawningAllowed = true;
             spawnRateNext = elapsedTime + spawnRate;
@@ -476,7 +532,7 @@ namespace Game{
             timeNext = elapsedTime + timeBetweenWave;
             timeCurrent = timeBetweenWave;
             
-            HandleLights( "BREAK", true);
+            //HandleLights( "BREAK", true);
             
             spawningAllowed = false;
             
@@ -488,14 +544,19 @@ namespace Game{
             else
             {
                 Log("=== ALL WAVES COMPLETE ===");
+                Log("=== AWAITING FOR PLAYERS TO KILL ALL ENEMIES");
                 isActive = false;
+                WallSetup_DisableActiveWalls();
+                WallSetup_InactiveWalls();
+
             }
         }
         
         private void SpawnEnemyByWaves()
         {
-            if (elapsedTime < spawnRateNext)
+            if (elapsedTime < spawnRateNext){
                 return;
+            }
             
             isSpawning = true;
             spawnRateNext = elapsedTime + spawnRate;
@@ -567,6 +628,8 @@ namespace Game{
             
             if(enemyType == 1){
                 //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
+                Log("HI LOVELETTER HERE");
+                SpawnLoveLetter(prefabpath);
                 return;
             }
 
@@ -576,104 +639,20 @@ namespace Game{
             // Get spawn position and rotation from the spawn point
             Vector3 spawnPos = spawnPoint.position;
             Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
+            Vector3 spawnScale = new Vector3(0.006f, 0.006f, 0.006f);
 
-            uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
+            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPos, ref spawnRot, ref spawnScale, false);
 
-            if(enemyID != 0){
-                Entity tempEntity = new Entity(enemyID);
-                Transform tempTransform = new Transform();
-                tempTransform.Entity = tempEntity;
-                InternalCalls.Transform_SetPosition(enemyID, ref spawnPos);
-                tempTransform.Rotation = spawnRot;
+            if(enemyID == 0){
+                Log("INVALID ID FOR SPAWNING");
+            } else {
                 Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
                 spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
                 spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
-            } else {
-                Log("INVALID ID FOR SPAWNING ENEMY");
             }
 
-            // MANUAL INSTANTIATION - adapt to your engine's PrefabInstantiator
-            /*
-            Entity enemy = PrefabRegistry.InstantiatePrefab(prefabName);
-            
-            if (enemy.IsValid())
-            {
-                // Manually set transform
-                enemy.Transform.Position = spawnPos;
-                enemy.Transform.Rotation = spawnRot;
-                
-                // If it's a loveletter, set its route
-                if (enemyType == 1 && loveletterRoutes.Length > 0)
-                {
-                    // Get random route
-                    int routeIndex = GetRandomInt(0, loveletterRoutes.Length);
-                    string route = loveletterRoutes[routeIndex];
-                    
-                    // Set the route on the enemy script
-                    // enemy.GetComponent<EnemyLoveletterScript>().SetPathID(route);
-                }
-                
-                Log("Spawned " + prefabName + " at position " + spawnPos);
-            }
-            else
-            {
-                Log("ERROR: Failed to instantiate " + prefabName);
-            }
-            */
-            
-            //Log("TODO: Spawn " + prefabpath + " at position " + spawnPos);
+            // uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
 
-            // Log with safe string concatenation
-            Log(string.Concat("TODO: Spawn ", prefabpath, " at position (", 
-                spawnPos.X.ToString(), ", ", spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), ")"));
-        }
-
-        private void SpawnLoveLetter(string prefabpath){
-            int spawnIndex = GetRandomInt(0, loveletterRoutes.Length);
-            string spawnPointName = loveletterRoutes[spawnIndex];
-
-            // Find the spawn point entity by name
-            uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
-            
-            // Get transform data directly using native calls
-            // We'll call the Transform native methods directly
-            Vector3 spawnPosition;
-            Vector3 spawnRotation;
-
-            if (entityID != 0)
-            {
-                try
-                {
-                    // Use the Transform class static methods via reflection/direct instantiation
-                    // Create a temporary entity wrapper
-                    Entity tempEntity = new Entity(entityID);
-                    Transform tempTransform = new Transform();
-                    tempTransform.Entity = tempEntity;
-                    
-                    // Now we can access the properties
-                    InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
-                    spawnRotation = tempTransform.Rotation;
-                    
-                    
-                    Log(string.Concat("Found ", spawnPointName, " registered at position (", 
-                        spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(), 
-                        ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ")"));
-                }
-                catch (Exception ex)
-                {
-                    Log(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
-                }
-            }
-            else
-            {
-                Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName, 
-                    " (EntityID: ", entityID.ToString(), ")"));
-            }
-
-            uint enemyID = InternalCalls.Prefab_Instantiate(prefabpath);
-
-            //Find and retrieve the parent of this loveletter and then change the rotation
-            //as well as the transform of that parent.
             // if(enemyID != 0){
             //     Entity tempEntity = new Entity(enemyID);
             //     Transform tempTransform = new Transform();
@@ -686,29 +665,103 @@ namespace Game{
             // } else {
             //     Log("INVALID ID FOR SPAWNING ENEMY");
             // }
+
+            // Log with safe string concatenation
+            Log(string.Concat("Spawn ", prefabpath, " at position (", 
+                spawnPos.X.ToString(), ", ", spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), ")"));
+        }
+
+        private void SpawnLoveLetter(string prefabpath){
+            int spawnIndex = GetRandomInt(0, loveletterRoutes.Length);
+            string spawnPointName = loveletterRoutes[spawnIndex];
+
+            // Find the spawn point entity by name
+            uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+
+            Log("Spawn point name is: " + spawnPointName);
+            
+            // Get transform data directly using native calls
+            // We'll call the Transform native methods directly
+            Vector3 spawnPosition;
+            Vector3 spawnRotation;
+
+            InternalCalls.Transform_GetPosition((uint)entityID, out spawnPosition);
+            Entity spawnent = new Entity(entityID);
+            Transform spawnentrans = new Transform();
+            spawnentrans.Entity = spawnent;
+            spawnRotation = spawnentrans.Rotation;
+
+            Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
+
+            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true);
+
+            if(enemyID == 0){
+                Log("LOVELETTERSPAWN FAIL");
+            } else {
+                Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", " ,
+                spawnPosition.Y.ToString(), ", " , spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", " ,
+                spawnRotation.Y.ToString(), ", " , spawnRotation.Z.ToString()));
+            }
+
+            // uint enemyID = InternalCalls.Prefab_InstantiateScene(prefabpath);
+
+            // if(enemyID != 0){
+            //     Entity tempEntity = new Entity(enemyID);
+            //     Transform tempTransform = new Transform();
+            //     tempTransform.Entity = tempEntity;
+            //     InternalCalls.Transform_SetPosition(enemyID, ref spawnPosition);
+            //     tempTransform.Rotation = spawnRotation;
+            //     Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", " ,
+            //     spawnPosition.Y.ToString(), ", " , spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", " ,
+            //     spawnRotation.Y.ToString(), ", " , spawnRotation.Z.ToString()));
+            // } else {
+            //     Log("INVALID ID FOR SPAWNING ENEMY");
+            // }
+
+
         }
         
         private void CheckForEnemiesLeft()
         {
             // Count enemies by tag or some other method
             // For now, just track the counter
+
+            uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
+            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("Enemy_Botnet");
+            uint[] trojan = InternalCalls.Scene_FindEntitiesByTag("Enemy_Trojan");
+            uint[] adware = InternalCalls.Scene_FindEntitiesByTag("Enemy_Adware");
+            uint[] worm = InternalCalls.Scene_FindEntitiesByTag("Enemy_Worm");
+
+            int totalenemiesleft = 0;
+
+            if(loveletter != null && loveletter.Length != 0){
+                totalenemiesleft += loveletter.Length;
+            } else if (botnet != null && botnet.Length != 0){
+                totalenemiesleft += botnet.Length;
+            } else if (trojan != null && trojan.Length != 0){
+                totalenemiesleft += trojan.Length;
+            } else if (adware != null && adware.Length != 0){
+                totalenemiesleft += adware.Length;
+            } else if (worm != null && worm.Length != 0){
+                totalenemiesleft += worm.Length;
+            }
             
-            if (enemiesLeft <= 0 && waveEnemiesLeftToSpawn <= 0)
-            {
+            if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
                 enemiesLeft = 0;
-                // End combat early if all enemies defeated
+
+                //End Combat early if all enemies defeated
                 EndTime();
+            } else {
+                enemiesLeft = totalenemiesleft;
             }
-        }
-        
-        public void EnemyDestroyed()
-        {
-            if (COMBAT)
-            {
-                enemiesLeft--;
-                //Log("Enemy destroyed - Remaining: " + enemiesLeft);
-                Log(string.Concat("Enemy destroyed - Remaining: ", enemiesLeft.ToString()));
-            }
+
+            // old code
+            // if (enemiesLeft <= 0 && waveEnemiesLeftToSpawn <= 0)
+            // {
+            //     enemiesLeft = 0;
+            //     // End combat early if all enemies defeated
+            //     EndTime();
+            // }
         }
         
         private void EndTime()
@@ -788,7 +841,7 @@ namespace Game{
             foreach(Entity entity in entities){
                 if (entity.EntityID != 0) // Extra safety check
                 {
-                    InternalCalls.MeshRenderer_SetVisible(entity.EntityID, true);
+                    InternalCalls.MeshRenderer_SetVisible((uint)entity.EntityID, true);
                 }
                 else
                 {
@@ -799,10 +852,10 @@ namespace Game{
             //deactivate the inactive wall of the walls that are spawning
             if (wallInactiveEntities != null && wallIndex < wallInactiveEntities.Length)
             {
-                ulong id = wallInactiveEntities[wallIndex].EntityID;
+                uint id = wallInactiveEntities[wallIndex].EntityID;
                 if (id != 0) // Extra safety check
                 {
-                    InternalCalls.MeshRenderer_SetVisible(id, false);
+                    InternalCalls.MeshRenderer_SetVisible((uint)id, false);
                 }
                 else
                 {
@@ -830,7 +883,7 @@ namespace Game{
                 foreach(Entity wall in wallInactiveEntities){
                     if (wall.EntityID != 0)
                     {
-                        InternalCalls.MeshRenderer_SetVisible(wall.EntityID, true);
+                        InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, true);
                     }
                 }
                 Log("All inactive walls enabled");
@@ -845,7 +898,7 @@ namespace Game{
                     if (wall.EntityID != 0) // Extra safety check
                     {
                         Log(string.Concat("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: ", wall.EntityID.ToString()));
-                        InternalCalls.MeshRenderer_SetVisible(wall.EntityID, false);
+                        InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, false);
                     }
                     else
                     {
@@ -856,32 +909,32 @@ namespace Game{
         }
         
         // Light management
-        private void SetupLights()
-        {
-            HandleLights( "BREAK", true);
-        }
+        // private void SetupLights()
+        // {
+        //     HandleLights( "BREAK", true);
+        // }
         
-        private void HandleLights(string phase, bool status)
-        {
-            /*
-            if (phase ==  BREAK")
-            {
-                if (lightPrep.IsValid())
-                    lightPrep.SetActive(status);
-                if (lightCombat.IsValid())
-                    lightCombat.SetActive(!status);
-            }
-            else if (phase == "COMBAT")
-            {
-                if (lightPrep.IsValid())
-                    lightPrep.SetActive(!status);
-                if (lightCombat.IsValid())
-                    lightCombat.SetActive(status);
-            }
-            */
+        // private void HandleLights(string phase, bool status)
+        // {
+        //     /*
+        //     if (phase ==  BREAK")
+        //     {
+        //         if (lightPrep.IsValid())
+        //             lightPrep.SetActive(status);
+        //         if (lightCombat.IsValid())
+        //             lightCombat.SetActive(!status);
+        //     }
+        //     else if (phase == "COMBAT")
+        //     {
+        //         if (lightPrep.IsValid())
+        //             lightPrep.SetActive(!status);
+        //         if (lightCombat.IsValid())
+        //             lightCombat.SetActive(status);
+        //     }
+        //     */
 
-            Log(string.Concat("TODO: Handle lights - ", phase));
-        }
+        //     Log(string.Concat("TODO: Handle lights - ", phase));
+        // }
 
         #endregion
         
@@ -906,7 +959,7 @@ namespace Game{
             
             foreach (string name in entityNames)
             {
-                ulong entityID = InternalCalls.Scene_FindEntityByName(name);
+                uint entityID = InternalCalls.Scene_FindEntityByName(name);
                 if (entityID != 0) // Only add valid entities
                 {
                     validEntities.Add(new Entity(entityID));
@@ -922,6 +975,34 @@ namespace Game{
                 " / ", entityNames.Length.ToString(), " entities found"));
             return validEntities.ToArray();
         }
+
+        private void PlayGameBGM(){
+            InternalCalls.Audio_Play((uint)EntityID);
+        }
+
+        //FOR FUTURE PURPOSE
+        private void PauseBGM(){
+            InternalCalls.Audio_Pause((uint)EntityID);
+        }
+
+        private void StopBGM(){
+            InternalCalls.Audio_Stop((uint)EntityID);
+        }
+
+        #endregion
+
+        #region public
+
+        
+        // public void EnemyDestroyed()
+        // {
+        //     if (COMBAT)
+        //     {
+        //         enemiesLeft--;
+        //         //Log("Enemy destroyed - Remaining: " + enemiesLeft);
+        //         Log(string.Concat("Enemy destroyed - Remaining: ", enemiesLeft.ToString()));
+        //     }
+        // }
 
         #endregion
     }

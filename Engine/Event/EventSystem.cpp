@@ -29,7 +29,7 @@ namespace Engine
 
 		if (!toProcess.empty())
 		{
-			LOG_INFO("[EventSystem] Dispatching ", toProcess.size(), " queued event(s)");
+			//LOG_INFO("[EventSystem] Dispatching ", toProcess.size(), " queued event(s)");
 		}
 
 		for (QueuedEvent &qe : toProcess)

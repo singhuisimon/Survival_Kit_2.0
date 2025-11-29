@@ -10,7 +10,7 @@ namespace Engine
         /// The entity this script is attached to
         /// Set automatically by the engine
         /// </summary>
-        public ulong EntityID { get; set; }
+        public uint EntityID { get; set; }
 
         /// <summary>
         /// Called once when the script is first created

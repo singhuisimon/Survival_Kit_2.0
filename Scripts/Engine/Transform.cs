@@ -1,123 +1,129 @@
-using System.Runtime.CompilerServices;
+using System;
 
 namespace Engine
 {
+    /// <summary>
+    /// Managed wrapper over native TransformComponent.
+    /// Exposes position, rotation and scale via InternalCalls.
+    /// </summary>
     public class Transform : Component
     {
-        // Internal calls to C++
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void GetPosition_Native(ulong entityID, out Vector3 position);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void SetPosition_Native(ulong entityID, ref Vector3 position);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void GetRotation_Native(ulong entityID, out Vector3 rotation);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SetRotation_Native(ulong entityID, ref Vector3 rotation);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void GetScale_Native(ulong entityID, out Vector3 scale);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void SetScale_Native(ulong entityID, ref Vector3 scale);
-
-        // Instance properties (component-style)
+        /// <summary>
+        /// World position of this entity.
+        /// </summary>
         public Vector3 Position
         {
             get
             {
-                GetPosition_Native(Entity.EntityID, out Vector3 position);
-                return position;
+                Vector3 pos;
+                InternalCalls.Transform_GetPosition(Entity.EntityID, out pos);
+                return pos;
             }
             set
             {
-                SetPosition_Native(Entity.EntityID, ref value);
+                InternalCalls.Transform_SetPosition(Entity.EntityID, ref value);
             }
         }
 
+        /// <summary>
+        /// World rotation as Euler angles in degrees (pitch, yaw, roll).
+        /// </summary>
         public Vector3 Rotation
         {
             get
             {
-                GetRotation_Native(Entity.EntityID, out Vector3 rotation);
-                return rotation;
+                Vector3 rot;
+                InternalCalls.Transform_GetRotation(Entity.EntityID, out rot);
+                return rot;
             }
             set
             {
-                SetRotation_Native(Entity.EntityID, ref value);
+                InternalCalls.Transform_SetRotation(Entity.EntityID, ref value);
             }
         }
 
+        /// <summary>
+        /// Local scale of this entity.
+        /// </summary>
         public Vector3 Scale
         {
             get
             {
-                GetScale_Native(Entity.EntityID, out Vector3 scale);
+                Vector3 scale;
+                InternalCalls.Transform_GetScale(Entity.EntityID, out scale);
                 return scale;
             }
             set
             {
-                SetScale_Native(Entity.EntityID, ref value);
+                InternalCalls.Transform_SetScale(Entity.EntityID, ref value);
             }
         }
 
-        // Methods
-        public void Translate(Vector3 translation)
-        {
-            Position = Position + translation;
-        }
+        // ---------------------------------
+        // Instance helpers
+        // ---------------------------------
 
+        /// <summary>
+        /// Adds to the current rotation (Euler degrees).
+        /// </summary>
         public void Rotate(Vector3 rotation)
         {
             Rotation = Rotation + rotation;
         }
 
+        /// <summary>
+        /// Rotates this transform so its forward faces the target position.
+        /// </summary>
         public void LookAt(Vector3 target)
         {
-            // Simple look-at implementation
             Vector3 direction = (target - Position).Normalized;
 
-            float yaw = (float)System.Math.Atan2(direction.X, direction.Z) * (180.0f / (float)System.Math.PI);
-            float pitch = (float)System.Math.Asin(-direction.Y) * (180.0f / (float)System.Math.PI);
+            float yaw = (float)System.Math.Atan2(direction.X, direction.Z) *
+                        (180.0f / (float)System.Math.PI);
+            float pitch = (float)System.Math.Asin(-direction.Y) *
+                          (180.0f / (float)System.Math.PI);
 
-            Rotation = new Vector3(pitch, yaw, 0);
+            Rotation = new Vector3(pitch, yaw, 0.0f);
         }
 
-        // ===== Static helpers for scripts that only have an entityID =====
+        // ---------------------------------
+        // Static helpers (when you only have an ID)
+        // ---------------------------------
 
-        public static Vector3 GetPosition(ulong entityID)
+        public static Vector3 GetPosition(uint entityID)
         {
-            GetPosition_Native(entityID, out Vector3 position);
-            return position;
+            Vector3 pos;
+            InternalCalls.Transform_GetPosition(entityID, out pos);
+            return pos;
         }
 
-        public static void SetPosition(ulong entityID, ref Vector3 position)
+        public static void SetPosition(uint entityID, ref Vector3 position)
         {
-            SetPosition_Native(entityID, ref position);
+            InternalCalls.Transform_SetPosition(entityID, ref position);
         }
 
-        public static Vector3 GetRotation(ulong entityID)
+        public static Vector3 GetRotation(uint entityID)
         {
-            GetRotation_Native(entityID, out Vector3 rotation);
-            return rotation;
+            Vector3 rot;
+            InternalCalls.Transform_GetRotation(entityID, out rot);
+            return rot;
         }
 
-        public static void SetRotation(ulong entityID, ref Vector3 rotation)
+        public static void SetRotation(uint entityID, ref Vector3 rotation)
         {
-            SetRotation_Native(entityID, ref rotation);
+            InternalCalls.Transform_SetRotation(entityID, ref rotation);
         }
 
-        public static Vector3 GetScale(ulong entityID)
+        public static Vector3 GetScale(uint entityID)
         {
-            GetScale_Native(entityID, out Vector3 scale);
+            Vector3 scale;
+            InternalCalls.Transform_GetScale(entityID, out scale);
             return scale;
         }
 
-        public static void SetScale(ulong entityID, ref Vector3 scale)
+        public static void SetScale(uint entityID, ref Vector3 scale)
         {
-            SetScale_Native(entityID, ref scale);
+            InternalCalls.Transform_SetScale(entityID, ref scale);
         }
     }
 }

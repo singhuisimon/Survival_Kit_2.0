@@ -184,6 +184,31 @@
                         "Parent": 4294967295,
                         "Children": []
                     }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav",
+                        "Type": 2,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ScriptClassName": ""
+                    }
                 }
             ]
         },
@@ -655,7 +680,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "ALLIES"
                     }
                 },
                 {
@@ -699,16 +724,44 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
                 }
             ]
         },
         {
-            "ID": 72,
+            "ID": 33,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "ALLIES"
                     }
                 },
                 {
@@ -752,6 +805,34 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
                 }
             ]
         },
@@ -761,7 +842,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "ALLIES"
                     }
                 },
                 {
@@ -805,6 +886,34 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
                 }
             ]
         },
@@ -814,7 +923,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "ALLIES"
                     }
                 },
                 {
@@ -850,6 +959,34 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]
@@ -1994,7 +2131,7 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.040462493896484,
+                            21.040464401245117,
                             38.87009811401367,
                             39.0
                         ],
@@ -2048,9 +2185,9 @@
                             -180.0
                         ],
                         "Scale": [
-                            2.0,
-                            2.0,
-                            2.0
+                            1.996999979019165,
+                            1.996999979019165,
+                            1.996999979019165
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -3900,7 +4037,7 @@
             ]
         },
         {
-            "ID": 33,
+            "ID": 90,
             "Components": [
                 {
                     "Type": "TagComponent",
