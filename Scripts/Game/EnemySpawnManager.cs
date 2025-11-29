@@ -736,14 +736,19 @@ namespace Game{
 
             if(loveletter != null && loveletter.Length != 0){
                 totalenemiesleft += loveletter.Length;
+                Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             } else if (botnet != null && botnet.Length != 0){
                 totalenemiesleft += botnet.Length;
+                Log("adding loveletter to total enemies left. currently there is: " + botnet.Length.ToString());
             } else if (trojan != null && trojan.Length != 0){
                 totalenemiesleft += trojan.Length;
+                Log("adding loveletter to total enemies left. currently there is: " + trojan.Length.ToString());
             } else if (adware != null && adware.Length != 0){
                 totalenemiesleft += adware.Length;
+                Log("adding loveletter to total enemies left. currently there is: " + adware.Length.ToString());
             } else if (worm != null && worm.Length != 0){
                 totalenemiesleft += worm.Length;
+                Log("adding loveletter to total enemies left. currently there is: " + worm.Length.ToString());
             }
             
             if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
