@@ -443,7 +443,7 @@ namespace Engine {
             });
 
         LOG_INFO("BTNodeRegistry: Registered ", registry.m_NodeTypes.size(), " built-in node types");
-    }
+}
 
 
 } // namespace Engine
