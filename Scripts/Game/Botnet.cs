@@ -93,6 +93,7 @@ namespace Game
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
         private const string TAG_ALLIES = "ALLIES";
+        private const string EVENT_BULLET_HIT = "BulletHit";
 
         // ===== Lifecycle =====
 
@@ -122,6 +123,8 @@ namespace Game
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
             InternalCalls.Physics_EnableCollisionEvents();
+
+            EventSystem.Subscribe(EVENT_BULLET_HIT, OnBulletHit);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -161,6 +164,11 @@ namespace Game
             }
         }
 
+        public override void OnDestroy()   // NEW
+        {
+            EventSystem.Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+        }
+
         // ===== Public API =====
 
         public void Stunned()
@@ -170,6 +178,31 @@ namespace Game
             stunTimer = stunnedTime;
             InternalCalls.Rigidbody_Stop((uint)EntityID);
         }
+
+        // ===== Event Handlers =====
+
+        private void OnBulletHit(string eventName, string payload)
+        {
+            // Ignore if already dead or wrong event
+            if (isDead || eventName != EVENT_BULLET_HIT)
+                return;
+
+            // Payload is the EntityID of whatever the bullet hit
+            if (!ulong.TryParse(payload, out ulong hitId))
+                return;
+
+            if (hitId != (ulong)EntityID)
+                return;
+
+            Log("Botnet (EntityID = " + EntityID + ") was hit by bullet! exploding");
+
+            // Either mark for explosion next frame...
+            isExploding = true;
+
+            // ...or explode immediately:
+            Explode();
+        }
+
 
         public void BruteForceAttack()
         {
