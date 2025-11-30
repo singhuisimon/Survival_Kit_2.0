@@ -242,10 +242,10 @@ namespace Game{
             }
             
             // Check if wave is complete
-            if (COMBAT)
-            {
-                CheckForEnemiesLeft();
-            }
+            // if (COMBAT)
+            // {
+            //     CheckForEnemiesLeft();
+            // }
             
             // CHEAT CODE - K to kill all enemies
             // if (Input.IsKeyPressed(KeyCode.K))

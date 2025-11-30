@@ -7,7 +7,7 @@ namespace Game
     {
         // ===== Movement Settings =====
         [SerializeField]
-        private float moveSpeed = 2.0f;  // Increased for visible movement
+        private float moveSpeed = 25.0f;  // Increased for visible movement
 
         [SerializeField]
         private float waypointReachedDistance = 5.0f;  // Increased for better detection
