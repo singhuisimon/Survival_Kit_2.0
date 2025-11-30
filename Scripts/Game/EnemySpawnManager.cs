@@ -165,6 +165,11 @@ namespace Game{
 
             InternalCalls.Entity_AddAudio((uint) EntityID);
 
+            timeCurrent = 10.0f;
+            timeNext = 10.0f;
+            spawnRateNext = 0.0f;
+            
+
             Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
         }
         
