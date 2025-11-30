@@ -25,6 +25,7 @@ namespace Game
         private string buttonEntityName = "Install_Btn";   // entity name of button
 
 
+
         // private fields
         private uint mainMenuCameraID;
         private uint gameCameraID;
@@ -33,6 +34,9 @@ namespace Game
 
         private uint buttonEntityID;    // for entity
         private bool wasMouseButtonPressed = false;
+
+        private bool hasGameStarted = false;
+
 
         public override void OnStart()
         {
@@ -108,6 +112,7 @@ namespace Game
                 else 
                 {
                     Log("Click was NOT over the button");
+                    OnButtonClicked();  // change camera anyway or else it will no longer change camera
                 }
                 
                 // float minX = buttonPos.X - (buttonWidth / 2f);
@@ -139,14 +144,21 @@ namespace Game
         {
             // Get mouse position (in screen/window coordinates)
             Vector2 mousePos = Input.GetMousePosition();
+            //Vector3 mouseWorld = ScreenToPseudoWorld(mousePos,0);
+
             
             // getting button world position directly from engine
-            Vector3 buttonPos;
+            Vector3 buttonPos;         
             InternalCalls.Transform_GetPosition(buttonEntityID, out buttonPos);
+            
+
+
 
             Log("Checking bounds...");
             Log("Mouse pos: " + mousePos.X + ", " + mousePos.Y);
+            //Log("MouseWorld pos: " + mouseWorld.X + ", " + mouseWorld.Y);
             Log("Button pos: " + buttonPos.X + ", " + buttonPos.Y);
+
             
             // Calculate button bounds
 
@@ -172,15 +184,25 @@ namespace Game
             Log("IsMouseOverButton result: " + hit);
             
             return hit;
+
+
         }
 
         // Handle button click - to toggle between cameras
         private void OnButtonClicked()
         {
+            if (hasGameStarted)
+            {
+                Log("StartGameButton: Game already started, ignoring click.");
+                return;
+            }
+
             Log("StartGameButton: Clicked! Switching cameras...");
             
             // Toggle state
-            isShowingMainMenu = !isShowingMainMenu;
+            isShowingMainMenu = false;
+
+            hasGameStarted = true; //lets player know game has started
             
             // Update which camera is active
             UpdateCameraStates();
@@ -242,5 +264,7 @@ namespace Game
                 InternalCalls.Camera_SetEnabled(gameCameraID, true);
             }
         }
+
+
     }
 }
