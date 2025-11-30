@@ -94,6 +94,8 @@ namespace Game{
         
         private const uint INVALID_ENTITY = 0xffffffffu;
 
+        private bool wasMouseButtonPressed = false;
+
         // Light entities
         //private Entity lightPrep;
         //private Entity lightCombat;
@@ -113,6 +115,8 @@ namespace Game{
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
         private uint spawnmanagerID;
+
+        private bool playbgm = false;
   
         public override void OnStart()
         {
@@ -128,8 +132,6 @@ namespace Game{
             //     return;
             // }
 
-            stopmainsound();
-            
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
 
@@ -170,23 +172,41 @@ namespace Game{
         {
 
             //check for the trigger to start
-            if(Input.IsKeyPressed(KeyCode.Semicolon) && !isActive){
+            if(Input.IsKeyPressed(KeyCode.Enter) && !isActive){
                 isActive = true;
+                stopmainsound();
             }
+
+            // bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
+            
+            // //if (Input.IsMouseButtonPressed(MouseButton.Left))
+            // if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
+            // {
+            //     Log("===================");
+            //     Log("CLICK DETECTED!");
+            //     Log("===================");
+
+            //     isActive = true;
+            //     stopmainsound();
+            // }
+
 
             if (!isActive){
 
                 if(started && (BREAK && enemiesLeft <= 0)){
                     StopBGM();
+                    playbgm = false;
                     //Log("====== EnemySpawnManager - All enemies died =====");
                 } 
 
                 return;
+            }
 
-            } else {
+            if(!playbgm){
                 PlayGameBGM();
                 started = true;
-            }
+                playbgm = true;
+            }   
 
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
@@ -771,7 +791,7 @@ namespace Game{
             // For now, just track the counter
 
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
-            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("Enemy_Botnet");
+            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
             uint[] trojan = InternalCalls.Scene_FindEntitiesByTag("Enemy_Trojan");
             uint[] adware = InternalCalls.Scene_FindEntitiesByTag("Enemy_Adware");
             uint[] worm = InternalCalls.Scene_FindEntitiesByTag("Enemy_Worm");
@@ -1101,7 +1121,7 @@ namespace Game{
 
             for(int i = 0; i < Allies.Length; i++){
                 if(Allies[i] != INVALID_ENTITY){
-                    Log("HIIII");
+                    //Log("HIIII");
                     InternalCalls.Entity_AddAudio(Allies[i]);
                     InternalCalls.Audio_SetFile(Allies[i], alliesambience);
                     InternalCalls.Audio_SetLoop(Allies[i], true);
