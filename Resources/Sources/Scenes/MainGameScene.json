@@ -527,7 +527,7 @@
                 {
                     "Type": "CameraComponent",
                     "Properties": {
-                        "Enabled": true,
+                        "Enabled": false,
                         "Primary": true,
                         "Projection": false,
                         "autoAspect": true,
@@ -6513,7 +6513,7 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.040462493896484,
+                            21.040464401245117,
                             38.87009811401367,
                             39.0
                         ],
