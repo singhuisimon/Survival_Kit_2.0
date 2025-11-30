@@ -3,12 +3,6 @@ using System;
 
 namespace Game
 {
-    /// <summary>
-    /// Health component for LoveLetter core sub-entities
-    /// Detects bullet collisions and takes 50 damage per hit
-    /// Dies after 2 hits (100 health total)
-    /// Calls parent's OnCoreDestroyed when this core dies
-    /// </summary>
     public class HealthLove : ScriptBehaviour
     {
         private const float MaxHealth = 100.0f;
@@ -16,18 +10,35 @@ namespace Game
         private const float DamagePerHit = 50.0f;
         private bool isDead = false;
 
-
+        // ===== Spawn Grace Period =====
+        private const float SPAWN_GRACE_TIME = 0.5f;  // Invulnerable for 0.5 seconds after spawn
+        private float spawnTimer = 0.0f;
+        private bool isInvulnerable = true;
 
         public override void OnStart()
         {
             CurrentHealth = MaxHealth;
             isDead = false;
-            Engine.InternalCalls.Log("Core " + EntityID + " Health initialized");
+            isInvulnerable = true;
+            spawnTimer = SPAWN_GRACE_TIME;
+            Engine.InternalCalls.Log("Core " + EntityID + " Health initialized (invulnerable for " + SPAWN_GRACE_TIME + " seconds)");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             if (isDead) return;
+
+            // Handle spawn grace period
+            if (isInvulnerable)
+            {
+                spawnTimer -= deltaTime;
+                if (spawnTimer <= 0.0f)
+                {
+                    isInvulnerable = false;
+                    Engine.InternalCalls.Log("Core " + EntityID + " is now vulnerable!");
+                }
+                return;  // Don't check collisions while invulnerable
+            }
 
             CheckBulletCollision();
         }
