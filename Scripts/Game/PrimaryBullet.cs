@@ -97,6 +97,10 @@ namespace Game
         {
             Log("=== OnHitEnemy Called ===");
             Log("Target: " + targetEntityID);
+
+            // Publish event BEFORE destroying the bullet
+            Engine.EventSystem.Publish("BulletHit", targetEntityID.ToString());
+
             Log("Destroying bullet EntityID: " + EntityID);
             InternalCalls.Scene_DestroyEntity((uint)EntityID);
         }
