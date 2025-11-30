@@ -99,7 +99,7 @@ namespace Engine {
 			Config cfg{};
 
 			//resource path (get from the /Resources not from the build folder)
-			std::string sourcesPath = GetSourceResourcesPath();
+			std::string sourcesPath = Engine::getAssetsPath();
 
 			//get the build/Resources path for compiled path
 			std::string assetsPath = Engine::getAssetsPath();
