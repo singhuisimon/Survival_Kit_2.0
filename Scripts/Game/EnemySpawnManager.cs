@@ -176,7 +176,7 @@ namespace Game{
 
                 if(started && (BREAK && enemiesLeft <= 0)){
                     StopBGM();
-                    Log("====== EnemySpawnManager - All enemies died =====");
+                    //Log("====== EnemySpawnManager - All enemies died =====");
                 } 
 
                 return;
@@ -656,7 +656,7 @@ namespace Game{
             
             if(enemyType == 1){
                 //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
-                Log("HI LOVELETTER HERE");
+                //Log("HI LOVELETTER HERE");
                 SpawnLoveLetter(prefabpath);
                 return;
             }
@@ -1015,7 +1015,7 @@ namespace Game{
         }
 
         private void PlayGameBGM(){
-            Log("Playbgm hehe");
+            //Log("Playbgm hehe");
             InternalCalls.Audio_Play((uint)EntityID);
             PlayAllOtherAudio();
         }
@@ -1036,20 +1036,10 @@ namespace Game{
                 case 0:
 
                 case 1:
-                    SetEnemyCount(1, 4, 0, 0, 0);
-                    //SetEnemyCount(1, 4, 20, 0, 0);
-                    loveletterRoutes = new string[] {"A1"};
-                    //loveletterRoutes = new string[] {"A1", "A2"};
-                    activeSpawnPoints = spawnPointsA;
+
                     break;
                 case 2:
-                    SetEnemyCount(3, 13, 0, 0, 0);
-                    //SetEnemyCount(3, 13, 6, 7, 0);
-                    loveletterRoutes = new string[] {"A1"};
-                    //loveletterRoutes = new string[] {"A1", "A2", "D1", "D2"};
-                    activeSpawnPoints = new List<SpawnPointData>();
-                    activeSpawnPoints.AddRange(spawnPointsA);
-                    //activeSpawnPoints.AddRange(spawnPointsD);
+
                     break;
                 case 3:
                     // not for this milestone
@@ -1087,31 +1077,43 @@ namespace Game{
         #region other sound
 
         private void PlayAllOtherAudio(){
-            Log("Life is not daijoubu");
+            //Log("Life is not daijoubu");
 
             //play for allies ambience audio
-            // uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
+            uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
 
-            // if(Allies == null || Allies.Length <= 0){
-            //     LogWarning("SpawnManager: Allies list is null or non-existent/not found");
-            // }
+            if(Allies == null || Allies.Length <= 0){
+                LogWarning("SpawnManager: Allies list is null or non-existent/not found");
+            } else {
+                //Log("hey allies are found yay");
+            }
 
-            // for(int i = 0; i < Allies.Length; i++){
-            //     if(Allies[i] != INVALID_ENTITY){
-            //         Log("HIIII");
-            //         InternalCalls.Audio_Play(Allies[i]);
-            //         Log("SpawnManager: Playing ally audio right now - only gunship ambience");
-            //     }
-            // }
+            for(int i = 0; i < Allies.Length; i++){
+                if(Allies[i] != INVALID_ENTITY){
+                    Log("HIIII");
+                    InternalCalls.Entity_AddAudio(Allies[i]);
+                    InternalCalls.Audio_SetFile(Allies[i], alliesambience);
+                    InternalCalls.Audio_SetLoop(Allies[i], true);
+                    InternalCalls.Audio_SetIs3D(Allies[i], true);
 
-            // uint coreID = InternalCalls.Scene_FindEntityByName("Core");
+                    InternalCalls.Audio_Play(Allies[i]);
+                    Log("SpawnManager: Playing ally audio right now - only gunship ambience");
+                }
+            }
+
+            uint coreID = InternalCalls.Scene_FindEntityByName("Core");
             
-            // if(coreID != INVALID_ENTITY){
-            //     InternalCalls.Audio_Play(coreID);
-            //     Log("SpawnManager: Playing core ambience now through core");
-            // } else {
-            //     LogError("SpawnManager: Cannot find Emplacement");
-            // }
+            if(coreID != INVALID_ENTITY){
+                InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetFile(coreID, coreambience);
+                InternalCalls.Audio_SetLoop(Allies[i], true);
+                InternalCalls.Audio_SetIs3D(Allies[i], true);
+
+                InternalCalls.Audio_Play(coreID);
+                Log("SpawnManager: Playing core ambience now through core");
+            } else {
+                LogError("SpawnManager: Cannot find Emplacement");
+            }
         }
 
         private void StopAllOtherAudio(){

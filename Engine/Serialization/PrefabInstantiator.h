@@ -62,15 +62,15 @@ namespace Engine {
          * @param entity Entity with PrefabComponent
          * @param scene Scene containing the entity
          */
-       // static void ApplyOverrides(Entity entity, Scene* scene);
+         // static void ApplyOverrides(Entity entity, Scene* scene);
 
-        /**
-     * @brief Deserialize and create entity from JSON data
-     * @param scene Target scene
-     * @param entityJson JSON string of entity data
-     * @param entityId Specific entity ID to use (entt::null for auto)
-     * @return Created entity
-     */
+          /**
+       * @brief Deserialize and create entity from JSON data
+       * @param scene Target scene
+       * @param entityJson JSON string of entity data
+       * @param entityId Specific entity ID to use (entt::null for auto)
+       * @return Created entity
+       */
         static Entity DeserializeEntity(
             Scene* scene,
             const std::string& entityJson,
@@ -90,6 +90,8 @@ namespace Engine {
         static void ApplyPrefabComponentToAll(
             const std::vector<Entity>& entities,
             xresource::instance_guid prefabGUID);
+
+        static Entity FindRootEntity(const std::vector<Entity>& entities);
     private:
 
         /**
