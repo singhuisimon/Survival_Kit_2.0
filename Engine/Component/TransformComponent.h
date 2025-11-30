@@ -74,6 +74,10 @@ namespace Engine {
         }
 
 
+        int GetParentEntity() const {
+            return Parent;
+        }
+
     };
 
 }
