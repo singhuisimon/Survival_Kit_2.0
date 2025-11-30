@@ -37,6 +37,35 @@ namespace Game
         private const float RAD2DEG = 57.2957795f;
         private const float PI = 3.14159265359f;
 
+        private void OnAllCoresDestroyed()
+        {
+            Engine.InternalCalls.Log("=== ALL CORES DESTROYED ===");
+            Engine.InternalCalls.Log("LoveLetter is defeated!");
+
+            // Destroy this entity
+            Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+        }
+
+        private void OnCoreDestroyed()
+        {
+            coresAlive--;
+            Engine.InternalCalls.Log("Core destroyed! Cores alive: " + coresAlive + "/" + totalCores);
+
+            if (coresAlive <= 0)
+            {
+                OnAllCoresDestroyed();
+            }
+        }
+
+        private void OnCoreDestroyedEvent(string eventName, string payload)
+        {
+            // payload contains the parent entity ID that lost a core
+            if (int.TryParse(payload, out int parentID) && parentID == EntityID)
+            {
+                OnCoreDestroyed();
+            }
+        }
+
         // ===== Lifecycle =====
         public void OnStart()
         {
@@ -47,6 +76,9 @@ namespace Game
             // Initialize cores alive
             coresAlive = totalCores;
 
+
+            // Subscribe to the "CoreDestroyed" channel
+            Engine.EventSystem.Subscribe("CoreDestroyed", OnCoreDestroyedEvent);
             // Get spawn position
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out startPosition);
             Engine.InternalCalls.Log("Spawn position: " + startPosition.X + ", " + startPosition.Y + ", " + startPosition.Z);
@@ -217,28 +249,12 @@ namespace Game
         /// <summary>
         /// Called by core sub-entities when they die
         /// </summary>
-        public void OnCoreDestroyed()
-        {
-            coresAlive--;
-            Engine.InternalCalls.Log("Core destroyed! Cores alive: " + coresAlive + "/" + totalCores);
 
-            if (coresAlive <= 0)
-            {
-                OnAllCoresDestroyed();
-            }
-        }
 
         /// <summary>
         /// Called when all cores are destroyed
         /// </summary>
-        private void OnAllCoresDestroyed()
-        {
-            Engine.InternalCalls.Log("=== ALL CORES DESTROYED ===");
-            Engine.InternalCalls.Log("LoveLetter is defeated!");
-
-            // Destroy this entity
-            Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
-        }
+   
 
         // ===== Helper Functions =====
         private float CalculateDistance(Engine.Vector3 a, Engine.Vector3 b)
