@@ -144,6 +144,7 @@ namespace Game
             }
 
 
+
         }
 
         // ===== Movement System =====
@@ -243,15 +244,38 @@ namespace Game
         private void MoveTowardsWaypoint(float deltaTime)
         {
             // Check if finished path
-            if (currentWaypoint >= waypoints.Length)
+            /*      if (currentWaypoint >= waypoints.Length)
+                  {
+                      // Loop back to start
+                      currentWaypoint = 0;
+                      StartRotationToWaypoint(currentWaypoint);
+                      Engine.InternalCalls.Log("Path complete! Looping back to waypoint 0");
+                      return;
+                  }
+      */
+
+            if (distance < waypointReachedDistance)
             {
-                // Loop back to start
-                currentWaypoint = 0;
+                Engine.InternalCalls.Log("Reached waypoint " + currentWaypoint);
+
+                // Move to next waypoint
+                currentWaypoint++;
+
+                // Check if this was the FINAL waypoint
+                if (currentWaypoint >= waypoints.Length)
+                {
+                    Engine.InternalCalls.Log("=== FINAL WAYPOINT REACHED ===");
+                    Engine.InternalCalls.Log("LoveLetter self-destructing...");
+                    Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                    return;
+                }
+
+                // Not final waypoint, continue to next one
                 StartRotationToWaypoint(currentWaypoint);
-                Engine.InternalCalls.Log("Path complete! Looping back to waypoint 0");
+                Engine.InternalCalls.Log("Starting rotation to waypoint " + currentWaypoint);
+
                 return;
             }
-
             // Get current position
             Engine.Vector3 currentPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out currentPos);
