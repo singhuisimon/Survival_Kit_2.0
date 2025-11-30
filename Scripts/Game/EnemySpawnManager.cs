@@ -109,8 +109,8 @@ namespace Game{
         [SerializeField]
         private float elapsedTime = 0f;
 
-        private string alliesambience = "Flotilla_Gunship_Ambient.wav";
-        private string coreambience = "Core_Ambient.wav";
+        //private string alliesambience = "Flotilla_Gunship_Ambient.wav";
+        //private string coreambience = "Core_Ambient.wav";
 
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 

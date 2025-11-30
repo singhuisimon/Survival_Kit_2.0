@@ -64,7 +64,7 @@ namespace Game
         private const float PI = 3.14159265359f;
         private const float HALF_PI = 1.5707963268f;
 
-        public void OnStart()
+        public override void OnStart()
         {
             Engine.InternalCalls.Log("=== PlayerMovement Started ===");
             Engine.InternalCalls.Log("PlayerID: " + EntityID);
@@ -96,7 +96,7 @@ namespace Game
             Engine.InternalCalls.Log("Camera controlled by C++ - use mouse to look around");
         }
 
-        public void OnUpdate(float deltaTime)
+        public override void OnUpdate(float deltaTime)
         {
             if (!moveAllowed || !initialized)
                 return;
@@ -543,7 +543,7 @@ namespace Game
             Engine.InternalCalls.Log("Player stopped");
         }
 
-        public void OnDestroy()
+        public override void OnDestroy()
         {
             Engine.InternalCalls.Log("=== PlayerMovement Destroyed ===");
         }
