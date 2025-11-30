@@ -10,8 +10,7 @@ namespace Game
         private const float DamagePerHit = 50.0f;
         private bool isDead = false;
 
-        // ===== Spawn Grace Period =====
-        private const float SPAWN_GRACE_TIME = 0.5f;  // Invulnerable for 0.5 seconds after spawn
+        private const float SPAWN_GRACE_TIME = 0.5f;
         private float spawnTimer = 0.0f;
         private bool isInvulnerable = true;
 
@@ -21,14 +20,17 @@ namespace Game
             isDead = false;
             isInvulnerable = true;
             spawnTimer = SPAWN_GRACE_TIME;
-            Engine.InternalCalls.Log("Core " + EntityID + " Health initialized (invulnerable for " + SPAWN_GRACE_TIME + " seconds)");
+
+            // Subscribe to bullet hits
+            Engine.EventSystem.Subscribe("BulletHit", OnBulletHit);
+
+            Engine.InternalCalls.Log("Core " + EntityID + " Health initialized");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             if (isDead) return;
 
-            // Handle spawn grace period
             if (isInvulnerable)
             {
                 spawnTimer -= deltaTime;
@@ -37,36 +39,23 @@ namespace Game
                     isInvulnerable = false;
                     Engine.InternalCalls.Log("Core " + EntityID + " is now vulnerable!");
                 }
-                return;  // Don't check collisions while invulnerable
+                return;
             }
-
-            CheckBulletCollision();
         }
 
-        /// <summary>
-        /// Check if this core collided with a bullet
-        /// </summary>
-        private void CheckBulletCollision()
+        private void OnBulletHit(string eventName, string payload)
         {
-            int collisionCount = Engine.InternalCalls.Physics_GetCollisionCount();
+            if (!uint.TryParse(payload, out uint hitEntity))
+                return;
 
-            for (int i = 0; i < collisionCount; i++)
+            // If this core was hit
+            if (hitEntity == EntityID && !isInvulnerable)
             {
-                Engine.InternalCalls.Physics_GetCollisionPair(i, out uint entityA, out uint entityB);
-
-                // Check if this core is involved in collision
-                if (entityA == EntityID || entityB == EntityID)
-                {
-                    Engine.InternalCalls.Log("Core " + EntityID + " hit by bullet!");
-                    TakeDamage();
-                    return;
-                }
+                Engine.InternalCalls.Log("Core " + EntityID + " hit by bullet!");
+                TakeDamage();
             }
         }
 
-        /// <summary>
-        /// Take damage from bullet hit (50 per hit)
-        /// </summary>
         private void TakeDamage()
         {
             CurrentHealth -= DamagePerHit;
@@ -78,9 +67,6 @@ namespace Game
             }
         }
 
-        /// <summary>
-        /// Core destroyed after 2 hits
-        /// </summary>
         private void Die()
         {
             if (isDead) return;
@@ -90,7 +76,6 @@ namespace Game
 
             if (parentEntityID != 0)
             {
-                // Publish event: channel="CoreDestroyed", payload=parentEntityID
                 Engine.EventSystem.Publish("CoreDestroyed", parentEntityID.ToString());
             }
 
