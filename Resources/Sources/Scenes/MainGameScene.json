@@ -497,9 +497,9 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -51.256011962890625,
-                            -53.95515823364258,
-                            -22.901859283447266
+                            -13.718133926391602,
+                            -120.71942901611328,
+                            -87.44053649902344
                         ],
                         "Rotation": [
                             179.98092651367188,
@@ -8634,31 +8634,22 @@
                     }
                 },
                 {
-                    "Type": "RigidbodyComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 7000.0,
-                        "AngularDamping": 7000.0,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 3,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
+                        "FilePath": "Core_Health_Damage_Alert.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 0.34200000762939453,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 71.7300033569336,
+                        "MaxDistance": 314.5690002441406,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
