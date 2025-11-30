@@ -22,7 +22,7 @@ namespace Game
         {
             CurrentHealth = MaxHealth;
             isDead = false;
-            Engine.InternalCalls.Log($"Core {EntityID} Health initialized");
+            Engine.InternalCalls.Log("Core " + EntityID + " Health initialized");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -46,7 +46,7 @@ namespace Game
                 // Check if this core is involved in collision
                 if (entityA == EntityID || entityB == EntityID)
                 {
-                    Engine.InternalCalls.Log($"Core {EntityID} hit by bullet!");
+                    Engine.InternalCalls.Log("Core " + EntityID + " hit by bullet!");
                     TakeDamage();
                     return;
                 }
@@ -59,7 +59,7 @@ namespace Game
         private void TakeDamage()
         {
             CurrentHealth -= DamagePerHit;
-            Engine.InternalCalls.Log($"Core {EntityID} hit! Health: {CurrentHealth}/{MaxHealth}");
+            Engine.InternalCalls.Log("Core " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
             if (CurrentHealth <= 0.0f)
             {
@@ -79,7 +79,7 @@ namespace Game
 
             if (parentEntityID != 0)
             {
-                // Publish event with parent ID
+                // Publish event: channel="CoreDestroyed", payload=parentEntityID
                 Engine.EventSystem.Publish("CoreDestroyed", parentEntityID.ToString());
             }
 
@@ -88,7 +88,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Engine.InternalCalls.Log($"Core {EntityID} destroyed");
+            Engine.InternalCalls.Log("Core " + EntityID + " destroyed");
         }
     }
 }
