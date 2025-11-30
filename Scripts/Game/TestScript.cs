@@ -72,6 +72,7 @@ namespace Game
         private const float DEG2RAD = 0.0174532924f;
         private const float RAD2DEG = 57.2957795f;
         private const float PI = 3.14159265359f;
+        private const float HALF_PI = 1.5707963268f;
 
         public override void OnStart()
         {
@@ -79,12 +80,12 @@ namespace Game
             Engine.InternalCalls.Log("PlayerID: " + EntityID);
 
             // Validate EntityID
-            if (EntityID == 0)
+        /*    if (EntityID == 0)
             {
                 Engine.InternalCalls.LogError("ERROR: EntityID is 0! Script was not properly initialized.");
                 return;
             }
-
+*/
             // Find MainCamera using the proper InternalCall
             mainCameraEntityID = Engine.InternalCalls.Scene_FindEntityByName("MainCamera");
 
@@ -383,9 +384,24 @@ namespace Game
 
                 Engine.InternalCalls.Log("Firing position: " + firingPosition.X + ", " + firingPosition.Y + ", " + firingPosition.Z);
 
-                // Instantiate bullet
-                uint bulletEntityID = Engine.InternalCalls.Prefab_Instantiate(prefabPath);
-                if (bulletEntityID == 0)
+                // Calculate bullet rotation to face the shoot direction
+                // Using atan2 for yaw (horizontal rotation) and asin for pitch (vertical rotation)
+                float bulletYaw = SimpleAtan2(shootDirection.X, shootDirection.Z) * RAD2DEG;
+                float bulletPitch = SimpleAsin(-shootDirection.Y) * RAD2DEG;  // Negative because looking down is positive pitch
+
+                Engine.Vector3 bulletRotation = new Engine.Vector3(bulletPitch, bulletYaw, 0.0f);
+                Engine.Vector3 bulletScale = new Engine.Vector3(1.0f, 1.0f, 1.0f);
+
+                Engine.InternalCalls.Log("Bullet rotation: " + bulletRotation.X + ", " + bulletRotation.Y + ", " + bulletRotation.Z);
+
+                // Instantiate bullet WITH TRANSFORM - this ensures position is set immediately
+                uint bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
+                    prefabPath,
+                    ref firingPosition,
+                    ref bulletRotation,
+                    ref bulletScale,
+                    false  // false = entity prefab, not scene prefab
+                ); if (bulletEntityID == 0)
                 {
                     Engine.InternalCalls.LogError("FAILED to instantiate bullet! Prefab_Instantiate returned 0");
                     Engine.InternalCalls.LogError("Check if prefab exists at: " + prefabPath);
@@ -506,6 +522,44 @@ namespace Game
             for (int i = 0; i < 3; i++)
                 x = 0.5f * (x + value / x);
             return x;
+        }
+
+        private float SimpleAsin(float x)
+        {
+            if (x <= -1.0f) return -HALF_PI;
+            if (x >= 1.0f) return HALF_PI;
+
+            float x2 = x * x;
+            float x3 = x2 * x;
+            float x5 = x3 * x2;
+            float x7 = x5 * x2;
+
+            return x + (x3 / 6.0f) + (3.0f * x5 / 40.0f) + (5.0f * x7 / 112.0f);
+        }
+
+        private float SimpleAtan2(float y, float x)
+        {
+            if (x == 0.0f)
+            {
+                if (y > 0.0f) return HALF_PI;
+                if (y < 0.0f) return -HALF_PI;
+                return 0.0f;
+            }
+
+            float absX = x < 0.0f ? -x : x;
+            float absY = y < 0.0f ? -y : y;
+            float a = absY < absX ? absY / absX : absX / absY;
+            float s = a * a;
+            float r = ((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a;
+
+            if (absY > absX)
+                r = HALF_PI - r;
+            if (x < 0.0f)
+                r = PI - r;
+            if (y < 0.0f)
+                r = -r;
+
+            return r;
         }
 
         private Engine.Vector3 CrossProduct(Engine.Vector3 a, Engine.Vector3 b)
