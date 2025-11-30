@@ -1087,7 +1087,7 @@ namespace Game{
         #region other sound
 
         private void PlayAllOtherAudio(){
-            Log("Life is not daijoubu")
+            Log("Life is not daijoubu");
 
             //play for allies ambience audio
             uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
