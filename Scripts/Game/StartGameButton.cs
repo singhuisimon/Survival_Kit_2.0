@@ -149,10 +149,17 @@ namespace Game
                 OnButtonClicked();
             }
 
-            if (Input.IsMouseButtonPressed(MouseButton.Right))
+            // detect right click
+            bool isRightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
+
+            if (isRightPressed && !wasRightMouseButtonPressed)
             {
+                // right-click JUST happened
                 ResetToMainMenu();
             }
+
+            wasRightMouseButtonPressed = isRightPressed;
+
         }
 
         public override void OnDestroy()

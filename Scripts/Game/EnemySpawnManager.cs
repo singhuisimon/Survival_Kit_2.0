@@ -107,10 +107,10 @@ namespace Game{
         [SerializeField]
         private float elapsedTime = 0f;
 
-        private string alliesambience = "Flotilla_Gunship_Ambient.wav";
-        private string coreambience = "Core_Ambient.wav";
+        //private string alliesambience = "Flotilla_Gunship_Ambient.wav";
+        //private string coreambience = "Core_Ambient.wav";
 
-        private string warnloveprefab = "Sources/Prefabs/loveletter_warn.prefab";
+        //private string warnloveprefab = "Sources/Prefabs/loveletter_warn.prefab";
 
         private uint spawnmanagerID;
   
