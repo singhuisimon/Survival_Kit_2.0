@@ -2380,7 +2380,7 @@
                         "Fields": {
                             "isActive": false,
                             "spawningAllowed": false,
-                            "CURRENT_WAVE": 1,
+                            "CURRENT_WAVE": 0,
                             "waveEnemiesLeftToSpawn": 0,
                             "E005_loveletter": 0,
                             "E004_botnet": 0,
@@ -2388,15 +2388,15 @@
                             "E003_trojan": 0,
                             "E007_adware": 0,
                             "spawnRate": 2.0,
-                            "spawnRateNext": 22.158300399780273,
+                            "spawnRateNext": 0.0,
                             "isSpawning": false,
                             "timeBetweenWave": 5.0,
                             "timeWave": 180.0,
-                            "timeCurrent": 180.0,
-                            "timeNext": 190.002685546875,
-                            "BREAK": false,
-                            "COMBAT": true,
-                            "elapsedTime": 127.40839385986328
+                            "timeCurrent": 10.0,
+                            "timeNext": 10.0,
+                            "BREAK": true,
+                            "COMBAT": false,
+                            "elapsedTime": 0.0
                         }
                     }
                 }
