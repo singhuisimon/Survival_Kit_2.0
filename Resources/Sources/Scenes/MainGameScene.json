@@ -38,10 +38,10 @@
                     "Properties": {
                         "FilePath": "RoomAmbience.wav",
                         "Type": 2,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
-                        "Loop": true,
+                        "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
                         "Is3D": false,
@@ -90,10 +90,10 @@
                     "Properties": {
                         "FilePath": "office_ambience.wav",
                         "Type": 2,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
-                        "Loop": true,
+                        "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
                         "Is3D": false,
@@ -382,7 +382,7 @@
                         ],
                         "Rotation": [
                             0.0000050089611249859445,
-                            9.602778505219312e-21,
+                            -0.0,
                             0.0000050089611249859445
                         ],
                         "Scale": [
@@ -439,13 +439,13 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -52.42853546142578,
+                            -18.682008743286133,
                             -190.66505432128906,
-                            -59.13444900512695
+                            -71.16463470458984
                         ],
                         "Rotation": [
-                            73.51998138427734,
-                            67.43413543701172,
+                            73.51996612548828,
+                            67.43412780761719,
                             74.7204818725586
                         ],
                         "Scale": [
@@ -983,7 +983,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1016,7 +1016,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1049,7 +1049,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1082,7 +1082,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1115,7 +1115,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1148,7 +1148,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -2438,6 +2438,25 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Core_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 52.41999816894531,
+                        "MaxDistance": 527.8699951171875,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -3939,7 +3958,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 1486329079522899547,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -3985,7 +4004,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 15897847887109707607,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -4288,9 +4307,9 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.040464401245117,
+                            21.040462493896484,
                             38.87009811401367,
-                            39.000003814697266
+                            39.0
                         ],
                         "Scale": [
                             1.0,
@@ -4376,7 +4395,7 @@
                         "Fields": {
                             "isActive": false,
                             "spawningAllowed": false,
-                            "CURRENT_WAVE": 0,
+                            "CURRENT_WAVE": 1,
                             "waveEnemiesLeftToSpawn": 0,
                             "E005_loveletter": 0,
                             "E004_botnet": 0,
@@ -4384,15 +4403,15 @@
                             "E003_trojan": 0,
                             "E007_adware": 0,
                             "spawnRate": 2.0,
-                            "spawnRateNext": 0.0,
+                            "spawnRateNext": 22.158300399780273,
                             "isSpawning": false,
                             "timeBetweenWave": 5.0,
                             "timeWave": 180.0,
-                            "timeCurrent": 10.0,
-                            "timeNext": 10.0,
-                            "BREAK": true,
-                            "COMBAT": false,
-                            "elapsedTime": 0.0
+                            "timeCurrent": 180.0,
+                            "timeNext": 190.002685546875,
+                            "BREAK": false,
+                            "COMBAT": true,
+                            "elapsedTime": 127.40839385986328
                         }
                     }
                 }
@@ -4460,6 +4479,25 @@
                         ],
                         "Parent": 4294967295,
                         "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Loveletter_Warp_Warning.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 22.420000076293945,
+                        "MaxDistance": 300.8699951171875,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -4748,7 +4786,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 2205374499459082779,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -4794,7 +4832,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 2205374499459082779,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -4840,7 +4878,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 2205374499459082779,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -4886,7 +4924,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 2205374499459082779,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -4932,7 +4970,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 2205374499459082779,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -4978,7 +5016,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 2205374499459082779,
                         "TextureGuid": 0,
-                        "Visible": false,
+                        "Visible": true,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -5031,7 +5069,7 @@
                         "MeshGuid": 0,
                         "MaterialGuid": 10852285783998821963,
                         "TextureGuid": 0,
-                        "Visible": true,
+                        "Visible": false,
                         "MeshType": 0,
                         "Material": 0,
                         "Texture": 0,
@@ -5059,7 +5097,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -5.0315671361366235e-15,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5123,7 +5161,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -5.0315671361366235e-15,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5551,6 +5589,25 @@
                         ],
                         "SphereRadius": 0.5
                     }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.420000076293945,
+                        "MaxDistance": 152.4499969482422,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
                 }
             ]
         },
@@ -5632,6 +5689,25 @@
                             0.0
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.420000076293945,
+                        "MaxDistance": 152.4499969482422,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -5715,6 +5791,25 @@
                         ],
                         "SphereRadius": 0.5
                     }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.420000076293945,
+                        "MaxDistance": 152.4499969482422,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
                 }
             ]
         },
@@ -5738,14 +5833,14 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            42.065818786621094,
-                            -128.27423095703125,
-                            -335.31103515625
+                            42.057132720947266,
+                            -128.27919006347656,
+                            -334.88671875
                         ],
                         "Rotation": [
-                            -180.0,
-                            -41.40201187133789,
-                            -180.0
+                            179.34576416015625,
+                            -36.8953971862793,
+                            -179.67953491210938
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -5774,8 +5869,8 @@
                     "Properties": {
                         "Mass": 1.0,
                         "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
+                        "IsTrigger": true,
+                        "UseGravity": false,
                         "Velocity": [
                             0.0,
                             0.0,
@@ -5796,6 +5891,25 @@
                             0.0
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.420000076293945,
+                        "MaxDistance": 152.4499969482422,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -5856,8 +5970,8 @@
                     "Properties": {
                         "Mass": 1.0,
                         "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
+                        "IsTrigger": true,
+                        "UseGravity": false,
                         "Velocity": [
                             0.0,
                             0.0,
@@ -5878,6 +5992,25 @@
                             0.0
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.420000076293945,
+                        "MaxDistance": 152.4499969482422,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -5938,8 +6071,8 @@
                     "Properties": {
                         "Mass": 1.0,
                         "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
+                        "IsTrigger": true,
+                        "UseGravity": false,
                         "Velocity": [
                             0.0,
                             0.0,
@@ -5960,6 +6093,25 @@
                             0.0
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.420000076293945,
+                        "MaxDistance": 152.4499969482422,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -6478,7 +6630,7 @@
                         ],
                         "Rotation": [
                             -180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [

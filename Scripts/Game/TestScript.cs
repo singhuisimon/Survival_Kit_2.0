@@ -379,7 +379,11 @@ namespace Game
                 float bulletPitch = SimpleAsin(-shootDirection.Y) * RAD2DEG;  // Negative because looking down is positive pitch
 
                 Engine.Vector3 bulletRotation = new Engine.Vector3(bulletPitch, bulletYaw, 0.0f);
-                Engine.Vector3 bulletScale = new Engine.Vector3(1.0f, 1.0f, 1.0f);
+                Engine.Vector3 bulletScale = new Engine.Vector3(0.2f, 0.2f, 0.1f);
+
+                if(prefabPath == SecondaryBulletPrefab){
+                    bulletScale = new Engine.Vector3(0.15f, 0.10f, 0.15f)
+                }
 
                 Engine.InternalCalls.Log("Bullet rotation: " + bulletRotation.X + ", " + bulletRotation.Y + ", " + bulletRotation.Z);
 
