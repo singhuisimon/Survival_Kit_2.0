@@ -23,6 +23,9 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Transform_GetParent(uint entityID);
+
         // NEW: list of entities matching a tag
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint[] Scene_FindEntitiesByTag(string tag);
@@ -281,6 +284,12 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Audio_SetReverbMix(uint entityID, float mix);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool EntityHasCamera(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool EntityHasRigidBody(ulong entityID);
 
         //Audio Manager implementation - new amanda
         [MethodImpl(MethodImplOptions.InternalCall)]
