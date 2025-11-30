@@ -66,8 +66,8 @@ namespace Game
         private string deathExplosionPrefab = string.Empty;
 
         // Health component
-      /*  [SerializeField]
-        private Health health;*/
+        //[SerializeField]
+        //private Health health;
 
         // ===== Private Runtime State =====
 
@@ -127,7 +127,7 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {
             // Death check
-            if (!isDead && health != null && health.IsDead)
+            if (!isDead /*&& /health != null && health.IsDead*/)
             {
                 Explode();
                 return;
@@ -482,7 +482,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
-                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    //DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }

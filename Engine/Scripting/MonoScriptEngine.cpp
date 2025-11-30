@@ -649,9 +649,7 @@ namespace Engine {
 		static void Transform_GetRotation(uint64_t entityID, glm::vec3 *outRotation);
 		static void Transform_SetRotation(uint64_t entityID, glm::vec3 *rotation);
 		static void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale);
-		static void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);
-		static void Transform_Move(uint64_t entityID, float deltaX, float deltaY, float deltaZ);
-	
+		static void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);	
 
 		static bool Input_IsKeyPressed(int keyCode);
 		static bool Input_IsMouseButtonPressed(int button);
@@ -1363,18 +1361,6 @@ namespace Engine {
 			return entityID;
 		}
 
-		void Transform_Move(uint64_t entityID, float deltaX, float deltaY, float deltaZ)
-		{
-			if (!s_CurrentScene) return;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if(!entity || !entity.HasComponent<TransformComponent>()) return;
-
-			auto &transform = entity.GetComponent<TransformComponent>();
-			transform.Position.x += deltaX;
-			transform.Position.y += deltaY;
-			transform.Position.z += deltaZ;
-		}
 		uint64_t Scene_FindEntityByName(MonoString *nameString) {
 			if(!s_CurrentScene) {
 				LOG_ERROR("[InternalCall] Scene not set!");
