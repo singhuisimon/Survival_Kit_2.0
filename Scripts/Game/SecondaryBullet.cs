@@ -9,7 +9,7 @@ namespace Game
         public float ProjectileSpeed = 800.0f;
 
         [SerializeField]
-        public float ProjectileLifetime = 0.9f;
+        public float ProjectileLifetime = 5.0f;
 
         [SerializeField]
         public float Damage = 25.0f;

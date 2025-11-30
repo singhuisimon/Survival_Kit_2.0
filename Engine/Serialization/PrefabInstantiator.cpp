@@ -48,7 +48,7 @@ namespace Engine {
             LOG_ERROR("PrefabInstantiator: Prefab not found in registry (GUID: 0x",
                 std::hex, prefabGUID.m_Value, std::dec, ")");
             return Entity();
-        } 
+        }
 
 
 #if 1 // original code bfr modified
@@ -680,28 +680,28 @@ namespace Engine {
        for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
            const auto& entityObj = entitiesArray[i];
 
-           // Get old ID from JSON
-           uint32_t oldID = 0;
-           if (entityObj.HasMember("ID")) {
-               oldID = entityObj["ID"].GetUint();
-           }
-           else {
-               LOG_WARNING("PrefabInstantiator: Entity {} has no ID in JSON", i);
-               continue;
-           }
+            // Get old ID from JSON
+            uint32_t oldID = 0;
+            if (entityObj.HasMember("ID")) {
+                oldID = entityObj["ID"].GetUint();
+            }
+            else {
+                LOG_WARNING("PrefabInstantiator: Entity {} has no ID in JSON", i);
+                continue;
+            }
 
-           // Convert entity JSON back to string
-           ::rapidjson::StringBuffer buffer;
-           ::rapidjson::Writer<::rapidjson::StringBuffer> writer(buffer);
-           entityObj.Accept(writer);
-           std::string jsonStr = buffer.GetString();
+            // Convert entity JSON back to string
+            ::rapidjson::StringBuffer buffer;
+            ::rapidjson::Writer<::rapidjson::StringBuffer> writer(buffer);
+            entityObj.Accept(writer);
+            std::string jsonStr = buffer.GetString();
 
-           // Create entity in scene
-           Entity newEntity = DeserializeEntity(scene, jsonStr);
-           if (!newEntity) {
-               LOG_WARNING("PrefabInstantiator: Failed to deserialize entity {} (old ID: {})", i, oldID);
-               continue;
-           }
+            // Create entity in scene
+            Entity newEntity = DeserializeEntity(scene, jsonStr);
+            if (!newEntity) {
+                LOG_WARNING("PrefabInstantiator: Failed to deserialize entity {} (old ID: {})", i, oldID);
+                continue;
+            }
 
            // ===== CRITICAL: Verify entity is valid in registry =====
            if (!registry.valid(static_cast<entt::entity>(newEntity))) {
@@ -750,8 +750,8 @@ namespace Engine {
            if (!entity.HasComponent<TransformComponent>())
                continue;
 
-           auto& transform = entity.GetComponent<TransformComponent>();
-           uint32_t entityID = static_cast<uint32_t>(entity);
+            auto& transform = entity.GetComponent<TransformComponent>();
+            uint32_t entityID = static_cast<uint32_t>(entity);
 
            LOG_DEBUG("Fixing entity ", entityID);
 

@@ -62,7 +62,7 @@ namespace Engine {
          * @param entity Entity with PrefabComponent
          * @param scene Scene containing the entity
          */
-       // static void ApplyOverrides(Entity entity, Scene* scene);
+         // static void ApplyOverrides(Entity entity, Scene* scene);
 
             /**
          * @brief Deserialize and create entity from JSON data

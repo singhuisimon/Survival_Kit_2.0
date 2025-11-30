@@ -84,17 +84,34 @@ namespace Game
             Engine.InternalCalls.Log("Spawn position: " + startPosition.X + ", " + startPosition.Y + ", " + startPosition.Z);
 
             // Create hardcoded waypoints
-            waypoints = new Engine.Vector3[4];
-            waypoints[0] = new Engine.Vector3(0.0f, 5.0f, 0.0f);      // Point 1 (right)
-            waypoints[1] = new Engine.Vector3(10.0f, 5.0f, 0.0f);     // Point 2 (forward)
-            waypoints[2] = new Engine.Vector3(10.0f, 5.0f, 10.0f);    // Point 3 (left)
-            waypoints[3] = new Engine.Vector3(0.0f, 5.0f, 10.0f);     // Point 4 (back to start)
+            waypoints = new Engine.Vector3[7];
+            // waypoints[0] = new Engine.Vector3(0.0f, 5.0f, 0.0f);      // Point 1 (right)
+            // waypoints[1] = new Engine.Vector3(10.0f, 5.0f, 0.0f);     // Point 2 (forward)
+            // waypoints[2] = new Engine.Vector3(10.0f, 5.0f, 10.0f);    // Point 3 (left)
+            // waypoints[3] = new Engine.Vector3(0.0f, 5.0f, 10.0f);     // Point 4 (back to start)
+
+            // Engine.InternalCalls.Log("Waypoints:");
+            // Engine.InternalCalls.Log("  [0]: " + waypoints[0].X + ", " + waypoints[0].Y + ", " + waypoints[0].Z);
+            // Engine.InternalCalls.Log("  [1]: " + waypoints[1].X + ", " + waypoints[1].Y + ", " + waypoints[1].Z);
+            // Engine.InternalCalls.Log("  [2]: " + waypoints[2].X + ", " + waypoints[2].Y + ", " + waypoints[2].Z);
+            // Engine.InternalCalls.Log("  [3]: " + waypoints[3].X + ", " + waypoints[3].Y + ", " + waypoints[3].Z);
+
+            waypoints[0] = new Engine.Vector3(-26.6f, -42.0f, -780.0f);
+            waypoints[1] = new Engine.Vector3(-96.0f, -42.0f, -634.0f);
+            waypoints[2] = new Engine.Vector3(-96.0f, -42.0f, -335.0f);
+            waypoints[3] = new Engine.Vector3(-40.0f, -42.0f, -250.0f);
+            waypoints[4] = new Engine.Vector3(45.0f, -42.0f, -250.0f);
+            waypoints[5] = new Engine.Vector3(165.0f, -57.0f, -215.0f);
+            waypoints[6] = new Engine.Vector3(165.0f, -115.0f, -131.0f);
 
             Engine.InternalCalls.Log("Waypoints:");
             Engine.InternalCalls.Log("  [0]: " + waypoints[0].X + ", " + waypoints[0].Y + ", " + waypoints[0].Z);
             Engine.InternalCalls.Log("  [1]: " + waypoints[1].X + ", " + waypoints[1].Y + ", " + waypoints[1].Z);
             Engine.InternalCalls.Log("  [2]: " + waypoints[2].X + ", " + waypoints[2].Y + ", " + waypoints[2].Z);
             Engine.InternalCalls.Log("  [3]: " + waypoints[3].X + ", " + waypoints[3].Y + ", " + waypoints[3].Z);
+            Engine.InternalCalls.Log("  [4]: " + waypoints[4].X + ", " + waypoints[4].Y + ", " + waypoints[4].Z);
+            Engine.InternalCalls.Log("  [5]: " + waypoints[5].X + ", " + waypoints[5].Y + ", " + waypoints[5].Z);
+            Engine.InternalCalls.Log("  [6]: " + waypoints[6].X + ", " + waypoints[6].Y + ", " + waypoints[6].Z);
 
             // Start with delay
             delayTimer = startDelay;
