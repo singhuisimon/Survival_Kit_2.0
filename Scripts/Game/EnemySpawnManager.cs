@@ -103,7 +103,7 @@ namespace Game{
         // Simple pseudo-random number generator
         private uint rngSeed;
 
-        bool started = false;
+        //private bool started = false;
 
         // Time tracking (since we don't have Time.time)
         [SerializeField]
@@ -137,7 +137,7 @@ namespace Game{
 
             // init some values
             isActive = false;
-            started = false;
+            //started = false;
 
             // Find all spawn points in the scene
             InitializeSpawnPoints();
@@ -204,7 +204,7 @@ namespace Game{
 
             if(!playbgm){
                 PlayGameBGM();
-                started = true;
+                //started = true;
                 playbgm = true;
             }   
 
@@ -598,7 +598,7 @@ namespace Game{
                 isActive = false;
                 WallSetup_DisableActiveWalls();
                 WallSetup_InactiveWalls();
-                StopBGM();
+                //StopBGM();
                 playbgm = false;
 
             }
