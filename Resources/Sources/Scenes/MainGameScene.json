@@ -3,6 +3,110 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 150,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "room_ambience"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "RoomAmbience.wav",
+                        "Type": 2,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.014999999664723873
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 149,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "office_ambience"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "FilePath": "office_ambience.wav",
+                        "Type": 2,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
             "ID": 148,
             "Components": [
                 {
@@ -82,7 +186,7 @@
                 {
                     "Type": "CameraComponent",
                     "Properties": {
-                        "Enabled": true,
+                        "Enabled": false,
                         "Primary": false,
                         "Projection": true,
                         "autoAspect": true,
@@ -91,7 +195,7 @@
                             64.80000305175781
                         ],
                         "Depth": 0,
-                        "Aspect": 0.9659348726272583,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 1000.0,
@@ -258,9 +362,9 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -50.14132308959961,
-                            -120.68895721435547,
-                            -65.65126037597656
+                            -53.12293243408203,
+                            -180.5210418701172,
+                            -41.668052673339844
                         ],
                         "Rotation": [
                             0.0000050089611249859445,
@@ -279,7 +383,7 @@
                 {
                     "Type": "CameraComponent",
                     "Properties": {
-                        "Enabled": false,
+                        "Enabled": true,
                         "Primary": false,
                         "Projection": false,
                         "autoAspect": true,
@@ -290,12 +394,12 @@
                         "Depth": 0,
                         "Aspect": 0.9659348726272583,
                         "FOV": 97.9000015258789,
-                        "NearPlane": 1.309999942779541,
+                        "NearPlane": 0.11999999731779099,
                         "FarPlane": 3531.0,
                         "Target": [
-                            -44.20000076293945,
-                            -116.69999694824219,
-                            -67.89600372314453
+                            -52.42853546142578,
+                            -180.66505432128906,
+                            -49.13444900512695
                         ]
                     }
                 }
@@ -321,14 +425,14 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -44.20000076293945,
-                            -126.69999694824219,
-                            -77.89600372314453
+                            -52.42853546142578,
+                            -190.66505432128906,
+                            -59.13444900512695
                         ],
                         "Rotation": [
-                            11.007084846496582,
-                            17.637813568115234,
-                            32.698238372802734
+                            -11.665573120117188,
+                            84.57408142089844,
+                            -11.716604232788086
                         ],
                         "Scale": [
                             0.15000000596046448,
@@ -391,9 +495,28 @@
                     }
                 },
                 {
+                    "Type": "ListenerComponent",
+                    "Properties": {
+                        "Active": true
+                    }
+                },
+                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": ""
+                        "ScriptClassName": "Game.TestScript",
+                        "Fields": {
+                            "moveSpeed": 0.5,
+                            "moveAllowed": true,
+                            "dashForce": 2.0,
+                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
+                            "SecondaryBulletPrefab": "Sources/Prefabs/SecondaryBullet.prefab",
+                            "PrimaryMaxAmmo": 100,
+                            "PrimaryReloadTime": 1.5,
+                            "PrimaryFireRate": 0.30000001192092896,
+                            "SecondaryMaxAmmo": 5,
+                            "SecondaryReloadTime": 3.0,
+                            "SecondaryFireRate": 0.800000011920929
+                        }
                     }
                 }
             ]
@@ -2297,25 +2420,6 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "FilePath": "Core_Ambient.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
                 }
             ]
         },
@@ -4124,7 +4228,7 @@
                             180.0
                         ],
                         "Scale": [
-                            2.0,
+                            2.000000238418579,
                             2.0,
                             2.0
                         ],
@@ -4166,7 +4270,7 @@
                         ],
                         "Rotation": [
                             21.040462493896484,
-                            38.87009048461914,
+                            38.87009811401367,
                             39.0
                         ],
                         "Scale": [
@@ -4244,6 +4348,34 @@
                         "RolloffMode": 0,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ScriptClassName": "Game.EnemySpawnManager",
+                        "Fields": {
+                            "isActive": false,
+                            "spawningAllowed": false,
+                            "CURRENT_WAVE": 0,
+                            "waveEnemiesLeftToSpawn": 0,
+                            "E005_loveletter": 0,
+                            "E004_botnet": 0,
+                            "E001_worm_host": 0,
+                            "E003_trojan": 0,
+                            "E007_adware": 0,
+                            "spawnRate": 2.0,
+                            "spawnRateNext": 0.0,
+                            "isSpawning": false,
+                            "timeBetweenWave": 5.0,
+                            "timeWave": 180.0,
+                            "timeCurrent": 10.0,
+                            "timeNext": 10.0,
+                            "BREAK": true,
+                            "COMBAT": false,
+                            "enemiesLeft": 0,
+                            "elapsedTime": 0.0
+                        }
                     }
                 }
             ]
@@ -5372,6 +5504,34 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
                 }
             ]
         },
@@ -5424,6 +5584,34 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]
@@ -5478,6 +5666,34 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
                 }
             ]
         },
@@ -5530,6 +5746,34 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]
@@ -5584,6 +5828,34 @@
                         "Texture": 0,
                         "SubmeshIndex": 0
                     }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
                 }
             ]
         },
@@ -5636,6 +5908,34 @@
                         "Material": 0,
                         "Texture": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 7000.0,
+                        "AngularDamping": 7000.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]
@@ -6228,8 +6528,8 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
+                        "LinearDamping": 10000.0,
+                        "AngularDamping": 10000.0,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
