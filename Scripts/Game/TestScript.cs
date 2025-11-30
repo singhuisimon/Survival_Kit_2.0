@@ -78,21 +78,10 @@ namespace Game
             Engine.InternalCalls.Log("=== PlayerMovement Started ===");
             Engine.InternalCalls.Log("PlayerID: " + EntityID);
 
-            // Validate EntityID
-            if (EntityID == 0)
-            {
-                Engine.InternalCalls.LogError("ERROR: EntityID is 0! Script was not properly initialized.");
-                return;
-            }
-
+            EntityID = Engine.InternalCalls.Scene_FindEntityByName("Player");
             // Find MainCamera using the proper InternalCall
             mainCameraEntityID = Engine.InternalCalls.Scene_FindEntityByName("MainCamera");
 
-            if (mainCameraEntityID == 0)
-            {
-                Engine.InternalCalls.LogError("MainCamera not found! Make sure an entity named 'MainCamera' exists.");
-                return;
-            }
 
             Engine.InternalCalls.Log("Found MainCamera with ID: " + mainCameraEntityID);
 
