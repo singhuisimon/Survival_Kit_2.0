@@ -159,7 +159,7 @@ namespace Game{
                 Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
             }
 
-            InternalCalls.Entity_AddAudio((uint) entityID);
+            InternalCalls.Entity_AddAudio((uint) EntityID);
 
             Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
         }
@@ -1090,27 +1090,28 @@ namespace Game{
             Log("Life is not daijoubu");
 
             //play for allies ambience audio
-            uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
+            // uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
 
-            if(Allies == null || Allies.Length <= 0){
-                LogWarning("SpawnManager: Allies list is null or non-existent/not found");
-            }
+            // if(Allies == null || Allies.Length <= 0){
+            //     LogWarning("SpawnManager: Allies list is null or non-existent/not found");
+            // }
 
-            for(int i = 0; i < Allies.Length; i++){
-                if(Allies[i] != INVALID_ENTITY){
-                    InternalCalls.Audio_Play(Allies[i]);
-                    Log("SpawnManager: Playing ally audio right now - only gunship ambience");
-                }
-            }
+            // for(int i = 0; i < Allies.Length; i++){
+            //     if(Allies[i] != INVALID_ENTITY){
+            //         Log("HIIII");
+            //         InternalCalls.Audio_Play(Allies[i]);
+            //         Log("SpawnManager: Playing ally audio right now - only gunship ambience");
+            //     }
+            // }
 
-            uint coreID = InternalCalls.Scene_FindEntityByName("Core");
+            // uint coreID = InternalCalls.Scene_FindEntityByName("Core");
             
-            if(coreID != INVALID_ENTITY){
-                InternalCalls.Audio_Play(coreID);
-                Log("SpawnManager: Playing core ambience now through core");
-            } else {
-                LogError("SpawnManager: Cannot find Emplacement");
-            }
+            // if(coreID != INVALID_ENTITY){
+            //     InternalCalls.Audio_Play(coreID);
+            //     Log("SpawnManager: Playing core ambience now through core");
+            // } else {
+            //     LogError("SpawnManager: Cannot find Emplacement");
+            // }
         }
 
         private void StopAllOtherAudio(){
