@@ -7,7 +7,7 @@ namespace Game
     {
         // ===== Movement Settings =====
         [SerializeField]
-        private float moveSpeed = 2.0f;  // Increased for visible movement
+        private float moveSpeed = 25.0f;  // Increased for visible movement
 
         [SerializeField]
         private float waypointReachedDistance = 5.0f;  // Increased for better detection
@@ -144,6 +144,7 @@ namespace Game
             }
 
 
+
         }
 
         // ===== Movement System =====
@@ -201,11 +202,14 @@ namespace Game
             // Calculate angle difference
             float angleDiff = targetYaw - currentYaw;
 
-            // Normalize to [-180, 180]
-            while (angleDiff > 180.0f) angleDiff -= 360.0f;
-            while (angleDiff < -180.0f) angleDiff += 360.0f;
+           
+            angleDiff = angleDiff % 360.0f;  // 
+            if (angleDiff > 180.0f)
+                angleDiff -= 360.0f;
+            else if (angleDiff < -180.0f)
+                angleDiff += 360.0f;
 
-            // Check if rotation is complete (within 2 degrees)
+        
             if (SimpleMath.Abs(angleDiff) < 2.0f)
             {
                 // Snap to target angle
@@ -239,16 +243,6 @@ namespace Game
 
         private void MoveTowardsWaypoint(float deltaTime)
         {
-            // Check if finished path
-            if (currentWaypoint >= waypoints.Length)
-            {
-                // Loop back to start
-                currentWaypoint = 0;
-                StartRotationToWaypoint(currentWaypoint);
-                Engine.InternalCalls.Log("Path complete! Looping back to waypoint 0");
-                return;
-            }
-
             // Get current position
             Engine.Vector3 currentPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out currentPos);
@@ -278,19 +272,18 @@ namespace Game
                 // Move to next waypoint
                 currentWaypoint++;
 
-                // Start rotation to next waypoint if available
-                if (currentWaypoint < waypoints.Length)
+                // Check if this was the FINAL waypoint
+                if (currentWaypoint >= waypoints.Length)
                 {
-                    StartRotationToWaypoint(currentWaypoint);
-                    Engine.InternalCalls.Log("Starting rotation to waypoint " + currentWaypoint);
+                    Engine.InternalCalls.Log("=== FINAL WAYPOINT REACHED ===");
+                    Engine.InternalCalls.Log("LoveLetter self-destructing...");
+                    Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                    return;
                 }
-                else
-                {
-                    // Loop back
-                    currentWaypoint = 0;
-                    StartRotationToWaypoint(currentWaypoint);
-                    Engine.InternalCalls.Log("Looping back to waypoint 0");
-                }
+
+                // Not final waypoint, continue to next one
+                StartRotationToWaypoint(currentWaypoint);
+                Engine.InternalCalls.Log("Starting rotation to waypoint " + currentWaypoint);
 
                 return;
             }
@@ -400,22 +393,41 @@ public static class SimpleMath
 
     public static float Atan2(float y, float x)
     {
-        if (x > 0.0f)
-            return ArcTan(y / x);
+        // Handle special cases first
+        if (x == 0.0f)
+        {
+            if (y > 0.0f) return PI_2;
+            if (y < 0.0f) return -PI_2;
+            return 0.0f;
+        }
 
-        if (x < 0.0f && y >= 0.0f)
-            return ArcTan(y / x) + PI;
+        // Calculate the absolute angle
+        float absX = x < 0.0f ? -x : x;
+        float absY = y < 0.0f ? -y : y;
 
-        if (x < 0.0f && y < 0.0f)
-            return ArcTan(y / x) - PI;
+        // Use the smaller ratio for better accuracy
+        float ratio;
+        bool useReciprocal = absY > absX;
 
-        if (x == 0.0f && y > 0.0f)
-            return PI_2;
+        if (useReciprocal)
+            ratio = absX / absY;
+        else
+            ratio = absY / absX;
 
-        if (x == 0.0f && y < 0.0f)
-            return -PI_2;
+        // Rational approximation for atan (more stable than Taylor series)
+        float ratio2 = ratio * ratio;
+        float result = ratio / (1.0f + 0.28f * ratio2);  // Simple rational approximation
 
-        return 0.0f;
+        if (useReciprocal)
+            result = PI_2 - result;
+
+        // Adjust for quadrant
+        if (x < 0.0f)
+            result = PI - result;
+        if (y < 0.0f)
+            result = -result;
+
+        return result;
     }
 
     public static float Asin(float x)

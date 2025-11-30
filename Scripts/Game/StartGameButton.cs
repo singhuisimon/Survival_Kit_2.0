@@ -33,7 +33,7 @@ namespace Game
         private bool isShowingMainMenu;
 
         private uint buttonEntityID;    // for entity
-        private bool wasMouseButtonPressed = false;
+        //private bool wasMouseButtonPressed = false;
 
         private bool hasGameStarted = false;    //this is to ensure that when player click on MouseButton left, it wouldnt trigger the camera switch again
 
@@ -107,10 +107,8 @@ namespace Game
             // === DEBUG: Log mouse position constantly ===
             //Vector2 mousePos = Input.GetMousePosition();
 
-           bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
-            
-            //if (Input.IsMouseButtonPressed(MouseButton.Left))
-            if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
+            //change key
+            if (Input.IsKeyPressed(KeyCode.Enter))
             {
                 //Vector3 buttonPos = Transform.Position;
                 
@@ -139,15 +137,48 @@ namespace Game
                 //OnButtonClicked();
             }
 
+
+        //    bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
+            
+        //     //if (Input.IsMouseButtonPressed(MouseButton.Left))
+        //     if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
+        //     {
+        //         //Vector3 buttonPos = Transform.Position;
+                
+        //         Log("===================");
+        //         Log("CLICK DETECTED!");
+        //         Log("===================");
+
+        //         // check if the mouse is over the button (detecting the button entity?)
+        //         if (IsMouseOverButton()) 
+        //         {
+        //             Log("Click was over the button!");
+        //             OnButtonClicked();
+        //         }
+        //         else 
+        //         {
+        //             Log("Click was NOT over the button");
+        //             OnButtonClicked();  // change camera anyway or else it will no longer change camera
+        //         }
+                
+        //         // float minX = buttonPos.X - (buttonWidth / 2f);
+        //         // float maxX = buttonPos.X + (buttonWidth / 2f);
+        //         // float minY = buttonPos.Y - (buttonHeight / 2f);
+        //         // float maxY = buttonPos.Y + (buttonHeight / 2f);
+                
+        //         // Try to switch anyway for testing
+        //         //OnButtonClicked();
+        //     }
+
             // update previous state for next frame
-            wasMouseButtonPressed = isMouseLeftButtonPressed;
+            //wasMouseButtonPressed = isMouseLeftButtonPressed;
             
             // Space to immediately test if Camera can toggle (debug, comment during actual gameplay)
-            if (Input.IsKeyPressed(KeyCode.Space))
-            {
-                Log("Space key pressed - toggling camera");
-                OnButtonClicked();
-            }
+            // if (Input.IsKeyPressed(KeyCode.Space))
+            // {
+            //     Log("Space key pressed - toggling camera");
+            //     OnButtonClicked();
+            // }
 
             // detect right click
             // bool isRightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
