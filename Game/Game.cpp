@@ -890,7 +890,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 			auto &camComp = GameCam.GetComponent<Engine::CameraComponent>();
 
 			// Player head/aim point (slightly above)
-			const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
+			const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 10.0f, transform.Position.z + 10.0f);
 
 			// Persistent orbit state
 			static bool  initialized = false;
@@ -996,10 +996,10 @@ void Game::OnUpdate(Engine::Timestep ts)
 			// Movement accumulator
 			glm::vec3 moveDir(0.0f);
 
-			if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
-			if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
-			if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
-			if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+			//if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+			//if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+			//if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+			//if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
 
 			// Normalize to prevent faster diagonal movement
 			if (glm::dot(moveDir, moveDir) > 0.0f)

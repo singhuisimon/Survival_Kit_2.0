@@ -92,6 +92,8 @@ namespace Game{
         private Entity[] wallEActiveEntities;
         private Entity[] wallInactiveEntities;
         
+        private const uint INVALID_ENTITY = 0xffffffffu;
+
         // Light entities
         //private Entity lightPrep;
         //private Entity lightCombat;
@@ -104,7 +106,14 @@ namespace Game{
         // Time tracking (since we don't have Time.time)
         [SerializeField]
         private float elapsedTime = 0f;
-        
+
+        private string alliesambience = "Flotilla_Gunship_Ambient.wav";
+        private string coreambience = "Core_Ambient.wav";
+
+        private string warnloveprefab = "Sources/Prefabs/loveletter_warn.prefab";
+
+        private uint spawnmanagerID;
+  
         public override void OnStart()
         {
             // // Singleton setup
@@ -145,6 +154,13 @@ namespace Game{
             // Start at wave 1
             //SetupWaveSpawning();
             
+            spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            if(spawnmanagerID != INVALID_ENTITY){
+                Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+            }
+
+            InternalCalls.Entity_AddAudio((uint) entityID);
+
             Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
         }
         
@@ -164,6 +180,7 @@ namespace Game{
                 } 
 
                 return;
+
             } else {
                 PlayGameBGM();
                 started = true;
@@ -458,6 +475,7 @@ namespace Game{
         
         private void SetupWaveSpawning()
         {
+            Log("SET UP WAVE SPAWNING HERE");
             CURRENT_WAVE++;
             
             //Log("=== Setting up WAVE " + CURRENT_WAVE + " ===");
@@ -492,7 +510,7 @@ namespace Game{
                     // activeSpawnPoints.AddRange(spawnPointsE);
                     break;
                 default:
-                    //Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
+                    Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
                     break;
             }
             
@@ -651,6 +669,8 @@ namespace Game{
             Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
             Vector3 spawnScale = new Vector3(0.006f, 0.006f, 0.006f);
 
+            PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
+
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPos, ref spawnRot, ref spawnScale, false);
 
             if(enemyID == 0){
@@ -703,7 +723,10 @@ namespace Game{
 
             Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
 
+            PlayEnemySpawnSound(1, ref spawnPosition, ref spawnRotation, ref spawnScale);
+
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true);
+            //uint warningloveletter = InternalCalls.Prefab_InstantiateWithTransform(warnloveprefab, ref spawnPosition, ref spawnRotation, ref spawnScale, false);
 
             if(enemyID == 0){
                 Log("LOVELETTERSPAWN FAIL");
@@ -992,16 +1015,56 @@ namespace Game{
         }
 
         private void PlayGameBGM(){
+            Log("Playbgm hehe");
             InternalCalls.Audio_Play((uint)EntityID);
+            PlayAllOtherAudio();
         }
 
         //FOR FUTURE PURPOSE
         private void PauseBGM(){
             InternalCalls.Audio_Pause((uint)EntityID);
+            StopAllOtherAudio();
         }
 
         private void StopBGM(){
             InternalCalls.Audio_Stop((uint)EntityID);
+        }
+
+        private void PlayEnemySpawnSound(int enemyType, ref Vector3 pos, ref Vector3 rot, ref Vector3 scale){
+            switch (enemyType)
+            {
+                case 0:
+
+                case 1:
+                    SetEnemyCount(1, 4, 0, 0, 0);
+                    //SetEnemyCount(1, 4, 20, 0, 0);
+                    loveletterRoutes = new string[] {"A1"};
+                    //loveletterRoutes = new string[] {"A1", "A2"};
+                    activeSpawnPoints = spawnPointsA;
+                    break;
+                case 2:
+                    SetEnemyCount(3, 13, 0, 0, 0);
+                    //SetEnemyCount(3, 13, 6, 7, 0);
+                    loveletterRoutes = new string[] {"A1"};
+                    //loveletterRoutes = new string[] {"A1", "A2", "D1", "D2"};
+                    activeSpawnPoints = new List<SpawnPointData>();
+                    activeSpawnPoints.AddRange(spawnPointsA);
+                    //activeSpawnPoints.AddRange(spawnPointsD);
+                    break;
+                case 3:
+                    // not for this milestone
+                    //SetEnemyCount{5, 16, 7, 0, 1};
+                    // SetEnemyCount{5, 16, 0, 0, 0};
+                    // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
+                    // activeSpawnPoints = new List<SpawnPointData>();
+                    // activeSpawnPoints.AddRange(spawnPointsB);
+                    // activeSpawnPoints.AddRange(spawnPointsC);
+                    // activeSpawnPoints.AddRange(spawnPointsE);
+                    break;
+                default:
+                    //Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
+                    break;
+            }
         }
 
         #endregion
@@ -1018,6 +1081,41 @@ namespace Game{
         //         Log(string.Concat("Enemy destroyed - Remaining: ", enemiesLeft.ToString()));
         //     }
         // }
+
+        #endregion
+
+        #region other sound
+
+        private void PlayAllOtherAudio(){
+            Log("Life is not daijoubu")
+
+            //play for allies ambience audio
+            uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
+
+            if(Allies == null || Allies.Length <= 0){
+                LogWarning("SpawnManager: Allies list is null or non-existent/not found");
+            }
+
+            for(int i = 0; i < Allies.Length; i++){
+                if(Allies[i] != INVALID_ENTITY){
+                    InternalCalls.Audio_Play(Allies[i]);
+                    Log("SpawnManager: Playing ally audio right now - only gunship ambience");
+                }
+            }
+
+            uint coreID = InternalCalls.Scene_FindEntityByName("Core");
+            
+            if(coreID != INVALID_ENTITY){
+                InternalCalls.Audio_Play(coreID);
+                Log("SpawnManager: Playing core ambience now through core");
+            } else {
+                LogError("SpawnManager: Cannot find Emplacement");
+            }
+        }
+
+        private void StopAllOtherAudio(){
+            AudioManager.StopAll();
+        }
 
         #endregion
     }
