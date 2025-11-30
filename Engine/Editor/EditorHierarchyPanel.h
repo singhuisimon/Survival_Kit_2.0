@@ -133,7 +133,7 @@ namespace Engine
 				ImGui::Separator();
 
 				if (!hasParent) { // For main entities
-#if 1 // 25/11 4:42 Test prefab hierarchy panel
+
 					// ===================== Prefab Section ==========================
 					if (ImGui::BeginMenu("Prefabs"))
 					{
@@ -159,6 +159,8 @@ namespace Engine
 								{
 
 									LOG_DEBUG("Have Children.");
+
+									
 									// Get all entities in the hierarchy (selected entity + children)
 									std::vector<Entity> entitiesInHierarchy;
 									entitiesInHierarchy.push_back(selectedEntity); // Add root
@@ -190,81 +192,10 @@ namespace Engine
 										temporaryPrefabPaths.insert(prefabPath);
 										LOG_DEBUG("Prefab created successfully: ", prefabPath);
 									}
+									PrefabSerializer::SavePrefabToFile(*prefab, convertAssetPathToRootResources(prefabPath));
 								}
 
 								LOG_DEBUG(" ========== End Create Prefab =========");
-
-								//ImGui::EndMenu();
-#if 0
-								std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
-								auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
-
-
-								//if (selectedEntity.HasComponent<PrefabComponent>())
-								//{
-								//	//auto& prefabComp = selectedEntity.GetComponent<PrefabComponent>();
-
-								//	ImGui::EndMenu();
-								//	return;
-								//}
-
-
-								//  Check if prefab file already exists
-								std::shared_ptr<Prefab> prefab;
-								xresource::instance_guid existingGUID{};
-
-								auto existingPrefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
-								if (existingPrefab)
-								{
-
-									existingGUID = existingPrefab->GetGUID();
-
-									// update existing prefab instead of creating new one
-									prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
-									if (prefab)
-									{
-
-										prefab->SetGUID(existingGUID);
-
-									}
-								}
-								else
-								{
-									prefab = PrefabSerializer::CreateEntityPrefab(selectedEntity, entityName);
-
-								}
-
-								if (!prefab)
-								{
-
-									ImGui::EndMenu();
-									return;
-								}
-
-
-								// Save prefab to disk
-								if (PrefabSerializer::SavePrefabToFile(*prefab, prefabPath))
-								{
-									// Register/Update prefab in registry
-									auto existingInRegistry = PrefabRegistry::Get().GetPrefab(prefab->GetGUID());
-									if (!existingInRegistry)
-									{
-										PrefabRegistry::Get().RegisterPrefab(prefab);
-
-									}
-									else
-									{
-										PrefabRegistry::Get().RegisterPrefab(prefab);
-
-									}
-
-									currentPrefab = prefab.get();
-									currPrefabPath = prefabPath;
-									temporaryPrefabPaths.insert(prefabPath);
-
-
-								}
-#endif
 
 							}
 						}
@@ -277,8 +208,6 @@ namespace Engine
 
 						ImGui::EndMenu(); // end prefab menu
 					}
-
-#endif
 					if (ImGui::BeginMenu("Add New Sub-Entity"))
 					{
 						if (ImGui::MenuItem("Create New Sub-Entity"))
@@ -292,6 +221,13 @@ namespace Engine
 								parentTransform.Children.push_back((uint32_t)newEntity);
 								auto& childTransform = newEntity.GetComponent<TransformComponent>();
 								childTransform.SetParent(entity);
+							}
+
+							if (entity.HasComponent<PrefabComponent>())
+							{
+								auto& parentPrefab = entity.GetComponent<PrefabComponent>();
+								auto& childPrefab = newEntity.AddComponent<PrefabComponent>();
+								childPrefab.PrefabGUID = parentPrefab.PrefabGUID;
 							}
 						}
 						ImGui::Separator();
@@ -319,6 +255,11 @@ namespace Engine
 						if (entity.HasComponent<TransformComponent>()) {
 							TransformSystem::UnParent(scene, entity);
 						}
+
+						if (entity.HasComponent<PrefabComponent>())
+						{
+							entity.RemoveComponent<PrefabComponent>();
+						}
 					}
 				}
 
@@ -327,7 +268,6 @@ namespace Engine
 			}
 
 			if (opened && hasChildren) {
-#if 1 // original code bfr modified 
 
 				auto& transform = entity.GetComponent<TransformComponent>();
 				for (uint32_t childID : transform.Children)  //Directly iterate handles
@@ -341,38 +281,9 @@ namespace Engine
 					DrawEntityParentAndChildren(childEntity, scene, selectedEntity, pickedID, currentPrefab,
 						temporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath, m_Scene);
 				}
-#endif
-
-#if 0
-				auto& transform = entity.GetComponent<TransformComponent>();
-				for (uint32_t childID : transform.Children) {
-					entt::entity childEntityID = static_cast<entt::entity>(childID);
-
-					// EXTRA DEFENSIVE: Check multiple conditions
-					if (scene->GetRegistry().valid(childEntityID) &&
-						scene->GetRegistry().all_of<TagComponent>(childEntityID) &&
-						scene->GetRegistry().all_of<TransformComponent>(childEntityID)) {
-
-						try {
-							Entity childEntity(childEntityID, &scene->GetRegistry());
-							DrawEntityParentAndChildren(childEntity, scene, selectedEntity, pickedID, currentPrefab,
-								temporaryPrefabPaths, currPrefabPath, replacePrefabPending, selectedPrefabPath);
-						}
-						catch (...) {
-							LOG_ERROR("Exception when drawing child entity: ", childID);
-						}
-					}
-					else {
-						LOG_WARNING("Skipping invalid child entity: ", childID);
-					}
-				}
-
-#endif 
 
 				ImGui::TreePop();
 			}
-
-
 		}
 
 		static void DeleteEntityParentAndChildren(Scene* scene) {
@@ -413,6 +324,14 @@ namespace Engine
 			return;
 		}
 
+		/**************************************************************************
+		* @brief
+		* 	Scans the scene hierarchy and identifies all child entities whose 
+		*	parent no longer exists, 
+		* @param scene
+		*	The scene whose hierarchy should be validated.
+		**************************************************************************/
+
 		static void CheckForParentlessChildren(Scene* scene) {
 
 			std::vector<std::pair<Entity, u32>> childrenParentID;
@@ -446,6 +365,12 @@ namespace Engine
 			}
 		}
 
+		/**************************************************************************
+		* @brief
+		* 	Destroy all entities previously detected as parentless. 
+		* @param scene
+		*	The scene whose hierarchy should be validated.
+		**************************************************************************/
 		static void ClearParentlessChildren(Scene* scene) {
 			if (!parentlessChildren.empty()) {
 				for (auto& entity : parentlessChildren) {
@@ -454,7 +379,5 @@ namespace Engine
 				parentlessChildren.clear();
 			}
 		}
-
-
 	};
 }

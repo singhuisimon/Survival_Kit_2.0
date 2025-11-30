@@ -133,10 +133,10 @@ namespace Engine
 			float& lastClickedTime, const float& doubleClickedTime,
 			Entity& selectedEntity, Renderer* renderer) {
 
-			double currentTime = ImGui::GetTime();
+			float currentTime = (float)ImGui::GetTime();
 			if (pickedID == lastClickedID && (currentTime - lastClickedTime) < doubleClickedTime) {
 
-				LOG_DEBUG("Double Clicked ID{", pickedID, "}");
+				//LOG_DEBUG("Double Clicked ID{", pickedID, "}");
 
 				if (selectedEntity.HasComponent<TransformComponent>()) {
 					TransformComponent& targetCamPos = selectedEntity.GetComponent<TransformComponent>();

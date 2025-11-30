@@ -57,8 +57,8 @@ namespace Game{
         [SerializeField] private bool COMBAT = false;
         
         // Enemy counting
-        [SerializeField] private int enemiesLeft = 0;
-
+        //[SerializeField] private int enemiesLeft = 0;
+        private int enemiesLeft = 0;
         // Prefab names 
         private string[] enemyPrefabNames = new string[]
         {
@@ -94,6 +94,8 @@ namespace Game{
         
         private const uint INVALID_ENTITY = 0xffffffffu;
 
+        private bool wasMouseButtonPressed = false;
+
         // Light entities
         //private Entity lightPrep;
         //private Entity lightCombat;
@@ -107,12 +109,14 @@ namespace Game{
         [SerializeField]
         private float elapsedTime = 0f;
 
-        private string alliesambience = "Flotilla_Gunship_Ambient.wav";
-        private string coreambience = "Core_Ambient.wav";
+        //private string alliesambience = "Flotilla_Gunship_Ambient.wav";
+        //private string coreambience = "Core_Ambient.wav";
 
-        private string warnloveprefab = "Sources/Prefabs/loveletter_warn.prefab";
+        private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
         private uint spawnmanagerID;
+
+        private bool playbgm = false;
   
         public override void OnStart()
         {
@@ -127,7 +131,7 @@ namespace Game{
             //     // In custom engine, you'd destroy this entity
             //     return;
             // }
-            
+
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
 
@@ -168,23 +172,41 @@ namespace Game{
         {
 
             //check for the trigger to start
-            if(Input.IsKeyPressed(KeyCode.Semicolon) && !isActive){
+            if(Input.IsKeyPressed(KeyCode.Enter) && !isActive){
                 isActive = true;
+                stopmainsound();
             }
+
+            // bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
+            
+            // //if (Input.IsMouseButtonPressed(MouseButton.Left))
+            // if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
+            // {
+            //     Log("===================");
+            //     Log("CLICK DETECTED!");
+            //     Log("===================");
+
+            //     isActive = true;
+            //     stopmainsound();
+            // }
+
 
             if (!isActive){
 
-                if(started && (BREAK && enemiesLeft <= 0)){
-                    StopBGM();
-                    Log("====== EnemySpawnManager - All enemies died =====");
-                } 
+                // if(started && (BREAK && enemiesLeft <= 0)){
+                //     StopBGM();
+                //     playbgm = false;
+                //     //Log("====== EnemySpawnManager - All enemies died =====");
+                // } 
 
                 return;
+            }
 
-            } else {
+            if(!playbgm){
                 PlayGameBGM();
                 started = true;
-            }
+                playbgm = true;
+            }   
 
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
@@ -576,6 +598,8 @@ namespace Game{
                 isActive = false;
                 WallSetup_DisableActiveWalls();
                 WallSetup_InactiveWalls();
+                StopBGM();
+                playbgm = false;
 
             }
         }
@@ -656,7 +680,7 @@ namespace Game{
             
             if(enemyType == 1){
                 //TODO:: ADD IN LOVELETTER SPAWN LOGIC + IN FUNCTION RANDOM POS VIA THE STRING.
-                Log("HI LOVELETTER HERE");
+                //Log("HI LOVELETTER HERE");
                 SpawnLoveLetter(prefabpath);
                 return;
             }
@@ -669,7 +693,7 @@ namespace Game{
             Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
             Vector3 spawnScale = new Vector3(0.006f, 0.006f, 0.006f);
 
-            PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
+            //PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
 
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPos, ref spawnRot, ref spawnScale, false);
 
@@ -706,7 +730,7 @@ namespace Game{
             string spawnPointName = loveletterRoutes[spawnIndex];
 
             // Find the spawn point entity by name
-            uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+            uint spawnID = InternalCalls.Scene_FindEntityByName(spawnPointName);
 
             Log("Spawn point name is: " + spawnPointName);
             
@@ -715,15 +739,24 @@ namespace Game{
             Vector3 spawnPosition;
             Vector3 spawnRotation;
 
-            InternalCalls.Transform_GetPosition((uint)entityID, out spawnPosition);
-            Entity spawnent = new Entity(entityID);
+            InternalCalls.Transform_GetPosition((uint)spawnID, out spawnPosition);
+            Entity spawnent = new Entity(spawnID);
             Transform spawnentrans = new Transform();
             spawnentrans.Entity = spawnent;
             spawnRotation = spawnentrans.Rotation;
 
             Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
 
-            PlayEnemySpawnSound(1, ref spawnPosition, ref spawnRotation, ref spawnScale);
+            //PLAY WANRING AUDIO ONCE
+            InternalCalls.Entity_AddAudio(spawnID);
+            InternalCalls.Audio_SetFile(spawnID, loveletterwarning);
+            InternalCalls.Audio_SetLoop(spawnID, false);
+            InternalCalls.Audio_SetIs3D(spawnID, true);
+            InternalCalls.Audio_SetMinDistance(spawnID, 22.42f);
+            InternalCalls.Audio_SetMaxDistance(spawnID, 300.87f);
+            InternalCalls.Audio_Play(spawnID);
+
+            //PlayEnemySpawnSound(1, ref spawnPosition, ref spawnRotation, ref spawnScale);
 
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true);
             //uint warningloveletter = InternalCalls.Prefab_InstantiateWithTransform(warnloveprefab, ref spawnPosition, ref spawnRotation, ref spawnScale, false);
@@ -760,7 +793,7 @@ namespace Game{
             // For now, just track the counter
 
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
-            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("Enemy_Botnet");
+            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
             uint[] trojan = InternalCalls.Scene_FindEntitiesByTag("Enemy_Trojan");
             uint[] adware = InternalCalls.Scene_FindEntitiesByTag("Enemy_Adware");
             uint[] worm = InternalCalls.Scene_FindEntitiesByTag("Enemy_Worm");
@@ -769,19 +802,19 @@ namespace Game{
 
             if(loveletter != null && loveletter.Length != 0){
                 totalenemiesleft += loveletter.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             } else if (botnet != null && botnet.Length != 0){
                 totalenemiesleft += botnet.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + botnet.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + botnet.Length.ToString());
             } else if (trojan != null && trojan.Length != 0){
                 totalenemiesleft += trojan.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + trojan.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + trojan.Length.ToString());
             } else if (adware != null && adware.Length != 0){
                 totalenemiesleft += adware.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + adware.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + adware.Length.ToString());
             } else if (worm != null && worm.Length != 0){
                 totalenemiesleft += worm.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + worm.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + worm.Length.ToString());
             }
             
             if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
@@ -1015,7 +1048,7 @@ namespace Game{
         }
 
         private void PlayGameBGM(){
-            Log("Playbgm hehe");
+            //Log("Playbgm hehe");
             InternalCalls.Audio_Play((uint)EntityID);
             PlayAllOtherAudio();
         }
@@ -1023,49 +1056,39 @@ namespace Game{
         //FOR FUTURE PURPOSE
         private void PauseBGM(){
             InternalCalls.Audio_Pause((uint)EntityID);
-            StopAllOtherAudio();
         }
 
         private void StopBGM(){
             InternalCalls.Audio_Stop((uint)EntityID);
+            StopAllOtherAudio();
         }
 
-        private void PlayEnemySpawnSound(int enemyType, ref Vector3 pos, ref Vector3 rot, ref Vector3 scale){
-            switch (enemyType)
-            {
-                case 0:
+        // private void PlayEnemySpawnSound(int enemyType, ref Vector3 pos, ref Vector3 rot, ref Vector3 scale){
+        //     switch (enemyType)
+        //     {
+        //         case 0:
 
-                case 1:
-                    SetEnemyCount(1, 4, 0, 0, 0);
-                    //SetEnemyCount(1, 4, 20, 0, 0);
-                    loveletterRoutes = new string[] {"A1"};
-                    //loveletterRoutes = new string[] {"A1", "A2"};
-                    activeSpawnPoints = spawnPointsA;
-                    break;
-                case 2:
-                    SetEnemyCount(3, 13, 0, 0, 0);
-                    //SetEnemyCount(3, 13, 6, 7, 0);
-                    loveletterRoutes = new string[] {"A1"};
-                    //loveletterRoutes = new string[] {"A1", "A2", "D1", "D2"};
-                    activeSpawnPoints = new List<SpawnPointData>();
-                    activeSpawnPoints.AddRange(spawnPointsA);
-                    //activeSpawnPoints.AddRange(spawnPointsD);
-                    break;
-                case 3:
-                    // not for this milestone
-                    //SetEnemyCount{5, 16, 7, 0, 1};
-                    // SetEnemyCount{5, 16, 0, 0, 0};
-                    // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
-                    // activeSpawnPoints = new List<SpawnPointData>();
-                    // activeSpawnPoints.AddRange(spawnPointsB);
-                    // activeSpawnPoints.AddRange(spawnPointsC);
-                    // activeSpawnPoints.AddRange(spawnPointsE);
-                    break;
-                default:
-                    //Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
-                    break;
-            }
-        }
+        //         case 1:
+
+        //             break;
+        //         case 2:
+                    
+        //             break;
+        //         case 3:
+        //             // not for this milestone
+        //             //SetEnemyCount{5, 16, 7, 0, 1};
+        //             // SetEnemyCount{5, 16, 0, 0, 0};
+        //             // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
+        //             // activeSpawnPoints = new List<SpawnPointData>();
+        //             // activeSpawnPoints.AddRange(spawnPointsB);
+        //             // activeSpawnPoints.AddRange(spawnPointsC);
+        //             // activeSpawnPoints.AddRange(spawnPointsE);
+        //             break;
+        //         default:
+        //             //Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
+        //             break;
+        //     }
+        // }
 
         #endregion
 
@@ -1087,35 +1110,75 @@ namespace Game{
         #region other sound
 
         private void PlayAllOtherAudio(){
-            Log("Life is not daijoubu");
+            //Log("Life is not daijoubu");
 
             //play for allies ambience audio
-            // uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
+            uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
 
-            // if(Allies == null || Allies.Length <= 0){
-            //     LogWarning("SpawnManager: Allies list is null or non-existent/not found");
-            // }
+            if(Allies == null || Allies.Length <= 0){
+                LogWarning("SpawnManager: Allies list is null or non-existent/not found");
+            } else {
+                //Log("hey allies are found yay");
+            }
 
-            // for(int i = 0; i < Allies.Length; i++){
-            //     if(Allies[i] != INVALID_ENTITY){
-            //         Log("HIIII");
-            //         InternalCalls.Audio_Play(Allies[i]);
-            //         Log("SpawnManager: Playing ally audio right now - only gunship ambience");
-            //     }
-            // }
+            for(int i = 0; i < Allies.Length; i++){
+                if(Allies[i] != INVALID_ENTITY){
+                    //Log("HIIII");
+                    InternalCalls.Entity_AddAudio(Allies[i]);
+                    InternalCalls.Audio_SetFile(Allies[i], alliesambience);
+                    InternalCalls.Audio_SetLoop(Allies[i], true);
+                    InternalCalls.Audio_SetIs3D(Allies[i], true);
+                    InternalCalls.Audio_SetMinDistance(Allies[i], 5.42f);
+                    InternalCalls.Audio_SetMaxDistance(Allies[i], 152.45f);
 
-            // uint coreID = InternalCalls.Scene_FindEntityByName("Core");
+                    InternalCalls.Audio_Play(Allies[i]);
+                    Log("SpawnManager: Playing ally audio right now - only gunship ambience");
+                }
+            }
+
+            uint coreID = InternalCalls.Scene_FindEntityByName("Core");
             
-            // if(coreID != INVALID_ENTITY){
-            //     InternalCalls.Audio_Play(coreID);
-            //     Log("SpawnManager: Playing core ambience now through core");
-            // } else {
-            //     LogError("SpawnManager: Cannot find Emplacement");
-            // }
+            if(coreID != INVALID_ENTITY){
+                InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetFile(coreID, coreambience);
+                InternalCalls.Audio_SetLoop(coreID, true);
+                InternalCalls.Audio_SetIs3D(coreID, true);
+                InternalCalls.Audio_SetMinDistance(coreID, 52.42f);
+                InternalCalls.Audio_SetMaxDistance(coreID, 527.87f);
+
+                InternalCalls.Audio_Play(coreID);
+                Log("SpawnManager: Playing core ambience now through core");
+            } else {
+                LogError("SpawnManager: Cannot find Emplacement");
+            }
         }
 
         private void StopAllOtherAudio(){
             AudioManager.StopAll();
+        }
+
+        private void stopmainsound(){
+            uint officeambi = InternalCalls.Scene_FindEntityByName("office_ambience");
+            
+            if(officeambi != INVALID_ENTITY){
+                //InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetLoop(officeambi, false);
+                InternalCalls.Audio_Stop(officeambi);
+                Log("SpawnManager: Stopping office ambience");
+            } else {
+                LogError("SpawnManager: Cannot find office ambience");
+            }
+
+            uint roomambi = InternalCalls.Scene_FindEntityByName("room_ambience");
+            
+            if(roomambi != INVALID_ENTITY){
+                //InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetLoop(roomambi, false);
+                InternalCalls.Audio_Stop(roomambi);
+                Log("SpawnManager: Stopping room ambience");
+            } else {
+                LogError("SpawnManager: Cannot find room ambience");
+            }
         }
 
         #endregion

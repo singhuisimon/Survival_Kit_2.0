@@ -651,6 +651,7 @@ namespace Engine {
 		static void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale);
 		static void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);
 		static void Transform_Move(uint64_t entityID, float deltaX, float deltaY, float deltaZ);
+	
 
 		static bool Input_IsKeyPressed(int keyCode);
 		static bool Input_IsMouseButtonPressed(int button);
@@ -903,6 +904,7 @@ namespace Engine {
 		mono_add_internal_call("Engine.InternalCalls::Camera_SetFar", (void *)InternalCalls::Camera_SetFar);
 		mono_add_internal_call("Engine.InternalCalls::Camera_GetTarget", (void *)InternalCalls::Camera_GetTarget);
 		mono_add_internal_call("Engine.InternalCalls::Camera_SetTarget", (void *)InternalCalls::Camera_SetTarget);
+
 
 		// MeshRenderer
 		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetVisible", (void *)InternalCalls::MeshRenderer_GetVisible);
@@ -1858,6 +1860,7 @@ namespace Engine {
 			auto &cam = e.GetComponent<CameraComponent>();
 			cam.SetTarget(*inTarget); // marks dirty internally
 		}
+
 
 		bool MeshRenderer_GetVisible(uint64_t entityID) {
 			auto e = GetEntityOrNull(entityID);
