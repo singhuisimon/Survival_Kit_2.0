@@ -201,11 +201,14 @@ namespace Game
             // Calculate angle difference
             float angleDiff = targetYaw - currentYaw;
 
-            // Normalize to [-180, 180]
-            while (angleDiff > 180.0f) angleDiff -= 360.0f;
-            while (angleDiff < -180.0f) angleDiff += 360.0f;
+           
+            angleDiff = angleDiff % 360.0f;  // 
+            if (angleDiff > 180.0f)
+                angleDiff -= 360.0f;
+            else if (angleDiff < -180.0f)
+                angleDiff += 360.0f;
 
-            // Check if rotation is complete (within 2 degrees)
+        
             if (SimpleMath.Abs(angleDiff) < 2.0f)
             {
                 // Snap to target angle
