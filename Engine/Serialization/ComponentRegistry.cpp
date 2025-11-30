@@ -417,6 +417,7 @@ namespace Engine {
         // Register PrefabComponent
         {
             auto& meta = REGISTER_COMPONENT(PrefabComponent);
+            (void)meta;
             // PrefabComponent properties are managed internally
             // No user-editable properties exposed in inspector by default
         }

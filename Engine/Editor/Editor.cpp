@@ -5129,7 +5129,7 @@ namespace Engine
 				{
 					audio.SetState(PlayState::PAUSE);
 				}
-				if (ImGui::RadioButton("Stop", playState == PlayState::STOP))
+				if (ImGui::RadioButton("Stop##Audio", playState == PlayState::STOP))
 				{
 					audio.SetState(PlayState::STOP);
 				}

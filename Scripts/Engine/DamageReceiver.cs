@@ -13,7 +13,7 @@ namespace Engine
     public class DamageReceiver : ScriptBehaviour
     {
         [SerializeField("Health Component")]
-        private Health health;
+        //private Health health;
 
         private bool subscribed = false;
         private string eventName;
@@ -69,14 +69,14 @@ namespace Engine
         /// </summary>
         private void OnDamageEvent(string name, string payload)
         {
-            if (health == null)
-                return;
+            //if (health == null)
+            //    return;
 
             float amount = DamageSystem.ParseAmount(payload, 0.0f);
             if (amount <= 0.0f)
                 return;
 
-            health.TakeDamage(amount);
+            //health.TakeDamage(amount);
         }
     }
 }

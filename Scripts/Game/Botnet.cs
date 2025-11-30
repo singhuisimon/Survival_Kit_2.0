@@ -31,11 +31,11 @@ namespace Game
         [SerializeField]
         private float blastRadius = 5.0f;
 
-        [SerializeField]
-        private int blastDamage = 10;
+        // [SerializeField]
+        // private int blastDamage = 10;
 
-        [SerializeField]
-        private float blastImpulse = 0.0f;
+        // [SerializeField]
+        // private float blastImpulse = 0.0f;
 
         // Status effects
         [SerializeField]
@@ -66,8 +66,8 @@ namespace Game
         private string deathExplosionPrefab = string.Empty;
 
         // Health component
-        [SerializeField]
-        private Health health;
+        //[SerializeField]
+        //private Health health;
 
         // ===== Private Runtime State =====
 
@@ -93,6 +93,7 @@ namespace Game
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
         private const string TAG_ALLIES = "ALLIES";
+        private const string EVENT_BULLET_HIT = "BulletHit";
 
         // ===== Lifecycle =====
 
@@ -122,17 +123,12 @@ namespace Game
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
             InternalCalls.Physics_EnableCollisionEvents();
+
+            EventSystem.Subscribe(EVENT_BULLET_HIT, OnBulletHit);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // Death check
-            if (!isDead && health != null && health.IsDead)
-            {
-                Explode();
-                return;
-            }
-
             if (isDead)
                 return;
 
@@ -168,6 +164,11 @@ namespace Game
             }
         }
 
+        public override void OnDestroy()   // NEW
+        {
+            EventSystem.Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+        }
+
         // ===== Public API =====
 
         public void Stunned()
@@ -177,6 +178,31 @@ namespace Game
             stunTimer = stunnedTime;
             InternalCalls.Rigidbody_Stop((uint)EntityID);
         }
+
+        // ===== Event Handlers =====
+
+        private void OnBulletHit(string eventName, string payload)
+        {
+            // Ignore if already dead or wrong event
+            if (isDead || eventName != EVENT_BULLET_HIT)
+                return;
+
+            // Payload is the EntityID of whatever the bullet hit
+            if (!ulong.TryParse(payload, out ulong hitId))
+                return;
+
+            if (hitId != (ulong)EntityID)
+                return;
+
+            Log("Botnet (EntityID = " + EntityID + ") was hit by bullet! exploding");
+
+            // Either mark for explosion next frame...
+            isExploding = true;
+
+            // ...or explode immediately:
+            Explode();
+        }
+
 
         public void BruteForceAttack()
         {
@@ -292,9 +318,6 @@ namespace Game
             }
         }
 
-        /// <summary>
-        /// Smoothly rotates the botnet to face its target
-        /// </summary>
         private void RotateTowardsTarget(float deltaTime)
         {
             if (targetID == INVALID_ENTITY)
@@ -332,9 +355,6 @@ namespace Game
             Transform.SetRotation((uint)EntityID, ref newRot);
         }
 
-        /// <summary>
-        /// Lerp between angles, taking wrapping into account
-        /// </summary>
         private float LerpAngle(float a, float b, float t)
         {
             float delta = ((b - a + 540.0f) % 360.0f) - 180.0f;
@@ -407,6 +427,10 @@ namespace Game
             if (count <= 0)
                 return;
 
+            // Only explode if we have a target
+            if (targetID == INVALID_ENTITY)
+                return;
+
             uint self = (uint)EntityID;
 
             for (int i = 0; i < count; ++i)
@@ -419,13 +443,9 @@ namespace Game
 
                 uint other = (a == self) ? b : a;
 
-                string tag = InternalCalls.Tag_GetTag(other);
-                if (tag == TAG_PLAYER ||
-                    tag == TAG_SEMICONDUCTOR ||
-                    tag == TAG_EMPLACEMENT ||
-                    tag == TAG_CORE_BARRIER ||
-                    tag == TAG_ALLIES)
+                if (other == targetID)
                 {
+                    Log("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     isExploding = true;
                     break;
                 }
@@ -482,7 +502,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
-                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    //DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }

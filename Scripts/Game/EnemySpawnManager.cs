@@ -103,14 +103,14 @@ namespace Game{
         // Simple pseudo-random number generator
         private uint rngSeed;
 
-        bool started = false;
+        //private bool started = false;
 
         // Time tracking (since we don't have Time.time)
         [SerializeField]
         private float elapsedTime = 0f;
 
-        //private string alliesambience = "Flotilla_Gunship_Ambient.wav";
-        //private string coreambience = "Core_Ambient.wav";
+        private string alliesambience = "Flotilla_Gunship_Ambient.wav";
+        private string coreambience = "Core_Ambient.wav";
 
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
@@ -137,7 +137,7 @@ namespace Game{
 
             // init some values
             isActive = false;
-            started = false;
+            //started = false;
 
             // Find all spawn points in the scene
             InitializeSpawnPoints();
@@ -158,10 +158,10 @@ namespace Game{
             // Start at wave 1
             //SetupWaveSpawning();
             
-            spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
-            if(spawnmanagerID != INVALID_ENTITY){
-                Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
-            }
+            // spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            // if(spawnmanagerID != INVALID_ENTITY){
+            //     Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+            // }
 
             InternalCalls.Entity_AddAudio((uint) EntityID);
 
@@ -204,7 +204,7 @@ namespace Game{
 
             if(!playbgm){
                 PlayGameBGM();
-                started = true;
+                //started = true;
                 playbgm = true;
             }   
 
@@ -242,10 +242,10 @@ namespace Game{
             }
             
             // Check if wave is complete
-            if (COMBAT)
-            {
-                CheckForEnemiesLeft();
-            }
+            // if (COMBAT)
+            // {
+            //     CheckForEnemiesLeft();
+            // }
             
             // CHEAT CODE - K to kill all enemies
             // if (Input.IsKeyPressed(KeyCode.K))
@@ -598,7 +598,7 @@ namespace Game{
                 isActive = false;
                 WallSetup_DisableActiveWalls();
                 WallSetup_InactiveWalls();
-                StopBGM();
+                //StopBGM();
                 playbgm = false;
 
             }
@@ -1049,7 +1049,11 @@ namespace Game{
 
         private void PlayGameBGM(){
             //Log("Playbgm hehe");
-            InternalCalls.Audio_Play((uint)EntityID);
+            spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            if(spawnmanagerID != INVALID_ENTITY){
+                Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+            }
+            InternalCalls.Audio_Play(spawnmanagerID);
             PlayAllOtherAudio();
         }
 
