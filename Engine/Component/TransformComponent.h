@@ -64,14 +64,16 @@ namespace Engine {
             IsDirty = true;
         }
 
-        u32 GetParent() const {
-			return Parent;
+        void SetParent(entt::entity const& parent) {
+            Parent = static_cast<u32>(parent);
+			IsDirty = true;
         }
 
-        entt::entity GetParentAsEntity() const {
-            return Parent == u32_max ? entt::null : static_cast<entt::entity>(Parent);
-		}
-        
+        void UnParent() {
+            SetParent(entt::null);
+        }
+
+
     };
 
 }
