@@ -31,11 +31,11 @@ namespace Game
         [SerializeField]
         private float blastRadius = 5.0f;
 
-        [SerializeField]
-        private int blastDamage = 10;
+        // [SerializeField]
+        // private int blastDamage = 10;
 
-        [SerializeField]
-        private float blastImpulse = 0.0f;
+        // [SerializeField]
+        // private float blastImpulse = 0.0f;
 
         // Status effects
         [SerializeField]
