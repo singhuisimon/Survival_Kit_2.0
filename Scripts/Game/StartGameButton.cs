@@ -10,19 +10,19 @@ namespace Game
         private string mainMenuCameraName = "MainMenuCamera";
         
         [SerializeField]
-        private string gameCameraName = "GameCamera";
+        private string gameCameraName = "MainCamera";
 
         [SerializeField]
         private bool showMainMenuInitially = true;
 
         [SerializeField]
-        private float buttonWidth = 2.4f;    // Set this to match your button scale
+        private float buttonWidth = 2.4f;    // Set this to match button scale on the editor
         
         [SerializeField]
-        private float buttonHeight = 0.8f;   // Set this to match your button scale
+        private float buttonHeight = 0.8f;   // Set this to match button scale on the editor
 
         [SerializeField]
-        private string buttonEntityName = "Install_Btn";   // entity name of button
+        private string buttonEntityName = "MainMenuStartButton";   // entity name of button
 
 
 
@@ -35,8 +35,10 @@ namespace Game
         private uint buttonEntityID;    // for entity
         private bool wasMouseButtonPressed = false;
 
-        private bool hasGameStarted = false;
+        private bool hasGameStarted = false;    //this is to ensure that when player click on MouseButton left, it wouldnt trigger the camera switch again
 
+        //IDK ANYMORE
+        private bool wasRightMouseButtonPressed = false;
 
         public override void OnStart()
         {
@@ -67,6 +69,19 @@ namespace Game
             {
                 LogError("StartGameButton: Failed to find cameras! Check entity names.");
             }
+
+            // starting in main menu
+            if (showMainMenuInitially)
+            {
+                ResetToMainMenu();
+            }
+            else
+            {
+                // If you want to start directly in game, you can do:
+                isShowingMainMenu = false;
+                UpdateCameraStates();
+            }
+
         }
 
         public override void OnUpdate(float deltaTime) 
@@ -133,6 +148,11 @@ namespace Game
                 Log("Space key pressed - toggling camera");
                 OnButtonClicked();
             }
+
+            if (Input.IsMouseButtonPressed(MouseButton.Right))
+            {
+                ResetToMainMenu();
+            }
         }
 
         public override void OnDestroy()
@@ -140,6 +160,7 @@ namespace Game
             Log("StartGameButton: Destroyed");
         }
         
+        // wonky and not working :/
         private bool IsMouseOverButton()
         {
             // Get mouse position (in screen/window coordinates)
@@ -209,6 +230,23 @@ namespace Game
             
             // Optional: Add audio feedback
             // Audio.Play("ButtonClick");
+        }
+
+        private void ResetToMainMenu()
+        {
+            Log("StartGameButton: Going back to main menu");
+
+            // Set logical state
+            isShowingMainMenu = true;
+
+            // allow the game to be started again
+            hasGameStarted = false;
+
+            // Turn on main menu camera, turn off game camera
+            UpdateCameraStates();
+
+            // If you have other game variables that mark "game started",
+            // reset them here too (score, timers, player health etc).
         }
 
         // Find camera entities by name
