@@ -38,7 +38,7 @@ namespace Game
         private bool hasGameStarted = false;    //this is to ensure that when player click on MouseButton left, it wouldnt trigger the camera switch again
 
         //IDK ANYMORE
-        private bool wasRightMouseButtonPressed = false;
+       // private bool wasRightMouseButtonPressed = false;
 
         public override void OnStart()
         {
@@ -150,15 +150,15 @@ namespace Game
             }
 
             // detect right click
-            bool isRightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
+            // bool isRightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
 
-            if (isRightPressed && !wasRightMouseButtonPressed)
-            {
-                // right-click JUST happened
-                ResetToMainMenu();
-            }
+            // if (isRightPressed && !wasRightMouseButtonPressed)
+            // {
+            //     // right-click JUST happened
+            //     ResetToMainMenu();
+            // }
 
-            wasRightMouseButtonPressed = isRightPressed;
+            // wasRightMouseButtonPressed = isRightPressed;
 
         }
 
