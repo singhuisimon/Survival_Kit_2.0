@@ -130,27 +130,31 @@ namespace Game
             // Calculate forward direction from camera to player (horizontal plane only)
             Engine.Vector3 camToPlayer = new Engine.Vector3(
                 playerPos.X - cameraPosition.X,
-                0.0f,  // Ignore Y difference for horizontal movement
+                 playerPos.Y - cameraPosition.Y,  
                 playerPos.Z - cameraPosition.Z
             );
 
             // Normalize to get forward direction (camera looking at player)
-            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X + camToPlayer.Z * camToPlayer.Z);
+            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X +
+                camToPlayer.Y * camToPlayer.Y +
+                camToPlayer.Z * camToPlayer.Z);
             Engine.Vector3 forward = new Engine.Vector3(0.0f, 0.0f, 0.0f);
 
             if (camToPlayerLen > 0.000001f)
             {
                 forward.X = camToPlayer.X / camToPlayerLen;
+                forward.Y = camToPlayer.Y / camToPlayerLen;
                 forward.Z = camToPlayer.Z / camToPlayerLen;
             }
 
             // Calculate right vector (perpendicular to forward on horizontal plane)
             Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
             Engine.Vector3 right = CrossProduct(forward, worldUp);
-            float rightLen = SimpleSqrt(right.X * right.X + right.Z * right.Z);
+            float rightLen = SimpleSqrt(right.X * right.X + right.Y * right.Y + right.Z * right.Z);
             if (rightLen > 0.000001f)
             {
                 right.X /= rightLen;
+                right.Y /= rightLen;
                 right.Z /= rightLen;
             }
 
@@ -160,31 +164,36 @@ namespace Game
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.W))  // W = Move away from camera (forward)
             {
                 moveDir.X += forward.X;
+                moveDir.Y += forward.Y;
                 moveDir.Z += forward.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.S))  // S = Move toward camera (backward)
             {
                 moveDir.X -= forward.X;
+                moveDir.Y -= forward.Y;
                 moveDir.Z -= forward.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.A))  // A = Move left relative to camera
             {
                 moveDir.X -= right.X;
+                moveDir.Y -= right.Y;
                 moveDir.Z -= right.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.D))  // D = Move right relative to camera
             {
                 moveDir.X += right.X;
+                moveDir.Y += right.Y;
                 moveDir.Z += right.Z;
             }
 
             // Normalize movement direction
-            float moveDirLenSq = moveDir.X * moveDir.X + moveDir.Z * moveDir.Z;
+            float moveDirLenSq = moveDir.X * moveDir.X + moveDir.Y * moveDir.Y + moveDir.Z * moveDir.Z;
             if (moveDirLenSq > 0.000001f)
             {
                 float moveDirLen = SimpleSqrt(moveDirLenSq);
                 moveDir.X /= moveDirLen;
-                moveDir.Z /= moveDirLen;
+                moveDir.Y /= moveDirLen;
+              moveDir.Z /= moveDirLen;
             }
 
             // Apply movement if not dashing
@@ -193,7 +202,7 @@ namespace Game
             {
                 Engine.Vector3 newPos = new Engine.Vector3(
                     playerPos.X + moveDir.X * moveSpeed,
-                    playerPos.Y,
+                      playerPos.Y + moveDir.Y * moveSpeed,
                     playerPos.Z + moveDir.Z * moveSpeed
                 );
                 Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
@@ -210,7 +219,7 @@ namespace Game
                 {
                     Engine.Vector3 dashImpulse = new Engine.Vector3(
                         moveDir.X * dashForce,
-                        0.0f,
+                        moveDir.Y * dashForce,
                         moveDir.Z * dashForce
                     );
                     Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref dashImpulse);
