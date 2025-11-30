@@ -85,6 +85,12 @@ namespace Engine {
         */
         static std::string SerializeEntity(Entity entity, Entity dummyEntity);
 
+        /**
+        * @brief Creates a scene prefab from an entity hierarchy starting from the specified root entity
+        * @param rootEntity  The root entity of the hierarchy to convert into a prefab
+        * @param name  The name to assign to the newly created prefab asset
+        * @return Shared pointer to the created Prefab object, or nullptr if creation failed
+        */
         static std::shared_ptr<Prefab> CreateEntityWithChildrenPrefab(Entity rootEntity, const std::string& name);
 
         /**

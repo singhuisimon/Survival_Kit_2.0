@@ -48,7 +48,7 @@
 
 namespace Engine
 {
-	void Editor::SetScene(Engine::Scene* scene)
+	void Editor::SetScene(Engine::Scene *scene)
 	{
 		m_Scene = scene;
 	}
@@ -75,7 +75,7 @@ namespace Engine
 		ImGui::StyleColorsDark();
 
 		// Setup scaling
-		ImGuiStyle& style = ImGui::GetStyle();
+		ImGuiStyle &style = ImGui::GetStyle();
 
 		// Set WindowRounding and ImGuiCol_WindowBg when viewport is enabled
 		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -206,10 +206,11 @@ namespace Engine
 
 										}*/
 										PrefabRegistry::Get().UpdatePrefab(updatedPrefab);
-										MarkPrefabAsUpdated(updatedPrefab->GetGUID());
+										//MarkPrefabAsUpdated(updatedPrefab->GetGUID());
 										PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
 										LOG_DEBUG("Entity Prefab updated successfully: ", currPrefabPath);
 									}
+									PrefabSerializer::SavePrefabToFile(*updatedPrefab, convertAssetPathToRootResources(currPrefabPath));
 								}
 							}
 							else
@@ -241,7 +242,7 @@ namespace Engine
 								if (PrefabSerializer::SavePrefabToFile(*updatedPrefab, currPrefabPath))
 								{
 									PrefabRegistry::Get().UpdatePrefab(updatedPrefab);
-									MarkPrefabAsUpdated(updatedPrefab->GetGUID());
+									//MarkPrefabAsUpdated(updatedPrefab->GetGUID());
 									PrefabRegistry::Get().RegisterPrefab(updatedPrefab);
 									LOG_DEBUG("Scene Prefab updated successfully: ", currPrefabPath);
 									//ClearPrefabInstances(existingPrefab->GetGUID());
@@ -250,6 +251,8 @@ namespace Engine
 								{
 									LOG_ERROR("Failed to save scene prefab to file");
 								}
+
+								PrefabSerializer::SavePrefabToFile(*updatedPrefab, convertAssetPathToRootResources(currPrefabPath));
 								LOG_DEBUG("=== End Scene Entity Prefab ===");
 							}
 
@@ -338,7 +341,8 @@ namespace Engine
 			if (ImGui::BeginMenu("Compile"))
 			{
 
-				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+				{
 
 					AM.CompileAllAsset(0);
 				}
@@ -399,7 +403,7 @@ namespace Engine
 				// Display entity name (TagComponent)
 				if (m_SelectedEntity.HasComponent<TagComponent>())
 				{
-					auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
+					auto &tag = m_SelectedEntity.GetComponent<TagComponent>();
 					char buffer[256];
 					strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
 					if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
@@ -408,7 +412,8 @@ namespace Engine
 						newTag.erase(newTag.find_last_not_of(" \t\n\r\f\v") + 1);
 						newTag.erase(0, newTag.find_first_not_of(" \t\n\r\f\v"));
 
-						if (!newTag.empty()) {
+						if (!newTag.empty())
+						{
 							tag.Tag = newTag;
 						}
 
@@ -417,9 +422,12 @@ namespace Engine
 				}
 
 				ImGui::Separator();
+				// calculate ... button size
+				ImVec2 dotTextSize = ImGui::CalcTextSize("...");
+				ImVec2 dotButtonSize(dotTextSize.x + 8.0f, dotTextSize.y + 8.0f);
 				// =========================== Display PrefabComponent ==============================
 
-				displayPrefabComp();
+				displayPrefabComp(dotButtonSize);
 
 				// =========================== Display TransformComponent ===========================
 				if (m_SelectedEntity.HasComponent<TransformComponent>())
@@ -427,7 +435,7 @@ namespace Engine
 
 					if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
+						auto &transform = m_SelectedEntity.GetComponent<TransformComponent>();
 
 						// Position
 						glm::vec3 position = transform.Position;
@@ -467,9 +475,7 @@ namespace Engine
 						}
 					}
 				}
-				// calculate ... button size
-				ImVec2 dotTextSize = ImGui::CalcTextSize("...");
-				ImVec2 dotButtonSize(dotTextSize.x + 8.0f, dotTextSize.y + 8.0f);
+
 
 				// =========================== Display Rigid Body components ===========================
 				displayRigidBodyComp(dotButtonSize);
@@ -580,7 +586,7 @@ namespace Engine
 				{
 
 					Entity entity(entityHandle, &m_Scene->GetRegistry());
-					auto& transform = entity.GetComponent<TransformComponent>();
+					auto &transform = entity.GetComponent<TransformComponent>();
 					if (transform.Parent == u32_max)
 					{
 						EditorHierarchyHelper::DrawEntityParentAndChildren(entity, m_Scene, m_SelectedEntity, m_PickedID,
@@ -621,19 +627,19 @@ namespace Engine
 					for (auto entityHandle : view)
 					{
 						Entity entity(entityHandle, &m_Scene->GetRegistry());
-						auto& transform = entity.GetComponent<TransformComponent>();
+						auto &transform = entity.GetComponent<TransformComponent>();
 
 						// Only show main entities (no parent) that aren't the entity itself
 						if (transform.Parent == u32_max && entity != EditorHierarchyHelper::entityToAttach)
 						{
-							auto& tag = entity.GetComponent<TagComponent>();
+							auto &tag = entity.GetComponent<TagComponent>();
 							if (ImGui::Selectable(tag.Tag.c_str()))
 							{
 								// Attach entityToAttach as child of selected entity
-								auto& parentTransform = entity.GetComponent<TransformComponent>();
+								auto &parentTransform = entity.GetComponent<TransformComponent>();
 								parentTransform.Children.push_back((uint32_t)EditorHierarchyHelper::entityToAttach);
 
-								auto& childTransform = EditorHierarchyHelper::entityToAttach.GetComponent<TransformComponent>();
+								auto &childTransform = EditorHierarchyHelper::entityToAttach.GetComponent<TransformComponent>();
 								childTransform.SetParent(entity);
 
 								ImGui::CloseCurrentPopup();
@@ -655,7 +661,7 @@ namespace Engine
 				if (ImGui::BeginPopupModal("Select Prefab For Sub-Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 				{
 					auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
-					for (auto& file : prefabFiles)
+					for (auto &file : prefabFiles)
 					{
 						if (ImGui::Selectable(file.name.c_str()))
 						{
@@ -677,10 +683,10 @@ namespace Engine
 
 
 							// Attach entityToAttach as child of selected entity
-							auto& parentTransform = EditorHierarchyHelper::parentOfPrefabEntity.GetComponent<TransformComponent>();
+							auto &parentTransform = EditorHierarchyHelper::parentOfPrefabEntity.GetComponent<TransformComponent>();
 							parentTransform.Children.push_back((uint32_t)newEntity);
 
-							auto& childTransform = newEntity.GetComponent<TransformComponent>();
+							auto &childTransform = newEntity.GetComponent<TransformComponent>();
 							childTransform.SetParent(EditorHierarchyHelper::parentOfPrefabEntity);
 
 							m_SelectedEntity = newEntity;
@@ -714,17 +720,17 @@ namespace Engine
 		if (ImGui::BeginPopupModal("Select Prefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
-			for (auto& file : prefabFiles)
+			for (auto &file : prefabFiles)
 			{
 				if (ImGui::Selectable(file.name.c_str()))
 				{
 					selectedPrefabPath = file.fullPath;
 					replacePrefabPending = false;
 
-					auto& registry = PrefabRegistry::Get();
+					auto &registry = PrefabRegistry::Get();
 					std::shared_ptr<Prefab> prefab = nullptr;
 
-					for (auto& [guid, regPrefab] : registry.GetAllPrefabs())
+					for (auto &[guid, regPrefab] : registry.GetAllPrefabs())
 					{
 						if (regPrefab && regPrefab->GetSourcePath() == selectedPrefabPath)
 						{
@@ -760,14 +766,14 @@ namespace Engine
 						else // prefab with parent and child
 						{
 							LOG_DEBUG("===== Replacing Scene Prefab ======");
-							auto& registry = m_Scene->GetRegistry();
+							auto &registry_scenePrefab = m_Scene->GetRegistry();
 							entt::entity selectedEntt = (entt::entity)entityToReplace;
 
 							// Save the parent before deleting
 							entt::entity oldParent = entt::null;
-							if (registry.all_of<TransformComponent>(selectedEntt))
+							if (registry_scenePrefab.all_of<TransformComponent>(selectedEntt))
 							{
-								auto& t = registry.get<TransformComponent>(selectedEntt);
+								auto &t = registry_scenePrefab.get<TransformComponent>(selectedEntt);
 								if (t.Parent != u32_max)
 									oldParent = (entt::entity)t.Parent;
 							}
@@ -780,11 +786,11 @@ namespace Engine
 
 							if (oldParent != entt::null)
 							{
-								Entity parentEntity(oldParent, &registry);
-								auto& parentTransform = parentEntity.GetComponent<TransformComponent>();
+								Entity parentEntity(oldParent, &registry_scenePrefab);
+								auto &parentTransform = parentEntity.GetComponent<TransformComponent>();
 								parentTransform.Children.push_back((uint32_t)newRoot);
 
-								auto& newRootTransform = newRoot.GetComponent<TransformComponent>();
+								auto &newRootTransform = newRoot.GetComponent<TransformComponent>();
 								newRootTransform.Parent = (uint32_t)oldParent;
 							}
 
@@ -818,7 +824,7 @@ namespace Engine
 		{
 			auto prefabFiles = getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
 
-			for (auto& file : prefabFiles)
+			for (auto &file : prefabFiles)
 			{
 				if (ImGui::Selectable(file.name.c_str()))
 				{
@@ -912,7 +918,7 @@ namespace Engine
 			return;
 		}
 
-		auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
+		auto &animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
 
 		// ---------------------------------------------------------------------
 		// Look up controller from storage (or allow user to create a new one)
@@ -944,7 +950,7 @@ namespace Engine
 			return;
 		}
 
-		AnimatorController& controller = ctrlIt->second;
+		AnimatorController &controller = ctrlIt->second;
 
 		// Static state for Controller "Save As" popup
 		static bool s_OpenCtrlSaveAsPopup = false;
@@ -960,7 +966,7 @@ namespace Engine
 
 		// Helper: controller file toolbar (New / Save / Save As)
 		bool newControllerCreated = false;
-		auto DrawControllerFileToolbar = [&](AnimatorController& controllerRef, AnimatorComponent& animatorRef)
+		auto DrawControllerFileToolbar = [&](AnimatorController &controllerRef, AnimatorComponent &animatorRef)
 			{
 				ImGui::SeparatorText("Controller");
 
@@ -1067,7 +1073,8 @@ namespace Engine
 		// CASE 1: Controller exists but has NO clips yet.
 		// Show a simpler UI that lets you save the controller and create first clip.
 		// =====================================================================
-		if (controller.clips.empty()) {
+		if (controller.clips.empty())
+		{
 			ImGui::Text("Entity: %s", m_SelectedEntity.GetComponent<TagComponent>().Tag.c_str());
 			ImGui::Text("Controller: %s (handle %u)", controller.name.c_str(), controller.id);
 
@@ -1117,7 +1124,7 @@ namespace Engine
 		u32 clipHandle = controller.clips[static_cast<size_t>(animator.currentClipIndex)];
 
 		// Look up active clip
-		AnimationClip* clipPtr = nullptr;
+		AnimationClip *clipPtr = nullptr;
 		{
 			auto clipIt = m_AnimationClipStorage.find(clipHandle);
 			if (clipIt != m_AnimationClipStorage.end())
@@ -1131,7 +1138,7 @@ namespace Engine
 			return;
 		}
 
-		AnimationClip& clip = *clipPtr;
+		AnimationClip &clip = *clipPtr;
 
 		// Compute left/right sizes
 		ImVec2 avail = ImGui::GetContentRegionAvail();
@@ -1179,11 +1186,11 @@ namespace Engine
 					u32 h = controller.clips[static_cast<size_t>(i)];
 					auto it = m_AnimationClipStorage.find(h);
 
-					const char* name = "(missing)";
+					const char *name = "(missing)";
 					if (it != m_AnimationClipStorage.end() && !it->second.name.empty())
 						name = it->second.name.c_str();
 
-					bool selected = (i == animator.currentClipIndex);
+					bool selected = (i == static_cast<int>(animator.currentClipIndex));
 					if (ImGui::Selectable(name, selected))
 					{
 						animator.currentClipIndex = i;
@@ -1227,9 +1234,9 @@ namespace Engine
 		if (ImGui::BeginPopupModal("Add Clip to Controller", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			// Build list of all clips in storage
-			std::vector<std::pair<u32, AnimationClip*>> allClips;
+			std::vector<std::pair<u32, AnimationClip *>> allClips;
 			allClips.reserve(m_AnimationClipStorage.size());
-			for (auto& kv : m_AnimationClipStorage)
+			for (auto &kv : m_AnimationClipStorage)
 			{
 				allClips.emplace_back(kv.first, &kv.second);
 			}
@@ -1248,7 +1255,7 @@ namespace Engine
 					for (int i = 0; i < (int)allClips.size(); ++i)
 					{
 						u32 h = allClips[i].first;
-						AnimationClip* c = allClips[i].second;
+						AnimationClip *c = allClips[i].second;
 
 						std::string label = std::to_string(h) + " - " +
 							(c->name.empty() ? "Unnamed Clip" : c->name);
@@ -1318,12 +1325,12 @@ namespace Engine
 		if (ImGui::BeginPopupModal("Remove Clip from Controller", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			// Build list of clips currently in controller
-			std::vector<std::pair<u32, AnimationClip*>> controllerClipList;
+			std::vector<std::pair<u32, AnimationClip *>> controllerClipList;
 			controllerClipList.reserve(controller.clips.size());
 			for (u32 h : controller.clips)
 			{
 				auto it = m_AnimationClipStorage.find(h);
-				AnimationClip* c = (it != m_AnimationClipStorage.end()) ? &it->second : nullptr;
+				AnimationClip *c = (it != m_AnimationClipStorage.end()) ? &it->second : nullptr;
 				controllerClipList.emplace_back(h, c);
 			}
 
@@ -1344,7 +1351,7 @@ namespace Engine
 					for (int i = 0; i < (int)controllerClipList.size(); ++i)
 					{
 						u32 h = controllerClipList[i].first;
-						AnimationClip* c = controllerClipList[i].second;
+						AnimationClip *c = controllerClipList[i].second;
 
 						std::string label = std::to_string(h) + " - ";
 						if (c)
@@ -1448,7 +1455,7 @@ namespace Engine
 		// -----------------------------------------------------------------
 		ImGui::SeparatorText("Component");
 
-		const char* componentItems[] = { "Transform", "UV Transform" };
+		const char *componentItems[] = { "Transform", "UV Transform" };
 		int componentIndex =
 			(m_SelectedComponentTrack == AnimatorComponentTrack::Transform) ? 0 : 1;
 
@@ -1470,10 +1477,10 @@ namespace Engine
 			ImGui::Text("Transform");
 
 			// Helper: sort by time after edits
-			auto sortByTime = [](auto& keys)
+			auto sortByTime = [](auto &keys)
 				{
 					std::sort(keys.begin(), keys.end(),
-						[](const auto& a, const auto& b) { return a.time < b.time; });
+						[](const auto &a, const auto &b) { return a.time < b.time; });
 				};
 
 			// Position track 
@@ -1506,7 +1513,7 @@ namespace Engine
 
 					for (int i = 0; i < static_cast<int>(clip.positionKeys.size()); ++i)
 					{
-						auto& k = clip.positionKeys[static_cast<size_t>(i)];
+						auto &k = clip.positionKeys[static_cast<size_t>(i)];
 						ImGui::PushID(i);
 
 						ImGui::TableNextRow();
@@ -1613,7 +1620,7 @@ namespace Engine
 
 					for (int i = 0; i < static_cast<int>(clip.rotationKeys.size()); ++i)
 					{
-						auto& k = clip.rotationKeys[static_cast<size_t>(i)];
+						auto &k = clip.rotationKeys[static_cast<size_t>(i)];
 						ImGui::PushID(1000 + i);
 
 						ImGui::TableNextRow();
@@ -1733,7 +1740,7 @@ namespace Engine
 
 					for (int i = 0; i < static_cast<int>(clip.scaleKeys.size()); ++i)
 					{
-						auto& k = clip.scaleKeys[static_cast<size_t>(i)];
+						auto &k = clip.scaleKeys[static_cast<size_t>(i)];
 						ImGui::PushID(2000 + i);
 
 						ImGui::TableNextRow();
@@ -1816,10 +1823,10 @@ namespace Engine
 			ImGui::Text("UV Transform");
 
 			// Helper: sort by time after edits
-			auto sortByTime = [](auto& keys)
+			auto sortByTime = [](auto &keys)
 				{
 					std::sort(keys.begin(), keys.end(),
-						[](const auto& a, const auto& b) { return a.time < b.time; });
+						[](const auto &a, const auto &b) { return a.time < b.time; });
 				};
 
 			// --------------------- Tiling track ---------------------
@@ -1852,7 +1859,7 @@ namespace Engine
 
 					for (int i = 0; i < static_cast<int>(clip.uvTilingKeys.size()); ++i)
 					{
-						auto& k = clip.uvTilingKeys[static_cast<size_t>(i)];
+						auto &k = clip.uvTilingKeys[static_cast<size_t>(i)];
 						ImGui::PushID(3000 + i);
 
 						ImGui::TableNextRow();
@@ -1961,7 +1968,7 @@ namespace Engine
 
 					for (int i = 0; i < static_cast<int>(clip.uvOffsetKeys.size()); ++i)
 					{
-						auto& k = clip.uvOffsetKeys[static_cast<size_t>(i)];
+						auto &k = clip.uvOffsetKeys[static_cast<size_t>(i)];
 						ImGui::PushID(4000 + i);
 
 						ImGui::TableNextRow();
@@ -2167,7 +2174,8 @@ namespace Engine
 		//const ImU32 colScaleSel = IM_COL32(160, 190, 255, 255);
 		//const ImU32 colPlayhead = IM_COL32(255, 255, 50, 255);
 
-		if (m_AnimatorViewMode == AnimatorViewMode::Dopesheet) {
+		if (m_AnimatorViewMode == AnimatorViewMode::Dopesheet)
+		{
 
 			// Colors per track
 			const ImU32 colPos = IM_COL32(80, 200, 120, 255);
@@ -2186,9 +2194,9 @@ namespace Engine
 
 			// Legend
 			ImGui::Text("Legend:");
-			ImDrawList* legendList = ImGui::GetWindowDrawList();
+			ImDrawList *legendList = ImGui::GetWindowDrawList();
 
-			auto drawLegendItem = [&](ImU32 col, const char* label)
+			auto drawLegendItem = [&](ImU32 col, const char *label)
 				{
 					ImVec2 p = ImGui::GetCursorScreenPos();
 					ImVec2 sz(12.0f, 12.0f);
@@ -2221,7 +2229,7 @@ namespace Engine
 
 			ImGui::InvisibleButton("##AnimDopesheet", canvasSize);
 			bool  timelineHovered = ImGui::IsItemHovered();
-			ImDrawList* drawList = ImGui::GetWindowDrawList();
+			ImDrawList *drawList = ImGui::GetWindowDrawList();
 
 			// Background
 			drawList->AddRectFilled(canvasPos, canvasEnd, IM_COL32(20, 20, 20, 255));
@@ -2248,7 +2256,7 @@ namespace Engine
 				DopesheetTrackType bestTrack = DopesheetTrackType::None;
 				int bestIndex = -1;
 
-				auto testKeys = [&](const auto& keys,
+				auto testKeys = [&](const auto &keys,
 					DopesheetTrackType trackType,
 					float yOffset)
 					{
@@ -2324,7 +2332,7 @@ namespace Engine
 			}
 
 			// ---------------- DRAW KEYS (with selection highlight) ----------------
-			auto drawTrackKeys = [&](auto& keys,
+			auto drawTrackKeys = [&](auto &keys,
 				DopesheetTrackType trackType,
 				ImU32 col,
 				ImU32 colSelected,
@@ -2433,7 +2441,7 @@ namespace Engine
 			ImVec2 cEnd = ImVec2(cPos.x + cSize.x, cPos.y + cSize.y);
 
 			ImGui::InvisibleButton("##AnimCurves", cSize);
-			ImDrawList* cDraw = ImGui::GetWindowDrawList();
+			ImDrawList *cDraw = ImGui::GetWindowDrawList();
 
 			cDraw->AddRectFilled(cPos, cEnd, IM_COL32(20, 20, 20, 255));
 			cDraw->AddRect(cPos, cEnd, IM_COL32(80, 80, 80, 255));
@@ -2447,7 +2455,7 @@ namespace Engine
 				};
 
 			// Generic vec3 curve drawer (Position / Rotation / Scale)
-			auto drawVec3Curves = [&](const auto& keys, auto getVec)
+			auto drawVec3Curves = [&](const auto &keys, auto getVec)
 				{
 					if (keys.size() < 2)
 						return;
@@ -2520,7 +2528,7 @@ namespace Engine
 				};
 
 			// Vec2 curve drawer (UV Tiling / Offset)
-			auto drawVec2Curves = [&](const auto& keys, auto getVec)
+			auto drawVec2Curves = [&](const auto &keys, auto getVec)
 				{
 					if (keys.size() < 2)
 						return;
@@ -2595,11 +2603,11 @@ namespace Engine
 			{
 			case DopesheetTrackType::Position:
 				drawVec3Curves(clip.positionKeys,
-					[](const PositionKeyframe& k) { return k.position; });
+					[](const PositionKeyframe &k) { return k.position; });
 				break;
 			case DopesheetTrackType::Rotation:
 				drawVec3Curves(clip.rotationKeys,
-					[](const RotationKeyframe& k)
+					[](const RotationKeyframe &k)
 					{
 						glm::vec3 euler = glm::degrees(glm::eulerAngles(k.rotation));
 						return euler;
@@ -2607,18 +2615,18 @@ namespace Engine
 				break;
 			case DopesheetTrackType::Scale:
 				drawVec3Curves(clip.scaleKeys,
-					[](const ScaleKeyframe& k) { return k.scale; });
+					[](const ScaleKeyframe &k) { return k.scale; });
 				break;
 			case DopesheetTrackType::UVTiling:
 				drawVec2Curves(clip.uvTilingKeys,
-					[](const UVKeyframe& k)
+					[](const UVKeyframe &k)
 					{
 						return glm::vec2(k.value[0], k.value[1]);
 					});
 				break;
 			case DopesheetTrackType::UVOffset:
 				drawVec2Curves(clip.uvOffsetKeys,
-					[](const UVKeyframe& k)
+					[](const UVKeyframe &k)
 					{
 						return glm::vec2(k.value[0], k.value[1]);
 					});
@@ -2651,11 +2659,11 @@ namespace Engine
 			// For resources handled by Asset Browser
 			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				auto& db = AM.db();
+				auto &db = AM.db();
 				auto allAssets = db.AllMutable();
 
 				std::set<ResourceType> availableTypes;
-				for (const auto* record : allAssets)
+				for (const auto *record : allAssets)
 				{
 					if (record && record->valid && record->type != ResourceType::UNKNOWN)
 					{
@@ -2663,11 +2671,13 @@ namespace Engine
 					}
 				}
 
-				for (const auto& type : availableTypes) {
+				for (const auto &type : availableTypes)
+				{
 					std::string typeName = resourceTypeToString(type);
 					bool isSelected = (selectedType == type);
 
-					if (ImGui::Selectable(typeName.c_str(), isSelected)) {
+					if (ImGui::Selectable(typeName.c_str(), isSelected))
+					{
 
 						raw_asset = true;
 						selectedType = type;
@@ -2682,9 +2692,10 @@ namespace Engine
 			{
 				auto folders = getAssetsInFolder(getAssetFilePath("Sources/"));
 
-				for (auto& folder : folders)
+				for (auto &folder : folders)
 				{
-					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" && folder.name != "Textures" && folder.name != "Material") {
+					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" && folder.name != "Textures" && folder.name != "Material")
+					{
 						bool isSelected = (selectedFolder == folder.fullPath);
 						if (ImGui::Selectable(folder.name.c_str(), isSelected))
 						{
@@ -2701,15 +2712,17 @@ namespace Engine
 
 			// ================= Right column panel - display assets of selected type ========================
 
-			auto& db = AM.db();
+			auto &db = AM.db();
 			auto allAssets = db.AllMutable();
 
-			std::vector<const AssetRecord*> filteredAssets;
+			std::vector<const AssetRecord *> filteredAssets;
 			filteredAssets.reserve(allAssets.size());
 
-			for (const auto* record : allAssets) {
+			for (const auto *record : allAssets)
+			{
 				if (!record || !record->valid) continue;
-				if (record->type == selectedType) {
+				if (record->type == selectedType)
+				{
 					filteredAssets.push_back(record);
 				}
 			}
@@ -2721,15 +2734,18 @@ namespace Engine
 			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
 
 
-			if (raw_asset && selectedResourcesIndex != -1) {
+			if (raw_asset && selectedResourcesIndex != -1)
+			{
 				ImGui::Text("Asset Selected: %s", filteredAssets[selectedResourcesIndex]->sourcePath.c_str());
 			}
-			else if (!raw_asset && selectedResourcesIndex != -1) {
+			else if (!raw_asset && selectedResourcesIndex != -1)
+			{
 				ImGui::Text("Asset Selected: %s", assetsList[selectedResourcesIndex].fullPath.c_str());
 			}
 
 			// For resources handled by Asset Browser
-			if (!selectedFolder.empty() && raw_asset) {
+			if (!selectedFolder.empty() && raw_asset)
+			{
 
 				// Display filtered assets
 				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
@@ -2741,10 +2757,12 @@ namespace Engine
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 				int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
 
-				if (ImGui::BeginTable("AssetGrid", itemsPerRow)) {
-					for (size_t i = 0; i < filteredAssets.size(); ++i) {
+				if (ImGui::BeginTable("AssetGrid", itemsPerRow))
+				{
+					for (size_t i = 0; i < filteredAssets.size(); ++i)
+					{
 
-						const auto* record = filteredAssets[i];
+						const auto *record = filteredAssets[i];
 
 						std::filesystem::path assetPath(record->sourcePath);
 						std::string filename = assetPath.filename().string();
@@ -2757,7 +2775,8 @@ namespace Engine
 						bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
 
 						// Optional background color for selected
-						if (isSelected) {
+						if (isSelected)
+						{
 							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
 							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
 							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
@@ -2766,7 +2785,8 @@ namespace Engine
 						// Unique ID per button
 						ImGui::PushID(static_cast<int>(i));
 
-						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize))) {
+						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+						{
 							selectedResourcesIndex = static_cast<int>(i);
 							ImGui::OpenPopup("AssetContextMenu");
 						}
@@ -2791,7 +2811,8 @@ namespace Engine
 							ImGui::Text("%s", filename.c_str());
 
 							// Only Texture and Meshes for now
-							if (record->type == ResourceType::TEXTURE || record->type == ResourceType::MESH) {
+							if (record->type == ResourceType::TEXTURE || record->type == ResourceType::MESH)
+							{
 								ImGui::Separator();
 
 								if (ImGui::MenuItem("Edit"))
@@ -2808,7 +2829,8 @@ namespace Engine
 							ImGui::EndPopup();
 						}
 
-						if (isSelected) {
+						if (isSelected)
+						{
 							ImGui::PopStyleColor(3);
 						}
 
@@ -2821,7 +2843,7 @@ namespace Engine
 							ImGui::Text("Content Hash: %s", hash.c_str());
 
 							char timeBuf[64];
-							std::tm* tm_local = std::localtime(&writeTime);
+							std::tm *tm_local = std::localtime(&writeTime);
 							std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
 							ImGui::Text("Last Write Time: %s", timeBuf);
 
@@ -2864,7 +2886,7 @@ namespace Engine
 				// loop through files in selected folder
 				for (size_t i = 0; i < assetsList.size(); i++)
 				{
-					const auto& asset = assetsList[i];
+					const auto &asset = assetsList[i];
 					std::string fileName = asset.name;
 					std::string filePath = asset.fullPath;
 
@@ -2887,12 +2909,10 @@ namespace Engine
 						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
 						if (extension == ".json" && folderName != "BT") // For scene, not BT
 						{
-
+							LOG_DEBUG(" ==== Start Loading Scene ==== : ", fileName);
 							currScenePath = filePath; // update curr file path
 							currFileName = fileName; // store file name
 
-							//LoadAllPrefabsIntoRegistry();
-							//m_Scene->SetName(fileName);
 							LOG_DEBUG("m_Scene->SetName(fileName)", fileName);
 							if (m_Scene)
 							{
@@ -2902,24 +2922,12 @@ namespace Engine
 								LoadAllPrefabsIntoRegistry();
 								m_Scene->GetRegistry().clear();
 								m_Scene->LoadFromFile(filePath);
-								// check for update 
-								//LOG_DEBUG("Before CheckAndUpdatePrefabInstances - isPrefabEditor: ", isPrefabEditor);
 
-							/*	CheckAndUpdatePrefabInstances();
-
-								if (!m_UpdatedPrefabsThisSession.empty())
-								{
-									m_Scene->SaveToFile(filePath);
-									m_Scene->SaveToFile(convertAssetPathToRootResources(filePath));
-									LOG_DEBUG("Scene auto-saved after prefab updates");
-								}*/
-
-								//m_Scene->SaveToFile(filePath);
 								m_SelectedEntity = Entity{}; // resets
 								m_PickedID = 0xFFFFFFFFu;
 								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
-								//LOG_DEBUG("After setting isPrefabEditor: ", isPrefabEditor);
 							}
+							LOG_DEBUG(" ==== End Loading Scene ==== : ", fileName);
 						}
 						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
@@ -2934,25 +2942,23 @@ namespace Engine
 								}
 							}
 							currPrefabPath = filePath;
-
-							//m_Scene->SetName("Prefab");
 							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
-							auto& registry = PrefabRegistry::Get();
+
 							PrefabRegistry::Get().RegisterPrefab(prefab);
 
 							if (prefab)
 							{
 								m_Scene->GetRegistry().clear();
-								//PrefabRegistry::Get().RegisterPrefab(prefab);
 
-#if 1 // added code for the parent child prefab file to work
 								Entity entity;
-								if (prefab->GetType() == PrefabType::Scene) {
+								if (prefab->GetType() == PrefabType::Scene)
+								{
 
 									LOG_INFO("Loading Scene prefab with hierarchy");
 									entity = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
 								}
-								else {
+								else
+								{
 									LOG_INFO("Loading single Entity prefab");
 									entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
 								}
@@ -2971,7 +2977,6 @@ namespace Engine
 								LOG_INFO("Now editing prefab:", currPrefabPath);
 								LOG_DEBUG("=====End Load Prefab File=========");
 
-#endif
 							}
 						}
 					}
@@ -3013,28 +3018,36 @@ namespace Engine
 		ImGui::End();
 	}
 
-	void Editor::displayDescriptorEditorPanel() {
+	void Editor::displayDescriptorEditorPanel()
+	{
 
-		if (!showDescriptorEditorPanel) {
+		if (!showDescriptorEditorPanel)
+		{
 			descriptorEditor.Clear();
 			return;
 		}
 
-		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel, ImGuiWindowFlags_NoDocking)) {
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel, ImGuiWindowFlags_NoDocking))
+		{
 			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
 
-			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid()) {
-				if (!descriptorEditor.Load(currentEditingGuid)) {
+			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid())
+			{
+				if (!descriptorEditor.Load(currentEditingGuid))
+				{
 					ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
 				}
 			}
-			else {
+			else
+			{
 				ImGui::Columns(2, nullptr, true);
 
 				// Drawing asset in descriptor editor if it is a texture
-				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
-					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
-					if (texture != nullptr) {
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE)
+				{
+					auto *texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
+					if (texture != nullptr)
+					{
 						float tex_w = static_cast<float>(texture->width);
 						float tex_h = static_cast<float>(texture->height);
 
@@ -3046,11 +3059,13 @@ namespace Engine
 						float aspect = tex_w / tex_h;
 
 						ImVec2 viewportSize;
-						if (win_w / win_h > aspect) {
+						if (win_w / win_h > aspect)
+						{
 							viewportSize.x = win_h * aspect;
 							viewportSize.y = win_h;
 						}
-						else {
+						else
+						{
 							viewportSize.x = win_w;
 							viewportSize.y = win_w / aspect;
 						}
@@ -3070,7 +3085,8 @@ namespace Engine
 				ImGui::Text("Source: %s", descriptorEditor.GetSourcePath().c_str());
 
 				std::string assetType{};
-				switch (descriptorEditor.GetType()) {
+				switch (descriptorEditor.GetType())
+				{
 				case ResourceType::TEXTURE:
 					assetType = "Texture";
 					break;
@@ -3086,27 +3102,34 @@ namespace Engine
 				ImGui::SeparatorText("Editable Properties");
 
 				// Check type
-				if (descriptorEditor.GetType() == ResourceType::TEXTURE) {
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE)
+				{
 
-					TextureSettings* settings = descriptorEditor.GetTextureSettings();
+					TextureSettings *settings = descriptorEditor.GetTextureSettings();
 
 					auto quality = settings->quality;
-					if (ImGui::SliderFloat("Quality", &quality, 0.0f, 1.0f)) {
+					if (ImGui::SliderFloat("Quality", &quality, 0.0f, 1.0f))
+					{
 						settings->quality = quality;
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::Checkbox("Minimaps", &settings->generateMipmaps)) {
+					if (ImGui::Checkbox("Minimaps", &settings->generateMipmaps))
+					{
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::Checkbox("sRGB", &settings->srgb)) {
+					if (ImGui::Checkbox("sRGB", &settings->srgb))
+					{
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::BeginCombo("Compression", settings->compression.c_str())) {
-						for (auto& option : descriptorEditor.GetCompressionOptions()) {
-							if (ImGui::Selectable(option.c_str())) {
+					if (ImGui::BeginCombo("Compression", settings->compression.c_str()))
+					{
+						for (auto &option : descriptorEditor.GetCompressionOptions())
+						{
+							if (ImGui::Selectable(option.c_str()))
+							{
 								settings->compression = option;
 								descriptorEditor.MarkModified();
 							}
@@ -3114,9 +3137,12 @@ namespace Engine
 						ImGui::EndCombo();
 					}
 
-					if (ImGui::BeginCombo("Usage", settings->usageType.c_str())) {
-						for (auto& option : descriptorEditor.GetUsageTypeOptions()) {
-							if (ImGui::Selectable(option.c_str())) {
+					if (ImGui::BeginCombo("Usage", settings->usageType.c_str()))
+					{
+						for (auto &option : descriptorEditor.GetUsageTypeOptions())
+						{
+							if (ImGui::Selectable(option.c_str()))
+							{
 								settings->usageType = option;
 								descriptorEditor.MarkModified();
 							}
@@ -3124,20 +3150,23 @@ namespace Engine
 						ImGui::EndCombo();
 					}
 				}
-				else if (descriptorEditor.GetType() == ResourceType::MESH) {
+				else if (descriptorEditor.GetType() == ResourceType::MESH)
+				{
 
-					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+					MeshSettings *settings = descriptorEditor.GetMeshSettings();
 
 					// ========== TRANSFORM SECTION ==========
 					ImGui::SeparatorText("Transform");
 
 					// Scale
 					float meshScale = settings->scale;
-					if (ImGui::DragFloat("Scale", &meshScale, 0.001f, 0.0001f, 1000.0f, "%.4f")) {
+					if (ImGui::DragFloat("Scale", &meshScale, 0.001f, 0.0001f, 1000.0f, "%.4f"))
+					{
 						settings->scale = meshScale;
 						descriptorEditor.MarkModified();
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetTooltip("Uniform scale factor (e.g., 0.001 for mm to m)");
 					}
 
@@ -3146,13 +3175,15 @@ namespace Engine
 					// Position
 					ImGui::Text("Position Offset:");
 					float position[3] = { settings->positionX, settings->positionY, settings->positionZ };
-					if (ImGui::DragFloat3("Position", position, 0.1f)) {
+					if (ImGui::DragFloat3("Position", position, 0.1f))
+					{
 						settings->positionX = position[0];
 						settings->positionY = position[1];
 						settings->positionZ = position[2];
 						descriptorEditor.MarkModified();
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetTooltip("Position offset in mesh units (X, Y, Z)");
 					}
 
@@ -3161,13 +3192,15 @@ namespace Engine
 					// Rotation
 					ImGui::Text("Rotation (Degrees):");
 					float rotation[3] = { settings->rotationX, settings->rotationY, settings->rotationZ };
-					if (ImGui::DragFloat3("Rotation", rotation, 1.0f, -180.0f, 180.0f)) {
+					if (ImGui::DragFloat3("Rotation", rotation, 1.0f, -180.0f, 180.0f))
+					{
 						settings->rotationX = rotation[0];
 						settings->rotationY = rotation[1];
 						settings->rotationZ = rotation[2];
 						descriptorEditor.MarkModified();
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetTooltip("Rotation in degrees (X=Pitch, Y=Yaw, Z=Roll)");
 					}
 
@@ -3180,19 +3213,23 @@ namespace Engine
 					// ========== VERTEX DATA SECTION ==========
 					ImGui::SeparatorText("Vertex Data");
 
-					if (ImGui::Checkbox("Include Position", &settings->includePos)) {
+					if (ImGui::Checkbox("Include Position", &settings->includePos))
+					{
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::Checkbox("Include Normals", &settings->includeNormals)) {
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals))
+					{
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::Checkbox("Include Colors", &settings->includeColors)) {
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors))
+					{
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords)) {
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords))
+					{
 						descriptorEditor.MarkModified();
 					}
 
@@ -3205,14 +3242,18 @@ namespace Engine
 
 					char formatBuffer[256];
 					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
-					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+					{
 						settings->outputFormat = std::string(formatBuffer);
 						descriptorEditor.MarkModified();
 					}
 
-					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str())) {
-						for (auto& option : descriptorEditor.GetIndexTypeOptions()) {
-							if (ImGui::Selectable(option.c_str())) {
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str()))
+					{
+						for (auto &option : descriptorEditor.GetIndexTypeOptions())
+						{
+							if (ImGui::Selectable(option.c_str()))
+							{
 								settings->indexType = option;
 								descriptorEditor.MarkModified();
 							}
@@ -3227,25 +3268,31 @@ namespace Engine
 					// ========== OPTIMIZATION SECTION ==========
 					ImGui::SeparatorText("Optimization");
 
-					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices)) {
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices))
+					{
 						descriptorEditor.MarkModified();
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetTooltip("Remove duplicate vertices and optimize for cache");
 					}
 
-					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals)) {
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals))
+					{
 						descriptorEditor.MarkModified();
 					}
-					if (ImGui::IsItemHovered()) {
+					if (ImGui::IsItemHovered())
+					{
 						ImGui::SetTooltip("Generate normals if missing");
 					}
 
 				}
 
-				if (!descriptorEditor.GetTags().empty()) {
+				if (!descriptorEditor.GetTags().empty())
+				{
 					ImGui::SeparatorText("Tags");
-					for (auto& tag : descriptorEditor.GetTags()) {
+					for (auto &tag : descriptorEditor.GetTags())
+					{
 						ImGui::Text("%s", tag.c_str());
 					}
 				}
@@ -3253,55 +3300,66 @@ namespace Engine
 				ImGui::SeparatorText("Last Imported");
 				std::time_t writeTime = descriptorEditor.GetLastImported();
 				char timeBuf[64];
-				std::tm* tm_local = std::localtime(&writeTime);
+				std::tm *tm_local = std::localtime(&writeTime);
 				std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
 				ImGui::Text("Last Write Time: %s", timeBuf);
 
 				static std::string notifMsg{};
 				static ImVec4 notifColour(0.0f, 0.0f, 0.0f, 0.0f);
 
-				if (ImGui::Button("Validate Descriptor")) {
-					if (descriptorEditor.Validate()) {
+				if (ImGui::Button("Validate Descriptor"))
+				{
+					if (descriptorEditor.Validate())
+					{
 						notifMsg = "Descriptor is Valid";
 						notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
 					}
-					else {
+					else
+					{
 						notifMsg = "Descriptor is NOT Valid";
 						notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 					}
 				}
 
-				if (!notifMsg.empty()) {
+				if (!notifMsg.empty())
+				{
 
 					ImGui::TextColored(notifColour, "%s", notifMsg.c_str());
 
 					static float notifTimer = 2.0f;
 					notifTimer -= ImGui::GetIO().DeltaTime;
 
-					if (notifTimer <= 0.0f) {
+					if (notifTimer <= 0.0f)
+					{
 						notifTimer = 2.0f;
 						notifMsg.clear();
 					}
 				}
 
 				// Save button
-				if (descriptorEditor.IsModified()) {
-					if (ImGui::Button("Save & Compile")) {
-						if (descriptorEditor.Save()) {
+				if (descriptorEditor.IsModified())
+				{
+					if (ImGui::Button("Save & Compile"))
+					{
+						if (descriptorEditor.Save())
+						{
 							notifMsg = "Descriptor is Saved";
 							notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
 
 							//compile
-							if (AM.CompileSingleAsset(currentEditingGuid, true)) {
+							if (AM.CompileSingleAsset(currentEditingGuid, true))
+							{
 								notifMsg = "Saved and Compiled successfully!";
 								notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);//green 
 							}
-							else {
+							else
+							{
 								notifMsg = "Saved but compilation FAILED";
 								notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red for error
 							}
 						}
-						else {
+						else
+						{
 							notifMsg = "Descriptor is NOT Saved";
 							notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 						}
@@ -3329,11 +3387,13 @@ namespace Engine
 			if (ImGui::Button("Launch Tracy Window"))
 			{
 #ifdef TRACY_ENABLE
-				if (auto profiler = m_Profiler.lock()) {
+				if (auto profiler = m_Profiler.lock())
+				{
 					profiler->LaunchTracy();
 					LOG_INFO("  -> Tracy profiler launched successfully");
 				}
-				else {
+				else
+				{
 					LOG_WARNING("  -> Tracy profiler reference expired.");
 				}
 #else
@@ -3526,7 +3586,8 @@ namespace Engine
 
 		// viewport size calculation...
 		ImVec2 viewportSize = { 600, 600 };
-		if (m_Window) {
+		if (m_Window)
+		{
 			int width = 0;
 			int height = 0;
 			glfwGetWindowSize(m_Window, &width, &height);
@@ -3540,21 +3601,24 @@ namespace Engine
 
 		ViewportPanelHelper::ViewportButtons(isPlaying, m_Scene, m_SelectedEntity,
 			currScenePath, currFileName, m_PickedID);
-		if (texhandle) {
+		if (texhandle)
+		{
 			ImVec2 imagePos = ImGui::GetCursorScreenPos();
 			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
 			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
 			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
 
-			ImGuiViewport* vp = ImGui::GetWindowViewport();
+			ImGuiViewport *vp = ImGui::GetWindowViewport();
 
 			// Convert to CLIENT-WINDOW coords (origin = top-left of that GLFW window's content area)
 			ImVec2 tl_client;
-			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
 				tl_client = { tl_screen.x - vp->Pos.x, tl_screen.y - vp->Pos.y }; // subtract OS window's top-left in screen coords
 			}
-			else {
+			else
+			{
 				// Single viewport: ImGui "screen" origin coincides with your main client window
 				tl_client = tl_screen;
 			}
@@ -3564,7 +3628,8 @@ namespace Engine
 			editorViewportData.size = viewportSize;
 
 			// Sync with renderer using the existing getEditorViewport() method
-			if (m_Renderer) {
+			if (m_Renderer)
+			{
 				m_Renderer->getEditorViewport() = editorViewportData;
 			}
 
@@ -3579,7 +3644,8 @@ namespace Engine
 				m_PreviousEditorCamToggle = currentCamToggle;
 			}
 
-			if (m_Renderer->getEditorCamToggle()) {
+			if (m_Renderer->getEditorCamToggle())
+			{
 				// Store screen coordinates separately for ImGuizmo - use ACTUAL size
 				m_ImGuizmoViewportData.tl = tl_screen;
 				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
@@ -3589,7 +3655,8 @@ namespace Engine
 				bool isOverGizmoThisFrame = false;
 
 				// FIRST: Handle ImGuizmo manipulation if we have a selected entity
-				if (m_SelectedEntity) {
+				if (m_SelectedEntity)
+				{
 					ManipulateEntityTransform(m_SelectedEntity);
 					isUsingGizmoThisFrame = ImGuizmo::IsUsing();
 					isOverGizmoThisFrame = ImGuizmo::IsOver();
@@ -3623,20 +3690,25 @@ namespace Engine
 				}
 
 				// Only handle keyboard shortcuts when viewport is focused
-				if (ImGui::IsWindowFocused()) {
-					if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+				if (ImGui::IsWindowFocused())
+				{
+					if (ImGui::IsKeyPressed(ImGuiKey_W))
+					{
 						m_Operation = ImGuizmo::TRANSLATE;
 						//std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
 					}
-					if (ImGui::IsKeyPressed(ImGuiKey_E)) {
+					if (ImGui::IsKeyPressed(ImGuiKey_E))
+					{
 						m_Operation = ImGuizmo::ROTATE;
 						//std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
 					}
-					if (ImGui::IsKeyPressed(ImGuiKey_R)) {
+					if (ImGui::IsKeyPressed(ImGuiKey_R))
+					{
 						m_Operation = ImGuizmo::SCALE;
 						//std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
 					}
-					if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
+					if (ImGui::IsKeyPressed(ImGuiKey_Q))
+					{
 						m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
 						//std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
 					}
@@ -3683,6 +3755,7 @@ namespace Engine
 	// Helper function for top menu 
 	void Editor::sceneOpenPanel()
 	{
+
 		// get all files inside scene
 		auto sceneFiles = getAssetsInFolder(getAssetFilePath("Sources/Scenes"));
 		if (openScenePanel)
@@ -3696,7 +3769,7 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
 			// list all scene files
-			for (auto& scenesAsset : sceneFiles)
+			for (auto &scenesAsset : sceneFiles)
 			{
 
 				if (ImGui::Selectable(scenesAsset.name.c_str()))
@@ -3715,6 +3788,7 @@ namespace Engine
 					// load the selected scene file
 					if (m_Scene->LoadFromFile(scenesAsset.fullPath))
 					{
+						LOG_DEBUG(" ==== Start Loading Scene ==== : ", scenesAsset.name);
 						//LOG_ERROR("Failed to load scene %s", sceneFiles);
 						currScenePath = scenesAsset.fullPath;
 						LOG_INFO("Scene loaded successfully: ", currScenePath);
@@ -3741,6 +3815,8 @@ namespace Engine
 						LOG_DEBUG("  selectedType: {}", static_cast<int>(selectedType));
 						LOG_DEBUG("  selectedResourcesIndex: {}", selectedResourcesIndex);
 						ImGui::CloseCurrentPopup();
+
+						LOG_DEBUG(" ==== End Loading Scene ==== : ", scenesAsset.name);
 					}
 				}
 			}
@@ -3780,7 +3856,8 @@ namespace Engine
 					// default new scene path 
 					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
 
-					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
+					if (!std::filesystem::path(defaultNewScenePath).has_extension())
+					{
 
 						defaultNewScenePath += ".json"; // ensure .json extension
 					}
@@ -3866,7 +3943,8 @@ namespace Engine
 				{
 					// default new scene path 
 					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
-					if (!std::filesystem::path(defaultNewScenePath).has_extension()) {
+					if (!std::filesystem::path(defaultNewScenePath).has_extension())
+					{
 						defaultNewScenePath += ".json"; // ensure .json extension
 					}
 					m_Scene->SaveToFile(defaultNewScenePath);
@@ -3910,7 +3988,7 @@ namespace Engine
 		// Update and Render additional Platform Windows
 		if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			GLFWwindow *backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
@@ -3918,14 +3996,14 @@ namespace Engine
 
 	}
 
-	std::vector<Editor::AssetEntry> Editor::getAssetsInFolder(const std::string& folderPath)
+	std::vector<Editor::AssetEntry> Editor::getAssetsInFolder(const std::string &folderPath)
 	{
 		std::vector<AssetEntry> entries;
 
 		if (!std::filesystem::exists(folderPath) || !std::filesystem::is_directory(folderPath))
 			return entries;
 
-		for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+		for (const auto &entry : std::filesystem::directory_iterator(folderPath))
 		{
 			entries.push_back({
 				entry.path().filename().string(),
@@ -3938,7 +4016,7 @@ namespace Engine
 
 	void Editor::CleanupTemporaryPrefabs()
 	{
-		for (const auto& prefabPath : m_TemporaryPrefabPaths)
+		for (const auto &prefabPath : m_TemporaryPrefabPaths)
 		{
 			if (std::filesystem::exists(prefabPath))
 			{
@@ -3949,15 +4027,15 @@ namespace Engine
 		m_TemporaryPrefabPaths.clear();
 	}
 
-	void Editor::ManipulateEntityTransform(Entity& entity)
+	void Editor::ManipulateEntityTransform(Entity &entity)
 	{
 
 		if (!entity || !m_Scene || !entity.HasComponent<TransformComponent>())
 			return;
 
-		Camera3D& camera = m_Renderer->getEditorCamera();
+		Camera3D &camera = m_Renderer->getEditorCamera();
 
-		auto& tc = entity.GetComponent<TransformComponent>();
+		auto &tc = entity.GetComponent<TransformComponent>();
 		//glm::mat4 transform = BuildTransformMatrix(tc);
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Position);
 		transform = transform * glm::mat4_cast(tc.Rotation); // Use quaternion directly
@@ -3980,7 +4058,8 @@ namespace Engine
 		glm::mat4 view = camera.getLookAt();
 		glm::mat4 proj = camera.getPerspective(aspect_ratio);
 
-		if (m_Operation != (ImGuizmo::OPERATION)-1) {
+		if (m_Operation != (ImGuizmo::OPERATION)-1)
+		{
 
 
 			//ImGuizmo::MODE mode = (m_Operation == ImGuizmo::ROTATE) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
@@ -3993,13 +4072,16 @@ namespace Engine
 				glm::value_ptr(transform)
 			);
 
-			if (ImGuizmo::IsUsing()) {
-				if (m_Operation == ImGuizmo::TRANSLATE) {
+			if (ImGuizmo::IsUsing())
+			{
+				if (m_Operation == ImGuizmo::TRANSLATE)
+				{
 					// update position
 					glm::vec3 newPosition = glm::vec3(transform[3]);
 					tc.SetPosition(newPosition);
 				}
-				else if (m_Operation == ImGuizmo::ROTATE) {
+				else if (m_Operation == ImGuizmo::ROTATE)
+				{
 					glm::mat3 rotationMatrix;
 					rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
 					rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
@@ -4011,7 +4093,8 @@ namespace Engine
 					tc.IsDirty = true;
 
 				}
-				else if (m_Operation == ImGuizmo::SCALE) {
+				else if (m_Operation == ImGuizmo::SCALE)
+				{
 
 					glm::vec3 newScale;
 					newScale.x = glm::length(glm::vec3(transform[0]));
@@ -4115,7 +4198,7 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 
 			std::string scriptPath = getRepository() + "/Scripts/Game";
-      		auto getScriptFiles = getAssetsInFolder(scriptPath);
+			auto getScriptFiles = getAssetsInFolder(scriptPath);
 
 			ImGui::Text("Select a script to open:");
 			ImGui::Separator();
@@ -4127,7 +4210,7 @@ namespace Engine
 			}
 			else
 			{
-				for (const auto& scriptFile : getScriptFiles)
+				for (const auto &scriptFile : getScriptFiles)
 				{
 					if (ImGui::Selectable(scriptFile.name.c_str()))
 					{
@@ -4149,7 +4232,7 @@ namespace Engine
 
 	}
 
-	bool Editor::OpenScriptInEditor(const std::string& scriptName)
+	bool Editor::OpenScriptInEditor(const std::string &scriptName)
 	{
 		std::string sanitizedName = scriptName;
 		if (sanitizedName.ends_with(".cs"))
@@ -4173,30 +4256,54 @@ namespace Engine
 			int result = system(command.c_str());
 			return result == 0;
 		}
-		catch (const std::exception&)
+		catch (const std::exception &)
 		{
 			return false;
 		}
 	}
-	void Editor::displayPrefabComp()
+	void Editor::displayPrefabComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<PrefabComponent>())
 		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+			bool openPrefabComp = ImGui::CollapsingHeader("Prefab Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removePrefabComp = false;
 			bool hasParent = true;
-			if (m_SelectedEntity.HasComponent<TransformComponent>()) {
-				auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
+			ImGui::NextColumn();
+
+			if (ImGui::Button("...###PrefabBtn", buttonSize))
+			{
+				ImGui::OpenPopup("PrefabPopUp");
+			}
+			if (ImGui::BeginPopup("PrefabPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removePrefabComp = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (m_SelectedEntity.HasComponent<TransformComponent>())
+			{
+				auto &transform = m_SelectedEntity.GetComponent<TransformComponent>();
 				hasParent = transform.Parent == u32_max ? false : true;
 			}
 
-			if (ImGui::CollapsingHeader("Prefab", ImGuiTreeNodeFlags_DefaultOpen))
+			if (openPrefabComp)
 			{
-				auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+				auto &prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
 				ImGui::Text("Prefab GUID: %llu", prefabComp.PrefabGUID.m_Value);
 
 				if (!isPrefabEditor)
 				{
-					if (hasParent) {
+					if (hasParent)
+					{
 						ImGui::BeginDisabled();
 					}
 
@@ -4215,16 +4322,22 @@ namespace Engine
 
 					}
 
-					if (hasParent) {
+					if (hasParent)
+					{
 						ImGui::EndDisabled();
 					}
 
 				}
 
 			}
+			if (removePrefabComp)
+			{
+				m_SelectedEntity.RemoveComponent<PrefabComponent>();
+			}
 		}
 	}
-	void Editor::displayCameraComp(ImVec2& buttonSize)
+
+	void Editor::displayCameraComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<CameraComponent>())
 		{
@@ -4254,7 +4367,7 @@ namespace Engine
 
 			if (openCameraComp)
 			{
-				auto& camComp = m_SelectedEntity.GetComponent<CameraComponent>();
+				auto &camComp = m_SelectedEntity.GetComponent<CameraComponent>();
 
 				// -------------------------------------------------
 				// Enabled
@@ -4284,7 +4397,7 @@ namespace Engine
 					// Projection type (Perspective / Orthographic)
 					// -------------------------------------------------
 					int projIndex = camComp.Projection ? 1 : 0;     // 0 = Persp, 1 = Ortho
-					const char* projItems[] = { "Perspective", "Orthographic" };
+					const char *projItems[] = { "Perspective", "Orthographic" };
 					if (ImGui::Combo("Projection", &projIndex, projItems, IM_ARRAYSIZE(projItems)))
 					{
 						bool isOrtho = (projIndex == 1);
@@ -4337,14 +4450,6 @@ namespace Engine
 						camComp.SetTarget(target);                 // only affects View
 					}
 
-					// For M3
-					/*
-					int depth = static_cast<int>(camComp.Depth);
-					if (ImGui::DragInt("Depth", &depth, 1, 0, 100))
-					{
-						camComp.Depth = static_cast<u32>(depth);
-					}
-					*/
 				}
 			}
 
@@ -4357,21 +4462,18 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayRigidBodyComp(ImVec2& buttonSize)
+	void Editor::displayRigidBodyComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<RigidbodyComponent>())
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
 			// col 1: RigidBody component header
 			bool openRigidBody = ImGui::CollapsingHeader("Rigid Body", ImGuiTreeNodeFlags_DefaultOpen);
 			bool removeRigidBody = false; // for remove part
-
 			// col2: ...
 			ImGui::NextColumn();
-
 			if (ImGui::Button("...###RigidbodyBtn", buttonSize))
 			{
 				ImGui::OpenPopup("RigidBodyPopUp");
@@ -4384,139 +4486,158 @@ namespace Engine
 				}
 				ImGui::EndPopup();
 			}
-
 			ImGui::Columns(1);
-
 			if (openRigidBody)
 			{
-				auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
+				auto &rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
 
-				// mass
+				// Mass
 				float rigidMass = rigidBody.GetMass();
-				if (ImGui::DragFloat("Mass", &rigidMass))
+				if (ImGui::DragFloat("Mass", &rigidMass, 0.1f, 0.0f, 1000.0f))
 				{
 					rigidBody.SetMass(rigidMass);
 				}
-
 				ImGui::Separator();
 
-				// kinematic
+				// Kinematic
 				ImGui::Text("Boolean to check if body is moved by code (not Physics)");
-				bool& isKinematic = rigidBody.IsKinematic;
-				if (ImGui::Checkbox("Is Kinematic", &isKinematic)) {
+				bool isKinematic = rigidBody.IsKinematic;
+				if (ImGui::Checkbox("Is Kinematic", &isKinematic))
+				{
 					rigidBody.SetKinematic(isKinematic);
 				}
-
 				ImGui::Separator();
 
-				// velocity
+				// Trigger
+				ImGui::Text("If true, acts as a sensor with no collision response");
+				bool isTrigger = rigidBody.IsTrigger;
+				if (ImGui::Checkbox("Is Trigger", &isTrigger))
+				{
+					rigidBody.IsTrigger = isTrigger;
+				}
+				ImGui::Separator();
+
+				// Gravity
+				ImGui::Text("Whether gravity affects this body");
+				bool useGravity = rigidBody.UseGravity;
+				if (ImGui::Checkbox("Use Gravity", &useGravity))
+				{
+					rigidBody.SetGravityEnabled(useGravity);
+				}
+				ImGui::Separator();
+
+				// Velocity
 				glm::vec3 vel = rigidBody.GetVelocity();
-				if (ImGui::DragFloat3("Velocity", &vel.x, 1.0f))
+				if (ImGui::DragFloat3("Velocity", &vel.x, 0.1f))
 				{
 					rigidBody.SetVelocity(vel);
 				}
 
-				if (ImGui::Button("Stop")) {
-					rigidBody.Stop();
+				// Angular Velocity
+				glm::vec3 angVel = rigidBody.AngularVelocity;
+				if (ImGui::DragFloat3("Angular Velocity", &angVel.x, 0.1f))
+				{
+					rigidBody.AngularVelocity = angVel;
 				}
 
+				if (ImGui::Button("Stop"))
+				{
+					rigidBody.Stop();
+				}
 				ImGui::Separator();
 
+				// Linear Damping
 				float linearDamping = rigidBody.LinearDamping;
-				if (ImGui::DragFloat("LinearDamping", &linearDamping))
+				if (ImGui::DragFloat("Linear Damping", &linearDamping, 0.01f, 0.0f, 1.0f))
 				{
 					rigidBody.LinearDamping = linearDamping;
 				}
 
+				// Angular Damping
 				float angularDamping = rigidBody.AngularDamping;
-				if (ImGui::DragFloat("AngularDamping", &angularDamping))
+				if (ImGui::DragFloat("Angular Damping", &angularDamping, 0.01f, 0.0f, 1.0f))
 				{
 					rigidBody.AngularDamping = angularDamping;
 				}
 
+				// Restitution
 				float restitution = rigidBody.Restitution;
-				if (ImGui::DragFloat("Restitution", &restitution))
+				if (ImGui::DragFloat("Restitution", &restitution, 0.01f, 0.0f, 1.0f))
 				{
 					rigidBody.Restitution = restitution;
 				}
+				ImGui::Separator();
 
-
-				ColliderType& colliderShape = rigidBody.Shape;
-
-				if (ImGui::BeginCombo("Collider Shape", Engine::PropertyPanelHelper::ColliderTypeToString(colliderShape))) {
-					for (int i = 0; i < 4; ++i) {
+				// Collider Shape
+				ColliderType colliderShape = rigidBody.Shape;
+				if (ImGui::BeginCombo("Collider Shape", Engine::PropertyPanelHelper::ColliderTypeToString(colliderShape)))
+				{
+					for (int i = 0; i < 4; ++i)
+					{
 						ColliderType type = (ColliderType)i;
 						bool selected = (colliderShape == type);
-
-						if (ImGui::Selectable(Engine::PropertyPanelHelper::ColliderTypeToString(type), selected)) {
-							colliderShape = type;
+						if (ImGui::Selectable(Engine::PropertyPanelHelper::ColliderTypeToString(type), selected))
+						{
+							rigidBody.Shape = type;
 						}
-
-						if (selected) {
+						if (selected)
+						{
 							ImGui::SetItemDefaultFocus();
 						}
 					}
 					ImGui::EndCombo();
 				}
 
-				switch (colliderShape)
+				// Collider-specific properties
+				switch (rigidBody.Shape)
 				{
-
 				case ColliderType::AABB:
 					ImGui::Text("AABB is automatically generated from the mesh.");
 					break;
-
 				case ColliderType::BOX:
-
 					ImGui::Text("Box Properties");
-					ImGui::DragFloat3("Box Half Extents", &rigidBody.BoxHalfExtents.x, 1.0f);
+					if (ImGui::DragFloat3("Box Half Extents", &rigidBody.BoxHalfExtents.x, 0.1f, 0.01f, 100.0f))
+					{
+						// Value updated directly
+					}
 					break;
-
 				case ColliderType::SPHERE:
-
 					ImGui::Text("Sphere Properties");
 					ImGui::Text("Sphere radius is originally determined from the mesh.");
-					ImGui::DragFloat("Sphere Radius", &rigidBody.SphereRadius, 1.0f);
+					if (ImGui::DragFloat("Sphere Radius", &rigidBody.SphereRadius, 0.1f, 0.01f, 100.0f))
+					{
+						// Value updated directly
+					}
 					break;
-
 				case ColliderType::MESH:
 					ImGui::Text("Mesh collider is generated directly from the mesh.");
 					break;
-
 				default:
 					break;
 				}
-
 				ImGui::Separator();
 
-				ImGui::Text("Display Runtime Value:");
-
+				// Runtime Display Values (Read-only)
+				ImGui::Text("Display Runtime Values:");
 				ImGui::BeginDisabled();
-
 				float speed = rigidBody.GetSpeed();
 				ImGui::InputFloat("Speed (m/s)", &speed, 0.0f, 0.0f, "%.2f", ImGuiInputTextFlags_ReadOnly);
-
 				bool isMoving = rigidBody.IsMoving();
 				ImGui::Checkbox("Is Moving", &isMoving);
-
 				bool isStatic = rigidBody.IsStatic();
 				ImGui::Checkbox("Is Static", &isStatic);
-
-
-
 				ImGui::EndDisabled();
 			}
-			// ---------------------- Remove Rigid Body Component by ... -------------------------
+
+			// Remove Rigid Body Component
 			if (removeRigidBody)
 			{
 				m_SelectedEntity.RemoveComponent<RigidbodyComponent>();
 			}
-
 		}
-
 	}
 
-	void Editor::displayMeshRendererComp(ImVec2& buttonSize)
+	void Editor::displayMeshRendererComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<MeshRendererComponent>())
 		{
@@ -4548,88 +4669,92 @@ namespace Engine
 
 			if (openMeshComponent)
 			{
-				auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
+				auto &mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
 
-#if 1 //start of AssetReference
 				// ======================= Asset Reference Section =======================
 				ImGui::SeparatorText("Asset References");
 
 				static bool showWrongType = false;
 
 				// Helper lambda to display asset field with drag-drop support
-				auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType) {
-					// Get the filename from the GUID
-					std::string displayName = AM.getNameFromGuid(guid);
-					if (displayName.empty()) {
-						displayName = "<None>";
-					}
-
-					// Create a buffer for the input text (read-only display)
-					char buffer[256];
-					strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
-					buffer[sizeof(buffer) - 1] = '\0';
-
-					ImGui::Text("%s", label);
-					ImGui::SameLine();
-
-					// Input text field (read-only)
-					ImGui::PushID(label);
-					ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
-
-					// Drag-drop target
-					if (ImGui::BeginDragDropTarget())
+				auto DisplayAssetField = [&](const char *label, xresource::instance_guid &guid, ResourceType expectedType)
 					{
-						// Accept payload from asset browser (assuming you use "ASSET_BROWSER_ITEM" as payload ID)
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+						// Get the filename from the GUID
+						std::string displayName = AM.getNameFromGuid(guid);
+						if (displayName.empty())
 						{
-							// Assuming payload contains xresource::instance_guid
-							xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
+							displayName = "<None>";
+						}
 
-							// Verify the asset type matches what's expected
-							const AssetRecord* record = AM.getAssetRecord(droppedGuid);
-							if (record && record->type == expectedType)
+						// Create a buffer for the input text (read-only display)
+						char buffer[256];
+						strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
+						buffer[sizeof(buffer) - 1] = '\0';
+
+						ImGui::Text("%s", label);
+						ImGui::SameLine();
+
+						// Input text field (read-only)
+						ImGui::PushID(label);
+						ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
+
+						// Drag-drop target
+						if (ImGui::BeginDragDropTarget())
+						{
+							// Accept payload from asset browser (assuming you use "ASSET_BROWSER_ITEM" as payload ID)
+							if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
 							{
-								// Temporary fix for now: To be fully fixed by M3
-								std::string fileName = std::filesystem::path(currScenePath).filename().string();
-								std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
+								// Assuming payload contains xresource::instance_guid
+								xresource::instance_guid droppedGuid = *(const xresource::instance_guid *)payload->Data;
 
-								if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
-									&& recordName != "E005_loveletter_v001.fbx") {
+								// Verify the asset type matches what's expected
+								const AssetRecord *record = AM.getAssetRecord(droppedGuid);
+								if (record && record->type == expectedType)
+								{
+									// Temporary fix for now: To be fully fixed by M3
+									std::string fileName = std::filesystem::path(currScenePath).filename().string();
+									std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
 
+									if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
+										&& recordName != "E005_loveletter_v001.fbx")
+									{
+
+										showWrongType = true;
+									}
+									else
+									{
+
+										guid = droppedGuid;
+
+									}
+								}
+								else
+								{
 									showWrongType = true;
 								}
-								else {
-
-									guid = droppedGuid;
-
-								}
 							}
-							else
-							{
-								showWrongType = true;
-							}
+							ImGui::EndDragDropTarget();
 						}
-						ImGui::EndDragDropTarget();
-					}
 
-					// Context menu to clear the reference
-					if (ImGui::BeginPopupContextItem())
-					{
-						if (ImGui::MenuItem("Clear Reference"))
+						// Context menu to clear the reference
+						if (ImGui::BeginPopupContextItem())
 						{
-							guid = xresource::instance_guid(); // Reset to invalid/default
+							if (ImGui::MenuItem("Clear Reference"))
+							{
+								guid = xresource::instance_guid(); // Reset to invalid/default
+							}
+							ImGui::EndPopup();
 						}
-						ImGui::EndPopup();
-					}
 
-					ImGui::PopID();
+						ImGui::PopID();
 					};
 
 				// Display asset reference fields
 				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
 				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
 
-				if (showWrongType) {
+				if (showWrongType)
+				{
 
 					ImGui::OpenPopup("Incompatible Asset Type");
 					showWrongType = false;
@@ -4647,24 +4772,28 @@ namespace Engine
 				}
 
 				ImGui::Spacing();
-#endif
+
 				bool globalIlluminate = mesh.GlobalIlluminate;
-				if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
+				if (ImGui::Checkbox("Global Illuminate", &globalIlluminate))
+				{
 					mesh.GlobalIlluminate = globalIlluminate;
 				}
 
 				bool shadowCast = mesh.ShadowCast;
-				if (ImGui::Checkbox("Shadow Cast", &shadowCast)) {
+				if (ImGui::Checkbox("Shadow Cast", &shadowCast))
+				{
 					mesh.ShadowCast = shadowCast;
 				}
 
 				bool shadowReceive = mesh.ShadowReceive;
-				if (ImGui::Checkbox("Shadow Receive", &shadowReceive)) {
+				if (ImGui::Checkbox("Shadow Receive", &shadowReceive))
+				{
 					mesh.ShadowReceive = shadowReceive;
 				}
 
 				bool visible = mesh.Visible;
-				if (ImGui::Checkbox("Visible", &visible)) {
+				if (ImGui::Checkbox("Visible", &visible))
+				{
 					mesh.Visible = visible;
 				}
 
@@ -4679,7 +4808,7 @@ namespace Engine
 				{
 					if (strlen(materialSaveName) > 0)
 					{
-						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+						MaterialResource *material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
 						if (material)
 						{
 							std::string filename = std::string(materialSaveName);
@@ -4724,7 +4853,7 @@ namespace Engine
 				}
 
 				// Get material reference
-				MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+				MaterialResource *material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
 
 				if (material)
 				{
@@ -4838,10 +4967,12 @@ namespace Engine
 				ImU32 meshType = mesh.MeshType;
 				if (ImGui::InputScalar("Mesh Type", ImGuiDataType_U32, &meshType))
 				{
-					if (meshType == 0 || meshType == 1 || meshType == 2) {
+					if (meshType == 0 || meshType == 1 || meshType == 2)
+					{
 						mesh.MeshType = meshType;
 					}
-					else {
+					else
+					{
 						meshType = mesh.MeshType;
 					}
 				}
@@ -4859,7 +4990,7 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayAudioComp(ImVec2& buttonSize)
+	void Editor::displayAudioComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<AudioComponent>())
 		{
@@ -4891,34 +5022,39 @@ namespace Engine
 
 			if (openAudioComponent)
 			{
-				auto& audio = m_SelectedEntity.GetComponent<AudioComponent>();
+				auto &audio = m_SelectedEntity.GetComponent<AudioComponent>();
 
 				ImGui::Separator();
 
-				if (audio.AudioFilePath.empty()) {
+				if (audio.AudioFilePath.empty())
+				{
 					ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255)); // Red
 					ImGui::Text("No audio file loaded. Please select and audio file below.");
 					ImGui::PopStyleColor();
 				}
-				else {
+				else
+				{
 					ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
 					ImGui::Text("Audio Filename: %s", audio.AudioFilePath.c_str());
 					ImGui::PopStyleColor();
 				}
 
 				// Get from Asset Manager
-				auto& db = AM.db();
+				auto &db = AM.db();
 				auto allAssets = db.AllMutable();
 
 				std::vector<std::string> audioAssetNames;
 				audioAssetNames.reserve(allAssets.size());
 
-				for (const auto* record : allAssets) {
-					if (!record || !record->valid) {
+				for (const auto *record : allAssets)
+				{
+					if (!record || !record->valid)
+					{
 						continue;
 					}
 
-					if (record->type == ResourceType::AUDIO) {
+					if (record->type == ResourceType::AUDIO)
+					{
 						std::string filepath = record->sourcePath;
 						size_t lastSlash = filepath.find_last_of("/\\");
 						std::string filename = (lastSlash == std::string::npos) ? filepath : filepath.substr(lastSlash + 1);
@@ -4928,15 +5064,18 @@ namespace Engine
 				}
 
 				// Const char* for dropdown
-				std::vector<const char*> audioAssets;
+				std::vector<const char *> audioAssets;
 				audioAssets.reserve(audioAssetNames.size());
-				for (auto& name : audioAssetNames) {
+				for (auto &name : audioAssetNames)
+				{
 					audioAssets.push_back(name.c_str());
 				}
 
 				int currentIndex = 0;
-				for (size_t i = 0; i < audioAssetNames.size(); ++i) {
-					if (audioAssetNames[i] == audio.AudioFilePath) {
+				for (size_t i = 0; i < audioAssetNames.size(); ++i)
+				{
+					if (audioAssetNames[i] == audio.AudioFilePath)
+					{
 						currentIndex = static_cast<int>(i);
 						break;
 					}
@@ -4944,76 +5083,92 @@ namespace Engine
 
 				// Dropdown menu
 				std::string label = "Filepath";
-				if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size()))) {
+				if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size())))
+				{
 					audio.SetAudioFile(audioAssetNames[currentIndex]);
 				}
 
-				if (audio.AudioFilePath.empty()) {
+				if (audio.AudioFilePath.empty())
+				{
 					ImGui::SameLine();
-					if (ImGui::Button("Load File")) {
+					if (ImGui::Button("Load File"))
+					{
 						audio.SetAudioFile(audioAssetNames[currentIndex]);
 					}
 				}
 
-				if (audio.AudioFilePath.empty()) {
+				if (audio.AudioFilePath.empty())
+				{
 					ImGui::BeginDisabled();
 				}
 
 				ImGui::Text("Audio Type:");
 				AudioType type = audio.Type;
 
-				if (ImGui::RadioButton("SFX", type == AudioType::SFX)) {
+				if (ImGui::RadioButton("SFX", type == AudioType::SFX))
+				{
 					audio.SetAudioType(AudioType::SFX);
 				}
-				if (ImGui::RadioButton("BGM", type == AudioType::BGM)) {
+				if (ImGui::RadioButton("BGM", type == AudioType::BGM))
+				{
 					audio.SetAudioType(AudioType::BGM);
 				}
-				if (ImGui::RadioButton("UI", type == AudioType::UI)) {
+				if (ImGui::RadioButton("UI", type == AudioType::UI))
+				{
 					audio.SetAudioType(AudioType::UI);
 				}
 
 				ImGui::Separator();
 				ImGui::Text("Play State:");
 				PlayState playState = audio.State;
-				if (ImGui::RadioButton("Play", playState == PlayState::PLAY)) {
+				if (ImGui::RadioButton("Play", playState == PlayState::PLAY))
+				{
 					audio.SetState(PlayState::PLAY);
 				}
-				if (ImGui::RadioButton("Pause", playState == PlayState::PAUSE)) {
+				if (ImGui::RadioButton("Pause", playState == PlayState::PAUSE))
+				{
 					audio.SetState(PlayState::PAUSE);
 				}
-				if (ImGui::RadioButton("Stop", playState == PlayState::STOP)) {
+				if (ImGui::RadioButton("Stop", playState == PlayState::STOP))
+				{
 					audio.SetState(PlayState::STOP);
 				}
 
 				ImGui::Separator();
 
 				float volume = audio.Volume;
-				if (ImGui::SliderFloat("Volume", &volume, 0.f, 1.f)) {
+				if (ImGui::SliderFloat("Volume", &volume, 0.f, 1.f))
+				{
 					audio.SetVolume(volume);
 				}
 
 				float pitch = audio.Pitch;
-				if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 1.f)) {
+				if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 1.f))
+				{
 					audio.SetPitch(pitch);
 				}
 
 				ImGui::Separator();
 				bool looping = audio.Loop;
-				if (ImGui::Checkbox("Looping", &looping)) {
+				if (ImGui::Checkbox("Looping", &looping))
+				{
 					audio.SetLoop(looping);
 				}
 				bool mute = audio.Mute;
-				if (ImGui::Checkbox("Mute", &mute)) {
+				if (ImGui::Checkbox("Mute", &mute))
+				{
 					audio.SetMute(mute);
 				}
 				bool is_3d = audio.Is3D;
-				if (ImGui::Checkbox("3D", &is_3d)) {
+				if (ImGui::Checkbox("3D", &is_3d))
+				{
 					audio.Set3D(is_3d);
 				}
 
 				ImGui::Separator();
 				float reverb = audio.ReverbProperties;
-				if (ImGui::SliderFloat("Reverb", &reverb, 0.0f, 1.0f)) {
+				if (ImGui::SliderFloat("Reverb", &reverb, 0.0f, 1.0f))
+				{
 					audio.SetReverbProperties(reverb);
 				}
 
@@ -5034,21 +5189,27 @@ namespace Engine
 				ImGui::BeginDisabled(!is_3d);
 
 				float min_distance = audio.MinDistance;
-				if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance)) {
-					if (is_3d) {
+				if (ImGui::SliderFloat("MinDistance", &min_distance, 0.0f, audio.MaxDistance))
+				{
+					if (is_3d)
+					{
 						audio.SetMinDistance(min_distance);
 					}
-					else {
+					else
+					{
 						audio.SetMinDistance(1.f);
 					}
 				}
 
 				float max_distance = audio.MaxDistance;
-				if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f)) {
-					if (is_3d) {
+				if (ImGui::SliderFloat("MaxDistance", &max_distance, audio.MinDistance, 1000.f))
+				{
+					if (is_3d)
+					{
 						audio.SetMaxDistance(max_distance);
 					}
-					else {
+					else
+					{
 						audio.SetMaxDistance(10.f);
 					}
 				}
@@ -5058,20 +5219,24 @@ namespace Engine
 				ImGui::Separator();
 
 				float dopplerLevel = audio.DopplerLevel;
-				if (ImGui::SliderFloat("Doppler", &dopplerLevel, 0.f, 5.f)) {
+				if (ImGui::SliderFloat("Doppler", &dopplerLevel, 0.f, 5.f))
+				{
 					audio.SetDopplerLevel(dopplerLevel);
 				}
 
 				ImGui::Text("RollOff Mode:");
 				AudioRolloffMode mode = audio.RolloffMode;
 
-				if (ImGui::RadioButton("INVERSE", mode == AudioRolloffMode::INVERSE)) {
+				if (ImGui::RadioButton("INVERSE", mode == AudioRolloffMode::INVERSE))
+				{
 					audio.SetRolloffMode(AudioRolloffMode::INVERSE);
 				}
-				if (ImGui::RadioButton("LINEAR", mode == AudioRolloffMode::LINEAR)) {
+				if (ImGui::RadioButton("LINEAR", mode == AudioRolloffMode::LINEAR))
+				{
 					audio.SetRolloffMode(AudioRolloffMode::LINEAR);
 				}
-				if (ImGui::RadioButton("LINEARSQUARE", mode == AudioRolloffMode::LINEARSQUARE)) {
+				if (ImGui::RadioButton("LINEARSQUARE", mode == AudioRolloffMode::LINEARSQUARE))
+				{
 					audio.SetRolloffMode(AudioRolloffMode::LINEARSQUARE);
 				}
 
@@ -5091,13 +5256,15 @@ namespace Engine
 				ImGui::BeginDisabled(is_3d);
 
 				float pan = audio.Pan2D;
-				if (ImGui::SliderFloat("Pan", &pan, -1.f, 1.f)) {
+				if (ImGui::SliderFloat("Pan", &pan, -1.f, 1.f))
+				{
 					audio.SetPan(pan);
 				}
 
 				ImGui::EndDisabled();
 
-				if (audio.AudioFilePath.empty()) {
+				if (audio.AudioFilePath.empty())
+				{
 					ImGui::EndDisabled();
 				}
 
@@ -5111,7 +5278,7 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayReverbZoneComp(ImVec2& buttonSize)
+	void Editor::displayReverbZoneComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<ReverbZoneComponent>())
 		{
@@ -5142,9 +5309,9 @@ namespace Engine
 
 			if (openReverbComponent)
 			{
-				auto& reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
+				auto &reverbZone = m_SelectedEntity.GetComponent<ReverbZoneComponent>();
 
-				const char* presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };
+				const char *presets[] = { "Custom", "Generic", "Bathroom", "Room", "Cave", "Arena" };
 				int currentIndex = static_cast<int>(reverbZone.Preset);
 
 				ImGui::Text("Select an option:");
@@ -5161,48 +5328,57 @@ namespace Engine
 							reverbZone.Preset = static_cast<ReverbPreset>(i);
 						}
 
-						if (isSelected) {
+						if (isSelected)
+						{
 							ImGui::SetItemDefaultFocus();
 						}
 					}
 					ImGui::EndCombo();
 				}
 
-				if (reverbZone.Preset == ReverbPreset::Custom) {
+				if (reverbZone.Preset == ReverbPreset::Custom)
+				{
 
-					float& decayTime = reverbZone.DecayTime;
-					if (ImGui::SliderFloat("Decay Time", &decayTime, 100.f, 20000.f)) {
+					float &decayTime = reverbZone.DecayTime;
+					if (ImGui::SliderFloat("Decay Time", &decayTime, 100.f, 20000.f))
+					{
 						reverbZone.SetDecayTime(decayTime);
 					}
 
-					float& hfDecayRatio = reverbZone.HfDecayRatio;
-					if (ImGui::SliderFloat("High-Frequency Decay Ratio", &hfDecayRatio, 0.f, 100.f)) {
+					float &hfDecayRatio = reverbZone.HfDecayRatio;
+					if (ImGui::SliderFloat("High-Frequency Decay Ratio", &hfDecayRatio, 0.f, 100.f))
+					{
 						reverbZone.SetHfDecayRatio(hfDecayRatio);
 					}
 
-					float& diffusion = reverbZone.Diffusion;
-					if (ImGui::SliderFloat("Diffusion", &diffusion, 0.f, 100.f)) {
+					float &diffusion = reverbZone.Diffusion;
+					if (ImGui::SliderFloat("Diffusion", &diffusion, 0.f, 100.f))
+					{
 						reverbZone.SetDiffusion(diffusion);
 					}
 
-					float& density = reverbZone.Density;
-					if (ImGui::SliderFloat("Density", &density, 0.f, 100.f)) {
+					float &density = reverbZone.Density;
+					if (ImGui::SliderFloat("Density", &density, 0.f, 100.f))
+					{
 						reverbZone.SetDensity(density);
 					}
 
-					float& wetLevel = reverbZone.WetLevel;
-					if (ImGui::SliderFloat("Wet Level", &wetLevel, -80.f, 20.f)) {
+					float &wetLevel = reverbZone.WetLevel;
+					if (ImGui::SliderFloat("Wet Level", &wetLevel, -80.f, 20.f))
+					{
 						reverbZone.SetWetLevel(wetLevel);
 					}
 				}
 
-				float& minDistanceReverb = reverbZone.MinDistance;
-				if (ImGui::InputFloat("MinDistance###minreverb", &minDistanceReverb)) {
+				float &minDistanceReverb = reverbZone.MinDistance;
+				if (ImGui::InputFloat("MinDistance###minreverb", &minDistanceReverb))
+				{
 					reverbZone.SetMinDistance(minDistanceReverb);
 				}
 
-				float& maxDistanceReverb = reverbZone.MaxDistance;
-				if (ImGui::InputFloat("MaxDistance###maxreverb", &maxDistanceReverb)) {
+				float &maxDistanceReverb = reverbZone.MaxDistance;
+				if (ImGui::InputFloat("MaxDistance###maxreverb", &maxDistanceReverb))
+				{
 					reverbZone.SetMaxDistance(maxDistanceReverb);
 				}
 			}
@@ -5215,7 +5391,7 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayListenerComp(ImVec2& buttonSize)
+	void Editor::displayListenerComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<ListenerComponent>())
 		{
@@ -5246,10 +5422,11 @@ namespace Engine
 
 			if (openListenerComponent)
 			{
-				auto& listener = m_SelectedEntity.GetComponent<ListenerComponent>();
-				bool& active = listener.Active;
+				auto &listener = m_SelectedEntity.GetComponent<ListenerComponent>();
+				bool &active = listener.Active;
 
-				if (ImGui::Checkbox("Active###activeListener", &active)) {
+				if (ImGui::Checkbox("Active###activeListener", &active))
+				{
 					listener.Active = active;
 				}
 			}
@@ -5262,7 +5439,7 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayBTComp(ImVec2& buttonSize)
+	void Editor::displayBTComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
 		{
@@ -5292,10 +5469,10 @@ namespace Engine
 
 			if (openBTComponent)
 			{
-				auto& ai_bt = m_SelectedEntity.GetComponent<BehaviourTreeComponent>();
+				auto &ai_bt = m_SelectedEntity.GetComponent<BehaviourTreeComponent>();
 
 				// Getting BT itself
-				BehaviourTree& treeInstance = *(ai_bt.TreeInstance);
+				BehaviourTree &treeInstance = *(ai_bt.TreeInstance);
 				if (ai_bt.TreeInstance)
 				{
 					size_t stackDepth = treeInstance.GetStackDepth();
@@ -5309,7 +5486,8 @@ namespace Engine
 						newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
 						newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
 
-						if (!newName.empty()) {
+						if (!newName.empty())
+						{
 							treeInstance.SetName(newName);
 							ai_bt.TreeAssetPath = newName + ".json";
 						}
@@ -5342,12 +5520,13 @@ namespace Engine
 					auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
 					ImGui::SetNextItemWidth(200.0f);
 					if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
-						[](void* data, int idx, const char** outText) -> bool {
-							auto& types = *static_cast<std::vector<std::string>*>(data);
+						[](void *data, int idx, const char **outText) -> bool
+						{
+							auto &types = *static_cast<std::vector<std::string>*>(data);
 							*outText = types[idx].c_str();
 							return true;
 						},
-						static_cast<void*>(&allTypes), (int)allTypes.size()))
+						static_cast<void *>(&allTypes), (int)allTypes.size()))
 					{
 						;
 					}
@@ -5362,22 +5541,26 @@ namespace Engine
 					ImGui::Separator();
 
 					// Reset the tree to initial state
-					if (ImGui::Button("Reset")) {
+					if (ImGui::Button("Reset"))
+					{
 						ai_bt.Reset();
 					}
 
 					ImGui::BeginDisabled();
 
 					// Last execution status
-					BTStatus& lastStatus = ai_bt.LastStatus;
+					BTStatus &lastStatus = ai_bt.LastStatus;
 					std::string lastStatusString{};
-					if (lastStatus == BTStatus::Success) {
+					if (lastStatus == BTStatus::Success)
+					{
 						lastStatusString = "Success";
 					}
-					else if (lastStatus == BTStatus::Failure) {
+					else if (lastStatus == BTStatus::Failure)
+					{
 						lastStatusString = "Failure";
 					}
-					else {
+					else
+					{
 						lastStatusString = "Running";
 					}
 					ImGui::Text("Execution Status: %s", lastStatusString.c_str());
@@ -5385,19 +5568,21 @@ namespace Engine
 					ImGui::EndDisabled();
 
 					// Whether tree executes every frame
-					bool& active = ai_bt.Active;
-					if (ImGui::Checkbox("Active###activeBT", &active)) {
+					bool &active = ai_bt.Active;
+					if (ImGui::Checkbox("Active###activeBT", &active))
+					{
 						ai_bt.Active = active;
 					}
 
 					// Reset the tree when it completes
-					bool& resetComplete = ai_bt.ResetOnComplete;
-					if (ImGui::Checkbox("Reset On Complete", &resetComplete)) {
+					bool &resetComplete = ai_bt.ResetOnComplete;
+					if (ImGui::Checkbox("Reset On Complete", &resetComplete))
+					{
 						ai_bt.ResetOnComplete = resetComplete;
 					}
 
 					// Reference to current asset path
-					std::string& treeAssetPath = ai_bt.TreeAssetPath;
+					std::string &treeAssetPath = ai_bt.TreeAssetPath;
 
 					// Find BT folder
 
@@ -5406,7 +5591,7 @@ namespace Engine
 
 					auto folders = getAssetsInFolder(btPath.string());
 					std::string btFolderPath;
-					for (auto& folder : folders)
+					for (auto &folder : folders)
 					{
 						if (folder.name == "BT")
 						{
@@ -5420,7 +5605,7 @@ namespace Engine
 					if (!btFolderPath.empty())
 					{
 						auto files = getAssetsInFolder(btFolderPath);
-						for (auto& f : files)
+						for (auto &f : files)
 						{
 							if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
 								btAssets.push_back(f);
@@ -5442,14 +5627,14 @@ namespace Engine
 					ImGui::Text("Choose Tree Asset Path:");
 					ImGui::SetNextItemWidth(400.0f);
 					if (ImGui::Combo("##TreeAssetPath", &currentIndex,
-						[](void* data, int idx, const char** outText) -> bool
+						[](void *data, int idx, const char **outText) -> bool
 						{
-							auto& assets = *static_cast<std::vector<AssetEntry>*>(data);
+							auto &assets = *static_cast<std::vector<AssetEntry>*>(data);
 							*outText = assets[idx].name.c_str();
 
 							return true;
 						},
-						static_cast<void*>(&btAssets), (int)btAssets.size()))
+						static_cast<void *>(&btAssets), (int)btAssets.size()))
 					{
 						if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
 						{
@@ -5466,7 +5651,8 @@ namespace Engine
 						}
 					}
 
-					if (ImGui::Button("Save Tree")) {
+					if (ImGui::Button("Save Tree"))
+					{
 						BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
 					}
 
@@ -5474,12 +5660,14 @@ namespace Engine
 					static char saveNewFileName[256] = "";  // Changed from saveNewTreePath - clearer naming
 					static char saveNewTreeName[256] = "";
 
-					if (ImGui::Button("Rename Tree File")) {
+					if (ImGui::Button("Rename Tree File"))
+					{
 						strncpy_s(changeNewNameBuffer, sizeof(changeNewNameBuffer), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
 						ImGui::OpenPopup("TreeRename Panel");
 					}
 
-					if (ImGui::Button("Save Tree File As")) {
+					if (ImGui::Button("Save Tree File As"))
+					{
 						strncpy_s(saveNewFileName, sizeof(saveNewFileName), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
 						strncpy_s(saveNewTreeName, sizeof(saveNewTreeName), treeInstance.GetName().c_str(), _TRUNCATE);
 						ImGui::OpenPopup("SaveTreeRename Panel");
@@ -5494,9 +5682,11 @@ namespace Engine
 						ImGui::Text("Enter file name ('.json' will be added automatically):");
 						ImGui::InputText("New Tree Filename", changeNewNameBuffer, sizeof(changeNewNameBuffer));
 
-						if (ImGui::Button("Rename File", ImVec2(120, 0))) {
+						if (ImGui::Button("Rename File", ImVec2(120, 0)))
+						{
 							std::string newFileName = changeNewNameBuffer;
-							if (!newFileName.empty()) {
+							if (!newFileName.empty())
+							{
 								std::string saveTreeName = newFileName + ".json";
 								BehaviourTreeEditor::RenameFile(ai_bt.TreeAssetPath, saveTreeName, m_Scene);
 								ImGui::CloseCurrentPopup();
@@ -5505,7 +5695,8 @@ namespace Engine
 
 						ImGui::SameLine();
 
-						if (ImGui::Button("Cancel###RenameCancel", ImVec2(120, 0))) {  // Fixed ID
+						if (ImGui::Button("Cancel###RenameCancel", ImVec2(120, 0)))
+						{  // Fixed ID
 							ImGui::CloseCurrentPopup();
 						}
 
@@ -5523,10 +5714,12 @@ namespace Engine
 						ImGui::InputText("New Filename", saveNewFileName, sizeof(saveNewFileName));
 						ImGui::InputText("New Tree Name", saveNewTreeName, sizeof(saveNewTreeName));
 
-						if (ImGui::Button("Save As Tree File", ImVec2(120, 0))) {
+						if (ImGui::Button("Save As Tree File", ImVec2(120, 0)))
+						{
 							std::string newSaveFileName = saveNewFileName;
 							std::string newSaveTreeName = saveNewTreeName;
-							if (!newSaveFileName.empty() && !newSaveTreeName.empty()) {
+							if (!newSaveFileName.empty() && !newSaveTreeName.empty())
+							{
 								std::string saveFileName = newSaveFileName + ".json";
 								BehaviourTreeEditor::SaveAs(ai_bt.TreeAssetPath, saveFileName, newSaveTreeName, true);
 								ImGui::CloseCurrentPopup();
@@ -5535,7 +5728,8 @@ namespace Engine
 
 						ImGui::SameLine();
 
-						if (ImGui::Button("Cancel###SaveAsCancel", ImVec2(120, 0))) {  // Fixed ID
+						if (ImGui::Button("Cancel###SaveAsCancel", ImVec2(120, 0)))
+						{  // Fixed ID
 							ImGui::CloseCurrentPopup();
 						}
 
@@ -5543,7 +5737,8 @@ namespace Engine
 					}
 
 				}
-				else {
+				else
+				{
 					ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("PlaceholderTreeName");
 				}
 
@@ -5556,7 +5751,7 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayParticleComp(ImVec2& buttonSize)
+	void Editor::displayParticleComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<ParticleComponent>())
 		{
@@ -5567,7 +5762,7 @@ namespace Engine
 			bool openParticleComp = ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen);
 			bool removeParticleComp = false;
 
-			auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
+			auto &particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
 
 			ImGui::NextColumn();
 
@@ -5601,7 +5796,7 @@ namespace Engine
 				// Emission Settings
 				if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000);
+					ImGui::DragInt("Max Particles", (int *)&particleComp.MaxParticles, 1.0f, 1, 10000);
 					ImGui::DragFloat("Emission Rate", &particleComp.EmissionRate, 0.1f, 0.0f, 1000.0f, "%.1f particles/sec");
 					ImGui::DragFloat("Particle Lifetime", &particleComp.ParticleLifetime, 0.1f, 0.1f, 100.0f, "%.1f seconds");
 					ImGui::TreePop();
@@ -5611,8 +5806,8 @@ namespace Engine
 				if (ImGui::TreeNodeEx("Appearance", ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					// Particle Type Dropdown
-					const char* particleTypes[] = { "Cube", "Plane", "Sphere" };
-					const char* currentType = particleTypes[particleComp.ParticleType];
+					const char *particleTypes[] = { "Cube", "Plane", "Sphere" };
+					const char *currentType = particleTypes[particleComp.ParticleType];
 
 					if (ImGui::BeginCombo("Particle Type", currentType))
 					{
@@ -5677,7 +5872,8 @@ namespace Engine
 				if (ImGui::TreeNode("Statistics"))
 				{
 					int aliveCount = 0;
-					for (const auto& particle : particleComp.Particles) {
+					for (const auto &particle : particleComp.Particles)
+					{
 						if (particle.Alive) aliveCount++;
 					}
 
@@ -5694,7 +5890,8 @@ namespace Engine
 				// Controls
 				if (ImGui::Button("Clear Particles", ImVec2(150, 0)))
 				{
-					for (auto& particle : particleComp.Particles) {
+					for (auto &particle : particleComp.Particles)
+					{
 						particle.Alive = false;
 					}
 				}
@@ -5715,8 +5912,10 @@ namespace Engine
 		}
 	}
 
-	void Editor::displayScriptComp(ImVec2 &buttonSize) {
-		if(m_SelectedEntity.HasComponent<ScriptComponent>()) {
+	void Editor::displayScriptComp(ImVec2 &buttonSize)
+	{
+		if (m_SelectedEntity.HasComponent<ScriptComponent>())
+		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
@@ -5726,29 +5925,36 @@ namespace Engine
 			std::string scriptPath = getRepository() + "\\Scripts\\Game";
 			auto scriptFiles = getAssetsInFolder(scriptPath);
 			ImGui::NextColumn();
-			if(ImGui::Button("...##ScriptBtn", buttonSize))
+			if (ImGui::Button("...##ScriptBtn", buttonSize))
 				ImGui::OpenPopup("ScriptPopUp");
-			if(ImGui::BeginPopup("ScriptPopUp")) {
-				if(ImGui::MenuItem("Remove Component"))
+			if (ImGui::BeginPopup("ScriptPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
 					removeScriptComp = true;
 				ImGui::EndPopup();
 			}
 			ImGui::Columns(1);
-			if(openScriptComp) {
+			if (openScriptComp)
+			{
 				ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
 				ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
 
-				if(!scriptFiles.empty()) {
-					if(ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str())) {
-						for(const auto &asset : scriptFiles) {
+				if (!scriptFiles.empty())
+				{
+					if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
+					{
+						for (const auto &asset : scriptFiles)
+						{
 							std::string className = asset.name;
-							if(className.ends_with(".cs"))
+							if (className.ends_with(".cs"))
 								className = className.substr(0, className.size() - 3); // remove extension
 							std::string selectedClassName = "Game." + className;
 							bool isSelected = scriptComp.ScriptClassName == selectedClassName;
-							if(ImGui::Selectable(className.c_str(), isSelected)) {
+							if (ImGui::Selectable(className.c_str(), isSelected))
+							{
 								// Destroy previous script instance if exists
-								if(scriptComp.ScriptInstance) {
+								if (scriptComp.ScriptInstance)
+								{
 									MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject *)scriptComp.ScriptInstance);
 									scriptComp.ScriptInstance = nullptr;
 									scriptComp.Started = false;
@@ -5761,7 +5967,7 @@ namespace Engine
 								// Just setting the class name is enough
 								// The instance will be created and EntityID will be bound when you play
 							}
-							if(isSelected)
+							if (isSelected)
 								ImGui::SetItemDefaultFocus();
 						}
 						ImGui::EndCombo();
@@ -5772,32 +5978,36 @@ namespace Engine
 					ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), "Serialized Fields:");
 					ImGui::Separator();
 					// THIS IS THE KEY LINE - renders all [SerializeField] fields
-					if(scriptComp.ScriptInstance) {
+					if (scriptComp.ScriptInstance)
+					{
 						RenderSerializedFieldsInImGui((MonoObject *)scriptComp.ScriptInstance);
 					}
-					else {
+					else
+					{
 						ImGui::TextDisabled("(No script instance - will be created when playing)");
 					}
-					if(ImGui::Button("Save Script Fields To JSON")) {
-						if(scriptComp.ScriptInstance)
+					if (ImGui::Button("Save Script Fields To JSON"))
+					{
+						if (scriptComp.ScriptInstance)
 							SerializeScriptToDiskRapidJSON((MonoObject *)scriptComp.ScriptInstance, "SavedScriptFields.json");
 					}
 					// Similarly, add a load button to test deserialization:
 					ImGui::SameLine();
-					if(ImGui::Button("Load Script Fields From JSON")) {
-						if(scriptComp.ScriptInstance)
+					if (ImGui::Button("Load Script Fields From JSON"))
+					{
+						if (scriptComp.ScriptInstance)
 							DeserializeScriptFromDiskRapidJSON((MonoObject *)scriptComp.ScriptInstance, "SavedScriptFields.json");
 					}
 					// ===== END NEW SERIALIZED FIELDS =====
 				}
 			}
 			// Remove Script Component
-			if(removeScriptComp)
+			if (removeScriptComp)
 				m_SelectedEntity.RemoveComponent<ScriptComponent>();
 		}
 	}
 
-	void Editor::displayAnimatorComp(ImVec2& buttonSize)
+	void Editor::displayAnimatorComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<AnimatorComponent>())
 		{
@@ -5828,7 +6038,7 @@ namespace Engine
 
 			if (openAnimatorComponent)
 			{
-				auto& animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
+				auto &animator = m_SelectedEntity.GetComponent<AnimatorComponent>();
 
 				// -----------------------------------------------------------------
 				// Controller selection combo (from m_AnimatorControllerStorage)
@@ -5840,10 +6050,10 @@ namespace Engine
 				controllerLabels.reserve(m_AnimatorControllerStorage.size());
 
 				// Build a simple list of (handle, "Name (id)") pairs
-				for (const auto& kv : m_AnimatorControllerStorage)
+				for (const auto &kv : m_AnimatorControllerStorage)
 				{
 					u32 handle = kv.first;
-					const AnimatorController& ctrl = kv.second;
+					const AnimatorController &ctrl = kv.second;
 
 					controllerHandles.push_back(handle);
 
@@ -5867,7 +6077,7 @@ namespace Engine
 					}
 				}
 
-				const char* previewLabel = "(None)";
+				const char *previewLabel = "(None)";
 				if (currentIndex >= 0 && currentIndex < static_cast<int>(controllerLabels.size()))
 					previewLabel = controllerLabels[currentIndex].c_str();
 
@@ -5879,7 +6089,7 @@ namespace Engine
 					for (int i = 0; i < static_cast<int>(controllerHandles.size()); ++i)
 					{
 						bool isSelected = (i == currentIndex);
-						const char* itemLabel = controllerLabels[i].c_str();
+						const char *itemLabel = controllerLabels[i].c_str();
 
 						if (ImGui::Selectable(itemLabel, isSelected))
 						{
@@ -5908,7 +6118,7 @@ namespace Engine
 				ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f);
 
 				// We keep these for debugging / manual scrubbing
-				ImGui::DragInt("Current Clip Index", (int*)(&animator.currentClipIndex), 1.0f, 0, 100);
+				ImGui::DragInt("Current Clip Index", (int *)(&animator.currentClipIndex), 1.0f, 0, 100);
 				ImGui::DragFloat("Current Time", &animator.currentTime, 0.01f, 0.0f, 1000.0f);
 
 				if (ImGui::Button("Restart Clip"))
@@ -6193,7 +6403,7 @@ namespace Engine
 			m_SelectedEntity.GetComponent<TransformComponent>().Parent != u32_max) // If entity is a sub-entity; DO NOT REVERT BY ITSELF
 			return;
 
-		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		auto &prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
 		// Load prefab data
 		auto prefab = PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
@@ -6204,7 +6414,7 @@ namespace Engine
 			return;
 		}
 
-		auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
+		auto &transform = m_SelectedEntity.GetComponent<TransformComponent>();
 		if (transform.Children.empty()) // For main entities with no children
 		{
 			// Remove the modified instance
@@ -6225,7 +6435,8 @@ namespace Engine
 			// Select it in the editor
 			m_SelectedEntity = newEntity;
 		}
-		else { // For main entities with children
+		else
+		{ // For main entities with children
 
 			Entity old = m_SelectedEntity;
 			EditorHierarchyHelper::FillEntitiesWithChildrenToDelete(old, m_Scene, m_SelectedEntity, m_PickedID);
@@ -6249,7 +6460,7 @@ namespace Engine
 		LOG_INFO("Prefab instance reverted to original prefab state.");
 	}
 
-	void Editor::displayLightComp(ImVec2& buttonSize)
+	void Editor::displayLightComp(ImVec2 &buttonSize)
 	{
 		if (m_SelectedEntity.HasComponent<LightComponent>())
 		{
@@ -6280,11 +6491,11 @@ namespace Engine
 
 			if (openLightComp)
 			{
-				auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
+				auto &lightComp = m_SelectedEntity.GetComponent<LightComponent>();
 				ImGui::Checkbox("Enabled", &lightComp.Enabled);
 
 				// --- Light Type Dropdown ---
-				const char* lightTypeNames[] = { "Directional", "Point", "Spot" };
+				const char *lightTypeNames[] = { "Directional", "Point", "Spot" };
 				int currentType = static_cast<int>(lightComp.Type);
 
 				if (ImGui::Combo("Type", &currentType, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
@@ -6343,19 +6554,18 @@ namespace Engine
 
 	}
 
-#if 1 // no use for now
 	void Editor::LoadAllPrefabsIntoRegistry()
 	{
-		auto& registry = Engine::PrefabRegistry::Get();
+		auto &registry = Engine::PrefabRegistry::Get();
 		std::string prefabDir = getAssetFilePath("Sources/Prefabs/");
 
 		if (!std::filesystem::exists(prefabDir))
 		{
-			LOG_WARNING("Prefab directory does not exist: {}", prefabDir);
+			LOG_WARNING("Prefab directory does not exist: ", prefabDir);
 			return;
 		}
 
-		for (auto& entry : std::filesystem::directory_iterator(prefabDir))
+		for (auto &entry : std::filesystem::directory_iterator(prefabDir))
 		{
 			if (entry.path().extension() == ".prefab")
 			{
@@ -6372,15 +6582,13 @@ namespace Engine
 		}
 	}
 
-#endif
+#if 0 // currently not use still fixing the issue
 	void Editor::UpdateAllInstancesOfPrefab(xresource::instance_guid prefabGUID, Entity modifiedEntity)
 	{
 		auto it = m_PrefabEntities.find(prefabGUID);
 		if (it == m_PrefabEntities.end()) return;
 
 		std::vector<Entity> updatedEntities;
-
-#if 1 // original code
 		for (Entity e : it->second)
 		{
 			// Skip the entity that was just modified
@@ -6418,10 +6626,8 @@ namespace Engine
 		// Replace the entity list in the map with updated entities
 		m_PrefabEntities[prefabGUID] = updatedEntities;
 
-#endif
-
-
 	}
+
 
 	void Editor::CheckAndUpdatePrefabInstances()
 	{
@@ -6460,146 +6666,17 @@ namespace Engine
 			// Mark this prefab as updated for current scene
 			m_SceneUpdateHistory[currScenePath].insert(prefabGUID);
 		}
-		//std::string prefabDir = getAssetFilePath("Sources/Prefabs/");
-		//if (!std::filesystem::exists(prefabDir)) return;
-
-		//bool anyPrefabUpdated = false;
-		//std::vector<std::pair<xresource::instance_guid, PrefabType>> updatedPrefabs;
-
-
-		//// Check all prefab files for modifications
-		//for (auto& entry : std::filesystem::directory_iterator(prefabDir))
-		//{
-		//	if (entry.path().extension() != ".prefab") continue;
-
-		//	auto lastWriteTime = std::filesystem::last_write_time(entry.path());
-		//	auto fileTime = std::chrono::duration_cast<std::chrono::seconds>(
-		//		lastWriteTime.time_since_epoch()).count();
-
-		//	// Load prefab to get its GUID
-		//	auto prefab = PrefabSerializer::LoadPrefabFromFile(entry.path().string());
-		//	if (!prefab) continue;
-
-		//	xresource::instance_guid guid = prefab->GetGUID();
-		//	PrefabType type = prefab->GetType();
-
-
-		//	LOG_DEBUG("Checking prefab: ", entry.path().filename().string());
-		//	LOG_DEBUG("  - GUID: ", guid.m_Value);
-		//	LOG_DEBUG("  - Type: ", (type == PrefabType::Scene ? "Scene" : "Entity"));
-
-
-		//	// Check if this is first time seeing this prefab or if it's been modified
-		//	auto it = m_PrefabLastModifiedTimes.find(guid);
-		//	if (it == m_PrefabLastModifiedTimes.end())
-		//	{
-		//		// First time - just record the time (silent)
-		//		m_PrefabLastModifiedTimes[guid] = fileTime;
-		//		LOG_DEBUG("  - First time seeing this prefab");
-		//	}
-		//	else if (it->second < fileTime)
-		//	{
-		//		// Prefab was modified! - ONLY SHOW DEBUG WHEN MODIFIED
-		//		m_PrefabLastModifiedTimes[guid] = fileTime;
-		//		updatedPrefabs.push_back({ guid, type });
-		//		anyPrefabUpdated = true;
-
-		//		auto freshPrefab = PrefabSerializer::LoadPrefabFromFile(entry.path().string());
-		//		if (freshPrefab)
-		//		{
-		//			PrefabRegistry::Get().UpdatePrefab(freshPrefab);
-		//			LOG_INFO("Reloaded and updated prefab: ", entry.path().filename().string());
-		//		}
-		//	}
-		//	else
-		//	{
-		//		LOG_DEBUG("  - No modification detected");
-		//	}
-		//}
-
-		//if (m_Scene)
-		//{
-		//	auto view = m_Scene->GetRegistry().view<PrefabComponent>();
-		//	LOG_DEBUG("Scene contains {} entities with PrefabComponent", view.size());
-
-		//	for (auto entityHandle : view)
-		//	{
-		//		Entity entity(entityHandle, &m_Scene->GetRegistry());
-		//		if (entity.HasComponent<PrefabComponent>())
-		//		{
-		//			auto& prefabComp = entity.GetComponent<PrefabComponent>();
-		//			LOG_DEBUG("Entity ", static_cast<uint32_t>(entityHandle), " has PrefabGUID: ", prefabComp.PrefabGUID.m_Value);
-		//		}
-		//	}
-		//}
-		//LOG_DEBUG("anyPrefabUpdated: ", anyPrefabUpdated, " | isPrefabEditor: ", isPrefabEditor);
-
-
-		//// Update all instances of modified prefabs
-		//if (anyPrefabUpdated && !isPrefabEditor)
-		//{
-		//	LOG_DEBUG("is not PrefabEditor");
-		//	for (auto& [prefabGUID, prefabType] : updatedPrefabs)
-		//	{
-		//		
-		//		LOG_DEBUG("Updating prefab instances for scene: ", currScenePath);
-		//		if (prefabType == PrefabType::Scene)
-		//		{
-		//			LOG_DEBUG("PrefabType::Scene");
-		//			UpdateScenePrefabInstances(prefabGUID, PrefabRegistry::Get().GetPrefab(prefabGUID));
-		//		}
-		//		else
-		//		{
-		//			LOG_DEBUG("PrefabType::Entity");
-		//			UpdateEntityPrefabInstances(prefabGUID, PrefabRegistry::Get().GetPrefab(prefabGUID));
-		//		}
-		//	}
-		//}
-		//else
-		//{
-		//	if (!anyPrefabUpdated)
-		//		LOG_DEBUG(" Condition failed - anyPrefabUpdated is false");
-		//	if (isPrefabEditor)
-		//		LOG_DEBUG(" Condition failed - isPrefabEditor is true");
-		//}
-		//LOG_DEBUG("===== End of CheckAndUpdatePrefabInstances ====");
 	}
+#endif
 
-	//	void Editor::UpdateAllPrefabInstancesInScene(xresource::instance_guid prefabGUID)
-	//	{
-	//		if (!m_Scene) return;
-	//
-	//		auto prefab = PrefabRegistry::Get().GetPrefab(prefabGUID);
-	//		if (!prefab)
-	//		{
-	//			return;
-	//		}
-	//
-	//#if 1
-	//		// Determine if it's a scene prefab or entity prefab
-	//		bool isScenePrefab = (prefab->GetType() == PrefabType::Scene);
-	//
-	//		if (isScenePrefab)
-	//		{
-	//			UpdateScenePrefabInstances(prefabGUID, prefab);
-	//		}
-	//		else
-	//		{
-	//			UpdateEntityPrefabInstances(prefabGUID, prefab);
-	//		}
-	//#endif
-	//
-	//
-	//	}
-
-	void Editor::DrawCurveLegendRow(const char* label,
-		const char* c0Label, ImU32 c0,
-		const char* c1Label, ImU32 c1,
-		const char* c2Label, ImU32 c2)
+	void Editor::DrawCurveLegendRow(const char *label,
+		const char *c0Label, ImU32 c0,
+		const char *c1Label, ImU32 c1,
+		const char *c2Label, ImU32 c2)
 	{
 		ImGui::TextUnformatted(label);
 
-		auto drawEntry = [](const char* lbl, ImU32 col)
+		auto drawEntry = [](const char *lbl, ImU32 col)
 			{
 				ImGui::SameLine();
 				ImGui::Dummy(ImVec2(10.0f, 0.0f)); // small gap
@@ -6607,7 +6684,7 @@ namespace Engine
 
 				ImVec2 p = ImGui::GetCursorScreenPos();
 				ImVec2 size(12.0f, 12.0f);
-				ImDrawList* dl = ImGui::GetWindowDrawList();
+				ImDrawList *dl = ImGui::GetWindowDrawList();
 				dl->AddRectFilled(p, ImVec2(p.x + size.x, p.y + size.y), col, 2.0f);
 				dl->AddRect(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(0, 0, 0, 255), 2.0f);
 
@@ -6649,9 +6726,9 @@ namespace Engine
 		// ======================
 		// Bloom toggle
 		// ======================
-		auto& bloomToggle = m_Renderer->getBloomToggle();
-		auto& bloomStrength = m_Renderer->getBloomStrength();
-		auto& bloomFilter = m_Renderer->getBloomFilterRadius();
+		auto &bloomToggle = m_Renderer->getBloomToggle();
+		auto &bloomStrength = m_Renderer->getBloomStrength();
+		auto &bloomFilter = m_Renderer->getBloomFilterRadius();
 		ImGui::Checkbox("Enable Bloom", &bloomToggle);
 
 		// ======================
@@ -6714,9 +6791,9 @@ namespace Engine
 
 	void Editor::ApplyPrefabOverrides(Entity entity)
 	{
-		//ApplyOverrideButtonTriggle = true;
+
 		LOG_DEBUG(" ========== Start Apply Override =========");
-		auto& prefabComp = entity.GetComponent<PrefabComponent>();
+		auto &prefabComp = entity.GetComponent<PrefabComponent>();
 		auto prefab = PrefabRegistry::Get().GetPrefab(prefabComp.PrefabGUID);
 
 		if (!prefab)
@@ -6725,15 +6802,13 @@ namespace Engine
 			return;
 		}
 
-#if 1 // to try to override with parent and children
-
-
 		bool hasChildren = false;
 		if (entity.HasComponent<TransformComponent>())
 		{
-			const auto& transform = entity.GetComponent<TransformComponent>();
+			const auto &transform = entity.GetComponent<TransformComponent>();
 
-			if (!transform.Children.empty()) {
+			if (!transform.Children.empty())
+			{
 				hasChildren = true;
 			}
 		}
@@ -6744,12 +6819,12 @@ namespace Engine
 			allEntities.reserve(64); // Reserve reasonable size
 			allEntities.push_back(entity);
 
-			// OPTIMIZATION 3: Use iterative collection instead of recursive
+			// Use iterative collection instead of recursive
 			CollectChildEntitiesIterative(entity, allEntities);
 
 			LOG_DEBUG("Collecting ", allEntities.size(), " entities for scene prefab");
 
-			// OPTIMIZATION 4: Serialize only once
+			// Serialize only once
 			std::string sceneJson = PrefabSerializer::SerializeEntities(allEntities, m_Scene->GetRegistry());
 
 			if (sceneJson.empty())
@@ -6758,11 +6833,9 @@ namespace Engine
 				return;
 			}
 
-			// OPTIMIZATION 5: Update prefab in single operation
 			prefab->SetSceneData(sceneJson);
 			prefab->SetType(PrefabType::Scene);
 
-			// OPTIMIZATION 6: Save to file
 			if (!PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath()))
 			{
 				LOG_ERROR("Failed to save prefab file: ", prefab->GetSourcePath());
@@ -6777,8 +6850,6 @@ namespace Engine
 					ent.GetComponent<PrefabComponent>().ClearModifications();
 				}
 			}
-
-			//CheckAndUpdatePrefabInstances();
 
 			LOG_INFO("Successfully applied overrides to scene prefab: ", prefab->GetSourcePath());
 
@@ -6805,47 +6876,16 @@ namespace Engine
 			LOG_INFO("Applied overrides to entity prefab: ", prefab->GetSourcePath());
 
 		}
-
-#endif
-#if 0// original code working for prefab entity without children only
-		std::string updatedJson = PrefabSerializer::SerializeEntity(entity, {});
-		prefab->SetEntityData(updatedJson);
-		PrefabSerializer::SavePrefabToFile(*prefab, prefab->GetSourcePath());
-
-		prefabComp.ClearModifications();
-		//UpdateAllInstancesOfPrefab(prefabComp.PrefabGUID, entity);
-
-		LOG_INFO("Applied overrides to prefab: ", prefab->GetSourcePath());
-#endif
 	}
 
 
-	/*void Editor::CollectChildEntities(Entity parentEntity, std::vector<Entity>& outEntities)
+
+	void Editor::CollectChildEntitiesIterative(Entity parentEntity, std::vector<Entity> &outEntities)
 	{
 		if (!parentEntity.HasComponent<TransformComponent>())
 			return;
 
-		const auto& transform = parentEntity.GetComponent<TransformComponent>();
-		auto& registry = m_Scene->GetRegistry();
-
-		for (uint32_t childID : transform.Children)
-		{
-			entt::entity childHandle = static_cast<entt::entity>(childID);
-			if (registry.valid(childHandle))
-			{
-				Entity childEntity(childHandle, &registry);
-				outEntities.push_back(childEntity);
-				CollectChildEntities(childEntity, outEntities);
-			}
-		}
-	}*/
-
-	void Editor::CollectChildEntitiesIterative(Entity parentEntity, std::vector<Entity>& outEntities)
-	{
-		if (!parentEntity.HasComponent<TransformComponent>())
-			return;
-
-		auto& registry = m_Scene->GetRegistry();
+		auto &registry = m_Scene->GetRegistry();
 		std::queue<Entity> toProcess;
 		std::unordered_set<uint32_t> processedIDs;
 
@@ -6860,7 +6900,7 @@ namespace Engine
 			if (!current.HasComponent<TransformComponent>())
 				continue;
 
-			const auto& transform = current.GetComponent<TransformComponent>();
+			const auto &transform = current.GetComponent<TransformComponent>();
 
 			for (uint32_t childID : transform.Children)
 			{
@@ -6883,7 +6923,8 @@ namespace Engine
 
 	void Editor::UpdateEntityPrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab)
 	{
-		struct InstanceInfo {
+		struct InstanceInfo
+		{
 			entt::entity handle;
 			uint32_t parentID;
 		};
@@ -6894,7 +6935,7 @@ namespace Engine
 			auto view = m_Scene->GetRegistry().view<PrefabComponent>();
 			for (auto entityHandle : view)
 			{
-				auto& prefabComp = m_Scene->GetRegistry().get<PrefabComponent>(entityHandle);
+				auto &prefabComp = m_Scene->GetRegistry().get<PrefabComponent>(entityHandle);
 
 				if (prefabComp.PrefabGUID.m_Value == prefabGUID.m_Value)
 				{
@@ -6916,9 +6957,9 @@ namespace Engine
 		}
 
 		// Update each instance
-		for (const auto& info : instancesToUpdate)
+		for (const auto &info : instancesToUpdate)
 		{
-			auto& registry = m_Scene->GetRegistry();
+			auto &registry = m_Scene->GetRegistry();
 
 			if (!registry.valid(info.handle))
 				continue;
@@ -6935,7 +6976,7 @@ namespace Engine
 				handle
 			);
 
-			auto& freshRegistry = m_Scene->GetRegistry();
+			auto &freshRegistry = m_Scene->GetRegistry();
 
 			if (freshRegistry.valid(handle))
 			{
@@ -6957,11 +6998,12 @@ namespace Engine
 
 	void Editor::UpdateScenePrefabInstances(xresource::instance_guid prefabGUID, std::shared_ptr<Prefab> prefab)
 	{
-		struct InstanceInfo {
-			entt::entity rootHandle;
+		struct InstanceInfo
+		{
+			entt::entity rootHandle{};
 			std::vector<entt::entity> allHandles;
-			uint32_t parentID;
-			entt::entity parentHandle;
+			uint32_t parentID{};
+			entt::entity parentHandle{};
 		};
 
 		std::vector<InstanceInfo> instancesToUpdate;
@@ -6970,7 +7012,7 @@ namespace Engine
 			auto view = m_Scene->GetRegistry().view<PrefabComponent>();
 			for (auto entityHandle : view)
 			{
-				auto& prefabComp = m_Scene->GetRegistry().get<PrefabComponent>(entityHandle);
+				auto &prefabComp = m_Scene->GetRegistry().get<PrefabComponent>(entityHandle);
 
 				if (prefabComp.PrefabGUID.m_Value == prefabGUID.m_Value)
 				{
@@ -6988,7 +7030,7 @@ namespace Engine
 
 					if (rootEntity.HasComponent<TransformComponent>())
 					{
-						auto& transform = rootEntity.GetComponent<TransformComponent>();
+						auto &transform = rootEntity.GetComponent<TransformComponent>();
 
 						info.parentID = transform.Parent;
 						if (transform.Parent != u32_max)
@@ -7004,13 +7046,13 @@ namespace Engine
 		}
 
 		// Update each scene prefab instance
-		for (const auto& info : instancesToUpdate)
+		for (const auto &info : instancesToUpdate)
 		{
-			auto& registry = m_Scene->GetRegistry();
+			auto &registry = m_Scene->GetRegistry();
 
 			if (!registry.valid(info.rootHandle))
 				continue;
-			bool parentExists = registry.valid(info.parentHandle);
+			//bool parentExists = registry.valid(info.parentHandle);
 
 
 			//uint32_t rootParentID = info.parentID;
@@ -7033,7 +7075,7 @@ namespace Engine
 
 
 
-			auto& freshRegistry = m_Scene->GetRegistry();
+			auto &freshRegistry = m_Scene->GetRegistry();
 			entt::entity newRootHandle = static_cast<entt::entity>(newRootEntity);
 
 			if (freshRegistry.valid(newRootHandle))
@@ -7041,13 +7083,13 @@ namespace Engine
 				// Restore parent relationship if the root was a child of something outside the prefab
 				if (info.parentID != u32_max && freshRegistry.all_of<TransformComponent>(newRootHandle))
 				{
-					auto& newRootTransform = freshRegistry.get<TransformComponent>(newRootHandle);
+					auto &newRootTransform = freshRegistry.get<TransformComponent>(newRootHandle);
 					newRootTransform.Parent = info.parentID;
 					Entity parentEntity(info.parentHandle, &freshRegistry);
 					//freshRegistry.get<TransformComponent>(newRootHandle).Parent = rootParentID;
 					if (parentEntity && parentEntity.HasComponent<TransformComponent>())
 					{
-						auto& parentTransform = parentEntity.GetComponent<TransformComponent>();
+						auto &parentTransform = parentEntity.GetComponent<TransformComponent>();
 						// Remove old child reference (if any)
 						parentTransform.Children.erase(
 							std::remove(parentTransform.Children.begin(), parentTransform.Children.end(),
@@ -7064,13 +7106,13 @@ namespace Engine
 		}
 	}
 
-	void Editor::CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles)
+	void Editor::CollectChildHandles(Entity parentEntity, std::vector<entt::entity> &outHandles)
 	{
 		if (!parentEntity.HasComponent<TransformComponent>())
 			return;
 
-		const auto& transform = parentEntity.GetComponent<TransformComponent>();
-		auto& registry = m_Scene->GetRegistry();
+		const auto &transform = parentEntity.GetComponent<TransformComponent>();
+		auto &registry = m_Scene->GetRegistry();
 
 		for (uint32_t childID : transform.Children)
 		{
