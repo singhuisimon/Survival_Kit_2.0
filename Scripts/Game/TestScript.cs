@@ -298,74 +298,76 @@ namespace Game
                 Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
                 Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
 
-                // Calculate aimTarget - this is where the camera is looking at
-                /*  Engine.Vector3 aimTarget = new Engine.Vector3(
-                      playerPosition.X,
-                      playerPosition.Y + aimHeightOffset,
-                      playerPosition.Z
-                  );
+                /*  // Calculate aimTarget - this is where the camera is looking at
+                    Engine.Vector3 aimTarget = new Engine.Vector3(
+                        playerPosition.X,
+                        playerPosition.Y + aimHeightOffset,
+                        playerPosition.Z
+                    );
 
-                  // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
-                  Engine.Vector3 cameraPosition;
-                  if (mainCameraEntityID != 0)
-                  {
-                      Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
-                  }
-                  else
-                  {
-                      // Fallback: use calculated camera position if MainCamera not found
-                      Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
-                      float cosPitch = SimpleCos(orbitPitch);
-                      float sinPitch = SimpleSin(orbitPitch);
-                      float cosYaw = SimpleCos(orbitYaw);
-                      float sinYaw = SimpleSin(orbitYaw);
+                    // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
+                    Engine.Vector3 cameraPosition;
+                    if (mainCameraEntityID != 0)
+                    {
+                        Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
+                    }
+                    else
+                    {
+                        // Fallback: use calculated camera position if MainCamera not found
+                        Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
+                        float cosPitch = SimpleCos(orbitPitch);
+                        float sinPitch = SimpleSin(orbitPitch);
+                        float cosYaw = SimpleCos(orbitYaw);
+                        float sinYaw = SimpleSin(orbitYaw);
 
-                      cameraPosition = new Engine.Vector3(
-                          aimTarget.X + cosPitch * sinYaw * orbitRadius,
-                          aimTarget.Y + sinPitch * orbitRadius,
-                          aimTarget.Z + cosPitch * cosYaw * orbitRadius
-                      );
-                  }
+                        cameraPosition = new Engine.Vector3(
+                            aimTarget.X + cosPitch * sinYaw * orbitRadius,
+                            aimTarget.Y + sinPitch * orbitRadius,
+                            aimTarget.Z + cosPitch * cosYaw * orbitRadius
+                        );
+                    }
 
-                  Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
+                    Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
 
-                  // Calculate direction FROM camera TO aimTarget (where camera is looking)
-                  Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
-                      aimTarget.X - cameraPosition.X,
-                      aimTarget.Y - cameraPosition.Y,
-                      aimTarget.Z - cameraPosition.Z
-                  );
+                    // Calculate direction FROM camera TO aimTarget (where camera is looking)
+                    Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
+                        aimTarget.X - cameraPosition.X,
+                        aimTarget.Y - cameraPosition.Y,
+                        aimTarget.Z - cameraPosition.Z
+                    );
 
-                  // Use the FULL 3D direction for shooting
-                  Engine.Vector3 shootDirection = cameraToAimTarget;
+                    // Use the FULL 3D direction for shooting
+                    Engine.Vector3 shootDirection = cameraToAimTarget;
 
-                  // Normalize the full 3D vector
-                  float lenSq = shootDirection.X * shootDirection.X +
-                                shootDirection.Y * shootDirection.Y +
-                                shootDirection.Z * shootDirection.Z;
+                    // Normalize the full 3D vector
+                    float lenSq = shootDirection.X * shootDirection.X +
+                                  shootDirection.Y * shootDirection.Y +
+                                  shootDirection.Z * shootDirection.Z;
 
-                  if (lenSq > 0.0001f)
-                  {
-                      float invLen = 1.0f / SimpleSqrt(lenSq);
-                      shootDirection = new Engine.Vector3(
-                          shootDirection.X * invLen,
-                          shootDirection.Y * invLen,
-                          shootDirection.Z * invLen
-                      );
-                  }
-                  else
-                  {
-                      Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
-                      return;
-                  }*/
-                Engine.Vector3 cameraRot;
-                Engine.InternalCalls.Transform_GetRotation(mainCameraEntityID, out cameraRot);
+                    if (lenSq > 0.0001f)
+                    {
+                        float invLen = 1.0f / SimpleSqrt(lenSq);
+                        shootDirection = new Engine.Vector3(
+                            shootDirection.X * invLen,
+                            shootDirection.Y * invLen,
+                            shootDirection.Z * invLen
+                        );
+                    }
+                    else
+                    {
+                        Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
+                        return;
+                    }*/
+                Engine.Vector3 playerRot;
+                Engine.InternalCalls.Transform_GetRotation((uint)EntityID, out playerRot);
 
-                // Convert camera rotation to shoot direction
-                float yawRad = cameraRot.Y * DEG2RAD;
-                float pitchRad = cameraRot.X * DEG2RAD;
+                Engine.InternalCalls.Log("Player rotation: " + playerRot.X + ", " + playerRot.Y + ", " + playerRot.Z);
 
-                // Calculate shoot direction from camera rotation
+                // Convert PLAYER rotation to forward direction
+                float yawRad = playerRot.Y * DEG2RAD;
+                float pitchRad = playerRot.X * DEG2RAD;
+
+                // Calculate shoot direction from PLAYER's rotation
                 Engine.Vector3 shootDirection = new Engine.Vector3(
                     SimpleSin(yawRad) * SimpleCos(pitchRad),   // X
                     -SimpleSin(pitchRad),                       // Y
@@ -379,7 +381,7 @@ namespace Game
                 // Spawn bullet along the full 3D shoot direction
                 Engine.Vector3 firingPosition = new Engine.Vector3(
                     playerPosition.X + (shootDirection.X * spawnDistance),
-                    playerPosition.Y + aimHeightOffset + (shootDirection.Y * spawnDistance),  // Follows angle
+                    playerPosition.Y + aimHeightOffset,  // Follows angle
                     playerPosition.Z + (shootDirection.Z * spawnDistance)
                 );
 
