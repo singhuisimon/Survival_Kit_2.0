@@ -26,6 +26,16 @@ namespace Engine
 
 		//-------------------- FOR BEHAVIOUR TREE -------------------------
 		// Functions for BT Component Editor to replace child node when it changes
+		/**************************************************************************
+		* @brief
+		* 	Function for BT Component Editor to replace child node when it changes
+		* @param parent
+		*	Shared pointer to the parent BTNode whose child is to be replaced.
+		* @param oldChild
+		*	Shared pointer to the existing child BTNode whose child is to be replaced.
+		* @param newChild
+		*	Shared pointer to the new BTNode that will replace the old child.
+		**************************************************************************/
 		static void ReplaceChildNode(std::shared_ptr<BTNode> parent,
 			std::shared_ptr<BTNode> oldChild,
 			std::shared_ptr<BTNode> newChild)
@@ -42,6 +52,14 @@ namespace Engine
 			}
 		}
 
+		/**************************************************************************
+		* @brief
+		* 	Draws a Behavior Tree node and its children in an ImGui editor.
+		* @param node
+		*	 Shared pointer to the BTNode to draw.
+		* @param parent
+		*	Shared Optional shared pointer to the parent node (nullptr for root nodes). 
+		**************************************************************************/
 		static void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr)
 		{
 			if (!node) return;
@@ -248,6 +266,14 @@ namespace Engine
 		}
 
 		// ----------------- FOR PHYSICS -----------------------
+		/**************************************************************************
+		* @brief
+		* 	Convert a  collide type enum to string
+		* @param colliderType
+		*	Enum value representing the type of the collider.
+		* @return 
+		*	A const char* string corresponding to the collider type.
+		**************************************************************************/
 		static const char* ColliderTypeToString(ColliderType& colliderType) {
 			if (colliderType == ColliderType::AABB) {
 				return "AABB";

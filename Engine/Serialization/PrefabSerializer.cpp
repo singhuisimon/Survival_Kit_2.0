@@ -489,7 +489,7 @@ namespace Engine {
             maxColorArray.PushBack(emitter.ColorMax.z, allocator);
             propertiesObj.AddMember("Color Max", maxColorArray, allocator);
 
-            // Max Particles
+            // Max ParScriptComponentticles
             propertiesObj.AddMember("Max Particles", emitter.MaxParticles, allocator);
 
             // Particle Type
@@ -533,6 +533,8 @@ namespace Engine {
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
             propertiesObj.AddMember("ScriptClassName",
                 rapidjson::Value(script.ScriptClassName.c_str(), allocator), allocator);
+
+
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
