@@ -158,10 +158,10 @@ namespace Game{
             // Start at wave 1
             //SetupWaveSpawning();
             
-            spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
-            if(spawnmanagerID != INVALID_ENTITY){
-                Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
-            }
+            // spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            // if(spawnmanagerID != INVALID_ENTITY){
+            //     Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+            // }
 
             InternalCalls.Entity_AddAudio((uint) EntityID);
 
@@ -1049,7 +1049,11 @@ namespace Game{
 
         private void PlayGameBGM(){
             //Log("Playbgm hehe");
-            InternalCalls.Audio_Play((uint)EntityID);
+            spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            if(spawnmanagerID != INVALID_ENTITY){
+                Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+            }
+            InternalCalls.Audio_Play(spawnmanagerID);
             PlayAllOtherAudio();
         }
 
