@@ -18,7 +18,7 @@ namespace Game
         // ===== Camera Settings (for fallback) =====
         [SerializeField]
         private float aimHeightOffset = 2.0f;
-        [SerializeField]
+       [SerializeField]
         private float orbitRadius = 7.5f;
         [SerializeField]
         private float orbitPitch = 0.25f;
@@ -298,7 +298,7 @@ namespace Game
                 Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
                 Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
 
-                /*  // Calculate aimTarget - this is where the camera is looking at
+                  // Calculate aimTarget - this is where the camera is looking at
                     Engine.Vector3 aimTarget = new Engine.Vector3(
                         playerPosition.X,
                         playerPosition.Y + aimHeightOffset,
@@ -357,22 +357,8 @@ namespace Game
                     {
                         Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
                         return;
-                    }*/
-                Engine.Vector3 playerRot;
-                Engine.InternalCalls.Transform_GetRotation((uint)EntityID, out playerRot);
-
-                Engine.InternalCalls.Log("Player rotation: " + playerRot.X + ", " + playerRot.Y + ", " + playerRot.Z);
-
-                // Convert PLAYER rotation to forward direction
-                float yawRad = playerRot.Y * DEG2RAD;
-                float pitchRad = playerRot.X * DEG2RAD;
-
-                // Calculate shoot direction from PLAYER's rotation
-                Engine.Vector3 shootDirection = new Engine.Vector3(
-                    SimpleSin(yawRad) * SimpleCos(pitchRad),   // X
-                    -SimpleSin(pitchRad),                       // Y
-                    SimpleCos(yawRad) * SimpleCos(pitchRad)    // Z
-                );
+                    }
+               
                 Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
 
                 // Spawn position - FOLLOWS THE ANGLE (full 3D offset)
