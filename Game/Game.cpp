@@ -793,7 +793,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 	}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_P))
+	/*if (input.IsKeyJustPressed(GLFW_KEY_P))
 	{
 		LOG_DEBUG("Testing Audio Playback");
 
@@ -836,7 +836,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		m_AudioManager->GetGroupVolume(Engine::AudioType::SFX, volume);
 		m_AudioManager->SetGroupVolume(Engine::AudioType::SFX, volume - 0.1f);
 		LOG_TRACE("Reducing Audio SFX Group Volume by 0.1 Currently it is: ", volume);
-	}
+	}*/
 
 
 	// Audio Testing if Attentuation works
@@ -1069,29 +1069,29 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 	// Test the DSP Global Effects
 
-	FMOD::DSP *dsp = nullptr;
-	if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
-	{
-		dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
-		m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
-			FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
-	}
+	//FMOD::DSP *dsp = nullptr;
+	//if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
+	//{
+	//	dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
+	//	m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
+	//		FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
+	//}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
-	{
-		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
-	}
-	if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET))
-	{
-		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
-	}
+	//if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
+	//{
+	//	m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
+	//}
+	//if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET))
+	//{
+	//	m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
+	//}
 
-	if (dsp)
-	{
-		float cutoff;
-		dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
-		LOG_INFO("LowPass cutoff currently: ", cutoff);
-	}
+	//if (dsp)
+	//{
+	//	float cutoff;
+	//	dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
+	//	LOG_INFO("LowPass cutoff currently: ", cutoff);
+	//}
 
 	// Move player in/out of the reverb radius with QE to feel falloff
 	/*if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {

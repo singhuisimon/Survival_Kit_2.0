@@ -122,6 +122,10 @@ namespace Game{
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
 
+            // init some values
+            isActive = false;
+            started = false;
+
             // Find all spawn points in the scene
             InitializeSpawnPoints();
             
@@ -150,8 +154,6 @@ namespace Game{
             //check for the trigger to start
             if(Input.IsKeyPressed(KeyCode.Semicolon) && !isActive){
                 isActive = true;
-                PlayGameBGM();
-                started = true;
             }
 
             if (!isActive){
@@ -162,6 +164,9 @@ namespace Game{
                 } 
 
                 return;
+            } else {
+                PlayGameBGM();
+                started = true;
             }
 
             elapsedTime += deltaTime;
@@ -463,16 +468,18 @@ namespace Game{
                 case 1:
                     SetEnemyCount(1, 4, 0, 0, 0);
                     //SetEnemyCount(1, 4, 20, 0, 0);
-                    loveletterRoutes = new string[] {"A1", "A2"};
+                    loveletterRoutes = new string[] {"A1"};
+                    //loveletterRoutes = new string[] {"A1", "A2"};
                     activeSpawnPoints = spawnPointsA;
                     break;
                 case 2:
                     SetEnemyCount(3, 13, 0, 0, 0);
                     //SetEnemyCount(3, 13, 6, 7, 0);
-                    loveletterRoutes = new string[] {"A1", "A2", "D1", "D2"};
+                    loveletterRoutes = new string[] {"A1"};
+                    //loveletterRoutes = new string[] {"A1", "A2", "D1", "D2"};
                     activeSpawnPoints = new List<SpawnPointData>();
                     activeSpawnPoints.AddRange(spawnPointsA);
-                    activeSpawnPoints.AddRange(spawnPointsD);
+                    //activeSpawnPoints.AddRange(spawnPointsD);
                     break;
                 case 3:
                     // not for this milestone
