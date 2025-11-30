@@ -66,8 +66,8 @@ namespace Game
         private string deathExplosionPrefab = string.Empty;
 
         // Health component
-        [SerializeField]
-        private Health health;
+      /*  [SerializeField]
+        private Health health;*/
 
         // ===== Private Runtime State =====
 

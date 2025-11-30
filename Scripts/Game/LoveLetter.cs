@@ -7,30 +7,33 @@ namespace Game
     {
         // ===== Movement Settings =====
         [SerializeField]
-        private float moveSpeed = 0.5f;
+        private float moveSpeed = 2.0f;  // Increased for visible movement
 
         [SerializeField]
-        private float waypointReachedDistance = 0.5f;
+        private float waypointReachedDistance = 5.0f;  // Increased for better detection
 
         [SerializeField]
         private float startDelay = 1.0f;
 
+        [SerializeField]
+        private float rotationSpeed = 3.0f;  // Speed of rotation to next waypoint
+
         // ===== Core Health System =====
         [SerializeField]
         private int totalCores = 9;
+        [SerializeField]
         private int coresAlive = 9;
 
         // ===== Status =====
-        [SerializeField]
         private bool isMoving = false;
-
-        [SerializeField]
+        private bool isRotating = false;
         private int currentWaypoint = 0;
 
         // ===== Hardcoded Waypoints =====
         private Engine.Vector3[] waypoints;
         private float delayTimer = 0.0f;
         private Engine.Vector3 startPosition;
+        private float targetYaw = 0.0f;  // Target rotation angle
 
         // ===== Constants =====
         private const float DEG2RAD = 0.0174532924f;
@@ -67,7 +70,7 @@ namespace Game
         }
 
         // ===== Lifecycle =====
-        public void OnStart()
+        public override void OnStart()
         {
             Engine.InternalCalls.Log("=== LoveLetter Started ===");
             Engine.InternalCalls.Log("EntityID: " + EntityID);
@@ -76,26 +79,15 @@ namespace Game
             // Initialize cores alive
             coresAlive = totalCores;
 
-
             // Subscribe to the "CoreDestroyed" channel
             Engine.EventSystem.Subscribe("CoreDestroyed", OnCoreDestroyedEvent);
+
             // Get spawn position
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out startPosition);
             Engine.InternalCalls.Log("Spawn position: " + startPosition.X + ", " + startPosition.Y + ", " + startPosition.Z);
 
             // Create hardcoded waypoints
             waypoints = new Engine.Vector3[7];
-            // waypoints[0] = new Engine.Vector3(0.0f, 5.0f, 0.0f);      // Point 1 (right)
-            // waypoints[1] = new Engine.Vector3(10.0f, 5.0f, 0.0f);     // Point 2 (forward)
-            // waypoints[2] = new Engine.Vector3(10.0f, 5.0f, 10.0f);    // Point 3 (left)
-            // waypoints[3] = new Engine.Vector3(0.0f, 5.0f, 10.0f);     // Point 4 (back to start)
-
-            // Engine.InternalCalls.Log("Waypoints:");
-            // Engine.InternalCalls.Log("  [0]: " + waypoints[0].X + ", " + waypoints[0].Y + ", " + waypoints[0].Z);
-            // Engine.InternalCalls.Log("  [1]: " + waypoints[1].X + ", " + waypoints[1].Y + ", " + waypoints[1].Z);
-            // Engine.InternalCalls.Log("  [2]: " + waypoints[2].X + ", " + waypoints[2].Y + ", " + waypoints[2].Z);
-            // Engine.InternalCalls.Log("  [3]: " + waypoints[3].X + ", " + waypoints[3].Y + ", " + waypoints[3].Z);
-
             waypoints[0] = new Engine.Vector3(-26.6f, -42.0f, -780.0f);
             waypoints[1] = new Engine.Vector3(-96.0f, -42.0f, -634.0f);
             waypoints[2] = new Engine.Vector3(-96.0f, -42.0f, -335.0f);
@@ -120,7 +112,7 @@ namespace Game
             Engine.InternalCalls.Log("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
         }
 
-        public void OnUpdate(float deltaTime)
+        public override void OnUpdate(float deltaTime)
         {
             // Handle start delay
             if (delayTimer > 0.0f)
@@ -134,12 +126,24 @@ namespace Game
                 }
                 return;
             }
-
+            if (isRotating)
+            {
+                RotateTowardsTarget(deltaTime);
+                return;
+            }
             // Move along path
             if (isMoving)
             {
                 MoveTowardsWaypoint(deltaTime);
             }
+
+            if (coresAlive <= 0)
+            {
+                Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                return;
+            }
+
+
         }
 
         // ===== Movement System =====
@@ -153,12 +157,84 @@ namespace Game
                 return;
             }
 
-            // Use spawn position as starting point, face first waypoint
+            // Start at waypoint 0, rotate to face it first
             currentWaypoint = 0;
-            FaceTowardsWaypoint(startPosition, waypoints[0]);
-            isMoving = true;
+            StartRotationToWaypoint(currentWaypoint);
 
-            Engine.InternalCalls.Log("Movement started! Facing waypoint 0, will start moving");
+            Engine.InternalCalls.Log("Starting rotation to waypoint 0");
+        }
+
+        private void StartRotationToWaypoint(int waypointIndex)
+        {
+            // Get current position
+            Engine.Vector3 currentPos;
+            Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out currentPos);
+
+            // Get target waypoint
+            Engine.Vector3 targetPos = waypoints[waypointIndex];
+
+            // Calculate direction to target (horizontal plane only for yaw)
+            Engine.Vector3 direction = new Engine.Vector3(
+                targetPos.X - currentPos.X,
+                0.0f,
+                targetPos.Z - currentPos.Z
+            );
+
+            // Calculate target yaw angle
+            targetYaw = SimpleMath.Atan2(direction.X, direction.Z) * RAD2DEG;
+
+            // Start rotating
+            isRotating = true;
+            isMoving = false;
+
+            Engine.InternalCalls.Log("Starting rotation to yaw: " + targetYaw);
+        }
+
+        private void RotateTowardsTarget(float deltaTime)
+        {
+            // Get current rotation
+            Engine.Vector3 currentRot;
+            Engine.InternalCalls.Transform_GetRotation((uint)EntityID, out currentRot);
+
+            float currentYaw = currentRot.Y;
+
+            // Calculate angle difference
+            float angleDiff = targetYaw - currentYaw;
+
+            // Normalize to [-180, 180]
+            while (angleDiff > 180.0f) angleDiff -= 360.0f;
+            while (angleDiff < -180.0f) angleDiff += 360.0f;
+
+            // Check if rotation is complete (within 2 degrees)
+            if (SimpleMath.Abs(angleDiff) < 2.0f)
+            {
+                // Snap to target angle
+                Engine.Vector3 finalRot = new Engine.Vector3(
+                    currentRot.X,
+                    targetYaw,
+                    currentRot.Z
+                );
+                Engine.InternalCalls.Transform_SetRotation((uint)EntityID, ref finalRot);
+
+                // Rotation complete, start moving
+                isRotating = false;
+                isMoving = true;
+
+                Engine.InternalCalls.Log("Rotation complete! Starting movement to waypoint " + currentWaypoint);
+                return;
+            }
+
+            // Calculate rotation step (with speed limit)
+            float maxRotation = rotationSpeed * deltaTime * RAD2DEG;
+            float rotationStep = SimpleMath.Clamp(angleDiff, -maxRotation, maxRotation);
+
+            // Apply rotation
+            Engine.Vector3 newRot = new Engine.Vector3(
+                currentRot.X,
+                currentYaw + rotationStep,
+                currentRot.Z
+            );
+            Engine.InternalCalls.Transform_SetRotation((uint)EntityID, ref newRot);
         }
 
         private void MoveTowardsWaypoint(float deltaTime)
@@ -166,8 +242,10 @@ namespace Game
             // Check if finished path
             if (currentWaypoint >= waypoints.Length)
             {
-                isMoving = false;
-                Engine.InternalCalls.Log("Reached end of path!");
+                // Loop back to start
+                currentWaypoint = 0;
+                StartRotationToWaypoint(currentWaypoint);
+                Engine.InternalCalls.Log("Path complete! Looping back to waypoint 0");
                 return;
             }
 
@@ -178,7 +256,7 @@ namespace Game
             // Get target waypoint
             Engine.Vector3 targetPos = waypoints[currentWaypoint];
 
-            // Calculate direction
+            // Calculate direction (FULL 3D for vertical movement)
             Engine.Vector3 direction = new Engine.Vector3(
                 targetPos.X - currentPos.X,
                 targetPos.Y - currentPos.Y,
@@ -186,25 +264,39 @@ namespace Game
             );
 
             // Calculate distance
-            float distance = CalculateDistance(direction, new Engine.Vector3(0, 0, 0));
+            float distance = SimpleMath.Sqrt(
+                direction.X * direction.X +
+                direction.Y * direction.Y +
+                direction.Z * direction.Z
+            );
 
             // Check if reached waypoint
             if (distance < waypointReachedDistance)
             {
                 Engine.InternalCalls.Log("Reached waypoint " + currentWaypoint);
+
+                // Move to next waypoint
                 currentWaypoint++;
 
-                // Face next waypoint if available
+                // Start rotation to next waypoint if available
                 if (currentWaypoint < waypoints.Length)
                 {
-                    FaceTowardsWaypoint(currentPos, waypoints[currentWaypoint]);
-                    Engine.InternalCalls.Log("Now facing waypoint " + currentWaypoint);
+                    StartRotationToWaypoint(currentWaypoint);
+                    Engine.InternalCalls.Log("Starting rotation to waypoint " + currentWaypoint);
                 }
+                else
+                {
+                    // Loop back
+                    currentWaypoint = 0;
+                    StartRotationToWaypoint(currentWaypoint);
+                    Engine.InternalCalls.Log("Looping back to waypoint 0");
+                }
+
                 return;
             }
 
             // Normalize direction
-            if (distance > 0.0f)
+            if (distance > 0.0001f)
             {
                 direction.X /= distance;
                 direction.Y /= distance;
@@ -215,7 +307,7 @@ namespace Game
                 return;
             }
 
-            // Calculate movement
+            // Calculate movement (FULL 3D)
             Engine.Vector3 movement = new Engine.Vector3(
                 direction.X * moveSpeed * deltaTime,
                 direction.Y * moveSpeed * deltaTime,
@@ -263,16 +355,6 @@ namespace Game
             Engine.InternalCalls.Log("Rotated to face waypoint. Yaw: " + (yaw * RAD2DEG));
         }
 
-        /// <summary>
-        /// Called by core sub-entities when they die
-        /// </summary>
-
-
-        /// <summary>
-        /// Called when all cores are destroyed
-        /// </summary>
-   
-
         // ===== Helper Functions =====
         private float CalculateDistance(Engine.Vector3 a, Engine.Vector3 b)
         {
@@ -298,14 +380,14 @@ namespace Game
             return x;
         }
 
-        public void OnDestroy()
+        public override void OnDestroy()
         {
+            Engine.EventSystem.Unsubscribe("CoreDestroyed", OnCoreDestroyedEvent);
             Engine.InternalCalls.Log("=== LoveLetter Destroyed ===");
         }
     }
 }
 
-// Simple math helper for Atan2
 // Simple math helper class
 public static class SimpleMath
 {
@@ -374,6 +456,13 @@ public static class SimpleMath
         return x;
     }
 
+    public static float Abs(float value)
+    {
+        return value < 0.0f ? -value : value;
+    }
+
+  
+
     private static float ArcTan(float x)
     {
         float x2 = x * x;
@@ -385,4 +474,3 @@ public static class SimpleMath
         return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
     }
 }
-
