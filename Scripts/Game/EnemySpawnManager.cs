@@ -57,8 +57,8 @@ namespace Game{
         [SerializeField] private bool COMBAT = false;
         
         // Enemy counting
-        [SerializeField] private int enemiesLeft = 0;
-
+        //[SerializeField] private int enemiesLeft = 0;
+        private int enemiesLeft = 0;
         // Prefab names 
         private string[] enemyPrefabNames = new string[]
         {
@@ -193,11 +193,11 @@ namespace Game{
 
             if (!isActive){
 
-                if(started && (BREAK && enemiesLeft <= 0)){
-                    StopBGM();
-                    playbgm = false;
-                    //Log("====== EnemySpawnManager - All enemies died =====");
-                } 
+                // if(started && (BREAK && enemiesLeft <= 0)){
+                //     StopBGM();
+                //     playbgm = false;
+                //     //Log("====== EnemySpawnManager - All enemies died =====");
+                // } 
 
                 return;
             }
@@ -598,6 +598,8 @@ namespace Game{
                 isActive = false;
                 WallSetup_DisableActiveWalls();
                 WallSetup_InactiveWalls();
+                StopBGM();
+                playbgm = false;
 
             }
         }
@@ -800,19 +802,19 @@ namespace Game{
 
             if(loveletter != null && loveletter.Length != 0){
                 totalenemiesleft += loveletter.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             } else if (botnet != null && botnet.Length != 0){
                 totalenemiesleft += botnet.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + botnet.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + botnet.Length.ToString());
             } else if (trojan != null && trojan.Length != 0){
                 totalenemiesleft += trojan.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + trojan.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + trojan.Length.ToString());
             } else if (adware != null && adware.Length != 0){
                 totalenemiesleft += adware.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + adware.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + adware.Length.ToString());
             } else if (worm != null && worm.Length != 0){
                 totalenemiesleft += worm.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + worm.Length.ToString());
+                //Log("adding loveletter to total enemies left. currently there is: " + worm.Length.ToString());
             }
             
             if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
