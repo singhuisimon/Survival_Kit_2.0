@@ -94,7 +94,7 @@ namespace Game{
         
         private const uint INVALID_ENTITY = 0xffffffffu;
 
-        private bool wasMouseButtonPressed = false;
+        //private bool wasMouseButtonPressed = false;
 
         // Light entities
         //private Entity lightPrep;
