@@ -104,32 +104,32 @@ namespace Engine
 			CheckAndUpdatePrefabInstances();
 		}*/
 		//Start the ImGui frame
-		StartImguiFrame();
+		// StartImguiFrame();
 
-		// Enable Docking Function
-		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		// // Enable Docking Function
+		// ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-		displayTopMenu();
+		// displayTopMenu();
 
 		renderViewport(texhandle);
 
 		// Panel Logic
-		displayPropertiesPanel();
+		// displayPropertiesPanel();
 
-		displayHierarchyPanel();
+		// displayHierarchyPanel();
 
-		displayAnimatorPanel();
+		// displayAnimatorPanel();
 
-		displayAssetsBrowserPanel();
+		// displayAssetsBrowserPanel();
 
-		displayPerformanceProfilePanel(ts);
+		// displayPerformanceProfilePanel(ts);
 
-		displayDescriptorEditorPanel();
+		// displayDescriptorEditorPanel();
 
-		displayHDRSettingsPanel();
+		// displayHDRSettingsPanel();
 
-		//Complete Imgui rendering for the frame
-		CompleteFrame();
+		// //Complete Imgui rendering for the frame
+		// CompleteFrame();
 	}
 
 	void Editor::displayTopMenu()
@@ -3582,173 +3582,37 @@ namespace Engine
 #if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
-		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
+		// If no window or texture, nothing to do
+		if (!m_Window || !texhandle) return;
 
-		// viewport size calculation...
-		ImVec2 viewportSize = { 600, 600 };
-		if (m_Window)
-		{
-			int width = 0;
-			int height = 0;
-			glfwGetWindowSize(m_Window, &width, &height);
-			viewportSize = {
-				static_cast<float>(width) / 2.0f,
-				static_cast<float>(height) / 2.0f
-			};
+		// Get viewport size from window
+		int width = 0;
+		int height = 0;
+		glfwGetWindowSize(m_Window, &width, &height);
+		ImVec2 viewportSize = {
+			static_cast<float>(width),  // Full width
+			static_cast<float>(height)  // Full height
+		};
+
+		// Set viewport data (kept for renderer compatibility)
+		editorViewportData.tl = { 0.0f, 0.0f };
+		editorViewportData.size = viewportSize;
+
+		// Sync with renderer
+		if (m_Renderer) {
+			m_Renderer->getEditorViewport() = editorViewportData;
 		}
 
-		ImGui::Begin("Viewport");
-
-		ViewportPanelHelper::ViewportButtons(isPlaying, m_Scene, m_SelectedEntity,
-			currScenePath, currFileName, m_PickedID);
-		if (texhandle)
-		{
-			ImVec2 imagePos = ImGui::GetCursorScreenPos();
-			ImGui::Image((ImTextureID)(intptr_t)texhandle, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-
-			ImVec2 tl_screen = ImGui::GetItemRectMin();    // Top left of image wrt SCREEN space
-			ImVec2 actualSize = ImGui::GetItemRectSize();  // Get ACTUAL rendered size
-
-			ImGuiViewport *vp = ImGui::GetWindowViewport();
-
-			// Convert to CLIENT-WINDOW coords (origin = top-left of that GLFW window's content area)
-			ImVec2 tl_client;
-			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-			{
-				tl_client = { tl_screen.x - vp->Pos.x, tl_screen.y - vp->Pos.y }; // subtract OS window's top-left in screen coords
-			}
-			else
-			{
-				// Single viewport: ImGui "screen" origin coincides with your main client window
-				tl_client = tl_screen;
-			}
-
-			// Save editor viewport data for OBJECT PICKING (client coordinates)
-			editorViewportData.tl = tl_client;
-			editorViewportData.size = viewportSize;
-
-			// Sync with renderer using the existing getEditorViewport() method
-			if (m_Renderer)
-			{
-				m_Renderer->getEditorViewport() = editorViewportData;
-			}
-
-			bool currentCamToggle = m_Renderer->getEditorCamToggle();
-
-			if (m_PreviousEditorCamToggle != currentCamToggle)
-			{
-				// toggled camera
-				m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
-				m_SelectedEntity = Entity{};
-				//std::cout << "*** [GIZMO] Reset operation after camera toggle ***" << std::endl;
-				m_PreviousEditorCamToggle = currentCamToggle;
-			}
-
-			if (m_Renderer->getEditorCamToggle())
-			{
-				// Store screen coordinates separately for ImGuizmo - use ACTUAL size
-				m_ImGuizmoViewportData.tl = tl_screen;
-				m_ImGuizmoViewportData.size = actualSize;  // Use actual rendered size
-
-				// Track current frame gizmo state
-				bool isUsingGizmoThisFrame = false;
-				bool isOverGizmoThisFrame = false;
-
-				// FIRST: Handle ImGuizmo manipulation if we have a selected entity
-				if (m_SelectedEntity)
-				{
-					ManipulateEntityTransform(m_SelectedEntity);
-					isUsingGizmoThisFrame = ImGuizmo::IsUsing();
-					isOverGizmoThisFrame = ImGuizmo::IsOver();
-				}
-
-				if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
-				{
-					LOG_INFO("[DEBUG] Right-click popup opened!");
-
-
-					if (ImGui::MenuItem("Move", "W"))
-					{
-						m_Operation = ImGuizmo::TRANSLATE;
-						//std::cout << "*** [GIZMO] Switched to MOVE mode ***" << std::endl;
-					}
-
-					if (ImGui::MenuItem("Rotate", "E"))
-					{
-						m_Operation = ImGuizmo::ROTATE;
-						//std::cout << "*** [GIZMO] Switched to ROTATE mode ***" << std::endl;
-					}
-
-					if (ImGui::MenuItem("Scale", "R"))
-					{
-						m_Operation = ImGuizmo::SCALE;
-						//std::cout << "*** [GIZMO] Switched to SCALE mode ***" << std::endl;
-					}
-
-					ImGui::Separator();
-					ImGui::EndPopup();
-				}
-
-				// Only handle keyboard shortcuts when viewport is focused
-				if (ImGui::IsWindowFocused())
-				{
-					if (ImGui::IsKeyPressed(ImGuiKey_W))
-					{
-						m_Operation = ImGuizmo::TRANSLATE;
-						//std::cout << "*** [GIZMO] Switched to MOVE mode (Keyboard W) ***" << std::endl;
-					}
-					if (ImGui::IsKeyPressed(ImGuiKey_E))
-					{
-						m_Operation = ImGuizmo::ROTATE;
-						//std::cout << "*** [GIZMO] Switched to ROTATE mode (Keyboard E) ***" << std::endl;
-					}
-					if (ImGui::IsKeyPressed(ImGuiKey_R))
-					{
-						m_Operation = ImGuizmo::SCALE;
-						//std::cout << "*** [GIZMO] Switched to SCALE mode (Keyboard R) ***" << std::endl;
-					}
-					if (ImGui::IsKeyPressed(ImGuiKey_Q))
-					{
-						m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
-						//std::cout << "*** [GIZMO] Disabled manipulation (Keyboard Q) ***" << std::endl;
-					}
-				}
-
-				// SECOND: Handle object selection
-				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-				{
-					// Only allow selection if we weren't using or over the gizmo in the PREVIOUS frame
-					if (!m_WasUsingGizmoLastFrame && !m_WasOverGizmoLastFrame)
-					{
-						if (m_PickedID != 0xFFFFFFFFu && m_Scene)
-						{
-							//LOG_INFO("[DEBUG] m_PickedID = {}", m_PickedID);
-							m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_Scene->GetRegistry() };
-							ViewportPanelHelper::ViewPortClickAndTeleport(m_PickedID, m_LastClickedID, m_LastClickedTime, m_DoublePickedTime, m_SelectedEntity, m_Renderer);
-						}
-						else
-						{
-							m_SelectedEntity = Entity{};
-							//LOG_INFO("Deselected entity.");
-							m_LastClickedTime = 0.0;
-							m_LastClickedID = 0xFFFFFFFFu;
-						}
-					}
-					/*else
-					{
-						LOG_INFO("Selection blocked - was interacting with gizmo last frame");
-					}*/
-				}
-
-				// Update gizmo state for next frame
-				m_WasUsingGizmoLastFrame = isUsingGizmoThisFrame;
-				m_WasOverGizmoLastFrame = isOverGizmoThisFrame;
-			}
+		// Camera toggle tracking
+		bool currentCamToggle = m_Renderer->getEditorCamToggle();
+		if (m_PreviousEditorCamToggle != currentCamToggle) {
+			m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+			m_SelectedEntity = Entity{};
+			m_PreviousEditorCamToggle = currentCamToggle;
 		}
 
-		ViewportPanelHelper::CameraControl(m_Renderer);
-
-		ImGui::End();
+		// Note: Texture rendering should be handled by your renderer
+		// The texhandle will be used by the rendering system to display the scene
 	}
 
 #endif

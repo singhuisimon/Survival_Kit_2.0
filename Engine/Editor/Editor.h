@@ -38,6 +38,7 @@
 #include "../Serialization/PrefabInstantiator.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
 #include "../Asset/DescriptorEditor.h"
+#include "../Asset/AssetManager.h"
 #include "../Scripting/MonoScriptEngine.h"
 #include "../Scripting/ScriptReloader.h"
 #include "../Component/ScriptComponent.h"
@@ -605,6 +606,15 @@ namespace Engine
 		*	Vector that will be populated with all descendant entt entity handles.
 		**************************************************************************/
 		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
+
+		void setCurrScenePathAndFilename(std::string scenePath, std::string fileName) {
+			currScenePath = scenePath;
+			currFileName = fileName;
+		}
+
+		void immediatelyCompile() {
+			AM.CompileAllAsset(0);
+		}
 
 	};
 

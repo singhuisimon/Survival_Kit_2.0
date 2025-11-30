@@ -112,11 +112,11 @@ void Game::OnInit()
 	else
 	{
 
-		LOG_INFO("Performing initial asset scan...");
-		Engine::AM.scanAndProcess();
+		 LOG_INFO("Performing initial asset scan...");
+		 Engine::AM.scanAndProcess();
 
-		LOG_INFO("Initial asset scan complete - found ",
-			Engine::AM.db().Count(), " assets");
+		 LOG_INFO("Initial asset scan complete - found ",
+		 	Engine::AM.db().Count(), " assets");
 	}
 
 	Engine::RM.startUp();
@@ -228,21 +228,23 @@ void Game::OnInit()
 
 	// Step 7: Load scene from file or create default
 	LOG_INFO("Step 7: Loading scene content...");
-	bool loadedFromFile = false;
+    bool loadedFromFile = false;
 
-	try
-	{
-		loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+    try {
+        loadedFromFile = m_Scene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/MainGameScene.json"));
 
-		if (loadedFromFile)
-		{
-			LOG_INFO("  -> Scene loaded from file successfully");
-		}
-		else
-		{
-			LOG_WARNING("  -> Could not load scene file (file may not exist)");
-		}
-	}
+        if (loadedFromFile) {
+            LOG_INFO("  -> Scene loaded from file successfully");
+        }
+        else {
+            LOG_WARNING("  -> Could not load scene file (file may not exist)");
+        }
+
+        if (m_Editor)
+        {
+            m_Editor->setCurrScenePathAndFilename(Engine::getAssetFilePath("Sources/Scenes/MainGameScene.json"), "MainGameScene.json");
+        }
+    }
 	catch (const std::exception &e)
 	{
 		LOG_ERROR("  -> Exception while loading: ", e.what());
@@ -278,7 +280,7 @@ void Game::OnInit()
 	{
 		m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
 
-		// Get the directory where the executable is running from
+		// Get the directory where the execuFle is running from
 		std::filesystem::path exeDir = Engine::getAssetsPath();
 
 		// Move up one level (from 'resources/' to project root)
@@ -704,20 +706,25 @@ void Game::OnUpdate(Engine::Timestep ts)
 	auto &editorModeToggle = m_Renderer->getEditorModeToggle();
 
 	// Add this somewhere in your input handling:
-	if (input.IsKeyJustPressed(GLFW_KEY_F3))
-	{
-		m_EditorEnable = !m_EditorEnable;
-		editorModeToggle = m_EditorEnable;
-		editorCamToggle = false;
-		LOG_INFO("Editor toggled: ", m_EditorEnable);
+	if (input.IsKeyJustPressed(GLFW_KEY_F3)) {
+		m_Editor->immediatelyCompile();
 	}
 
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
-	{
-		editorCamToggle = !editorCamToggle;
-		LOG_INFO("Editor camera toggled: ", editorCamToggle);
-	}
+	// // Add this somewhere in your input handling:
+	// if (input.IsKeyJustPressed(GLFW_KEY_F3))
+	// {
+	// 	m_EditorEnable = !m_EditorEnable;
+	// 	editorModeToggle = m_EditorEnable;
+	// 	editorCamToggle = false;
+	// 	LOG_INFO("Editor toggled: ", m_EditorEnable);
+	// }
+
+	 //// Editor camera toggle
+	 //if (input.IsKeyJustPressed(GLFW_KEY_TAB))
+	 //{
+	 //	editorCamToggle = !editorCamToggle;
+	 //	LOG_INFO("Editor camera toggled: ", editorCamToggle);
+	 //}
 
 	Engine::ScriptReloader::GetInstance().Update();
 
@@ -1020,52 +1027,52 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
-	// Editor camera controls
-	if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
-	{
+	//// Editor camera controls
+	//if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
+	//{
 
-		auto &editorCam = m_Renderer->getEditorCamera();
+	//	auto &editorCam = m_Renderer->getEditorCamera();
 
-		// Check for left or right mouse click
-		uint32_t mouse = 2;
-		if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-			mouse = GLFW_MOUSE_BUTTON_LEFT;
-		}
-		else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
-		{
-			mouse = GLFW_MOUSE_BUTTON_RIGHT;
-		}
+	//	// Check for left or right mouse click
+	//	uint32_t mouse = 2;
+	//	if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+	//	{
+	//		mouse = GLFW_MOUSE_BUTTON_LEFT;
+	//	}
+	//	else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+	//	{
+	//		mouse = GLFW_MOUSE_BUTTON_RIGHT;
+	//	}
 
-		// Cursor orbiting
-		editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
+	//	// Cursor orbiting
+	//	editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
 
-		// Zooming in-and-out scrolling
-		double scrollY_offset = input.GetScrollDelta().y;
-		if (scrollY_offset != 0)
-		{
-			editorCam.cameraOnScroll(scrollY_offset);
-		}
+	//	// Zooming in-and-out scrolling
+	//	double scrollY_offset = input.GetScrollDelta().y;
+	//	if (scrollY_offset != 0)
+	//	{
+	//		editorCam.cameraOnScroll(scrollY_offset);
+	//	}
 
-		// Check moving input
-		if (input.IsKeyPressed(GLFW_KEY_W))
-		{
-			editorCam.moveCamForward();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_A))
-		{
-			editorCam.moveCamLeft();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_S))
-		{
-			editorCam.moveCamBack();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_D))
-		{
-			editorCam.moveCamRight();
-		}
+	//	// Check moving input
+	//	if (input.IsKeyPressed(GLFW_KEY_W))
+	//	{
+	//		editorCam.moveCamForward();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_A))
+	//	{
+	//		editorCam.moveCamLeft();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_S))
+	//	{
+	//		editorCam.moveCamBack();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_D))
+	//	{
+	//		editorCam.moveCamRight();
+	//	}
 
-	}
+	//}
 
 	// Test the DSP Global Effects
 
@@ -1218,11 +1225,11 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//m_Editor->OnUpdate(Engine::Timestep ts);
 	//m_Renderer->get_imgui_texture();
 
-	if (m_EditorEnable)
-	{
-		m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
-	}
+	/*if (m_EditorEnable) {
+        m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
+    }*/
 
+    m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
 	m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
 	m_TracyProfiler->OnUpdate();
 
