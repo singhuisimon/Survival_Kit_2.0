@@ -86,6 +86,12 @@ namespace Engine {
                 [](const ScriptComponent& c) -> std::string { return c.ScriptClassName; },
                 [](ScriptComponent& c, const std::string& v) { c.ScriptClassName = v; }
             );
+            meta.AddProperty<ScriptComponent, bool>(
+                "Started",
+                PropertyType::Bool,
+                [](const ScriptComponent& c) -> bool { return c.Started; },
+                [](ScriptComponent& c, bool v) { c.Started = v; }
+            );
         }
         // Register CameraComponent
         {
