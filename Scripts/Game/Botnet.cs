@@ -126,13 +126,6 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // Death check
-            if (!isDead /*&& /health != null && health.IsDead*/)
-            {
-                Explode();
-                return;
-            }
-
             if (isDead)
                 return;
 
@@ -292,9 +285,6 @@ namespace Game
             }
         }
 
-        /// <summary>
-        /// Smoothly rotates the botnet to face its target
-        /// </summary>
         private void RotateTowardsTarget(float deltaTime)
         {
             if (targetID == INVALID_ENTITY)
@@ -332,9 +322,6 @@ namespace Game
             Transform.SetRotation((uint)EntityID, ref newRot);
         }
 
-        /// <summary>
-        /// Lerp between angles, taking wrapping into account
-        /// </summary>
         private float LerpAngle(float a, float b, float t)
         {
             float delta = ((b - a + 540.0f) % 360.0f) - 180.0f;
@@ -407,6 +394,10 @@ namespace Game
             if (count <= 0)
                 return;
 
+            // Only explode if we have a target
+            if (targetID == INVALID_ENTITY)
+                return;
+
             uint self = (uint)EntityID;
 
             for (int i = 0; i < count; ++i)
@@ -419,13 +410,9 @@ namespace Game
 
                 uint other = (a == self) ? b : a;
 
-                string tag = InternalCalls.Tag_GetTag(other);
-                if (tag == TAG_PLAYER ||
-                    tag == TAG_SEMICONDUCTOR ||
-                    tag == TAG_EMPLACEMENT ||
-                    tag == TAG_CORE_BARRIER ||
-                    tag == TAG_ALLIES)
+                if (other == targetID)
                 {
+                    Log("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     isExploding = true;
                     break;
                 }

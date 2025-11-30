@@ -16,6 +16,9 @@ namespace Engine
         private static extern bool IsMouseButtonPressed_Native(int button);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsKeyReleased_Native(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void GetMousePosition_Native(out Vector2 position);
 
         // Public API
@@ -33,6 +36,11 @@ namespace Engine
         {
             GetMousePosition_Native(out Vector2 position);
             return position;
+        }
+
+        public static bool IsKeyReleased(KeyCode key)
+        {
+            return IsKeyReleased_Native((int)key);
         }
     }
 

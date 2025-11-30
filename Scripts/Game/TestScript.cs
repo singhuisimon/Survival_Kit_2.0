@@ -128,26 +128,53 @@ namespace Game
 
             // ===== MOVEMENT INPUT =====
             // Calculate forward direction from camera to player (horizontal plane only)
-            Engine.Vector3 camToPlayer = new Engine.Vector3(
-                playerPos.X - cameraPosition.X,
-                 playerPos.Y - cameraPosition.Y,  
-                playerPos.Z - cameraPosition.Z
+            /*            Engine.Vector3 camToPlayer = new Engine.Vector3(
+                            playerPos.X - cameraPosition.X,
+                             playerPos.Y - cameraPosition.Y,  
+                            playerPos.Z - cameraPosition.Z
+                        );
+
+                        // Normalize to get forward direction (camera looking at player)
+                        float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X +
+                            camToPlayer.Y * camToPlayer.Y +
+                            camToPlayer.Z * camToPlayer.Z);
+                        Engine.Vector3 forward = new Engine.Vector3(0.0f, 0.0f, 0.0f);
+
+                        if (camToPlayerLen > 0.000001f)
+                        {
+                            forward.X = camToPlayer.X / camToPlayerLen;
+                            forward.Y = camToPlayer.Y / camToPlayerLen;
+                            forward.Z = camToPlayer.Z / camToPlayerLen;
+                        }
+
+                        // Calculate right vector (perpendicular to forward on horizontal plane)
+                        Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
+                        Engine.Vector3 right = CrossProduct(forward, worldUp);
+                        float rightLen = SimpleSqrt(right.X * right.X + right.Y * right.Y + right.Z * right.Z);
+                        if (rightLen > 0.000001f)
+                        {
+                            right.X /= rightLen;
+                            right.Y /= rightLen;
+                            right.Z /= rightLen;
+                        }*/
+
+            // ===== MOVEMENT INPUT =====
+            // Get camera rotation (updated by C++)
+            Engine.Vector3 cameraRot;
+            Engine.InternalCalls.Transform_GetRotation(mainCameraEntityID, out cameraRot);
+
+            // Convert camera rotation to forward vector
+            float yawRad = cameraRot.Y * DEG2RAD;
+            float pitchRad = cameraRot.X * DEG2RAD;
+
+            // Calculate forward vector from camera rotation
+            Engine.Vector3 forward = new Engine.Vector3(
+                SimpleSin(yawRad) * SimpleCos(pitchRad),   // X
+                -SimpleSin(pitchRad),                       // Y (negative because pitch down is positive)
+                SimpleCos(yawRad) * SimpleCos(pitchRad)    // Z
             );
 
-            // Normalize to get forward direction (camera looking at player)
-            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X +
-                camToPlayer.Y * camToPlayer.Y +
-                camToPlayer.Z * camToPlayer.Z);
-            Engine.Vector3 forward = new Engine.Vector3(0.0f, 0.0f, 0.0f);
-
-            if (camToPlayerLen > 0.000001f)
-            {
-                forward.X = camToPlayer.X / camToPlayerLen;
-                forward.Y = camToPlayer.Y / camToPlayerLen;
-                forward.Z = camToPlayer.Z / camToPlayerLen;
-            }
-
-            // Calculate right vector (perpendicular to forward on horizontal plane)
+            // Calculate right vector (perpendicular to forward)
             Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
             Engine.Vector3 right = CrossProduct(forward, worldUp);
             float rightLen = SimpleSqrt(right.X * right.X + right.Y * right.Y + right.Z * right.Z);
