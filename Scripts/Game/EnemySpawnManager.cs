@@ -110,7 +110,7 @@ namespace Game{
         private string alliesambience = "Flotilla_Gunship_Ambient.wav";
         private string coreambience = "Core_Ambient.wav";
 
-        private string warnloveprefab = "Sources/Prefabs/loveletter_warn.prefab";
+        private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
         private uint spawnmanagerID;
   
@@ -127,6 +127,8 @@ namespace Game{
             //     // In custom engine, you'd destroy this entity
             //     return;
             // }
+
+            stopmainsound();
             
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
@@ -669,7 +671,7 @@ namespace Game{
             Vector3 spawnRot = spawnPoint.rotation; // Or use Euler angles
             Vector3 spawnScale = new Vector3(0.006f, 0.006f, 0.006f);
 
-            PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
+            //PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
 
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPos, ref spawnRot, ref spawnScale, false);
 
@@ -706,7 +708,7 @@ namespace Game{
             string spawnPointName = loveletterRoutes[spawnIndex];
 
             // Find the spawn point entity by name
-            uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+            uint spawnID = InternalCalls.Scene_FindEntityByName(spawnPointName);
 
             Log("Spawn point name is: " + spawnPointName);
             
@@ -715,15 +717,24 @@ namespace Game{
             Vector3 spawnPosition;
             Vector3 spawnRotation;
 
-            InternalCalls.Transform_GetPosition((uint)entityID, out spawnPosition);
-            Entity spawnent = new Entity(entityID);
+            InternalCalls.Transform_GetPosition((uint)spawnID, out spawnPosition);
+            Entity spawnent = new Entity(spawnID);
             Transform spawnentrans = new Transform();
             spawnentrans.Entity = spawnent;
             spawnRotation = spawnentrans.Rotation;
 
             Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
 
-            PlayEnemySpawnSound(1, ref spawnPosition, ref spawnRotation, ref spawnScale);
+            //PLAY WANRING AUDIO ONCE
+            InternalCalls.Entity_AddAudio(spawnID);
+            InternalCalls.Audio_SetFile(spawnID, loveletterwarning);
+            InternalCalls.Audio_SetLoop(spawnID, false);
+            InternalCalls.Audio_SetIs3D(spawnID, true);
+            InternalCalls.Audio_SetMinDistance(spawnID, 22.42f);
+            InternalCalls.Audio_SetMaxDistance(spawnID, 300.87f);
+            InternalCalls.Audio_Play(spawnID);
+
+            //PlayEnemySpawnSound(1, ref spawnPosition, ref spawnRotation, ref spawnScale);
 
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true);
             //uint warningloveletter = InternalCalls.Prefab_InstantiateWithTransform(warnloveprefab, ref spawnPosition, ref spawnRotation, ref spawnScale, false);
@@ -1023,39 +1034,39 @@ namespace Game{
         //FOR FUTURE PURPOSE
         private void PauseBGM(){
             InternalCalls.Audio_Pause((uint)EntityID);
-            StopAllOtherAudio();
         }
 
         private void StopBGM(){
             InternalCalls.Audio_Stop((uint)EntityID);
+            StopAllOtherAudio();
         }
 
-        private void PlayEnemySpawnSound(int enemyType, ref Vector3 pos, ref Vector3 rot, ref Vector3 scale){
-            switch (enemyType)
-            {
-                case 0:
+        // private void PlayEnemySpawnSound(int enemyType, ref Vector3 pos, ref Vector3 rot, ref Vector3 scale){
+        //     switch (enemyType)
+        //     {
+        //         case 0:
 
-                case 1:
+        //         case 1:
 
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-                    // not for this milestone
-                    //SetEnemyCount{5, 16, 7, 0, 1};
-                    // SetEnemyCount{5, 16, 0, 0, 0};
-                    // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
-                    // activeSpawnPoints = new List<SpawnPointData>();
-                    // activeSpawnPoints.AddRange(spawnPointsB);
-                    // activeSpawnPoints.AddRange(spawnPointsC);
-                    // activeSpawnPoints.AddRange(spawnPointsE);
-                    break;
-                default:
-                    //Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
-                    break;
-            }
-        }
+        //             break;
+        //         case 2:
+                    
+        //             break;
+        //         case 3:
+        //             // not for this milestone
+        //             //SetEnemyCount{5, 16, 7, 0, 1};
+        //             // SetEnemyCount{5, 16, 0, 0, 0};
+        //             // loveletterRoutes = new string[] {"B1", "B2", "C1", "E1"};
+        //             // activeSpawnPoints = new List<SpawnPointData>();
+        //             // activeSpawnPoints.AddRange(spawnPointsB);
+        //             // activeSpawnPoints.AddRange(spawnPointsC);
+        //             // activeSpawnPoints.AddRange(spawnPointsE);
+        //             break;
+        //         default:
+        //             //Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
+        //             break;
+        //     }
+        // }
 
         #endregion
 
@@ -1095,6 +1106,8 @@ namespace Game{
                     InternalCalls.Audio_SetFile(Allies[i], alliesambience);
                     InternalCalls.Audio_SetLoop(Allies[i], true);
                     InternalCalls.Audio_SetIs3D(Allies[i], true);
+                    InternalCalls.Audio_SetMinDistance(Allies[i], 5.42f);
+                    InternalCalls.Audio_SetMaxDistance(Allies[i], 152.45f);
 
                     InternalCalls.Audio_Play(Allies[i]);
                     Log("SpawnManager: Playing ally audio right now - only gunship ambience");
@@ -1106,8 +1119,10 @@ namespace Game{
             if(coreID != INVALID_ENTITY){
                 InternalCalls.Entity_AddAudio(coreID);
                 InternalCalls.Audio_SetFile(coreID, coreambience);
-                InternalCalls.Audio_SetLoop(Allies[i], true);
-                InternalCalls.Audio_SetIs3D(Allies[i], true);
+                InternalCalls.Audio_SetLoop(coreID, true);
+                InternalCalls.Audio_SetIs3D(coreID, true);
+                InternalCalls.Audio_SetMinDistance(coreID, 52.42f);
+                InternalCalls.Audio_SetMaxDistance(coreID, 527.87f);
 
                 InternalCalls.Audio_Play(coreID);
                 Log("SpawnManager: Playing core ambience now through core");
@@ -1118,6 +1133,30 @@ namespace Game{
 
         private void StopAllOtherAudio(){
             AudioManager.StopAll();
+        }
+
+        private void stopmainsound(){
+            uint officeambi = InternalCalls.Scene_FindEntityByName("office_ambience");
+            
+            if(officeambi != INVALID_ENTITY){
+                //InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetLoop(officeambi, false);
+                InternalCalls.Audio_Stop(officeambi);
+                Log("SpawnManager: Stopping office ambience");
+            } else {
+                LogError("SpawnManager: Cannot find office ambience");
+            }
+
+            uint roomambi = InternalCalls.Scene_FindEntityByName("room_ambience");
+            
+            if(roomambi != INVALID_ENTITY){
+                //InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetLoop(roomambi, false);
+                InternalCalls.Audio_Stop(roomambi);
+                Log("SpawnManager: Stopping room ambience");
+            } else {
+                LogError("SpawnManager: Cannot find room ambience");
+            }
         }
 
         #endregion
