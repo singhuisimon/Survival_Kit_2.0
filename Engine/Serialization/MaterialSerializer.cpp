@@ -28,24 +28,26 @@ namespace Engine {
         // --- ShaderName ---
         doc.AddMember("shaderName", Value(mat->shaderName.c_str(), allocator), allocator);
 
-        // --- Texture Maps (Formatted as hex strings) ---
-        std::string baseMapHex = std::format("{:x}", mat->baseMap.m_Value);
-        doc.AddMember("baseMap", rapidjson::Value(baseMapHex.c_str(), allocator), allocator);
+        // --- Texture Maps ---
+        // Store texture maps as filenames resolved from GUIDs on disk and resolve them back into GUIDS when loading
+        std::string baseMap_filename = AM.getNameFromGuid(mat->baseMap);
+        doc.AddMember("baseMap", rapidjson::Value(baseMap_filename.c_str(), allocator), allocator);
 
-        std::string normalMapHex = std::format("{:x}", mat->normalMap.m_Value);
-        doc.AddMember("normalMap", rapidjson::Value(normalMapHex.c_str(), allocator), allocator);
+        std::string normalMap_filename = AM.getNameFromGuid(mat->normalMap);
+        doc.AddMember("normalMap", rapidjson::Value(normalMap_filename.c_str(), allocator), allocator);
 
-        std::string metallicMapHex = std::format("{:x}", mat->metallicMap.m_Value);
-        doc.AddMember("metallicMap", rapidjson::Value(metallicMapHex.c_str(), allocator), allocator);
+        std::string metallicMap_filename = AM.getNameFromGuid(mat->metallicMap);
+        doc.AddMember("metallicMap", rapidjson::Value(metallicMap_filename.c_str(), allocator), allocator);
 
-        std::string roughnessMapHex = std::format("{:x}", mat->roughnessMap.m_Value);
-        doc.AddMember("roughnessMap", rapidjson::Value(roughnessMapHex.c_str(), allocator), allocator);
+        std::string roughnessMap_filename = AM.getNameFromGuid(mat->roughnessMap);
+        doc.AddMember("roughnessMap", rapidjson::Value(roughnessMap_filename.c_str(), allocator), allocator);
 
-        std::string emissionMapHex = std::format("{:x}", mat->emissionMap.m_Value);
-        doc.AddMember("emissionMap", rapidjson::Value(emissionMapHex.c_str(), allocator), allocator);
+        std::string emissionMap_filename = AM.getNameFromGuid(mat->emissionMap);
+        doc.AddMember("emissionMap", rapidjson::Value(emissionMap_filename.c_str(), allocator), allocator);
 
-        std::string occlusionMapHex = std::format("{:x}", mat->occlusionMap.m_Value);
-        doc.AddMember("occlusionMap", rapidjson::Value(occlusionMapHex.c_str(), allocator), allocator);
+        std::string occlusionMap_filename = AM.getNameFromGuid(mat->occlusionMap);
+        doc.AddMember("occlusionMap", rapidjson::Value(occlusionMap_filename.c_str(), allocator), allocator);
+
 
         // --- Color Properties (Arrays) ---
         Value baseColorArray(kArrayType);
