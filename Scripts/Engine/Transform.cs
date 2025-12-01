@@ -26,13 +26,13 @@ namespace Engine
         }
 
         /// <summary>
-        /// World rotation as Euler angles in degrees (pitch, yaw, roll).
+        /// World rotation as a quaternion.
         /// </summary>
-        public Vector3 Rotation
+        public Quat Rotation
         {
             get
             {
-                Vector3 rot;
+                Quat rot;
                 InternalCalls.Transform_GetRotation(Entity.EntityID, out rot);
                 return rot;
             }
@@ -64,28 +64,38 @@ namespace Engine
         // ---------------------------------
 
         /// <summary>
-        /// Adds to the current rotation (Euler degrees).
+        /// Rotates by multiplying the current rotation with the given quaternion.
         /// </summary>
-        public void Rotate(Vector3 rotation)
+        public void Rotate(Quat rotation)
         {
-            Rotation = Rotation + rotation;
+            Rotation = Rotation * rotation;
+        }
+
+        /// <summary>
+        /// Rotates by a given axis and angle (in radians).
+        /// </summary>
+        public void RotateAxisAngle(Vector3 axis, float angleRadians)
+        {
+            Quat deltaRotation = Quat.FromAxisAngle(axis, angleRadians);
+            Rotation = Rotation * deltaRotation;
         }
 
         /// <summary>
         /// Rotates this transform so its forward faces the target position.
-        /// Uses custom math functions to avoid System.Math dependency.
         /// </summary>
         public void LookAt(Vector3 target)
         {
             Vector3 direction = (target - Position).Normalized;
 
             // Calculate yaw (rotation around Y axis)
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z) * SimpleMath.RAD_TO_DEG;
+            float yaw = SimpleMath.Atan2(direction.X, direction.Z);
 
             // Calculate pitch (rotation around X axis)
-            float pitch = SimpleMath.Asin(-direction.Y) * SimpleMath.RAD_TO_DEG;
+            float pitch = SimpleMath.Asin(-direction.Y);
 
-            Rotation = new Vector3(pitch, yaw, 0.0f);
+            // Create quaternion from Euler angles (in radians)
+            Vector3 eulerRadians = new Vector3(pitch, yaw, 0.0f);
+            Rotation = Quat.FromEuler(eulerRadians);
         }
 
         /// <summary>
@@ -105,10 +115,11 @@ namespace Engine
             direction.Y *= invLen;
             direction.Z *= invLen;
 
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z) * SimpleMath.RAD_TO_DEG;
-            float pitch = SimpleMath.Asin(-direction.Y) * SimpleMath.RAD_TO_DEG;
+            float yaw = SimpleMath.Atan2(direction.X, direction.Z);
+            float pitch = SimpleMath.Asin(-direction.Y);
 
-            Vector3 rotation = new Vector3(pitch, yaw, 0.0f);
+            Vector3 eulerRadians = new Vector3(pitch, yaw, 0.0f);
+            Quat rotation = Quat.FromEuler(eulerRadians);
             SetRotation(entityID, ref rotation);
         }
 
@@ -128,14 +139,14 @@ namespace Engine
             InternalCalls.Transform_SetPosition(entityID, ref position);
         }
 
-        public static Vector3 GetRotation(uint entityID)
+        public static Quat GetRotation(uint entityID)
         {
-            Vector3 rot;
+            Quat rot;
             InternalCalls.Transform_GetRotation(entityID, out rot);
             return rot;
         }
 
-        public static void SetRotation(uint entityID, ref Vector3 rotation)
+        public static void SetRotation(uint entityID, ref Quat rotation)
         {
             InternalCalls.Transform_SetRotation(entityID, ref rotation);
         }

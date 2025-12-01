@@ -29,6 +29,10 @@
 #include <filesystem>
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 
 namespace Engine
 {
@@ -887,6 +891,46 @@ namespace Engine
 		static bool EntityHasRigidBody(uint64_t entityID);
 		static int  Transform_GetParent(uint64_t entityID);
 
+		// GLM Functions exposed
+		// Quaternion creation from axis-angle
+		static void Quat_FromAxisAngle(glm::vec3* axis, float angleRadians, glm::quat* outQuat);
+
+		// Extract forward vector from quaternion
+		static void Quat_GetForward(glm::quat* quat, glm::vec3* outForward);
+
+		// Extract right vector
+		static void Quat_GetRight(glm::quat* quat, glm::vec3* outRight);
+
+		// Extract up vector
+		static void Quat_GetUp(glm::quat* quat, glm::vec3* outUp);
+
+		// Rotate vector by quaternion
+		static void Quat_RotateVector(glm::quat* quat, glm::vec3* vec, glm::vec3* outVec);
+
+		// Multiply quaternions (combine rotations)
+		static void Quat_Multiply(glm::quat* q1, glm::quat* q2, glm::quat* outQuat);
+
+		// SLERP interpolation
+		static void Quat_Slerp(glm::quat* q1, glm::quat* q2, float t, glm::quat* outQuat);
+
+		// Inverse quaternion
+		static void Quat_Inverse(glm::quat* quat, glm::quat* outQuat);
+
+		// Convert quaternion to Euler angles
+		static void Quat_ToEuler(glm::quat* quat, glm::vec3* outEuler);
+
+		// Create quaternion from Euler angles
+		static void Quat_FromEuler(glm::vec3* euler, glm::quat* outQuat);
+
+		// Normalize quaternion
+		static void Quat_Normalize(glm::quat* quat, glm::quat* outQuat);
+
+		// Get quaternion length
+		static float Quat_Length(glm::quat* quat);
+
+		// Quaternion dot product
+		static float Quat_Dot(glm::quat* q1, glm::quat* q2);
+
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -1095,6 +1139,20 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void *)InternalCalls::EntityHasCamera);
 		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void *)InternalCalls::EntityHasRigidBody);
 
+		// Quaternion Bindings
+		mono_add_internal_call("Engine.InternalCalls::Quat_FromAxisAngle", (void*)InternalCalls::Quat_FromAxisAngle);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetForward", (void*)InternalCalls::Quat_GetForward);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetRight", (void*)InternalCalls::Quat_GetRight);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetUp", (void*)InternalCalls::Quat_GetUp);
+		mono_add_internal_call("Engine.InternalCalls::Quat_RotateVector", (void*)InternalCalls::Quat_RotateVector);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Multiply", (void*)InternalCalls::Quat_Multiply);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Slerp", (void*)InternalCalls::Quat_Slerp);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Inverse", (void*)InternalCalls::Quat_Inverse);
+		mono_add_internal_call("Engine.InternalCalls::Quat_ToEuler", (void*)InternalCalls::Quat_ToEuler);
+		mono_add_internal_call("Engine.InternalCalls::Quat_FromEuler", (void*)InternalCalls::Quat_FromEuler);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void*)InternalCalls::Quat_Normalize);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void*)InternalCalls::Quat_Length);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void*)InternalCalls::Quat_Dot);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -1656,32 +1714,26 @@ namespace Engine
 			transform.IsDirty = true;
 		}
 
-		void Transform_GetRotation(uint64_t entityID, glm::vec3 *outRotation)
+		void Transform_GetRotation(uint64_t entityID, glm::quat* outRotation)
 		{
 			if (!s_CurrentScene || !outRotation) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
+			auto& registry = s_CurrentScene->GetRegistry();
 			auto handle = static_cast<entt::entity>(entityID);
-
 			if (!registry.valid(handle)) return;
 			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			*outRotation = glm::degrees(glm::eulerAngles(transform.Rotation));  // Convert quat to euler
+			auto& transform = registry.get<TransformComponent>(handle);
+			*outRotation = transform.Rotation;
 		}
 
-		void Transform_SetRotation(uint64_t entityID, glm::vec3 *rotation)
+		void Transform_SetRotation(uint64_t entityID, glm::quat* rotation)
 		{
 			if (!s_CurrentScene || !rotation) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
+			auto& registry = s_CurrentScene->GetRegistry();
 			auto handle = static_cast<entt::entity>(entityID);
-
 			if (!registry.valid(handle)) return;
 			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			transform.Rotation = glm::quat(glm::radians(*rotation));  // Convert euler to quat
+			auto& transform = registry.get<TransformComponent>(handle);
+			transform.Rotation = *rotation;
 		}
 
 		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale)
@@ -2559,6 +2611,84 @@ namespace Engine
 			}
 
 			return resultArray;
+		}
+
+		// Quaternion creation from axis-angle
+		void Quat_FromAxisAngle(glm::vec3* axis, float angleRadians, glm::quat* outQuat)
+		{
+			*outQuat = glm::angleAxis(angleRadians, *axis);
+		}
+
+		// Extract forward vector from quaternion
+		void Quat_GetForward(glm::quat* quat, glm::vec3* outForward)
+		{
+			*outForward = glm::rotate(*quat, glm::vec3(0.0f, 0.0f, -1.0f));
+		}
+
+		// Extract right vector
+		void Quat_GetRight(glm::quat* quat, glm::vec3* outRight)
+		{
+			*outRight = glm::rotate(*quat, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+
+		// Extract up vector
+		void Quat_GetUp(glm::quat* quat, glm::vec3* outUp)
+		{
+			*outUp = glm::rotate(*quat, glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		// Rotate vector by quaternion
+		void Quat_RotateVector(glm::quat* quat, glm::vec3* vec, glm::vec3* outVec)
+		{
+			*outVec = glm::rotate(*quat, *vec);
+		}
+
+		// Multiply quaternions (combine rotations)
+		void Quat_Multiply(glm::quat* q1, glm::quat* q2, glm::quat* outQuat)
+		{
+			*outQuat = (*q1) * (*q2);
+		}
+
+		// SLERP interpolation
+		void Quat_Slerp(glm::quat* q1, glm::quat* q2, float t, glm::quat* outQuat)
+		{
+			*outQuat = glm::slerp(*q1, *q2, t);
+		}
+
+		// Inverse quaternion
+		void Quat_Inverse(glm::quat* quat, glm::quat* outQuat)
+		{
+			*outQuat = glm::inverse(*quat);
+		}
+
+		// Convert quaternion to Euler angles
+		void Quat_ToEuler(glm::quat* quat, glm::vec3* outEuler)
+		{
+			*outEuler = glm::eulerAngles(*quat);
+		}
+
+		// Create quaternion from Euler angles
+		void Quat_FromEuler(glm::vec3* euler, glm::quat* outQuat)
+		{
+			*outQuat = glm::quat(*euler);
+		}
+
+		// Normalize quaternion
+		void Quat_Normalize(glm::quat* quat, glm::quat* outQuat)
+		{
+			*outQuat = glm::normalize(*quat);
+		}
+
+		// Get quaternion length
+		float Quat_Length(glm::quat* quat)
+		{
+			return glm::length(*quat);
+		}
+
+		// Quaternion dot product
+		float Quat_Dot(glm::quat* q1, glm::quat* q2)
+		{
+			return glm::dot(*q1, *q2);
 		}
 	} // namespace internalcalls
 

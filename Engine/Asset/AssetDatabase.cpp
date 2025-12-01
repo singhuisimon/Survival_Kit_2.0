@@ -52,6 +52,7 @@ namespace Engine {
 		return ext;
 	}
 
+#pragma region LoadSave
 	bool AssetDatabase::Load(const std::string& file)
 	{
 		std::ifstream in(file);
@@ -198,6 +199,7 @@ namespace Engine {
 		LOG_DEBUG("Saved ", byId.size(), " asset records to database");
 		return true;
 	}
+#pragma endregion
 
 	xresource::instance_guid AssetDatabase::EnsureIdForPath(const std::string& path)
 	{
