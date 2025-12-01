@@ -41,6 +41,7 @@
 #include "../Scripting/MonoScriptEngine.h"
 #include "../Scripting/ScriptReloader.h"
 #include "../Component/ScriptComponent.h"
+#include "../Asset/AssetManager.h"
 
 // Temporary inclusion to access EditorViewport data struct
 #include "Graphics/GraphicsLoader.h"
@@ -605,7 +606,14 @@ namespace Engine
 		*	Vector that will be populated with all descendant entt entity handles.
 		**************************************************************************/
 		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
+		void setCurrScenePathAndFilename(std::string scenePath, std::string fileName) {
+			currScenePath = scenePath;
+			currFileName = fileName;
+		}
 
+		void immediatelyCompile() {
+			AM.CompileAllAsset(0);
+		}
 	};
 
 
