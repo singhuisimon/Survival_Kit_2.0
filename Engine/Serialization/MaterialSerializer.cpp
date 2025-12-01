@@ -96,7 +96,7 @@ namespace Engine {
         filename += ".mat";
 
 		// Write the full filepath
-        std::string filepath = AssetManager::GetSourceResourcesPath() + "/Sources/Material/" + filename;
+        std::string filepath = Engine::getAssetsPath() + "/Sources/Material/" + filename;
         
         std::ofstream ofs(filepath);
         if (ofs.is_open()) {
