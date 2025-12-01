@@ -2932,7 +2932,7 @@ namespace Engine
 						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
 							LOG_DEBUG("=====Start Load Prefab File=========");
-							if (!isPrefabEditor)
+						/*	if (!isPrefabEditor)
 							{
 								if (!currScenePath.empty())
 								{
@@ -2940,7 +2940,7 @@ namespace Engine
 									m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
 									LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
 								}
-							}
+							}*/
 							currPrefabPath = filePath;
 							auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
 
