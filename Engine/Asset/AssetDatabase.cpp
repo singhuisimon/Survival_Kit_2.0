@@ -110,12 +110,26 @@ namespace Engine {
 					else if (pathWithoutResources.find("/Resources/") == 0) {
 						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 					}
+					LOG_INFO("pathWithoutResources: ", pathWithoutResources); 
+
+					std::replace(pathWithoutResources.begin(), pathWithoutResources.end(), '\\', '/');
+
+					LOG_INFO("pathWithoutResources after normalizing: ", pathWithoutResources);
+
+
 					std::string sourceRoot = Engine::getAssetsPath();
+
+					LOG_INFO("Source Roots: ", sourceRoot);
+
 					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
+
+
 
 					//normalize here
 					std::string result = fullPath.string(); 
 					std::replace(result.begin(), result.end(), '\\', '/');
+
+					LOG_INFO("Normalized full path: ", result);
 
 					rec.sourcePath = result;
 				}
@@ -140,9 +154,9 @@ namespace Engine {
 					rec.lastCompiledTime = 0;
 					rec.needsRecompile = false;
 				}
-
+				std::string normalizedSrcPath = NormalizePath(rec.sourcePath);
 				byId[rec.guid] = rec;
-				bySourcePath[rec.sourcePath] = rec.guid;
+				bySourcePath[normalizedSrcPath] = rec.guid;
 				loadedCount++;
 			}
 			catch (const std::exception& e) {

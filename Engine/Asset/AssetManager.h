@@ -104,6 +104,17 @@ namespace Engine {
 			//get the build/Resources path for compiled path
 			std::string assetsPath = Engine::getAssetsPath();
 
+			// Normalize BOTH paths: convert to forward slashes and remove trailing slash
+			std::replace(sourcesPath.begin(), sourcesPath.end(), '\\', '/');
+			if (!sourcesPath.empty() && sourcesPath.back() == '/') {
+				sourcesPath.pop_back();
+			}
+
+			std::replace(assetsPath.begin(), assetsPath.end(), '\\', '/');
+			if (!assetsPath.empty() && assetsPath.back() == '/') {
+				assetsPath.pop_back();
+			}
+
 			//=============== SOURCE ROOTS ===============
 			cfg.sourceRoots = {
 				sourcesPath + "/Sources/Scenes", //every folder under Sources is a source
@@ -116,7 +127,7 @@ namespace Engine {
 
 			//================= OUTPUT PATHS ===============
 			cfg.descriptorRoot = sourcesPath + "/Descriptors";
-			cfg.compiledPath = assetsPath + "Compiled";
+			cfg.compiledPath = assetsPath + "/Compiled";
 
 			//================= INTERNAL PATHS ===================
 			cfg.databaseFile = sourcesPath + "/DB/assetdb.txt";

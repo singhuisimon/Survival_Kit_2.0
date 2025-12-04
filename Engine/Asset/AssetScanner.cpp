@@ -135,6 +135,8 @@ namespace Engine {
 					// Normalize path to forward slashes for consistent comparison
 					std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
 
+					LOG_INFO("AssetSCanner::pathStr to the file after normalizing: ", pathStr);
+
 					const std::time_t t = toTimeT(entry.last_write_time());
 					const std::uintmax_t sz = entry.file_size();
 
@@ -146,6 +148,7 @@ namespace Engine {
                     // not found in the prev snap, it's a new file
 					if (found == m_snapshot.end())
 					{
+						LOG_DEBUG("Scanner: File not in snapshot: ", pathStr);
                         //push the new file into the changes 
 						m_snapshot[pathStr] = { t, sz };
 						changes.push_back({ ScanChange::Kind::Added, pathStr });
@@ -153,7 +156,7 @@ namespace Engine {
 					else {
 						// File exists, check if changed
 						FileStamp& stamp = found->second;
-
+						LOG_DEBUG("Scanner: Checking file in snapshot: ", pathStr);
 						// Add tolerance for timestamp comparison (1 second)
 						// Filesystem timestamps can have rounding differences
 						bool timeChanged = std::abs(static_cast<long long>(stamp.lastWrite) -
@@ -239,12 +242,18 @@ namespace Engine {
 				else if (pathWithoutResources.find("/Resources/") == 0) {
 					pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 				}
+
+				std::replace(pathWithoutResources.begin(), pathWithoutResources.end(), '\\', '/');
+
 				std::string sourceRoot = Engine::getAssetsPath();
 				fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
 				//normalize here as well for safety
 				std::string result = fullPath.string(); 
 				std::replace(result.begin(), result.end(), '\\', '/');
+
+				LOG_INFO("AssetScanner AbsolutePath: ", result);
+
 				absolutePath = result;
 			}
 			else {
