@@ -1,6 +1,6 @@
 {
   "id": 0,
   "name": "MainAnimatorController",
-  "clips": [0, 1, 2, 3],
-  "defaultClipIndex": 3
+  "clips": [0, 1, 2, 3, 6],
+  "defaultClipIndex": 4
 }

@@ -560,6 +560,7 @@ void Game::CreateDefaultScene()
 
 	auto& sphereTransform = sphere.AddComponent<Engine::TransformComponent>();
 	sphereTransform.Position = glm::vec3(-5.0f, 1.0f, 1.0f);
+	//sphereTransform.Scale = glm::vec3(1.0f);
 	sphereTransform.Scale = glm::vec3(1.0f);
 
 	auto& sphereRb = sphere.AddComponent<Engine::RigidbodyComponent>();
@@ -580,6 +581,28 @@ void Game::CreateDefaultScene()
 	sphereAnimation.playbackSpeed = 1.0f;
 
 	LOG_TRACE("  -> Sphere created");
+
+	LOG_TRACE("  Creating TimerBar entity...");
+	auto TimerBar = m_Scene->CreateEntity("TimerBar");
+	TimerBar.AddComponent<Engine::TagComponent>("TimerBar");
+
+	auto& TimerBarTransform = TimerBar.AddComponent<Engine::TransformComponent>();
+	TimerBarTransform.Position = glm::vec3(1.0f, 4.0f, 0.0f);
+	//TimerBarTransform.Scale = glm::vec3(1.0f);
+	TimerBarTransform.Scale = glm::vec3(4.0f, 0.05f, 0.05f);
+
+	auto& TimerBarmesh = TimerBar.AddComponent<Engine::MeshRendererComponent>();
+	TimerBarmesh.MeshType = 0; // Square
+
+	auto& TimerBarAnimation = TimerBar.AddComponent<Engine::AnimatorComponent>();
+	TimerBarAnimation.playing = true;
+	TimerBarAnimation.respectClipLoop = true;
+	TimerBarAnimation.controller = 0;
+	TimerBarAnimation.currentClipIndex = 0;
+	TimerBarAnimation.currentTime = 0.0f;
+	TimerBarAnimation.playbackSpeed = 1.0f;
+
+	LOG_TRACE("  -> TimerBar created");
 
 	LOG_TRACE("  Creating ReverbZone entity...");
 	auto reverbZone = m_Scene->CreateEntity("CaveReverb");
@@ -873,6 +896,46 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
+	Engine::Entity SecCam;
+	bool SecCamFound = false;
+	for (auto entityHandle : view)
+	{
+		auto& camTag = view.get<Engine::TagComponent>(entityHandle);
+		if (camTag.Tag == "SecondCamera")
+		{
+			SecCam = Engine::Entity(entityHandle, &registry);
+			SecCamFound = true;
+			break;
+		}
+	}
+
+	Engine::Entity timerBarUI;
+	bool timerBarUIFound = false;
+	for (auto entityHandle : view)
+	{
+		auto& timerBarUITag = view.get<Engine::TagComponent>(entityHandle);
+		if (timerBarUITag.Tag == "TimerBar")
+		{
+			timerBarUI = Engine::Entity(entityHandle, &registry);
+			timerBarUIFound = true;
+			break;
+		}
+	}
+
+	// Editor camera toggle
+	if (input.IsKeyJustPressed(GLFW_KEY_C))
+	{
+		if (GameCam.HasComponent<Engine::CameraComponent>() &&
+			SecCam.HasComponent<Engine::CameraComponent>()) {
+
+			auto& GameCamComp = GameCam.GetComponent<Engine::CameraComponent>();
+			auto& SecCamComp = SecCam.GetComponent<Engine::CameraComponent>();
+
+			GameCamComp.Enabled = !GameCamComp.Enabled;
+			SecCamComp.Enabled = !SecCamComp.Enabled;
+		}
+	}
+
 	if (found && foundEntity.HasComponent<Engine::TransformComponent>())
 	{
 
@@ -949,7 +1012,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 			// Always update camera target to the player's head/aim point
 			camComp.SetTarget(aimTarget);
 
-			/* Camera and Player rotations if all meshes face Z- as forward */
+			///* Camera and Player rotations if all meshes face Z- as forward */
 			//// Player face same horizontal direction as the camera (camera behind player)
 			//glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
 
@@ -961,7 +1024,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 			//float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
 
 			//transform.SetRotation(glm::vec3(pitchDeg, yawDeg/* - 90.0f*/, 0.0f));
-			/* Camera and Player rotations if all meshes face Z- as forward */
+			///* Camera and Player rotations if all meshes face Z- as forward */
 
 			/* Temporary adjustments to Camera and Player rotations */
 			glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
@@ -987,11 +1050,31 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 			// Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
 			//glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
-			glm::vec3 forward = transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f); // forward in local space (For botnet)
-			forward = glm::normalize(forward);
+			glm::vec3 forward = glm::normalize(transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f)); // forward in local space (For botnet)
 
-			// Compute right vector from forward and world up
+			// Compute right vector of player from forward and world up
 			glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+			// TimerBar entity exists and has a TransformComponent
+			if (timerBarUIFound && timerBarUI.HasComponent<Engine::TransformComponent>()) {
+
+				// Timerbar UI transform
+				auto& timerBarTrans = timerBarUI.GetComponent<Engine::TransformComponent>();
+
+				// Place timer bar above the player's local up
+				const float timerBarDist = 3.0f; // How high above the player
+				const float angleRad = glm::radians(20.0f);	// Diagonal angle to "fit" into the camera screen
+				glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
+					camUp * std::sin(angleRad));
+				timerBarTrans.Position = camPos + angledDir * timerBarDist;
+
+				// Make timer bar "follow" camera rotation
+				// Use only pitch and yaw so the timer bar stays upright 
+				const float timerBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+				const float timerBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+				timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
+			}
+
 
 			// Movement accumulator
 			glm::vec3 moveDir(0.0f);
@@ -1008,7 +1091,6 @@ void Game::OnUpdate(Engine::Timestep ts)
 			// Apply movement to player
 			transform.Position += moveDir * moveSpeed;
 
-
 		}
 		else
 		{
@@ -1020,6 +1102,12 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
+
+	////sphereTrans.Position = glm::vec3(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
+	//sphereTrans.SetPosition(glm::vec3(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z));
+	//sphereTrans.Rotation = q;
+	////sphereTrans.IsDirty = true;
+	
 	// Editor camera controls
 	if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
 	{
