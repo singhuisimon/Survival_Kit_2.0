@@ -37,7 +37,7 @@ namespace Game{
         [SerializeField] private bool isSpawning = false;
 
         // Enemy counting
-        private int enemiesLeft = 0;
+        [SerializeField] private int enemiesLeft = 0;
 
         // Prefab names 
         private string[] enemyPrefabNames = new string[]
@@ -366,7 +366,7 @@ namespace Game{
         {
             Log("SpawnManager - Setting up enemy spawning");
             
-            E005_loveletter = 0;
+            E005_loveletter = 1;
             E004_botnet = 15;
 
             loveletterRoutes = new string[] {"A1"};
@@ -560,22 +560,23 @@ namespace Game{
             // For now, just track the counter
 
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
-            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
+            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("Botnet");
 
             int totalenemiesleft = 0;
 
             if(loveletter != null && loveletter.Length != 0){
                 totalenemiesleft += loveletter.Length;
-                //Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
+                Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             } else if (botnet != null && botnet.Length != 0){
                 totalenemiesleft += botnet.Length;
-                //Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
+                Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
             
             if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
                 enemiesLeft = 0;
 
                 isActive = false;
+                StopAllOtherAudio();
                 Log("=== Wave Complete ===");
 
             } else {
