@@ -237,6 +237,7 @@ namespace Engine
 				propertiesObj.AddMember("MeshGuid", mesh.MeshGuid.m_Value, allocator);
 				propertiesObj.AddMember("MaterialGuid", mesh.MaterialGuid.m_Value, allocator);
 				propertiesObj.AddMember("TextureGuid", mesh.TextureGuid.m_Value, allocator);
+				//LOG_DEBUG("TextureGuid in serializer SerializeToString(): ", mesh.TextureGuid.m_Value);
 				propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 				propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
 				propertiesObj.AddMember("Material", mesh.Material, allocator);

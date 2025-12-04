@@ -94,7 +94,7 @@ namespace Game{
         
         private const uint INVALID_ENTITY = 0xffffffffu;
 
-        private bool wasMouseButtonPressed = false;
+        //private bool wasMouseButtonPressed = false;
 
         // Light entities
         //private Entity lightPrep;
@@ -164,6 +164,11 @@ namespace Game{
             // }
 
             InternalCalls.Entity_AddAudio((uint) EntityID);
+
+            timeCurrent = 10.0f;
+            timeNext = 10.0f;
+            spawnRateNext = 0.0f;
+            
 
             Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
         }

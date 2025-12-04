@@ -182,7 +182,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     xresource::mgr& /*mgr*/, const full_guid& guid)
 {
 
-
+    LOG_DEBUG(" ==== Start Loader for mesh ==========");
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
     //LOG_INFO("MESHFILE PATH : ", compiled_path);
@@ -395,6 +395,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     auto* meshPtr = mesh.release();
     LOG_INFO("mesh.release() returned pointer: ", static_cast<void*>(meshPtr));
+    LOG_DEBUG(" ==== End of loader debug for mesh ===");
     return meshPtr;
 }
 
@@ -427,7 +428,7 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
 
     // Get the source file path
     std::string filepath = Engine::AM.getNameFromGuid(guid.m_Instance);
-    std::string prefix = Engine::AssetManager::GetSourceResourcesPath() + "/Sources/Material/";
+    std::string prefix = Engine::getAssetsPath() + "/Sources/Material/";
 	filepath = prefix + filepath;
 
     // Check if file exists
@@ -465,24 +466,25 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
     if (doc.HasMember("shaderName"))
         material->shaderName = doc["shaderName"].GetString();
 
-    // --- Texture Maps ---
+    // --- Texture Maps (convert filenames to GUIDs) ---
     if (doc.HasMember("baseMap"))
-        material->baseMap = xresource::instance_guid{ std::stoull(doc["baseMap"].GetString(), nullptr, 16) };
+        material->baseMap = Engine::AM.getGuidFromName(doc["baseMap"].GetString());
 
     if (doc.HasMember("normalMap"))
-        material->normalMap = xresource::instance_guid{ std::stoull(doc["normalMap"].GetString(), nullptr, 16) };
+        material->normalMap = Engine::AM.getGuidFromName(doc["normalMap"].GetString());
 
     if (doc.HasMember("metallicMap"))
-        material->metallicMap = xresource::instance_guid{ std::stoull(doc["metallicMap"].GetString(), nullptr, 16) };
+        material->metallicMap = Engine::AM.getGuidFromName(doc["metallicMap"].GetString());
 
     if (doc.HasMember("roughnessMap"))
-        material->roughnessMap = xresource::instance_guid{ std::stoull(doc["roughnessMap"].GetString(), nullptr, 16) };
+        material->roughnessMap = Engine::AM.getGuidFromName(doc["roughnessMap"].GetString());
 
     if (doc.HasMember("emissionMap"))
-        material->emissionMap = xresource::instance_guid{ std::stoull(doc["emissionMap"].GetString(), nullptr, 16) };
+        material->emissionMap = Engine::AM.getGuidFromName(doc["emissionMap"].GetString());
 
     if (doc.HasMember("occlusionMap"))
-        material->occlusionMap = xresource::instance_guid{ std::stoull(doc["occlusionMap"].GetString(), nullptr, 16) };
+        material->occlusionMap = Engine::AM.getGuidFromName(doc["occlusionMap"].GetString());
+
 
     // --- Color Properties (3-component) ---
     if (doc.HasMember("baseColor"))
