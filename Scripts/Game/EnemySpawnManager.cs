@@ -20,54 +20,31 @@ namespace Game
     }
 
     public class EnemySpawnManager : ScriptBehaviour
-    {
-        //public static EnemySpawnManager instance;
-
+    {    
         // Basic toggles
         [SerializeField] private bool isActive = false;
         [SerializeField] private bool spawningAllowed = false;
-
+        [SerializeField] private bool infiniteSpawning = false;
+        
         // Wave tracking
-        [SerializeField] private int CURRENT_WAVE = 0;
         [SerializeField] private int waveEnemiesLeftToSpawn = 0;
 
         // Enemy counts for current wave
         [SerializeField] private int E005_loveletter = 0;
         [SerializeField] private int E004_botnet = 0;
-        [SerializeField] private int E001_worm_host = 0;
-        [SerializeField] private int E003_trojan = 0;
-        [SerializeField] private int E007_adware = 0;
 
         // Spawn timing
-        [SerializeField] private float spawnRate = 2.0f;
+        [SerializeField] private float spawnRate = 1.50f;
         [SerializeField] private float spawnRateNext = 0.0f;
         [SerializeField] private bool isSpawning = false;
-
-        // Wave timers
-        [SerializeField] private float timeBetweenWave = 5.0f;
-
-        //time per wave
-        [SerializeField] private float timeWave = 180.0f;
-
-        //shows the current time it is waiting for (180 for wave, 10 for start, 5 for between)
-        [SerializeField] private float timeCurrent = 10.0f;
-        [SerializeField] private float timeNext = 10.0f;
-
-        //state
-        [SerializeField] private bool BREAK = true;
-        [SerializeField] private bool COMBAT = false;
-
         // Enemy counting
-        //[SerializeField] private int enemiesLeft = 0;
-        private int enemiesLeft = 0;
+        [SerializeField] private int enemiesLeft = 0;
+
         // Prefab names 
         private string[] enemyPrefabNames = new string[]
         {
             "Enemy_Botnet",      // 0
             "Enemy_LoveLetter",  // 1  
-            "Enemy_Worm",        // 2
-            "Enemy_Trojan",      // 3
-            "Enemy_Adware",      // 4
         };
 
         // Create spawn point of equal spacing based off wall scale
@@ -91,32 +68,28 @@ namespace Game
         private Entity[] wallCActiveEntities;
         private Entity[] wallDActiveEntities;
         private Entity[] wallEActiveEntities;
+
         private Entity[] wallInactiveEntities;
-
-        private const uint INVALID_ENTITY = 0xffffffffu;
-
-        // Light entities
-        //private Entity lightPrep;
-        //private Entity lightCombat;
 
         // Simple pseudo-random number generator
         private uint rngSeed;
 
         // Time tracking (since we don't have Time.time)
-        [SerializeField]
-        private float elapsedTime = 0f;
+        [SerializeField] private float elapsedTime = 0f;
+        [SerializeField] private int botnetSpawned = 0;
+        [SerializeField] private int loveletterSpawned = 0;
 
         private string alliesambience = "Flotilla_Gunship_Ambient.wav";
         private string coreambience = "Core_Ambient.wav";
-
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
         private uint spawnmanagerID;
 
-        private bool playbgm = false;
-
+        private bool playInGameSound = false;
+  
         public override void OnStart()
         {
+
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
 
@@ -128,77 +101,84 @@ namespace Game
 
             // Find wall entities
             InitializeWalls();
-
-            // Setup walls for initial state
-            WallSetup_DisableActiveWalls();
-            WallSetup_InactiveWalls();
+            
+            // // Setup walls for initial state
+            EnvironmentReset();
+            
+            // spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            // if(spawnmanagerID != INVALID_ENTITY){
+            //     Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+            // }
 
             InternalCalls.Entity_AddAudio((uint)EntityID);
 
-            timeCurrent = 10.0f;
-            timeNext = 10.0f;
-            spawnRateNext = 0.0f;
-
-            Log("EnemySpawnManager initialized - Wave " + CURRENT_WAVE);
+            Log("EnemySpawnManager initialized");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             //check for the trigger to start
-            if (Input.IsKeyPressed(KeyCode.Enter) && !isActive)
-            {
+            //logically restart will also be via enter!
+            //change of plan. change this part of the code to look for maincamera if enabled.
+            if(Input.IsKeyPressed(KeyCode.Enter) && !isActive){
                 isActive = true;
                 stopmainsound();
+
+                //deactivate all active wall and activate all inactive
+                EnvironmentReset();
+
+                //set the no. of enemies to spawn here
+                //in the function it also activates the wall we spawning enemies from
+                SetupEnemySpawning();
+
+                //play the ingame sounds
+                if(!playInGameSound){
+                    PlayInGameSounds();
+                } 
             }
 
-            if (!isActive)
-            {
+            //check if the game has started
+            if (!isActive){
                 return;
             }
 
-            if (!playbgm)
-            {
-                PlayGameBGM();
-                playbgm = true;
-            }
-
+            //update elapsed time
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
-
-            // Phase transitions
-            if (currentTime > timeNext)
-            {
-                if (BREAK)
-                {
-                    if (CURRENT_WAVE == 0)
-                    {
-                        SetupWaveSpawning();
-                    }
-                    StartCombat();
-                }
-                else if (COMBAT)
-                {
-                    StartPrep();
-                }
-            }
 
             // Spawning logic
             if (spawningAllowed)
             {
                 if (!isSpawning && waveEnemiesLeftToSpawn > 0)
                 {
-                    SpawnEnemyByWaves();
+                    SpawnPresetEnemy();
                 }
                 else
                 {
                     isSpawning = false;
-                    spawningAllowed = false;
+                    //spawningAllowed = false;
+                }
+
+                if(infiniteSpawning){
+                    SetupInfiniteBotnetSpawning();
                 }
             }
+
+            CheckForEnemiesLeft();
+            
         }
 
+        #region setup
+        
         private void InitializeSpawnPoints()
         {
+            // Find spawn points by name pattern
+            // You'll need to have entities named like:
+            // "SpawnPoint_A_1", "SpawnPoint_A_2", "SpawnPoint_A_3", etc.
+            
+            // For now, we'll create arrays to hold them
+            // You'll need to implement Entity.FindByName() or similar
+
             Log("=== Initializing Spawn Points ===");
 
             // Wall A spawn points - register each one
@@ -270,15 +250,15 @@ namespace Game
 
             // Wall E spawn points - register each one
             RegisterSpawnPointsForWall("E", spawnPointsE, new string[] {
-                "SpawnPointB_1",
-                "SpawnPointB_2",
-                "SpawnPointB_3",
-                "SpawnPointB_4",
-                "SpawnPointB_5",
-                "SpawnPointB_6"
+                "SpawnPointE_1",
+                "SpawnPointE_2",
+                "SpawnPointE_3",
+                "SpawnPointE_4",
+                "SpawnPointE_5",
+                "SpawnPointE_6"
             });
-
-            Log("TODO: Initialize spawn points - find entities by name");
+            
+            Log("SpawnManager is initializing spawnpoints for all wall");
         }
 
         private void RegisterSpawnPointsForWall(string wallName, List<SpawnPointData> targetList, string[] spawnPointNames)
@@ -345,6 +325,9 @@ namespace Game
 
         private void InitializeWalls()
         {
+            // Find wall entities by name
+            // Expected names: "Wall_A_Active", "Wall_A_Inactive", etc.
+
             // Helper to create entity list with validation
             wallAActiveEntities = CreateValidEntityArray(new string[]{
                 "WallA1", "WallA2", "WallA3", "WallA4", "WallA5", "WallA6", "WallA_Logo", "WallA_Void"
@@ -381,101 +364,53 @@ namespace Game
                 wallActiveEntities.AddRange(wallDActiveEntities);
             if (wallEActiveEntities != null && wallEActiveEntities.Length > 0)
                 wallActiveEntities.AddRange(wallEActiveEntities);
-
+            
             Log(string.Concat("Initialize wall entities - found ", wallActiveEntities.Count.ToString(), " active walls"));
             Log(string.Concat("Found ", wallInactiveEntities.Length.ToString(), " inactive walls"));
         }
 
-        private void SetupWaveSpawning()
+        private void SetupEnemySpawning()
         {
-            Log("SET UP WAVE SPAWNING HERE");
-            CURRENT_WAVE++;
+            Log("SpawnManager - Setting up enemy spawning");
+            
+            E005_loveletter = 0;
+            E004_botnet = 15;
 
-            switch (CURRENT_WAVE)
-            {
-                case 1:
-                    SetEnemyCount(1, 4, 0, 0, 0);
-                    loveletterRoutes = new string[] { "A1" };
-                    activeSpawnPoints = spawnPointsA;
-                    break;
-                case 2:
-                    SetEnemyCount(3, 13, 0, 0, 0);
-                    loveletterRoutes = new string[] { "A1" };
-                    activeSpawnPoints = new List<SpawnPointData>();
-                    activeSpawnPoints.AddRange(spawnPointsA);
-                    break;
-                case 3:
-                    // not for this milestone
-                    break;
-                default:
-                    Log("Wave " + CURRENT_WAVE + " not configured - using Wave 3 settings");
-                    break;
-            }
+            loveletterRoutes = new string[] {"A1"};
+
+            activeSpawnPoints = spawnPointsA;
 
             // Calculate total enemies to spawn
-            waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet + E001_worm_host + E003_trojan;
-
+            waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
+            
             Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
 
             // Update walls based on loveletter routes
             WallChange(loveletterRoutes);
-        }
-
-        private void SetEnemyCount(int loveletters, int botnets, int worms, int trojans, int adwares)
-        {
-            E005_loveletter = loveletters;
-            E004_botnet = botnets;
-            E001_worm_host = worms;
-            E003_trojan = trojans;
-            E007_adware = adwares;
-        }
-
-        private void StartCombat()
-        {
-            BREAK = false;
-            COMBAT = true;
-
-            //calculate when is the next time (Accumulated) for wave
-            timeNext = elapsedTime + timeWave;
-            timeCurrent = timeWave;
 
             spawningAllowed = true;
-            spawnRateNext = elapsedTime + spawnRate;
-
-            Log(string.Concat("=== COMBAT PHASE START - Wave ", CURRENT_WAVE.ToString(), " ==="));
+            spawnRateNext = elapsedTime;
         }
 
-        private void StartPrep()
-        {
-            BREAK = true;
-            COMBAT = false;
+        private void SetupInfiniteBotnetSpawning(){
+            Log("SpawnManager - Setting up enemy spawning");
+            
+            E004_botnet += 1;
 
-            timeNext = elapsedTime + timeBetweenWave;
-            timeCurrent = timeBetweenWave;
-
-            spawningAllowed = false;
-
-            // Setup next wave
-            if (CURRENT_WAVE < 2)
-            {
-                SetupWaveSpawning();
-            }
-            else
-            {
-                Log("=== ALL WAVES COMPLETE ===");
-                Log("=== AWAITING FOR PLAYERS TO KILL ALL ENEMIES");
-                isActive = false;
-                WallSetup_DisableActiveWalls();
-                WallSetup_InactiveWalls();
-                //StopBGM();
-                playbgm = false;
-            }
+            // Calculate total enemies to spawn
+            waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
+            
+            Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
         }
 
-        private void SpawnEnemyByWaves()
+        #endregion
+
+        #region Spawning
+        
+        private void SpawnPresetEnemy()
         {
-            if (elapsedTime < spawnRateNext)
-            {
+            if (elapsedTime < spawnRateNext){
+                isSpawning = false;
                 return;
             }
 
@@ -494,12 +429,15 @@ namespace Game
 
             // Spawn the enemy
             SpawnEnemy(enemyType);
-
-            waveEnemiesLeftToSpawn--;
-            isSpawning = false;
-
-            Log(string.Concat("Spawned enemy type ", enemyType.ToString(),
+            
+            //waveEnemiesLeftToSpawn--;
+            waveEnemiesLeftToSpawn = E004_botnet + E005_loveletter;
+            //isSpawning = false;
+            
+            Log(string.Concat("Spawned enemy type ", enemyType.ToString(), 
                 " - Remaining: ", waveEnemiesLeftToSpawn.ToString()));
+            Log("spawned botnet count: " + botnetSpawned.ToString());
+            Log("spawned loveletter count: " + loveletterSpawned.ToString());
         }
 
         private int DetermineEnemyTypeToSpawn()
@@ -508,29 +446,16 @@ namespace Game
             if (E005_loveletter > 0)
             {
                 E005_loveletter--;
+                //loveletterSpawned++;
                 return 1; // Loveletter
             }
             else if (E004_botnet > 0)
             {
                 E004_botnet--;
+                //botnetSpawned++;
                 return 0; // Botnet
             }
-            else if (E001_worm_host > 0)
-            {
-                E001_worm_host--;
-                return 2; // Worm
-            }
-            else if (E003_trojan > 0)
-            {
-                E003_trojan--;
-                return 3; // Trojan
-            }
-            else if (E007_adware > 0)
-            {
-                E007_adware--;
-                return 4; // Adware
-            }
-
+            
             return -1; // No enemies left to spawn
         }
 
@@ -539,18 +464,25 @@ namespace Game
             // Get random spawn point
             if (activeSpawnPoints == null || activeSpawnPoints.Count == 0)
             {
+                isSpawning = false;
                 Log("ERROR: No active spawn points!");
                 return;
             }
 
             // Create enemy from prefab
             string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
-
-            if (enemyType == 1)
-            {
-                // Loveletter special spawn logic
+            
+            if(enemyType == 1){
+                //Log("HI LOVELETTER HERE");
                 SpawnLoveLetter(prefabpath);
                 return;
+            }
+
+            //comment this part if u want to test more than 20 botnet.
+            if(botnetSpawned >= 20){
+                if(enemyType == 0){
+                    return;
+                }
             }
 
             int spawnIndex = GetRandomInt(0, activeSpawnPoints.Count);
@@ -566,12 +498,14 @@ namespace Game
             if (enemyID == 0)
             {
                 Log("INVALID ID FOR SPAWNING");
-            }
-            else
-            {
-                Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", ",
-                spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", ",
-                spawnRot.Y.ToString(), ", ", spawnRot.Z.ToString()));
+            } else {
+                if(enemyType == 0){
+                    botnetSpawned++;
+                }
+                InternalCalls.Entity_AddScript(enemyID, "Game.Botnet");
+                Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
+                spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
+                spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
             }
 
             Log(string.Concat("Spawn ", prefabpath, " at position (",
@@ -602,7 +536,7 @@ namespace Game
 
             Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
 
-            //PLAY WARNING AUDIO ONCE
+            // PLAY WARNING AUDIO ONCE
             InternalCalls.Entity_AddAudio(spawnID);
             InternalCalls.Audio_SetFile(spawnID, loveletterwarning);
             InternalCalls.Audio_SetLoop(spawnID, false);
@@ -611,7 +545,9 @@ namespace Game
             InternalCalls.Audio_SetMaxDistance(spawnID, 300.87f);
             InternalCalls.Audio_Play(spawnID);
 
-            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true);
+            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(
+                prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true
+            );
 
             if (enemyID == 0)
             {
@@ -619,62 +555,71 @@ namespace Game
             }
             else
             {
-                Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", ",
-                spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", ",
-                spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString()));
+                loveletterSpawned++;
+                Log(string.Concat(
+                    "Spawn type: loveletter at position ",
+                    spawnPosition.X.ToString(), ", ",
+                    spawnPosition.Y.ToString(), ", ",
+                    spawnPosition.Z.ToString(), " and at rotation ",
+                    spawnRotation.X.ToString(), ", ",
+                    spawnRotation.Y.ToString(), ", ",
+                    spawnRotation.Z.ToString()
+                ));
             }
         }
+
+        #endregion
 
         private void CheckForEnemiesLeft()
         {
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
             uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
-            uint[] trojan = InternalCalls.Scene_FindEntitiesByTag("Enemy_Trojan");
-            uint[] adware = InternalCalls.Scene_FindEntitiesByTag("Enemy_Adware");
-            uint[] worm = InternalCalls.Scene_FindEntitiesByTag("Enemy_Worm");
 
             int totalenemiesleft = 0;
 
             if (loveletter != null && loveletter.Length != 0)
             {
                 totalenemiesleft += loveletter.Length;
+                Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             }
-            else if (botnet != null && botnet.Length != 0)
-            {
+            
+            if (botnet != null && botnet.Length != 0){
                 totalenemiesleft += botnet.Length;
-            }
-            else if (trojan != null && trojan.Length != 0)
-            {
-                totalenemiesleft += trojan.Length;
-            }
-            else if (adware != null && adware.Length != 0)
-            {
-                totalenemiesleft += adware.Length;
-            }
-            else if (worm != null && worm.Length != 0)
-            {
-                totalenemiesleft += worm.Length;
+                Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
 
-            if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)
-            {
+            //keep this here first to debug - amanda
+            // if(botnet == null){
+            //     Log("hello botnet is null");
+            // } else if (botnet.Length == 0){
+            //     Log("hi this is currently 0 for botnet length");
+            // } else if (botnet != null){
+            //     Log("hi this is botnet length that is not null " + botnet.Length.ToString());
+            // }
+            
+            //logic here will have to change in the future when i got player information. 
+            //need detect if player destroy 15 botnets.
+            if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
                 enemiesLeft = 0;
-                EndTime();
-            }
-            else
-            {
+
+                isActive = false;
+                playInGameSound = false;
+                spawningAllowed = false;
+                StopAllOtherAudio();
+                Log("=== Wave Complete ===");
+
+            } else {
                 enemiesLeft = totalenemiesleft;
             }
         }
-
-        private void EndTime()
-        {
-            Log("=== Wave Complete ===");
-            StartPrep();
-        }
-
+        
         #region environment
 
+        private void EnvironmentReset(){
+            WallSetup_DisableActiveWalls();
+            WallSetup_InactiveWalls();
+        }
+        
         // Wall management
         private void WallChange(string[] routes)
         {
@@ -700,8 +645,8 @@ namespace Game
 
         private void WallEnable(int wallIndex)
         {
-            switch (wallIndex)
-            {
+            // Enable active wall, disable inactive wall
+            switch(wallIndex){
                 case 0:
                     if (wallAActiveEntities != null)
                     {
@@ -770,11 +715,9 @@ namespace Game
         private void WallSetup_InactiveWalls()
         {
             // Enable all inactive walls
-            if (wallInactiveEntities != null)
-            {
+            if(wallInactiveEntities != null){
                 Log(string.Concat("Enabling ", wallInactiveEntities.Length.ToString(), " inactive wall entities"));
-                foreach (Entity wall in wallInactiveEntities)
-                {
+                foreach(Entity wall in wallInactiveEntities){
                     if (wall.EntityID != 0)
                     {
                         InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, true);
@@ -787,13 +730,11 @@ namespace Game
         private void WallSetup_DisableActiveWalls()
         {
             // Disable all active walls
-            if (wallActiveEntities != null)
-            {
-                foreach (Entity wall in wallActiveEntities)
-                {
-                    if (wall.EntityID != 0) // Extra safety check
+            if(wallActiveEntities != null){
+                foreach (Entity wall in wallActiveEntities){
+                    if (wall.EntityID != INVALID_ENTITY) // Extra safety check
                     {
-                        Log(string.Concat("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: ", wall.EntityID.ToString()));
+                        //Log(string.Concat("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: ", wall.EntityID.ToString()));
                         InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, false);
                     }
                     else
@@ -844,8 +785,8 @@ namespace Game
             return validEntities.ToArray();
         }
 
-        private void PlayGameBGM()
-        {
+        private void PlayInGameSounds(){
+            //Log("Playbgm hehe");
             spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
             if (spawnmanagerID != INVALID_ENTITY)
             {
@@ -853,6 +794,8 @@ namespace Game
             }
             InternalCalls.Audio_Play(spawnmanagerID);
             PlayAllOtherAudio();
+
+            playInGameSound = true;
         }
 
         //FOR FUTURE PURPOSE

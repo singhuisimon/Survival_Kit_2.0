@@ -21,6 +21,7 @@
 #include "../Scripting/MonoScriptEngine.h"
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
+#include "../Asset/AssetManager.h"
 
 // RapidJSON includes
 #include <rapidjson/document.h>
@@ -234,13 +235,25 @@ namespace Engine
 				componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
 				Value propertiesObj(kObjectType);
-				propertiesObj.AddMember("MeshGuid", mesh.MeshGuid.m_Value, allocator);
-				propertiesObj.AddMember("MaterialGuid", mesh.MaterialGuid.m_Value, allocator);
-				propertiesObj.AddMember("TextureGuid", mesh.TextureGuid.m_Value, allocator);
+
+				std::string meshFilename = AM.getNameFromGuid(mesh.MeshGuid);
+				std::string materialFilename = AM.getNameFromGuid(mesh.MaterialGuid);
+				std::string textureFilename = AM.getNameFromGuid(mesh.TextureGuid);
+
+				propertiesObj.AddMember("Mesh",
+					Value(meshFilename.empty() ? "" : meshFilename.c_str(), allocator),
+					allocator);
+				propertiesObj.AddMember("Material",
+					Value(materialFilename.empty() ? "" : materialFilename.c_str(), allocator),
+					allocator);
+				propertiesObj.AddMember("Texture",
+					Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
+					allocator);
+				//LOG_DEBUG("TextureGuid in serializer SerializeToString(): ", mesh.TextureGuid.m_Value);
 				propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 				propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
-				propertiesObj.AddMember("Material", mesh.Material, allocator);
-				propertiesObj.AddMember("Texture", mesh.Texture, allocator);
+				propertiesObj.AddMember("MaterialIdx", mesh.Material, allocator);
+				propertiesObj.AddMember("TextureIdx", mesh.Texture, allocator);
 				propertiesObj.AddMember("SubmeshIndex", mesh.SubmeshIndex, allocator);
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
@@ -518,6 +531,20 @@ namespace Engine
 
 		doc.AddMember("Entities", entitiesArray, allocator);
 
+		// Update settings
+		Value settingsArray(kArrayType);
+		Value settingsObj(kObjectType);
+
+		// TODO: replace these with wherever you actually store the values
+		auto& sceneSettings = m_Scene->GetSceneSetting();
+		settingsObj.AddMember("BloomToggle", sceneSettings.s_BloomToggle, allocator);
+		settingsObj.AddMember("BloomStrength", sceneSettings.s_BloomStrength, allocator);
+		settingsObj.AddMember("BloomFilterRadius", sceneSettings.s_BloomFilterRadius, allocator);
+		settingsObj.AddMember("Exposure", sceneSettings.s_Exposure, allocator);
+
+		settingsArray.PushBack(settingsObj, allocator);
+		doc.AddMember("Settings", settingsArray, allocator);
+
 		// Convert to string
 		StringBuffer buffer;
 		PrettyWriter<StringBuffer> writer(buffer);
@@ -631,19 +658,19 @@ namespace Engine
 
 				for (SizeType j = 0; j < components.Size(); j++)
 				{
-					const Value &componentObj = components[j];
+					const Value& componentObj = components[j];
 					std::string componentType = componentObj["Type"].GetString();
-					const Value &properties = componentObj["Properties"];
+					const Value& properties = componentObj["Properties"];
 
 					// Deserialize specific component types
 					if (componentType == "TagComponent")
 					{
-						auto &tag = entity.AddComponent<TagComponent>();
+						auto& tag = entity.AddComponent<TagComponent>();
 						tag.Tag = properties["Tag"].GetString();
 					}
 					else if (componentType == "PrefabComponent")
 					{
-						auto &prefabComp = entity.AddComponent<PrefabComponent>();
+						auto& prefabComp = entity.AddComponent<PrefabComponent>();
 
 						// --- Prefab GUID ---
 						if (properties.HasMember("PrefabGUID"))
@@ -661,12 +688,12 @@ namespace Engine
 					}
 					else if (componentType == "TransformComponent")
 					{
-						auto &transform = entity.AddComponent<TransformComponent>();
+						auto& transform = entity.AddComponent<TransformComponent>();
 
 						// Position
 						if (properties.HasMember("Position"))
 						{
-							const Value &posArray = properties["Position"];
+							const Value& posArray = properties["Position"];
 							transform.Position = glm::vec3(
 								posArray[0].GetFloat(),
 								posArray[1].GetFloat(),
@@ -677,7 +704,7 @@ namespace Engine
 						// Rotation - Convert Euler angles to quaternion
 						if (properties.HasMember("Rotation"))
 						{
-							const Value &rotArray = properties["Rotation"];
+							const Value& rotArray = properties["Rotation"];
 							glm::vec3 eulerRotation(
 								rotArray[0].GetFloat(),
 								rotArray[1].GetFloat(),
@@ -689,7 +716,7 @@ namespace Engine
 						// Scale
 						if (properties.HasMember("Scale"))
 						{
-							const Value &scaleArray = properties["Scale"];
+							const Value& scaleArray = properties["Scale"];
 							transform.Scale = glm::vec3(
 								scaleArray[0].GetFloat(),
 								scaleArray[1].GetFloat(),
@@ -706,7 +733,7 @@ namespace Engine
 						{
 
 							transform.Children.clear();
-							const Value &childrenArray = properties["Children"];
+							const Value& childrenArray = properties["Children"];
 
 							for (rapidjson::SizeType i = 0; i < childrenArray.Size(); ++i)
 								transform.Children.push_back(childrenArray[i].GetUint());
@@ -715,7 +742,7 @@ namespace Engine
 					}
 					else if (componentType == "CameraComponent")
 					{
-						auto &camera = entity.AddComponent<CameraComponent>();
+						auto& camera = entity.AddComponent<CameraComponent>();
 
 						if (properties.HasMember("Enabled"))
 							camera.Enabled = properties["Enabled"].GetBool();
@@ -728,7 +755,7 @@ namespace Engine
 
 						if (properties.HasMember("Size"))
 						{
-							const Value &size = properties["Size"];
+							const Value& size = properties["Size"];
 							camera.Size = glm::vec2(
 								size[0].GetFloat(),
 								size[1].GetFloat()
@@ -747,7 +774,7 @@ namespace Engine
 
 						if (properties.HasMember("Target"))
 						{
-							const Value &target = properties["Target"];
+							const Value& target = properties["Target"];
 							camera.Target = glm::vec3(
 								target[0].GetFloat(),
 								target[1].GetFloat(),
@@ -757,23 +784,72 @@ namespace Engine
 					}
 					else if (componentType == "MeshRendererComponent")
 					{
-						auto &mesh = entity.AddComponent<MeshRendererComponent>();
+						auto& mesh = entity.AddComponent<MeshRendererComponent>();
+
+						// Handle filename fields (strings)
+						if (properties.HasMember("Mesh") && properties["Mesh"].IsString())
+						{
+							std::string meshName = properties["Mesh"].GetString();
+							mesh.MeshGuid = AM.getGuidFromName(meshName);
+						}
+
+						if (properties.HasMember("Material") && properties["Material"].IsString())
+						{
+							std::string matName = properties["Material"].GetString();
+							mesh.MaterialGuid = AM.getGuidFromName(matName);
+						}
+
+						if (properties.HasMember("Texture") && properties["Texture"].IsString())
+						{
+							std::string texName = properties["Texture"].GetString();
+							mesh.TextureGuid = AM.getGuidFromName(texName);
+						}
+
+						// Handle old GUID fields (for backward compatibility)
 						if (properties.HasMember("MeshGuid"))
+						{
 							mesh.MeshGuid = xresource::instance_guid{ properties["MeshGuid"].GetUint64() };
+						}
+
 						if (properties.HasMember("MaterialGuid"))
 						{
 							mesh.MaterialGuid = xresource::instance_guid{ properties["MaterialGuid"].GetUint64() };
 						}
+
 						if (properties.HasMember("TextureGuid"))
 						{
 							mesh.TextureGuid = xresource::instance_guid{ properties["TextureGuid"].GetUint64() };
 						}
+
+						// Handle other properties
 						if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
 						if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
-						if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
-						if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
+
+						// FIXED: Check if "Material" is a NUMBER before reading as integer
+						if (properties.HasMember("Material") && properties["Material"].IsNumber())
+						{
+							mesh.Material = properties["Material"].GetUint();
+						}
+						// Also check for the new name "MaterialIdx"
+						else if (properties.HasMember("MaterialIdx"))
+						{
+							mesh.Material = properties["MaterialIdx"].GetUint();
+						}
+
+						// FIXED: Check if "Texture" is a NUMBER before reading as integer
+						if (properties.HasMember("Texture") && properties["Texture"].IsNumber())
+						{
+							mesh.Texture = properties["Texture"].GetUint();
+						}
+						// Also check for the new name "TextureIdx"
+						else if (properties.HasMember("TextureIdx"))
+						{
+							mesh.Texture = properties["TextureIdx"].GetUint();
+						}
+
 						if (properties.HasMember("SubmeshIndex")) mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
 					}
+			
 					else if (componentType == "RigidbodyComponent")
 					{
 						auto &rb = entity.AddComponent<RigidbodyComponent>();
@@ -1079,6 +1155,36 @@ namespace Engine
 					}
 				}
 			}
+		}
+
+		// Read entities
+		if (doc.HasMember("Settings")) {
+			if (doc["Settings"].IsArray()) {
+				// Update current settings
+				auto& sceneSettings = m_Scene->GetSceneSetting();
+			
+				const auto& settingsArray = doc["Settings"].GetArray();
+				if (!settingsArray.Empty() && settingsArray[0].IsObject())
+				{
+					const auto& s = settingsArray[0];
+
+					if (s.HasMember("BloomToggle") && s["BloomToggle"].IsBool())
+						sceneSettings.s_BloomToggle = s["BloomToggle"].GetBool();
+
+					if (s.HasMember("BloomStrength") && s["BloomStrength"].IsFloat())
+						sceneSettings.s_BloomStrength = s["BloomStrength"].GetFloat();
+
+					if (s.HasMember("BloomFilterRadius") && s["BloomFilterRadius"].IsFloat())
+						sceneSettings.s_BloomFilterRadius = s["BloomFilterRadius"].GetFloat();
+
+					if (s.HasMember("Exposure") && s["Exposure"].IsFloat())
+						sceneSettings.s_Exposure = s["Exposure"].GetFloat();
+				}
+			}
+		}
+		else {
+			LOG_ERROR("No settings array in scene file");
+			return false;
 		}
 
 		LOG_INFO("Scene deserialized successfully");

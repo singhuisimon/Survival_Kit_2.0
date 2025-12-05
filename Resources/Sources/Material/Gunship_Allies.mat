@@ -1,11 +1,11 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "4051086a3e19403f",
-    "normalMap": "51086a3e194041",
-    "metallicMap": "0",
-    "roughnessMap": "0",
-    "emissionMap": "0",
-    "occlusionMap": "0",
+    "baseMap": "",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
     "baseColor": [
         1.0,
         1.0,

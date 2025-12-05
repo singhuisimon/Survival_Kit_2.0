@@ -1,0 +1,7 @@
+{
+    "PrefabVersion": "1.0",
+    "Name": "Ground_Below",
+    "GUID": "2713964606272767541",
+    "Type": "Entity",
+    "EntityData": "{\"ID\":7340182,\"Components\":[{\"Type\":\"TagComponent\",\"Properties\":{\"ComponentGUID\":\"7325650624698762799\",\"Tag\":\"Ground_Below\"}},{\"Type\":\"TransformComponent\",\"Properties\":{\"Position\":[0.0,-251.0,-300.0],\"Rotation\":[4.371138828673793e-8,1.0,4.371138828673793e-8,1.910685465164705e-15],\"Scale\":[1.996999979019165,1.996999979019165,1.996999979019165],\"Parent\":4294967295,\"Children\":[]}},{\"Type\":\"MeshRendererComponent\",\"Properties\":{\"Mesh\":\"level_design_v003.fbx\",\"Material\":\"LevelDesign_GroundBelow.mat\",\"Texture\":\"\",\"Visible\":true,\"MeshType\":0,\"Material\":0,\"Texture\":0,\"SubmeshIndex\":0}}]}"
+}

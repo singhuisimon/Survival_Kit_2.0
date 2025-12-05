@@ -240,7 +240,7 @@ namespace Engine {
 				else if (pathWithoutResources.find("/Resources/") == 0) {
 					pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 				}
-				std::string sourceRoot = AssetManager::GetSourceResourcesPath();
+				std::string sourceRoot = Engine::getAssetsPath();
 				fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
 				//normalize here as well for safety

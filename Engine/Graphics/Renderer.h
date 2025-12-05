@@ -160,8 +160,7 @@ namespace Engine {
 		inline bool& getBloomToggle() { return m_bloomOn; }
 		inline float& getBloomStrength() { return m_bloomStrength; }
 		inline float& getBloomFilterRadius() { return m_bloomFilterRadius; }
-
-		float m_exposure = 1.0;
+		inline float& getExposure() { return m_exposure; }
 
 	private:
 		/**
@@ -226,8 +225,8 @@ namespace Engine {
 		bool  m_bloomOn = false;
 
 		// Physically-based bloom strength (mix factor in final pass; reco ~0.03-0.15)
-		float m_bloomStrength = 0.04f;  
-		float m_bloomFilterRadius = 0.005f;
+		float m_bloomStrength = 0.01f;  
+		float m_bloomFilterRadius = 0.0025f;
 
 		// Cached scene size for bloom
 		glm::ivec2 m_bloomSrcSize{ 1280, 720 };
@@ -239,7 +238,10 @@ namespace Engine {
 		void renderBloomUpsamples(float filterRadius);
 		/*------------------- BLOOM PROPERTIES/DATA ------------------*/
 
-		// Engine Provided Items
+		// Exposure value
+		float m_exposure = 1.0;
+
+		// Engine Provided Items1
 		MeshGL m_skybox; // Default engine provided skybox
 		GLuint m_skybox_texture; // Will need to change
 		void renderSkyboxHDR();

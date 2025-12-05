@@ -26,6 +26,14 @@ namespace Engine {
          */
         Entity CreateEntity(const std::string& name = "Entity");
 
+        // Settings struct
+        struct SceneSettings
+        {
+            bool s_BloomToggle = false;
+            float s_BloomStrength = 0.01;
+            float s_BloomFilterRadius = 0.0025;
+            float s_Exposure = 1.0;
+        };
 
         /**
   * @brief Get an entity by its ID
@@ -177,6 +185,8 @@ namespace Engine {
             m_SystemRegistry.OnShutdown(this);
         }
 
+        // Get scene setting
+        SceneSettings& GetSceneSetting() { return m_Settings; }
 
         /**
   * @brief Find an entity by its tag/name
@@ -189,6 +199,7 @@ namespace Engine {
         std::string m_Name;
         entt::registry m_Registry;
         SystemRegistry m_SystemRegistry;
+        SceneSettings m_Settings;
 
         friend class SceneSerializer;
     };
