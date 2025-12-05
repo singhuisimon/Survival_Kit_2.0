@@ -1,3 +1,4 @@
+// Botnet.cs
 using Engine;
 using System;
 
@@ -6,7 +7,7 @@ namespace Game
     /// <summary>
     /// Port of EnemyE004_BOTNET from Unity to custom engine script.
     /// Uses rigidbody physics via InternalCalls and simple tag-based targeting.
-    /// Now with look-at functionality!
+    /// Now with look-at functionality using quaternion-only rotation.
     /// </summary>
     public class Botnet : ScriptBehaviour
     {
@@ -163,7 +164,7 @@ namespace Game
             }
         }
 
-        public override void OnDestroy()   // NEW
+        public override void OnDestroy()
         {
             EventSystem.Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
         }
@@ -322,58 +323,47 @@ namespace Game
             if (targetID == INVALID_ENTITY)
                 return;
 
-            Vector3 myPos = Transform.GetPosition((uint)EntityID);
+            uint self = (uint)EntityID;
+
+            // Positions
+            Vector3 myPos = Transform.GetPosition(self);
             Vector3 targetPos = Transform.GetPosition(targetID);
 
-            // Calculate desired direction
-            Vector3 direction = targetPos - myPos;
+            // Direction to target
+            Vector3 toTarget = new Vector3(
+                targetPos.X - myPos.X,
+                targetPos.Y - myPos.Y,
+                targetPos.Z - myPos.Z
+            );
 
-            float lenSq = direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z;
+            // Normalize direction
+            float lenSq = toTarget.X * toTarget.X +
+                          toTarget.Y * toTarget.Y +
+                          toTarget.Z * toTarget.Z;
             if (lenSq <= 0.0001f)
                 return;
 
             float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-            direction.X *= invLen;
-            direction.Y *= invLen;
-            direction.Z *= invLen;
+            toTarget.X *= invLen;
+            toTarget.Y *= invLen;
+            toTarget.Z *= invLen;
 
-            // Calculate target yaw and pitch (in degrees)
-            float targetYaw = SimpleMath.Atan2(direction.X, direction.Z) * SimpleMath.RAD_TO_DEG;
-            float targetPitch = SimpleMath.Asin(-direction.Y) * SimpleMath.RAD_TO_DEG;
+            // Engine convention: forward is +Z for identity rotation
+            Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
 
-            // Get current rotation as quaternion, convert to Euler (radians), then to degrees
-            Quat currentQuat = Transform.GetRotation((uint)EntityID);
-            Vector3 currentEulerRad = currentQuat.ToEuler();
+            // Current orientation (quat)
+            Quat currentRot = Transform.GetRotation(self);
 
-            Vector3 currentEulerDeg = new Vector3(
-                currentEulerRad.X * SimpleMath.RAD_TO_DEG,
-                currentEulerRad.Y * SimpleMath.RAD_TO_DEG,
-                currentEulerRad.Z * SimpleMath.RAD_TO_DEG
-            );
+            // Desired orientation: rotate +Z to face toTarget (world-space)
+            Quat targetRot = QuaternionFromTo(forward, toTarget);
 
-            // Smoothly interpolate to target rotation
+            // Interpolation factor based on rotateSpeed
             float t = SimpleMath.Clamp(rotateSpeed * deltaTime, 0.0f, 1.0f);
 
-            float newYaw = LerpAngle(currentEulerDeg.Y, targetYaw, t);
-            float newPitch = LerpAngle(currentEulerDeg.X, targetPitch, t);
+            // Smoothly rotate towards target using nlerp (shortest path)
+            Quat newRot = Nlerp(currentRot, targetRot, t);
 
-            Vector3 newEulerDeg = new Vector3(newPitch, newYaw, 0.0f);
-
-            // Convert back to radians for quaternion construction
-            Vector3 newEulerRad = new Vector3(
-                newEulerDeg.X * SimpleMath.DEG_TO_RAD,
-                newEulerDeg.Y * SimpleMath.DEG_TO_RAD,
-                newEulerDeg.Z * SimpleMath.DEG_TO_RAD
-            );
-
-            Quat newQuat = Quat.FromEuler(newEulerRad);
-            Transform.SetRotation((uint)EntityID, ref newQuat);
-        }
-
-        private float LerpAngle(float a, float b, float t)
-        {
-            float delta = ((b - a + 540.0f) % 360.0f) - 180.0f;
-            return a + delta * t;
+            Transform.SetRotation(self, ref newRot);
         }
 
         private void MoveTowardsTarget(float deltaTime)
@@ -522,7 +512,78 @@ namespace Game
             }
         }
 
-        // ===== RNG Helpers =====
+        private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
+        {
+            float dot = from.X * to.X + from.Y * to.Y + from.Z * to.Z;
+
+            if (dot < -0.9999f)
+            {
+                Quat q180;
+                q180.X = 0.0f;
+                q180.Y = 1.0f;
+                q180.Z = 0.0f;
+                q180.W = 0.0f;
+                return q180;
+            }
+
+            // General case: use cross product
+            Vector3 cross = new Vector3(
+                from.Y * to.Z - from.Z * to.Y,
+                from.Z * to.X - from.X * to.Z,
+                from.X * to.Y - from.Y * to.X
+            );
+
+            float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
+            float invS = 1.0f / s;
+
+            Quat q;
+            q.X = cross.X * invS;
+            q.Y = cross.Y * invS;
+            q.Z = cross.Z * invS;
+            q.W = 0.5f * s;
+
+            return q;
+        }
+
+        private static Quat Nlerp(Quat a, Quat b, float t)
+        {
+            float dot = a.X * b.X + a.Y * b.Y + a.Z * b.Z + a.W * b.W;
+            if (dot < 0.0f)
+            {
+                b.X = -b.X;
+                b.Y = -b.Y;
+                b.Z = -b.Z;
+                b.W = -b.W;
+            }
+
+            float invT = 1.0f - t;
+
+            Quat result;
+            result.X = a.X * invT + b.X * t;
+            result.Y = a.Y * invT + b.Y * t;
+            result.Z = a.Z * invT + b.Z * t;
+            result.W = a.W * invT + b.W * t;
+
+            float lenSq = result.X * result.X +
+                          result.Y * result.Y +
+                          result.Z * result.Z +
+                          result.W * result.W;
+
+            if (lenSq > 0.000001f)
+            {
+                float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+                result.X *= invLen;
+                result.Y *= invLen;
+                result.Z *= invLen;
+                result.W *= invLen;
+            }
+            else
+            {
+                result = a;
+            }
+
+            return result;
+        }
 
         private static uint NextUInt()
         {

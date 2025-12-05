@@ -43,48 +43,6 @@ namespace Engine
         }
 
         /// <summary>
-        /// World rotation as Euler angles in radians.
-        /// Wraps the quaternion Rotation property.
-        /// </summary>
-        public Vector3 RotationEulerRadians
-        {
-            get
-            {
-                return Rotation.ToEuler();
-            }
-            set
-            {
-                Rotation = Quat.FromEuler(value);
-            }
-        }
-
-        /// <summary>
-        /// World rotation as Euler angles in degrees.
-        /// Convenience wrapper for designers who prefer degrees.
-        /// </summary>
-        public Vector3 RotationEulerDegrees
-        {
-            get
-            {
-                Vector3 eulerRad = Rotation.ToEuler();
-                return new Vector3(
-                    eulerRad.X * SimpleMath.RAD_TO_DEG,
-                    eulerRad.Y * SimpleMath.RAD_TO_DEG,
-                    eulerRad.Z * SimpleMath.RAD_TO_DEG
-                );
-            }
-            set
-            {
-                Vector3 eulerRad = new Vector3(
-                    value.X * SimpleMath.DEG_TO_RAD,
-                    value.Y * SimpleMath.DEG_TO_RAD,
-                    value.Z * SimpleMath.DEG_TO_RAD
-                );
-                Rotation = Quat.FromEuler(eulerRad);
-            }
-        }
-
-        /// <summary>
         /// Local scale of this entity.
         /// </summary>
         public Vector3 Scale
@@ -101,50 +59,26 @@ namespace Engine
             }
         }
 
-        // ---------------------------------
-        // Instance helpers
-        // ---------------------------------
-
-        /// <summary>
-        /// Rotates by multiplying the current rotation with the given quaternion.
-        /// </summary>
         public void Rotate(Quat rotation)
         {
             Rotation = Rotation * rotation;
         }
 
-        /// <summary>
-        /// Rotates by a given axis and angle (in radians).
-        /// </summary>
         public void RotateAxisAngle(Vector3 axis, float angleRadians)
         {
             Quat deltaRotation = Quat.FromAxisAngle(axis, angleRadians);
             Rotation = Rotation * deltaRotation;
         }
 
-        /// <summary>
-        /// Rotates this transform so its forward faces the target position.
-        /// </summary>
-        public void LookAt(Vector3 target)
-        {
-            Vector3 direction = (target - Position).Normalized;
-
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z);
-            float pitch = SimpleMath.Asin(-direction.Y);
-
-            Vector3 eulerRadians = new Vector3(pitch, yaw, 0.0f);
-            Rotation = Quat.FromEuler(eulerRadians);
-        }
-
-        /// <summary>
-        /// Static version: Rotates entity to look at target position.
-        /// </summary>
         public static void LookAt(uint entityID, Vector3 target)
         {
             Vector3 myPos = GetPosition(entityID);
             Vector3 direction = target - myPos;
 
-            float lenSq = direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z;
+            // Normalize direction
+            float lenSq = direction.X * direction.X +
+                          direction.Y * direction.Y +
+                          direction.Z * direction.Z;
             if (lenSq <= 0.0001f)
                 return;
 
@@ -153,11 +87,44 @@ namespace Engine
             direction.Y *= invLen;
             direction.Z *= invLen;
 
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z);
-            float pitch = SimpleMath.Asin(-direction.Y);
+            Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
 
-            Vector3 eulerRadians = new Vector3(pitch, yaw, 0.0f);
-            Quat rotation = Quat.FromEuler(eulerRadians);
+            float dot = forward.X * direction.X +
+                        forward.Y * direction.Y +
+                        forward.Z * direction.Z;
+
+            Quat rotation;
+
+            if (dot < -0.9999f)
+            {
+                rotation = new Quat
+                {
+                    X = 0.0f,
+                    Y = 1.0f,
+                    Z = 0.0f,
+                    W = 0.0f
+                };
+            }
+            else
+            {
+                Vector3 cross = new Vector3(
+                    forward.Y * direction.Z - forward.Z * direction.Y,
+                    forward.Z * direction.X - forward.X * direction.Z,
+                    forward.X * direction.Y - forward.Y * direction.X
+                );
+
+                float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
+                float invS = 1.0f / s;
+
+                rotation = new Quat
+                {
+                    X = cross.X * invS,
+                    Y = cross.Y * invS,
+                    Z = cross.Z * invS,
+                    W = 0.5f * s
+                };
+            }
+
             SetRotation(entityID, ref rotation);
         }
 
@@ -187,49 +154,6 @@ namespace Engine
         public static void SetRotation(uint entityID, ref Quat rotation)
         {
             InternalCalls.Transform_SetRotation(entityID, ref rotation);
-        }
-
-        /// <summary>
-        /// Gets world rotation as Euler angles in radians for an entity ID.
-        /// </summary>
-        public static Vector3 GetRotationEulerRadians(uint entityID)
-        {
-            return GetRotation(entityID).ToEuler();
-        }
-
-        /// <summary>
-        /// Sets world rotation from Euler angles in radians for an entity ID.
-        /// </summary>
-        public static void SetRotationEulerRadians(uint entityID, ref Vector3 eulerRadians)
-        {
-            Quat rotation = Quat.FromEuler(eulerRadians);
-            SetRotation(entityID, ref rotation);
-        }
-
-        /// <summary>
-        /// Gets world rotation as Euler angles in degrees for an entity ID.
-        /// </summary>
-        public static Vector3 GetRotationEulerDegrees(uint entityID)
-        {
-            Vector3 eulerRadians = GetRotationEulerRadians(entityID);
-            return new Vector3(
-                eulerRadians.X * SimpleMath.RAD_TO_DEG,
-                eulerRadians.Y * SimpleMath.RAD_TO_DEG,
-                eulerRadians.Z * SimpleMath.RAD_TO_DEG
-            );
-        }
-
-        /// <summary>
-        /// Sets world rotation from Euler angles in degrees for an entity ID.
-        /// </summary>
-        public static void SetRotationEulerDegrees(uint entityID, ref Vector3 eulerDegrees)
-        {
-            Vector3 eulerRadians = new Vector3(
-                eulerDegrees.X * SimpleMath.DEG_TO_RAD,
-                eulerDegrees.Y * SimpleMath.DEG_TO_RAD,
-                eulerDegrees.Z * SimpleMath.DEG_TO_RAD
-            );
-            SetRotationEulerRadians(entityID, ref eulerRadians);
         }
 
         public static Vector3 GetScale(uint entityID)
