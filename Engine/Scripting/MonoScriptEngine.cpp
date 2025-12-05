@@ -181,11 +181,11 @@ namespace Engine
 
 
 
-		if (!m_AppDomain)
+	/*	if (!m_AppDomain)
 		{
 			LOG_ERROR("Failed to create Mono app domain");
 			return;
-		}
+		}*/
 		mono_domain_set(m_AppDomain, false);
 
 
@@ -234,23 +234,21 @@ namespace Engine
 	{
 		LOG_INFO("Shutting down Mono Script Engine...");
 
+		// Unload assembly (clears mAppAssembly and mAppImage)
 		UnloadAssembly();
 
-		if (m_AppDomain)
-		{
-			mono_domain_set(m_RootDomain, false);
-			mono_domain_unload(m_AppDomain);
-			m_AppDomain = nullptr;
-		}
+		// The OS will clean up Mono memory when the process exits
 
-		if (m_RootDomain)
-		{
-			mono_jit_cleanup(m_RootDomain);
-			m_RootDomain = nullptr;
-		}
+
+		// Just null the pointers
+		m_RootDomain = nullptr;
+		m_AppDomain = nullptr;
+
+
 
 		LOG_INFO("Mono Script Engine shut down");
 	}
+
 
 	void MonoScriptEngine::LoadAssembly(const std::string &path)
 	{
@@ -290,30 +288,30 @@ namespace Engine
 		m_AppAssembly = nullptr;
 	}
 
-	void MonoScriptEngine::ReloadAssembly()
-	{
-		LOG_INFO("Hot-reload: Starting...");
-		ClearAllInstances();
-		LOG_INFO("Hot-reload: Cleared instance tracking");
+	//void MonoScriptEngine::ReloadAssembly()
+	//{
+	//	LOG_INFO("Hot-reload: Starting...");
+	//	ClearAllInstances();
+	//	LOG_INFO("Hot-reload: Cleared instance tracking");
 
-		UnloadAssembly();
-		mono_domain_set(m_RootDomain, false);
-		mono_domain_unload(m_AppDomain);
+	//	UnloadAssembly();
+	//	mono_domain_set(m_RootDomain, false);
+	//	mono_domain_unload(m_AppDomain);
 
-		LOG_INFO("Hot-reload: Domain unloaded");
+	//	LOG_INFO("Hot-reload: Domain unloaded");
 
-		ScriptReloader::GetInstance().FinalizeDllSwap();
-		LOG_INFO("Hot-reload: DLL swapped");
+	//	ScriptReloader::GetInstance().FinalizeDllSwap();
+	//	LOG_INFO("Hot-reload: DLL swapped");
 
-		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
-		mono_domain_set(m_AppDomain, true);
+	//	m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+	//	mono_domain_set(m_AppDomain, true);
 
-		LoadAssembly(m_AssemblyPath);
-		RegisterInternalCalls();
+	//	LoadAssembly(m_AssemblyPath);
+	//	RegisterInternalCalls();
 
-		LOG_INFO("Hot-reload: Domain reloaded");
-		LOG_INFO("Hot-reload: Complete!");
-	}
+	//	LOG_INFO("Hot-reload: Domain reloaded");
+	//	LOG_INFO("Hot-reload: Complete!");
+	//}
 
 
 	MonoClass *MonoScriptEngine::GetScriptClass(const std::string &className)

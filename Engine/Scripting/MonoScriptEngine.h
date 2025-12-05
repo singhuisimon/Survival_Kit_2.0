@@ -60,7 +60,7 @@ namespace Engine {
 		void BindEntityID(MonoObject *instance, std::uint32_t entityID);
 
 		// Hot reload support
-		void ReloadAssembly();
+		//void ReloadAssembly();
 		void EnsureCorrectDomain();
 
 		bool IsInCorrectDomain();
