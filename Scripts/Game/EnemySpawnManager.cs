@@ -157,7 +157,7 @@ namespace Game{
                 else
                 {
                     isSpawning = false;
-                    spawningAllowed = false;
+                    //spawningAllowed = false;
                 }
             }
 
@@ -366,7 +366,7 @@ namespace Game{
         {
             Log("SpawnManager - Setting up enemy spawning");
             
-            E005_loveletter = 1;
+            E005_loveletter = 0;
             E004_botnet = 15;
 
             loveletterRoutes = new string[] {"A1"};
@@ -392,6 +392,7 @@ namespace Game{
         private void SpawnPresetEnemy()
         {
             if (elapsedTime < spawnRateNext){
+                isSpawning = false;
                 return;
             }
             
@@ -412,7 +413,7 @@ namespace Game{
             SpawnEnemy(enemyType);
             
             waveEnemiesLeftToSpawn--;
-            isSpawning = false;
+            //isSpawning = false;
 
             Log(string.Concat("Spawned enemy type ", enemyType.ToString(), 
                 " - Remaining: ", waveEnemiesLeftToSpawn.ToString()));
@@ -440,6 +441,7 @@ namespace Game{
             // Get random spawn point
             if (activeSpawnPoints == null || activeSpawnPoints.Count == 0)
             {
+                isSpawning = false;
                 Log("ERROR: No active spawn points!");
                 return;
             }
@@ -560,22 +562,35 @@ namespace Game{
             // For now, just track the counter
 
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
-            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("Botnet");
+            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
 
             int totalenemiesleft = 0;
 
             if(loveletter != null && loveletter.Length != 0){
                 totalenemiesleft += loveletter.Length;
                 Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
-            } else if (botnet != null && botnet.Length != 0){
+            }
+            
+            if (botnet != null && botnet.Length != 0){
                 totalenemiesleft += botnet.Length;
                 Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
+
+            //keep this here first to debug - amanda
+            // if(botnet == null){
+            //     Log("hello botnet is null");
+            // } else if (botnet.Length == 0){
+            //     Log("hi this is currently 0 for botnet length");
+            // } else if (botnet != null){
+            //     Log("hi this is botnet length that is not null " + botnet.Length.ToString());
+            // }
             
             if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
                 enemiesLeft = 0;
 
                 isActive = false;
+                playInGameSound = false;
+                spawningAllowed = false;
                 StopAllOtherAudio();
                 Log("=== Wave Complete ===");
 
