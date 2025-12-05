@@ -26,13 +26,13 @@ namespace Engine
         }
 
         /// <summary>
-        /// World rotation as Euler angles in degrees (pitch, yaw, roll).
+        /// World rotation as a quaternion (primary representation).
         /// </summary>
-        public Vector3 Rotation
+        public Quat Rotation
         {
             get
             {
-                Vector3 rot;
+                Quat rot;
                 InternalCalls.Transform_GetRotation(Entity.EntityID, out rot);
                 return rot;
             }
@@ -59,44 +59,26 @@ namespace Engine
             }
         }
 
-        // ---------------------------------
-        // Instance helpers
-        // ---------------------------------
-
-        /// <summary>
-        /// Adds to the current rotation (Euler degrees).
-        /// </summary>
-        public void Rotate(Vector3 rotation)
+        public void Rotate(Quat rotation)
         {
-            Rotation = Rotation + rotation;
+            Rotation = Rotation * rotation;
         }
 
-        /// <summary>
-        /// Rotates this transform so its forward faces the target position.
-        /// Uses custom math functions to avoid System.Math dependency.
-        /// </summary>
-        public void LookAt(Vector3 target)
+        public void RotateAxisAngle(Vector3 axis, float angleRadians)
         {
-            Vector3 direction = (target - Position).Normalized;
-
-            // Calculate yaw (rotation around Y axis)
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z) * SimpleMath.RAD_TO_DEG;
-
-            // Calculate pitch (rotation around X axis)
-            float pitch = SimpleMath.Asin(-direction.Y) * SimpleMath.RAD_TO_DEG;
-
-            Rotation = new Vector3(pitch, yaw, 0.0f);
+            Quat deltaRotation = Quat.FromAxisAngle(axis, angleRadians);
+            Rotation = Rotation * deltaRotation;
         }
 
-        /// <summary>
-        /// Static version: Rotates entity to look at target position.
-        /// </summary>
         public static void LookAt(uint entityID, Vector3 target)
         {
             Vector3 myPos = GetPosition(entityID);
             Vector3 direction = target - myPos;
 
-            float lenSq = direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z;
+            // Normalize direction
+            float lenSq = direction.X * direction.X +
+                          direction.Y * direction.Y +
+                          direction.Z * direction.Z;
             if (lenSq <= 0.0001f)
                 return;
 
@@ -105,10 +87,44 @@ namespace Engine
             direction.Y *= invLen;
             direction.Z *= invLen;
 
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z) * SimpleMath.RAD_TO_DEG;
-            float pitch = SimpleMath.Asin(-direction.Y) * SimpleMath.RAD_TO_DEG;
+            Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
 
-            Vector3 rotation = new Vector3(pitch, yaw, 0.0f);
+            float dot = forward.X * direction.X +
+                        forward.Y * direction.Y +
+                        forward.Z * direction.Z;
+
+            Quat rotation;
+
+            if (dot < -0.9999f)
+            {
+                rotation = new Quat
+                {
+                    X = 0.0f,
+                    Y = 1.0f,
+                    Z = 0.0f,
+                    W = 0.0f
+                };
+            }
+            else
+            {
+                Vector3 cross = new Vector3(
+                    forward.Y * direction.Z - forward.Z * direction.Y,
+                    forward.Z * direction.X - forward.X * direction.Z,
+                    forward.X * direction.Y - forward.Y * direction.X
+                );
+
+                float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
+                float invS = 1.0f / s;
+
+                rotation = new Quat
+                {
+                    X = cross.X * invS,
+                    Y = cross.Y * invS,
+                    Z = cross.Z * invS,
+                    W = 0.5f * s
+                };
+            }
+
             SetRotation(entityID, ref rotation);
         }
 
@@ -128,14 +144,14 @@ namespace Engine
             InternalCalls.Transform_SetPosition(entityID, ref position);
         }
 
-        public static Vector3 GetRotation(uint entityID)
+        public static Quat GetRotation(uint entityID)
         {
-            Vector3 rot;
+            Quat rot;
             InternalCalls.Transform_GetRotation(entityID, out rot);
             return rot;
         }
 
-        public static void SetRotation(uint entityID, ref Vector3 rotation)
+        public static void SetRotation(uint entityID, ref Quat rotation)
         {
             InternalCalls.Transform_SetRotation(entityID, ref rotation);
         }
@@ -154,7 +170,7 @@ namespace Engine
     }
 
     /// <summary>
-    /// Simple math utilities that don't rely on System.Math
+    /// Simple math utilities that do not rely on System.Math
     /// </summary>
     public static class SimpleMath
     {
@@ -162,9 +178,6 @@ namespace Engine
         public const float DEG_TO_RAD = 0.0174532924f;
         public const float RAD_TO_DEG = 57.2957795131f;
 
-        /// <summary>
-        /// Square root using Newton-Raphson method
-        /// </summary>
         public static float Sqrt(float value)
         {
             if (value <= 0.0f) return 0.0f;
@@ -186,12 +199,8 @@ namespace Engine
             return y;
         }
 
-        /// <summary>
-        /// Arctangent of y/x using Taylor series
-        /// </summary>
         public static float Atan2(float y, float x)
         {
-            // Handle special cases
             if (x == 0.0f)
             {
                 if (y > 0.0f) return PI * 0.5f;
@@ -202,7 +211,6 @@ namespace Engine
             float z = y / x;
             float absZ = z < 0.0f ? -z : z;
 
-            // Use atan approximation for |z| <= 1
             float atan;
             if (absZ <= 1.0f)
             {
@@ -215,7 +223,6 @@ namespace Engine
                     atan = -atan;
             }
 
-            // Adjust for quadrant
             if (x < 0.0f)
             {
                 if (y >= 0.0f)
@@ -227,9 +234,6 @@ namespace Engine
             return atan;
         }
 
-        /// <summary>
-        /// Arctangent approximation for |x| <= 1
-        /// </summary>
         private static float AtanApprox(float x)
         {
             float x2 = x * x;
@@ -241,16 +245,12 @@ namespace Engine
             return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
         }
 
-        /// <summary>
-        /// Arcsine using Taylor series (valid for |x| <= 1)
-        /// </summary>
         public static float Asin(float x)
         {
-            // Clamp to valid range
             if (x <= -1.0f) return -PI * 0.5f;
             if (x >= 1.0f) return PI * 0.5f;
 
-            if (x > 0.7f || x < -0.7f)
+            if (x < -0.5f || x > 0.5f)
             {
                 float sign = x < 0.0f ? -1.0f : 1.0f;
                 float absX = x < 0.0f ? -x : x;
@@ -261,22 +261,17 @@ namespace Engine
             return AsinApprox(x);
         }
 
-        /// <summary>
-        /// Arcsine approximation using Taylor series
-        /// </summary>
         private static float AsinApprox(float x)
         {
             float x2 = x * x;
             float x3 = x2 * x;
             float x5 = x3 * x2;
             float x7 = x5 * x2;
+            float x9 = x7 * x2;
 
-            return x + (x3 / 6.0f) + (3.0f * x5 / 40.0f) + (5.0f * x7 / 112.0f);
+            return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
         }
 
-        /// <summary>
-        /// Linear interpolation
-        /// </summary>
         public static float Lerp(float a, float b, float t)
         {
             if (t <= 0.0f) return a;
@@ -284,9 +279,6 @@ namespace Engine
             return a + (b - a) * t;
         }
 
-        /// <summary>
-        /// Clamp value between min and max
-        /// </summary>
         public static float Clamp(float value, float min, float max)
         {
             if (value < min) return min;

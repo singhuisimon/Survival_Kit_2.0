@@ -4,11 +4,19 @@ using System;
 namespace Game
 {
     /// <summary>
-    /// Simple script that makes an object rotate continuously
+    /// Simple script that makes an object rotate continuously.
+    /// Now uses quaternion-based rotation via Transform.RotateAxisAngle.
     /// </summary>
     public class RotatingObject : ScriptBehaviour
     {
-        public float RotationSpeed = 45.0f; // Degrees per second
+        /// <summary>
+        /// Rotation speed in degrees per second.
+        /// </summary>
+        public float RotationSpeed = 45.0f;
+
+        /// <summary>
+        /// Axis to rotate around (in local space).
+        /// </summary>
         public Vector3 RotationAxis = Vector3.Up;
 
         private float totalRotation = 0.0f;
@@ -20,26 +28,37 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // Calculate rotation for this frame
-            float rotationThisFrame = RotationSpeed * deltaTime;
-            totalRotation += rotationThisFrame;
+            // No rotation requested or no time has passed
+            if (deltaTime <= 0.0f || Math.Abs(RotationSpeed) <= 0.0001f)
+                return;
 
-            // Apply rotation based on axis
-            Vector3 currentRotation = Transform.Rotation;
-            
-            if (Math.Abs(RotationAxis.X) > 0.5f)
-                currentRotation.X += rotationThisFrame;
-            if (Math.Abs(RotationAxis.Y) > 0.5f)
-                currentRotation.Y += rotationThisFrame;
-            if (Math.Abs(RotationAxis.Z) > 0.5f)
-                currentRotation.Z += rotationThisFrame;
+            // Normalise the axis (engine's Vector3 has a Normalized helper)
+            Vector3 axis = RotationAxis.Normalized;
 
-            Transform.Rotation = currentRotation;
+            // Guard against a zero-length axis
+            if (Math.Abs(axis.X) < 0.0001f &&
+                Math.Abs(axis.Y) < 0.0001f &&
+                Math.Abs(axis.Z) < 0.0001f)
+            {
+                return;
+            }
 
-            // Log every 360 degrees
+            // Degrees this frame
+            float rotationThisFrameDeg = RotationSpeed * deltaTime;
+
+            // Convert to radians for the quaternion API (glm-style)
+            float rotationThisFrameRad = rotationThisFrameDeg * SimpleMath.DEG_TO_RAD;
+
+            // Apply rotation using the Transform helper (quaternion under the hood)
+            Transform.RotateAxisAngle(axis, rotationThisFrameRad);
+
+            // Track accumulated rotation in degrees just for logging
+            totalRotation += Math.Abs(rotationThisFrameDeg);
+
+            // Log every full revolution
             if (totalRotation >= 360.0f)
             {
-                Log($"Completed a full rotation! Total: {totalRotation} degrees");
+                Log($"Completed a full rotation! Total accumulated: {totalRotation:F2} degrees");
                 totalRotation -= 360.0f;
             }
         }

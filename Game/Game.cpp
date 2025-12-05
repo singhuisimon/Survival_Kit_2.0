@@ -237,6 +237,12 @@ void Game::OnInit()
 		if (loadedFromFile)
 		{
 			LOG_INFO("  -> Scene loaded from file successfully");
+			
+			// Update settings from loaded scene
+			m_Renderer->getBloomToggle() = m_Scene->GetSceneSetting().s_BloomToggle;
+			m_Renderer->getBloomStrength() = m_Scene->GetSceneSetting().s_BloomStrength;
+			m_Renderer->getBloomFilterRadius() = m_Scene->GetSceneSetting().s_BloomFilterRadius;
+			m_Renderer->getExposure() = m_Scene->GetSceneSetting().s_Exposure;
 		}
 		else
 		{
@@ -383,6 +389,12 @@ void Game::CreateDefaultScene()
 	namespace fs = std::filesystem;
 	Engine::m_AnimationClipStorage.clear();
 	Engine::m_AnimatorControllerStorage.clear();
+
+	// Update settings 
+	m_Renderer->getBloomToggle() = m_Scene->GetSceneSetting().s_BloomToggle;
+	m_Renderer->getBloomStrength() = m_Scene->GetSceneSetting().s_BloomStrength;
+	m_Renderer->getBloomFilterRadius() = m_Scene->GetSceneSetting().s_BloomFilterRadius;
+	m_Renderer->getExposure() = m_Scene->GetSceneSetting().s_Exposure;
 
 	// ---------------------------------------------------------------------
 	// Load animation clips
