@@ -77,8 +77,7 @@ namespace Game{
         private uint rngSeed;
 
         // Time tracking (since we don't have Time.time)
-        [SerializeField]
-        private float elapsedTime = 0f;
+        [SerializeField] private float elapsedTime = 0f;
         [SerializeField] private int botnetSpawned = 0;
         [SerializeField] private int loveletterSpawned = 0;
 
@@ -476,6 +475,7 @@ namespace Game{
                 return;
             }
 
+            //comment this part if u want to test more than 20 botnet.
             if(botnetSpawned >= 20){
                 if(enemyType == 0){
                     return;
@@ -617,6 +617,8 @@ namespace Game{
             //     Log("hi this is botnet length that is not null " + botnet.Length.ToString());
             // }
             
+            //logic here will have to change in the future when i got player information. 
+            //need detect if player destroy 15 botnets.
             if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
                 enemiesLeft = 0;
 
