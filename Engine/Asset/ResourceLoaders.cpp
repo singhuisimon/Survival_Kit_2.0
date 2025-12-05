@@ -182,7 +182,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
     xresource::mgr& /*mgr*/, const full_guid& guid)
 {
 
-    LOG_DEBUG(" ==== Start Loader for mesh ==========");
+    // LOG_DEBUG(" ==== Start Loader for mesh ==========");
     std::string compiled_path = getCompiledFilePath(guid, Engine::ResourceType::MESH);
 
     //LOG_INFO("MESHFILE PATH : ", compiled_path);
@@ -395,7 +395,7 @@ xresource::loader<Engine::ResourceGUID::mesh_type_guid_v>::Load(
 
     auto* meshPtr = mesh.release();
     LOG_INFO("mesh.release() returned pointer: ", static_cast<void*>(meshPtr));
-    LOG_DEBUG(" ==== End of loader debug for mesh ===");
+    //LOG_DEBUG(" ==== End of loader debug for mesh ===");
     return meshPtr;
 }
 

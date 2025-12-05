@@ -347,6 +347,8 @@ namespace Engine {
 
         // Final root path
         fs::path finalPath = resourcesRoot / relativeFromSources;
+        finalPath = finalPath.lexically_normal();
+
 
         LOG_DEBUG("Asset mapped to root resources path: ", finalPath);
         return finalPath.generic_string();

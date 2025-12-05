@@ -1,7 +1,6 @@
 {
   "shaderName": "StandardMetallicRoughness",
-
-  "baseMap": "f992d866396f4025",
+  "baseMap": "",
   "normalMap": "0",
   "metallicMap": "0",
   "roughnessMap": "0",
