@@ -102,7 +102,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -117,13 +117,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 1981927356018606155,
-                        "MaterialGuid": 4864231117535740111,
-                        "TextureGuid": 0,
+                        "Mesh": "level_design_v003.fbx",
+                        "Material": "LevelDesign_GroundBelow.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -665,13 +665,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -766,13 +766,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -867,13 +867,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -968,13 +968,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -1069,13 +1069,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -1163,13 +1163,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -1257,13 +1257,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1303,13 +1303,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1349,13 +1349,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1395,13 +1395,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1441,13 +1441,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1487,13 +1487,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1567,7 +1567,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            5.0315671361366235e-15,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1582,13 +1582,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 7902753479394623501,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 1,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -1624,7 +1624,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            5.0315671361366235e-15,
+                            -0.0,
                             -180.0
                         ],
                         "Scale": [
@@ -1639,13 +1639,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 7902753479394623501,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 1,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -1703,13 +1703,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1749,13 +1749,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1795,13 +1795,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1841,13 +1841,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1887,13 +1887,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1933,13 +1933,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -1979,13 +1979,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2399,8 +2399,8 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.04046058654785,
-                            38.87009048461914,
+                            21.040462493896484,
+                            38.87009811401367,
                             39.0
                         ],
                         "Scale": [
@@ -2464,13 +2464,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 1981927356018606155,
-                        "MaterialGuid": 17546367668211056849,
-                        "TextureGuid": 0,
+                        "Mesh": "level_design_v003.fbx",
+                        "Material": "LevelDesign_GroundTexture.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2510,13 +2510,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2556,13 +2556,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2602,13 +2602,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2648,13 +2648,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2694,13 +2694,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2740,13 +2740,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2786,13 +2786,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2832,13 +2832,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2878,13 +2878,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2966,13 +2966,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3012,13 +3012,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3058,13 +3058,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3104,13 +3104,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3150,13 +3150,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3196,13 +3196,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3242,13 +3242,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3288,13 +3288,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3334,13 +3334,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3422,13 +3422,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3468,13 +3468,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3514,13 +3514,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3560,13 +3560,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3606,13 +3606,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3652,13 +3652,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3698,13 +3698,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3744,13 +3744,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3790,13 +3790,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3878,13 +3878,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3924,13 +3924,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3970,13 +3970,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4016,13 +4016,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4062,13 +4062,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4108,13 +4108,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4154,13 +4154,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4200,13 +4200,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4246,13 +4246,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4292,13 +4292,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 12980350961226956805,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Core.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -4357,13 +4357,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5576,7 +5576,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5609,7 +5609,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5642,7 +5642,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5675,7 +5675,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5708,7 +5708,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5741,7 +5741,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -9.044308579931901e-23,
+                            -0.0,
                             180.0
                         ],
                         "Scale": [
@@ -5796,13 +5796,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 7
                     }
                 }
@@ -5849,13 +5849,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 6
                     }
                 }
@@ -5902,13 +5902,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 5
                     }
                 }
@@ -5955,13 +5955,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 4
                     }
                 }
@@ -6008,13 +6008,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 3
                     }
                 }
@@ -6061,13 +6061,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 2
                     }
                 }
@@ -6114,13 +6114,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 1
                     }
                 }
@@ -6167,13 +6167,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 852359476590953005,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -6205,7 +6205,7 @@
                         ],
                         "Rotation": [
                             2.6846516132354736,
-                            22.905099868774414,
+                            22.905094146728516,
                             6.869709014892578
                         ],
                         "Scale": [
@@ -6230,13 +6230,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 852359476590953005,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -6302,7 +6302,7 @@
                         ],
                         "Rotation": [
                             0.0000050089611249859445,
-                            9.602778505219312e-21,
+                            -0.0,
                             0.0000050089611249859445
                         ],
                         "Scale": [
@@ -6373,13 +6373,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 7769140836781965323,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "ShutdownButton.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -6468,13 +6468,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 16416052121333317645,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -6523,7 +6523,7 @@
                             64.80000305175781
                         ],
                         "Depth": 0,
-                        "Aspect": 1.7135207653045654,
+                        "Aspect": 1.7777777910232544,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 1000.0,
@@ -6570,13 +6570,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 8345601589085388809,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -6624,7 +6624,7 @@
                     "Properties": {
                         "FilePath": "office_ambience.wav",
                         "Type": 2,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -6676,7 +6676,7 @@
                     "Properties": {
                         "FilePath": "RoomAmbience.wav",
                         "Type": 2,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,

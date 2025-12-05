@@ -23,6 +23,7 @@
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Utility/Logger.h"
+#include "../Asset/AssetManager.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
@@ -314,18 +315,23 @@ namespace Engine {
         // Serialize MeshRendererComponent
         if (entity.HasComponent<MeshRendererComponent>()) {
             const auto& mesh = entity.GetComponent<MeshRendererComponent>();
+            std::string meshFilename = AM.getNameFromGuid(mesh.MeshGuid);
+            std::string materialFilename = AM.getNameFromGuid(mesh.MaterialGuid);
+            std::string textureFilename = AM.getNameFromGuid(mesh.TextureGuid);
+
             rapidjson::Value componentObj(rapidjson::kObjectType);
             componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
             rapidjson::Value propertiesObj(rapidjson::kObjectType);
-            propertiesObj.AddMember("MeshGuid",
-                rapidjson::Value(mesh.MeshGuid.m_Value), allocator);
-
-            propertiesObj.AddMember("MaterialGuid",
-                rapidjson::Value(mesh.MaterialGuid.m_Value), allocator);
-
-            propertiesObj.AddMember("TextureGuid",
-                rapidjson::Value(mesh.TextureGuid.m_Value), allocator);
+            propertiesObj.AddMember("Mesh",
+                rapidjson::Value(meshFilename.empty() ? "" : meshFilename.c_str(), allocator),
+                allocator);
+            propertiesObj.AddMember("Material",
+                rapidjson::Value(materialFilename.empty() ? "" : materialFilename.c_str(), allocator),
+                allocator);
+            propertiesObj.AddMember("Texture",
+                rapidjson::Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
+                allocator);
 
             //propertiesObj.AddMember("MeshGuid",
             //    rapidjson::Value(std::to_string(mesh.MeshGuid.m_Value).c_str(), allocator), allocator);

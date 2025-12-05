@@ -21,6 +21,7 @@
 #include "../Scripting/MonoScriptEngine.h"
 #include "ReflectionRegistry.h"
 #include "../Utility/Logger.h"
+#include "../Asset/AssetManager.h"
 
 // RapidJSON includes
 #include <rapidjson/document.h>
@@ -234,14 +235,25 @@ namespace Engine
 				componentObj.AddMember("Type", "MeshRendererComponent", allocator);
 
 				Value propertiesObj(kObjectType);
-				propertiesObj.AddMember("MeshGuid", mesh.MeshGuid.m_Value, allocator);
-				propertiesObj.AddMember("MaterialGuid", mesh.MaterialGuid.m_Value, allocator);
-				propertiesObj.AddMember("TextureGuid", mesh.TextureGuid.m_Value, allocator);
+
+				std::string meshFilename = AM.getNameFromGuid(mesh.MeshGuid);
+				std::string materialFilename = AM.getNameFromGuid(mesh.MaterialGuid);
+				std::string textureFilename = AM.getNameFromGuid(mesh.TextureGuid);
+
+				propertiesObj.AddMember("Mesh",
+					Value(meshFilename.empty() ? "" : meshFilename.c_str(), allocator),
+					allocator);
+				propertiesObj.AddMember("Material",
+					Value(materialFilename.empty() ? "" : materialFilename.c_str(), allocator),
+					allocator);
+				propertiesObj.AddMember("Texture",
+					Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
+					allocator);
 				//LOG_DEBUG("TextureGuid in serializer SerializeToString(): ", mesh.TextureGuid.m_Value);
 				propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 				propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
-				propertiesObj.AddMember("Material", mesh.Material, allocator);
-				propertiesObj.AddMember("Texture", mesh.Texture, allocator);
+				propertiesObj.AddMember("MaterialIdx", mesh.Material, allocator);
+				propertiesObj.AddMember("TextureIdx", mesh.Texture, allocator);
 				propertiesObj.AddMember("SubmeshIndex", mesh.SubmeshIndex, allocator);
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
@@ -758,23 +770,71 @@ namespace Engine
 					}
 					else if (componentType == "MeshRendererComponent")
 					{
-						auto &mesh = entity.AddComponent<MeshRendererComponent>();
+						auto& mesh = entity.AddComponent<MeshRendererComponent>();
+
+						// Handle filename fields (strings)
+						if (properties.HasMember("Mesh") && properties["Mesh"].IsString())
+						{
+							std::string meshName = properties["Mesh"].GetString();
+							mesh.MeshGuid = AM.getGuidFromName(meshName);
+						}
+
+						if (properties.HasMember("Material") && properties["Material"].IsString())
+						{
+							std::string matName = properties["Material"].GetString();
+							mesh.MaterialGuid = AM.getGuidFromName(matName);
+						}
+
+						if (properties.HasMember("Texture") && properties["Texture"].IsString())
+						{
+							std::string texName = properties["Texture"].GetString();
+							mesh.TextureGuid = AM.getGuidFromName(texName);
+						}
+
+						// Handle old GUID fields (for backward compatibility)
 						if (properties.HasMember("MeshGuid"))
+						{
 							mesh.MeshGuid = xresource::instance_guid{ properties["MeshGuid"].GetUint64() };
+						}
+
 						if (properties.HasMember("MaterialGuid"))
 						{
 							mesh.MaterialGuid = xresource::instance_guid{ properties["MaterialGuid"].GetUint64() };
 						}
+
 						if (properties.HasMember("TextureGuid"))
 						{
 							mesh.TextureGuid = xresource::instance_guid{ properties["TextureGuid"].GetUint64() };
 						}
+
+						// Handle other properties
 						if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
 						if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
-						if (properties.HasMember("Material")) mesh.Material = properties["Material"].GetUint();
-						if (properties.HasMember("Texture")) mesh.Texture = properties["Texture"].GetUint();
+
+						// FIXED: Check if "Material" is a NUMBER before reading as integer
+						if (properties.HasMember("Material") && properties["Material"].IsNumber())
+						{
+							mesh.Material = properties["Material"].GetUint();
+						}
+						// Also check for the new name "MaterialIdx"
+						else if (properties.HasMember("MaterialIdx"))
+						{
+							mesh.Material = properties["MaterialIdx"].GetUint();
+						}
+
+						// FIXED: Check if "Texture" is a NUMBER before reading as integer
+						if (properties.HasMember("Texture") && properties["Texture"].IsNumber())
+						{
+							mesh.Texture = properties["Texture"].GetUint();
+						}
+						// Also check for the new name "TextureIdx"
+						else if (properties.HasMember("TextureIdx"))
+						{
+							mesh.Texture = properties["TextureIdx"].GetUint();
+						}
+
 						if (properties.HasMember("SubmeshIndex")) mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
-					}
+						}
 					else if (componentType == "RigidbodyComponent")
 					{
 						auto &rb = entity.AddComponent<RigidbodyComponent>();

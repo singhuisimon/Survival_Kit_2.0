@@ -3749,6 +3749,34 @@ namespace Engine
 		ViewportPanelHelper::CameraControl(m_Renderer);
 
 		ImGui::End();
+
+		//if (!m_Window || !texhandle) return;
+
+		//// Get viewport size from window
+		//int width = 0;
+		//int height = 0;
+		//glfwGetWindowSize(m_Window, &width, &height);
+		//ImVec2 viewportSize = {
+		//	static_cast<float>(width),  // Full width
+		//	static_cast<float>(height)  // Full height
+		//};
+
+		//// Set viewport data (kept for renderer compatibility)
+		//editorViewportData.tl = { 0.0f, 0.0f };
+		//editorViewportData.size = viewportSize;
+
+		//// Sync with renderer
+		//if (m_Renderer) {
+		//	m_Renderer->getEditorViewport() = editorViewportData;
+		//}
+
+		//// Camera toggle tracking
+		//bool currentCamToggle = m_Renderer->getEditorCamToggle();
+		//if (m_PreviousEditorCamToggle != currentCamToggle) {
+		//	m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+		//	m_SelectedEntity = Entity{};
+		//	m_PreviousEditorCamToggle = currentCamToggle;
+		//}
 	}
 
 #endif
