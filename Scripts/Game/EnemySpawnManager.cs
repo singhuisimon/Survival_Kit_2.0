@@ -23,6 +23,7 @@ namespace Game{
         // Basic toggles
         [SerializeField] private bool isActive = false;
         [SerializeField] private bool spawningAllowed = false;
+        [SerializeField] private bool infiniteSpawning = false;
         
         // Wave tracking
         [SerializeField] private int waveEnemiesLeftToSpawn = 0;
@@ -78,6 +79,8 @@ namespace Game{
         // Time tracking (since we don't have Time.time)
         [SerializeField]
         private float elapsedTime = 0f;
+        [SerializeField] private int botnetSpawned = 0;
+        [SerializeField] private int loveletterSpawned = 0;
 
         private string alliesambience = "Flotilla_Gunship_Ambient.wav";
         private string coreambience = "Core_Ambient.wav";
@@ -159,11 +162,13 @@ namespace Game{
                     isSpawning = false;
                     //spawningAllowed = false;
                 }
+
+                if(infiniteSpawning){
+                    SetupInfiniteBotnetSpawning();
+                }
             }
 
-            if(waveEnemiesLeftToSpawn <= 0){
-                CheckForEnemiesLeft();
-            }
+            CheckForEnemiesLeft();
             
         }
 
@@ -385,6 +390,17 @@ namespace Game{
             spawnRateNext = elapsedTime;
         }
 
+        private void SetupInfiniteBotnetSpawning(){
+            Log("SpawnManager - Setting up enemy spawning");
+            
+            E004_botnet += 1;
+
+            // Calculate total enemies to spawn
+            waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
+            
+            Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
+        }
+
         #endregion
 
         #region Spawning
@@ -398,7 +414,7 @@ namespace Game{
             
             isSpawning = true;
             spawnRateNext = elapsedTime + spawnRate;
-            
+
             // Determine which enemy type to spawn based on remaining counts
             int enemyType = DetermineEnemyTypeToSpawn();
             
@@ -412,11 +428,14 @@ namespace Game{
             // Spawn the enemy
             SpawnEnemy(enemyType);
             
-            waveEnemiesLeftToSpawn--;
+            //waveEnemiesLeftToSpawn--;
+            waveEnemiesLeftToSpawn = E004_botnet + E005_loveletter;
             //isSpawning = false;
-
+            
             Log(string.Concat("Spawned enemy type ", enemyType.ToString(), 
                 " - Remaining: ", waveEnemiesLeftToSpawn.ToString()));
+            Log("spawned botnet count: " + botnetSpawned.ToString());
+            Log("spawned loveletter count: " + loveletterSpawned.ToString());
         }
         
         private int DetermineEnemyTypeToSpawn()
@@ -425,11 +444,13 @@ namespace Game{
             if (E005_loveletter > 0)
             {
                 E005_loveletter--;
+                //loveletterSpawned++;
                 return 1; // Loveletter
             }
             else if (E004_botnet > 0)
             {
                 E004_botnet--;
+                //botnetSpawned++;
                 return 0; // Botnet
             }
             
@@ -455,6 +476,12 @@ namespace Game{
                 return;
             }
 
+            if(botnetSpawned >= 20){
+                if(enemyType == 0){
+                    return;
+                }
+            }
+
             int spawnIndex = GetRandomInt(0, activeSpawnPoints.Count);
             SpawnPointData spawnPoint = activeSpawnPoints[spawnIndex];
             
@@ -470,6 +497,10 @@ namespace Game{
             if(enemyID == 0){
                 Log("INVALID ID FOR SPAWNING");
             } else {
+                if(enemyType == 0){
+                    botnetSpawned++;
+                }
+                InternalCalls.Entity_AddScript(enemyID, "Game.Botnet");
                 Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
                 spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
                 spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
@@ -531,6 +562,7 @@ namespace Game{
             if(enemyID == 0){
                 Log("LOVELETTERSPAWN FAIL");
             } else {
+                loveletterSpawned++;
                 Log(string.Concat("Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", " ,
                 spawnPosition.Y.ToString(), ", " , spawnPosition.Z.ToString(), " and at rotation ", spawnRotation.X.ToString(), ", " ,
                 spawnRotation.Y.ToString(), ", " , spawnRotation.Z.ToString()));
