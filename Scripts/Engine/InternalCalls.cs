@@ -373,5 +373,8 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float Quat_Dot(ref Quat q1, ref Quat q2);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float Input_GetMouseDelta(out float deltaX, out float deltaY);
     }
 }

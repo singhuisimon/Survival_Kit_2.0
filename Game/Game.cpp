@@ -1019,10 +1019,10 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 			// Keep constant distance from the player (orbit)
 			const glm::vec3 camPos = aimTarget + dir * radius;
-			camTransform.SetPosition(camPos);
+			//camTransform.SetPosition(camPos);
 
-			// Always update camera target to the player's head/aim point
-			camComp.SetTarget(aimTarget);
+			//// Always update camera target to the player's head/aim point
+			//camComp.SetTarget(aimTarget);
 
 			///* Camera and Player rotations if all meshes face Z- as forward */
 			//// Player face same horizontal direction as the camera (camera behind player)
@@ -1052,8 +1052,8 @@ void Game::OnUpdate(Engine::Timestep ts)
 			// Convert basis to quaternion and apply offset
 			glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
 
-			transform.Rotation = q;
-			transform.IsDirty = true;
+			//transform.Rotation = q;
+			//transform.IsDirty = true;
 			/* Temporary adjustments to Camera and Player rotations */
 
 			/* Player controls begin here */

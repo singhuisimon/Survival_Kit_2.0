@@ -71,7 +71,7 @@ namespace Engine
 	{
 		if (!m_AppDomain) return;
 
-		MonoDomain* current = mono_domain_get();
+		MonoDomain *current = mono_domain_get();
 
 		if (current != m_AppDomain)
 		{
@@ -82,7 +82,7 @@ namespace Engine
 
 			mono_domain_set(m_AppDomain, false);
 
-			MonoDomain* after = mono_domain_get();
+			MonoDomain *after = mono_domain_get();
 			if (after == m_AppDomain)
 			{
 				LOG_INFO("  Successfully switched to correct domain");
@@ -181,11 +181,11 @@ namespace Engine
 
 
 
-	/*	if (!m_AppDomain)
-		{
-			LOG_ERROR("Failed to create Mono app domain");
-			return;
-		}*/
+		/*	if (!m_AppDomain)
+			{
+				LOG_ERROR("Failed to create Mono app domain");
+				return;
+			}*/
 		mono_domain_set(m_AppDomain, false);
 
 
@@ -363,7 +363,7 @@ namespace Engine
 		}
 		EnsureCorrectDomain();
 		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		MonoDomain* current = mono_domain_get();
+		MonoDomain *current = mono_domain_get();
 		LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
 		LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
 		LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
@@ -378,21 +378,21 @@ namespace Engine
 			return nullptr;
 		}
 
-		MonoDomain* currentDomain = mono_domain_get();
+		MonoDomain *currentDomain = mono_domain_get();
 
 		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
 		LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
 		LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
 		LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
 
-		    if (currentDomain != m_RootDomain)
-    {
-        LOG_ERROR("   WRONG DOMAIN! Currently in ROOT domain!");
-        LOG_ERROR("  Switching to APP domain...");
-        mono_domain_set(m_AppDomain, false);
-        currentDomain = mono_domain_get();
-        LOG_INFO("  Switched to: " + std::to_string((uintptr_t)currentDomain));
-    }
+		if (currentDomain != m_RootDomain)
+		{
+			LOG_ERROR("   WRONG DOMAIN! Currently in ROOT domain!");
+			LOG_ERROR("  Switching to APP domain...");
+			mono_domain_set(m_AppDomain, false);
+			currentDomain = mono_domain_get();
+			LOG_INFO("  Switched to: " + std::to_string((uintptr_t)currentDomain));
+		}
 
 		// Allocate object
 		MonoObject *instance = mono_object_new(m_AppDomain, klass);
@@ -1003,6 +1003,8 @@ namespace Engine
 		// Quaternion dot product
 		static float Quat_Dot(glm::quat *q1, glm::quat *q2);
 
+		static void Input_GetMouseDelta(float *outX, float *outY);
+
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -1225,6 +1227,7 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
 		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
 		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
+		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -2755,6 +2758,21 @@ namespace Engine
 		float Quat_Dot(glm::quat *q1, glm::quat *q2)
 		{
 			return glm::dot(*q1, *q2);
+		}
+
+		static void Input_GetMouseDelta(float *outX, float *outY)
+		{
+			if (outX) *outX = 0.0f;
+			if (outY) *outY = 0.0f;
+			if (!s_InputSystem)
+			{
+				LOG_WARNING("[InternalCall] Input system not initialized");
+				return;
+			}
+			glm::vec2 in_out;
+			in_out = s_InputSystem->GetMouseDelta();
+			*outX = in_out.x;
+			*outY = in_out.y;
 		}
 	} // namespace internalcalls
 
