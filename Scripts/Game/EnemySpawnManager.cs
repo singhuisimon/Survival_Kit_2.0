@@ -5,14 +5,13 @@ using Engine;
 
 namespace Game
 {
-
     // Simple struct to hold spawn point transform data
     public struct SpawnPointData
     {
         public Vector3 position;
-        public Vector3 rotation;   // Euler angles (as returned by Quat.ToEuler)
+        public Quat rotation;
 
-        public SpawnPointData(Vector3 pos, Vector3 rot)
+        public SpawnPointData(Vector3 pos, Quat rot)
         {
             position = pos;
             rotation = rot;
@@ -20,12 +19,12 @@ namespace Game
     }
 
     public class EnemySpawnManager : ScriptBehaviour
-    {    
+    {
         // Basic toggles
         [SerializeField] private bool isActive = false;
         [SerializeField] private bool spawningAllowed = false;
         [SerializeField] private bool infiniteSpawning = false;
-        
+
         // Wave tracking
         [SerializeField] private int waveEnemiesLeftToSpawn = 0;
 
@@ -37,6 +36,7 @@ namespace Game
         [SerializeField] private float spawnRate = 1.50f;
         [SerializeField] private float spawnRateNext = 0.0f;
         [SerializeField] private bool isSpawning = false;
+
         // Enemy counting
         [SerializeField] private int enemiesLeft = 0;
 
@@ -71,6 +71,8 @@ namespace Game
 
         private Entity[] wallInactiveEntities;
 
+        private const uint INVALID_ENTITY = 0xffffffffu;
+
         // Simple pseudo-random number generator
         private uint rngSeed;
 
@@ -86,10 +88,9 @@ namespace Game
         private uint spawnmanagerID;
 
         private bool playInGameSound = false;
-  
+
         public override void OnStart()
         {
-
             // Initialize random seed
             rngSeed = (uint)DateTime.Now.Ticks;
 
@@ -101,14 +102,9 @@ namespace Game
 
             // Find wall entities
             InitializeWalls();
-            
-            // // Setup walls for initial state
+
+            // Setup walls for initial state
             EnvironmentReset();
-            
-            // spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
-            // if(spawnmanagerID != INVALID_ENTITY){
-            //     Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
-            // }
 
             InternalCalls.Entity_AddAudio((uint)EntityID);
 
@@ -117,32 +113,35 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            //check for the trigger to start
-            //logically restart will also be via enter!
-            //change of plan. change this part of the code to look for maincamera if enabled.
-            if(Input.IsKeyPressed(KeyCode.Enter) && !isActive){
+            // check for the trigger to start
+            // logically restart will also be via enter!
+            // change of plan. change this part of the code to look for maincamera if enabled.
+            if (Input.IsKeyPressed(KeyCode.Enter) && !isActive)
+            {
                 isActive = true;
                 stopmainsound();
 
-                //deactivate all active wall and activate all inactive
+                // deactivate all active wall and activate all inactive
                 EnvironmentReset();
 
-                //set the no. of enemies to spawn here
-                //in the function it also activates the wall we spawning enemies from
+                // set the no. of enemies to spawn here
+                // in the function it also activates the wall we spawning enemies from
                 SetupEnemySpawning();
 
-                //play the ingame sounds
-                if(!playInGameSound){
+                // play the ingame sounds
+                if (!playInGameSound)
+                {
                     PlayInGameSounds();
-                } 
+                }
             }
 
-            //check if the game has started
-            if (!isActive){
+            // check if the game has started
+            if (!isActive)
+            {
                 return;
             }
 
-            //update elapsed time
+            // update elapsed time
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
 
@@ -159,26 +158,19 @@ namespace Game
                     //spawningAllowed = false;
                 }
 
-                if(infiniteSpawning){
+                if (infiniteSpawning)
+                {
                     SetupInfiniteBotnetSpawning();
                 }
             }
 
             CheckForEnemiesLeft();
-            
         }
 
         #region setup
-        
+
         private void InitializeSpawnPoints()
         {
-            // Find spawn points by name pattern
-            // You'll need to have entities named like:
-            // "SpawnPoint_A_1", "SpawnPoint_A_2", "SpawnPoint_A_3", etc.
-            
-            // For now, we'll create arrays to hold them
-            // You'll need to implement Entity.FindByName() or similar
-
             Log("=== Initializing Spawn Points ===");
 
             // Wall A spawn points - register each one
@@ -257,7 +249,7 @@ namespace Game
                 "SpawnPointE_5",
                 "SpawnPointE_6"
             });
-            
+
             Log("SpawnManager is initializing spawnpoints for all wall");
         }
 
@@ -276,19 +268,14 @@ namespace Game
                 if (entityID != 0)
                 {
                     Vector3 spawnPosition;
-                    Vector3 spawnRotation;
+                    Quat spawnRotation;
 
                     try
                     {
-                        // Native position
+                        // Position from internal call
                         InternalCalls.Transform_GetPosition(entityID, out spawnPosition);
-
-                        Entity tempEntity = new Entity(entityID);
-                        Transform tempTransform = new Transform();
-                        tempTransform.Entity = tempEntity;
-
-                        Quat spawnQuat = tempTransform.Rotation;
-                        spawnRotation = spawnQuat.ToEuler();   // store Euler for prefab instantiation
+                        // Rotation as QUAT from your Transform API
+                        spawnRotation = Transform.GetRotation(entityID);
 
                         // Create spawn point data and add to list
                         SpawnPointData spawnData = new SpawnPointData(spawnPosition, spawnRotation);
@@ -298,9 +285,8 @@ namespace Game
                         Log(string.Concat(
                             spawnPointName, " registered at position (",
                             spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(),
-                            ") rotation (",
-                            spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ")"
-                        ));
+                            ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ",
+                            spawnRotation.Z.ToString(), ", ", spawnRotation.W.ToString(), ")"));
                     }
                     catch (Exception ex)
                     {
@@ -309,13 +295,8 @@ namespace Game
                 }
                 else
                 {
-                    Log(string.Concat(
-                        "WARNING: Spawn point not found or invalid: ",
-                        spawnPointName,
-                        " (EntityID: ",
-                        entityID.ToString(),
-                        ")"
-                    ));
+                    Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName,
+                        " (EntityID: ", entityID.ToString(), ")"));
                 }
             }
 
@@ -325,9 +306,6 @@ namespace Game
 
         private void InitializeWalls()
         {
-            // Find wall entities by name
-            // Expected names: "Wall_A_Active", "Wall_A_Inactive", etc.
-
             // Helper to create entity list with validation
             wallAActiveEntities = CreateValidEntityArray(new string[]{
                 "WallA1", "WallA2", "WallA3", "WallA4", "WallA5", "WallA6", "WallA_Logo", "WallA_Void"
@@ -364,7 +342,7 @@ namespace Game
                 wallActiveEntities.AddRange(wallDActiveEntities);
             if (wallEActiveEntities != null && wallEActiveEntities.Length > 0)
                 wallActiveEntities.AddRange(wallEActiveEntities);
-            
+
             Log(string.Concat("Initialize wall entities - found ", wallActiveEntities.Count.ToString(), " active walls"));
             Log(string.Concat("Found ", wallInactiveEntities.Length.ToString(), " inactive walls"));
         }
@@ -372,17 +350,17 @@ namespace Game
         private void SetupEnemySpawning()
         {
             Log("SpawnManager - Setting up enemy spawning");
-            
+
             E005_loveletter = 0;
             E004_botnet = 15;
 
-            loveletterRoutes = new string[] {"A1"};
+            loveletterRoutes = new string[] { "A1" };
 
             activeSpawnPoints = spawnPointsA;
 
             // Calculate total enemies to spawn
             waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
-            
+
             Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
 
             // Update walls based on loveletter routes
@@ -392,24 +370,26 @@ namespace Game
             spawnRateNext = elapsedTime;
         }
 
-        private void SetupInfiniteBotnetSpawning(){
-            Log("SpawnManager - Setting up enemy spawning");
-            
+        private void SetupInfiniteBotnetSpawning()
+        {
+            Log("SpawnManager - Setting up infinite botnet spawning");
+
             E004_botnet += 1;
 
             // Calculate total enemies to spawn
             waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
-            
+
             Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
         }
 
         #endregion
 
         #region Spawning
-        
+
         private void SpawnPresetEnemy()
         {
-            if (elapsedTime < spawnRateNext){
+            if (elapsedTime < spawnRateNext)
+            {
                 isSpawning = false;
                 return;
             }
@@ -429,12 +409,10 @@ namespace Game
 
             // Spawn the enemy
             SpawnEnemy(enemyType);
-            
-            //waveEnemiesLeftToSpawn--;
+
             waveEnemiesLeftToSpawn = E004_botnet + E005_loveletter;
-            //isSpawning = false;
-            
-            Log(string.Concat("Spawned enemy type ", enemyType.ToString(), 
+
+            Log(string.Concat("Spawned enemy type ", enemyType.ToString(),
                 " - Remaining: ", waveEnemiesLeftToSpawn.ToString()));
             Log("spawned botnet count: " + botnetSpawned.ToString());
             Log("spawned loveletter count: " + loveletterSpawned.ToString());
@@ -442,20 +420,18 @@ namespace Game
 
         private int DetermineEnemyTypeToSpawn()
         {
-            // Priority: Loveletter > Botnet > Worm > Trojan
+            // Priority: Loveletter > Botnet
             if (E005_loveletter > 0)
             {
                 E005_loveletter--;
-                //loveletterSpawned++;
                 return 1; // Loveletter
             }
             else if (E004_botnet > 0)
             {
                 E004_botnet--;
-                //botnetSpawned++;
                 return 0; // Botnet
             }
-            
+
             return -1; // No enemies left to spawn
         }
 
@@ -471,16 +447,18 @@ namespace Game
 
             // Create enemy from prefab
             string prefabpath = "Sources/Prefabs/" + enemyPrefabNames[enemyType] + ".prefab";
-            
-            if(enemyType == 1){
-                //Log("HI LOVELETTER HERE");
+
+            if (enemyType == 1)
+            {
                 SpawnLoveLetter(prefabpath);
                 return;
             }
 
-            //comment this part if u want to test more than 20 botnet.
-            if(botnetSpawned >= 20){
-                if(enemyType == 0){
+            // comment this part if u want to test more than 20 botnet.
+            if (botnetSpawned >= 20)
+            {
+                if (enemyType == 0)
+                {
                     return;
                 }
             }
@@ -490,22 +468,35 @@ namespace Game
 
             // Get spawn position and rotation from the spawn point
             Vector3 spawnPos = spawnPoint.position;
-            Vector3 spawnRot = spawnPoint.rotation; // Euler from Quat.ToEuler
+            Quat spawnRot = spawnPoint.rotation; // QUAT
             Vector3 spawnScale = new Vector3(0.006f, 0.006f, 0.006f);
 
-            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(prefabpath, ref spawnPos, ref spawnRot, ref spawnScale, false);
+            //PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
+
+            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(
+                prefabpath,
+                ref spawnPos,
+                ref spawnRot,
+                ref spawnScale,
+                false
+            );
 
             if (enemyID == 0)
             {
                 Log("INVALID ID FOR SPAWNING");
-            } else {
-                if(enemyType == 0){
+            }
+            else
+            {
+                if (enemyType == 0)
+                {
                     botnetSpawned++;
                 }
                 InternalCalls.Entity_AddScript(enemyID, "Game.Botnet");
-                Log(string.Concat("Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", " ,
-                spawnPos.Y.ToString(), ", " , spawnPos.Z.ToString(), " and at rotation ", spawnRot.X.ToString(), ", " ,
-                spawnRot.Y.ToString(), ", " , spawnRot.Z.ToString()));
+                Log(string.Concat(
+                    "Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", ",
+                    spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), " and at rotation ",
+                    spawnRot.X.ToString(), ", ", spawnRot.Y.ToString(), ", ",
+                    spawnRot.Z.ToString(), ", ", spawnRot.W.ToString(), ")"));
             }
 
             Log(string.Concat("Spawn ", prefabpath, " at position (",
@@ -522,17 +513,12 @@ namespace Game
 
             Log("Spawn point name is: " + spawnPointName);
 
+            // Get transform data directly using native calls
             Vector3 spawnPosition;
-            Vector3 spawnRotation;
+            Quat spawnRotation;
 
-            InternalCalls.Transform_GetPosition((uint)spawnID, out spawnPosition);
-
-            // Get rotation from Transform (Quat) and convert to Euler Vector3
-            Entity spawnent = new Entity(spawnID);
-            Transform spawnentrans = new Transform();
-            spawnentrans.Entity = spawnent;
-            Quat spawnQuat = spawnentrans.Rotation;
-            spawnRotation = spawnQuat.ToEuler();
+            InternalCalls.Transform_GetPosition(spawnID, out spawnPosition);
+            spawnRotation = Transform.GetRotation(spawnID);
 
             Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
 
@@ -546,7 +532,11 @@ namespace Game
             InternalCalls.Audio_Play(spawnID);
 
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(
-                prefabpath, ref spawnPosition, ref spawnRotation, ref spawnScale, true
+                prefabpath,
+                ref spawnPosition,
+                ref spawnRotation,
+                ref spawnScale,
+                true
             );
 
             if (enemyID == 0)
@@ -557,14 +547,11 @@ namespace Game
             {
                 loveletterSpawned++;
                 Log(string.Concat(
-                    "Spawn type: loveletter at position ",
-                    spawnPosition.X.ToString(), ", ",
-                    spawnPosition.Y.ToString(), ", ",
-                    spawnPosition.Z.ToString(), " and at rotation ",
-                    spawnRotation.X.ToString(), ", ",
-                    spawnRotation.Y.ToString(), ", ",
-                    spawnRotation.Z.ToString()
-                ));
+                    "Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", ",
+                    spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(),
+                    " and at rotation ", spawnRotation.X.ToString(), ", ",
+                    spawnRotation.Y.ToString(), ", ", spawnRotation.Z.ToString(), ", ",
+                    spawnRotation.W.ToString(), ")"));
             }
         }
 
@@ -582,24 +569,15 @@ namespace Game
                 totalenemiesleft += loveletter.Length;
                 Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             }
-            
-            if (botnet != null && botnet.Length != 0){
+
+            if (botnet != null && botnet.Length != 0)
+            {
                 totalenemiesleft += botnet.Length;
                 Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
 
-            //keep this here first to debug - amanda
-            // if(botnet == null){
-            //     Log("hello botnet is null");
-            // } else if (botnet.Length == 0){
-            //     Log("hi this is currently 0 for botnet length");
-            // } else if (botnet != null){
-            //     Log("hi this is botnet length that is not null " + botnet.Length.ToString());
-            // }
-            
-            //logic here will have to change in the future when i got player information. 
-            //need detect if player destroy 15 botnets.
-            if(totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0){
+            if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)
+            {
                 enemiesLeft = 0;
 
                 isActive = false;
@@ -607,19 +585,21 @@ namespace Game
                 spawningAllowed = false;
                 StopAllOtherAudio();
                 Log("=== Wave Complete ===");
-
-            } else {
+            }
+            else
+            {
                 enemiesLeft = totalenemiesleft;
             }
         }
-        
+
         #region environment
 
-        private void EnvironmentReset(){
+        private void EnvironmentReset()
+        {
             WallSetup_DisableActiveWalls();
             WallSetup_InactiveWalls();
         }
-        
+
         // Wall management
         private void WallChange(string[] routes)
         {
@@ -634,10 +614,13 @@ namespace Game
             {
                 switch (route)
                 {
-                    case "A1": case "A2": WallEnable(0); break;
-                    case "B1": case "B2": WallEnable(1); break;
+                    case "A1":
+                    case "A2": WallEnable(0); break;
+                    case "B1":
+                    case "B2": WallEnable(1); break;
                     case "C1": WallEnable(2); break;
-                    case "D1": case "D2": WallEnable(3); break;
+                    case "D1":
+                    case "D2": WallEnable(3); break;
                     case "E1": WallEnable(4); break;
                 }
             }
@@ -646,7 +629,8 @@ namespace Game
         private void WallEnable(int wallIndex)
         {
             // Enable active wall, disable inactive wall
-            switch(wallIndex){
+            switch (wallIndex)
+            {
                 case 0:
                     if (wallAActiveEntities != null)
                     {
@@ -684,7 +668,7 @@ namespace Game
 
         private void WallSetup_ActiveWallVisibility(Entity[] entities, int wallIndex)
         {
-            //activate the selected walls to spawn
+            // activate the selected walls to spawn
             foreach (Entity entity in entities)
             {
                 if (entity.EntityID != 0) // Extra safety check
@@ -697,13 +681,13 @@ namespace Game
                 }
             }
 
-            //deactivate the inactive wall of the walls that are spawning
+            // deactivate the inactive wall of the walls that are spawning
             if (wallInactiveEntities != null && wallIndex < wallInactiveEntities.Length)
             {
                 uint id = wallInactiveEntities[wallIndex].EntityID;
                 if (id != 0) // Extra safety check
                 {
-                    InternalCalls.MeshRenderer_SetVisible((uint)id, false);
+                    InternalCalls.MeshRenderer_SetVisible(id, false);
                 }
                 else
                 {
@@ -715,9 +699,11 @@ namespace Game
         private void WallSetup_InactiveWalls()
         {
             // Enable all inactive walls
-            if(wallInactiveEntities != null){
+            if (wallInactiveEntities != null)
+            {
                 Log(string.Concat("Enabling ", wallInactiveEntities.Length.ToString(), " inactive wall entities"));
-                foreach(Entity wall in wallInactiveEntities){
+                foreach (Entity wall in wallInactiveEntities)
+                {
                     if (wall.EntityID != 0)
                     {
                         InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, true);
@@ -730,11 +716,12 @@ namespace Game
         private void WallSetup_DisableActiveWalls()
         {
             // Disable all active walls
-            if(wallActiveEntities != null){
-                foreach (Entity wall in wallActiveEntities){
+            if (wallActiveEntities != null)
+            {
+                foreach (Entity wall in wallActiveEntities)
+                {
                     if (wall.EntityID != INVALID_ENTITY) // Extra safety check
                     {
-                        //Log(string.Concat("HI PLS WORK DISABLE ACTIVE WALLS - EntityID: ", wall.EntityID.ToString()));
                         InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, false);
                     }
                     else
@@ -753,7 +740,7 @@ namespace Game
         private int GetRandomInt(int min, int max)
         {
             // Linear Congruential Generator
-            rngSeed = (1103515245 * rngSeed + 12345) & 0x7fffffff;
+            rngSeed = (1103515245u * rngSeed + 12345u) & 0x7fffffffu;
             return min + (int)(rngSeed % (uint)(max - min));
         }
 
@@ -785,12 +772,12 @@ namespace Game
             return validEntities.ToArray();
         }
 
-        private void PlayInGameSounds(){
-            //Log("Playbgm hehe");
+        private void PlayInGameSounds()
+        {
             spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
             if (spawnmanagerID != INVALID_ENTITY)
             {
-                Log("YAY FOUND IT IT'S " + spawnmanagerID.ToString());
+                Log("Spawn Manager entity ID: " + spawnmanagerID.ToString());
             }
             InternalCalls.Audio_Play(spawnmanagerID);
             PlayAllOtherAudio();
@@ -798,7 +785,7 @@ namespace Game
             playInGameSound = true;
         }
 
-        //FOR FUTURE PURPOSE
+        // FOR FUTURE PURPOSE
         private void PauseBGM()
         {
             InternalCalls.Audio_Pause((uint)EntityID);
@@ -898,5 +885,4 @@ namespace Game
 
         #endregion
     }
-
 }
