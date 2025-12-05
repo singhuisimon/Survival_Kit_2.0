@@ -119,59 +119,67 @@ namespace Game
             Engine.Vector3 cameraPosition;
             Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
 
-            // ===== MOVEMENT INPUT =====
-            // Calculate forward direction from camera to player (horizontal plane only)
+            // ===== MOVEMENT INPUT (FROM DOCUMENT 16 - FULL 3D) =====
+            // Calculate forward direction from camera to player (FULL 3D)
             Engine.Vector3 camToPlayer = new Engine.Vector3(
                 playerPos.X - cameraPosition.X,
-                0.0f,  // Ignore Y difference for horizontal movement
+                playerPos.Y - cameraPosition.Y,  // ? Includes Y for 3D movement
                 playerPos.Z - cameraPosition.Z
             );
 
             // Normalize to get forward direction (camera looking at player)
-            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X + camToPlayer.Z * camToPlayer.Z);
+            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X +
+                camToPlayer.Y * camToPlayer.Y +
+                camToPlayer.Z * camToPlayer.Z);
             Engine.Vector3 forward = new Engine.Vector3(0.0f, 0.0f, 0.0f);
 
             if (camToPlayerLen > 0.000001f)
             {
                 forward.X = camToPlayer.X / camToPlayerLen;
+                forward.Y = camToPlayer.Y / camToPlayerLen;
                 forward.Z = camToPlayer.Z / camToPlayerLen;
             }
 
-            // Calculate right vector (perpendicular to forward on horizontal plane)
+            // Calculate right vector (perpendicular to forward)
             Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
             Engine.Vector3 right = CrossProduct(forward, worldUp);
-            float rightLen = SimpleSqrt(right.X * right.X + right.Z * right.Z);
+            float rightLen = SimpleSqrt(right.X * right.X + right.Y * right.Y + right.Z * right.Z);
             if (rightLen > 0.000001f)
             {
                 right.X /= rightLen;
+                right.Y /= rightLen;
                 right.Z /= rightLen;
             }
 
             Engine.Vector3 moveDir = new Engine.Vector3(0.0f, 0.0f, 0.0f);
 
-            // Movement controls - relative to camera view
+            // Movement controls - relative to camera view (FULL 3D)
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.W))  // W = Move away from camera (forward)
             {
                 moveDir.X += forward.X;
+                moveDir.Y += forward.Y;
                 moveDir.Z += forward.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.S))  // S = Move toward camera (backward)
             {
                 moveDir.X -= forward.X;
+                moveDir.Y -= forward.Y;
                 moveDir.Z -= forward.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.A))  // A = Move left relative to camera
             {
                 moveDir.X -= right.X;
+                moveDir.Y -= right.Y;
                 moveDir.Z -= right.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.D))  // D = Move right relative to camera
             {
                 moveDir.X += right.X;
+                moveDir.Y += right.Y;
                 moveDir.Z += right.Z;
             }
 
-            // Normalize movement direction (FULL 3D)
+            // Normalize movement direction
             float moveDirLenSq = moveDir.X * moveDir.X + moveDir.Y * moveDir.Y + moveDir.Z * moveDir.Z;
             if (moveDirLenSq > 0.000001f)
             {

@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace Engine
@@ -16,25 +15,44 @@ namespace Engine
             W = w;
         }
 
-        // Static properties
+        // Static identity quaternion
         public static Quat Identity => new Quat(0f, 0f, 0f, 1f);
 
-        // Properties
-        public float Length => (float)Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
+        // Squared length (no sqrt)
         public float SqrLength => X * X + Y * Y + Z * Z + W * W;
 
+        // Length using custom sqrt (no System.Math)
+        public float Length
+        {
+            get
+            {
+                float sq = SqrLength;
+                if (sq <= 0.0f)
+                    return 0.0f;
+                return FastSqrt(sq);
+            }
+        }
+
+        // Normalized quaternion (no System.Math)
         public Quat Normalized
         {
             get
             {
-                float len = Length;
-                if (len > 0.00001f)
-                    return new Quat(X / len, Y / len, Z / len, W / len);
-                return Identity;
+                float sqLen = SqrLength;
+                if (sqLen <= 0.0000001f)
+                    return Identity;
+
+                float invLen = 1.0f / FastSqrt(sqLen);
+                return new Quat(
+                    X * invLen,
+                    Y * invLen,
+                    Z * invLen,
+                    W * invLen
+                );
             }
         }
 
-        // Direction vector properties
+        // Direction vector properties (implemented via internal calls)
         public Vector3 Forward
         {
             get
@@ -62,14 +80,20 @@ namespace Engine
             }
         }
 
+        // =================
         // Operators
+        // =================
+
         public static Quat operator *(Quat lhs, Quat rhs)
         {
             InternalCalls.Quat_Multiply(ref lhs, ref rhs, out Quat result);
             return result;
         }
 
-        // Static methods
+        // =================
+        // Static factories
+        // =================
+
         public static Quat FromAxisAngle(Vector3 axis, float angleRadians)
         {
             InternalCalls.Quat_FromAxisAngle(ref axis, angleRadians, out Quat result);
@@ -89,12 +113,18 @@ namespace Engine
 
         public static Quat Slerp(Quat from, Quat to, float t)
         {
-            t = Math.Max(0f, Math.Min(1f, t));
+            // Clamp t manually (no System.Math)
+            if (t < 0.0f) t = 0.0f;
+            else if (t > 1.0f) t = 1.0f;
+
             InternalCalls.Quat_Slerp(ref from, ref to, t, out Quat result);
             return result;
         }
 
+        // =================
         // Instance methods
+        // =================
+
         public Vector3 Rotate(Vector3 vec)
         {
             InternalCalls.Quat_RotateVector(ref this, ref vec, out Vector3 result);
@@ -113,6 +143,36 @@ namespace Engine
             return result;
         }
 
-        public override string ToString() => $"Quat({X:F2}, {Y:F2}, {Z:F2}, {W:F2})";
+        public override string ToString()
+        {
+            return $"Quat({X:F2}, {Y:F2}, {Z:F2}, {W:F2})";
+        }
+
+        // =================
+        // Internal helpers
+        // =================
+
+        /// <summary>
+        /// Simple Newton–Raphson sqrt approximation.
+        /// No System.Math usage, only basic float ops.
+        /// Good enough for normalization & length checks.
+        /// </summary>
+        private static float FastSqrt(float value)
+        {
+            if (value <= 0.0f)
+                return 0.0f;
+
+            // Initial guess
+            float x = value;
+
+            // A few NR iterations
+            // x_{n+1} = 0.5 * (x_n + value / x_n)
+            for (int i = 0; i < 5; ++i)
+            {
+                x = 0.5f * (x + value / x);
+            }
+
+            return x;
+        }
     }
 }

@@ -756,29 +756,29 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 	Engine::ScriptReloader::GetInstance().Update();
 
-	if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
-	{
-		LOG_INFO("[Game] Hot-reload requested, clearing script instances...");
+	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
+	//{
+	//	LOG_INFO("[Game] Hot-reload requested, clearing script instances...");
 
-		if (m_Scene)
-		{
-			auto& registry = m_Scene->GetRegistry();
-			auto view = registry.view<Engine::ScriptComponent>();
+	//	if (m_Scene)
+	//	{
+	//		auto& registry = m_Scene->GetRegistry();
+	//		auto view = registry.view<Engine::ScriptComponent>();
 
-			for (auto entity : view)
-			{
-				auto& script = registry.get<Engine::ScriptComponent>(entity);
-				script.ScriptInstance = nullptr;  // ✅ NULL the pointer
-			}
+	//		for (auto entity : view)
+	//		{
+	//			auto& script = registry.get<Engine::ScriptComponent>(entity);
+	//			script.ScriptInstance = nullptr;  //  NULL the pointer
+	//		}
 
-			LOG_INFO("[Game] Cleared all script instances");
-		}
+	//		LOG_INFO("[Game] Cleared all script instances");
+	//	}
 
-		// NOW reload safely - no stale pointers exist
-		Engine::MonoScriptEngine::GetInstance().ReloadAssembly();
-		Engine::ScriptReloader::GetInstance().ClearReloadFlag();
-		LOG_INFO("[Game] Hot-reload complete!");
-	}
+	//	// NOW reload safely - no stale pointers exist
+	//	Engine::MonoScriptEngine::GetInstance().ReloadAssembly();
+	//	Engine::ScriptReloader::GetInstance().ClearReloadFlag();
+	//	LOG_INFO("[Game] Hot-reload complete!");
+	//}
 
 	// When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
 	if (!m_EditorEnable || (m_EditorEnable && m_Editor->getIsPlaying()))
@@ -1019,10 +1019,10 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 			// Keep constant distance from the player (orbit)
 			const glm::vec3 camPos = aimTarget + dir * radius;
-			camTransform.SetPosition(camPos);
+			//camTransform.SetPosition(camPos);
 
-			// Always update camera target to the player's head/aim point
-			camComp.SetTarget(aimTarget);
+			//// Always update camera target to the player's head/aim point
+			//camComp.SetTarget(aimTarget);
 
 			///* Camera and Player rotations if all meshes face Z- as forward */
 			//// Player face same horizontal direction as the camera (camera behind player)
@@ -1052,8 +1052,8 @@ void Game::OnUpdate(Engine::Timestep ts)
 			// Convert basis to quaternion and apply offset
 			glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
 
-			transform.Rotation = q;
-			transform.IsDirty = true;
+			//transform.Rotation = q;
+			//transform.IsDirty = true;
 			/* Temporary adjustments to Camera and Player rotations */
 
 			/* Player controls begin here */
