@@ -61,10 +61,18 @@ namespace Engine {
 
 		// Hot reload support
 		void ReloadAssembly();
+		void EnsureCorrectDomain();
 
+		bool IsInCorrectDomain();
 		// Getters
+
+		MonoDomain* GetRootDomain() const { return m_RootDomain; }   //  NEW
+
+
+		MonoDomain* GetAppDomain() const { return m_AppDomain; }  //  NOT GetDomain!
+
 		MonoDomain *GetDomain() const {
-			return m_RootDomain;
+			return m_AppDomain;
 		}
 		MonoAssembly *GetAssembly() const {
 			return m_AppAssembly;

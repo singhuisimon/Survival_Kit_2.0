@@ -232,6 +232,7 @@ namespace Game
                 dot = -dot;
             }
 
+
             // If we are already very close, snap to final rotation
             const float DOT_THRESHOLD = 0.9995f; // ~ < 1 degree apart
             if (dot > DOT_THRESHOLD)
@@ -245,13 +246,18 @@ namespace Game
                 return;
             }
 
+
             float t = rotationSpeed * deltaTime;
             if (t > 1.0f)
                 t = 1.0f;
 
             // Slerp towards target quaternion
-            Engine.Quat newRot = Engine.Quat.Slerp(currentRot, targetRotation, t);
+            Engine.Quat newRot;
+            InternalCalls.Quat_Slerp(ref currentRot, ref targetRotation, t, out newRot);
+            //Engine.InternalCalls.Log("works");
+
             Engine.Transform.SetRotation((uint)EntityID, ref newRot);
+
         }
 
         private void MoveTowardsWaypoint(float deltaTime)

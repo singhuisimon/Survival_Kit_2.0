@@ -12,6 +12,7 @@
 #include "../Event/EventSystem.h"
 #include "ScriptReloader.h"
 
+
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
 #include "../Serialization/PrefabInstantiator.h"
@@ -66,6 +67,39 @@ namespace Engine
 		return true;
 	}
 
+	void MonoScriptEngine::EnsureCorrectDomain()
+	{
+		if (!m_AppDomain) return;
+
+		MonoDomain* current = mono_domain_get();
+
+		if (current != m_AppDomain)
+		{
+			LOG_WARNING("EnsureCorrectDomain: Wrong domain active!");
+			LOG_WARNING("  Current:  " + std::to_string((uintptr_t)current));
+			LOG_WARNING("  Expected: " + std::to_string((uintptr_t)m_AppDomain));
+			LOG_WARNING("  Forcing switch to correct domain...");
+
+			mono_domain_set(m_AppDomain, false);
+
+			MonoDomain* after = mono_domain_get();
+			if (after == m_AppDomain)
+			{
+				LOG_INFO("  Successfully switched to correct domain");
+			}
+			else
+			{
+				LOG_ERROR("   FAILED to switch domain!");
+				LOG_ERROR("  After switch: " + std::to_string((uintptr_t)after));
+			}
+		}
+	}
+
+	bool MonoScriptEngine::IsInCorrectDomain()
+	{
+		if (!m_AppDomain) return false;
+		return mono_domain_get() == m_AppDomain;
+	}
 
 	// Pointer to Engine.EventSystem.RaiseFromNative(string, string)
 	static MonoMethod *s_EventSystemRaiseFromNative = nullptr;
@@ -135,14 +169,26 @@ namespace Engine
 			return;
 		}
 
+		LOG_INFO(" Mono JIT initialized");
+		LOG_INFO(" Root domain created: " + std::to_string((uintptr_t)m_RootDomain));
+		m_AppDomain = m_RootDomain;
 		// Create app domain
-		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+		//m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+
+		LOG_INFO("Using single domain mode (no separate app domain)");
+		LOG_INFO("  Root domain: " + std::to_string((uintptr_t)m_RootDomain));
+		LOG_INFO("  App domain:  " + std::to_string((uintptr_t)m_AppDomain) + " (same as root)");
+
+
+
 		if (!m_AppDomain)
 		{
 			LOG_ERROR("Failed to create Mono app domain");
 			return;
 		}
-		mono_domain_set(m_AppDomain, true);
+		mono_domain_set(m_AppDomain, false);
+
+
 
 		// Load assembly (only if it exists)
 		if (!assemblyPath.empty() && std::filesystem::exists("GameScripts.dll"))
@@ -317,12 +363,38 @@ namespace Engine
 			// Assembly not loaded - silently skip
 			return nullptr;
 		}
+		EnsureCorrectDomain();
+		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		MonoDomain* current = mono_domain_get();
+		LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
+		LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
+		LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
 
+		if (current != m_AppDomain)
+		{
+			LOG_ERROR("   Still in wrong domain after EnsureCorrectDomain!");
+		}
 		MonoClass *klass = GetScriptClass(className);
 		if (!klass)
 		{
 			return nullptr;
 		}
+
+		MonoDomain* currentDomain = mono_domain_get();
+
+		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
+		LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
+		LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
+
+		    if (currentDomain != m_RootDomain)
+    {
+        LOG_ERROR("   WRONG DOMAIN! Currently in ROOT domain!");
+        LOG_ERROR("  Switching to APP domain...");
+        mono_domain_set(m_AppDomain, false);
+        currentDomain = mono_domain_get();
+        LOG_INFO("  Switched to: " + std::to_string((uintptr_t)currentDomain));
+    }
 
 		// Allocate object
 		MonoObject *instance = mono_object_new(m_AppDomain, klass);
@@ -377,6 +449,7 @@ namespace Engine
 		{
 			return;
 		}
+		EnsureCorrectDomain();
 
 		if (!IsValidMonoObject(instance))
 		{
