@@ -192,9 +192,9 @@ namespace Engine
 										temporaryPrefabPaths.insert(prefabPath);
 										LOG_DEBUG("Prefab created successfully: ", prefabPath);
 									}
-									PrefabSerializer::SavePrefabToFile(*prefab, convertAssetPathToRootResources(prefabPath));
 								}
 
+								PrefabSerializer::SavePrefabToFile(*prefab, convertAssetPathToRootResources(prefabPath));
 								LOG_DEBUG(" ========== End Create Prefab =========");
 
 							}

@@ -3,5 +3,5 @@
     "Name": "Gunship",
     "GUID": "16738692809979045151",
     "Type": "Entity",
-    "EntityData": "{\"ID\":4194373,\"Components\":[{\"Type\":\"TagComponent\",\"Properties\":{\"ComponentGUID\":\"3480095506996818433\",\"Tag\":\"Gunship\"}},{\"Type\":\"TransformComponent\",\"Properties\":{\"Position\":[0.0,-79.38986206054688,0.0],\"Rotation\":[0.0,0.0,0.0,1.0],\"Scale\":[0.05000000074505806,0.05000000074505806,0.05000000074505806],\"Parent\":4294967295,\"Children\":[]}},{\"Type\":\"MeshRendererComponent\",\"Properties\":{\"MeshGuid\":985224451753541643,\"MaterialGuid\":0,\"TextureGuid\":0,\"Visible\":true,\"MeshType\":0,\"Material\":0,\"Texture\":0}}]}"
+    "EntityData": "{\"ID\":1048709,\"Components\":[{\"Type\":\"TagComponent\",\"Properties\":{\"ComponentGUID\":\"3480095506996818433\",\"Tag\":\"Gunship\"}},{\"Type\":\"TransformComponent\",\"Properties\":{\"Position\":[0.0,-79.38986206054688,0.0],\"Rotation\":[0.0,0.0,0.0,1.0],\"Scale\":[0.05000000074505806,0.05000000074505806,0.05000000074505806],\"Parent\":4294967295,\"Children\":[]}},{\"Type\":\"MeshRendererComponent\",\"Properties\":{\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"MeshType\":0,\"Material\":0,\"Texture\":0,\"SubmeshIndex\":0}}]}"
 }

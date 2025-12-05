@@ -25,6 +25,7 @@
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Utility/Logger.h"
+#include "../Asset/AssetManager.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
@@ -333,6 +334,7 @@ namespace Engine {
         else if (componentType == "MeshRendererComponent") {
             auto& comp = entity.AddComponent<MeshRendererComponent>();
 
+#if 0
             if (properties.HasMember("MeshGuid")) {
                 uint64_t guidValue = properties["MeshGuid"].GetUint64();
                 comp.MeshGuid = xresource::instance_guid{ guidValue };
@@ -360,6 +362,79 @@ namespace Engine {
             if (properties.HasMember("SubmeshIndex")) {
                 comp.SubmeshIndex = properties["SubmeshIndex"].GetUint();
             }
+
+#endif
+#if 1
+            if (properties.HasMember("Mesh") && properties["Mesh"].IsString())
+            {
+                std::string meshFilename = properties["Mesh"].GetString();
+                if (!meshFilename.empty())
+                {
+                    xresource::instance_guid meshGuid = AM.getGuidFromName(meshFilename);
+                    comp.MeshGuid = meshGuid;
+                }
+            }
+            // Fallback to old GUID format
+            else if (properties.HasMember("MeshGuid")) {
+                uint64_t guidValue = properties["MeshGuid"].GetUint64();
+                comp.MeshGuid = xresource::instance_guid{ guidValue };
+            }
+
+            if (properties.HasMember("Material") && properties["Material"].IsString())
+            {
+                std::string materialFilename = properties["Material"].GetString();
+                if (!materialFilename.empty())
+                {
+                    xresource::instance_guid materialGuid = AM.getGuidFromName(materialFilename);
+                    comp.MaterialGuid = materialGuid;
+                }
+            }
+            else if (properties.HasMember("MaterialGuid")) {
+                uint64_t guidValue = properties["MaterialGuid"].GetUint64();
+                comp.MaterialGuid = xresource::instance_guid{ guidValue };
+            }
+
+            if (properties.HasMember("Texture") && properties["Texture"].IsString())
+            {
+                std::string textureFilename = properties["Texture"].GetString();
+                if (!textureFilename.empty())
+                {
+                    xresource::instance_guid textureGuid = AM.getGuidFromName(textureFilename);
+                    comp.TextureGuid = textureGuid;
+                }
+            }
+            else if (properties.HasMember("TextureGuid")) {
+                uint64_t guidValue = properties["TextureGuid"].GetUint64();
+                comp.TextureGuid = xresource::instance_guid{ guidValue };
+            }
+
+            // --- Other properties (unchanged) ---
+            if (properties.HasMember("Visible")) {
+                comp.Visible = properties["Visible"].GetBool();
+            }
+            if (properties.HasMember("MeshType")) {
+                comp.MeshType = properties["MeshType"].GetUint();
+            }
+
+            // Handle renamed fields
+            if (properties.HasMember("MaterialIdx")) {
+                comp.Material = properties["MaterialIdx"].GetUint();
+            }
+            else if (properties.HasMember("Material") && properties["Material"].IsNumber()) {
+                comp.Material = properties["Material"].GetUint();
+            }
+
+            if (properties.HasMember("TextureIdx")) {
+                comp.Texture = properties["TextureIdx"].GetUint();
+            }
+            else if (properties.HasMember("Texture") && properties["Texture"].IsNumber()) {
+                comp.Texture = properties["Texture"].GetUint();
+            }
+
+            if (properties.HasMember("SubmeshIndex")) {
+                comp.SubmeshIndex = properties["SubmeshIndex"].GetUint();
+            }
+#endif
         }
         else if (componentType == "RigidbodyComponent") {
             auto& comp = entity.AddComponent<RigidbodyComponent>();
