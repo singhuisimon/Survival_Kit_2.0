@@ -1,4 +1,3 @@
-// Botnet.cs
 using Engine;
 using System;
 
@@ -326,7 +325,7 @@ namespace Game
             Vector3 myPos = Transform.GetPosition((uint)EntityID);
             Vector3 targetPos = Transform.GetPosition(targetID);
 
-            // Calculate desired rotation
+            // Calculate desired direction
             Vector3 direction = targetPos - myPos;
 
             float lenSq = direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z;
@@ -338,21 +337,37 @@ namespace Game
             direction.Y *= invLen;
             direction.Z *= invLen;
 
-            // Calculate target yaw and pitch
+            // Calculate target yaw and pitch (in degrees)
             float targetYaw = SimpleMath.Atan2(direction.X, direction.Z) * SimpleMath.RAD_TO_DEG;
             float targetPitch = SimpleMath.Asin(-direction.Y) * SimpleMath.RAD_TO_DEG;
 
-            // Get current rotation
-            Vector3 currentRot = Transform.GetRotation((uint)EntityID);
+            // Get current rotation as quaternion, convert to Euler (radians), then to degrees
+            Quat currentQuat = Transform.GetRotation((uint)EntityID);
+            Vector3 currentEulerRad = currentQuat.ToEuler();
+
+            Vector3 currentEulerDeg = new Vector3(
+                currentEulerRad.X * SimpleMath.RAD_TO_DEG,
+                currentEulerRad.Y * SimpleMath.RAD_TO_DEG,
+                currentEulerRad.Z * SimpleMath.RAD_TO_DEG
+            );
 
             // Smoothly interpolate to target rotation
             float t = SimpleMath.Clamp(rotateSpeed * deltaTime, 0.0f, 1.0f);
 
-            float newYaw = LerpAngle(currentRot.Y, targetYaw, t);
-            float newPitch = LerpAngle(currentRot.X, targetPitch, t);
+            float newYaw = LerpAngle(currentEulerDeg.Y, targetYaw, t);
+            float newPitch = LerpAngle(currentEulerDeg.X, targetPitch, t);
 
-            Vector3 newRot = new Vector3(newPitch, newYaw, 0.0f);
-            Transform.SetRotation((uint)EntityID, ref newRot);
+            Vector3 newEulerDeg = new Vector3(newPitch, newYaw, 0.0f);
+
+            // Convert back to radians for quaternion construction
+            Vector3 newEulerRad = new Vector3(
+                newEulerDeg.X * SimpleMath.DEG_TO_RAD,
+                newEulerDeg.Y * SimpleMath.DEG_TO_RAD,
+                newEulerDeg.Z * SimpleMath.DEG_TO_RAD
+            );
+
+            Quat newQuat = Quat.FromEuler(newEulerRad);
+            Transform.SetRotation((uint)EntityID, ref newQuat);
         }
 
         private float LerpAngle(float a, float b, float t)

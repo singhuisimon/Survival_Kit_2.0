@@ -26,7 +26,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// World rotation as a quaternion.
+        /// World rotation as a quaternion (primary representation).
         /// </summary>
         public Quat Rotation
         {
@@ -39,6 +39,48 @@ namespace Engine
             set
             {
                 InternalCalls.Transform_SetRotation(Entity.EntityID, ref value);
+            }
+        }
+
+        /// <summary>
+        /// World rotation as Euler angles in radians.
+        /// Wraps the quaternion Rotation property.
+        /// </summary>
+        public Vector3 RotationEulerRadians
+        {
+            get
+            {
+                return Rotation.ToEuler();
+            }
+            set
+            {
+                Rotation = Quat.FromEuler(value);
+            }
+        }
+
+        /// <summary>
+        /// World rotation as Euler angles in degrees.
+        /// Convenience wrapper for designers who prefer degrees.
+        /// </summary>
+        public Vector3 RotationEulerDegrees
+        {
+            get
+            {
+                Vector3 eulerRad = Rotation.ToEuler();
+                return new Vector3(
+                    eulerRad.X * SimpleMath.RAD_TO_DEG,
+                    eulerRad.Y * SimpleMath.RAD_TO_DEG,
+                    eulerRad.Z * SimpleMath.RAD_TO_DEG
+                );
+            }
+            set
+            {
+                Vector3 eulerRad = new Vector3(
+                    value.X * SimpleMath.DEG_TO_RAD,
+                    value.Y * SimpleMath.DEG_TO_RAD,
+                    value.Z * SimpleMath.DEG_TO_RAD
+                );
+                Rotation = Quat.FromEuler(eulerRad);
             }
         }
 
@@ -87,13 +129,9 @@ namespace Engine
         {
             Vector3 direction = (target - Position).Normalized;
 
-            // Calculate yaw (rotation around Y axis)
             float yaw = SimpleMath.Atan2(direction.X, direction.Z);
-
-            // Calculate pitch (rotation around X axis)
             float pitch = SimpleMath.Asin(-direction.Y);
 
-            // Create quaternion from Euler angles (in radians)
             Vector3 eulerRadians = new Vector3(pitch, yaw, 0.0f);
             Rotation = Quat.FromEuler(eulerRadians);
         }
@@ -151,6 +189,49 @@ namespace Engine
             InternalCalls.Transform_SetRotation(entityID, ref rotation);
         }
 
+        /// <summary>
+        /// Gets world rotation as Euler angles in radians for an entity ID.
+        /// </summary>
+        public static Vector3 GetRotationEulerRadians(uint entityID)
+        {
+            return GetRotation(entityID).ToEuler();
+        }
+
+        /// <summary>
+        /// Sets world rotation from Euler angles in radians for an entity ID.
+        /// </summary>
+        public static void SetRotationEulerRadians(uint entityID, ref Vector3 eulerRadians)
+        {
+            Quat rotation = Quat.FromEuler(eulerRadians);
+            SetRotation(entityID, ref rotation);
+        }
+
+        /// <summary>
+        /// Gets world rotation as Euler angles in degrees for an entity ID.
+        /// </summary>
+        public static Vector3 GetRotationEulerDegrees(uint entityID)
+        {
+            Vector3 eulerRadians = GetRotationEulerRadians(entityID);
+            return new Vector3(
+                eulerRadians.X * SimpleMath.RAD_TO_DEG,
+                eulerRadians.Y * SimpleMath.RAD_TO_DEG,
+                eulerRadians.Z * SimpleMath.RAD_TO_DEG
+            );
+        }
+
+        /// <summary>
+        /// Sets world rotation from Euler angles in degrees for an entity ID.
+        /// </summary>
+        public static void SetRotationEulerDegrees(uint entityID, ref Vector3 eulerDegrees)
+        {
+            Vector3 eulerRadians = new Vector3(
+                eulerDegrees.X * SimpleMath.DEG_TO_RAD,
+                eulerDegrees.Y * SimpleMath.DEG_TO_RAD,
+                eulerDegrees.Z * SimpleMath.DEG_TO_RAD
+            );
+            SetRotationEulerRadians(entityID, ref eulerRadians);
+        }
+
         public static Vector3 GetScale(uint entityID)
         {
             Vector3 scale;
@@ -165,7 +246,7 @@ namespace Engine
     }
 
     /// <summary>
-    /// Simple math utilities that don't rely on System.Math
+    /// Simple math utilities that do not rely on System.Math
     /// </summary>
     public static class SimpleMath
     {
@@ -173,9 +254,6 @@ namespace Engine
         public const float DEG_TO_RAD = 0.0174532924f;
         public const float RAD_TO_DEG = 57.2957795131f;
 
-        /// <summary>
-        /// Square root using Newton-Raphson method
-        /// </summary>
         public static float Sqrt(float value)
         {
             if (value <= 0.0f) return 0.0f;
@@ -197,12 +275,8 @@ namespace Engine
             return y;
         }
 
-        /// <summary>
-        /// Arctangent of y/x using Taylor series
-        /// </summary>
         public static float Atan2(float y, float x)
         {
-            // Handle special cases
             if (x == 0.0f)
             {
                 if (y > 0.0f) return PI * 0.5f;
@@ -213,7 +287,6 @@ namespace Engine
             float z = y / x;
             float absZ = z < 0.0f ? -z : z;
 
-            // Use atan approximation for |z| <= 1
             float atan;
             if (absZ <= 1.0f)
             {
@@ -226,7 +299,6 @@ namespace Engine
                     atan = -atan;
             }
 
-            // Adjust for quadrant
             if (x < 0.0f)
             {
                 if (y >= 0.0f)
@@ -238,9 +310,6 @@ namespace Engine
             return atan;
         }
 
-        /// <summary>
-        /// Arctangent approximation for |x| <= 1
-        /// </summary>
         private static float AtanApprox(float x)
         {
             float x2 = x * x;
@@ -252,16 +321,12 @@ namespace Engine
             return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
         }
 
-        /// <summary>
-        /// Arcsine using Taylor series (valid for |x| <= 1)
-        /// </summary>
         public static float Asin(float x)
         {
-            // Clamp to valid range
             if (x <= -1.0f) return -PI * 0.5f;
             if (x >= 1.0f) return PI * 0.5f;
 
-            if (x > 0.7f || x < -0.7f)
+            if (x < -0.5f || x > 0.5f)
             {
                 float sign = x < 0.0f ? -1.0f : 1.0f;
                 float absX = x < 0.0f ? -x : x;
@@ -272,22 +337,17 @@ namespace Engine
             return AsinApprox(x);
         }
 
-        /// <summary>
-        /// Arcsine approximation using Taylor series
-        /// </summary>
         private static float AsinApprox(float x)
         {
             float x2 = x * x;
             float x3 = x2 * x;
             float x5 = x3 * x2;
             float x7 = x5 * x2;
+            float x9 = x7 * x2;
 
-            return x + (x3 / 6.0f) + (3.0f * x5 / 40.0f) + (5.0f * x7 / 112.0f);
+            return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
         }
 
-        /// <summary>
-        /// Linear interpolation
-        /// </summary>
         public static float Lerp(float a, float b, float t)
         {
             if (t <= 0.0f) return a;
@@ -295,9 +355,6 @@ namespace Engine
             return a + (b - a) * t;
         }
 
-        /// <summary>
-        /// Clamp value between min and max
-        /// </summary>
         public static float Clamp(float value, float min, float max)
         {
             if (value < min) return min;

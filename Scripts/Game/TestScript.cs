@@ -18,7 +18,7 @@ namespace Game
         // ===== Camera Settings (for fallback) =====
         [SerializeField]
         private float aimHeightOffset = 2.0f;
-       [SerializeField]
+        [SerializeField]
         private float orbitRadius = 7.5f;
         [SerializeField]
         private float orbitPitch = 0.25f;
@@ -83,7 +83,6 @@ namespace Game
             // Find MainCamera using the proper InternalCall
             mainCameraEntityID = Engine.InternalCalls.Scene_FindEntityByName("MainCamera");
 
-
             Engine.InternalCalls.Log("Found MainCamera with ID: " + mainCameraEntityID);
 
             // Weapon setup
@@ -114,12 +113,9 @@ namespace Game
             if (primaryFireCooldown > 0) primaryFireCooldown -= deltaTime;
             if (secondaryFireCooldown > 0) secondaryFireCooldown -= deltaTime;
 
-            // Get player position and rotation (set by C++)
+            // Get player position (set by C++)
             Engine.Vector3 playerPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPos);
-
-            Engine.Vector3 playerRot;
-            Engine.InternalCalls.Transform_GetRotation((uint)EntityID, out playerRot);
 
             // Get camera position (updated by C++)
             Engine.Vector3 cameraPosition;
@@ -192,7 +188,7 @@ namespace Game
             {
                 Engine.Vector3 newPos = new Engine.Vector3(
                     playerPos.X + moveDir.X * moveSpeed,
-                    playerPos.Y + moveDir.Y * moveSpeed,  // Now moves up/down!
+                    playerPos.Y + moveDir.Y * moveSpeed,
                     playerPos.Z + moveDir.Z * moveSpeed
                 );
                 Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
@@ -209,7 +205,7 @@ namespace Game
                 {
                     Engine.Vector3 dashImpulse = new Engine.Vector3(
                         moveDir.X * dashForce,
-                        moveDir.Y * dashForce,  // Dash in 3D direction
+                        moveDir.Y * dashForce,
                         moveDir.Z * dashForce
                     );
                     Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref dashImpulse);
@@ -298,67 +294,67 @@ namespace Game
                 Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
                 Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
 
-                  // Calculate aimTarget - this is where the camera is looking at
-                    Engine.Vector3 aimTarget = new Engine.Vector3(
-                        playerPosition.X,
-                        playerPosition.Y + aimHeightOffset,
-                        playerPosition.Z
+                // Calculate aimTarget - this is where the camera is looking at
+                Engine.Vector3 aimTarget = new Engine.Vector3(
+                    playerPosition.X,
+                    playerPosition.Y + aimHeightOffset,
+                    playerPosition.Z
+                );
+
+                // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
+                Engine.Vector3 cameraPosition;
+                if (mainCameraEntityID != 0)
+                {
+                    Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
+                }
+                else
+                {
+                    // Fallback: use calculated camera position if MainCamera not found
+                    Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
+                    float cosPitch = SimpleCos(orbitPitch);
+                    float sinPitch = SimpleSin(orbitPitch);
+                    float cosYaw = SimpleCos(orbitYaw);
+                    float sinYaw = SimpleSin(orbitYaw);
+
+                    cameraPosition = new Engine.Vector3(
+                        aimTarget.X + cosPitch * sinYaw * orbitRadius,
+                        aimTarget.Y + sinPitch * orbitRadius,
+                        aimTarget.Z + cosPitch * cosYaw * orbitRadius
                     );
+                }
 
-                    // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
-                    Engine.Vector3 cameraPosition;
-                    if (mainCameraEntityID != 0)
-                    {
-                        Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
-                    }
-                    else
-                    {
-                        // Fallback: use calculated camera position if MainCamera not found
-                        Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
-                        float cosPitch = SimpleCos(orbitPitch);
-                        float sinPitch = SimpleSin(orbitPitch);
-                        float cosYaw = SimpleCos(orbitYaw);
-                        float sinYaw = SimpleSin(orbitYaw);
+                Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
 
-                        cameraPosition = new Engine.Vector3(
-                            aimTarget.X + cosPitch * sinYaw * orbitRadius,
-                            aimTarget.Y + sinPitch * orbitRadius,
-                            aimTarget.Z + cosPitch * cosYaw * orbitRadius
-                        );
-                    }
+                // Calculate direction FROM camera TO aimTarget (where camera is looking)
+                Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
+                    aimTarget.X - cameraPosition.X,
+                    aimTarget.Y - cameraPosition.Y,
+                    aimTarget.Z - cameraPosition.Z
+                );
 
-                    Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
+                // Use the FULL 3D direction for shooting
+                Engine.Vector3 shootDirection = cameraToAimTarget;
 
-                    // Calculate direction FROM camera TO aimTarget (where camera is looking)
-                    Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
-                        aimTarget.X - cameraPosition.X,
-                        aimTarget.Y - cameraPosition.Y,
-                        aimTarget.Z - cameraPosition.Z
+                // Normalize the full 3D vector
+                float lenSq = shootDirection.X * shootDirection.X +
+                              shootDirection.Y * shootDirection.Y +
+                              shootDirection.Z * shootDirection.Z;
+
+                if (lenSq > 0.0001f)
+                {
+                    float invLen = 1.0f / SimpleSqrt(lenSq);
+                    shootDirection = new Engine.Vector3(
+                        shootDirection.X * invLen,
+                        shootDirection.Y * invLen,
+                        shootDirection.Z * invLen
                     );
+                }
+                else
+                {
+                    Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
+                    return;
+                }
 
-                    // Use the FULL 3D direction for shooting
-                    Engine.Vector3 shootDirection = cameraToAimTarget;
-
-                    // Normalize the full 3D vector
-                    float lenSq = shootDirection.X * shootDirection.X +
-                                  shootDirection.Y * shootDirection.Y +
-                                  shootDirection.Z * shootDirection.Z;
-
-                    if (lenSq > 0.0001f)
-                    {
-                        float invLen = 1.0f / SimpleSqrt(lenSq);
-                        shootDirection = new Engine.Vector3(
-                            shootDirection.X * invLen,
-                            shootDirection.Y * invLen,
-                            shootDirection.Z * invLen
-                        );
-                    }
-                    else
-                    {
-                        Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
-                        return;
-                    }
-               
                 Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
 
                 // Spawn position - FOLLOWS THE ANGLE (full 3D offset)
@@ -367,34 +363,47 @@ namespace Game
                 // Spawn bullet along the full 3D shoot direction
                 Engine.Vector3 firingPosition = new Engine.Vector3(
                     playerPosition.X + (shootDirection.X * spawnDistance),
-                    playerPosition.Y + aimHeightOffset,  // Follows angle
+                    playerPosition.Y + aimHeightOffset,
                     playerPosition.Z + (shootDirection.Z * spawnDistance)
                 );
 
                 Engine.InternalCalls.Log("Firing position: " + firingPosition.X + ", " + firingPosition.Y + ", " + firingPosition.Z);
 
-                // Calculate bullet rotation to face the shoot direction
-                // Using atan2 for yaw (horizontal rotation) and asin for pitch (vertical rotation)
-                float bulletYaw = SimpleAtan2(shootDirection.X, shootDirection.Z) * RAD2DEG;
-                float bulletPitch = SimpleAsin(-shootDirection.Y) * RAD2DEG;  // Negative because looking down is positive pitch
+                // Calculate bullet rotation to face the shoot direction using quaternions
+                // Compute yaw and pitch in radians from the 3D shoot direction
+                float bulletYawRad = SimpleAtan2(shootDirection.X, shootDirection.Z);
+                float bulletPitchRad = SimpleAsin(-shootDirection.Y);
 
-                Engine.Vector3 bulletRotation = new Engine.Vector3(bulletPitch, bulletYaw, 0.0f);
+                // Build quaternion from Euler angles in radians (pitch, yaw, roll)
+                Engine.Vector3 bulletEulerRad = new Engine.Vector3(bulletPitchRad, bulletYawRad, 0.0f);
+                Engine.Quat bulletRotationQuat = Engine.Quat.FromEuler(bulletEulerRad);
+
+                // Convert quaternion back to Euler degrees as a helper for prefab instantiation
+                Engine.Vector3 bulletEulerFromQuatRad = bulletRotationQuat.ToEuler();
+                Engine.Vector3 bulletRotationDeg = new Engine.Vector3(
+                    bulletEulerFromQuatRad.X * RAD2DEG,
+                    bulletEulerFromQuatRad.Y * RAD2DEG,
+                    bulletEulerFromQuatRad.Z * RAD2DEG
+                );
+
                 Engine.Vector3 bulletScale = new Engine.Vector3(0.4f, 0.4f, 0.2f);
 
-                if(prefabPath == SecondaryBulletPrefab){
+                if (prefabPath == SecondaryBulletPrefab)
+                {
                     bulletScale = new Engine.Vector3(0.3f, 0.20f, 0.3f);
                 }
 
-                Engine.InternalCalls.Log("Bullet rotation: " + bulletRotation.X + ", " + bulletRotation.Y + ", " + bulletRotation.Z);
+                Engine.InternalCalls.Log("Bullet rotation (deg): " + bulletRotationDeg.X + ", " + bulletRotationDeg.Y + ", " + bulletRotationDeg.Z);
 
                 // Instantiate bullet WITH TRANSFORM - this ensures position is set immediately
                 uint bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
                     prefabPath,
                     ref firingPosition,
-                    ref bulletRotation,
+                    ref bulletRotationDeg,
                     ref bulletScale,
                     false  // false = entity prefab, not scene prefab
-                ); if (bulletEntityID == 0)
+                );
+                if (bulletEntityID == 0)
                 {
                     Engine.InternalCalls.LogError("FAILED to instantiate bullet! Prefab_Instantiate returned 0");
                     Engine.InternalCalls.LogError("Check if prefab exists at: " + prefabPath);
@@ -402,6 +411,9 @@ namespace Game
                 }
 
                 Engine.InternalCalls.Log("Bullet entity created with ID: " + bulletEntityID);
+
+                // Ensure bullet uses quaternion rotation as the authoritative orientation
+                Engine.Transform.SetRotation(bulletEntityID, ref bulletRotationQuat);
 
                 // Set bullet position
                 Engine.InternalCalls.Transform_SetPosition(bulletEntityID, ref firingPosition);
