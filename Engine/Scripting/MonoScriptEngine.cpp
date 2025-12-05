@@ -932,6 +932,8 @@ namespace Engine
 		// Quaternion dot product
 		static float Quat_Dot(glm::quat *q1, glm::quat *q2);
 
+		static void Input_GetMouseDelta(float *outX, float *outY);
+
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -1154,6 +1156,8 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
 		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
 		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
+
+		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -2684,6 +2688,19 @@ namespace Engine
 		float Quat_Dot(glm::quat *q1, glm::quat *q2)
 		{
 			return glm::dot(*q1, *q2);
+		}
+
+		static void Input_GetMouseDelta(float *outX, float *outY)
+		{
+			if (!s_InputSystem)
+			{
+				LOG_WARNING("[InternalCall] Input system not initialized");
+				return;
+			}
+			glm::vec2 in_out;
+			in_out = s_InputSystem->GetMouseDelta();
+			*outX = in_out.x;
+			*outY = in_out.y;
 		}
 	} // namespace internalcalls
 

@@ -4,8 +4,8 @@
 #include "../ECS/Scene.h"
 #include "../Utility/Logger.h"
 #include <mono/metadata/object.h>
-// #include "ScriptReloader.h"         // Hot-reload disabled
-// #include <filesystem>               // Hot-reload disabled
+#include "ScriptReloader.h"         // Hot-reload disabled
+#include <filesystem>               // Hot-reload disabled
 
 namespace Engine
 {
@@ -26,7 +26,7 @@ namespace Engine
         // ==========================
         // Hot-reload logic disabled
         // ==========================
-        /*
+
         // Hot-reload check: Only reload if DLL file has actually changed
         static std::filesystem::file_time_type lastModifiedTime;
         static bool initialized = false;
@@ -82,7 +82,6 @@ namespace Engine
 
             LOG_INFO("[Hot-Reload] Complete!");
         }
-        */
 
         // ==========================
         // Normal script update logic
@@ -153,7 +152,7 @@ namespace Engine
         }
 
         s_CurrentScene = nullptr;
-        m_Scene = nullptr;
+        m_Scene = nullptr; 
         LOG_INFO("[ScriptSystem] Shutdown");
     }
 

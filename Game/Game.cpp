@@ -1088,20 +1088,20 @@ void Game::OnUpdate(Engine::Timestep ts)
 			}
 
 
-			// Movement accumulator
-			glm::vec3 moveDir(0.0f);
+			//// Movement accumulator
+			//glm::vec3 moveDir(0.0f);
 
-			if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
-			if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
-			if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
-			if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+			//if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+			//if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+			//if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+			//if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
 
-			// Normalize to prevent faster diagonal movement
-			if (glm::dot(moveDir, moveDir) > 0.0f)
-				moveDir = glm::normalize(moveDir);
+			//// Normalize to prevent faster diagonal movement
+			//if (glm::dot(moveDir, moveDir) > 0.0f)
+			//	moveDir = glm::normalize(moveDir);
 
-			// Apply movement to player
-			transform.Position += moveDir * moveSpeed;
+			//// Apply movement to player
+			//transform.Position += moveDir * moveSpeed;
 
 		}
 		else
@@ -1148,22 +1148,22 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 
 		// Check moving input
-		if (input.IsKeyPressed(GLFW_KEY_W))
-		{
-			editorCam.moveCamForward();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_A))
-		{
-			editorCam.moveCamLeft();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_S))
-		{
-			editorCam.moveCamBack();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_D))
-		{
-			editorCam.moveCamRight();
-		}
+		//if (input.IsKeyPressed(GLFW_KEY_W))
+		//{
+		//	editorCam.moveCamForward();
+		//}
+		//if (input.IsKeyPressed(GLFW_KEY_A))
+		//{
+		//	editorCam.moveCamLeft();
+		//}
+		//if (input.IsKeyPressed(GLFW_KEY_S))
+		//{
+		//	editorCam.moveCamBack();
+		//}
+		//if (input.IsKeyPressed(GLFW_KEY_D))
+		//{
+		//	editorCam.moveCamRight();
+		//}
 
 	}
 
