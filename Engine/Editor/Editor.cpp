@@ -266,7 +266,11 @@ namespace Engine
 						if (!currScenePath.empty())
 						{
 							m_Scene->SaveToFile(currScenePath);
-							m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
+							if (m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath)))
+							{
+								LOG_DEBUG(currFileName, "save to ", convertAssetPathToRootResources(currScenePath), " in root");
+							}
+							
 
 						}
 						else

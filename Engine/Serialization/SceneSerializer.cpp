@@ -644,19 +644,19 @@ namespace Engine
 
 				for (SizeType j = 0; j < components.Size(); j++)
 				{
-					const Value &componentObj = components[j];
+					const Value& componentObj = components[j];
 					std::string componentType = componentObj["Type"].GetString();
-					const Value &properties = componentObj["Properties"];
+					const Value& properties = componentObj["Properties"];
 
 					// Deserialize specific component types
 					if (componentType == "TagComponent")
 					{
-						auto &tag = entity.AddComponent<TagComponent>();
+						auto& tag = entity.AddComponent<TagComponent>();
 						tag.Tag = properties["Tag"].GetString();
 					}
 					else if (componentType == "PrefabComponent")
 					{
-						auto &prefabComp = entity.AddComponent<PrefabComponent>();
+						auto& prefabComp = entity.AddComponent<PrefabComponent>();
 
 						// --- Prefab GUID ---
 						if (properties.HasMember("PrefabGUID"))
@@ -674,12 +674,12 @@ namespace Engine
 					}
 					else if (componentType == "TransformComponent")
 					{
-						auto &transform = entity.AddComponent<TransformComponent>();
+						auto& transform = entity.AddComponent<TransformComponent>();
 
 						// Position
 						if (properties.HasMember("Position"))
 						{
-							const Value &posArray = properties["Position"];
+							const Value& posArray = properties["Position"];
 							transform.Position = glm::vec3(
 								posArray[0].GetFloat(),
 								posArray[1].GetFloat(),
@@ -690,7 +690,7 @@ namespace Engine
 						// Rotation - Convert Euler angles to quaternion
 						if (properties.HasMember("Rotation"))
 						{
-							const Value &rotArray = properties["Rotation"];
+							const Value& rotArray = properties["Rotation"];
 							glm::vec3 eulerRotation(
 								rotArray[0].GetFloat(),
 								rotArray[1].GetFloat(),
@@ -702,7 +702,7 @@ namespace Engine
 						// Scale
 						if (properties.HasMember("Scale"))
 						{
-							const Value &scaleArray = properties["Scale"];
+							const Value& scaleArray = properties["Scale"];
 							transform.Scale = glm::vec3(
 								scaleArray[0].GetFloat(),
 								scaleArray[1].GetFloat(),
@@ -719,7 +719,7 @@ namespace Engine
 						{
 
 							transform.Children.clear();
-							const Value &childrenArray = properties["Children"];
+							const Value& childrenArray = properties["Children"];
 
 							for (rapidjson::SizeType i = 0; i < childrenArray.Size(); ++i)
 								transform.Children.push_back(childrenArray[i].GetUint());
@@ -728,7 +728,7 @@ namespace Engine
 					}
 					else if (componentType == "CameraComponent")
 					{
-						auto &camera = entity.AddComponent<CameraComponent>();
+						auto& camera = entity.AddComponent<CameraComponent>();
 
 						if (properties.HasMember("Enabled"))
 							camera.Enabled = properties["Enabled"].GetBool();
@@ -741,7 +741,7 @@ namespace Engine
 
 						if (properties.HasMember("Size"))
 						{
-							const Value &size = properties["Size"];
+							const Value& size = properties["Size"];
 							camera.Size = glm::vec2(
 								size[0].GetFloat(),
 								size[1].GetFloat()
@@ -760,7 +760,7 @@ namespace Engine
 
 						if (properties.HasMember("Target"))
 						{
-							const Value &target = properties["Target"];
+							const Value& target = properties["Target"];
 							camera.Target = glm::vec3(
 								target[0].GetFloat(),
 								target[1].GetFloat(),
@@ -834,7 +834,8 @@ namespace Engine
 						}
 
 						if (properties.HasMember("SubmeshIndex")) mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
-						}
+					}
+			
 					else if (componentType == "RigidbodyComponent")
 					{
 						auto &rb = entity.AddComponent<RigidbodyComponent>();
