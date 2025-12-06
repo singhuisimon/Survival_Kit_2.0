@@ -97,6 +97,8 @@ namespace Engine {
 			m_ValidInstances.clear();
 		}
 
+		MonoObject* GetObjectFromHandle(void* instancePtr);
+
 	private:
 		MonoScriptEngine() = default;
 		~MonoScriptEngine() = default;
@@ -116,6 +118,7 @@ namespace Engine {
 		MonoImage *m_AppImage = nullptr;
 		std::string   m_AssemblyPath;
 		std::unordered_map<std::string, MonoClass *> m_ClassCache;
+		std::unordered_map<MonoObject*, uint32_t> m_ObjectToHandle;
 	};
 
 } // namespace Engine

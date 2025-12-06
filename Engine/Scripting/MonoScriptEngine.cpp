@@ -44,23 +44,39 @@ namespace Engine
 		return instance;
 	}
 
-	bool MonoScriptEngine::IsValidMonoObject(MonoObject *instance)
+	bool MonoScriptEngine::IsValidMonoObject(MonoObject* instance)
 	{
 		if (!instance)
 			return false;
 
-		MonoDomain *currentDomain = mono_domain_get();
+		// Check if pointer looks valid (basic sanity check)
+		if ((uintptr_t)instance == 0xFFFFFFFFFFFFFFFF ||
+			(uintptr_t)instance < 0x10000)
+		{
+			LOG_WARNING("IsValidMonoObject: Invalid pointer detected");
+			return false;
+		}
+
+		MonoDomain* currentDomain = mono_domain_get();
 		if (!currentDomain)
 		{
 			LOG_WARNING("IsValidMonoObject: No current Mono domain");
 			return false;
 		}
 
-		// If not, it's from an old unloaded domain
-		MonoDomain *instanceDomain = mono_object_get_domain(instance);
-		if (!instanceDomain || instanceDomain != currentDomain)
+		// Wrap in try-catch for safety (if using C++ exceptions)
+		try
 		{
-			LOG_WARNING("IsValidMonoObject: Instance is from a different/unloaded domain");
+			MonoDomain* instanceDomain = mono_object_get_domain(instance);
+			if (!instanceDomain || instanceDomain != currentDomain)
+			{
+				LOG_WARNING("IsValidMonoObject: Instance is from a different/unloaded domain");
+				return false;
+			}
+		}
+		catch (...)
+		{
+			LOG_WARNING("IsValidMonoObject: Exception while checking domain");
 			return false;
 		}
 
@@ -405,6 +421,9 @@ namespace Engine
 		// Call constructor
 		mono_runtime_object_init(instance);
 
+		uint32_t handle = mono_gchandle_new(instance, false);
+		m_ObjectToHandle[instance] = handle;
+
 		return instance;
 	}
 
@@ -413,15 +432,36 @@ namespace Engine
 	{
 		// Mono uses garbage collection, so we just need to clear references
 		// The GC will handle cleanup
-		if (instance)
+
+		//if (instance)
+		//{
+		//	// Optionally call OnDestroy if the class has it
+		//	MonoClass *klass = mono_object_get_class(instance);
+		//	MonoMethod *destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
+		//	if (destroyMethod)
+		//	{
+		//		mono_runtime_invoke(destroyMethod, instance, nullptr, nullptr);
+		//	}
+		//}
+
+		if (!instance)
+			return;
+
+		// Call OnDestroy if the class has it
+		MonoClass* klass = mono_object_get_class(instance);
+		MonoMethod* destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
+		if (destroyMethod)
 		{
-			// Optionally call OnDestroy if the class has it
-			MonoClass *klass = mono_object_get_class(instance);
-			MonoMethod *destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
-			if (destroyMethod)
-			{
-				mono_runtime_invoke(destroyMethod, instance, nullptr, nullptr);
-			}
+			mono_runtime_invoke(destroyMethod, instance, nullptr, nullptr);
+		}
+
+		// ======== ADD THIS SECTION - Free the GC handle ========
+		auto it = m_ObjectToHandle.find(instance);
+		if (it != m_ObjectToHandle.end())
+		{
+			mono_gchandle_free(it->second);
+			m_ObjectToHandle.erase(it);
+			LOG_INFO("Freed GC handle for script instance");
 		}
 	}
 
@@ -502,6 +542,40 @@ namespace Engine
 
 	}
 
+	MonoObject* MonoScriptEngine::GetObjectFromHandle(void* instancePtr)
+	{
+		if (!instancePtr)
+			return nullptr;
+
+		MonoObject* obj = (MonoObject*)instancePtr;
+
+		auto it = m_ObjectToHandle.find(obj);
+		if (it == m_ObjectToHandle.end())
+		{
+			LOG_WARNING("No GC handle found for instance");
+			return nullptr;
+		}
+
+		// Verify handle is valid
+		if (it->second == 0)
+		{
+			LOG_WARNING("Invalid GC handle (0)");
+			return nullptr;
+		}
+
+		EnsureCorrectDomain();
+
+		// Get the actual object from the GC handle
+		MonoObject* target = mono_gchandle_get_target(it->second);
+
+		if (!target)
+		{
+			LOG_WARNING("GC handle target is null (object was collected)");
+			return nullptr;
+		}
+
+		return target;
+	}
 	// Replace the existing SetFieldValue method in MonoScriptEngine with this corrected version:
 
 	void MonoScriptEngine::SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value)
