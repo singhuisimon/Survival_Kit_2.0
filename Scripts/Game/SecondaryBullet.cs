@@ -32,7 +32,7 @@ namespace Game
             if (elapsedTime >= ProjectileLifetime)
             {
                 Log("SecondaryBullet lifetime expired, destroying...");
-                InternalCalls.Scene_DestroyEntity((ulong)EntityID);
+                InternalCalls.Scene_DestroyEntity((uint)EntityID);
                 return;
             }
 
@@ -46,18 +46,18 @@ namespace Game
 
             for (int i = 0; i < collisionCount; i++)
             {
-                InternalCalls.Physics_GetCollisionPair(i, out ulong entityA, out ulong entityB);
+                InternalCalls.Physics_GetCollisionPair(i, out uint entityA, out uint entityB);
 
                 if (entityA == EntityID || entityB == EntityID)
                 {
-                    ulong otherEntity = (entityA == EntityID) ? entityB : entityA;
+                    uint otherEntity = (entityA == EntityID) ? entityB : entityA;
                     OnHitEnemy(otherEntity);
                     return;
                 }
             }
         }
 
-        public void OnHitEnemy(ulong targetEntityID)
+        public void OnHitEnemy(uint targetEntityID)
         {
             Log("SecondaryBullet hit entity " + targetEntityID + "! Spawning Vortex AOE...");
 
@@ -65,7 +65,7 @@ namespace Game
             SpawnVortexAOE();
 
             // Destroy this bullet
-            InternalCalls.Scene_DestroyEntity((ulong)EntityID);
+            InternalCalls.Scene_DestroyEntity((uint)EntityID);
         }
 
         private void SpawnVortexAOE()
@@ -74,12 +74,12 @@ namespace Game
             {
                 // Get current bullet position before destroying
                 Vector3 currentPosition;
-                InternalCalls.Transform_GetPosition((ulong)EntityID, out currentPosition);
+                InternalCalls.Transform_GetPosition((uint)EntityID, out currentPosition);
 
                 Log("Spawning Vortex at: " + currentPosition.X + ", " + currentPosition.Y + ", " + currentPosition.Z);
 
                 // Instantiate vortex prefab
-                ulong vortexEntityID = InternalCalls.Prefab_Instantiate(VortexPrefabPath);
+                uint vortexEntityID = InternalCalls.Prefab_Instantiate(VortexPrefabPath);
 
                 if (vortexEntityID != 0)
                 {

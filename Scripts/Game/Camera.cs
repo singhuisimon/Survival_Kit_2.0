@@ -43,9 +43,9 @@ namespace Game
 
         // ===== Internal state =====
 
-        private const ulong INVALID_ENTITY = 0xffffffffu;
+        private const uint INVALID_ENTITY = 0xffffffffu;
 
-        private ulong targetEntityID = INVALID_ENTITY;
+        private uint targetEntityID = INVALID_ENTITY;
 
         // We track orientation purely in quaternions
         private Quat currentRotation;   // What is currently applied to camera
@@ -62,7 +62,7 @@ namespace Game
             targetEntityID = InternalCalls.Scene_FindEntityByName(targetName);
 
             // Grab initial rotation from the camera entity
-            currentRotation = Transform.GetRotation((ulong)EntityID);
+            currentRotation = Transform.GetRotation((uint)EntityID);
             targetRotation = currentRotation;
 
             // Derive an initial pitch estimate from the forward vector (quat-only)
@@ -166,7 +166,7 @@ namespace Game
             newRotation = newRotation.Normalized;
 
             currentRotation = newRotation;
-            Transform.SetRotation((ulong)EntityID, ref currentRotation);
+            Transform.SetRotation((uint)EntityID, ref currentRotation);
         }
 
         // ==================
@@ -176,7 +176,7 @@ namespace Game
         private void UpdatePosition(float deltaTime)
         {
             Vector3 targetPos = Transform.GetPosition(targetEntityID);
-            Vector3 currentPos = Transform.GetPosition((ulong)EntityID);
+            Vector3 currentPos = Transform.GetPosition((uint)EntityID);
 
             // Use camera's orientation (quats only) to compute offset
             Vector3 forward = currentRotation.Forward;
@@ -195,7 +195,7 @@ namespace Game
             else if (t < 0.0f) t = 0.0f;
 
             Vector3 newPos = LerpVector3(currentPos, desiredPos, t);
-            Transform.SetPosition((ulong)EntityID, ref newPos);
+            Transform.SetPosition((uint)EntityID, ref newPos);
         }
 
         private void SnapToTargetPosition()
@@ -214,7 +214,7 @@ namespace Game
                 targetPos.Z - forward.Z * followDistance + up.Z * followHeight
             );
 
-            Transform.SetPosition((ulong)EntityID, ref snapPos);
+            Transform.SetPosition((uint)EntityID, ref snapPos);
         }
 
         // =====================

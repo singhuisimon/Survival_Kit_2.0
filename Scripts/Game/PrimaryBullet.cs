@@ -31,7 +31,7 @@ namespace Game
             elapsedTime += deltaTime;
             if (elapsedTime >= ProjectileLifetime)
             {
-                InternalCalls.Scene_DestroyEntity((ulong)EntityID);
+                InternalCalls.Scene_DestroyEntity((uint)EntityID);
                 return;
             }
 
@@ -44,13 +44,13 @@ namespace Game
         private void CheckCollisions()
         {
             int collisionCount = InternalCalls.Physics_GetCollisionCount();
-            ulong bulletID = (ulong)EntityID;
+            uint bulletID = EntityID;
 
             for (int i = 0; i < collisionCount; i++)
             {
-                InternalCalls.Physics_GetCollisionPair(i, out ulong entityA, out ulong entityB);
+                InternalCalls.Physics_GetCollisionPair(i, out uint entityA, out uint entityB);
 
-                ulong otherEntity;
+                uint otherEntity;
 
                 if (entityA == bulletID)
                 {
@@ -62,13 +62,16 @@ namespace Game
                 }
                 else
                 {
+                    Log("Sanity check: " + InternalCalls.Tag_GetTag(EntityID));
+                    Log("Bullet Pair: " + EntityID + " " + entityA + " " + entityB);
+                    Log("Bullet Pair: " + InternalCalls.Tag_GetTag(entityA) + " " + InternalCalls.Tag_GetTag(entityB));
                     // This pair does not involve the bullet
                     continue;
                 }
 
                 // Get the tag of the other entity
                 string otherTag = InternalCalls.Tag_GetTag(otherEntity);
-
+                Log("Going into Target Tagged");
                 // Only react if the tag matches one of our TargetTags
                 if (IsTargetTag(otherTag))
                 {
@@ -82,6 +85,7 @@ namespace Game
         {
             if (string.IsNullOrEmpty(tag) || TargetTags == null)
                 return false;
+            Log("Not null or empty");
 
             for (int i = 0; i < TargetTags.Length; i++)
             {
@@ -89,21 +93,23 @@ namespace Game
                 if (!string.IsNullOrEmpty(target) &&
                     string.Equals(tag, target, StringComparison.OrdinalIgnoreCase))
                 {
+                    InternalCalls.Log("Target Tagged: " + tag);
                     return true;
                 }
             }
+            Log("Failed to tag target: " + tag);
 
             return false;
         }
 
         // -------- WHEN A VALID TARGET IS HIT --------
 
-        public void OnHitEnemy(ulong targetEntityID)
+        public void OnHitEnemy(uint targetEntityID)
         {
             // Publish event BEFORE destroying the bullet
             EventSystem.Publish("BulletHit", targetEntityID.ToString());
-
-            InternalCalls.Scene_DestroyEntity((ulong)EntityID);
+            Log("Event Published! BulletHit: " + targetEntityID);
+            InternalCalls.Scene_DestroyEntity((uint)EntityID);
         }
 
         public override void OnDestroy()
