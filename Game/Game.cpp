@@ -748,24 +748,24 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_INFO("Editor toggled: ", m_EditorEnable);
 	}
 
-// Editor camera toggle
-if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
-{
-    editorCamToggle = !editorCamToggle;
+	// Editor camera toggle
+	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
+	{
+		editorCamToggle = !editorCamToggle;
 
-    if (!editorCamToggle)
-    {
-        // Lock & hide cursor (free-look mode)
-        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    }
-    else
-    {
-        // Restore normal cursor
-        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
+		if (!editorCamToggle)
+		{
+			// Lock & hide cursor (free-look mode)
+			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+		else
+		{
+			// Restore normal cursor
+			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
 
-    LOG_INFO("Editor camera toggled: ", editorCamToggle);
-}
+		LOG_INFO("Editor camera toggled: ", editorCamToggle);
+	}
 
 
 	Engine::ScriptReloader::GetInstance().Update();
@@ -952,19 +952,7 @@ if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 	bool healthBarUIFound = false;
 	for (auto entityHandle : view)
 	{
-		auto& healthUITag = view.get<Engine::TagComponent>(entityHandle);
-		if (healthUITag.Tag == "HealthBar")
-		{
-			healthBarUI = Engine::Entity(entityHandle, &registry);
-			healthBarUIFound = true;
-			break;
-		}
-	}
-
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_C))
-	{
-		auto& healthUITag = view.get<Engine::TagComponent>(entityHandle);
+		auto &healthUITag = view.get<Engine::TagComponent>(entityHandle);
 		if (healthUITag.Tag == "HealthBar")
 		{
 			healthBarUI = Engine::Entity(entityHandle, &registry);
@@ -1129,10 +1117,11 @@ if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 				timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
 			}
 
-			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>()) {
+			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>())
+			{
 
 				// Healthbar UI transform
-				auto& healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
+				auto &healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
 
 				// Place timer bar above the player's local up
 				const float healthBarDist = 3.0f;      // How far from camera/player
