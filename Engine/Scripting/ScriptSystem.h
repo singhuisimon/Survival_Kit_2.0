@@ -18,6 +18,7 @@ namespace Engine {
 
     private:
         Scene* m_Scene = nullptr;
+        bool m_IsShuttingDown = false;
     };
 
 } // namespace Engine

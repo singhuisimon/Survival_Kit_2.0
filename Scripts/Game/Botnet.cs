@@ -188,18 +188,15 @@ namespace Game
                 return;
 
             // Payload is the EntityID of whatever the bullet hit
-            if (!ulong.TryParse(payload, out ulong hitId))
+            if (!uint.TryParse(payload, out uint hitId))
                 return;
 
-            if (hitId != (ulong)EntityID)
+            if (hitId != (uint)EntityID)
                 return;
-
-            Log("Botnet (EntityID = " + EntityID + ") was hit by bullet! exploding");
-
-            // Either mark for explosion next frame...
-            isExploding = true;
-
             // ...or explode immediately:
+
+            EventSystem.Publish("BotnetDeath", 1.ToString());
+
             Explode();
         }
 
@@ -272,23 +269,24 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
-            uint chosen = INVALID_ENTITY;
+            uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
+            //uint chosen = INVALID_ENTITY;
 
-            switch (choice)
-            {
-                case 0:
-                    chosen = FindFirstEntityWithTag(TAG_PLAYER);
-                    break;
-                case 1:
-                    chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
-                    break;
-                case 2:
-                    chosen = FindFirstEntityWithTag(TAG_EMPLACEMENT);
-                    break;
-                case 3:
-                    chosen = FindRandomEntityWithTag(TAG_ALLIES);
-                    break;
-            }
+            //switch (choice)
+            //{
+            //    case 0:
+            //        chosen = FindFirstEntityWithTag(TAG_PLAYER);
+            //        break;
+            //    case 1:
+            //        chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+            //        break;
+            //    case 2:
+            //        chosen = FindFirstEntityWithTag(TAG_EMPLACEMENT);
+            //        break;
+            //    case 3:
+            //        chosen = FindRandomEntityWithTag(TAG_ALLIES);
+            //        break;
+            //}
 
             if (chosen != INVALID_ENTITY)
             {
@@ -437,6 +435,7 @@ namespace Game
                 return;
 
             uint self = (uint)EntityID;
+            uint playerID = InternalCalls.Scene_FindEntityByName("Player");
 
             for (int i = 0; i < count; ++i)
             {
@@ -447,6 +446,12 @@ namespace Game
                     continue;
 
                 uint other = (a == self) ? b : a;
+
+                if (other == playerID)
+                {
+                    Log("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
+                    EventSystem.Publish("BotnetAttackedPlayer", EntityID.ToString());
+                }
 
                 if (other == targetID)
                 {
@@ -585,7 +590,7 @@ namespace Game
             return result;
         }
 
-        private static uint NextUInt()
+        private static uint Nextuint()
         {
             uint x = s_RngState;
             if (x == 0)
@@ -604,7 +609,7 @@ namespace Game
                 return minInclusive;
 
             uint range = (uint)(maxExclusive - minInclusive);
-            uint r = NextUInt();
+            uint r = Nextuint();
             return minInclusive + (int)(r % range);
         }
 
@@ -613,7 +618,7 @@ namespace Game
             if (maxInclusive <= minInclusive)
                 return minInclusive;
 
-            uint r = NextUInt() & 0x00FFFFFFu;
+            uint r = Nextuint() & 0x00FFFFFFu;
             float t = r / 16777215.0f;
             return minInclusive + (maxInclusive - minInclusive) * t;
         }

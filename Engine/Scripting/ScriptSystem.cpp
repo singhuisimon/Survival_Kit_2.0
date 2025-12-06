@@ -87,18 +87,18 @@ namespace Engine
         // ==========================
         // Normal script update logic
         // ==========================
+        if (m_IsShuttingDown)  // Add this check at the very top
+            return;
         float deltaTime = ts.GetSeconds();
-        auto &registry = scene->GetRegistry();
+        auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
 
         for (auto entity : view)
         {
-            auto &script = view.get<ScriptComponent>(entity);
+            auto& script = view.get<ScriptComponent>(entity);
 
             if (script.ScriptClassName.empty())
-            {
                 continue;
-            }
 
             // Create instance if needed
             if (!script.ScriptInstance)
@@ -107,48 +107,62 @@ namespace Engine
                     .CreateScriptInstance(script.ScriptClassName);
 
                 if (!script.ScriptInstance)
-                {
-                    // LOG_ERROR("[ScriptSystem] Failed to create script instance: {0}", script.ScriptClassName);
                     continue;
-                }
 
                 MonoScriptEngine::GetInstance().SetFieldValue(
-                    (MonoObject *)script.ScriptInstance, "EntityID", &entity);
+                    (MonoObject*)script.ScriptInstance, "EntityID", &entity);
             }
 
             if (script.ScriptInstance)
             {
+                MonoObject* freshInstance = MonoScriptEngine::GetInstance()
+                    .GetObjectFromHandle(script.ScriptInstance);
+
+                if (!freshInstance)
+                {
+                    LOG_WARNING("Script instance was garbage collected: ", script.ScriptClassName);
+                    script.ScriptInstance = nullptr;
+                    script.Started = false;
+                    continue;
+                }
+
                 // Call OnStart once
                 if (!script.Started)
                 {
+                    // ===== CHANGED: Use freshInstance, not script.ScriptInstance =====
                     MonoScriptEngine::GetInstance().CallMethod(
-                        (MonoObject *)script.ScriptInstance, "OnStart");
+                        freshInstance, "OnStart");  // CHANGED THIS LINE
                     script.Started = true;
                 }
 
                 // Call OnUpdate every frame
-                void *params[1] = { &deltaTime };
+                void* params[1] = { &deltaTime };
+                // ===== CHANGED: Use freshInstance, not script.ScriptInstance =====
                 MonoScriptEngine::GetInstance().CallMethod(
-                    (MonoObject *)script.ScriptInstance, "OnUpdate",
-                    params, 1);
+                    freshInstance, "OnUpdate", params, 1);  // CHANGED THIS LINE
             }
         }
     }
 
-    void ScriptSystem::OnShutdown(Scene *scene)
-    {  // Added Scene* parameter
-        auto &registry = scene->GetRegistry();  // Use parameter instead of s_CurrentScene
+    void ScriptSystem::OnShutdown(Scene* scene)
+    {
+        m_IsShuttingDown = true;
+
+        auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
 
         for (auto entity : view)
         {
-            auto &script = view.get<ScriptComponent>(entity);
+            auto& script = view.get<ScriptComponent>(entity);
+
             if (script.ScriptInstance)
             {
-                MonoScriptEngine::GetInstance().CallMethod(
-                    (MonoObject *)script.ScriptInstance, "OnDestroy");
+                // DestroyScriptInstance will handle calling OnDestroy internally
                 MonoScriptEngine::GetInstance().DestroyScriptInstance(
-                    (MonoObject *)script.ScriptInstance);
+                    (MonoObject*)script.ScriptInstance);
+
+                script.ScriptInstance = nullptr;
+                script.Started = false;
             }
         }
 

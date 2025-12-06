@@ -80,10 +80,15 @@ namespace Game
         [SerializeField] private float elapsedTime = 0f;
         [SerializeField] private int botnetSpawned = 0;
         [SerializeField] private int loveletterSpawned = 0;
+        [SerializeField] private int botnetkilled = 0;
 
         private string alliesambience = "Flotilla_Gunship_Ambient.wav";
         private string coreambience = "Core_Ambient.wav";
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
+
+        private const string BOTNETKILLED = "BotnetDeath";
+
+        private const int TARGETBOTNETKILLED = 15;
 
         private uint spawnmanagerID;
 
@@ -107,6 +112,8 @@ namespace Game
             EnvironmentReset();
 
             InternalCalls.Entity_AddAudio((uint)EntityID);
+
+            EventSystem.Subscribe(BOTNETKILLED, UpdateBotnetKilled);
 
             Log("EnemySpawnManager initialized");
         }
@@ -133,6 +140,8 @@ namespace Game
                 {
                     PlayInGameSounds();
                 }
+
+                botnetkilled = 0;
             }
 
             // check if the game has started
@@ -164,7 +173,13 @@ namespace Game
                 }
             }
 
+            CheckBotnetKilled();
+
             CheckForEnemiesLeft();
+        }
+
+        public override void OnDestroy(){
+            EventSystem.Unsubscribe(BOTNETKILLED, UpdateBotnetKilled);
         }
 
         #region setup
@@ -352,7 +367,7 @@ namespace Game
             Log("SpawnManager - Setting up enemy spawning");
 
             E005_loveletter = 0;
-            E004_botnet = 15;
+            E004_botnet = 30;
 
             loveletterRoutes = new string[] { "A1" };
 
@@ -455,13 +470,13 @@ namespace Game
             }
 
             // comment this part if u want to test more than 20 botnet.
-            if (botnetSpawned >= 20)
-            {
-                if (enemyType == 0)
-                {
-                    return;
-                }
-            }
+            // if (botnetSpawned >= 20)
+            // {
+            //     if (enemyType == 0)
+            //     {
+            //         return;
+            //     }
+            // }
 
             int spawnIndex = GetRandomInt(0, activeSpawnPoints.Count);
             SpawnPointData spawnPoint = activeSpawnPoints[spawnIndex];
@@ -557,6 +572,32 @@ namespace Game
 
         #endregion
 
+        private void UpdateBotnetKilled(string eventName, string payload){
+            if(!int.TryParse(payload, out int count)){
+                return;
+            }
+
+            botnetkilled += count;
+
+            Log("SpawnManager detected botnet is killed current count: " + botnetkilled.ToString());
+        }
+
+        private void CheckBotnetKilled(){
+            if(botnetkilled >= TARGETBOTNETKILLED){
+                enemiesLeft = 0;
+
+                isActive = false;
+                playInGameSound = false;
+                spawningAllowed = false;
+                StopAllOtherAudio();
+                EnvironmentReset();
+                Log("=== YIPPEE U KILLED ENOUGH ===");
+
+                //hello
+
+            }
+        }
+
         private void CheckForEnemiesLeft()
         {
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
@@ -573,17 +614,21 @@ namespace Game
             if (botnet != null && botnet.Length != 0)
             {
                 totalenemiesleft += botnet.Length;
-                Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
+                //Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
 
             if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)
             {
+                if(botnetkilled >= TARGETBOTNETKILLED){
+                    return;
+                }
                 enemiesLeft = 0;
 
                 isActive = false;
                 playInGameSound = false;
                 spawningAllowed = false;
                 StopAllOtherAudio();
+                EnvironmentReset();
                 Log("=== Wave Complete ===");
             }
             else

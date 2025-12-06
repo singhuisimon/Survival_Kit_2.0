@@ -294,7 +294,7 @@ namespace Game
             uint mainMenuID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
             uint gameID = InternalCalls.Scene_FindEntityByName(gameCameraName);
             
-            // Convert to ulong (EntityID is ulong in the engine)
+            // Convert to uint (EntityID is uint in the engine)
             mainMenuCameraID = mainMenuID;
             gameCameraID = gameID;
             

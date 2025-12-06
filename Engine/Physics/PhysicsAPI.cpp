@@ -57,6 +57,24 @@ namespace Engine
 		return true;
 	}
 
+	static inline EntityID BodyIDToEntityID(JPH::BodyID id)
+	{
+		// Use the same mPhysics you already use in SetGravityFactor()
+		JPH::BodyLockRead lock{ mPhysics.GetBodyLockInterface(), id };
+		if (!lock.Succeeded())
+			return entt::null;
+
+		const JPH::Body &body = lock.GetBody();
+		JPH::uint64 raw = body.GetUserData();
+
+		// If you keep 0 as "no entity", guard it
+		if (raw == 0)
+			return entt::null;
+
+		// Stored as uint32_t(EntityID) in mUserData
+		return static_cast<EntityID>(static_cast<std::uint32_t>(raw));
+	}
+
 	/**************************************************************************
 	 * @brief
 	 * Internal helper: fetches the RigidbodyComponent for an entity, if any.
@@ -280,27 +298,12 @@ namespace Engine
 	}
 
 	/**************************************************************************
-	 * @brief
-	 * Per-frame collision event buffer (deduped unordered pairs).
-	 **************************************************************************/
+ * @brief
+ * Per-frame collision event buffer (deduped unordered pairs).
+ **************************************************************************/
 	static std::vector<ContactEvent>         s_frame_contacts{};
 	static std::unordered_set<std::uint64_t> s_dedupe{};
 	static std::mutex                        s_contact_mutex{};
-
-	/**************************************************************************
-	 * @brief
-	 * Internal: converts BodyID back to EntityID.
-	 * @param id
-	 * Jolt BodyID.
-	 * @return
-	 * Matching EntityID or entt::null if not found.
-	 **************************************************************************/
-	static inline EntityID BodyIDToEntityID(JPH::BodyID id)
-	{
-		for (const auto &kv : mBodyOf)
-			if (kv.second == id) return kv.first;
-		return entt::null;
-	}
 
 	/**************************************************************************
 	 * @brief
@@ -323,6 +326,10 @@ namespace Engine
 	/**************************************************************************
 	 * @brief
 	 * Local contact listener that records added/persisted contacts.
+	 *
+	 * NOTE:
+	 * We rely on Jolt Body::GetUserData() storing the ECS EntityID.
+	 * Make sure body creation sets user data appropriately.
 	 **************************************************************************/
 	class LocalContactListener final : public JPH::ContactListener
 	{
@@ -352,7 +359,7 @@ namespace Engine
 			JPH::ContactSettings &
 		) override
 		{
-			Record(a.GetID(), b.GetID());
+			Record(a, b);
 		}
 
 		/**************************************************************************
@@ -366,31 +373,38 @@ namespace Engine
 			JPH::ContactSettings &
 		) override
 		{
-			Record(a.GetID(), b.GetID());
+			Record(a, b);
 		}
 
 	private:
 		/**************************************************************************
 		 * @brief
 		 * Records a pair into the frame buffer with de-duplication.
-		 * @param ba
-		 * BodyID A.
-		 * @param bb
-		 * BodyID B.
+		 * @param a
+		 * Body A.
+		 * @param b
+		 * Body B.
 		 **************************************************************************/
-		static void Record(JPH::BodyID ba, JPH::BodyID bb)
+		static void Record(const JPH::Body &a, const JPH::Body &b)
 		{
-			const EntityID ea{ BodyIDToEntityID(ba) };
-			const EntityID eb{ BodyIDToEntityID(bb) };
-			if (ea == entt::null || eb == entt::null) return;
+			// Pull ECS entity IDs from Jolt user data
+			const EntityID ea = static_cast<EntityID>(a.GetUserData());
+			const EntityID eb = static_cast<EntityID>(b.GetUserData());
+
+			// Skip bodies that are not associated with ECS entities
+			if (ea == entt::null || eb == entt::null)
+				return;
 
 			const std::uint64_t key{ PairKey(ea, eb) };
 
 			// Protect shared contact buffers from concurrent access
+			std::lock_guard<std::mutex> lock(s_contact_mutex);
+			if (s_dedupe.insert(key).second)
 			{
-				std::lock_guard<std::mutex> lock(s_contact_mutex);
-				if (s_dedupe.insert(key).second)
-					s_frame_contacts.push_back(ContactEvent{ ea, eb });
+				s_frame_contacts.push_back(ContactEvent{ ea, eb });
+
+				// inside Record(...)
+				LOG_INFO("[Physics] Contact recorded as a: ", static_cast<unsigned int>(ea), " b: ", static_cast<unsigned int>(eb));
 			}
 		}
 	};
