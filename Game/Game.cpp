@@ -961,6 +961,18 @@ if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 		}
 	}
 
+	// Editor camera toggle
+	if (input.IsKeyJustPressed(GLFW_KEY_C))
+	{
+		auto& healthUITag = view.get<Engine::TagComponent>(entityHandle);
+		if (healthUITag.Tag == "HealthBar")
+		{
+			healthBarUI = Engine::Entity(entityHandle, &registry);
+			healthBarUIFound = true;
+			break;
+		}
+	}
+
 	//// Editor camera toggle
 	//if (input.IsKeyJustPressed(GLFW_KEY_C))
 	//{
@@ -1115,6 +1127,30 @@ if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 				const float timerBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
 				const float timerBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
 				timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
+			}
+
+			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>()) {
+
+				// Healthbar UI transform
+				auto& healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
+
+				// Place timer bar above the player's local up
+				const float healthBarDist = 3.0f;      // How far from camera/player
+				const float angleRad = glm::radians(20.0f);
+				glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
+					camUp * std::sin(angleRad));
+
+				// Offset downward in camera's local up direction
+				const float yOffset = -3.5f; // negative = lower
+				glm::vec3 offset = camUp * yOffset;
+
+				// Final position
+				healthBarTrans.Position = camPos + angledDir * healthBarDist + offset;
+
+				// Make timer bar "follow" camera rotation
+				const float healthBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+				const float healthBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+				healthBarTrans.SetRotation(glm::vec3(healthBarPitchDeg, healthBarYawDeg, 0.0f));
 			}
 
 

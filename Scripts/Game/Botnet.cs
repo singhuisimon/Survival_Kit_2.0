@@ -432,6 +432,7 @@ namespace Game
                 return;
 
             uint self = (uint)EntityID;
+            uint playerID = InternalCalls.Scene_FindEntityByName("Player");
 
             for (int i = 0; i < count; ++i)
             {
@@ -442,6 +443,12 @@ namespace Game
                     continue;
 
                 uint other = (a == self) ? b : a;
+
+                if (other == playerID)
+                {
+                    Log("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
+                    EventSystem.Publish("BotnetAttackedPlayer", EntityID.ToString());
+                }
 
                 if (other == targetID)
                 {
