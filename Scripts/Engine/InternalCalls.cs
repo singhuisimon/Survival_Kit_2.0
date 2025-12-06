@@ -3,13 +3,8 @@ using System.Runtime.CompilerServices;
 
 namespace Engine
 {
-    /// <summary>
-    /// Internal calls to C++ engine functions
-    /// These are implemented in C++ and registered via mono_add_internal_call
-    /// </summary>
     public static class InternalCalls
     {
-        // Logging
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Log(string message);
 
@@ -19,35 +14,33 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LogWarning(string message);
 
-        // Scene / entities
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_FindEntityByName(string name);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Transform_GetParent(uint entityID);
 
-        // NEW: list of entities matching a tag
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint[] Scene_FindEntitiesByTag(string tag);
 
-        // CORRECT - GetPosition uses out, SetPosition uses ref
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_GetPosition(uint entityID, out Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_SetPosition(uint entityID, ref Vector3 position);
 
+        // Rotation now uses Quat as the marshalled type
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetRotation(uint entityID, out Vector3 position);
+        public static extern void Transform_GetRotation(uint entityID, out Quat rotation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetRotation(uint entityID, ref Vector3 position);
+        public static extern void Transform_SetRotation(uint entityID, ref Quat rotation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetScale(uint entityID, out Vector3 position);
+        public static extern void Transform_GetScale(uint entityID, out Vector3 scale);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetScale(uint entityID, ref Vector3 position);
+        public static extern void Transform_SetScale(uint entityID, ref Vector3 scale);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern uint Scene_CreateEntity(string name);
@@ -69,7 +62,7 @@ namespace Engine
         public static extern uint Prefab_InstantiateScene(string prefabPath);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern uint Prefab_InstantiateWithTransform(string prefabPath, ref Vector3 pos, ref Vector3 rot, ref Vector3 scale, bool isScenePrefab);
+        internal static extern uint Prefab_InstantiateWithTransform(string prefabPath, ref Vector3 position, ref Quat rotation, ref Vector3 scale, bool isScenePrefab);
 
         // Rigidbody core properties
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -113,8 +106,6 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rigidbody_Stop(uint entityID);
-
-        // ---- Collision events ----
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Physics_EnableCollisionEvents();
@@ -248,7 +239,6 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Audio_SetFile(uint entityID, string path);
 
-        //Added new functions -amanda
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float Audio_GetMinDistance(uint entityID);
 
@@ -291,7 +281,6 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool EntityHasRigidBody(ulong entityID);
 
-        //Audio Manager implementation - new amanda
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float AudioManager_GetGroupVolume(int groupType);
 
@@ -346,5 +335,46 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Event_Publish(string name, string payload);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_GetForward(ref Quat quat, out Vector3 forward);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_GetRight(ref Quat quat, out Vector3 right);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_GetUp(ref Quat quat, out Vector3 up);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_RotateVector(ref Quat quat, ref Vector3 vec, out Vector3 outVec);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_Multiply(ref Quat q1, ref Quat q2, out Quat outQuat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_FromAxisAngle(ref Vector3 axis, float angleRadians, out Quat outQuat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_Slerp(ref Quat q1, ref Quat q2, float t, out Quat outQuat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_Inverse(ref Quat quat, out Quat outQuat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_ToEuler(ref Quat quat, out Vector3 euler);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_FromEuler(ref Vector3 euler, out Quat outQuat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Quat_Normalize(ref Quat quat, out Quat outQuat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float Quat_Length(ref Quat quat);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float Quat_Dot(ref Quat q1, ref Quat q2);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float Input_GetMouseDelta(out float deltaX, out float deltaY);
     }
 }

@@ -1,4 +1,3 @@
-
 #include <windows.h>  // Add at top
 
 #include "MonoScriptEngine.h"
@@ -12,6 +11,7 @@
 #include "../Audio/AudioManager.h"
 #include "../Event/EventSystem.h"
 #include "ScriptReloader.h"
+
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
@@ -28,6 +28,12 @@
 
 #include <filesystem>
 #include <iostream>
+
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 
 namespace Engine
@@ -61,6 +67,39 @@ namespace Engine
 		return true;
 	}
 
+	void MonoScriptEngine::EnsureCorrectDomain()
+	{
+		if (!m_AppDomain) return;
+
+		MonoDomain *current = mono_domain_get();
+
+		if (current != m_AppDomain)
+		{
+			LOG_WARNING("EnsureCorrectDomain: Wrong domain active!");
+			LOG_WARNING("  Current:  " + std::to_string((uintptr_t)current));
+			LOG_WARNING("  Expected: " + std::to_string((uintptr_t)m_AppDomain));
+			LOG_WARNING("  Forcing switch to correct domain...");
+
+			mono_domain_set(m_AppDomain, false);
+
+			MonoDomain *after = mono_domain_get();
+			if (after == m_AppDomain)
+			{
+				LOG_INFO("  Successfully switched to correct domain");
+			}
+			else
+			{
+				LOG_ERROR("   FAILED to switch domain!");
+				LOG_ERROR("  After switch: " + std::to_string((uintptr_t)after));
+			}
+		}
+	}
+
+	bool MonoScriptEngine::IsInCorrectDomain()
+	{
+		if (!m_AppDomain) return false;
+		return mono_domain_get() == m_AppDomain;
+	}
 
 	// Pointer to Engine.EventSystem.RaiseFromNative(string, string)
 	static MonoMethod *s_EventSystemRaiseFromNative = nullptr;
@@ -130,14 +169,26 @@ namespace Engine
 			return;
 		}
 
+		LOG_INFO(" Mono JIT initialized");
+		LOG_INFO(" Root domain created: " + std::to_string((uintptr_t)m_RootDomain));
+		m_AppDomain = m_RootDomain;
 		// Create app domain
-		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
-		if (!m_AppDomain)
-		{
-			LOG_ERROR("Failed to create Mono app domain");
-			return;
-		}
-		mono_domain_set(m_AppDomain, true);
+		//m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+
+		LOG_INFO("Using single domain mode (no separate app domain)");
+		LOG_INFO("  Root domain: " + std::to_string((uintptr_t)m_RootDomain));
+		LOG_INFO("  App domain:  " + std::to_string((uintptr_t)m_AppDomain) + " (same as root)");
+
+
+
+		/*	if (!m_AppDomain)
+			{
+				LOG_ERROR("Failed to create Mono app domain");
+				return;
+			}*/
+		mono_domain_set(m_AppDomain, false);
+
+
 
 		// Load assembly (only if it exists)
 		if (!assemblyPath.empty() && std::filesystem::exists("GameScripts.dll"))
@@ -183,23 +234,21 @@ namespace Engine
 	{
 		LOG_INFO("Shutting down Mono Script Engine...");
 
+		// Unload assembly (clears mAppAssembly and mAppImage)
 		UnloadAssembly();
 
-		if (m_AppDomain)
-		{
-			mono_domain_set(m_RootDomain, false);
-			mono_domain_unload(m_AppDomain);
-			m_AppDomain = nullptr;
-		}
+		// The OS will clean up Mono memory when the process exits
 
-		if (m_RootDomain)
-		{
-			mono_jit_cleanup(m_RootDomain);
-			m_RootDomain = nullptr;
-		}
+
+		// Just null the pointers
+		m_RootDomain = nullptr;
+		m_AppDomain = nullptr;
+
+
 
 		LOG_INFO("Mono Script Engine shut down");
 	}
+
 
 	void MonoScriptEngine::LoadAssembly(const std::string &path)
 	{
@@ -239,30 +288,30 @@ namespace Engine
 		m_AppAssembly = nullptr;
 	}
 
-	void MonoScriptEngine::ReloadAssembly()
-	{
-		LOG_INFO("Hot-reload: Starting...");
-		ClearAllInstances();
-		LOG_INFO("Hot-reload: Cleared instance tracking");
+	//void MonoScriptEngine::ReloadAssembly()
+	//{
+	//	LOG_INFO("Hot-reload: Starting...");
+	//	ClearAllInstances();
+	//	LOG_INFO("Hot-reload: Cleared instance tracking");
 
-		UnloadAssembly();
-		mono_domain_set(m_RootDomain, false);
-		mono_domain_unload(m_AppDomain);
+	//	UnloadAssembly();
+	//	mono_domain_set(m_RootDomain, false);
+	//	mono_domain_unload(m_AppDomain);
 
-		LOG_INFO("Hot-reload: Domain unloaded");
+	//	LOG_INFO("Hot-reload: Domain unloaded");
 
-		ScriptReloader::GetInstance().FinalizeDllSwap();
-		LOG_INFO("Hot-reload: DLL swapped");
+	//	ScriptReloader::GetInstance().FinalizeDllSwap();
+	//	LOG_INFO("Hot-reload: DLL swapped");
 
-		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
-		mono_domain_set(m_AppDomain, true);
+	//	m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+	//	mono_domain_set(m_AppDomain, true);
 
-		LoadAssembly(m_AssemblyPath);
-		RegisterInternalCalls();
+	//	LoadAssembly(m_AssemblyPath);
+	//	RegisterInternalCalls();
 
-		LOG_INFO("Hot-reload: Domain reloaded");
-		LOG_INFO("Hot-reload: Complete!");
-	}
+	//	LOG_INFO("Hot-reload: Domain reloaded");
+	//	LOG_INFO("Hot-reload: Complete!");
+	//}
 
 
 	MonoClass *MonoScriptEngine::GetScriptClass(const std::string &className)
@@ -312,11 +361,37 @@ namespace Engine
 			// Assembly not loaded - silently skip
 			return nullptr;
 		}
+		EnsureCorrectDomain();
+		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		MonoDomain *current = mono_domain_get();
+		LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
+		LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
+		LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
 
+		if (current != m_AppDomain)
+		{
+			LOG_ERROR("   Still in wrong domain after EnsureCorrectDomain!");
+		}
 		MonoClass *klass = GetScriptClass(className);
 		if (!klass)
 		{
 			return nullptr;
+		}
+
+		MonoDomain *currentDomain = mono_domain_get();
+
+		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
+		LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
+		LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
+
+		if (currentDomain != m_RootDomain)
+		{
+			LOG_ERROR("   WRONG DOMAIN! Currently in ROOT domain!");
+			LOG_ERROR("  Switching to APP domain...");
+			mono_domain_set(m_AppDomain, false);
+			currentDomain = mono_domain_get();
+			LOG_INFO("  Switched to: " + std::to_string((uintptr_t)currentDomain));
 		}
 
 		// Allocate object
@@ -372,6 +447,7 @@ namespace Engine
 		{
 			return;
 		}
+		EnsureCorrectDomain();
 
 		if (!IsValidMonoObject(instance))
 		{
@@ -732,8 +808,8 @@ namespace Engine
 
 		static void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition);
 		static void Transform_SetPosition(uint64_t entityID, glm::vec3 *position);
-		static void Transform_GetRotation(uint64_t entityID, glm::vec3 *outRotation);
-		static void Transform_SetRotation(uint64_t entityID, glm::vec3 *rotation);
+		static void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation);
+		static void Transform_SetRotation(uint64_t entityID, glm::quat *rotation);
 		static void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale);
 		static void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);
 
@@ -749,7 +825,7 @@ namespace Engine
 		// Prefab instantiation
 		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr);
 		static uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr);
-		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::vec3 *rotation, glm::vec3 *scale, bool isScenePrefab);
+		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::quat *rotation, glm::vec3 *scale, bool isScenePrefab);
 
 		//Physics bindings
 		static void Entity_AddRigidBody(uint64_t entityID);
@@ -886,6 +962,48 @@ namespace Engine
 		static bool EntityHasCamera(uint64_t entityID);
 		static bool EntityHasRigidBody(uint64_t entityID);
 		static int  Transform_GetParent(uint64_t entityID);
+
+		// GLM Functions exposed
+		// Quaternion creation from axis-angle
+		static void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat);
+
+		// Extract forward vector from quaternion
+		static void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward);
+
+		// Extract right vector
+		static void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight);
+
+		// Extract up vector
+		static void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp);
+
+		// Rotate vector by quaternion
+		static void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec);
+
+		// Multiply quaternions (combine rotations)
+		static void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat);
+
+		// SLERP interpolation
+		static void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat);
+
+		// Inverse quaternion
+		static void Quat_Inverse(glm::quat *quat, glm::quat *outQuat);
+
+		// Convert quaternion to Euler angles
+		static void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler);
+
+		// Create quaternion from Euler angles
+		static void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat);
+
+		// Normalize quaternion
+		static void Quat_Normalize(glm::quat *quat, glm::quat *outQuat);
+
+		// Get quaternion length
+		static float Quat_Length(glm::quat *quat);
+
+		// Quaternion dot product
+		static float Quat_Dot(glm::quat *q1, glm::quat *q2);
+
+		static void Input_GetMouseDelta(float *outX, float *outY);
 
 	}
 
@@ -1095,6 +1213,21 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void *)InternalCalls::EntityHasCamera);
 		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void *)InternalCalls::EntityHasRigidBody);
 
+		// Quaternion Bindings
+		mono_add_internal_call("Engine.InternalCalls::Quat_FromAxisAngle", (void *)InternalCalls::Quat_FromAxisAngle);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetForward", (void *)InternalCalls::Quat_GetForward);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetRight", (void *)InternalCalls::Quat_GetRight);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetUp", (void *)InternalCalls::Quat_GetUp);
+		mono_add_internal_call("Engine.InternalCalls::Quat_RotateVector", (void *)InternalCalls::Quat_RotateVector);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Multiply", (void *)InternalCalls::Quat_Multiply);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Slerp", (void *)InternalCalls::Quat_Slerp);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Inverse", (void *)InternalCalls::Quat_Inverse);
+		mono_add_internal_call("Engine.InternalCalls::Quat_ToEuler", (void *)InternalCalls::Quat_ToEuler);
+		mono_add_internal_call("Engine.InternalCalls::Quat_FromEuler", (void *)InternalCalls::Quat_FromEuler);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
+		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -1379,100 +1512,87 @@ namespace Engine
 			return entityID;
 		}
 
-		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::vec3 *rotation, glm::vec3 *scale, bool isScenePrefab)
+		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::quat *rotation, glm::vec3 *scale, bool isScenePrefab)
 		{
 			if (!InternalCalls::s_CurrentScene)
 			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: current scene is null");
+				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: current scene is null");
 				return 0;
 			}
 
 			if (!prefabPathStr)
 			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: prefab path is null");
+				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: prefab path is null");
 				return 0;
 			}
 
-			// Convert MonoString to C++ string
 			char *c = mono_string_to_utf8(prefabPathStr);
 			std::string prefabPath = c ? c : "";
 			if (c) mono_free(c);
 
 			if (prefabPath.empty())
 			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: empty prefab path");
+				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: empty prefab path");
 				return 0;
 			}
 
-			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
+			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			// Load prefab from file
-			std::string prefabfullpath = getAssetFilePath(prefabPath);
-
-
-			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
+			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
 			if (!prefab)
 			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to load prefab from ", prefabPath);
+				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: failed to load prefab from ", prefabFullPath);
 				return 0;
 			}
 
-			// Register prefab
 			PrefabRegistry::Get().RegisterPrefab(prefab);
 
 			Entity entity;
-
 			if (isScenePrefab)
 			{
-				// Instantiate entity from prefab
 				entity = PrefabInstantiator::InstantiateScenePrefab(
 					InternalCalls::s_CurrentScene,
-					prefab->GetGUID()
-				);
+					prefab->GetGUID());
 			}
 			else
 			{
-				// Instantiate entity from prefab
 				entity = PrefabInstantiator::InstantiateEntityPrefab(
 					InternalCalls::s_CurrentScene,
-					prefab->GetGUID()
-				);
+					prefab->GetGUID());
 			}
 
 			if (!entity)
 			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to instantiate entity");
+				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: failed to instantiate entity from prefab");
 				return 0;
 			}
-			else
+
+			if (entity.HasComponent<TransformComponent>())
 			{
-				//enemy.AddComponent<RigidbodyComponent>();
-				if (entity.HasComponent<TransformComponent>())
-				{
-					auto &transform = entity.GetComponent<TransformComponent>();
-					transform.Position = *position;
-					transform.Rotation = *rotation;
-					transform.Scale = *scale;
+				auto &transform = entity.GetComponent<TransformComponent>();
 
-					transform.IsDirty = true;
+				// **Quats only**: assign directly
+				transform.Position = *position;
+				transform.Rotation = *rotation;
+				transform.Scale = *scale;
+				transform.IsDirty = true;
 
-					// CRITICAL: Manually calculate WorldTransform immediately!
-					glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
-					glm::mat4 rotation_matrix = glm::mat4_cast(transform.Rotation);
-					glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), transform.Scale);
-					glm::mat4 transformation_matrix = translation_matrix * rotation_matrix * scale_matrix;
+				// Build matrices from quat
+				glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
+				glm::mat4 rotation_matrix = glm::mat4_cast(transform.Rotation);
+				glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), transform.Scale);
 
-					transform.WorldTransform = transformation_matrix;
-					transform.LocalTransform = transformation_matrix;
-				}
+				glm::mat4 transform_matrix = translation_matrix * rotation_matrix * scale_matrix;
+
+				transform.LocalTransform = transform_matrix;
+				transform.WorldTransform = transform_matrix;
 			}
 
 			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Successfully instantiated scene prefab - root Entity ID: ", entityID);
-
+			LOG_INFO("[InternalCall] Prefab_InstantiateWithTransform: instantiated entity with ID ", entityID);
 			return entityID;
 		}
+
 
 		uint64_t Scene_FindEntityByName(MonoString *nameString)
 		{
@@ -1656,7 +1776,7 @@ namespace Engine
 			transform.IsDirty = true;
 		}
 
-		void Transform_GetRotation(uint64_t entityID, glm::vec3 *outRotation)
+		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation)
 		{
 			if (!s_CurrentScene || !outRotation) return;
 
@@ -1667,10 +1787,10 @@ namespace Engine
 			if (!registry.all_of<TransformComponent>(handle)) return;
 
 			auto &transform = registry.get<TransformComponent>(handle);
-			*outRotation = glm::degrees(glm::eulerAngles(transform.Rotation));  // Convert quat to euler
+			*outRotation = transform.Rotation;
 		}
 
-		void Transform_SetRotation(uint64_t entityID, glm::vec3 *rotation)
+		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation)
 		{
 			if (!s_CurrentScene || !rotation) return;
 
@@ -1681,7 +1801,8 @@ namespace Engine
 			if (!registry.all_of<TransformComponent>(handle)) return;
 
 			auto &transform = registry.get<TransformComponent>(handle);
-			transform.Rotation = glm::quat(glm::radians(*rotation));  // Convert euler to quat
+			transform.Rotation = *rotation;
+			transform.IsDirty = true;
 		}
 
 		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale)
@@ -2559,6 +2680,99 @@ namespace Engine
 			}
 
 			return resultArray;
+		}
+
+		// Quaternion creation from axis-angle
+		void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat)
+		{
+			*outQuat = glm::angleAxis(angleRadians, *axis);
+		}
+
+		// Extract forward vector from quaternion
+		void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward)
+		{
+			*outForward = glm::rotate(*quat, glm::vec3(0.0f, 0.0f, -1.0f));
+		}
+
+		// Extract right vector
+		void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight)
+		{
+			*outRight = glm::rotate(*quat, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+
+		// Extract up vector
+		void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp)
+		{
+			*outUp = glm::rotate(*quat, glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		// Rotate vector by quaternion
+		void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec)
+		{
+			*outVec = glm::rotate(*quat, *vec);
+		}
+
+		// Multiply quaternions (combine rotations)
+		void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat)
+		{
+			*outQuat = (*q1) * (*q2);
+		}
+
+		// SLERP interpolation
+		void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat)
+		{
+			*outQuat = glm::slerp(*q1, *q2, t);
+		}
+
+		// Inverse quaternion
+		void Quat_Inverse(glm::quat *quat, glm::quat *outQuat)
+		{
+			*outQuat = glm::inverse(*quat);
+		}
+
+		// Convert quaternion to Euler angles
+		void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler)
+		{
+			*outEuler = glm::eulerAngles(*quat);
+		}
+
+		// Create quaternion from Euler angles
+		void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat)
+		{
+			*outQuat = glm::quat(*euler);
+		}
+
+		// Normalize quaternion
+		void Quat_Normalize(glm::quat *quat, glm::quat *outQuat)
+		{
+			*outQuat = glm::normalize(*quat);
+		}
+
+		// Get quaternion length
+		float Quat_Length(glm::quat *quat)
+		{
+			return glm::length(*quat);
+		}
+
+		// Quaternion dot product
+		float Quat_Dot(glm::quat *q1, glm::quat *q2)
+		{
+			return glm::dot(*q1, *q2);
+		}
+
+		static void Input_GetMouseDelta(float *outX, float *outY)
+		{
+			if (outX) *outX = 0.0f;
+			if (outY) *outY = 0.0f;
+			if (!s_InputSystem)
+			{
+				LOG_WARNING("[InternalCall] Input system not initialized");
+				return;
+			}
+			glm::vec2 in_out;
+			in_out = s_InputSystem->GetMouseDelta();
+			*outX = in_out.x;
+			*outY = in_out.y;
 		}
 	} // namespace internalcalls
 

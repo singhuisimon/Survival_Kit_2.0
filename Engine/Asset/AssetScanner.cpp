@@ -194,6 +194,7 @@ namespace Engine {
 		return changes;
 	}
 
+#pragma region LoadSave
 	bool AssetScanner::SaveSnapshot(const std::string& file) const
 	{
 		std::ofstream out(file, std::ios::trunc);
@@ -261,5 +262,6 @@ namespace Engine {
 		}
 		return true;
 	}
+#pragma endregion
 
 }//end of namespace engine

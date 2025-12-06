@@ -531,6 +531,20 @@ namespace Engine
 
 		doc.AddMember("Entities", entitiesArray, allocator);
 
+		// Update settings
+		Value settingsArray(kArrayType);
+		Value settingsObj(kObjectType);
+
+		// TODO: replace these with wherever you actually store the values
+		auto& sceneSettings = m_Scene->GetSceneSetting();
+		settingsObj.AddMember("BloomToggle", sceneSettings.s_BloomToggle, allocator);
+		settingsObj.AddMember("BloomStrength", sceneSettings.s_BloomStrength, allocator);
+		settingsObj.AddMember("BloomFilterRadius", sceneSettings.s_BloomFilterRadius, allocator);
+		settingsObj.AddMember("Exposure", sceneSettings.s_Exposure, allocator);
+
+		settingsArray.PushBack(settingsObj, allocator);
+		doc.AddMember("Settings", settingsArray, allocator);
+
 		// Convert to string
 		StringBuffer buffer;
 		PrettyWriter<StringBuffer> writer(buffer);
@@ -1141,6 +1155,36 @@ namespace Engine
 					}
 				}
 			}
+		}
+
+		// Read entities
+		if (doc.HasMember("Settings")) {
+			if (doc["Settings"].IsArray()) {
+				// Update current settings
+				auto& sceneSettings = m_Scene->GetSceneSetting();
+			
+				const auto& settingsArray = doc["Settings"].GetArray();
+				if (!settingsArray.Empty() && settingsArray[0].IsObject())
+				{
+					const auto& s = settingsArray[0];
+
+					if (s.HasMember("BloomToggle") && s["BloomToggle"].IsBool())
+						sceneSettings.s_BloomToggle = s["BloomToggle"].GetBool();
+
+					if (s.HasMember("BloomStrength") && s["BloomStrength"].IsFloat())
+						sceneSettings.s_BloomStrength = s["BloomStrength"].GetFloat();
+
+					if (s.HasMember("BloomFilterRadius") && s["BloomFilterRadius"].IsFloat())
+						sceneSettings.s_BloomFilterRadius = s["BloomFilterRadius"].GetFloat();
+
+					if (s.HasMember("Exposure") && s["Exposure"].IsFloat())
+						sceneSettings.s_Exposure = s["Exposure"].GetFloat();
+				}
+			}
+		}
+		else {
+			LOG_ERROR("No settings array in scene file");
+			return false;
 		}
 
 		LOG_INFO("Scene deserialized successfully");

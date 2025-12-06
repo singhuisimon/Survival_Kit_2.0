@@ -18,7 +18,7 @@ namespace Game
         // ===== Camera Settings (for fallback) =====
         [SerializeField]
         private float aimHeightOffset = 2.0f;
-       [SerializeField]
+        [SerializeField]
         private float orbitRadius = 7.5f;
         [SerializeField]
         private float orbitPitch = 0.25f;
@@ -68,9 +68,7 @@ namespace Game
         private bool rWasPressed = false;
         private bool initialized = false;
 
-        // ===== Constants =====
-        private const float DEG2RAD = 0.0174532924f;
-        private const float RAD2DEG = 57.2957795f;
+        // ===== Constants (for math helpers) =====
         private const float PI = 3.14159265359f;
         private const float HALF_PI = 1.5707963268f;
 
@@ -82,7 +80,6 @@ namespace Game
             EntityID = Engine.InternalCalls.Scene_FindEntityByName("Player");
             // Find MainCamera using the proper InternalCall
             mainCameraEntityID = Engine.InternalCalls.Scene_FindEntityByName("MainCamera");
-
 
             Engine.InternalCalls.Log("Found MainCamera with ID: " + mainCameraEntityID);
 
@@ -114,70 +111,75 @@ namespace Game
             if (primaryFireCooldown > 0) primaryFireCooldown -= deltaTime;
             if (secondaryFireCooldown > 0) secondaryFireCooldown -= deltaTime;
 
-            // Get player position and rotation (set by C++)
+            // Get player position (set by C++)
             Engine.Vector3 playerPos;
             Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPos);
-
-            Engine.Vector3 playerRot;
-            Engine.InternalCalls.Transform_GetRotation((uint)EntityID, out playerRot);
 
             // Get camera position (updated by C++)
             Engine.Vector3 cameraPosition;
             Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
 
-            // ===== MOVEMENT INPUT =====
-            // Calculate forward direction from camera to player (horizontal plane only)
+            // ===== MOVEMENT INPUT (FROM DOCUMENT 16 - FULL 3D) =====
+            // Calculate forward direction from camera to player (FULL 3D)
             Engine.Vector3 camToPlayer = new Engine.Vector3(
                 playerPos.X - cameraPosition.X,
-                0.0f,  // Ignore Y difference for horizontal movement
+                playerPos.Y - cameraPosition.Y,  // ? Includes Y for 3D movement
                 playerPos.Z - cameraPosition.Z
             );
 
             // Normalize to get forward direction (camera looking at player)
-            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X + camToPlayer.Z * camToPlayer.Z);
+            float camToPlayerLen = SimpleSqrt(camToPlayer.X * camToPlayer.X +
+                camToPlayer.Y * camToPlayer.Y +
+                camToPlayer.Z * camToPlayer.Z);
             Engine.Vector3 forward = new Engine.Vector3(0.0f, 0.0f, 0.0f);
 
             if (camToPlayerLen > 0.000001f)
             {
                 forward.X = camToPlayer.X / camToPlayerLen;
+                forward.Y = camToPlayer.Y / camToPlayerLen;
                 forward.Z = camToPlayer.Z / camToPlayerLen;
             }
 
-            // Calculate right vector (perpendicular to forward on horizontal plane)
+            // Calculate right vector (perpendicular to forward)
             Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
             Engine.Vector3 right = CrossProduct(forward, worldUp);
-            float rightLen = SimpleSqrt(right.X * right.X + right.Z * right.Z);
+            float rightLen = SimpleSqrt(right.X * right.X + right.Y * right.Y + right.Z * right.Z);
             if (rightLen > 0.000001f)
             {
                 right.X /= rightLen;
+                right.Y /= rightLen;
                 right.Z /= rightLen;
             }
 
             Engine.Vector3 moveDir = new Engine.Vector3(0.0f, 0.0f, 0.0f);
 
-            // Movement controls - relative to camera view
+            // Movement controls - relative to camera view (FULL 3D)
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.W))  // W = Move away from camera (forward)
             {
                 moveDir.X += forward.X;
+                moveDir.Y += forward.Y;
                 moveDir.Z += forward.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.S))  // S = Move toward camera (backward)
             {
                 moveDir.X -= forward.X;
+                moveDir.Y -= forward.Y;
                 moveDir.Z -= forward.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.A))  // A = Move left relative to camera
             {
                 moveDir.X -= right.X;
+                moveDir.Y -= right.Y;
                 moveDir.Z -= right.Z;
             }
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.D))  // D = Move right relative to camera
             {
                 moveDir.X += right.X;
+                moveDir.Y += right.Y;
                 moveDir.Z += right.Z;
             }
 
-            // Normalize movement direction (FULL 3D)
+            // Normalize movement direction
             float moveDirLenSq = moveDir.X * moveDir.X + moveDir.Y * moveDir.Y + moveDir.Z * moveDir.Z;
             if (moveDirLenSq > 0.000001f)
             {
@@ -192,7 +194,7 @@ namespace Game
             {
                 Engine.Vector3 newPos = new Engine.Vector3(
                     playerPos.X + moveDir.X * moveSpeed,
-                    playerPos.Y + moveDir.Y * moveSpeed,  // Now moves up/down!
+                    playerPos.Y + moveDir.Y * moveSpeed,
                     playerPos.Z + moveDir.Z * moveSpeed
                 );
                 Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
@@ -209,7 +211,7 @@ namespace Game
                 {
                     Engine.Vector3 dashImpulse = new Engine.Vector3(
                         moveDir.X * dashForce,
-                        moveDir.Y * dashForce,  // Dash in 3D direction
+                        moveDir.Y * dashForce,
                         moveDir.Z * dashForce
                     );
                     Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref dashImpulse);
@@ -298,110 +300,109 @@ namespace Game
                 Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
                 Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
 
-                  // Calculate aimTarget - this is where the camera is looking at
-                    Engine.Vector3 aimTarget = new Engine.Vector3(
-                        playerPosition.X,
-                        playerPosition.Y + aimHeightOffset,
-                        playerPosition.Z
+                // Calculate aimTarget - this is where the camera is looking at (approx)
+                Engine.Vector3 aimTarget = new Engine.Vector3(
+                    playerPosition.X,
+                    playerPosition.Y + aimHeightOffset,
+                    playerPosition.Z
+                );
+
+                // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
+                Engine.Vector3 cameraPosition;
+                if (mainCameraEntityID != 0)
+                {
+                    Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
+                }
+                else
+                {
+                    // Fallback: use calculated camera position if MainCamera not found
+                    Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
+                    float cosPitch = SimpleCos(orbitPitch);
+                    float sinPitch = SimpleSin(orbitPitch);
+                    float cosYaw = SimpleCos(orbitYaw);
+                    float sinYaw = SimpleSin(orbitYaw);
+
+                    cameraPosition = new Engine.Vector3(
+                        aimTarget.X + cosPitch * sinYaw * orbitRadius,
+                        aimTarget.Y + sinPitch * orbitRadius,
+                        aimTarget.Z + cosPitch * cosYaw * orbitRadius
                     );
+                }
 
-                    // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
-                    Engine.Vector3 cameraPosition;
-                    if (mainCameraEntityID != 0)
-                    {
-                        Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
-                    }
-                    else
-                    {
-                        // Fallback: use calculated camera position if MainCamera not found
-                        Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
-                        float cosPitch = SimpleCos(orbitPitch);
-                        float sinPitch = SimpleSin(orbitPitch);
-                        float cosYaw = SimpleCos(orbitYaw);
-                        float sinYaw = SimpleSin(orbitYaw);
+                Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
 
-                        cameraPosition = new Engine.Vector3(
-                            aimTarget.X + cosPitch * sinYaw * orbitRadius,
-                            aimTarget.Y + sinPitch * orbitRadius,
-                            aimTarget.Z + cosPitch * cosYaw * orbitRadius
-                        );
-                    }
+                // Calculate direction FROM camera TO aimTarget (where camera is looking)
+                Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
+                    aimTarget.X - cameraPosition.X,
+                    aimTarget.Y - cameraPosition.Y,
+                    aimTarget.Z - cameraPosition.Z
+                );
 
-                    Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
+                // Use the FULL 3D direction for shooting
+                Engine.Vector3 shootDirection = cameraToAimTarget;
 
-                    // Calculate direction FROM camera TO aimTarget (where camera is looking)
-                    Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
-                        aimTarget.X - cameraPosition.X,
-                        aimTarget.Y - cameraPosition.Y,
-                        aimTarget.Z - cameraPosition.Z
+                // Normalize the full 3D vector
+                float lenSq = shootDirection.X * shootDirection.X +
+                              shootDirection.Y * shootDirection.Y +
+                              shootDirection.Z * shootDirection.Z;
+
+                if (lenSq > 0.0001f)
+                {
+                    float invLen = 1.0f / SimpleSqrt(lenSq);
+                    shootDirection = new Engine.Vector3(
+                        shootDirection.X * invLen,
+                        shootDirection.Y * invLen,
+                        shootDirection.Z * invLen
                     );
+                }
+                else
+                {
+                    Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
+                    return;
+                }
 
-                    // Use the FULL 3D direction for shooting
-                    Engine.Vector3 shootDirection = cameraToAimTarget;
-
-                    // Normalize the full 3D vector
-                    float lenSq = shootDirection.X * shootDirection.X +
-                                  shootDirection.Y * shootDirection.Y +
-                                  shootDirection.Z * shootDirection.Z;
-
-                    if (lenSq > 0.0001f)
-                    {
-                        float invLen = 1.0f / SimpleSqrt(lenSq);
-                        shootDirection = new Engine.Vector3(
-                            shootDirection.X * invLen,
-                            shootDirection.Y * invLen,
-                            shootDirection.Z * invLen
-                        );
-                    }
-                    else
-                    {
-                        Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
-                        return;
-                    }
-               
                 Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
 
-                // Spawn position - FOLLOWS THE ANGLE (full 3D offset)
+                // Spawn position - along the full 3D shoot direction
                 float spawnDistance = 1.5f;  // Distance in front of player
 
-                // Spawn bullet along the full 3D shoot direction
                 Engine.Vector3 firingPosition = new Engine.Vector3(
                     playerPosition.X + (shootDirection.X * spawnDistance),
-                    playerPosition.Y + aimHeightOffset,  // Follows angle
+                    playerPosition.Y + aimHeightOffset,
                     playerPosition.Z + (shootDirection.Z * spawnDistance)
                 );
 
                 Engine.InternalCalls.Log("Firing position: " + firingPosition.X + ", " + firingPosition.Y + ", " + firingPosition.Z);
 
-                // Calculate bullet rotation to face the shoot direction
-                // Using atan2 for yaw (horizontal rotation) and asin for pitch (vertical rotation)
-                float bulletYaw = SimpleAtan2(shootDirection.X, shootDirection.Z) * RAD2DEG;
-                float bulletPitch = SimpleAsin(-shootDirection.Y) * RAD2DEG;  // Negative because looking down is positive pitch
+                // Compute bullet rotation as a pure quaternion that looks along shootDirection
+                Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
+                Engine.Quat bulletRotationQuat = LookRotation(shootDirection, worldUp);
 
-                Engine.Vector3 bulletRotation = new Engine.Vector3(bulletPitch, bulletYaw, 0.0f);
                 Engine.Vector3 bulletScale = new Engine.Vector3(0.4f, 0.4f, 0.2f);
-
-                if(prefabPath == SecondaryBulletPrefab){
+                if (prefabPath == SecondaryBulletPrefab)
+                {
                     bulletScale = new Engine.Vector3(0.3f, 0.20f, 0.3f);
                 }
 
-                Engine.InternalCalls.Log("Bullet rotation: " + bulletRotation.X + ", " + bulletRotation.Y + ", " + bulletRotation.Z);
-
-                // Instantiate bullet WITH TRANSFORM - this ensures position is set immediately
+                // Instantiate bullet WITH TRANSFORM (quat-based rotation)
                 uint bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
                     prefabPath,
                     ref firingPosition,
-                    ref bulletRotation,
+                    ref bulletRotationQuat,
                     ref bulletScale,
                     false  // false = entity prefab, not scene prefab
-                ); if (bulletEntityID == 0)
+                );
+                if (bulletEntityID == 0)
                 {
-                    Engine.InternalCalls.LogError("FAILED to instantiate bullet! Prefab_Instantiate returned 0");
+                    Engine.InternalCalls.LogError("FAILED to instantiate bullet! Prefab_InstantiateWithTransform returned 0");
                     Engine.InternalCalls.LogError("Check if prefab exists at: " + prefabPath);
                     return;
                 }
 
                 Engine.InternalCalls.Log("Bullet entity created with ID: " + bulletEntityID);
+
+                // Ensure bullet uses quaternion rotation as the authoritative orientation
+                Engine.Transform.SetRotation(bulletEntityID, ref bulletRotationQuat);
 
                 // Set bullet position
                 Engine.InternalCalls.Transform_SetPosition(bulletEntityID, ref firingPosition);
@@ -488,6 +489,94 @@ namespace Game
             Engine.EventSystem.Publish("PlayerPosition", payload);
         }
 
+        // ===== QUAT HELPERS =====
+
+        // Builds a quaternion that rotates the "forward" axis of the object to match `forward`,
+        // using `up` as the approximate up direction (similar to LookRotation in other engines).
+        private Engine.Quat LookRotation(Engine.Vector3 forward, Engine.Vector3 up)
+        {
+            // Normalize forward
+            float fLenSq = forward.X * forward.X + forward.Y * forward.Y + forward.Z * forward.Z;
+            if (fLenSq < 1e-8f)
+            {
+                // Degenerate forward; return identity
+                Engine.Quat id = new Engine.Quat();
+                id.X = 0.0f;
+                id.Y = 0.0f;
+                id.Z = 0.0f;
+                id.W = 1.0f;
+                return id;
+            }
+            float fInvLen = 1.0f / SimpleSqrt(fLenSq);
+            Engine.Vector3 f = new Engine.Vector3(
+                forward.X * fInvLen,
+                forward.Y * fInvLen,
+                forward.Z * fInvLen
+            );
+
+            // Orthonormal basis: right = normalize(cross(up, forward)), newUp = cross(forward, right)
+            Engine.Vector3 r = CrossProduct(up, f);
+            float rLenSq = r.X * r.X + r.Y * r.Y + r.Z * r.Z;
+            if (rLenSq < 1e-8f)
+            {
+                // up and forward are colinear; choose arbitrary orthogonal up
+                r = CrossProduct(new Engine.Vector3(0.0f, 1.0f, 0.0f), f);
+                rLenSq = r.X * r.X + r.Y * r.Y + r.Z * r.Z;
+                if (rLenSq < 1e-8f)
+                {
+                    r = CrossProduct(new Engine.Vector3(1.0f, 0.0f, 0.0f), f);
+                    rLenSq = r.X * r.X + r.Y * r.Y + r.Z * r.Z;
+                }
+            }
+            float rInvLen = 1.0f / SimpleSqrt(rLenSq);
+            r = new Engine.Vector3(r.X * rInvLen, r.Y * rInvLen, r.Z * rInvLen);
+
+            Engine.Vector3 u = CrossProduct(f, r);
+
+            // Build rotation matrix from basis (right, up, forward) as columns
+            float m00 = r.X; float m01 = u.X; float m02 = f.X;
+            float m10 = r.Y; float m11 = u.Y; float m12 = f.Y;
+            float m20 = r.Z; float m21 = u.Z; float m22 = f.Z;
+
+            float trace = m00 + m11 + m22;
+            Engine.Quat q = new Engine.Quat();
+
+            if (trace > 0.0f)
+            {
+                float s = SimpleSqrt(trace + 1.0f) * 2.0f; // s = 4 * qw
+                q.W = 0.25f * s;
+                q.X = (m21 - m12) / s;
+                q.Y = (m02 - m20) / s;
+                q.Z = (m10 - m01) / s;
+            }
+            else if (m00 > m11 && m00 > m22)
+            {
+                float s = SimpleSqrt(1.0f + m00 - m11 - m22) * 2.0f; // s = 4 * qx
+                q.W = (m21 - m12) / s;
+                q.X = 0.25f * s;
+                q.Y = (m01 + m10) / s;
+                q.Z = (m02 + m20) / s;
+            }
+            else if (m11 > m22)
+            {
+                float s = SimpleSqrt(1.0f + m11 - m00 - m22) * 2.0f; // s = 4 * qy
+                q.W = (m02 - m20) / s;
+                q.X = (m01 + m10) / s;
+                q.Y = 0.25f * s;
+                q.Z = (m12 + m21) / s;
+            }
+            else
+            {
+                float s = SimpleSqrt(1.0f + m22 - m00 - m11) * 2.0f; // s = 4 * qz
+                q.W = (m10 - m01) / s;
+                q.X = (m02 + m20) / s;
+                q.Y = (m12 + m21) / s;
+                q.Z = 0.25f * s;
+            }
+
+            return q;
+        }
+
         // ===== MATH HELPERS =====
         private float SimpleSin(float x)
         {
@@ -515,44 +604,6 @@ namespace Game
             for (int i = 0; i < 3; i++)
                 x = 0.5f * (x + value / x);
             return x;
-        }
-
-        private float SimpleAsin(float x)
-        {
-            if (x <= -1.0f) return -HALF_PI;
-            if (x >= 1.0f) return HALF_PI;
-
-            float x2 = x * x;
-            float x3 = x2 * x;
-            float x5 = x3 * x2;
-            float x7 = x5 * x2;
-
-            return x + (x3 / 6.0f) + (3.0f * x5 / 40.0f) + (5.0f * x7 / 112.0f);
-        }
-
-        private float SimpleAtan2(float y, float x)
-        {
-            if (x == 0.0f)
-            {
-                if (y > 0.0f) return HALF_PI;
-                if (y < 0.0f) return -HALF_PI;
-                return 0.0f;
-            }
-
-            float absX = x < 0.0f ? -x : x;
-            float absY = y < 0.0f ? -y : y;
-            float a = absY < absX ? absY / absX : absX / absY;
-            float s = a * a;
-            float r = ((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a;
-
-            if (absY > absX)
-                r = HALF_PI - r;
-            if (x < 0.0f)
-                r = PI - r;
-            if (y < 0.0f)
-                r = -r;
-
-            return r;
         }
 
         private Engine.Vector3 CrossProduct(Engine.Vector3 a, Engine.Vector3 b)
