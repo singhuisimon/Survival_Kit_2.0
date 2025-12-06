@@ -276,10 +276,10 @@ namespace Engine
         public static extern void Audio_SetReverbMix(uint entityID, float mix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool EntityHasCamera(ulong entityID);
+        public static extern bool EntityHasCamera(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool EntityHasRigidBody(ulong entityID);
+        public static extern bool EntityHasRigidBody(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float AudioManager_GetGroupVolume(int groupType);

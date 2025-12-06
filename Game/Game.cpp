@@ -748,12 +748,25 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_INFO("Editor toggled: ", m_EditorEnable);
 	}
 
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
-	{
-		editorCamToggle = !editorCamToggle;
-		LOG_INFO("Editor camera toggled: ", editorCamToggle);
-	}
+// Editor camera toggle
+if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
+{
+    editorCamToggle = !editorCamToggle;
+
+    if (!editorCamToggle)
+    {
+        // Lock & hide cursor (free-look mode)
+        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+    else
+    {
+        // Restore normal cursor
+        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    LOG_INFO("Editor camera toggled: ", editorCamToggle);
+}
+
 
 	Engine::ScriptReloader::GetInstance().Update();
 

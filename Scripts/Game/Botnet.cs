@@ -188,17 +188,11 @@ namespace Game
                 return;
 
             // Payload is the EntityID of whatever the bullet hit
-            if (!ulong.TryParse(payload, out ulong hitId))
+            if (!uint.TryParse(payload, out uint hitId))
                 return;
 
-            if (hitId != (ulong)EntityID)
+            if (hitId != (uint)EntityID)
                 return;
-
-            Log("Botnet (EntityID = " + EntityID + ") was hit by bullet! exploding");
-
-            // Either mark for explosion next frame...
-            isExploding = true;
-
             // ...or explode immediately:
             Explode();
         }
@@ -592,7 +586,7 @@ namespace Game
             return result;
         }
 
-        private static uint NextUInt()
+        private static uint Nextuint()
         {
             uint x = s_RngState;
             if (x == 0)
@@ -611,7 +605,7 @@ namespace Game
                 return minInclusive;
 
             uint range = (uint)(maxExclusive - minInclusive);
-            uint r = NextUInt();
+            uint r = Nextuint();
             return minInclusive + (int)(r % range);
         }
 
@@ -620,7 +614,7 @@ namespace Game
             if (maxInclusive <= minInclusive)
                 return minInclusive;
 
-            uint r = NextUInt() & 0x00FFFFFFu;
+            uint r = Nextuint() & 0x00FFFFFFu;
             float t = r / 16777215.0f;
             return minInclusive + (maxInclusive - minInclusive) * t;
         }
