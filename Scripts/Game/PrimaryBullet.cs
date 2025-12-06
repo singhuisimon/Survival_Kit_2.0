@@ -19,6 +19,10 @@ namespace Game
         [SerializeField]
         private string[] TargetTags = { "botnet", "loveletter", "adware" };
 
+        // Tags that represent bullets (fill this in Inspector with your bullet tag, e.g. "primarybullet")
+        [SerializeField]
+        private string[] BulletTags = { "primarybullet" };
+
         private float elapsedTime = 0.0f;
 
         public override void OnStart()
@@ -35,46 +39,52 @@ namespace Game
                 return;
             }
 
-            // Collisions
+            // Collisions (for ALL bullets, decided by tag)
             CheckCollisions();
         }
 
-        // -------- COLLISION HANDLING (TAG-FILTERED) --------
+        // -------- COLLISION HANDLING (TAG-BASED, FOR ALL BULLETS) --------
 
         private void CheckCollisions()
         {
             int collisionCount = InternalCalls.Physics_GetCollisionCount();
-            uint bulletID = EntityID;
 
             for (int i = 0; i < collisionCount; i++)
             {
                 InternalCalls.Physics_GetCollisionPair(i, out uint entityA, out uint entityB);
 
-                uint otherEntity;
+                string tagA = InternalCalls.Tag_GetTag(entityA);
+                string tagB = InternalCalls.Tag_GetTag(entityB);
 
-                if (entityA == bulletID)
+                // Case 1: A is bullet, B is valid target
+                if (IsBulletTag(tagA) && IsTargetTag(tagB))
                 {
-                    otherEntity = entityB;
+                    OnBulletHit(entityA, entityB);
                 }
-                else if (entityB == bulletID)
+                // Case 2: B is bullet, A is valid target
+                else if (IsBulletTag(tagB) && IsTargetTag(tagA))
                 {
-                    otherEntity = entityA;
-                }
-                else
-                {
-                    // This pair does not involve the bullet
-                    continue;
-                }
-
-                // Get the tag of the other entity
-                string otherTag = InternalCalls.Tag_GetTag(otherEntity);
-                // Only react if the tag matches one of our TargetTags
-                if (IsTargetTag(otherTag))
-                {
-                    OnHitEnemy(otherEntity);
-                    return; // bullet will be destroyed
+                    OnBulletHit(entityB, entityA);
                 }
             }
+        }
+
+        private bool IsBulletTag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag) || BulletTags == null)
+                return false;
+
+            for (int i = 0; i < BulletTags.Length; i++)
+            {
+                string bulletTag = BulletTags[i];
+                if (!string.IsNullOrEmpty(bulletTag) &&
+                    string.Equals(tag, bulletTag, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsTargetTag(string tag)
@@ -91,16 +101,23 @@ namespace Game
                     return true;
                 }
             }
+
+            InternalCalls.Log("Failed to tag target: " + tag);
             return false;
         }
 
         // -------- WHEN A VALID TARGET IS HIT --------
 
-        public void OnHitEnemy(uint targetEntityID)
+        // bulletEntityID = entity that has a "bullet" tag
+        // targetEntityID = entity that has one of TargetTags
+        private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
         {
-            // Publish event BEFORE destroying the bullet
+            // Publish event
             EventSystem.Publish("BulletHit", targetEntityID.ToString());
-            InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            Log("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
+
+            // Destroy the bullet that actually hit
+            InternalCalls.Scene_DestroyEntity(bulletEntityID);
         }
 
         public override void OnDestroy()

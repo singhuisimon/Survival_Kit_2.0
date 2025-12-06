@@ -248,7 +248,7 @@ namespace Game
 
             if (Engine.Input.IsKeyPressed(Engine.KeyCode.J) && shootCooldownTimer <= 0.0f)
             {
-                shootCooldownTimer = 0.5f;
+                shootCooldownTimer = 0.1f;
                 ShootBullet();
             }
 
