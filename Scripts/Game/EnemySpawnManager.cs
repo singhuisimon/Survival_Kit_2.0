@@ -573,7 +573,7 @@ namespace Game
             if (botnet != null && botnet.Length != 0)
             {
                 totalenemiesleft += botnet.Length;
-                Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
+                //Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
 
             if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)

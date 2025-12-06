@@ -1343,7 +1343,7 @@ namespace Engine
 		{
 			if (!InternalCalls::s_CurrentScene)
 			{
-				LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
+				//LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
 				return 0;
 			}
 
@@ -1361,7 +1361,7 @@ namespace Engine
 			// Create via your scene API
 			Entity e = InternalCalls::s_CurrentScene->CreateEntity(name.c_str());
 			const uint64_t id = static_cast<uint32_t>(e);
-			LOG_INFO("[InternalCall] Created entity '", name, "' (ID=", id, ")");
+			//LOG_INFO("[InternalCall] Created entity '", name, "' (ID=", id, ")");
 
 			return id;
 		}
@@ -1687,7 +1687,6 @@ namespace Engine
 
 			// Find entity by name
 			Entity entity = s_CurrentScene->FindEntityByName(name);
-			LOG_INFO("player found heres");
 
 			// Convert Entity to uint32_t using the conversion operator
 			// If entity is invalid (entt::null), this will return 0
@@ -1960,7 +1959,8 @@ namespace Engine
 		void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel)
 		{
 			auto e = GetEntityOrNull(entityID);
-			if (!outVel) return;
+			if (!e || !outVel) return;
+			if (!e.HasComponent<RigidbodyComponent>()) return;
 			*outVel = e.GetComponent<RigidbodyComponent>().GetVelocity();
 		}
 
@@ -2140,6 +2140,7 @@ namespace Engine
 		bool Camera_GetEnabled(uint64_t entityID)
 		{
 			auto e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<CameraComponent>()) return false;
 			auto &cam = e.GetComponent<CameraComponent>();
 			return cam.Enabled;
 		}
