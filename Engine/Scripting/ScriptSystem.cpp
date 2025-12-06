@@ -87,6 +87,8 @@ namespace Engine
         // ==========================
         // Normal script update logic
         // ==========================
+        if (m_IsShuttingDown)  // Add this check at the very top
+            return;
         float deltaTime = ts.GetSeconds();
         auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
@@ -142,20 +144,25 @@ namespace Engine
         }
     }
 
-    void ScriptSystem::OnShutdown(Scene *scene)
-    {  // Added Scene* parameter
-        auto &registry = scene->GetRegistry();  // Use parameter instead of s_CurrentScene
+    void ScriptSystem::OnShutdown(Scene* scene)
+    {
+        m_IsShuttingDown = true;
+
+        auto& registry = scene->GetRegistry();
         auto view = registry.view<ScriptComponent>();
 
         for (auto entity : view)
         {
-            auto &script = view.get<ScriptComponent>(entity);
+            auto& script = view.get<ScriptComponent>(entity);
+
             if (script.ScriptInstance)
             {
-                MonoScriptEngine::GetInstance().CallMethod(
-                    (MonoObject *)script.ScriptInstance, "OnDestroy");
+                // DestroyScriptInstance will handle calling OnDestroy internally
                 MonoScriptEngine::GetInstance().DestroyScriptInstance(
-                    (MonoObject *)script.ScriptInstance);
+                    (MonoObject*)script.ScriptInstance);
+
+                script.ScriptInstance = nullptr;
+                script.Started = false;
             }
         }
 

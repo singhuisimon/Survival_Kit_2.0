@@ -428,41 +428,48 @@ namespace Engine
 	}
 
 
-	void MonoScriptEngine::DestroyScriptInstance(MonoObject *instance)
+	void MonoScriptEngine::DestroyScriptInstance(MonoObject* instance)
 	{
-		// Mono uses garbage collection, so we just need to clear references
-		// The GC will handle cleanup
-
-		//if (instance)
-		//{
-		//	// Optionally call OnDestroy if the class has it
-		//	MonoClass *klass = mono_object_get_class(instance);
-		//	MonoMethod *destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
-		//	if (destroyMethod)
-		//	{
-		//		mono_runtime_invoke(destroyMethod, instance, nullptr, nullptr);
-		//	}
-		//}
-
 		if (!instance)
 			return;
 
-		// Call OnDestroy if the class has it
-		MonoClass* klass = mono_object_get_class(instance);
-		MonoMethod* destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
-		if (destroyMethod)
+		// Look up the GC handle first
+		auto it = m_ObjectToHandle.find(instance);
+		if (it == m_ObjectToHandle.end())
 		{
-			mono_runtime_invoke(destroyMethod, instance, nullptr, nullptr);
+			LOG_WARNING("No GC handle found for instance during destroy");
+			return;
 		}
 
-		// ======== ADD THIS SECTION - Free the GC handle ========
-		auto it = m_ObjectToHandle.find(instance);
-		if (it != m_ObjectToHandle.end())
+		// Get fresh instance from handle
+		MonoObject* freshInstance = mono_gchandle_get_target(it->second);
+
+		if (freshInstance)
 		{
-			mono_gchandle_free(it->second);
-			m_ObjectToHandle.erase(it);
-			LOG_INFO("Freed GC handle for script instance");
+			// Try to call OnDestroy with the fresh instance
+			try
+			{
+				MonoClass* klass = mono_object_get_class(freshInstance);
+				if (klass)
+				{
+					MonoMethod* destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
+					if (destroyMethod)
+					{
+						EnsureCorrectDomain();
+						mono_runtime_invoke(destroyMethod, freshInstance, nullptr, nullptr);
+					}
+				}
+			}
+			catch (...)
+			{
+				LOG_WARNING("Exception during OnDestroy call");
+			}
 		}
+
+		// Free the GC handle
+		mono_gchandle_free(it->second);
+		m_ObjectToHandle.erase(it);
+		LOG_INFO("Freed GC handle for script instance");
 	}
 
 	MonoMethod *MonoScriptEngine::GetMethod(MonoClass *klass, const std::string &methodName, int paramCount)
