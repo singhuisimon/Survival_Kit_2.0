@@ -618,10 +618,12 @@ namespace Engine
 		settings.mLinearDamping = rb.LinearDamping;
 		settings.mAngularDamping = rb.AngularDamping;
 
-		// Trigger bodies -> Jolt sensors: no collision response, still callbacks
 		settings.mIsSensor = rb.IsTrigger;
 
-		JPH::BodyID const id = mBodyInterface->CreateAndAddBody(settings, JPH::EActivation::Activate);
+		settings.mUserData = static_cast<JPH::uint64>(static_cast<std::uint32_t>(e));
+
+		JPH::BodyID const id =
+			mBodyInterface->CreateAndAddBody(settings, JPH::EActivation::Activate);
 
 		if (!rb.IsKinematic)
 		{

@@ -57,7 +57,7 @@ namespace Game
             }
         }
 
-        public void OnHitEnemy(ulong targetEntityID)
+        public void OnHitEnemy(uint targetEntityID)
         {
             Log("SecondaryBullet hit entity " + targetEntityID + "! Spawning Vortex AOE...");
 

@@ -752,8 +752,21 @@ void Game::OnUpdate(Engine::Timestep ts)
 	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 	{
 		editorCamToggle = !editorCamToggle;
+
+		if (!editorCamToggle)
+		{
+			// Lock & hide cursor (free-look mode)
+			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+		else
+		{
+			// Restore normal cursor
+			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+
 		LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
+
 
 	Engine::ScriptReloader::GetInstance().Update();
 
@@ -939,7 +952,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	bool healthBarUIFound = false;
 	for (auto entityHandle : view)
 	{
-		auto& healthUITag = view.get<Engine::TagComponent>(entityHandle);
+		auto &healthUITag = view.get<Engine::TagComponent>(entityHandle);
 		if (healthUITag.Tag == "HealthBar")
 		{
 			healthBarUI = Engine::Entity(entityHandle, &registry);
@@ -948,20 +961,20 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_C))
-	{
-		if (GameCam.HasComponent<Engine::CameraComponent>() &&
-			SecCam.HasComponent<Engine::CameraComponent>())
-		{
+	//// Editor camera toggle
+	//if (input.IsKeyJustPressed(GLFW_KEY_C))
+	//{
+	//	if (GameCam.HasComponent<Engine::CameraComponent>() &&
+	//		SecCam.HasComponent<Engine::CameraComponent>())
+	//	{
 
-			auto &GameCamComp = GameCam.GetComponent<Engine::CameraComponent>();
-			auto &SecCamComp = SecCam.GetComponent<Engine::CameraComponent>();
+	//		auto &GameCamComp = GameCam.GetComponent<Engine::CameraComponent>();
+	//		auto &SecCamComp = SecCam.GetComponent<Engine::CameraComponent>();
 
-			GameCamComp.Enabled = !GameCamComp.Enabled;
-			SecCamComp.Enabled = !SecCamComp.Enabled;
-		}
-	}
+	//		GameCamComp.Enabled = !GameCamComp.Enabled;
+	//		SecCamComp.Enabled = !SecCamComp.Enabled;
+	//	}
+	//}
 
 	if (found && foundEntity.HasComponent<Engine::TransformComponent>())
 	{
@@ -1104,10 +1117,11 @@ void Game::OnUpdate(Engine::Timestep ts)
 				timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
 			}
 
-			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>()) {
+			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>())
+			{
 
 				// Healthbar UI transform
-				auto& healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
+				auto &healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
 
 				// Place timer bar above the player's local up
 				const float healthBarDist = 3.0f;      // How far from camera/player
