@@ -6,23 +6,23 @@ namespace Game
     // As of right now, using keys W and L to test for Win and Lose screen
     // while waiting for further gameplay integration
 
-    public class UIStateManager : ScriptBehaviour 
+    public class UIStateManager : ScriptBehaviour
     {
-        // serialize the camera entities 
+        // serialize the camera entities
          [SerializeField]
         private string mainMenuCameraName = "MainMenuCamera";
-        
+
         [SerializeField]
         private string gameCameraName = "MainCamera";
-        
+
         [SerializeField]
         private string winCameraName = "WinCamera";
-        
+
         [SerializeField]
         private string loseCameraName = "LoseCamera";
 
         // current state
-        private enum ScreenState 
+        private enum ScreenState
         {
             MainMenu,       // showing main menu screen
             Playing,        // game is active
@@ -43,7 +43,7 @@ namespace Game
         private bool wWasPressed = false;
         private bool lWasPressed = false;
 
-        public override void OnStart() 
+        public override void OnStart()
         {
             // find all the cameras in the scene
             mainMenuCameraID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
@@ -55,6 +55,9 @@ namespace Game
              currentState = ScreenState.MainMenu;
 
              // put here for events (once implemented)
+             // added the PlayerHasDied event
+             EventSystem.Subscribe("PlayerHasDied", OnPlayerDied);
+
 
         }
 
@@ -103,7 +106,7 @@ namespace Game
                 Log("Testing Win screen...");
                 ShowWinScreen();
             }
-            
+
             if (lJustPressed)
             {
                 Log("Testing Lose screen...");
@@ -113,17 +116,18 @@ namespace Game
 
         // EVENT HANDLERS
 
-        // private void OnPlayerDied(string eventName, string payload)
-        // {
-        //     Log("Player died event received!");
-        //     ShowLoseScreen();
-        // }
+        private void OnPlayerDied(string eventName, string payload)
+        {
+            Log("Player died event received!");
+            ShowLoseScreen();
+        }
 
+        // For Future win condition
         // private void OnEnemyKilled(string eventName, string payload)
         // {
         //     if (currentState != ScreenState.Playing)
         //         return;
-            
+
         //     enemiesKilled++;
         //     Log("Enemy killed! Total: " + enemiesKilled + "/" + enemiesRequiredForWin);
         // }
@@ -132,15 +136,15 @@ namespace Game
 
         private void CheckWinCondition()
         {
- 
+
             // PLACEHOLDER: ADD WIN CONDITION HERE
             // once enemy death events is implemented (idk) event OnEnemyKilled will track the count
-            
+
             // if (enemiesKilled >= enemiesRequiredForWin)
             // {
             //     ShowWinScreen();
             // }
-            
+
             // can count remaining enemies in scene for alternative
             /*
             int remainingEnemies = CountRemainingEnemies();
@@ -150,29 +154,24 @@ namespace Game
             }
             */
         }
-        
+
         private void CheckLoseCondition()
         {
             // PLACEHOLDER: ADD LOSE CONDITION HERE
-            // once player health is implemented and event OnPlayerDied will trigger the lose screen
-            
-            // manual checks if needed
-            /*
-            if (playerCurrentHealth <= 0)
-            {
-                ShowLoseScreen();
-            }
-            */
+            // Already handled by OnPlayerDied event handler
         }
 
         // Screen Transistions
 
-        private void ShowWinScreen() 
+        private void ShowWinScreen()
         {
             if (currentState == ScreenState.Won)
             return; // player is already on win screen
 
             Log("PLAYER WINS!!");
+
+            // update the win state
+            currentState = ScreenState.Won;
 
             // disable all other cameras
             DisableAllCameras();
@@ -196,6 +195,9 @@ namespace Game
 
             Log("PLAYER LOST!!");
 
+            // update the lose state
+            currentState = ScreenState.Lost;
+
             // disable all other cameras
             DisableAllCameras();
 
@@ -213,11 +215,11 @@ namespace Game
 
         private void ReturnToMainMenu()
         {
-            currentState = ScreenState.Playing;
+            currentState = ScreenState.MainMenu;
 
             // disable all other cameras
             DisableAllCameras();
-            
+
             // enable the main menu camera
             if (mainMenuCameraID != 0)
             {
@@ -230,7 +232,7 @@ namespace Game
             }
 
             // reset the game state here
-            // add code here
+            // add code whenever needed here
         }
 
         // HELPER FUNCTIONS
@@ -238,13 +240,13 @@ namespace Game
         {
             if (mainMenuCameraID != 0)
                 InternalCalls.Camera_SetEnabled(mainMenuCameraID, false);
-                
+
             if (gameCameraID != 0)
                 InternalCalls.Camera_SetEnabled(gameCameraID, false);
-                
+
             if (winCameraID != 0)
                 InternalCalls.Camera_SetEnabled(winCameraID, false);
-                
+
             if (loseCameraID != 0)
                 InternalCalls.Camera_SetEnabled(loseCameraID, false);
         }
@@ -256,6 +258,13 @@ namespace Game
                 Log("Found " + name + " (ID: " + id + ")");
             else
                 LogWarning(name + " not found!");
+        }
+
+        // clean up event subscriptions
+        public override void OnDestroy()
+        {
+            EventSystem.Unsubscribe("PlayerHasDied", OnPlayerDied);
+            Log("UIStateManager destroyed");
         }
 
     }
