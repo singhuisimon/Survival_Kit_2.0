@@ -595,6 +595,9 @@ namespace Game
 
                 //hello
 
+                // publish the win event to be integrated with the win screen 
+                EventSystem.Publish("PlayerWin", botnetkilled.ToString());
+
             }
         }
 
