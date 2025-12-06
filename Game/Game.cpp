@@ -948,20 +948,33 @@ if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 		}
 	}
 
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_C))
+	Engine::Entity healthBarUI;
+	bool healthBarUIFound = false;
+	for (auto entityHandle : view)
 	{
-		if (GameCam.HasComponent<Engine::CameraComponent>() &&
-			SecCam.HasComponent<Engine::CameraComponent>())
+		auto& healthUITag = view.get<Engine::TagComponent>(entityHandle);
+		if (healthUITag.Tag == "HealthBar")
 		{
-
-			auto &GameCamComp = GameCam.GetComponent<Engine::CameraComponent>();
-			auto &SecCamComp = SecCam.GetComponent<Engine::CameraComponent>();
-
-			GameCamComp.Enabled = !GameCamComp.Enabled;
-			SecCamComp.Enabled = !SecCamComp.Enabled;
+			healthBarUI = Engine::Entity(entityHandle, &registry);
+			healthBarUIFound = true;
+			break;
 		}
 	}
+
+	//// Editor camera toggle
+	//if (input.IsKeyJustPressed(GLFW_KEY_C))
+	//{
+	//	if (GameCam.HasComponent<Engine::CameraComponent>() &&
+	//		SecCam.HasComponent<Engine::CameraComponent>())
+	//	{
+
+	//		auto &GameCamComp = GameCam.GetComponent<Engine::CameraComponent>();
+	//		auto &SecCamComp = SecCam.GetComponent<Engine::CameraComponent>();
+
+	//		GameCamComp.Enabled = !GameCamComp.Enabled;
+	//		SecCamComp.Enabled = !SecCamComp.Enabled;
+	//	}
+	//}
 
 	if (found && foundEntity.HasComponent<Engine::TransformComponent>())
 	{

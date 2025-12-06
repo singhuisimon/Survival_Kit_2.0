@@ -266,23 +266,24 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
-            uint chosen = INVALID_ENTITY;
+            uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
+            //uint chosen = INVALID_ENTITY;
 
-            switch (choice)
-            {
-                case 0:
-                    chosen = FindFirstEntityWithTag(TAG_PLAYER);
-                    break;
-                case 1:
-                    chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
-                    break;
-                case 2:
-                    chosen = FindFirstEntityWithTag(TAG_EMPLACEMENT);
-                    break;
-                case 3:
-                    chosen = FindRandomEntityWithTag(TAG_ALLIES);
-                    break;
-            }
+            //switch (choice)
+            //{
+            //    case 0:
+            //        chosen = FindFirstEntityWithTag(TAG_PLAYER);
+            //        break;
+            //    case 1:
+            //        chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+            //        break;
+            //    case 2:
+            //        chosen = FindFirstEntityWithTag(TAG_EMPLACEMENT);
+            //        break;
+            //    case 3:
+            //        chosen = FindRandomEntityWithTag(TAG_ALLIES);
+            //        break;
+            //}
 
             if (chosen != INVALID_ENTITY)
             {
