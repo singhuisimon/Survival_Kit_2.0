@@ -140,13 +140,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 8345601589085388809,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "InstallButton.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -209,7 +209,7 @@
                             64.80000305175781
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.9374369382858276,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 1000.0,
@@ -256,13 +256,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 16416052121333317645,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "WindowsBG.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -351,13 +351,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 7769140836781965323,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "ShutdownButton.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -470,13 +470,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 852359476590953005,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerBackWings.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -581,13 +581,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 852359476590953005,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerBackWings.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -634,13 +634,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 1
                     }
                 }
@@ -687,13 +687,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 2
                     }
                 }
@@ -740,13 +740,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 3
                     }
                 }
@@ -793,13 +793,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 4
                     }
                 }
@@ -846,13 +846,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 5
                     }
                 }
@@ -899,13 +899,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 6
                     }
                 }
@@ -952,13 +952,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 10098047199709839361,
-                        "MaterialGuid": 3470147128605868905,
-                        "TextureGuid": 0,
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 7
                     }
                 }
@@ -2384,13 +2384,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Inactive.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2430,13 +2430,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 12980350961226956805,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Core.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -2495,13 +2495,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Inactive.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2541,13 +2541,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Void.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2587,13 +2587,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Logo.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2633,13 +2633,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2679,13 +2679,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2725,13 +2725,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2771,13 +2771,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2817,13 +2817,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2863,13 +2863,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2951,13 +2951,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Inactive.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -2997,13 +2997,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Void.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3043,13 +3043,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Logo.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3089,13 +3089,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3135,13 +3135,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3181,13 +3181,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3227,13 +3227,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3273,13 +3273,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3319,13 +3319,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3407,13 +3407,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Inactive.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3453,13 +3453,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Void.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3499,13 +3499,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Logo.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3545,13 +3545,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3591,13 +3591,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3637,13 +3637,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3683,13 +3683,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3729,13 +3729,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3775,13 +3775,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3863,13 +3863,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Void.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3909,13 +3909,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Logo.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -3955,13 +3955,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 1486329079522899547,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Void.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4001,13 +4001,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 15897847887109707607,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Logo.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4047,13 +4047,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4093,13 +4093,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4139,13 +4139,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4185,13 +4185,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4231,13 +4231,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4277,13 +4277,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 12403890208923533323,
-                        "TextureGuid": 0,
+                        "Mesh": "level_design_v003.fbx",
+                        "Material": "LevelDesign_GroundTexture.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4307,7 +4307,7 @@
                             -225.72303771972656
                         ],
                         "Rotation": [
-                            21.040462493896484,
+                            21.040464401245117,
                             38.87009811401367,
                             39.0
                         ],
@@ -4395,6 +4395,7 @@
                         "Fields": {
                             "isActive": false,
                             "spawningAllowed": false,
+                            "infiniteSpawning": false,
                             "waveEnemiesLeftToSpawn": 0,
                             "E005_loveletter": 0,
                             "E004_botnet": 0,
@@ -4402,7 +4403,9 @@
                             "spawnRateNext": 0.0,
                             "isSpawning": false,
                             "enemiesLeft": 0,
-                            "elapsedTime": 0.0
+                            "elapsedTime": 0.0,
+                            "botnetSpawned": 0,
+                            "loveletterSpawned": 0
                         }
                     }
                 }
@@ -4774,13 +4777,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4820,13 +4823,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4866,13 +4869,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4912,13 +4915,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -4958,13 +4961,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5004,13 +5007,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5057,13 +5060,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 10852285783998821963,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Inactive.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5103,13 +5106,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 7902753479394623501,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "TestUVAnimationMat.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 1,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -5167,13 +5170,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 7902753479394623501,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "TestUVAnimationMat.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 1,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -5266,13 +5269,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5312,13 +5315,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5358,13 +5361,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5404,13 +5407,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5450,13 +5453,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5496,13 +5499,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 2205374499459082779,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "Firewall_Active.mat",
+                        "Texture": "",
                         "Visible": false,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -5542,13 +5545,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -5643,13 +5646,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -5744,13 +5747,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -5845,13 +5848,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -5946,13 +5949,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -6047,13 +6050,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 985224451753541643,
-                        "MaterialGuid": 4909900428979027975,
-                        "TextureGuid": 0,
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -6636,13 +6639,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 18414286944142344193,
-                        "MaterialGuid": 14709733218137227273,
-                        "TextureGuid": 0,
+                        "Mesh": "level_design_v003.fbx",
+                        "Material": "LevelDesign_GroundBelow.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 }
@@ -6728,6 +6731,71 @@
                     }
                 }
             ]
+        },
+        {
+            "ID": 151,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "HealthBar"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            7.0,
+                            0.20000000298023224,
+                            0.10000000149011612
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "Mesh": "",
+                        "Material": "Firewall_Inactive.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ScriptClassName": "Game.HealthBar",
+                        "Fields": {
+                            "health": 100.0,
+                            "fullWidth": 7.0,
+                            "currentWidth": 7.0
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0
         }
     ]
 }

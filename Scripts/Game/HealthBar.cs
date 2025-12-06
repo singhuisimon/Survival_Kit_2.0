@@ -15,18 +15,19 @@ namespace Game
         private float currentWidth = 1f;
 
         private const float fullHealth = 100f;
-        private const float botnetAttack = 10f;
+        private const float botnetAttack = 20f;
 
         public override void OnStart()
         {
 			Engine.InternalCalls.Log("HealthBar started!");
-            Engine.InternalCalls.Log("EntityID: " + EntityID);
+            uint healthID = InternalCalls.Scene_FindEntityByName("HealthBar");
+            Engine.InternalCalls.Log("HealthBar EntityID: " + healthID.ToString());
 
             health = fullHealth;
 
             EventSystem.Subscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
 
-            Vector3 originalScale = Transform.GetScale((uint)EntityID);
+            Vector3 originalScale = Transform.GetScale((uint)healthID);
             fullWidth = originalScale.X;
             currentWidth = originalScale.X;
         }
@@ -46,7 +47,7 @@ namespace Game
 
         private void Die()
         {
-            Log("Player died!");
+            Engine.InternalCalls.Log("Player died!");
 
             EventSystem.Unsubscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
 
@@ -56,7 +57,7 @@ namespace Game
         {
             ulong botId = ulong.Parse(payload);
 
-            Log("UI: Botnet attacked the player! Bot ID = " + botId);
+            Engine.InternalCalls.Log("UI: Botnet attacked the player! Bot ID = " + botId);
 
             health -= botnetAttack;
 
@@ -65,10 +66,12 @@ namespace Game
                 health = 0f;
             }
 
-            currentWidth = fullWidth * (health / fullHealth);
-            Vector3 scale = Transform.GetScale((uint)EntityID);
-            scale.X = currentWidth;
-            Transform.SetScale((uint)EntityID, ref scale);
+            float ratio = health / fullHealth;
+            uint healthID = InternalCalls.Scene_FindEntityByName("HealthBar");
+            Vector3 scale = Transform.GetScale((uint)healthID);
+            scale.X = fullWidth * ratio;
+            Transform.SetScale((uint)healthID, ref scale);
+            currentWidth = scale.X;
         }
     }
 }
