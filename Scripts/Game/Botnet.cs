@@ -194,6 +194,9 @@ namespace Game
             if (hitId != (uint)EntityID)
                 return;
             // ...or explode immediately:
+
+            EventSystem.Publish("BotnetDeath", 1.ToString());
+
             Explode();
         }
 
