@@ -16,11 +16,12 @@ namespace Game
 
         private const float fullHealth = 100f;
         private const float botnetAttack = 20f;
+        private uint healthID = 0;
 
         public override void OnStart()
         {
 			Engine.InternalCalls.Log("HealthBar started!");
-            uint healthID = InternalCalls.Scene_FindEntityByName("HealthBar");
+            healthID = InternalCalls.Scene_FindEntityByName("HealthBar");
             Engine.InternalCalls.Log("HealthBar EntityID: " + healthID.ToString());
 
             health = fullHealth;
@@ -34,6 +35,15 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (Input.IsKeyPressed(KeyCode.RightAlt))
+            {
+                health = 0f;
+                Vector3 scale = Transform.GetScale((uint)healthID);
+                scale.X = 0;
+                Transform.SetScale((uint)healthID, ref scale);
+                currentWidth = scale.X;
+            }
+
             if (health <= 0f)
             {
                 Die();
@@ -48,8 +58,8 @@ namespace Game
         private void Die()
         {
             Engine.InternalCalls.Log("Player died!");
-
             EventSystem.Unsubscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
+            EventSystem.Publish("PlayerHasDied", healthID.ToString());
 
         }
 
@@ -67,7 +77,6 @@ namespace Game
             }
 
             float ratio = health / fullHealth;
-            uint healthID = InternalCalls.Scene_FindEntityByName("HealthBar");
             Vector3 scale = Transform.GetScale((uint)healthID);
             scale.X = fullWidth * ratio;
             Transform.SetScale((uint)healthID, ref scale);
