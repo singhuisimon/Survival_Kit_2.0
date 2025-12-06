@@ -378,10 +378,10 @@ namespace Engine {
             propertiesObj.AddMember("CollideType", static_cast<int>(rb.Shape), allocator);
 
             rapidjson::Value boxHalfExtent(rapidjson::kArrayType);
-            boxHalfExtent.PushBack(rb.Velocity.x, allocator);
-            boxHalfExtent.PushBack(rb.Velocity.y, allocator);
-            boxHalfExtent.PushBack(rb.Velocity.z, allocator);
-            propertiesObj.AddMember("BoxHalfExtent", boxHalfExtent, allocator);
+            boxHalfExtent.PushBack(rb.BoxHalfExtents.x, allocator);
+            boxHalfExtent.PushBack(rb.BoxHalfExtents.y, allocator);
+            boxHalfExtent.PushBack(rb.BoxHalfExtents.z, allocator);
+            propertiesObj.AddMember("BoxHalfExtents", boxHalfExtent, allocator);
 
             propertiesObj.AddMember("SphereRadius", rb.SphereRadius, allocator);
 
