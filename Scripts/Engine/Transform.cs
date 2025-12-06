@@ -70,7 +70,7 @@ namespace Engine
             Rotation = Rotation * deltaRotation;
         }
 
-        public static void LookAt(uint entityID, Vector3 target)
+        public static void LookAt(ulong entityID, Vector3 target)
         {
             Vector3 myPos = GetPosition(entityID);
             Vector3 direction = target - myPos;
@@ -132,38 +132,38 @@ namespace Engine
         // Static helpers (when you only have an ID)
         // ---------------------------------
 
-        public static Vector3 GetPosition(uint entityID)
+        public static Vector3 GetPosition(ulong entityID)
         {
             Vector3 pos;
             InternalCalls.Transform_GetPosition(entityID, out pos);
             return pos;
         }
 
-        public static void SetPosition(uint entityID, ref Vector3 position)
+        public static void SetPosition(ulong entityID, ref Vector3 position)
         {
             InternalCalls.Transform_SetPosition(entityID, ref position);
         }
 
-        public static Quat GetRotation(uint entityID)
+        public static Quat GetRotation(ulong entityID)
         {
             Quat rot;
             InternalCalls.Transform_GetRotation(entityID, out rot);
             return rot;
         }
 
-        public static void SetRotation(uint entityID, ref Quat rotation)
+        public static void SetRotation(ulong entityID, ref Quat rotation)
         {
             InternalCalls.Transform_SetRotation(entityID, ref rotation);
         }
 
-        public static Vector3 GetScale(uint entityID)
+        public static Vector3 GetScale(ulong entityID)
         {
             Vector3 scale;
             InternalCalls.Transform_GetScale(entityID, out scale);
             return scale;
         }
 
-        public static void SetScale(uint entityID, ref Vector3 scale)
+        public static void SetScale(ulong entityID, ref Vector3 scale)
         {
             InternalCalls.Transform_SetScale(entityID, ref scale);
         }

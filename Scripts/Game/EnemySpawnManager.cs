@@ -71,10 +71,10 @@ namespace Game
 
         private Entity[] wallInactiveEntities;
 
-        private const uint INVALID_ENTITY = 0xffffffffu;
+        private const ulong INVALID_ENTITY = 0xffffffffu;
 
         // Simple pseudo-random number generator
-        private uint rngSeed;
+        private ulong rngSeed;
 
         // Time tracking (since we don't have Time.time)
         [SerializeField] private float elapsedTime = 0f;
@@ -85,14 +85,14 @@ namespace Game
         private string coreambience = "Core_Ambient.wav";
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
-        private uint spawnmanagerID;
+        private ulong spawnmanagerID;
 
         private bool playInGameSound = false;
 
         public override void OnStart()
         {
             // Initialize random seed
-            rngSeed = (uint)DateTime.Now.Ticks;
+            rngSeed = (ulong)DateTime.Now.Ticks;
 
             // init some values
             isActive = false;
@@ -106,7 +106,7 @@ namespace Game
             // Setup walls for initial state
             EnvironmentReset();
 
-            InternalCalls.Entity_AddAudio((uint)EntityID);
+            InternalCalls.Entity_AddAudio((ulong)EntityID);
 
             Log("EnemySpawnManager initialized");
         }
@@ -263,7 +263,7 @@ namespace Game
             foreach (string spawnPointName in spawnPointNames)
             {
                 // Find the spawn point entity by name
-                uint entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+                ulong entityID = InternalCalls.Scene_FindEntityByName(spawnPointName);
 
                 if (entityID != 0)
                 {
@@ -473,7 +473,7 @@ namespace Game
 
             //PlayEnemySpawnSound(enemyType, ref spawnPos, ref spawnRot, ref spawnScale);
 
-            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(
+            ulong enemyID = InternalCalls.Prefab_InstantiateWithTransform(
                 prefabpath,
                 ref spawnPos,
                 ref spawnRot,
@@ -509,7 +509,7 @@ namespace Game
             string spawnPointName = loveletterRoutes[spawnIndex];
 
             // Find the spawn point entity by name
-            uint spawnID = InternalCalls.Scene_FindEntityByName(spawnPointName);
+            ulong spawnID = InternalCalls.Scene_FindEntityByName(spawnPointName);
 
             Log("Spawn point name is: " + spawnPointName);
 
@@ -531,7 +531,7 @@ namespace Game
             InternalCalls.Audio_SetMaxDistance(spawnID, 300.87f);
             InternalCalls.Audio_Play(spawnID);
 
-            uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(
+            ulong enemyID = InternalCalls.Prefab_InstantiateWithTransform(
                 prefabpath,
                 ref spawnPosition,
                 ref spawnRotation,
@@ -559,8 +559,8 @@ namespace Game
 
         private void CheckForEnemiesLeft()
         {
-            uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
-            uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
+            ulong[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
+            ulong[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
 
             int totalenemiesleft = 0;
 
@@ -673,7 +673,7 @@ namespace Game
             {
                 if (entity.EntityID != 0) // Extra safety check
                 {
-                    InternalCalls.MeshRenderer_SetVisible((uint)entity.EntityID, true);
+                    InternalCalls.MeshRenderer_SetVisible((ulong)entity.EntityID, true);
                 }
                 else
                 {
@@ -684,7 +684,7 @@ namespace Game
             // deactivate the inactive wall of the walls that are spawning
             if (wallInactiveEntities != null && wallIndex < wallInactiveEntities.Length)
             {
-                uint id = wallInactiveEntities[wallIndex].EntityID;
+                ulong id = wallInactiveEntities[wallIndex].EntityID;
                 if (id != 0) // Extra safety check
                 {
                     InternalCalls.MeshRenderer_SetVisible(id, false);
@@ -706,7 +706,7 @@ namespace Game
                 {
                     if (wall.EntityID != 0)
                     {
-                        InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, true);
+                        InternalCalls.MeshRenderer_SetVisible((ulong)wall.EntityID, true);
                     }
                 }
                 Log("All inactive walls enabled");
@@ -722,7 +722,7 @@ namespace Game
                 {
                     if (wall.EntityID != INVALID_ENTITY) // Extra safety check
                     {
-                        InternalCalls.MeshRenderer_SetVisible((uint)wall.EntityID, false);
+                        InternalCalls.MeshRenderer_SetVisible((ulong)wall.EntityID, false);
                     }
                     else
                     {
@@ -741,7 +741,7 @@ namespace Game
         {
             // Linear Congruential Generator
             rngSeed = (1103515245u * rngSeed + 12345u) & 0x7fffffffu;
-            return min + (int)(rngSeed % (uint)(max - min));
+            return min + (int)(rngSeed % (ulong)(max - min));
         }
 
         #endregion
@@ -755,7 +755,7 @@ namespace Game
 
             foreach (string name in entityNames)
             {
-                uint entityID = InternalCalls.Scene_FindEntityByName(name);
+                ulong entityID = InternalCalls.Scene_FindEntityByName(name);
                 if (entityID != 0) // Only add valid entities
                 {
                     validEntities.Add(new Entity(entityID));
@@ -788,12 +788,12 @@ namespace Game
         // FOR FUTURE PURPOSE
         private void PauseBGM()
         {
-            InternalCalls.Audio_Pause((uint)EntityID);
+            InternalCalls.Audio_Pause((ulong)EntityID);
         }
 
         private void StopBGM()
         {
-            InternalCalls.Audio_Stop((uint)EntityID);
+            InternalCalls.Audio_Stop((ulong)EntityID);
             StopAllOtherAudio();
         }
 
@@ -803,7 +803,7 @@ namespace Game
 
         private void PlayAllOtherAudio()
         {
-            uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
+            ulong[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
 
             if (Allies == null || Allies.Length <= 0)
             {
@@ -829,7 +829,7 @@ namespace Game
                 }
             }
 
-            uint coreID = InternalCalls.Scene_FindEntityByName("Core");
+            ulong coreID = InternalCalls.Scene_FindEntityByName("Core");
 
             if (coreID != INVALID_ENTITY)
             {
@@ -856,7 +856,7 @@ namespace Game
 
         private void stopmainsound()
         {
-            uint officeambi = InternalCalls.Scene_FindEntityByName("office_ambience");
+            ulong officeambi = InternalCalls.Scene_FindEntityByName("office_ambience");
 
             if (officeambi != INVALID_ENTITY)
             {
@@ -869,7 +869,7 @@ namespace Game
                 LogError("SpawnManager: Cannot find office ambience");
             }
 
-            uint roomambi = InternalCalls.Scene_FindEntityByName("room_ambience");
+            ulong roomambi = InternalCalls.Scene_FindEntityByName("room_ambience");
 
             if (roomambi != INVALID_ENTITY)
             {

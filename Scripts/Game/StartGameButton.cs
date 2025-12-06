@@ -27,12 +27,12 @@ namespace Game
 
 
         // private fields
-        private uint mainMenuCameraID;
-        private uint gameCameraID;
+        private ulong mainMenuCameraID;
+        private ulong gameCameraID;
         private bool camerasInitialized = false;
         private bool isShowingMainMenu;
 
-        private uint buttonEntityID;    // for entity
+        private ulong buttonEntityID;    // for entity
         //private bool wasMouseButtonPressed = false;
 
         private bool hasGameStarted = false;    //this is to ensure that when player click on MouseButton left, it wouldnt trigger the camera switch again
@@ -291,8 +291,8 @@ namespace Game
         private void InitializeCameras()
         {
             // Find entities by name (MainMenuCamera and GameCamera)
-            uint mainMenuID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
-            uint gameID = InternalCalls.Scene_FindEntityByName(gameCameraName);
+            ulong mainMenuID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
+            ulong gameID = InternalCalls.Scene_FindEntityByName(gameCameraName);
             
             // Convert to ulong (EntityID is ulong in the engine)
             mainMenuCameraID = mainMenuID;

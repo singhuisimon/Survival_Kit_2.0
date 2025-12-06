@@ -71,9 +71,9 @@ namespace Game
 
         // ===== Private Runtime State =====
 
-        private const uint INVALID_ENTITY = 0xffffffffu;
+        private const ulong INVALID_ENTITY = 0xffffffffu;
 
-        private uint targetID = INVALID_ENTITY;
+        private ulong targetID = INVALID_ENTITY;
 
         private bool isMoving = false;
         private bool isDead = false;
@@ -85,7 +85,7 @@ namespace Game
         private bool hasChosenInitialTarget = false;
 
         // Simple script-side RNG state (xorshift32)
-        private static uint s_RngState = 0x12345678u;
+        private static ulong s_RngState = 0x12345678u;
 
         // Tags
         private const string TAG_PLAYER = "Player";
@@ -102,13 +102,13 @@ namespace Game
             Log("=== Botnet started (EntityID = " + EntityID + ") ===");
 
             // Seed RNG
-            s_RngState ^= (uint)EntityID * 747796405u + 2891336453u;
+            s_RngState ^= (ulong)EntityID * 747796405u + 2891336453u;
 
             // Setup rigidbody
-            InternalCalls.Entity_AddRigidBody((uint)EntityID);
-            InternalCalls.Rigidbody_SetIsKinematic((uint)EntityID, false);
-            InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, false);
-            InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
+            InternalCalls.Entity_AddRigidBody((ulong)EntityID);
+            InternalCalls.Rigidbody_SetIsKinematic((ulong)EntityID, false);
+            InternalCalls.Rigidbody_SetUseGravity((ulong)EntityID, false);
+            InternalCalls.Rigidbody_SetMass((ulong)EntityID, 1.0f);
 
             // Reset runtime state
             isDead = false;
@@ -176,7 +176,7 @@ namespace Game
             Log("Botnet (EntityID = " + EntityID + ") stunned");
             isStunned = true;
             stunTimer = stunnedTime;
-            InternalCalls.Rigidbody_Stop((uint)EntityID);
+            InternalCalls.Rigidbody_Stop((ulong)EntityID);
         }
 
         // ===== Event Handlers =====
@@ -193,12 +193,6 @@ namespace Game
 
             if (hitId != (ulong)EntityID)
                 return;
-
-            Log("Botnet (EntityID = " + EntityID + ") was hit by bullet! exploding");
-
-            // Either mark for explosion next frame...
-            isExploding = true;
-
             // ...or explode immediately:
             Explode();
         }
@@ -210,7 +204,7 @@ namespace Game
 
             topSpeed = bruteForceAttackSpeed;
 
-            uint semi = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+            ulong semi = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
             if (semi != INVALID_ENTITY)
             {
                 targetID = semi;
@@ -272,7 +266,7 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
-            uint chosen = INVALID_ENTITY;
+            ulong chosen = INVALID_ENTITY;
 
             switch (choice)
             {
@@ -323,7 +317,7 @@ namespace Game
             if (targetID == INVALID_ENTITY)
                 return;
 
-            uint self = (uint)EntityID;
+            ulong self = (ulong)EntityID;
 
             // Positions
             Vector3 myPos = Transform.GetPosition(self);
@@ -371,7 +365,7 @@ namespace Game
             if (targetID == INVALID_ENTITY)
                 return;
 
-            Vector3 myPos = Transform.GetPosition((uint)EntityID);
+            Vector3 myPos = Transform.GetPosition((ulong)EntityID);
             Vector3 targetPos = Transform.GetPosition(targetID);
 
             Vector3 dir = new Vector3(
@@ -395,17 +389,17 @@ namespace Game
                 dir.Z * acceleration
             );
 
-            InternalCalls.Rigidbody_AddForce((uint)EntityID, ref force);
+            InternalCalls.Rigidbody_AddForce((ulong)EntityID, ref force);
         }
 
         private void ClampSpeed()
         {
-            float speed = InternalCalls.Rigidbody_GetSpeed((uint)EntityID);
+            float speed = InternalCalls.Rigidbody_GetSpeed((ulong)EntityID);
             if (speed <= topSpeed || topSpeed <= 0.0f)
                 return;
 
             Vector3 vel;
-            InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out vel);
+            InternalCalls.Rigidbody_GetVelocity((ulong)EntityID, out vel);
 
             float lenSq = vel.X * vel.X + vel.Y * vel.Y + vel.Z * vel.Z;
             if (lenSq <= 0.0001f)
@@ -421,7 +415,7 @@ namespace Game
             vel.Y *= scale;
             vel.Z *= scale;
 
-            InternalCalls.Rigidbody_SetVelocity((uint)EntityID, ref vel);
+            InternalCalls.Rigidbody_SetVelocity((ulong)EntityID, ref vel);
         }
 
         // ===== Collision & Explosion =====
@@ -436,17 +430,17 @@ namespace Game
             if (targetID == INVALID_ENTITY)
                 return;
 
-            uint self = (uint)EntityID;
+            ulong self = (ulong)EntityID;
 
             for (int i = 0; i < count; ++i)
             {
-                uint a, b;
+                ulong a, b;
                 InternalCalls.Physics_GetCollisionPair(i, out a, out b);
 
                 if (a != self && b != self)
                     continue;
 
-                uint other = (a == self) ? b : a;
+                ulong other = (a == self) ? b : a;
 
                 if (other == targetID)
                 {
@@ -474,27 +468,27 @@ namespace Game
 
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
-                uint explosionID = InternalCalls.Prefab_Instantiate(deathExplosionPrefab);
-                Vector3 myPos = Transform.GetPosition((uint)EntityID);
+                ulong explosionID = InternalCalls.Prefab_Instantiate(deathExplosionPrefab);
+                Vector3 myPos = Transform.GetPosition((ulong)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
             }
 
-            InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            InternalCalls.Scene_DestroyEntity((ulong)EntityID);
         }
 
         private void ApplyBlastToTag(string tag)
         {
-            uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
+            ulong[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
                 return;
 
-            Vector3 myPos = Transform.GetPosition((uint)EntityID);
+            Vector3 myPos = Transform.GetPosition((ulong)EntityID);
             float radiusSq = blastRadius * blastRadius;
 
             for (int i = 0; i < entities.Length; ++i)
             {
-                uint id = entities[i];
-                if (id == (uint)EntityID)
+                ulong id = entities[i];
+                if (id == (ulong)EntityID)
                     continue;
 
                 Vector3 targetPos = Transform.GetPosition(id);
@@ -507,7 +501,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
-                    //DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    //DamageSystem.DealDamage(id, blastDamage, (ulong)EntityID);
                 }
             }
         }
@@ -585,9 +579,9 @@ namespace Game
             return result;
         }
 
-        private static uint NextUInt()
+        private static ulong Nextulong()
         {
-            uint x = s_RngState;
+            ulong x = s_RngState;
             if (x == 0)
                 x = 0x12345678u;
 
@@ -603,8 +597,8 @@ namespace Game
             if (maxExclusive <= minInclusive)
                 return minInclusive;
 
-            uint range = (uint)(maxExclusive - minInclusive);
-            uint r = NextUInt();
+            ulong range = (ulong)(maxExclusive - minInclusive);
+            ulong r = Nextulong();
             return minInclusive + (int)(r % range);
         }
 
@@ -613,25 +607,25 @@ namespace Game
             if (maxInclusive <= minInclusive)
                 return minInclusive;
 
-            uint r = NextUInt() & 0x00FFFFFFu;
+            ulong r = Nextulong() & 0x00FFFFFFu;
             float t = r / 16777215.0f;
             return minInclusive + (maxInclusive - minInclusive) * t;
         }
 
         // ===== Search Helpers =====
 
-        private static uint FindFirstEntityWithTag(string tag)
+        private static ulong FindFirstEntityWithTag(string tag)
         {
-            uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
+            ulong[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
                 return INVALID_ENTITY;
 
             return entities[0];
         }
 
-        private static uint FindRandomEntityWithTag(string tag)
+        private static ulong FindRandomEntityWithTag(string tag)
         {
-            uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
+            ulong[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
                 return INVALID_ENTITY;
 

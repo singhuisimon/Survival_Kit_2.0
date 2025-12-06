@@ -362,11 +362,11 @@ namespace Engine
 			return nullptr;
 		}
 		EnsureCorrectDomain();
-		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
 		MonoDomain *current = mono_domain_get();
-		LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
-		LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
+		//LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
+		//LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
+		//LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
 
 		if (current != m_AppDomain)
 		{
@@ -380,10 +380,10 @@ namespace Engine
 
 		MonoDomain *currentDomain = mono_domain_get();
 
-		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
-		LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
+		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		//LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
+		//LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
+		//LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
 
 		if (currentDomain != m_RootDomain)
 		{
@@ -539,8 +539,8 @@ namespace Engine
 			field = mono_class_get_field_from_name(currentClass, fieldName.c_str());
 			if (field)
 			{
-				LOG_INFO("[SetFieldValue] Found FIELD '", fieldName, "' in class ",
-					classNs ? classNs : "", classNs ? "." : "", className);
+				//LOG_INFO("[SetFieldValue] Found FIELD '", fieldName, "' in class ",
+				//	classNs ? classNs : "", classNs ? "." : "", className);
 				break;
 			}
 			currentClass = mono_class_get_parent(currentClass);
@@ -554,8 +554,8 @@ namespace Engine
 			// Verify it was set (for uint32)
 			uint32_t readBack = 0;
 			mono_field_get_value(instance, field, &readBack);
-			LOG_INFO("[SetFieldValue] Set field '", fieldName, "' to ", *(uint32_t *)value,
-				", read back: ", readBack);
+			//LOG_INFO("[SetFieldValue] Set field '", fieldName, "' to ", *(uint32_t *)value,
+			//	", read back: ", readBack);
 			return;
 		}
 

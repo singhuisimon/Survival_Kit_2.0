@@ -45,7 +45,7 @@ namespace Game
 
         private void OnBulletHit(string eventName, string payload)
         {
-            if (!uint.TryParse(payload, out uint hitEntity))
+            if (!ulong.TryParse(payload, out ulong hitEntity))
                 return;
 
             // If this core was hit
@@ -72,14 +72,14 @@ namespace Game
             if (isDead) return;
             isDead = true;
 
-            uint parentEntityID = Engine.InternalCalls.Transform_GetParent((uint)EntityID);
+            ulong parentEntityID = Engine.InternalCalls.Transform_GetParent((ulong)EntityID);
 
             if (parentEntityID != 0)
             {
                 Engine.EventSystem.Publish("CoreDestroyed", parentEntityID.ToString());
             }
 
-            Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            Engine.InternalCalls.Scene_DestroyEntity((ulong)EntityID);
         }
 
         public override void OnDestroy()

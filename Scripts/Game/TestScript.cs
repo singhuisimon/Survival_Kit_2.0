@@ -61,7 +61,7 @@ namespace Game
         private WeaponType currentWeapon = WeaponType.Primary;
 
         // ===== Camera Reference =====
-        private uint mainCameraEntityID = 0;
+        private ulong mainCameraEntityID = 0;
 
         // ===== Input State Tracking =====
         private bool spaceWasPressed = false;
@@ -113,7 +113,7 @@ namespace Game
 
             // Get player position (set by C++)
             Engine.Vector3 playerPos;
-            Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPos);
+            Engine.InternalCalls.Transform_GetPosition((ulong)EntityID, out playerPos);
 
             // Get camera position (updated by C++)
             Engine.Vector3 cameraPosition;
@@ -197,7 +197,7 @@ namespace Game
                     playerPos.Y + moveDir.Y * moveSpeed,
                     playerPos.Z + moveDir.Z * moveSpeed
                 );
-                Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
+                Engine.InternalCalls.Transform_SetPosition((ulong)EntityID, ref newPos);
             }
 
             // Handle dash (FULL 3D)
@@ -214,7 +214,7 @@ namespace Game
                         moveDir.Y * dashForce,
                         moveDir.Z * dashForce
                     );
-                    Engine.InternalCalls.Rigidbody_AddForce((uint)EntityID, ref dashImpulse);
+                    Engine.InternalCalls.Rigidbody_AddForce((ulong)EntityID, ref dashImpulse);
                     isDashing = true;
                     dashCooldown = DASH_COOLDOWN_TIME;
                     Engine.InternalCalls.Log("DASH!");
@@ -271,7 +271,7 @@ namespace Game
             primaryFireCooldown = PrimaryFireRate;
 
             Engine.InternalCalls.Log("PRIMARY FIRE! Ammo: " + primaryCurrentAmmo + "/" + PrimaryMaxAmmo);
-            SpawnBullet(PrimaryBulletPrefab, 50.0f);
+            SpawnBullet(PrimaryBulletPrefab, 1200.0f);
         }
 
         private void TryShootSecondary()
@@ -297,7 +297,7 @@ namespace Game
 
                 // Get player position
                 Engine.Vector3 playerPosition;
-                Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
+                Engine.InternalCalls.Transform_GetPosition((ulong)EntityID, out playerPosition);
                 Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
 
                 // Calculate aimTarget - this is where the camera is looking at (approx)
@@ -385,7 +385,7 @@ namespace Game
                 }
 
                 // Instantiate bullet WITH TRANSFORM (quat-based rotation)
-                uint bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
+                ulong bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
                     prefabPath,
                     ref firingPosition,
                     ref bulletRotationQuat,
@@ -618,7 +618,7 @@ namespace Game
         public void Stop()
         {
             moveAllowed = false;
-            Engine.InternalCalls.Rigidbody_Stop((uint)EntityID);
+            Engine.InternalCalls.Rigidbody_Stop((ulong)EntityID);
             Engine.InternalCalls.Log("Player stopped");
         }
 
