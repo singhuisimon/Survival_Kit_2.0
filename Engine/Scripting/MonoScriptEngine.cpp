@@ -309,22 +309,22 @@ namespace Engine
 	//	LOG_INFO("Hot-reload: Starting...");
 	//	ClearAllInstances();
 	//	LOG_INFO("Hot-reload: Cleared instance tracking");
-
+	//
 	//	UnloadAssembly();
 	//	mono_domain_set(m_RootDomain, false);
 	//	mono_domain_unload(m_AppDomain);
-
+	//
 	//	LOG_INFO("Hot-reload: Domain unloaded");
-
+	//
 	//	ScriptReloader::GetInstance().FinalizeDllSwap();
 	//	LOG_INFO("Hot-reload: DLL swapped");
-
+	//
 	//	m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
 	//	mono_domain_set(m_AppDomain, true);
-
+	//
 	//	LoadAssembly(m_AssemblyPath);
 	//	RegisterInternalCalls();
-
+	//
 	//	LOG_INFO("Hot-reload: Domain reloaded");
 	//	LOG_INFO("Hot-reload: Complete!");
 	//}
@@ -378,15 +378,19 @@ namespace Engine
 			return nullptr;
 		}
 		EnsureCorrectDomain();
-		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
 		MonoDomain *current = mono_domain_get();
-		LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
-		LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
+		//LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
+		//LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
+		//LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
 
 		if (current != m_AppDomain)
 		{
 			LOG_ERROR("   Still in wrong domain after EnsureCorrectDomain!");
+			//LOG_ERROR("  Switching to APP domain...");
+			//mono_domain_set(m_AppDomain, false);
+			//current = mono_domain_get();
+			//LOG_INFO("  Switched to: " + std::to_string((uintptr_t)current));
 		}
 		MonoClass *klass = GetScriptClass(className);
 		if (!klass)
@@ -396,10 +400,10 @@ namespace Engine
 
 		MonoDomain *currentDomain = mono_domain_get();
 
-		LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
-		LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
+		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
+		//LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
+		//LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
+		//LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
 
 		if (currentDomain != m_RootDomain)
 		{
@@ -620,8 +624,8 @@ namespace Engine
 			field = mono_class_get_field_from_name(currentClass, fieldName.c_str());
 			if (field)
 			{
-				LOG_INFO("[SetFieldValue] Found FIELD '", fieldName, "' in class ",
-					classNs ? classNs : "", classNs ? "." : "", className);
+				//LOG_INFO("[SetFieldValue] Found FIELD '", fieldName, "' in class ",
+				//	classNs ? classNs : "", classNs ? "." : "", className);
 				break;
 			}
 			currentClass = mono_class_get_parent(currentClass);
@@ -635,8 +639,8 @@ namespace Engine
 			// Verify it was set (for uint32)
 			uint32_t readBack = 0;
 			mono_field_get_value(instance, field, &readBack);
-			LOG_INFO("[SetFieldValue] Set field '", fieldName, "' to ", *(uint32_t *)value,
-				", read back: ", readBack);
+			//LOG_INFO("[SetFieldValue] Set field '", fieldName, "' to ", *(uint32_t *)value,
+			//	", read back: ", readBack);
 			return;
 		}
 
@@ -761,20 +765,20 @@ namespace Engine
 		const char *className = mono_class_get_name(klass);
 		const char *classNs = mono_class_get_namespace(klass);
 
-		LOG_INFO("[BindEntityID] Attempting to bind EntityID=", entityID, " to instance of ",
-			classNs ? classNs : "", classNs ? "." : "", className);
+		//LOG_INFO("[BindEntityID] Attempting to bind EntityID=", entityID, " to instance of ",
+		//	classNs ? classNs : "", classNs ? "." : "", className);
 
 		// Make a local copy - CRITICAL: pass the ADDRESS of this copy
 		std::uint32_t idCopy = entityID;
 
-		LOG_INFO("[BindEntityID] Calling SetFieldValue with idCopy address: ",
-			(void *)&idCopy, ", value: ", idCopy);
+		//LOG_INFO("[BindEntityID] Calling SetFieldValue with idCopy address: ",
+		//	(void *)&idCopy, ", value: ", idCopy);
 
 		// SetFieldValue needs the ADDRESS of the value
 		SetFieldValue(instance, "EntityID", &idCopy);
 
 		// VERIFICATION: Try to read it back multiple ways
-		LOG_INFO("[BindEntityID] === Verification Phase ===");
+		//LOG_INFO("[BindEntityID] === Verification Phase ===");
 
 		// Method 1: Try reading as a property
 		MonoProperty *prop = nullptr;
@@ -798,8 +802,8 @@ namespace Engine
 				{
 					MonoString *excStr = mono_object_to_string(exception, nullptr);
 					char *cStr = excStr ? mono_string_to_utf8(excStr) : nullptr;
-					LOG_ERROR("[BindEntityID] Exception reading EntityID property: ",
-						cStr ? cStr : "<null>");
+					//LOG_ERROR("[BindEntityID] Exception reading EntityID property: ",
+					//	cStr ? cStr : "<null>");
 					if (cStr) mono_free(cStr);
 				}
 				else if (result)
@@ -810,13 +814,13 @@ namespace Engine
 						uint32_t verifyID = *reinterpret_cast<uint32_t *>(unboxed);
 						if (verifyID == entityID)
 						{
-							LOG_INFO("[BindEntityID] SUCCESS! EntityID=", entityID,
-								" verified via property getter");
+							//LOG_INFO("[BindEntityID] SUCCESS! EntityID=", entityID,
+							//	" verified via property getter");
 						}
 						else
 						{
-							LOG_ERROR("[BindEntityID] FAILED! Set ", entityID,
-								" but property getter returned ", verifyID);
+							//LOG_ERROR("[BindEntityID] FAILED! Set ", entityID,
+							//	" but property getter returned ", verifyID);
 						}
 						return; // Exit after property check
 					}
@@ -866,6 +870,55 @@ namespace Engine
 		{
 			LOG_ERROR("[BindEntityID] Could not find EntityID as field or property!");
 		}
+	}
+
+	// ------------------------------------------------
+	// Helper: Initialize ScriptComponent for new entity
+	// ------------------------------------------------
+	static void InitializeScriptComponentForEntity(Entity entity)
+	{
+		if (!entity)
+			return;
+
+		if (!entity.HasComponent<ScriptComponent>())
+			return;
+
+		auto &sc = entity.GetComponent<ScriptComponent>();
+
+		// No script assigned on this entity
+		if (sc.ScriptClassName.empty())
+			return;
+
+		auto &se = MonoScriptEngine::GetInstance();
+
+		uint64_t eid = static_cast<uint32_t>(entity);
+
+		// If there's already a managed instance (e.g. cloned from prefab),
+		// just (re)bind EntityID to be safe.
+		if (sc.ScriptInstance)
+		{
+			LOG_INFO("[Prefab] Rebinding EntityID on existing script instance '",
+				sc.ScriptClassName, "' for entity ", eid);
+			se.BindEntityID(static_cast<MonoObject *>(sc.ScriptInstance), eid);
+			return;
+		}
+
+		// Otherwise create a fresh managed instance
+		MonoObject *instance = se.CreateScriptInstance(sc.ScriptClassName);
+		if (!instance)
+		{
+			LOG_ERROR("[Prefab] Failed to create script instance for class '",
+				sc.ScriptClassName, "' on entity ", eid);
+			return;
+		}
+
+		se.BindEntityID(instance, eid);
+
+		sc.ScriptInstance = instance;
+		sc.Started = false; // ScriptSystem will call OnStart on next update
+
+		LOG_INFO("[Prefab] Initialized script '", sc.ScriptClassName,
+			"' for entity ", eid, " and bound EntityID");
 	}
 
 	// ============================================
@@ -1371,7 +1424,7 @@ namespace Engine
 		{
 			if (!InternalCalls::s_CurrentScene)
 			{
-				LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
+				//LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
 				return 0;
 			}
 
@@ -1389,7 +1442,7 @@ namespace Engine
 			// Create via your scene API
 			Entity e = InternalCalls::s_CurrentScene->CreateEntity(name.c_str());
 			const uint64_t id = static_cast<uint32_t>(e);
-			LOG_INFO("[InternalCall] Created entity '", name, "' (ID=", id, ")");
+			//LOG_INFO("[InternalCall] Created entity '", name, "' (ID=", id, ")");
 
 			return id;
 		}
@@ -1500,15 +1553,14 @@ namespace Engine
 
 			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
 
-			// Load prefab from file
+			// Resolve path to actual asset file
 			std::string prefabfullpath = getAssetFilePath(prefabPath);
 
-
-			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+			// Load prefab from file
 			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
 			if (!prefab)
 			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to load prefab from ", prefabPath);
+				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to load prefab from ", prefabfullpath);
 				return 0;
 			}
 
@@ -1526,6 +1578,9 @@ namespace Engine
 				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to instantiate entity");
 				return 0;
 			}
+
+			// Initialize ScriptComponent on the newly spawned entity (if any)
+			InitializeScriptComponentForEntity(entity);
 
 			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
 			LOG_INFO("[InternalCall] Successfully instantiated prefab - Entity ID: ", entityID);
@@ -1558,24 +1613,23 @@ namespace Engine
 				return 0;
 			}
 
-			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
+			LOG_INFO("[InternalCall] Instantiating scene prefab: ", prefabPath);
 
-			// Load prefab from file
+			// Resolve path to actual asset file
 			std::string prefabfullpath = getAssetFilePath(prefabPath);
 
-
-			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabPath);
+			// Load prefab from file
 			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
 			if (!prefab)
 			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to load prefab from ", prefabPath);
+				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to load prefab from ", prefabfullpath);
 				return 0;
 			}
 
 			// Register prefab
 			PrefabRegistry::Get().RegisterPrefab(prefab);
 
-			// Instantiate entity from prefab
+			// Instantiate root entity from scene prefab
 			Entity entity = PrefabInstantiator::InstantiateScenePrefab(
 				InternalCalls::s_CurrentScene,
 				prefab->GetGUID()
@@ -1586,6 +1640,9 @@ namespace Engine
 				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to instantiate entity");
 				return 0;
 			}
+
+			// Initialize ScriptComponent on the root entity (if any)
+			InitializeScriptComponentForEntity(entity);
 
 			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
 			LOG_INFO("[InternalCall] Successfully instantiated scene prefab - root Entity ID: ", entityID);
@@ -1669,6 +1726,9 @@ namespace Engine
 				transform.WorldTransform = transform_matrix;
 			}
 
+			// Initialize ScriptComponent on the spawned entity (if any)
+			InitializeScriptComponentForEntity(entity);
+
 			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
 			LOG_INFO("[InternalCall] Prefab_InstantiateWithTransform: instantiated entity with ID ", entityID);
 			return entityID;
@@ -1708,7 +1768,6 @@ namespace Engine
 
 			// Find entity by name
 			Entity entity = s_CurrentScene->FindEntityByName(name);
-			LOG_INFO("player found heres");
 
 			// Convert Entity to uint32_t using the conversion operator
 			// If entity is invalid (entt::null), this will return 0
@@ -1981,7 +2040,8 @@ namespace Engine
 		void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel)
 		{
 			auto e = GetEntityOrNull(entityID);
-			if (!outVel) return;
+			if (!e || !outVel) return;
+			if (!e.HasComponent<RigidbodyComponent>()) return;
 			*outVel = e.GetComponent<RigidbodyComponent>().GetVelocity();
 		}
 
@@ -2161,6 +2221,7 @@ namespace Engine
 		bool Camera_GetEnabled(uint64_t entityID)
 		{
 			auto e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<CameraComponent>()) return false;
 			auto &cam = e.GetComponent<CameraComponent>();
 			return cam.Enabled;
 		}

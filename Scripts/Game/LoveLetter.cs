@@ -66,7 +66,7 @@ namespace Game
         private void OnCoreDestroyedEvent(string eventName, string payload)
         {
             // payload contains the parent entity ID that lost a core
-            if (int.TryParse(payload, out int parentID) && parentID == EntityID)
+            if (ulong.TryParse(payload, out ulong parentID) && parentID == EntityID)
             {
                 OnCoreDestroyed();
             }

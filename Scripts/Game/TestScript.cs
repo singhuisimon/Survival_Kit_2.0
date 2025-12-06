@@ -60,6 +60,8 @@ namespace Game
         private enum WeaponType { Primary, Secondary }
         private WeaponType currentWeapon = WeaponType.Primary;
 
+        private float shootCooldownTimer = 0.5f;
+
         // ===== Camera Reference =====
         private uint mainCameraEntityID = 0;
 
@@ -241,15 +243,19 @@ namespace Game
         // ===== WEAPON SYSTEM =====
         private void HandleWeaponInput(float deltaTime)
         {
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.J))
+            if (shootCooldownTimer > 0.0f)
+                shootCooldownTimer -= deltaTime;
+
+            if (Engine.Input.IsKeyPressed(Engine.KeyCode.J) && shootCooldownTimer <= 0.0f)
             {
-                TryShootPrimary();
+                shootCooldownTimer = 0.1f;
+                ShootBullet();
             }
 
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.K))
-            {
-                TryShootSecondary();
-            }
+            //if (Engine.Input.IsKeyPressed(Engine.KeyCode.K))
+            //{
+            //    TryShootSecondary();
+            //}
 
             bool rIsPressed = Engine.Input.IsKeyPressed(Engine.KeyCode.R);
             bool rJustPressed = rIsPressed && !rWasPressed;
@@ -261,189 +267,234 @@ namespace Game
             }
         }
 
-        private void TryShootPrimary()
+        private void ShootBullet()
         {
-            if (isReloading || primaryFireCooldown > 0 || primaryCurrentAmmo <= 0)
+            // Player position & forward
+            Engine.Vector3 playerPos = Engine.Transform.GetPosition(EntityID);
+            Engine.Quat playerRot = Engine.Transform.GetRotation(EntityID);
+
+            Vector3 forward = playerRot.Right;      // or
+                                                    // Vector3 forward  = -playerRot.Right;  // if it goes backwards
+
+            // Tune these as needed
+            float spawnDistance = 1.5f;
+            float bulletForce = 100.0f;
+
+            // Spawn position in front of the player
+            Engine.Vector3 spawnPos = new Engine.Vector3(
+                playerPos.X + forward.X * spawnDistance,
+                playerPos.Y + forward.Y * spawnDistance,
+                playerPos.Z + forward.Z * spawnDistance
+            );
+
+            // Create bullet entity
+            uint bulletID = Engine.InternalCalls.Scene_CreateEntity("PrimaryBullet");
+            if (bulletID == 0)
                 return;
 
-            currentWeapon = WeaponType.Primary;
-            primaryCurrentAmmo--;
-            primaryFireCooldown = PrimaryFireRate;
+            // Set transform
+            Engine.Transform.SetPosition(bulletID, ref spawnPos);
+            Engine.Transform.SetRotation(bulletID, ref playerRot);
 
-            Engine.InternalCalls.Log("PRIMARY FIRE! Ammo: " + primaryCurrentAmmo + "/" + PrimaryMaxAmmo);
-            SpawnBullet(PrimaryBulletPrefab, 50.0f);
+            // Add Rigidbody and shoot it
+            Engine.InternalCalls.Entity_AddRigidBody(bulletID);
+
+            Engine.Vector3 force = new Engine.Vector3(
+                forward.X * bulletForce,
+                forward.Y * bulletForce,
+                forward.Z * bulletForce
+            );
+            Engine.InternalCalls.Rigidbody_AddForce(bulletID, ref force);
+
+            // Optional: visuals + script
+            Engine.InternalCalls.Entity_AddMeshRenderer(bulletID);
+            Engine.InternalCalls.Entity_AddScript(bulletID, "Game.PrimaryBullet");
+            Log("Creating bullet with ID: " + bulletID);
         }
 
-        private void TryShootSecondary()
-        {
-            if (isReloading || secondaryFireCooldown > 0 || secondaryCurrentAmmo <= 0)
-                return;
+        //private void TryShootPrimary()
+        //{
+        //    if (isReloading || primaryFireCooldown > 0 || primaryCurrentAmmo <= 0)
+        //        return;
 
-            currentWeapon = WeaponType.Secondary;
-            secondaryCurrentAmmo--;
-            secondaryFireCooldown = SecondaryFireRate;
+        //    currentWeapon = WeaponType.Primary;
+        //    primaryCurrentAmmo--;
+        //    primaryFireCooldown = PrimaryFireRate;
 
-            Engine.InternalCalls.Log("SECONDARY FIRE! Ammo: " + secondaryCurrentAmmo + "/" + SecondaryMaxAmmo);
-            SpawnBullet(SecondaryBulletPrefab, 30.0f);
-        }
+        //    Engine.InternalCalls.Log("PRIMARY FIRE! Ammo: " + primaryCurrentAmmo + "/" + PrimaryMaxAmmo);
+        //    SpawnBullet(PrimaryBulletPrefab, 10.0f);
+        //}
 
-        private void SpawnBullet(string prefabPath, float bulletSpeed)
-        {
-            try
-            {
-                Engine.InternalCalls.Log("=== SPAWNING BULLET ===");
-                Engine.InternalCalls.Log("Prefab path: " + prefabPath);
-                Engine.InternalCalls.Log("Bullet speed: " + bulletSpeed);
+        //private void TryShootSecondary()
+        //{
+        //    if (isReloading || secondaryFireCooldown > 0 || secondaryCurrentAmmo <= 0)
+        //        return;
 
-                // Get player position
-                Engine.Vector3 playerPosition;
-                Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
-                Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
+        //    currentWeapon = WeaponType.Secondary;
+        //    secondaryCurrentAmmo--;
+        //    secondaryFireCooldown = SecondaryFireRate;
 
-                // Calculate aimTarget - this is where the camera is looking at (approx)
-                Engine.Vector3 aimTarget = new Engine.Vector3(
-                    playerPosition.X,
-                    playerPosition.Y + aimHeightOffset,
-                    playerPosition.Z
-                );
+        //    Engine.InternalCalls.Log("SECONDARY FIRE! Ammo: " + secondaryCurrentAmmo + "/" + SecondaryMaxAmmo);
+        //    SpawnBullet(SecondaryBulletPrefab, 30.0f);
+        //}
 
-                // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
-                Engine.Vector3 cameraPosition;
-                if (mainCameraEntityID != 0)
-                {
-                    Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
-                }
-                else
-                {
-                    // Fallback: use calculated camera position if MainCamera not found
-                    Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
-                    float cosPitch = SimpleCos(orbitPitch);
-                    float sinPitch = SimpleSin(orbitPitch);
-                    float cosYaw = SimpleCos(orbitYaw);
-                    float sinYaw = SimpleSin(orbitYaw);
+        //private void SpawnBullet(string prefabPath, float bulletSpeed)
+        //{
+        //    try
+        //    {
+        //        Engine.InternalCalls.Log("=== SPAWNING BULLET ===");
+        //        Engine.InternalCalls.Log("Prefab path: " + prefabPath);
+        //        Engine.InternalCalls.Log("Bullet speed: " + bulletSpeed);
 
-                    cameraPosition = new Engine.Vector3(
-                        aimTarget.X + cosPitch * sinYaw * orbitRadius,
-                        aimTarget.Y + sinPitch * orbitRadius,
-                        aimTarget.Z + cosPitch * cosYaw * orbitRadius
-                    );
-                }
+        //        // Get player position
+        //        Engine.Vector3 playerPosition;
+        //        Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out playerPosition);
+        //        Engine.InternalCalls.Log("Player position: " + playerPosition.X + ", " + playerPosition.Y + ", " + playerPosition.Z);
 
-                Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
+        //        // Calculate aimTarget - this is where the camera is looking at (approx)
+        //        Engine.Vector3 aimTarget = new Engine.Vector3(
+        //            playerPosition.X,
+        //            playerPosition.Y + aimHeightOffset,
+        //            playerPosition.Z
+        //        );
 
-                // Calculate direction FROM camera TO aimTarget (where camera is looking)
-                Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
-                    aimTarget.X - cameraPosition.X,
-                    aimTarget.Y - cameraPosition.Y,
-                    aimTarget.Z - cameraPosition.Z
-                );
+        //        // Get the ACTUAL MainCamera position (updated by C++ with mouse movement)
+        //        Engine.Vector3 cameraPosition;
+        //        if (mainCameraEntityID != 0)
+        //        {
+        //            Engine.InternalCalls.Transform_GetPosition(mainCameraEntityID, out cameraPosition);
+        //        }
+        //        else
+        //        {
+        //            // Fallback: use calculated camera position if MainCamera not found
+        //            Engine.InternalCalls.LogWarning("MainCamera not found, using fallback position");
+        //            float cosPitch = SimpleCos(orbitPitch);
+        //            float sinPitch = SimpleSin(orbitPitch);
+        //            float cosYaw = SimpleCos(orbitYaw);
+        //            float sinYaw = SimpleSin(orbitYaw);
 
-                // Use the FULL 3D direction for shooting
-                Engine.Vector3 shootDirection = cameraToAimTarget;
+        //            cameraPosition = new Engine.Vector3(
+        //                aimTarget.X + cosPitch * sinYaw * orbitRadius,
+        //                aimTarget.Y + sinPitch * orbitRadius,
+        //                aimTarget.Z + cosPitch * cosYaw * orbitRadius
+        //            );
+        //        }
 
-                // Normalize the full 3D vector
-                float lenSq = shootDirection.X * shootDirection.X +
-                              shootDirection.Y * shootDirection.Y +
-                              shootDirection.Z * shootDirection.Z;
+        //        Engine.InternalCalls.Log("Camera position: " + cameraPosition.X + ", " + cameraPosition.Y + ", " + cameraPosition.Z);
 
-                if (lenSq > 0.0001f)
-                {
-                    float invLen = 1.0f / SimpleSqrt(lenSq);
-                    shootDirection = new Engine.Vector3(
-                        shootDirection.X * invLen,
-                        shootDirection.Y * invLen,
-                        shootDirection.Z * invLen
-                    );
-                }
-                else
-                {
-                    Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
-                    return;
-                }
+        //        // Calculate direction FROM camera TO aimTarget (where camera is looking)
+        //        Engine.Vector3 cameraToAimTarget = new Engine.Vector3(
+        //            aimTarget.X - cameraPosition.X,
+        //            aimTarget.Y - cameraPosition.Y,
+        //            aimTarget.Z - cameraPosition.Z
+        //        );
 
-                Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
+        //        // Use the FULL 3D direction for shooting
+        //        Engine.Vector3 shootDirection = cameraToAimTarget;
 
-                // Spawn position - along the full 3D shoot direction
-                float spawnDistance = 1.5f;  // Distance in front of player
+        //        // Normalize the full 3D vector
+        //        float lenSq = shootDirection.X * shootDirection.X +
+        //                      shootDirection.Y * shootDirection.Y +
+        //                      shootDirection.Z * shootDirection.Z;
 
-                Engine.Vector3 firingPosition = new Engine.Vector3(
-                    playerPosition.X + (shootDirection.X * spawnDistance),
-                    playerPosition.Y + aimHeightOffset,
-                    playerPosition.Z + (shootDirection.Z * spawnDistance)
-                );
+        //        if (lenSq > 0.0001f)
+        //        {
+        //            float invLen = 1.0f / SimpleSqrt(lenSq);
+        //            shootDirection = new Engine.Vector3(
+        //                shootDirection.X * invLen,
+        //                shootDirection.Y * invLen,
+        //                shootDirection.Z * invLen
+        //            );
+        //        }
+        //        else
+        //        {
+        //            Engine.InternalCalls.LogError("Invalid shoot direction - length is zero!");
+        //            return;
+        //        }
 
-                Engine.InternalCalls.Log("Firing position: " + firingPosition.X + ", " + firingPosition.Y + ", " + firingPosition.Z);
+        //        Engine.InternalCalls.Log("Shoot direction: " + shootDirection.X + ", " + shootDirection.Y + ", " + shootDirection.Z);
 
-                // Compute bullet rotation as a pure quaternion that looks along shootDirection
-                Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
-                Engine.Quat bulletRotationQuat = LookRotation(shootDirection, worldUp);
+        //        // Spawn position - along the full 3D shoot direction
+        //        float spawnDistance = 1.5f;  // Distance in front of player
 
-                Engine.Vector3 bulletScale = new Engine.Vector3(0.4f, 0.4f, 0.2f);
-                if (prefabPath == SecondaryBulletPrefab)
-                {
-                    bulletScale = new Engine.Vector3(0.3f, 0.20f, 0.3f);
-                }
+        //        Engine.Vector3 firingPosition = new Engine.Vector3(
+        //            playerPosition.X + (shootDirection.X * spawnDistance),
+        //            playerPosition.Y + aimHeightOffset,
+        //            playerPosition.Z + (shootDirection.Z * spawnDistance)
+        //        );
 
-                // Instantiate bullet WITH TRANSFORM (quat-based rotation)
-                uint bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
-                    prefabPath,
-                    ref firingPosition,
-                    ref bulletRotationQuat,
-                    ref bulletScale,
-                    false  // false = entity prefab, not scene prefab
-                );
-                if (bulletEntityID == 0)
-                {
-                    Engine.InternalCalls.LogError("FAILED to instantiate bullet! Prefab_InstantiateWithTransform returned 0");
-                    Engine.InternalCalls.LogError("Check if prefab exists at: " + prefabPath);
-                    return;
-                }
+        //        Engine.InternalCalls.Log("Firing position: " + firingPosition.X + ", " + firingPosition.Y + ", " + firingPosition.Z);
 
-                Engine.InternalCalls.Log("Bullet entity created with ID: " + bulletEntityID);
+        //        // Compute bullet rotation as a pure quaternion that looks along shootDirection
+        //        Engine.Vector3 worldUp = new Engine.Vector3(0.0f, 1.0f, 0.0f);
+        //        Engine.Quat bulletRotationQuat = LookRotation(shootDirection, worldUp);
 
-                // Ensure bullet uses quaternion rotation as the authoritative orientation
-                Engine.Transform.SetRotation(bulletEntityID, ref bulletRotationQuat);
+        //        Engine.Vector3 bulletScale = new Engine.Vector3(0.4f, 0.4f, 0.2f);
+        //        if (prefabPath == SecondaryBulletPrefab)
+        //        {
+        //            bulletScale = new Engine.Vector3(0.3f, 0.20f, 0.3f);
+        //        }
 
-                // Set bullet position
-                Engine.InternalCalls.Transform_SetPosition(bulletEntityID, ref firingPosition);
+        //        // Instantiate bullet WITH TRANSFORM (quat-based rotation)
+        //        uint bulletEntityID = Engine.InternalCalls.Prefab_InstantiateWithTransform(
+        //            prefabPath,
+        //            ref firingPosition,
+        //            ref bulletRotationQuat,
+        //            ref bulletScale,
+        //            false  // false = entity prefab, not scene prefab
+        //        );
+        //        if (bulletEntityID == 0)
+        //        {
+        //            Engine.InternalCalls.LogError("FAILED to instantiate bullet! Prefab_InstantiateWithTransform returned 0");
+        //            Engine.InternalCalls.LogError("Check if prefab exists at: " + prefabPath);
+        //            return;
+        //        }
 
-                // Verify position was set
-                Engine.Vector3 verifyPos;
-                Engine.InternalCalls.Transform_GetPosition(bulletEntityID, out verifyPos);
-                Engine.InternalCalls.Log("Bullet position set to: " + verifyPos.X + ", " + verifyPos.Y + ", " + verifyPos.Z);
+        //        Engine.InternalCalls.Log("Bullet entity created with ID: " + bulletEntityID);
 
-                // Set velocity with FULL 3D direction (this allows up/down shooting)
-                Engine.Vector3 velocity = new Engine.Vector3(
-                    shootDirection.X * bulletSpeed,
-                    shootDirection.Y * bulletSpeed,
-                    shootDirection.Z * bulletSpeed
-                );
+        //        // Ensure bullet uses quaternion rotation as the authoritative orientation
+        //        Engine.Transform.SetRotation(bulletEntityID, ref bulletRotationQuat);
 
-                Engine.InternalCalls.Log("Setting bullet velocity: " + velocity.X + ", " + velocity.Y + ", " + velocity.Z);
+        //        // Set bullet position
+        //        Engine.InternalCalls.Transform_SetPosition(bulletEntityID, ref firingPosition);
 
-                // Check if bullet has rigidbody
-                if (Engine.InternalCalls.EntityHasRigidBody(bulletEntityID))
-                {
-                    Engine.InternalCalls.Rigidbody_SetVelocity(bulletEntityID, ref velocity);
+        //        // Verify position was set
+        //        Engine.Vector3 verifyPos;
+        //        Engine.InternalCalls.Transform_GetPosition(bulletEntityID, out verifyPos);
+        //        Engine.InternalCalls.Log("Bullet position set to: " + verifyPos.X + ", " + verifyPos.Y + ", " + verifyPos.Z);
 
-                    // Verify velocity was set
-                    Engine.Vector3 verifyVel;
-                    Engine.InternalCalls.Rigidbody_GetVelocity(bulletEntityID, out verifyVel);
-                    Engine.InternalCalls.Log("Bullet velocity verified: " + verifyVel.X + ", " + verifyVel.Y + ", " + verifyVel.Z);
-                }
-                else
-                {
-                    Engine.InternalCalls.LogError("Bullet has NO RIGIDBODY! Velocity not set.");
-                    Engine.InternalCalls.LogError("Make sure your bullet prefab has a RigidbodyComponent!");
-                }
+        //        // Set velocity with FULL 3D direction (this allows up/down shooting)
+        //        Engine.Vector3 velocity = new Engine.Vector3(
+        //            shootDirection.X * bulletSpeed,
+        //            shootDirection.Y * bulletSpeed,
+        //            shootDirection.Z * bulletSpeed
+        //        );
 
-                Engine.InternalCalls.Log("=== BULLET SPAWN COMPLETE ===");
-            }
-            catch (Exception e)
-            {
-                Engine.InternalCalls.LogError("EXCEPTION spawning bullet: " + e.Message);
-            }
-        }
+        //        Engine.InternalCalls.Log("Setting bullet velocity: " + velocity.X + ", " + velocity.Y + ", " + velocity.Z);
+
+        //        // Check if bullet has rigidbody
+        //        if (Engine.InternalCalls.EntityHasRigidBody(bulletEntityID))
+        //        {
+        //            Engine.InternalCalls.Rigidbody_SetVelocity(bulletEntityID, ref velocity);
+
+        //            // Verify velocity was set
+        //            Engine.Vector3 verifyVel;
+        //            Engine.InternalCalls.Rigidbody_GetVelocity(bulletEntityID, out verifyVel);
+        //            Engine.InternalCalls.Log("Bullet velocity verified: " + verifyVel.X + ", " + verifyVel.Y + ", " + verifyVel.Z);
+        //        }
+        //        else
+        //        {
+        //            Engine.InternalCalls.LogError("Bullet has NO RIGIDBODY! Velocity not set.");
+        //            Engine.InternalCalls.LogError("Make sure your bullet prefab has a RigidbodyComponent!");
+        //        }
+
+        //        Engine.InternalCalls.Log("=== BULLET SPAWN COMPLETE ===");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Engine.InternalCalls.LogError("EXCEPTION spawning bullet: " + e.Message);
+        //    }
+        //}
 
         private void TryReload()
         {

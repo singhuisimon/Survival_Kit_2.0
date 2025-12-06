@@ -3,19 +3,19 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048588,
+            "ID": 12,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Enemy"
+                        "Tag": "New Entity"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            19.37978744506836,
+                            0.0,
                             0.0,
                             0.0
                         ],
@@ -36,13 +36,94 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ScriptClassName": ""
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 11,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Enemy"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            10.140863418579102,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -86,246 +167,7 @@
             ]
         },
         {
-            "ID": 11,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "New Entity"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            -0.8930489420890808,
-                            0.00002237797889392823,
-                            0.00001071904171112692
-                        ],
-                        "Rotation": [
-                            2.126993417739868,
-                            0.00010389013186795637,
-                            0.0000031494196264247876
-                        ],
-                        "Scale": [
-                            0.0010000000474974513,
-                            0.0010000000474974513,
-                            0.0010000000474974513
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 14945565271540858947,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ScriptClassName": ""
-                    }
-                }
-            ]
-        },
-        {
             "ID": 10,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "ALLIES"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            -9.399999618530273,
-                            -0.4000000059604645,
-                            -37.70000076293945
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 9,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Enemy"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            65.38987731933594,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "BehaviourTreeComponent",
-                    "Properties": {
-                        "Active": true,
-                        "ResetOnComplete": false,
-                        "TreeAssetPath": "ShootableKillableEnemy.json"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 8,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -374,7 +216,7 @@
             ]
         },
         {
-            "ID": 7,
+            "ID": 9,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -423,7 +265,7 @@
             ]
         },
         {
-            "ID": 6,
+            "ID": 8,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -442,7 +284,7 @@
                         "Rotation": [
                             -59.75373840332031,
                             30.963762283325195,
-                            0.0
+                            -9.956626172424876e-7
                         ],
                         "Scale": [
                             1.0,
@@ -472,7 +314,7 @@
             ]
         },
         {
-            "ID": 5,
+            "ID": 7,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -513,7 +355,7 @@
             ]
         },
         {
-            "ID": 4,
+            "ID": 6,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -559,7 +401,64 @@
             ]
         },
         {
-            "ID": 3,
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "TimerBar"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            1.0,
+                            4.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            18.647367477416992,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            4.0,
+                            0.05000000074505806,
+                            0.05000000074505806
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.5179824829101563,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -576,7 +475,7 @@
                             1.0
                         ],
                         "Rotation": [
-                            80.91636657714844,
+                            18.647367477416992,
                             -0.0,
                             0.0
                         ],
@@ -592,13 +491,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -624,9 +523,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
+                            0.5,
+                            0.5,
+                            0.5
                         ],
                         "SphereRadius": 0.5
                     }
@@ -638,14 +537,14 @@
                         "respectClipLoop": true,
                         "controller": 0,
                         "currentClipIndex": 0,
-                        "currentTime": 2.2476768493652344,
+                        "currentTime": 0.5179824829101563,
                         "playbackSpeed": 1.0
                     }
                 }
             ]
         },
         {
-            "ID": 2,
+            "ID": 3,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -678,13 +577,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 17142345493132460037,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "test.mat",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -710,11 +609,67 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SecondCamera"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
                             0.0,
+                            5.0,
+                            5.0
+                        ],
+                        "Rotation": [
+                            -139.43670654296875,
                             0.0,
                             0.0
                         ],
-                        "SphereRadius": 0.5
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": false,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 1,
+                        "Aspect": 1.9028741121292114,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 100.0,
+                        "Target": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
                     }
                 }
             ]
@@ -732,9 +687,9 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            15.933002471923828,
-                            9.005436897277832,
-                            -5.614560604095459
+                            0.0,
+                            5.0,
+                            5.0
                         ],
                         "Rotation": [
                             -139.43670654296875,
@@ -767,9 +722,9 @@
                         "NearPlane": 0.5,
                         "FarPlane": 100.0,
                         "Target": [
-                            20.79400062561035,
-                            9.11299991607666,
-                            -11.325000762939453
+                            0.0,
+                            0.0,
+                            0.0
                         ]
                     }
                 },
@@ -794,19 +749,19 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            20.79400062561035,
-                            -0.8870000243186951,
-                            -21.325000762939453
+                            -28.30032730102539,
+                            -1.1895623207092285,
+                            -3.125063419342041
                         ],
                         "Rotation": [
-                            0.9652224779129028,
-                            49.58707809448242,
-                            1.2676204442977905
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            0.0005000000237487257,
+                            0.0005000000237487257,
+                            0.0005000000237487257
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -815,43 +770,14 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 0,
-                        "TextureGuid": 0,
+                        "Mesh": "E004_botnet_v001.fbx",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 1,
-                        "Texture": 0,
+                        "MaterialIdx": 1,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 110.05000305175781,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
                     }
                 },
                 {
@@ -876,10 +802,35 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": ""
+                        "ScriptClassName": "Game.TestScript",
+                        "Fields": {
+                            "moveSpeed": 5.5,
+                            "moveAllowed": true,
+                            "aimHeightOffset": 2.0,
+                            "orbitRadius": 7.5,
+                            "orbitPitch": 0.25,
+                            "orbitYaw": 0.0,
+                            "dashForce": 2.0,
+                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
+                            "SecondaryBulletPrefab": "Sources/Prefabs/SecondaryBullet.prefab",
+                            "PrimaryMaxAmmo": 100,
+                            "PrimaryReloadTime": 1.5,
+                            "PrimaryFireRate": 0.30000001192092896,
+                            "SecondaryMaxAmmo": 5,
+                            "SecondaryReloadTime": 3.0,
+                            "SecondaryFireRate": 0.800000011920929
+                        }
                     }
                 }
             ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0
         }
     ]
 }
