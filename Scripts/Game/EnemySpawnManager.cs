@@ -186,6 +186,7 @@ namespace Game
 
         public override void OnDestroy(){
             EventSystem.Unsubscribe(BOTNETKILLED, UpdateBotnetKilled);
+            EventSystem.Unsubscribe(LOSTDETECTED, DeactiveSpawnCondition);
         }
 
         #region setup
@@ -615,6 +616,8 @@ namespace Game
             botnetkilled = 0;
             StopAllOtherAudio();
             EnvironmentReset();
+
+            EventSystem.Publish("DisablingSpawn", isActive.ToString());
         }
 
         private void CheckBotnetKilled(){
@@ -652,13 +655,7 @@ namespace Game
 
             if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)
             {
-                enemiesLeft = 0;
-
-                isActive = false;
-                playInGameSound = false;
-                spawningAllowed = false;
-                StopAllOtherAudio();
-                EnvironmentReset();
+                DisableSpawn();
                 Log("=== Wave Complete ===");
             }
             else
