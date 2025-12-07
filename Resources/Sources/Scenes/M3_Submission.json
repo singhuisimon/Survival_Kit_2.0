@@ -15,9 +15,9 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -18.755720138549805,
-                            -199.1016845703125,
-                            -71.20569610595703
+                            -36.07037353515625,
+                            -2180.92041015625,
+                            -80.84922790527344
                         ],
                         "Rotation": [
                             -150.88674926757813,
@@ -54,9 +54,9 @@
                         "IsTrigger": false,
                         "UseGravity": true,
                         "Velocity": [
-                            -0.8706059455871582,
-                            -99.64802551269531,
-                            -0.4848543107509613
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "AngularVelocity": [
                             0.0,
@@ -78,12 +78,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.PrimaryBullet",
-                        "Fields": {
-                            "ProjectileLifetime": 2.0,
-                            "Damage": 10.0,
-                            "ShooterName": "Player"
-                        }
+                        "ScriptClassName": "Game.PrimaryBullet"
                     }
                 }
             ]
@@ -122,13 +117,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.UIStateManager",
-                        "Fields": {
-                            "mainMenuCameraName": "MainMenuCamera",
-                            "gameCameraName": "MainCamera",
-                            "winCameraName": "WinCamera",
-                            "loseCameraName": "LoseCamera"
-                        }
+                        "ScriptClassName": "Game.UIStateManager"
                     }
                 }
             ]
@@ -1690,7 +1679,7 @@
                             -69.9382095336914
                         ],
                         "Rotation": [
-                            -90.57301330566406,
+                            -90.57300567626953,
                             -60.885528564453125,
                             -180.0
                         ],
@@ -1719,12 +1708,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.HealthBar",
-                        "Fields": {
-                            "health": 100.0,
-                            "fullWidth": 5.5,
-                            "currentWidth": 5.5
-                        }
+                        "ScriptClassName": "Game.HealthBar"
                     }
                 }
             ]
@@ -2443,23 +2427,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.EnemySpawnManager",
-                        "Fields": {
-                            "isActive": false,
-                            "spawningAllowed": false,
-                            "infiniteSpawning": false,
-                            "waveEnemiesLeftToSpawn": 0,
-                            "E005_loveletter": 0,
-                            "E004_botnet": 0,
-                            "spawnRate": 1.5,
-                            "spawnRateNext": 0.0,
-                            "isSpawning": false,
-                            "enemiesLeft": 0,
-                            "elapsedTime": 0.0,
-                            "botnetSpawned": 0,
-                            "loveletterSpawned": 0,
-                            "botnetkilled": 0
-                        }
+                        "ScriptClassName": "Game.EnemySpawnManager"
                     }
                 }
             ]
@@ -6361,24 +6329,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.TestScript",
-                        "Fields": {
-                            "moveSpeed": 5.5,
-                            "moveAllowed": true,
-                            "aimHeightOffset": 2.0,
-                            "orbitRadius": 7.5,
-                            "orbitPitch": 0.25,
-                            "orbitYaw": 0.0,
-                            "dashForce": 2.0,
-                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
-                            "SecondaryBulletPrefab": "Sources/Prefabs/SecondaryBullet.prefab",
-                            "PrimaryMaxAmmo": 100,
-                            "PrimaryReloadTime": 1.5,
-                            "PrimaryFireRate": 0.30000001192092896,
-                            "SecondaryMaxAmmo": 5,
-                            "SecondaryReloadTime": 3.0,
-                            "SecondaryFireRate": 0.800000011920929
-                        }
+                        "ScriptClassName": "Game.TestScript"
                     }
                 }
             ]
@@ -6623,7 +6574,7 @@
                             64.80000305175781
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9374369382858276,
+                        "Aspect": 1.9028741121292114,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 1000.0,
@@ -6683,15 +6634,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.StartGameButton",
-                        "Fields": {
-                            "mainMenuCameraName": "MainMenuCamera",
-                            "gameCameraName": "MainCamera",
-                            "showMainMenuInitially": true,
-                            "buttonWidth": 2.4000000953674316,
-                            "buttonHeight": 0.800000011920929,
-                            "buttonEntityName": "MainMenuStartButton"
-                        }
+                        "ScriptClassName": "Game.StartGameButton"
                     }
                 }
             ]
