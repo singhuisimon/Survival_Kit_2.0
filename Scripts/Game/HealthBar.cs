@@ -36,6 +36,9 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {
             if (Input.IsKeyPressed(KeyCode.RightAlt))
+            //if (Input.IsKeyPressed(KeyCode.M)) 
+            // Note to Lily: Right Alt dosen't work for me
+            // so I temporarily switched it to 'M' button for testing
             {
                 health = 0f;
                 Vector3 scale = Transform.GetScale((uint)healthID);
