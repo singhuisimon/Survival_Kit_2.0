@@ -32,6 +32,9 @@ namespace Game
         private bool camerasInitialized = false;
         private bool isShowingMainMenu;
 
+        // for keyedge detection
+        private bool enterWasPressed = false;
+
         private uint buttonEntityID;    // for entity
         //private bool wasMouseButtonPressed = false;
 
@@ -82,6 +85,8 @@ namespace Game
                 UpdateCameraStates();
             }
 
+            EventSystem.Subscribe("GameRestart", OnGameRestart);
+
         }
 
         public override void OnUpdate(float deltaTime) 
@@ -90,6 +95,14 @@ namespace Game
             {
                 return;
             }
+
+            // just pressed detection for enter
+            bool enterIsPressed = Input.IsKeyPressed(KeyCode.Enter);
+            bool enterJustPressed = enterIsPressed && !enterWasPressed;
+            enterWasPressed = enterIsPressed;
+
+            // only allow starting the game if the main menu camera is actually active
+            bool mainMenuActive = InternalCalls.Camera_GetEnabled(mainMenuCameraID);
 
             //Vector2 mousePos = Input.GetMousePosition();
 
@@ -108,7 +121,8 @@ namespace Game
             //Vector2 mousePos = Input.GetMousePosition();
 
             //change key
-            if (Input.IsKeyPressed(KeyCode.Enter))
+            //if (Input.IsKeyPressed(KeyCode.Enter))
+            if (enterJustPressed && mainMenuActive)
             {
                 //Vector3 buttonPos = Transform.Position;
                 
@@ -196,6 +210,13 @@ namespace Game
         public override void OnDestroy()
         {
             Log("StartGameButton: Destroyed");
+            EventSystem.Unsubscribe("GameRestart", OnGameRestart);
+        }
+
+        public void OnGameRestart(string eventName, string payload) 
+        {
+            // reset internal state and cameras in order to sync with UIStateManager
+            ResetToMainMenu();
         }
         
         // wonky and not working :/
