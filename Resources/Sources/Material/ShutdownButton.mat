@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "fbd1886daa5ec005",
+    "baseMap": "ShutdownButton.png",
     "normalMap": "51086a3e194041",
     "metallicMap": "0",
     "roughnessMap": "0",

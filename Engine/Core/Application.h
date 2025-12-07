@@ -88,6 +88,7 @@ namespace Engine {
     protected:
         // Renderer
         std::unique_ptr<Renderer> m_Renderer;
+        GLFWwindow *m_Window = nullptr;
 
     private:
         void Init();
@@ -95,7 +96,6 @@ namespace Engine {
         void UpdateWindowTitle(float fps);
         std::shared_ptr<Scene> m_Scene;
 
-        GLFWwindow* m_Window = nullptr;
         bool m_Running = true;
         float m_LastFrameTime = 0.0f;
 

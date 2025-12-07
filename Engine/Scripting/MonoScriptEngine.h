@@ -60,11 +60,19 @@ namespace Engine {
 		void BindEntityID(MonoObject *instance, std::uint32_t entityID);
 
 		// Hot reload support
-		void ReloadAssembly();
+		//void ReloadAssembly();
+		void EnsureCorrectDomain();
 
+		bool IsInCorrectDomain();
 		// Getters
+
+		MonoDomain* GetRootDomain() const { return m_RootDomain; }   //  NEW
+
+
+		MonoDomain* GetAppDomain() const { return m_AppDomain; }  //  NOT GetDomain!
+
 		MonoDomain *GetDomain() const {
-			return m_RootDomain;
+			return m_AppDomain;
 		}
 		MonoAssembly *GetAssembly() const {
 			return m_AppAssembly;
@@ -89,6 +97,8 @@ namespace Engine {
 			m_ValidInstances.clear();
 		}
 
+		MonoObject* GetObjectFromHandle(void* instancePtr);
+
 	private:
 		MonoScriptEngine() = default;
 		~MonoScriptEngine() = default;
@@ -108,6 +118,7 @@ namespace Engine {
 		MonoImage *m_AppImage = nullptr;
 		std::string   m_AssemblyPath;
 		std::unordered_map<std::string, MonoClass *> m_ClassCache;
+		std::unordered_map<MonoObject*, uint32_t> m_ObjectToHandle;
 	};
 
 } // namespace Engine

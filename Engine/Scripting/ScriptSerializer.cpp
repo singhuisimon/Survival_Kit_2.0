@@ -4,6 +4,7 @@
 #include <mono/metadata/reflection.h>
 #include <mono/metadata/attrdefs.h>
 #include <imgui.h>
+#include "MonoScriptEngine.h"
 
 #include <fstream>
 #include <sstream>
@@ -20,6 +21,7 @@ namespace Engine
 
         if (!instance)
             return serializedFields;
+        MonoScriptEngine::GetInstance().EnsureCorrectDomain();
 
         MonoClass* klass = mono_object_get_class(instance);
         if (!klass)

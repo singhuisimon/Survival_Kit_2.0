@@ -1,11 +1,11 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "8423786d27d54003",
-    "normalMap": "51086a3e194041",
-    "metallicMap": "0",
-    "roughnessMap": "0",
-    "emissionMap": "0",
-    "occlusionMap": "0",
+    "baseMap": "level_Design_Grid_Texture.png",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
     "baseColor": [
         1.0,
         0.0,

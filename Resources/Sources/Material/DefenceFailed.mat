@@ -1,11 +1,11 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Firewall-active-void.png",
-    "normalMap": "51086a3e194041",
-    "metallicMap": "0",
-    "roughnessMap": "0",
-    "emissionMap": "0",
-    "occlusionMap": "0",
+    "baseMap": "DefenceFailed.png",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
     "baseColor": [
         1.0,
         1.0,

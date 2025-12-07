@@ -265,8 +265,19 @@ namespace Engine
 
 						if (!currScenePath.empty())
 						{
+							// Save settings before saving to scene file
+							auto& sceneSettings = m_Scene->GetSceneSetting();
+							sceneSettings.s_BloomToggle = m_Renderer->getBloomToggle();
+							sceneSettings.s_BloomStrength= m_Renderer->getBloomStrength();
+							sceneSettings.s_BloomFilterRadius = m_Renderer->getBloomFilterRadius();
+							sceneSettings.s_Exposure = m_Renderer->getExposure();
+
 							m_Scene->SaveToFile(currScenePath);
-							m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
+							if (m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath)))
+							{
+								LOG_DEBUG(currFileName, "save to ", convertAssetPathToRootResources(currScenePath), " in root");
+							}
+							
 
 						}
 						else
@@ -2926,6 +2937,12 @@ namespace Engine
 								m_SelectedEntity = Entity{}; // resets
 								m_PickedID = 0xFFFFFFFFu;
 								m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+
+								// Update settings 
+								m_Renderer->getBloomToggle() = m_Scene->GetSceneSetting().s_BloomToggle;
+								m_Renderer->getBloomStrength() = m_Scene->GetSceneSetting().s_BloomStrength;
+								m_Renderer->getBloomFilterRadius() = m_Scene->GetSceneSetting().s_BloomFilterRadius;
+								m_Renderer->getExposure() = m_Scene->GetSceneSetting().s_Exposure;
 							}
 							LOG_DEBUG(" ==== End Loading Scene ==== : ", fileName);
 						}
@@ -3749,6 +3766,34 @@ namespace Engine
 		ViewportPanelHelper::CameraControl(m_Renderer);
 
 		ImGui::End();
+
+		//if (!m_Window || !texhandle) return;
+
+		//// Get viewport size from window
+		//int width = 0;
+		//int height = 0;
+		//glfwGetWindowSize(m_Window, &width, &height);
+		//ImVec2 viewportSize = {
+		//	static_cast<float>(width),  // Full width
+		//	static_cast<float>(height)  // Full height
+		//};
+
+		//// Set viewport data (kept for renderer compatibility)
+		//editorViewportData.tl = { 0.0f, 0.0f };
+		//editorViewportData.size = viewportSize;
+
+		//// Sync with renderer
+		//if (m_Renderer) {
+		//	m_Renderer->getEditorViewport() = editorViewportData;
+		//}
+
+		//// Camera toggle tracking
+		//bool currentCamToggle = m_Renderer->getEditorCamToggle();
+		//if (m_PreviousEditorCamToggle != currentCamToggle) {
+		//	m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+		//	m_SelectedEntity = Entity{};
+		//	m_PreviousEditorCamToggle = currentCamToggle;
+		//}
 	}
 
 #endif
@@ -3790,6 +3835,13 @@ namespace Engine
 					{
 						LOG_DEBUG(" ==== Start Loading Scene ==== : ", scenesAsset.name);
 						//LOG_ERROR("Failed to load scene %s", sceneFiles);
+
+						// Update settings 
+						m_Renderer->getBloomToggle() = m_Scene->GetSceneSetting().s_BloomToggle;
+						m_Renderer->getBloomStrength() = m_Scene->GetSceneSetting().s_BloomStrength;
+						m_Renderer->getBloomFilterRadius() = m_Scene->GetSceneSetting().s_BloomFilterRadius;
+						m_Renderer->getExposure() = m_Scene->GetSceneSetting().s_Exposure;
+
 						currScenePath = scenesAsset.fullPath;
 						LOG_INFO("Scene loaded successfully: ", currScenePath);
 						openScenePanel = false; //  reset after select scene
@@ -3868,6 +3920,12 @@ namespace Engine
 					}
 					else
 					{
+						// Save settings before saving to scene file
+						auto& sceneSettings = m_Scene->GetSceneSetting();
+						sceneSettings.s_BloomToggle = m_Renderer->getBloomToggle();
+						sceneSettings.s_BloomStrength = m_Renderer->getBloomStrength();
+						sceneSettings.s_BloomFilterRadius = m_Renderer->getBloomFilterRadius();
+						sceneSettings.s_Exposure = m_Renderer->getExposure();
 
 						m_Scene->SaveToFile(defaultNewScenePath); // save scene file
 						m_Scene->SetName(saveAsDefaultSceneName);
@@ -3941,6 +3999,13 @@ namespace Engine
 
 				if (ImGui::Button("Yes", ImVec2(120, 0)))
 				{
+					// Save settings before saving to scene file
+					auto& sceneSettings = m_Scene->GetSceneSetting();
+					sceneSettings.s_BloomToggle = m_Renderer->getBloomToggle();
+					sceneSettings.s_BloomStrength = m_Renderer->getBloomStrength();
+					sceneSettings.s_BloomFilterRadius = m_Renderer->getBloomFilterRadius();
+					sceneSettings.s_Exposure = m_Renderer->getExposure();
+
 					// default new scene path 
 					std::string defaultNewScenePath = getAssetFilePath("Sources/Scenes/") + saveAsDefaultSceneName;
 					if (!std::filesystem::path(defaultNewScenePath).has_extension())
@@ -6702,8 +6767,10 @@ namespace Engine
 	{
 		ImGui::Begin("HDR Settings");
 
+		float& exposure = m_Renderer->getExposure();
+
 		// Exposure control
-		if (ImGui::SliderFloat("Exposure", &m_Renderer->m_exposure, 0.1f, 5.0f, "%.2f"))
+		if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 5.0f, "%.2f"))
 		{
 			// Exposure value changed
 		}
@@ -6711,7 +6778,7 @@ namespace Engine
 		// Optional: Add a reset button
 		if (ImGui::Button("Reset to Default"))
 		{
-			m_Renderer->m_exposure = 1.0f;
+			exposure = 1.0f;
 		}
 
 		// Optional: Add tooltip
@@ -6776,14 +6843,14 @@ namespace Engine
 		// Reset button for bloom settings
 		if (ImGui::Button("Reset to Default##Bloom"))
 		{
-			bloomStrength = 0.04f;
-			bloomFilter = 0.005f;
+			bloomStrength = 0.01f;
+			bloomFilter = 0.0025f;
 		}
 
 		// Tooltip for bloom settings
 		if (ImGui::IsItemHovered())
 		{
-			ImGui::SetTooltip("Reset bloom strength (0.04) and filter radius (0.005) to default values");
+			ImGui::SetTooltip("Reset bloom strength (0.01) and filter radius (0.0025) to default values");
 		}
 
 		ImGui::End();

@@ -1,88 +1,7 @@
 {
-    "Scene": "Main Scene",
+    "Scene": "TimerBarRef",
     "Version": "1.0",
     "Entities": [
-        {
-            "ID": 12,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "New Entity"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ScriptClassName": ""
-                    }
-                }
-            ]
-        },
         {
             "ID": 11,
             "Components": [
@@ -96,7 +15,7 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            10.140863418579102,
+                            66.925048828125,
                             0.0,
                             0.0
                         ],
@@ -117,13 +36,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
+                        "Material": 0,
+                        "Texture": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -413,17 +332,17 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            1.0,
-                            4.0,
+                            -1.7778319120407104,
+                            1.611083984375,
                             0.0
                         ],
                         "Rotation": [
-                            18.647367477416992,
-                            -0.0,
+                            -57.99903106689453,
+                            0.0,
                             0.0
                         ],
                         "Scale": [
-                            4.0,
+                            0.12696075439453125,
                             0.05000000074505806,
                             0.05000000074505806
                         ],
@@ -434,13 +353,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
+                        "MeshGuid": 0,
+                        "MaterialGuid": 6608777839582183603,
+                        "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
+                        "Material": 0,
+                        "Texture": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -450,8 +369,8 @@
                         "playing": true,
                         "respectClipLoop": true,
                         "controller": 0,
-                        "currentClipIndex": 0,
-                        "currentTime": 0.5179824829101563,
+                        "currentClipIndex": 4,
+                        "currentTime": 29.047794342041016,
                         "playbackSpeed": 1.0
                     }
                 }
@@ -475,7 +394,7 @@
                             1.0
                         ],
                         "Rotation": [
-                            18.647367477416992,
+                            143.9173583984375,
                             -0.0,
                             0.0
                         ],
@@ -491,13 +410,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
+                        "MeshGuid": 0,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
+                        "Material": 0,
+                        "Texture": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -537,7 +456,7 @@
                         "respectClipLoop": true,
                         "controller": 0,
                         "currentClipIndex": 0,
-                        "currentTime": 0.5179824829101563,
+                        "currentTime": 3.99770450592041,
                         "playbackSpeed": 1.0
                     }
                 }
@@ -577,13 +496,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Mesh": "",
-                        "Material": "test.mat",
-                        "Texture": "",
+                        "MeshGuid": 0,
+                        "MaterialGuid": 17753260570738442411,
+                        "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
+                        "Material": 0,
+                        "Texture": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -661,7 +580,7 @@
                             20.0
                         ],
                         "Depth": 1,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9374369382858276,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 100.0,
@@ -717,7 +636,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9374369382858276,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 100.0,
@@ -749,9 +668,9 @@
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            -28.30032730102539,
-                            -1.1895623207092285,
-                            -3.125063419342041
+                            1.0,
+                            2.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -770,13 +689,13 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Mesh": "E004_botnet_v001.fbx",
-                        "Material": "",
-                        "Texture": "",
+                        "MeshGuid": 2765281010849415233,
+                        "MaterialGuid": 0,
+                        "TextureGuid": 0,
                         "Visible": true,
                         "MeshType": 0,
-                        "MaterialIdx": 1,
-                        "TextureIdx": 0,
+                        "Material": 1,
+                        "Texture": 0,
                         "SubmeshIndex": 0
                     }
                 },
@@ -802,35 +721,10 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.TestScript",
-                        "Fields": {
-                            "moveSpeed": 5.5,
-                            "moveAllowed": true,
-                            "aimHeightOffset": 2.0,
-                            "orbitRadius": 7.5,
-                            "orbitPitch": 0.25,
-                            "orbitYaw": 0.0,
-                            "dashForce": 2.0,
-                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
-                            "SecondaryBulletPrefab": "Sources/Prefabs/SecondaryBullet.prefab",
-                            "PrimaryMaxAmmo": 100,
-                            "PrimaryReloadTime": 1.5,
-                            "PrimaryFireRate": 0.30000001192092896,
-                            "SecondaryMaxAmmo": 5,
-                            "SecondaryReloadTime": 3.0,
-                            "SecondaryFireRate": 0.800000011920929
-                        }
+                        "ScriptClassName": "Game.TestScript"
                     }
                 }
             ]
-        }
-    ],
-    "Settings": [
-        {
-            "BloomToggle": false,
-            "BloomStrength": 0.009999999776482582,
-            "BloomFilterRadius": 0.0024999999441206455,
-            "Exposure": 1.0
         }
     ]
 }

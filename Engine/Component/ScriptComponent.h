@@ -13,6 +13,7 @@ namespace Engine {
         std::string ScriptClassName;  // e.g., "Game.PlayerController"
         void* ScriptInstance = nullptr;  // Mono object instance
         bool Started = false;
+        uint32_t GCHandle = 0;
 
         ScriptComponent() = default;
         ScriptComponent(const std::string& className) 

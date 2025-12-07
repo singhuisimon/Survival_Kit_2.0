@@ -7,20 +7,24 @@ namespace Game
     {
         // ===== Movement Settings =====
         [SerializeField]
-        private float moveSpeed = 25.0f;  // Increased for visible movement
+        private float moveSpeed = 25.0f;  // Movement speed
 
         [SerializeField]
-        private float waypointReachedDistance = 5.0f;  // Increased for better detection
+        private float waypointReachedDistance = 5.0f;  // Distance threshold to consider waypoint reached
 
         [SerializeField]
-        private float startDelay = 1.0f;
+        private float rotationSpeed = 3.0f;  // Quaternion slerp speed
 
         [SerializeField]
-        private float rotationSpeed = 3.0f;  // Speed of rotation to next waypoint
+        private float startDelay = 3.0f;     // Delay before starting movement
+
+        // Quaternion we want to rotate towards
+        private Quat targetRotation;
 
         // ===== Core Health System =====
         [SerializeField]
         private int totalCores = 9;
+
         [SerializeField]
         private int coresAlive = 9;
 
@@ -33,7 +37,6 @@ namespace Game
         private Engine.Vector3[] waypoints;
         private float delayTimer = 0.0f;
         private Engine.Vector3 startPosition;
-        private float targetYaw = 0.0f;  // Target rotation angle
 
         // ===== Constants =====
         private const float DEG2RAD = 0.0174532924f;
@@ -63,7 +66,7 @@ namespace Game
         private void OnCoreDestroyedEvent(string eventName, string payload)
         {
             // payload contains the parent entity ID that lost a core
-            if (int.TryParse(payload, out int parentID) && parentID == EntityID)
+            if (ulong.TryParse(payload, out ulong parentID) && parentID == EntityID)
             {
                 OnCoreDestroyed();
             }
@@ -126,11 +129,13 @@ namespace Game
                 }
                 return;
             }
+
             if (isRotating)
             {
                 RotateTowardsTarget(deltaTime);
                 return;
             }
+
             // Move along path
             if (isMoving)
             {
@@ -142,9 +147,6 @@ namespace Game
                 Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
                 return;
             }
-
-
-
         }
 
         // ===== Movement System =====
@@ -174,53 +176,69 @@ namespace Game
             // Get target waypoint
             Engine.Vector3 targetPos = waypoints[waypointIndex];
 
-            // Calculate direction to target (horizontal plane only for yaw)
+            // Horizontal direction (ignore vertical for facing)
             Engine.Vector3 direction = new Engine.Vector3(
                 targetPos.X - currentPos.X,
                 0.0f,
                 targetPos.Z - currentPos.Z
             );
 
-            // Calculate target yaw angle
-            targetYaw = SimpleMath.Atan2(direction.X, direction.Z) * RAD2DEG;
+            // Length squared in XZ plane
+            float lenSq = direction.X * direction.X + direction.Z * direction.Z;
+            if (lenSq <= 0.0001f)
+            {
+                isRotating = false;
+                isMoving = true;
+                return;
+            }
 
-            // Start rotating
+            // Normalize horizontal direction
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            direction.X *= invLen;
+            direction.Z *= invLen;
+
+            // Yaw in radians around world Y axis
+            float yaw = SimpleMath.Atan2(direction.X, direction.Z);
+
+            // Build quaternion from axis-angle (Y axis)
+            Engine.Vector3 upAxis = new Engine.Vector3(0.0f, 1.0f, 0.0f);
+            targetRotation = Engine.Quat.FromAxisAngle(upAxis, yaw);
+
+            // Optional: debug log in degrees
+            float yawDeg = yaw * RAD2DEG;
+            Engine.InternalCalls.Log("Starting rotation to yaw (deg): " + yawDeg);
+
+            // Start rotating, stop moving for now
             isRotating = true;
             isMoving = false;
-
-            Engine.InternalCalls.Log("Starting rotation to yaw: " + targetYaw);
         }
 
         private void RotateTowardsTarget(float deltaTime)
         {
-            // Get current rotation
-            Engine.Vector3 currentRot;
-            Engine.InternalCalls.Transform_GetRotation((uint)EntityID, out currentRot);
+            // Get current rotation as quaternion
+            Engine.Quat currentRot = Engine.Transform.GetRotation((uint)EntityID);
 
-            float currentYaw = currentRot.Y;
-
-            // Calculate angle difference
-            float angleDiff = targetYaw - currentYaw;
-
-           
-            angleDiff = angleDiff % 360.0f;  // 
-            if (angleDiff > 180.0f)
-                angleDiff -= 360.0f;
-            else if (angleDiff < -180.0f)
-                angleDiff += 360.0f;
-
-        
-            if (SimpleMath.Abs(angleDiff) < 2.0f)
+            // Ensure we take the shortest path by fixing the sign of the dot
+            float dot = Engine.Quat.Dot(currentRot, targetRotation);
+            if (dot < 0.0f)
             {
-                // Snap to target angle
-                Engine.Vector3 finalRot = new Engine.Vector3(
-                    currentRot.X,
-                    targetYaw,
-                    currentRot.Z
+                // Flip target to stay on the same hemisphere
+                targetRotation = new Engine.Quat(
+                    -targetRotation.X,
+                    -targetRotation.Y,
+                    -targetRotation.Z,
+                    -targetRotation.W
                 );
-                Engine.InternalCalls.Transform_SetRotation((uint)EntityID, ref finalRot);
+                dot = -dot;
+            }
 
-                // Rotation complete, start moving
+
+            // If we are already very close, snap to final rotation
+            const float DOT_THRESHOLD = 0.9995f; // ~ < 1 degree apart
+            if (dot > DOT_THRESHOLD)
+            {
+                Engine.Transform.SetRotation((uint)EntityID, ref targetRotation);
+
                 isRotating = false;
                 isMoving = true;
 
@@ -228,17 +246,18 @@ namespace Game
                 return;
             }
 
-            // Calculate rotation step (with speed limit)
-            float maxRotation = rotationSpeed * deltaTime * RAD2DEG;
-            float rotationStep = SimpleMath.Clamp(angleDiff, -maxRotation, maxRotation);
 
-            // Apply rotation
-            Engine.Vector3 newRot = new Engine.Vector3(
-                currentRot.X,
-                currentYaw + rotationStep,
-                currentRot.Z
-            );
-            Engine.InternalCalls.Transform_SetRotation((uint)EntityID, ref newRot);
+            float t = rotationSpeed * deltaTime;
+            if (t > 1.0f)
+                t = 1.0f;
+
+            // Slerp towards target quaternion
+            Engine.Quat newRot;
+            InternalCalls.Quat_Slerp(ref currentRot, ref targetRotation, t, out newRot);
+            //Engine.InternalCalls.Log("works");
+
+            Engine.Transform.SetRotation((uint)EntityID, ref newRot);
+
         }
 
         private void MoveTowardsWaypoint(float deltaTime)
@@ -319,33 +338,33 @@ namespace Game
         }
 
         /// <summary>
-        /// Rotate entity to face target position
+        /// Instantly rotate entity to face target position (horizontal Y-only).
         /// </summary>
         private void FaceTowardsWaypoint(Engine.Vector3 fromPos, Engine.Vector3 toPos)
         {
-            // Calculate direction to target
+            // Horizontal direction
             Engine.Vector3 direction = new Engine.Vector3(
                 toPos.X - fromPos.X,
-                0.0f,  // Keep Y rotation only (horizontal)
+                0.0f,
                 toPos.Z - fromPos.Z
             );
 
-            // Calculate yaw angle (rotation around Y axis)
+            float lenSq = direction.X * direction.X + direction.Z * direction.Z;
+            if (lenSq <= 0.0001f)
+                return;
+
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            direction.X *= invLen;
+            direction.Z *= invLen;
+
+            // Compute yaw (radians) and create quaternion around Y axis
             float yaw = SimpleMath.Atan2(direction.X, direction.Z);
+            Engine.Vector3 upAxis = new Engine.Vector3(0.0f, 1.0f, 0.0f);
 
-            // Get current rotation
-            Engine.Vector3 currentRot = Engine.Transform.GetRotation((uint)EntityID);
+            Engine.Quat lookRot = Engine.Quat.FromAxisAngle(upAxis, yaw);
+            Engine.Transform.SetRotation((uint)EntityID, ref lookRot);
 
-            // Set new rotation (keep pitch and roll, update yaw)
-            Engine.Vector3 newRot = new Engine.Vector3(
-                currentRot.X,
-                yaw * RAD2DEG,
-                currentRot.Z
-            );
-
-            Engine.Transform.SetRotation((uint)EntityID, ref newRot);
-
-            Engine.InternalCalls.Log("Rotated to face waypoint. Yaw: " + (yaw * RAD2DEG));
+            Engine.InternalCalls.Log("Rotated to face waypoint. Yaw (deg): " + (yaw * RAD2DEG));
         }
 
         // ===== Helper Functions =====
@@ -472,8 +491,6 @@ public static class SimpleMath
     {
         return value < 0.0f ? -value : value;
     }
-
-  
 
     private static float ArcTan(float x)
     {
