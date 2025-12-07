@@ -294,7 +294,8 @@ namespace Engine {
 		pickedID = NO_HIT;
 
 		// Set default editor camera toggle
-		isEditorCamOn = true;
+
+		isEditorCamOn = false;
 
 		// Create a framebuffer for ImGui editor and configure its settings
 		auto fp_fbo = FrameBuffer::create();

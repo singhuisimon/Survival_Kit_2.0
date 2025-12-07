@@ -254,8 +254,8 @@ namespace Engine {
 		u32 pickedID = 0xFFFFFFFFu;
 
 		// Temp toggle to check if editor camera is enabled
-		bool isEditorCamOn = true;
-		bool isEditorMode = true;
+		bool isEditorCamOn = false;
+		bool isEditorMode = false;
 
 		// Last camera used for the main HDR pass (FBO 0)
 		glm::mat4 m_lastView{};

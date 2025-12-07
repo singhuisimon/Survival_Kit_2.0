@@ -113,11 +113,11 @@ void Game::OnInit()
 	else
 	{
 
-		LOG_INFO("Performing initial asset scan...");
+		/*LOG_INFO("Performing initial asset scan...");
 		Engine::AM.scanAndProcess();
 
 		LOG_INFO("Initial asset scan complete - found ",
-			Engine::AM.db().Count(), " assets");
+			Engine::AM.db().Count(), " assets");*/
 	}
 
 	Engine::RM.startUp();
@@ -233,7 +233,7 @@ void Game::OnInit()
 
 	try
 	{
-		loadedFromFile = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+		loadedFromFile = m_Scene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/M3_Submission.json"));
 
 		if (loadedFromFile)
 		{
@@ -249,6 +249,12 @@ void Game::OnInit()
 		{
 			LOG_WARNING("  -> Could not load scene file (file may not exist)");
 		}
+
+		if (m_Editor)
+		{
+			m_Editor->setCurrScenePathAndFilename(Engine::getAssetFilePath("Sources/Scenes/M3_Submission.json"), "M3_Submission.json");
+		}
+
 	}
 	catch (const std::exception &e)
 	{
@@ -740,32 +746,32 @@ void Game::OnUpdate(Engine::Timestep ts)
 	auto &editorModeToggle = m_Renderer->getEditorModeToggle();
 
 	// Add this somewhere in your input handling:
-	if (input.IsKeyJustPressed(GLFW_KEY_F3))
-	{
-		m_EditorEnable = !m_EditorEnable;
-		editorModeToggle = m_EditorEnable;
-		editorCamToggle = false;
-		LOG_INFO("Editor toggled: ", m_EditorEnable);
-	}
+	//if (input.IsKeyJustPressed(GLFW_KEY_F3))
+	//{
+	//	m_EditorEnable = !m_EditorEnable;
+	//	editorModeToggle = m_EditorEnable;
+	//	editorCamToggle = false;
+	//	LOG_INFO("Editor toggled: ", m_EditorEnable);
+	//}
 
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
-	{
-		editorCamToggle = !editorCamToggle;
+	//// Editor camera toggle
+	//if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
+	//{
+	//	editorCamToggle = !editorCamToggle;
 
-		if (!editorCamToggle)
-		{
-			// Lock & hide cursor (free-look mode)
-			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		}
-		else
-		{
-			// Restore normal cursor
-			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
+	//	if (!editorCamToggle)
+	//	{
+	//		// Lock & hide cursor (free-look mode)
+	//		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//	}
+	//	else
+	//	{
+	//		// Restore normal cursor
+	//		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	//	}
 
-		LOG_INFO("Editor camera toggled: ", editorCamToggle);
-	}
+	//	LOG_INFO("Editor camera toggled: ", editorCamToggle);
+	//}
 
 
 	Engine::ScriptReloader::GetInstance().Update();
@@ -1146,10 +1152,10 @@ void Game::OnUpdate(Engine::Timestep ts)
 			// Movement accumulator
 			glm::vec3 moveDir(0.0f);
 
-			if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
-			if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
-			if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
-			if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+			//if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+			//if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+			//if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+			//if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
 
 			// Normalize to prevent faster diagonal movement
 			if (glm::dot(moveDir, moveDir) > 0.0f)
@@ -1176,77 +1182,77 @@ void Game::OnUpdate(Engine::Timestep ts)
 	////sphereTrans.IsDirty = true;
 
 	// Editor camera controls
-	if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
-	{
+	//if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
+	//{
 
-		auto &editorCam = m_Renderer->getEditorCamera();
+	//	auto &editorCam = m_Renderer->getEditorCamera();
 
-		// Check for left or right mouse click
-		uint32_t mouse = 2;
-		if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-			mouse = GLFW_MOUSE_BUTTON_LEFT;
-		}
-		else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
-		{
-			mouse = GLFW_MOUSE_BUTTON_RIGHT;
-		}
+	//	// Check for left or right mouse click
+	//	uint32_t mouse = 2;
+	//	if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+	//	{
+	//		mouse = GLFW_MOUSE_BUTTON_LEFT;
+	//	}
+	//	else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+	//	{
+	//		mouse = GLFW_MOUSE_BUTTON_RIGHT;
+	//	}
 
-		// Cursor orbiting
-		editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
+	//	// Cursor orbiting
+	//	editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
 
-		// Zooming in-and-out scrolling
-		double scrollY_offset = input.GetScrollDelta().y;
-		if (scrollY_offset != 0)
-		{
-			editorCam.cameraOnScroll(scrollY_offset);
-		}
+	//	// Zooming in-and-out scrolling
+	//	double scrollY_offset = input.GetScrollDelta().y;
+	//	if (scrollY_offset != 0)
+	//	{
+	//		editorCam.cameraOnScroll(scrollY_offset);
+	//	}
 
-		// Check moving input
-		if (input.IsKeyPressed(GLFW_KEY_W))
-		{
-			editorCam.moveCamForward();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_A))
-		{
-			editorCam.moveCamLeft();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_S))
-		{
-			editorCam.moveCamBack();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_D))
-		{
-			editorCam.moveCamRight();
-		}
+	//	// Check moving input
+	//	if (input.IsKeyPressed(GLFW_KEY_W))
+	//	{
+	//		editorCam.moveCamForward();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_A))
+	//	{
+	//		editorCam.moveCamLeft();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_S))
+	//	{
+	//		editorCam.moveCamBack();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_D))
+	//	{
+	//		editorCam.moveCamRight();
+	//	}
 
-	}
+	//}
 
 	// Test the DSP Global Effects
 
-	FMOD::DSP *dsp = nullptr;
-	if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
-	{
-		dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
-		m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
-			FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
-	}
+	//FMOD::DSP *dsp = nullptr;
+	//if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
+	//{
+	//	dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
+	//	m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
+	//		FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
+	//}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
-	{
-		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
-	}
-	if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET))
-	{
-		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
-	}
+	//if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
+	//{
+	//	m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
+	//}
+	//if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET))
+	//{
+	//	m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
+	//}
 
-	if (dsp)
-	{
-		float cutoff;
-		dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
-		LOG_INFO("LowPass cutoff currently: ", cutoff);
-	}
+	//if (dsp)
+	//{
+	//	float cutoff;
+	//	dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
+	//	LOG_INFO("LowPass cutoff currently: ", cutoff);
+	//}
 
 	// Move player in/out of the reverb radius with QE to feel falloff
 	/*if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
@@ -1352,7 +1358,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		// Shutdown systems before loading new scene
 		m_Scene->ShutdownSystems();
 
-		bool success = m_Scene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+		bool success = m_Scene->LoadFromFile("Resources/Sources/Scenes/M3_Submission.json");
 
 		// Reinitialize systems after loading
 		if (success)
@@ -1373,11 +1379,11 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//m_Editor->OnUpdate(Engine::Timestep ts);
 	//m_Renderer->get_imgui_texture();
 
-	if (m_EditorEnable)
+	/*if (m_EditorEnable)
 	{
 		m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
-	}
-
+	}*/
+	m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
 	m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
 	m_TracyProfiler->OnUpdate();
 

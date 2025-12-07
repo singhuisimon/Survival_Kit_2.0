@@ -104,16 +104,19 @@ namespace Engine
 			CheckAndUpdatePrefabInstances();
 		}*/
 		//Start the ImGui frame
+		
+#if 0
 		StartImguiFrame();
 
 		// Enable Docking Function
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
 		displayTopMenu();
-
+#endif
 		renderViewport(texhandle);
 
 		// Panel Logic
+#if 0
 		displayPropertiesPanel();
 
 		displayHierarchyPanel();
@@ -130,6 +133,7 @@ namespace Engine
 
 		//Complete Imgui rendering for the frame
 		CompleteFrame();
+#endif
 	}
 
 	void Editor::displayTopMenu()
@@ -3599,6 +3603,7 @@ namespace Engine
 #if 1
 	void Editor::renderViewport(GLuint texhandle)
 	{
+#if 0
 		ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
 		// viewport size calculation...
@@ -3794,6 +3799,35 @@ namespace Engine
 		//	m_SelectedEntity = Entity{};
 		//	m_PreviousEditorCamToggle = currentCamToggle;
 		//}
+#endif
+		if (!m_Window || !texhandle) return;
+
+		// Get viewport size from window
+		int width = 0;
+		int height = 0;
+		glfwGetWindowSize(m_Window, &width, &height);
+		ImVec2 viewportSize = {
+			static_cast<float>(width),  // Full width
+			static_cast<float>(height)  // Full height
+		};
+
+		// Set viewport data (kept for renderer compatibility)
+		editorViewportData.tl = { 0.0f, 0.0f };
+		editorViewportData.size = viewportSize;
+
+		// Sync with renderer
+		if (m_Renderer) {
+			m_Renderer->getEditorViewport() = editorViewportData;
+		}
+
+		// Camera toggle tracking
+		bool currentCamToggle = m_Renderer->getEditorCamToggle();
+		if (m_PreviousEditorCamToggle != currentCamToggle) {
+			m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+			m_SelectedEntity = Entity{};
+			m_PreviousEditorCamToggle = currentCamToggle;
+		}
+
 	}
 
 #endif
