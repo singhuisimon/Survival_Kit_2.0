@@ -121,6 +121,8 @@ namespace Game
             EventSystem.Subscribe(BOTNETKILLED, UpdateBotnetKilled);
             EventSystem.Subscribe(LOSTDETECTED, DeactiveSpawnCondition);
 
+            StopInGameSounds();
+
             Log("EnemySpawnManager initialized");
         }
 
@@ -551,7 +553,7 @@ namespace Game
             InternalCalls.Audio_SetIs3D(spawnID, true);
             InternalCalls.Audio_SetMinDistance(spawnID, 22.42f);
             InternalCalls.Audio_SetMaxDistance(spawnID, 300.87f);
-            InternalCalls.Audio_Play(spawnID);
+            //InternalCalls.Audio_Play(spawnID);
 
             uint enemyID = InternalCalls.Prefab_InstantiateWithTransform(
                 prefabpath,
@@ -852,9 +854,20 @@ namespace Game
                 Log("Spawn Manager entity ID: " + spawnmanagerID.ToString());
             }
             InternalCalls.Audio_Play(spawnmanagerID);
-            PlayAllOtherAudio();
+            PlayAllOtherGameAudio();
 
             playInGameSound = true;
+        }
+
+        private void StopInGameSounds(){
+            spawnmanagerID = InternalCalls.Scene_FindEntityByName("Spawn Manager");
+            if(spawnmanagerID != INVALID_ENTITY){
+                Log("Spawn Manager entity ID: " + spawnmanagerID.ToString());
+            }
+            InternalCalls.Audio_Stop(spawnmanagerID);
+            StopAllOtherGameAudio();
+
+            playInGameSound = false;
         }
 
         // FOR FUTURE PURPOSE
@@ -873,7 +886,7 @@ namespace Game
 
         #region other sound
 
-        private void PlayAllOtherAudio()
+        private void PlayAllOtherGameAudio()
         {
             uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
 
@@ -917,7 +930,76 @@ namespace Game
             }
             else
             {
+                LogError("SpawnManager: Cannot find Core");
+            }
+        }
+
+        private void StopAllOtherGameAudio(){
+            uint[] Allies = InternalCalls.Scene_FindEntitiesByTag("ALLIES");
+
+            if (Allies == null || Allies.Length <= 0)
+            {
+                LogWarning("SpawnManager: Allies list is null or non-existent/not found");
+            }
+
+            if (Allies != null)
+            {
+                for (int i = 0; i < Allies.Length; i++)
+                {
+                    if (Allies[i] != INVALID_ENTITY)
+                    {
+                        InternalCalls.Entity_AddAudio(Allies[i]);
+                        InternalCalls.Audio_SetFile(Allies[i], alliesambience);
+
+                        InternalCalls.Audio_Stop(Allies[i]);
+                        Log("SpawnManager: stopping gunship ambience");
+                    }
+                }
+            }
+
+            uint coreID = InternalCalls.Scene_FindEntityByName("Core");
+
+            if (coreID != INVALID_ENTITY)
+            {
+                InternalCalls.Entity_AddAudio(coreID);
+                InternalCalls.Audio_SetFile(coreID, coreambience);
+
+                InternalCalls.Audio_Stop(coreID);
+                Log("SpawnManager: Stopping core ambience");
+            }
+            else
+            {
+                LogError("SpawnManager: Cannot find Core");
+            }
+
+            uint emplacementID = InternalCalls.Scene_FindEntityByName("EMPLACEMENT");
+
+            if (emplacementID != INVALID_ENTITY)
+            {
+                InternalCalls.Entity_AddAudio(emplacementID);
+                //InternalCalls.Audio_SetFile(emplacementID, coreambience);
+
+                InternalCalls.Audio_Stop(emplacementID);
+                Log("SpawnManager: Stop emplacement from playing");
+            }
+            else
+            {
                 LogError("SpawnManager: Cannot find Emplacement");
+            }
+
+            uint a1ID = InternalCalls.Scene_FindEntityByName("A1");
+
+            if (a1ID != INVALID_ENTITY)
+            {
+                InternalCalls.Entity_AddAudio(a1ID);
+                //InternalCalls.Audio_SetFile(emplacementID, coreambience);
+
+                InternalCalls.Audio_Stop(a1ID);
+                Log("SpawnManager: Stop A1 from playing");
+            }
+            else
+            {
+                LogError("SpawnManager: Cannot find A1");
             }
         }
 
