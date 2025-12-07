@@ -1,0 +1,20 @@
+{
+    "sourcePath": "\\Resources\\Sources\\Meshes\\Temp_PlayerPrimaryBullet.fbx",
+    "meshSettings": {
+        "outputFormat": "CUSTOM",
+        "includePos": true,
+        "includeNormals": true,
+        "includeColors": false,
+        "includeTexCoords": true,
+        "indexType": "UINT32",
+        "scale": 1.0,
+        "positionX": 0.0,
+        "positionY": 0.0,
+        "positionZ": 0.0,
+        "rotationX": 90.0,
+        "rotationY": 0.0,
+        "rotationZ": 0.0,
+        "optimizeVertices": true,
+        "generateNormals": false
+    }
+}

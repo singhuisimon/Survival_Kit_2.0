@@ -1,0 +1,7 @@
+{
+  "name": "test.mat",
+  "guid": "2494406797D3C037",
+  "tags": [],
+  "lastImported": "0000000069253BF0",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav",
+  "guid": "36D1606C3306C005",
+  "tags": [],
+  "lastImported": "000000006925AF8F",
+  "resourceLinks": []
+}

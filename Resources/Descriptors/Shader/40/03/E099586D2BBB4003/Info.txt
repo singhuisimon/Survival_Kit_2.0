@@ -1,0 +1,7 @@
+{
+  "name": "bloom_upsample.frag",
+  "guid": "E099586D2BBB4003",
+  "tags": [],
+  "lastImported": "00000000692B17D2",
+  "resourceLinks": []
+}

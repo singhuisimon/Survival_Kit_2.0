@@ -1,0 +1,7 @@
+{
+  "name": "E007_adware_popup_v001.fbx",
+  "guid": "FC94406797D3C021",
+  "tags": [],
+  "lastImported": "000000006912E4CF",
+  "resourceLinks": []
+}
