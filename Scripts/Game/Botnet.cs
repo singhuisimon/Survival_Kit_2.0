@@ -94,6 +94,7 @@ namespace Game
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
         private const string TAG_ALLIES = "ALLIES";
         private const string EVENT_BULLET_HIT = "BulletHit";
+        private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
 
         // ===== Lifecycle =====
 
@@ -125,6 +126,7 @@ namespace Game
             InternalCalls.Physics_EnableCollisionEvents();
 
             EventSystem.Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            EventSystem.Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -167,6 +169,7 @@ namespace Game
         public override void OnDestroy()
         {
             EventSystem.Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            EventSystem.Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         // ===== Public API =====
@@ -198,6 +201,24 @@ namespace Game
             EventSystem.Publish("BotnetDeath", 1.ToString());
 
             Explode();
+        }
+
+        private void OnSpawnDisable(string eventName, string payload){
+            //Ignore if already dead or wrong event
+            if(isDead || eventName != EVENT_SPAWN_DISABLE)
+                return;
+            
+            if(!bool.TryParse(payload, out bool active))
+                return;
+
+            if(!active){
+                isDead = true;
+                isExploding = false;
+
+                Log("Destroying itself as spawn is disabled");
+
+                InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            }
         }
 
 
