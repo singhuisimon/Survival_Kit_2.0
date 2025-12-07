@@ -87,6 +87,11 @@ namespace Game
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
         private const string BOTNETKILLED = "BotnetDeath";
+        private const string LOSTDETECTED = "ChangeToLost";
+
+        private const string WINCAM = "WinCamera";
+        private const string LOSECAM = "LoseCamera";
+        private const string MENUCAM = "MainMenuCamera";
 
         private const int TARGETBOTNETKILLED = 15;
 
@@ -114,6 +119,7 @@ namespace Game
             InternalCalls.Entity_AddAudio((uint)EntityID);
 
             EventSystem.Subscribe(BOTNETKILLED, UpdateBotnetKilled);
+            EventSystem.Subscribe(LOSTDETECTED, DeactiveSpawnCondition);
 
             Log("EnemySpawnManager initialized");
         }
@@ -572,6 +578,8 @@ namespace Game
 
         #endregion
 
+        #region eventhandler
+
         private void UpdateBotnetKilled(string eventName, string payload){
             if(!int.TryParse(payload, out int count)){
                 return;
@@ -582,27 +590,49 @@ namespace Game
             Log("SpawnManager detected botnet is killed current count: " + botnetkilled.ToString());
         }
 
+        private void DeactiveSpawnCondition(string eventName, string payload){
+            
+            string name = payload;
+
+            if(name == WINCAM || name == LOSECAM || name == MENUCAM){
+                DisableSpawn();
+                Log("Detect win, lose, maincam so disabling spawn");
+            } else {
+                Log("hey its not win or lose or mainmenu cam soo im not deactivating sadly");
+            }
+        }
+
+        #endregion
+
+        private void DisableSpawn(){
+            Log("Disabling spawn rn");
+
+            enemiesLeft = 0;
+
+            isActive = false;
+            playInGameSound = false;
+            spawningAllowed = false;
+            botnetkilled = 0;
+            StopAllOtherAudio();
+            EnvironmentReset();
+        }
+
         private void CheckBotnetKilled(){
             if(botnetkilled >= TARGETBOTNETKILLED){
-                enemiesLeft = 0;
-
-                isActive = false;
-                playInGameSound = false;
-                spawningAllowed = false;
-                StopAllOtherAudio();
-                EnvironmentReset();
+                DisableSpawn();
                 Log("=== YIPPEE U KILLED ENOUGH ===");
-
-                //hello
 
                 // publish the win event to be integrated with the win screen 
                 EventSystem.Publish("PlayerWin", botnetkilled.ToString());
-
             }
         }
 
         private void CheckForEnemiesLeft()
         {
+            if(botnetkilled >= TARGETBOTNETKILLED){
+                return;
+            }
+
             uint[] loveletter = InternalCalls.Scene_FindEntitiesByTag("loveletter");
             uint[] botnet = InternalCalls.Scene_FindEntitiesByTag("botnet");
 
@@ -622,9 +652,6 @@ namespace Game
 
             if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)
             {
-                if(botnetkilled >= TARGETBOTNETKILLED){
-                    return;
-                }
                 enemiesLeft = 0;
 
                 isActive = false;

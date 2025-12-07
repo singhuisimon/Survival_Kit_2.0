@@ -40,7 +40,7 @@ namespace Game
 
         // input states (checking if each key is pressed)
         private bool enterWasPressed = false;
-        private bool wWasPressed = false;
+        private bool pWasPressed = false;
         private bool lWasPressed = false;
 
         public override void OnStart()
@@ -78,9 +78,9 @@ namespace Game
             enterWasPressed = enterIsPressed;
 
             // detect the W key (shortcut to test to view win screen)
-            bool wIsPressed = Input.IsKeyPressed(KeyCode.W);
-            bool wJustPressed = wIsPressed && !wWasPressed;
-            wWasPressed = wIsPressed;
+            bool pIsPressed = Input.IsKeyPressed(KeyCode.P);
+            bool pJustPressed = pIsPressed && !pWasPressed;
+            pWasPressed = pIsPressed;
 
             //detect the L key (shortcut to test to view lose screen)
             bool lIsPressed = Input.IsKeyPressed(KeyCode.L);
@@ -97,7 +97,7 @@ namespace Game
             }
 
             // testing shortcut (remember to remove during submission
-            if (wJustPressed)
+            if (pJustPressed)
             {
                 Log("Testing Win screen...");
                 ShowWinScreen();
@@ -115,6 +115,7 @@ namespace Game
         private void OnPlayerDied(string eventName, string payload)
         {
             Log("Player died event received!");
+            EventSystem.Publish("ChangeToLost", loseCameraName);
             ShowLoseScreen();
         }
 
