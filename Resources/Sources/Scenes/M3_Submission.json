@@ -759,7 +759,7 @@
                     "Properties": {
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -860,7 +860,7 @@
                     "Properties": {
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -961,7 +961,7 @@
                     "Properties": {
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -1062,7 +1062,7 @@
                     "Properties": {
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -1163,7 +1163,7 @@
                     "Properties": {
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -1257,7 +1257,7 @@
                     "Properties": {
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -1656,7 +1656,7 @@
                     "Properties": {
                         "FilePath": "Core_Health_Damage_Alert.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -2341,7 +2341,7 @@
                     "Properties": {
                         "FilePath": "Loveletter_Warp_Warning.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
@@ -2426,7 +2426,7 @@
                     "Properties": {
                         "FilePath": "COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav",
                         "Type": 2,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
@@ -4390,7 +4390,7 @@
                     "Properties": {
                         "FilePath": "Core_Ambient.wav",
                         "Type": 1,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": true,
