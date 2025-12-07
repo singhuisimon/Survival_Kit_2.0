@@ -86,8 +86,10 @@ namespace Game
         private string coreambience = "Core_Ambient.wav";
         private string loveletterwarning = "Loveletter_Warp_Warning.wav";
 
+        //event names
         private const string BOTNETKILLED = "BotnetDeath";
         private const string LOSTDETECTED = "ChangeToLost";
+        private const string GAMESTARTDETECTED = "StartingGame";
 
         private const string WINCAM = "WinCamera";
         private const string LOSECAM = "LoseCamera";
@@ -120,6 +122,7 @@ namespace Game
 
             EventSystem.Subscribe(BOTNETKILLED, UpdateBotnetKilled);
             EventSystem.Subscribe(LOSTDETECTED, DeactiveSpawnCondition);
+            EventSystem.Subscribe(GAMESTARTDETECTED, ActivateSpawnManager);
 
             StopInGameSounds();
 
@@ -128,30 +131,28 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // check for the trigger to start
-            // logically restart will also be via enter!
-            // change of plan. change this part of the code to look for maincamera if enabled.
-            //THIS CHUNK OF CODE HERE IS SUPPOSE TO BE INSIDE A FUNCTION THAT GETS TRIGGERED WHEN IT DETECTS
-            //THE EVENT FROM WHERE ITS PUBLISHED THAT ITS SWITCH TO MAIN CAM
-            if (Input.IsKeyPressed(KeyCode.Enter) && !isActive)
+            //Cheat code
+            if (Input.IsKeyPressed(KeyCode.U) && !isActive)
             {
-                isActive = true;
-                stopmainsound();
+                // isActive = true;
+                // stopmainsound();
 
-                // deactivate all active wall and activate all inactive
-                EnvironmentReset();
+                // // deactivate all active wall and activate all inactive
+                // EnvironmentReset();
 
-                // set the no. of enemies to spawn here
-                // in the function it also activates the wall we spawning enemies from
-                SetupEnemySpawning();
+                // // set the no. of enemies to spawn here
+                // // in the function it also activates the wall we spawning enemies from
+                // SetupEnemySpawning();
 
-                // play the ingame sounds
-                if (!playInGameSound)
-                {
-                    PlayInGameSounds();
-                }
+                // // play the ingame sounds
+                // if (!playInGameSound)
+                // {
+                //     PlayInGameSounds();
+                // }
 
-                botnetkilled = 0;
+                // botnetkilled = 0;
+                ActiveSpawn();
+                Log("Cheatcode to start spawnmanager again when deactivate from any cam!");
             }
 
             // check if the game has started
@@ -191,6 +192,7 @@ namespace Game
         public override void OnDestroy(){
             EventSystem.Unsubscribe(BOTNETKILLED, UpdateBotnetKilled);
             EventSystem.Unsubscribe(LOSTDETECTED, DeactiveSpawnCondition);
+            EventSystem.Unsubscribe(GAMESTARTDETECTED, ActivateSpawnManager);
         }
 
         #region setup
@@ -607,7 +609,40 @@ namespace Game
             }
         }
 
+        private void ActivateSpawnManager(string eventName, string payload){
+            if(!bool.TryParse(payload, out bool camactive))
+                return;
+
+            if(camactive && !isActive){
+                ActiveSpawn();
+                Log("detect cam is active for event " + eventName + "and curr spawn manager is just activated");
+            } else {
+                Log("game cam is not active");
+            }
+        }
+
         #endregion
+
+        private void ActiveSpawn(){
+            Log("Activating Spawn/Setting up Spawn");
+            isActive = true;
+            stopmainsound();
+
+            // deactivate all active wall and activate all inactive
+            EnvironmentReset();
+
+            // set the no. of enemies to spawn here
+            // in the function it also activates the wall we spawning enemies from
+            SetupEnemySpawning();
+
+            // play the ingame sounds
+            if (!playInGameSound)
+            {
+                PlayInGameSounds();
+            }
+
+            botnetkilled = 0;
+        }
 
         private void DisableSpawn(){
             Log("Disabling spawn rn");
@@ -620,6 +655,7 @@ namespace Game
             botnetkilled = 0;
             StopAllOtherAudio();
             EnvironmentReset();
+
 
             EventSystem.Publish("DisablingSpawn", isActive.ToString());
         }
@@ -1032,6 +1068,34 @@ namespace Game
                 InternalCalls.Audio_SetLoop(roomambi, false);
                 InternalCalls.Audio_Stop(roomambi);
                 Log("SpawnManager: Stopping room ambience");
+            }
+            else
+            {
+                LogError("SpawnManager: Cannot find room ambience");
+            }
+        }
+
+        private void startmainsound(){
+            uint officeambi = InternalCalls.Scene_FindEntityByName("office_ambience");
+
+            if (officeambi != INVALID_ENTITY)
+            {
+                InternalCalls.Audio_SetLoop(officeambi, true);
+                InternalCalls.Audio_Play(officeambi);
+                Log("SpawnManager: Playing office ambience");
+            }
+            else
+            {
+                LogError("SpawnManager: Cannot find office ambience");
+            }
+
+            uint roomambi = InternalCalls.Scene_FindEntityByName("room_ambience");
+
+            if (roomambi != INVALID_ENTITY)
+            {
+                InternalCalls.Audio_SetLoop(roomambi, true);
+                InternalCalls.Audio_Play(roomambi);
+                Log("SpawnManager: Playing room ambience");
             }
             else
             {

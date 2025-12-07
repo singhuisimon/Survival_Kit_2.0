@@ -338,6 +338,7 @@ namespace Game
                 Log("StartGameButton: Switching to Game Camera");
                 InternalCalls.Camera_SetEnabled(mainMenuCameraID, false);
                 InternalCalls.Camera_SetEnabled(gameCameraID, true);
+                EventSystem.Publish("StartingGame", true.ToString());
             }
         }
 
