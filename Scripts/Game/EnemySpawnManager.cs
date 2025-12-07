@@ -642,6 +642,8 @@ namespace Game
             }
 
             botnetkilled = 0;
+
+            //feel free to add any event publish here for when spawn start
         }
 
         private void DisableSpawn(){
@@ -656,8 +658,10 @@ namespace Game
             StopAllOtherAudio();
             EnvironmentReset();
 
-
+            //this event is being used by botnet !
             EventSystem.Publish("DisablingSpawn", isActive.ToString());
+
+            //feel free to add more event for disabling spawn.
         }
 
         private void CheckBotnetKilled(){
@@ -666,6 +670,7 @@ namespace Game
                 Log("=== YIPPEE U KILLED ENOUGH ===");
 
                 // publish the win event to be integrated with the win screen 
+                // this event is use by UI Spawn Manager
                 EventSystem.Publish("PlayerWin", botnetkilled.ToString());
             }
         }
