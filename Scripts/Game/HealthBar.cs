@@ -17,6 +17,7 @@ namespace Game
         private const float fullHealth = 100f;
         private const float botnetAttack = 20f;
         private uint healthID = 0;
+        private bool hasDied = false;
 
         public override void OnStart()
         {
@@ -31,6 +32,8 @@ namespace Game
             Vector3 originalScale = Transform.GetScale((uint)healthID);
             fullWidth = originalScale.X;
             currentWidth = originalScale.X;
+
+            hasDied = false;
         }
 
         public override void OnUpdate(float deltaTime)
@@ -47,9 +50,10 @@ namespace Game
                 currentWidth = scale.X;
             }
 
-            if (health <= 0f)
+            if (health <= 0f && hasDied == false)
             {
                 Die();
+                hasDied = true;
             }
         }
 
