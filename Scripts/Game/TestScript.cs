@@ -38,6 +38,8 @@ namespace Game
         [SerializeField]
         private string SecondaryBulletPrefab = "Sources/Prefabs/SecondaryBullet.prefab";
         [SerializeField]
+        private string PlayerHitSoundPrefab = "Sources/Prefabs/PlayerHit.prefab";
+        [SerializeField]
         private int PrimaryMaxAmmo = 100;
         [SerializeField]
         private float PrimaryReloadTime = 1.5f;
@@ -74,6 +76,9 @@ namespace Game
         private const float PI = 3.14159265359f;
         private const float HALF_PI = 1.5707963268f;
 
+        // ===== Constant string for event ======
+        private const string BULLETHITENEMY = "BulletHitEnemy";
+
         public override void OnStart()
         {
             Engine.InternalCalls.Log("=== PlayerMovement Started ===");
@@ -92,6 +97,8 @@ namespace Game
             initialized = true;
             Engine.InternalCalls.Log("Player initialized - Movement + Shooting ready");
             Engine.InternalCalls.Log("Camera controlled by C++ - use mouse to look around");
+
+            EventSystem.Subscribe(BULLETHITENEMY, PlayBulletHit);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -676,6 +683,29 @@ namespace Game
         public override void OnDestroy()
         {
             Engine.InternalCalls.Log("=== PlayerMovement Destroyed ===");
+            EventSystem.Unsubscribe(BULLETHITENEMY, PlayBulletHit);
         }
+
+        #region event handlers
+
+        private void PlayBulletHit(string eventName, string payload){
+            if(!bool.TryParse(payload, out bool hitenemy)){
+                return;
+            }
+            if(hitenemy){
+                //Spawn Instantiate a prefab with the sound and play it
+                if (!string.IsNullOrEmpty(PlayerHitSoundPrefab))
+                {
+                    uint hitSoundID = InternalCalls.Prefab_Instantiate(PlayerHitSoundPrefab);
+                    Vector3 myPos = Transform.GetPosition((uint)EntityID);
+                    Transform.SetPosition(hitSoundID, ref myPos);
+                    InternalCalls.Audio_Play(hitSoundID);
+
+                    Log("Player Hit Sound Prefab was instantiated");
+                }
+            }
+        }
+
+        #endregion
     }
 }

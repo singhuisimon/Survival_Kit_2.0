@@ -63,7 +63,7 @@ namespace Game
 
         // Death explosion prefab path
         [SerializeField]
-        private string deathExplosionPrefab = string.Empty;
+        private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
 
         // Health component
         //[SerializeField]
@@ -503,6 +503,7 @@ namespace Game
                 uint explosionID = InternalCalls.Prefab_Instantiate(deathExplosionPrefab);
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
+                InternalCalls.Audio_Play(explosionID);
             }
 
             InternalCalls.Scene_DestroyEntity((uint)EntityID);

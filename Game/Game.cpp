@@ -355,9 +355,9 @@ void Game::OnInit()
 	LOG_INFO("  F2: Create test entity with velocity");
 	LOG_INFO("  F5: Save scene to file");
 	LOG_INFO("  F9: Load scene from file");
-	LOG_INFO("  P: Play Audio");
-	LOG_INFO("  O: Pause Audio");
-	LOG_INFO("  L: Stop Audio");
+	//LOG_INFO("  P: Play Audio");
+	//LOG_INFO("  O: Pause Audio");
+	//LOG_INFO("  L: Stop Audio");
 	LOG_INFO("  ESC: Exit");
 	LOG_INFO("================");
 	LOG_INFO("");
@@ -842,7 +842,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 	}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_P))
+	/*if (input.IsKeyJustPressed(GLFW_KEY_P))
 	{
 		LOG_DEBUG("Testing Audio Playback");
 
@@ -885,7 +885,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		m_AudioManager->GetGroupVolume(Engine::AudioType::SFX, volume);
 		m_AudioManager->SetGroupVolume(Engine::AudioType::SFX, volume - 0.1f);
 		LOG_TRACE("Reducing Audio SFX Group Volume by 0.1 Currently it is: ", volume);
-	}
+	}*/
 
 
 	// Audio Testing if Attentuation works

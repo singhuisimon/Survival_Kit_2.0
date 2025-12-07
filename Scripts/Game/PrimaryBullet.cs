@@ -114,6 +114,7 @@ namespace Game
         {
             // Publish event
             EventSystem.Publish("BulletHit", targetEntityID.ToString());
+            EventSystem.Publish("BulletHitEnemy", true.ToString());
             Log("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
 
             // Destroy the bullet that actually hit
