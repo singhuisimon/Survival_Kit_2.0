@@ -55,14 +55,14 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            if (Input.IsKeyPressed(KeyCode.RightAlt))
-            {
-                health = 0f;
-                Vector3 scale = Transform.GetScale((uint)healthID);
-                scale.X = 0;
-                Transform.SetScale((uint)healthID, ref scale);
-                currentWidth = scale.X;
-            }
+            // if (Input.IsKeyPressed(KeyCode.RightAlt))
+            // {
+            //     health = 0f;
+            //     Vector3 scale = Transform.GetScale((uint)healthID);
+            //     scale.X = 0;
+            //     Transform.SetScale((uint)healthID, ref scale);
+            //     currentWidth = scale.X;
+            // }
 
             if (health <= 0f && hasDied == false)
             {

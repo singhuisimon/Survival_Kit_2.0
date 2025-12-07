@@ -132,28 +132,28 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {
             //Cheat code
-            if (Input.IsKeyPressed(KeyCode.U) && !isActive)
-            {
-                // isActive = true;
-                // stopmainsound();
+            // if (Input.IsKeyPressed(KeyCode.U) && !isActive)
+            // {
+            //     // isActive = true;
+            //     // stopmainsound();
 
-                // // deactivate all active wall and activate all inactive
-                // EnvironmentReset();
+            //     // // deactivate all active wall and activate all inactive
+            //     // EnvironmentReset();
 
-                // // set the no. of enemies to spawn here
-                // // in the function it also activates the wall we spawning enemies from
-                // SetupEnemySpawning();
+            //     // // set the no. of enemies to spawn here
+            //     // // in the function it also activates the wall we spawning enemies from
+            //     // SetupEnemySpawning();
 
-                // // play the ingame sounds
-                // if (!playInGameSound)
-                // {
-                //     PlayInGameSounds();
-                // }
+            //     // // play the ingame sounds
+            //     // if (!playInGameSound)
+            //     // {
+            //     //     PlayInGameSounds();
+            //     // }
 
-                // botnetkilled = 0;
-                ActiveSpawn();
-                Log("Cheatcode to start spawnmanager again when deactivate from any cam!");
-            }
+            //     // botnetkilled = 0;
+            //     ActiveSpawn();
+            //     Log("Cheatcode to start spawnmanager again when deactivate from any cam!");
+            // }
 
             // check if the game has started
             if (!isActive)
