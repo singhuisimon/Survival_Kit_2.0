@@ -40,8 +40,8 @@ namespace Game
 
         // input states (checking if each key is pressed)
         private bool enterWasPressed = false;
-        private bool pWasPressed = false;
-        private bool lWasPressed = false;
+        //private bool pWasPressed = false;
+        //private bool lWasPressed = false;
 
         public override void OnStart()
         {
@@ -78,14 +78,14 @@ namespace Game
             enterWasPressed = enterIsPressed;
 
             // detect the W key (shortcut to test to view win screen)
-            bool pIsPressed = Input.IsKeyPressed(KeyCode.P);
-            bool pJustPressed = pIsPressed && !pWasPressed;
-            pWasPressed = pIsPressed;
+            //bool pIsPressed = Input.IsKeyPressed(KeyCode.P);
+            //bool pJustPressed = pIsPressed && !pWasPressed;
+            //pWasPressed = pIsPressed;
 
             //detect the L key (shortcut to test to view lose screen)
-            bool lIsPressed = Input.IsKeyPressed(KeyCode.L);
-            bool lJustPressed = lIsPressed && !lWasPressed;
-            lWasPressed = lIsPressed;
+            //bool lIsPressed = Input.IsKeyPressed(KeyCode.L);
+            //bool lJustPressed = lIsPressed && !lWasPressed;
+            //lWasPressed = lIsPressed;
 
             // handle enter (this should only work IF player is on win/lose screen)
             if (enterJustPressed)
