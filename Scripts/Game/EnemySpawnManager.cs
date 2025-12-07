@@ -644,6 +644,7 @@ namespace Game
             botnetkilled = 0;
 
             //feel free to add any event publish here for when spawn start
+            EventSystem.Publish("SMActivated", EntityID.ToString());
         }
 
         private void DisableSpawn(){
@@ -662,6 +663,7 @@ namespace Game
             EventSystem.Publish("DisablingSpawn", isActive.ToString());
 
             //feel free to add more event for disabling spawn.
+            EventSystem.Publish("SMDeactivated", EntityID.ToString());
         }
 
         private void CheckBotnetKilled(){

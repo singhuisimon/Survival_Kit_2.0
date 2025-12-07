@@ -97,17 +97,17 @@ namespace Game
             }
 
             // testing shortcut (remember to remove during submission
-            if (pJustPressed)
-            {
-                Log("Testing Win screen...");
-                ShowWinScreen();
-            }
+            // if (pJustPressed)
+            // {
+            //     Log("Testing Win screen...");
+            //     ShowWinScreen();
+            // }
 
-            if (lJustPressed)
-            {
-                Log("Testing Lose screen...");
-                ShowLoseScreen();
-            }
+            // if (lJustPressed)
+            // {
+            //     Log("Testing Lose screen...");
+            //     ShowLoseScreen();
+            // }
         }
 
         // EVENT HANDLERS
@@ -201,7 +201,7 @@ namespace Game
             // reset the game state here
             // add code whenever needed here
 
-            // letting it know it should restart the game but further coding is required
+            // letting it know it should restart the game
             EventSystem.Publish("GameRestart", ""); 
         }
 
