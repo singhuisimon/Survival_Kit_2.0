@@ -131,6 +131,8 @@ namespace Game
             // check for the trigger to start
             // logically restart will also be via enter!
             // change of plan. change this part of the code to look for maincamera if enabled.
+            //THIS CHUNK OF CODE HERE IS SUPPOSE TO BE INSIDE A FUNCTION THAT GETS TRIGGERED WHEN IT DETECTS
+            //THE EVENT FROM WHERE ITS PUBLISHED THAT ITS SWITCH TO MAIN CAM
             if (Input.IsKeyPressed(KeyCode.Enter) && !isActive)
             {
                 isActive = true;
