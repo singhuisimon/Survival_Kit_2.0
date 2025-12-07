@@ -246,7 +246,7 @@ namespace Game
             if (shootCooldownTimer > 0.0f)
                 shootCooldownTimer -= deltaTime;
 
-            if (Engine.Input.IsKeyPressed(Engine.KeyCode.J) && shootCooldownTimer <= 0.0f)
+            if (Engine.Input.IsMouseButtonPressed(Engine.MouseButton.Left) && shootCooldownTimer <= 0.0f)
             {
                 shootCooldownTimer = 0.1f;
                 ShootBullet();
