@@ -100,6 +100,18 @@ else()
 endif()
 
 # ====================================
+# Windows Subsystem Configuration
+# ====================================
+
+if(MSVC)
+    # Disable console window in Release builds
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+    
+    # Optional: Also disable console in RelWithDebInfo
+    set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()
+
+# ====================================
 # RelWithDebInfo Configuration (Release + Debug Info)
 # ====================================
 
