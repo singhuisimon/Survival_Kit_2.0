@@ -167,15 +167,17 @@ namespace Engine
 
 		if (ImGui::IsItemClicked())
 		{
+			entt::entity entityHandle = entity.GetHandle();
 			m_SelectedEntity = entity;
-			m_PickedID = static_cast<u32>(ent);
+			m_PickedID = static_cast<u32>(entityHandle);
 
 			m_Editor->SetCurrSelectedEntity(m_SelectedEntity);
 			m_Editor->RetrievePickedID(m_PickedID);
 
 			LOG_DEBUG("Selected entity: ", tag.Tag.c_str());
-			LOG_DEBUG("currSelectedEntity: ", static_cast<uint32_t>(currentSelectedEntity.GetHandle()));
-			LOG_DEBUG("m_PickedID: ", currentPickedID);
+			LOG_DEBUG("new currSelectedEntity: ", static_cast<uint32_t>(m_Editor->GetSelectedEntity().GetHandle()));
+			LOG_DEBUG("NEW m_PickedID: ", m_PickedID);
+			LOG_DEBUG("Editor's picked ID: ", m_Editor->GetPickedID());
 		}
 
 		if (ImGui::BeginPopupContextItem())

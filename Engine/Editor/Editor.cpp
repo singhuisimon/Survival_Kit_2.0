@@ -73,6 +73,7 @@ namespace Engine
 
         m_EditorHierarchy->HierarchyPanel();
         
+        m_EditorProperty->PropertyPanel();
         RenderViewport(texhandle);
 
         CompleteFrame();

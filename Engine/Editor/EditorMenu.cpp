@@ -84,6 +84,7 @@ namespace Engine
 			if (ImGui::BeginMenu("View"))
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &m_Editor->GetHierarchyWindowRef());
+				ImGui::MenuItem("Property", NULL, &m_Editor->GetPropertyWindowRef());
 				ImGui::EndMenu();
 			}
 

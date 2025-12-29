@@ -28,12 +28,11 @@
 #include <unordered_map>
 #include <vector>
 
-
-
 // Include other necessary headers
 #include "../ECS/Scene.h"
 #include "../Editor/EditorMenu.h"
 #include "../Editor/EditorHierarchyPanel.h"
+#include "../Editor/EditorPropertyPanel.h"
 #include "Graphics/GraphicsLoader.h"
 #include "Graphics/Renderer.h"
 
@@ -46,6 +45,7 @@ namespace Engine
 	class Renderer;
 	class TracyProfiler;
 	class EditorHierarchyPanel;
+	class EditorPropertyPanel;
 
 	/**
 	* @class Editor
@@ -71,6 +71,7 @@ namespace Engine
 
 		std::unique_ptr<EditorMenu> m_EditorMenu;
 		std::unique_ptr<EditorHierarchyPanel> m_EditorHierarchy;
+		std::unique_ptr<EditorPropertyPanel> m_EditorProperty;
 
 		// gizmo
 		Entity m_SelectedEntity{};
@@ -84,7 +85,7 @@ namespace Engine
 		bool m_Initialized = false;
 
 		bool m_HierarchyWindow = true;
-		bool m_InspectorWindow = true;
+		bool m_PropertyWindow = true;
 		bool m_AnimatorWindow = true;
 		bool m_PerformanceProfileWindow = false;
 
@@ -104,6 +105,7 @@ namespace Engine
 		{
 			m_EditorMenu = std::make_unique<EditorMenu>(this);
 			m_EditorHierarchy = std::make_unique<EditorHierarchyPanel>(this);
+			m_EditorProperty = std::make_unique<EditorPropertyPanel>(this);
 		};
 
 		~Editor() = default;
@@ -149,7 +151,7 @@ namespace Engine
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 
 		bool& GetHierarchyWindowRef() { return m_HierarchyWindow; }
-		bool& GetInspectorWindowRef() { return m_InspectorWindow; }
+		bool& GetPropertyWindowRef() { return m_PropertyWindow; }
 		bool& GetAnimatorWindowRef() { return m_AnimatorWindow; }
 		bool& GetPerformanceProfileWindowRef() { return m_PerformanceProfileWindow; }
 	};
