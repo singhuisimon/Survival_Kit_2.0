@@ -80,8 +80,8 @@ namespace Engine
 			}
 		}
 
-		CheckParentlessChildren(m_Scene);
-		ClearParentlessChildren(m_Scene);
+		//CheckParentlessChildren(m_Scene);
+		//ClearParentlessChildren(m_Scene);
 
 		// ==================== Main Entity Selection Part ==========================
 		if (openAttachEntityPopup)
@@ -98,7 +98,7 @@ namespace Engine
 				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
 			}
 			ImGui::Separator();
-
+			bool selected = false;
 			for (auto entityHandle : viewEntities)
 			{
 				Entity entity(entityHandle, &m_Scene->GetRegistry());
@@ -112,9 +112,13 @@ namespace Engine
 					parentTransform.Children.push_back((uint32_t)entityToAttach);
 					auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
 					childTransform.SetParent(entity);
-					ImGui::CloseCurrentPopup();
+					selected = true;
 					break;
 				}
+			}
+			if (selected)
+			{
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::Separator();
 			if (ImGui::Button("Cancel"))
@@ -125,7 +129,8 @@ namespace Engine
 		}
 
 		// ========================== Selected Prefab For Sub Entity Part ======================
-
+		CheckParentlessChildren(m_Scene);
+		ClearParentlessChildren(m_Scene);
 	}
 
 	void EditorHierarchyPanel::DrawEntityTree(Entity& entity)
@@ -143,7 +148,9 @@ namespace Engine
 		if (!registry.all_of<TagComponent>(ent)) return;
 
 		auto& tag = entity.GetComponent<TagComponent>();
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
+			ImGuiTreeNodeFlags_OpenOnDoubleClick |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool hasChildren = false;
 		bool hasParent = false;
@@ -307,6 +314,7 @@ namespace Engine
 
 			ImGui::TreePop();
 		}
+	
 
 	}
 
