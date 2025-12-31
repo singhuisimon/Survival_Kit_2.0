@@ -85,6 +85,7 @@ namespace Engine
 			{
 				ImGui::MenuItem("Hierarchy", NULL, &m_Editor->GetHierarchyWindowRef());
 				ImGui::MenuItem("Property", NULL, &m_Editor->GetPropertyWindowRef());
+				ImGui::MenuItem("Performance", NULL, &m_Editor->GetPerformanceProfileWindowRef());
 				ImGui::EndMenu();
 			}
 
