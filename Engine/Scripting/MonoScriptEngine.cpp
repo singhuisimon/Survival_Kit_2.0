@@ -44,7 +44,7 @@ namespace Engine
 		return instance;
 	}
 
-	bool MonoScriptEngine::IsValidMonoObject(MonoObject* instance)
+	bool MonoScriptEngine::IsValidMonoObject(MonoObject *instance)
 	{
 		if (!instance)
 			return false;
@@ -57,7 +57,7 @@ namespace Engine
 			return false;
 		}
 
-		MonoDomain* currentDomain = mono_domain_get();
+		MonoDomain *currentDomain = mono_domain_get();
 		if (!currentDomain)
 		{
 			LOG_WARNING("IsValidMonoObject: No current Mono domain");
@@ -67,7 +67,7 @@ namespace Engine
 		// Wrap in try-catch for safety (if using C++ exceptions)
 		try
 		{
-			MonoDomain* instanceDomain = mono_object_get_domain(instance);
+			MonoDomain *instanceDomain = mono_object_get_domain(instance);
 			if (!instanceDomain || instanceDomain != currentDomain)
 			{
 				LOG_WARNING("IsValidMonoObject: Instance is from a different/unloaded domain");
@@ -432,7 +432,7 @@ namespace Engine
 	}
 
 
-	void MonoScriptEngine::DestroyScriptInstance(MonoObject* instance)
+	void MonoScriptEngine::DestroyScriptInstance(MonoObject *instance)
 	{
 		if (!instance)
 			return;
@@ -446,17 +446,17 @@ namespace Engine
 		}
 
 		// Get fresh instance from handle
-		MonoObject* freshInstance = mono_gchandle_get_target(it->second);
+		MonoObject *freshInstance = mono_gchandle_get_target(it->second);
 
 		if (freshInstance)
 		{
 			// Try to call OnDestroy with the fresh instance
 			try
 			{
-				MonoClass* klass = mono_object_get_class(freshInstance);
+				MonoClass *klass = mono_object_get_class(freshInstance);
 				if (klass)
 				{
-					MonoMethod* destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
+					MonoMethod *destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
 					if (destroyMethod)
 					{
 						EnsureCorrectDomain();
@@ -553,12 +553,12 @@ namespace Engine
 
 	}
 
-	MonoObject* MonoScriptEngine::GetObjectFromHandle(void* instancePtr)
+	MonoObject *MonoScriptEngine::GetObjectFromHandle(void *instancePtr)
 	{
 		if (!instancePtr)
 			return nullptr;
 
-		MonoObject* obj = (MonoObject*)instancePtr;
+		MonoObject *obj = (MonoObject *)instancePtr;
 
 		auto it = m_ObjectToHandle.find(obj);
 		if (it == m_ObjectToHandle.end())
@@ -577,7 +577,7 @@ namespace Engine
 		EnsureCorrectDomain();
 
 		// Get the actual object from the GC handle
-		MonoObject* target = mono_gchandle_get_target(it->second);
+		MonoObject *target = mono_gchandle_get_target(it->second);
 
 		if (!target)
 		{
@@ -1141,235 +1141,9 @@ namespace Engine
 
 	}
 
-	void MonoScriptEngine::RegisterInternalCalls()
-	{
-		LOG_INFO("Registering internal calls...");
-
-		// ECS Bindings
-		mono_add_internal_call("Engine.InternalCalls::Scene_CreateEntity", (void *)InternalCalls::Scene_CreateEntity);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddScript", (void *)InternalCalls::Entity_AddScript);
-		mono_add_internal_call("Engine.InternalCalls::Scene_DestroyEntity", (void *)InternalCalls::Scene_DestroyEntity);
-
-
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetParent", (void *)InternalCalls::Transform_GetParent);
-
-		// Logging
-		mono_add_internal_call("Engine.InternalCalls::Log", (void *)InternalCalls::Log);
-		mono_add_internal_call("Engine.InternalCalls::LogError", (void *)InternalCalls::LogError);
-		mono_add_internal_call("Engine.InternalCalls::LogWarning", (void *)InternalCalls::LogWarning);
-
-		// Entity
-		mono_add_internal_call("Engine.Entity::GetEntityID_Native", (void *)InternalCalls::Entity_GetEntityID);
-		mono_add_internal_call("Engine.Entity::HasComponent_Native", (void *)InternalCalls::Entity_HasComponent);
-
-		// Prefab
-		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void *)InternalCalls::Prefab_Instantiate);
-		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateScene", (void *)InternalCalls::Prefab_InstantiateScene);
-		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateWithTransform", (void *)InternalCalls::Prefab_InstantiateWithTransform);
-
-		// Transform
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void *)InternalCalls::Transform_GetPosition);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void *)InternalCalls::Transform_SetPosition);
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetRotation", (void *)InternalCalls::Transform_GetRotation);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetRotation", (void *)InternalCalls::Transform_SetRotation);
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetScale", (void *)InternalCalls::Transform_GetScale);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetScale", (void *)InternalCalls::Transform_SetScale);
-
-		// Input
-		mono_add_internal_call("Engine.Input::IsKeyPressed_Native", (void *)InternalCalls::Input_IsKeyPressed);
-		mono_add_internal_call("Engine.Input::IsMouseButtonPressed_Native", (void *)InternalCalls::Input_IsMouseButtonPressed);
-		mono_add_internal_call("Engine.Input::GetMousePosition_Native", (void *)InternalCalls::Input_GetMousePosition);
-		mono_add_internal_call("Engine.Input::IsKeyReleased_Native", (void *)InternalCalls::Input_IsKeyReleased);
-		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntityByName", (void *)InternalCalls::Scene_FindEntityByName);
-
-		// Physics
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddRigidBody", (void *)InternalCalls::Entity_AddRigidBody);
-
-		// Entity / components
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddTag", (void *)InternalCalls::Entity_AddTag);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddCamera", (void *)InternalCalls::Entity_AddCamera);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddAudio", (void *)InternalCalls::Entity_AddAudio);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddMeshRenderer", (void *)InternalCalls::Entity_AddMeshRenderer);
-
-
-		// Rigidbody (component-level velocity)
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetVelocity", (void *)InternalCalls::Rigidbody_GetVelocity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetVelocity", (void *)InternalCalls::Rigidbody_SetVelocity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddVelocity", (void *)InternalCalls::Rigidbody_AddVelocity);
-
-		// Rigidbody scalar/flag bindings
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetMass", (void *)InternalCalls::Rigidbody_GetMass);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetMass", (void *)InternalCalls::Rigidbody_SetMass);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetIsKinematic", (void *)InternalCalls::Rigidbody_GetIsKinematic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetIsKinematic", (void *)InternalCalls::Rigidbody_SetIsKinematic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetUseGravity", (void *)InternalCalls::Rigidbody_GetUseGravity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetUseGravity", (void *)InternalCalls::Rigidbody_SetUseGravity);
-
-		// Rigidbody helpers
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetSpeed", (void *)InternalCalls::Rigidbody_GetSpeed);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsMoving", (void *)InternalCalls::Rigidbody_IsMoving);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsStatic", (void *)InternalCalls::Rigidbody_IsStatic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddForce", (void *)InternalCalls::Rigidbody_AddForce);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_Stop", (void *)InternalCalls::Rigidbody_Stop);
-
-
-		// Physics collisions (keep using PhysicsAPI ONLY for this)
-		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
-		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
-
-		// Collision event access
-		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
-		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
-
-		// Tag
-		mono_add_internal_call("Engine.InternalCalls::Tag_GetTag", (void *)InternalCalls::Tag_GetTag);
-		mono_add_internal_call("Engine.InternalCalls::Tag_SetTag", (void *)InternalCalls::Tag_SetTag);
-		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntitiesByTag", (void *)InternalCalls::Scene_FindEntitiesByTag);
-
-		// Camera
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetEnabled", (void *)InternalCalls::Camera_GetEnabled);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetEnabled", (void *)InternalCalls::Camera_SetEnabled);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetPrimary", (void *)InternalCalls::Camera_GetPrimary);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetPrimary", (void *)InternalCalls::Camera_SetPrimary);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetFOV", (void *)InternalCalls::Camera_GetFOV);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetFOV", (void *)InternalCalls::Camera_SetFOV);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetNear", (void *)InternalCalls::Camera_GetNear);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetNear", (void *)InternalCalls::Camera_SetNear);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetFar", (void *)InternalCalls::Camera_GetFar);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetFar", (void *)InternalCalls::Camera_SetFar);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetTarget", (void *)InternalCalls::Camera_GetTarget);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetTarget", (void *)InternalCalls::Camera_SetTarget);
-
-
-		// MeshRenderer
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetVisible", (void *)InternalCalls::MeshRenderer_GetVisible);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetVisible", (void *)InternalCalls::MeshRenderer_SetVisible);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowCast", (void *)InternalCalls::MeshRenderer_GetShadowCast);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowCast", (void *)InternalCalls::MeshRenderer_SetShadowCast);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowReceive", (void *)InternalCalls::MeshRenderer_GetShadowReceive);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowReceive", (void *)InternalCalls::MeshRenderer_SetShadowReceive);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_GetGlobalIlluminate);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_SetGlobalIlluminate);
-
-		// Audio
-		mono_add_internal_call("Engine.InternalCalls::Audio_Play", (void *)InternalCalls::Audio_Play);
-		mono_add_internal_call("Engine.InternalCalls::Audio_Stop", (void *)InternalCalls::Audio_Stop);
-		mono_add_internal_call("Engine.InternalCalls::Audio_Pause", (void *)InternalCalls::Audio_Pause);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetVolume", (void *)InternalCalls::Audio_GetVolume);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetVolume", (void *)InternalCalls::Audio_SetVolume);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetPitch", (void *)InternalCalls::Audio_GetPitch);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetPitch", (void *)InternalCalls::Audio_SetPitch);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetLoop", (void *)InternalCalls::Audio_GetLoop);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetLoop", (void *)InternalCalls::Audio_SetLoop);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMute", (void *)InternalCalls::Audio_GetMute);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMute", (void *)InternalCalls::Audio_SetMute);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetIs3D", (void *)InternalCalls::Audio_GetIs3D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetIs3D", (void *)InternalCalls::Audio_SetIs3D);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
-
-		mono_add_internal_call("Engine.InternalCalls::Event_Publish", (void *)InternalCalls::Event_Publish);
-
-		// ===== NEW: AudioComponent Extensions =====
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMinDistance",
-			(void *)InternalCalls::Audio_GetMinDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMinDistance",
-			(void *)InternalCalls::Audio_SetMinDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMaxDistance",
-			(void *)InternalCalls::Audio_GetMaxDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMaxDistance",
-			(void *)InternalCalls::Audio_SetMaxDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetRolloffMode",
-			(void *)InternalCalls::Audio_GetRolloffMode);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetRolloffMode",
-			(void *)InternalCalls::Audio_SetRolloffMode);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetDopplerLevel",
-			(void *)InternalCalls::Audio_GetDopplerLevel);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetDopplerLevel",
-			(void *)InternalCalls::Audio_SetDopplerLevel);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetPan2D",
-			(void *)InternalCalls::Audio_GetPan2D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetPan2D",
-			(void *)InternalCalls::Audio_SetPan2D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetReverbMix",
-			(void *)InternalCalls::Audio_GetReverbMix);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetReverbMix",
-			(void *)InternalCalls::Audio_SetReverbMix);
-
-		// ===== NEW: AudioManager Global Controls =====
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupVolume",
-			(void *)InternalCalls::AudioManager_SetGroupVolume);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupVolume",
-			(void *)InternalCalls::AudioManager_GetGroupVolume);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupPitch",
-			(void *)InternalCalls::AudioManager_SetGroupPitch);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupPitch",
-			(void *)InternalCalls::AudioManager_GetGroupPitch);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupMute",
-			(void *)InternalCalls::AudioManager_SetGroupMute);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_IsGroupMuted",
-			(void *)InternalCalls::AudioManager_IsGroupMuted);
-
-		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseGroup",
-			(void *)InternalCalls::AudioManager_PauseGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseAll",
-			(void *)InternalCalls::AudioManager_PauseAll);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_StopByType",
-			(void *)InternalCalls::AudioManager_StopByType);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_StopAll",
-			(void *)InternalCalls::AudioManager_StopAll);
-
-		mono_add_internal_call("Engine.AudioManager::AudioManager_CreateDSP",
-			(void *)InternalCalls::AudioManager_CreateDSP);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_EnableDSP",
-			(void *)InternalCalls::AudioManager_EnableDSP);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetDSPParameter",
-			(void *)InternalCalls::AudioManager_SetDSPParameter);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
-			(void *)InternalCalls::AudioManager_ReleaseSpecificDSPinGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
-			(void *)InternalCalls::AudioManager_ReleaseDSPByGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
-			(void *)InternalCalls::AudioManager_ReleaseAllDSPs);
-
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
-			(void *)InternalCalls::AudioManager_SetListenerAttributes);
-
-		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void *)InternalCalls::EntityHasCamera);
-		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void *)InternalCalls::EntityHasRigidBody);
-
-		// Quaternion Bindings
-		mono_add_internal_call("Engine.InternalCalls::Quat_FromAxisAngle", (void *)InternalCalls::Quat_FromAxisAngle);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetForward", (void *)InternalCalls::Quat_GetForward);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetRight", (void *)InternalCalls::Quat_GetRight);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetUp", (void *)InternalCalls::Quat_GetUp);
-		mono_add_internal_call("Engine.InternalCalls::Quat_RotateVector", (void *)InternalCalls::Quat_RotateVector);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Multiply", (void *)InternalCalls::Quat_Multiply);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Slerp", (void *)InternalCalls::Quat_Slerp);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Inverse", (void *)InternalCalls::Quat_Inverse);
-		mono_add_internal_call("Engine.InternalCalls::Quat_ToEuler", (void *)InternalCalls::Quat_ToEuler);
-		mono_add_internal_call("Engine.InternalCalls::Quat_FromEuler", (void *)InternalCalls::Quat_FromEuler);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
-		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
-
-		LOG_INFO("Internal calls registered");
-	}
-
 	// ============================================
 	// Internal Call Implementations
 	// ============================================
-
 	namespace InternalCalls
 	{
 		// Global scene pointer (set by ScriptSystem)
@@ -2917,6 +2691,234 @@ namespace Engine
 			*outY = in_out.y;
 		}
 	} // namespace internalcalls
+
+	void MonoScriptEngine::RegisterInternalCalls()
+	{
+		LOG_INFO("Registering internal calls...");
+
+		// ECS Bindings
+		mono_add_internal_call("Engine.InternalCalls::Scene_CreateEntity", (void *)InternalCalls::Scene_CreateEntity);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddScript", (void *)InternalCalls::Entity_AddScript);
+		mono_add_internal_call("Engine.InternalCalls::Scene_DestroyEntity", (void *)InternalCalls::Scene_DestroyEntity);
+
+
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetParent", (void *)InternalCalls::Transform_GetParent);
+
+		// Logging
+		mono_add_internal_call("Engine.InternalCalls::Log", (void *)InternalCalls::Log);
+		mono_add_internal_call("Engine.InternalCalls::LogError", (void *)InternalCalls::LogError);
+		mono_add_internal_call("Engine.InternalCalls::LogWarning", (void *)InternalCalls::LogWarning);
+
+		// Entity
+		mono_add_internal_call("Engine.Entity::GetEntityID_Native", (void *)InternalCalls::Entity_GetEntityID);
+		mono_add_internal_call("Engine.Entity::HasComponent_Native", (void *)InternalCalls::Entity_HasComponent);
+
+		// Prefab
+		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void *)InternalCalls::Prefab_Instantiate);
+		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateScene", (void *)InternalCalls::Prefab_InstantiateScene);
+		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateWithTransform", (void *)InternalCalls::Prefab_InstantiateWithTransform);
+
+		// Transform
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void *)InternalCalls::Transform_GetPosition);
+		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void *)InternalCalls::Transform_SetPosition);
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetRotation", (void *)InternalCalls::Transform_GetRotation);
+		mono_add_internal_call("Engine.InternalCalls::Transform_SetRotation", (void *)InternalCalls::Transform_SetRotation);
+		mono_add_internal_call("Engine.InternalCalls::Transform_GetScale", (void *)InternalCalls::Transform_GetScale);
+		mono_add_internal_call("Engine.InternalCalls::Transform_SetScale", (void *)InternalCalls::Transform_SetScale);
+
+		// Input
+		mono_add_internal_call("Engine.Input::IsKeyPressed_Native", (void *)InternalCalls::Input_IsKeyPressed);
+		mono_add_internal_call("Engine.Input::IsMouseButtonPressed_Native", (void *)InternalCalls::Input_IsMouseButtonPressed);
+		mono_add_internal_call("Engine.Input::GetMousePosition_Native", (void *)InternalCalls::Input_GetMousePosition);
+		mono_add_internal_call("Engine.Input::IsKeyReleased_Native", (void *)InternalCalls::Input_IsKeyReleased);
+		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntityByName", (void *)InternalCalls::Scene_FindEntityByName);
+
+		// Physics
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddRigidBody", (void *)InternalCalls::Entity_AddRigidBody);
+
+		// Entity / components
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddTag", (void *)InternalCalls::Entity_AddTag);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddCamera", (void *)InternalCalls::Entity_AddCamera);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddAudio", (void *)InternalCalls::Entity_AddAudio);
+		mono_add_internal_call("Engine.InternalCalls::Entity_AddMeshRenderer", (void *)InternalCalls::Entity_AddMeshRenderer);
+
+
+		// Rigidbody (component-level velocity)
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetVelocity", (void *)InternalCalls::Rigidbody_GetVelocity);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetVelocity", (void *)InternalCalls::Rigidbody_SetVelocity);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddVelocity", (void *)InternalCalls::Rigidbody_AddVelocity);
+
+		// Rigidbody scalar/flag bindings
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetMass", (void *)InternalCalls::Rigidbody_GetMass);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetMass", (void *)InternalCalls::Rigidbody_SetMass);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetIsKinematic", (void *)InternalCalls::Rigidbody_GetIsKinematic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetIsKinematic", (void *)InternalCalls::Rigidbody_SetIsKinematic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetUseGravity", (void *)InternalCalls::Rigidbody_GetUseGravity);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetUseGravity", (void *)InternalCalls::Rigidbody_SetUseGravity);
+
+		// Rigidbody helpers
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetSpeed", (void *)InternalCalls::Rigidbody_GetSpeed);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsMoving", (void *)InternalCalls::Rigidbody_IsMoving);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsStatic", (void *)InternalCalls::Rigidbody_IsStatic);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddForce", (void *)InternalCalls::Rigidbody_AddForce);
+		mono_add_internal_call("Engine.InternalCalls::Rigidbody_Stop", (void *)InternalCalls::Rigidbody_Stop);
+
+
+		// Physics collisions (keep using PhysicsAPI ONLY for this)
+		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
+		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
+		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
+		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
+
+		// Collision event access
+		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
+		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
+		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
+		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
+
+		// Tag
+		mono_add_internal_call("Engine.InternalCalls::Tag_GetTag", (void *)InternalCalls::Tag_GetTag);
+		mono_add_internal_call("Engine.InternalCalls::Tag_SetTag", (void *)InternalCalls::Tag_SetTag);
+		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntitiesByTag", (void *)InternalCalls::Scene_FindEntitiesByTag);
+
+		// Camera
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetEnabled", (void *)InternalCalls::Camera_GetEnabled);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetEnabled", (void *)InternalCalls::Camera_SetEnabled);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetPrimary", (void *)InternalCalls::Camera_GetPrimary);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetPrimary", (void *)InternalCalls::Camera_SetPrimary);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetFOV", (void *)InternalCalls::Camera_GetFOV);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetFOV", (void *)InternalCalls::Camera_SetFOV);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetNear", (void *)InternalCalls::Camera_GetNear);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetNear", (void *)InternalCalls::Camera_SetNear);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetFar", (void *)InternalCalls::Camera_GetFar);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetFar", (void *)InternalCalls::Camera_SetFar);
+		mono_add_internal_call("Engine.InternalCalls::Camera_GetTarget", (void *)InternalCalls::Camera_GetTarget);
+		mono_add_internal_call("Engine.InternalCalls::Camera_SetTarget", (void *)InternalCalls::Camera_SetTarget);
+
+
+		// MeshRenderer
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetVisible", (void *)InternalCalls::MeshRenderer_GetVisible);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetVisible", (void *)InternalCalls::MeshRenderer_SetVisible);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowCast", (void *)InternalCalls::MeshRenderer_GetShadowCast);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowCast", (void *)InternalCalls::MeshRenderer_SetShadowCast);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowReceive", (void *)InternalCalls::MeshRenderer_GetShadowReceive);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowReceive", (void *)InternalCalls::MeshRenderer_SetShadowReceive);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_GetGlobalIlluminate);
+		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_SetGlobalIlluminate);
+
+		// Audio
+		mono_add_internal_call("Engine.InternalCalls::Audio_Play", (void *)InternalCalls::Audio_Play);
+		mono_add_internal_call("Engine.InternalCalls::Audio_Stop", (void *)InternalCalls::Audio_Stop);
+		mono_add_internal_call("Engine.InternalCalls::Audio_Pause", (void *)InternalCalls::Audio_Pause);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetVolume", (void *)InternalCalls::Audio_GetVolume);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetVolume", (void *)InternalCalls::Audio_SetVolume);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetPitch", (void *)InternalCalls::Audio_GetPitch);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetPitch", (void *)InternalCalls::Audio_SetPitch);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetLoop", (void *)InternalCalls::Audio_GetLoop);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetLoop", (void *)InternalCalls::Audio_SetLoop);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetMute", (void *)InternalCalls::Audio_GetMute);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetMute", (void *)InternalCalls::Audio_SetMute);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetIs3D", (void *)InternalCalls::Audio_GetIs3D);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetIs3D", (void *)InternalCalls::Audio_SetIs3D);
+
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
+
+		mono_add_internal_call("Engine.InternalCalls::Event_Publish", (void *)InternalCalls::Event_Publish);
+
+		// ===== NEW: AudioComponent Extensions =====
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetMinDistance",
+			(void *)InternalCalls::Audio_GetMinDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetMinDistance",
+			(void *)InternalCalls::Audio_SetMinDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetMaxDistance",
+			(void *)InternalCalls::Audio_GetMaxDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetMaxDistance",
+			(void *)InternalCalls::Audio_SetMaxDistance);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetRolloffMode",
+			(void *)InternalCalls::Audio_GetRolloffMode);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetRolloffMode",
+			(void *)InternalCalls::Audio_SetRolloffMode);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetDopplerLevel",
+			(void *)InternalCalls::Audio_GetDopplerLevel);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetDopplerLevel",
+			(void *)InternalCalls::Audio_SetDopplerLevel);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetPan2D",
+			(void *)InternalCalls::Audio_GetPan2D);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetPan2D",
+			(void *)InternalCalls::Audio_SetPan2D);
+		mono_add_internal_call("Engine.InternalCalls::Audio_GetReverbMix",
+			(void *)InternalCalls::Audio_GetReverbMix);
+		mono_add_internal_call("Engine.InternalCalls::Audio_SetReverbMix",
+			(void *)InternalCalls::Audio_SetReverbMix);
+
+		// ===== NEW: AudioManager Global Controls =====
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupVolume",
+			(void *)InternalCalls::AudioManager_SetGroupVolume);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupVolume",
+			(void *)InternalCalls::AudioManager_GetGroupVolume);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupPitch",
+			(void *)InternalCalls::AudioManager_SetGroupPitch);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupPitch",
+			(void *)InternalCalls::AudioManager_GetGroupPitch);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupMute",
+			(void *)InternalCalls::AudioManager_SetGroupMute);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_IsGroupMuted",
+			(void *)InternalCalls::AudioManager_IsGroupMuted);
+
+		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseGroup",
+			(void *)InternalCalls::AudioManager_PauseGroup);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseAll",
+			(void *)InternalCalls::AudioManager_PauseAll);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_StopByType",
+			(void *)InternalCalls::AudioManager_StopByType);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_StopAll",
+			(void *)InternalCalls::AudioManager_StopAll);
+
+		mono_add_internal_call("Engine.AudioManager::AudioManager_CreateDSP",
+			(void *)InternalCalls::AudioManager_CreateDSP);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_EnableDSP",
+			(void *)InternalCalls::AudioManager_EnableDSP);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetDSPParameter",
+			(void *)InternalCalls::AudioManager_SetDSPParameter);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
+			(void *)InternalCalls::AudioManager_ReleaseSpecificDSPinGroup);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
+			(void *)InternalCalls::AudioManager_ReleaseDSPByGroup);
+		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
+			(void *)InternalCalls::AudioManager_ReleaseAllDSPs);
+
+		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
+			(void *)InternalCalls::AudioManager_SetListenerAttributes);
+
+		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void *)InternalCalls::EntityHasCamera);
+		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void *)InternalCalls::EntityHasRigidBody);
+
+		// Quaternion Bindings
+		mono_add_internal_call("Engine.InternalCalls::Quat_FromAxisAngle", (void *)InternalCalls::Quat_FromAxisAngle);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetForward", (void *)InternalCalls::Quat_GetForward);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetRight", (void *)InternalCalls::Quat_GetRight);
+		mono_add_internal_call("Engine.InternalCalls::Quat_GetUp", (void *)InternalCalls::Quat_GetUp);
+		mono_add_internal_call("Engine.InternalCalls::Quat_RotateVector", (void *)InternalCalls::Quat_RotateVector);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Multiply", (void *)InternalCalls::Quat_Multiply);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Slerp", (void *)InternalCalls::Quat_Slerp);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Inverse", (void *)InternalCalls::Quat_Inverse);
+		mono_add_internal_call("Engine.InternalCalls::Quat_ToEuler", (void *)InternalCalls::Quat_ToEuler);
+		mono_add_internal_call("Engine.InternalCalls::Quat_FromEuler", (void *)InternalCalls::Quat_FromEuler);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
+		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
+		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
+
+		LOG_INFO("Internal calls registered");
+	}
+
+
+
 
 	// Expose these functions for external use
 	void SetScriptingInputSystem(Input *input)
