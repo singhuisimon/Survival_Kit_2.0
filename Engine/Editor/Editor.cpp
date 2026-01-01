@@ -4745,82 +4745,9 @@ namespace Engine
 
 				static bool showWrongType = false;
 
-				// Helper lambda to display asset field with drag-drop support
-				auto DisplayAssetField = [&](const char *label, xresource::instance_guid &guid, ResourceType expectedType)
-					{
-						// Get the filename from the GUID
-						std::string displayName = AM.getNameFromGuid(guid);
-						if (displayName.empty())
-						{
-							displayName = "<None>";
-						}
-
-						// Create a buffer for the input text (read-only display)
-						char buffer[256];
-						strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
-						buffer[sizeof(buffer) - 1] = '\0';
-
-						ImGui::Text("%s", label);
-						ImGui::SameLine();
-
-						// Input text field (read-only)
-						ImGui::PushID(label);
-						ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
-
-						// Drag-drop target
-						if (ImGui::BeginDragDropTarget())
-						{
-							// Accept payload from asset browser (assuming you use "ASSET_BROWSER_ITEM" as payload ID)
-							if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
-							{
-								// Assuming payload contains xresource::instance_guid
-								xresource::instance_guid droppedGuid = *(const xresource::instance_guid *)payload->Data;
-
-								// Verify the asset type matches what's expected
-								const AssetRecord *record = AM.getAssetRecord(droppedGuid);
-								if (record && record->type == expectedType)
-								{
-									// Temporary fix for now: To be fully fixed by M3
-									std::string fileName = std::filesystem::path(currScenePath).filename().string();
-									std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
-
-									if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
-										&& recordName != "E005_loveletter_v001.fbx")
-									{
-
-										showWrongType = true;
-									}
-									else
-									{
-
-										guid = droppedGuid;
-
-									}
-								}
-								else
-								{
-									showWrongType = true;
-								}
-							}
-							ImGui::EndDragDropTarget();
-						}
-
-						// Context menu to clear the reference
-						if (ImGui::BeginPopupContextItem())
-						{
-							if (ImGui::MenuItem("Clear Reference"))
-							{
-								guid = xresource::instance_guid(); // Reset to invalid/default
-							}
-							ImGui::EndPopup();
-						}
-
-						ImGui::PopID();
-					};
-
 				// Display asset reference fields
-				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
-				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
+				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH, showWrongType);
+				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL, showWrongType);
 
 				if (showWrongType)
 				{
@@ -4932,12 +4859,12 @@ namespace Engine
 					// Texture Maps (PBR Metallic/Roughness)
 					if (ImGui::CollapsingHeader("Texture Maps"))
 					{
-						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE);
-						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE);
-						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE);
-						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE);
-						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE);
-						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE);
+						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongType);
 					}
 
 					// Color Properties
@@ -6256,11 +6183,39 @@ namespace Engine
 				// ======================= Asset Reference Section =======================
 				ImGui::SeparatorText("Asset References");
 
-				
+				static bool showWrongType_ = false;
+
+				DisplayAssetField("Texture", spriteRenderer.TextureGuid, ResourceType::TEXTURE, showWrongType_);
+
+				if (showWrongType_)
+				{
+					ImGui::OpenPopup("Incompatible Asset Type");
+					showWrongType_ = false;
+				}
+
+				// Popup for incompatible asset type
+				if (ImGui::BeginPopup("Incompatible Asset Type"))
+				{
+					ImGui::Text("The dropped asset type does not match the expected type.");
+					if (ImGui::Button("Close"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Spacing();
+
+				ImGui::ColorEdit4("Color", &spriteRenderer.Color.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB);
+				ImGui::DragInt("Quad", (int*)(&spriteRenderer.Quad), 1, 0, 10);
+				ImGui::DragInt("Layer",  (int *)(&spriteRenderer.SpriteLayer), 1, 0, 255);
+			}
+
+			if (removeSpriteRenderer) 
+			{
+				m_SelectedEntity.RemoveComponent<SpriteRendererComponent>();
 			}
 		}
-
-
 	}
 
 	void Editor::addComponents()
@@ -7257,6 +7212,76 @@ namespace Engine
 				CollectChildHandles(childEntity, outHandles);
 			}
 		}
+	}
+
+	void Editor::DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag) 
+	{
+		std::string displayName = AM.getNameFromGuid(guid);
+
+		if (displayName.empty())
+			displayName = "<None>";
+
+		// Create a buffer for the input text (read-only display)
+		char buffer[256];
+		strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
+		buffer[sizeof(buffer) - 1] = '\0';
+
+		ImGui::Text("%s", label);
+		ImGui::SameLine();
+
+		// Input text field (read-only)
+		ImGui::PushID(label);
+		ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
+
+		// Drag-drop target
+		if (ImGui::BeginDragDropTarget())
+		{
+			// Accept payload from asset browser (assuming you use "ASSET_BROWSER_ITEM" as payload ID)
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+			{
+				// Assuming payload contains xresource::instance_guid
+				xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
+
+				// Verify the asset type matches what's expected
+				const AssetRecord* record = AM.getAssetRecord(droppedGuid);
+				if (record && record->type == expectedType)
+				{
+					// Temporary fix for now: To be fully fixed by M3
+					std::string fileName = std::filesystem::path(currScenePath).filename().string();
+					std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
+
+					if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
+						&& recordName != "E005_loveletter_v001.fbx")
+					{
+
+						errorFlag = true;
+					}
+					else
+					{
+
+						guid = droppedGuid;
+
+					}
+				}
+				else
+				{
+					errorFlag = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		// Context menu to clear the reference
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Clear Reference"))
+			{
+				guid = xresource::instance_guid(); // Reset to invalid/default
+			}
+			ImGui::EndPopup();
+		}
+
+		ImGui::PopID();
 	}
 
 

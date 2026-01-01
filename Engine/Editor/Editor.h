@@ -615,6 +615,21 @@ namespace Engine
 		**************************************************************************/
 		void CollectChildHandles(Entity parentEntity, std::vector<entt::entity>& outHandles);
 
+		/**************************************************************************
+		* @brief
+		* 	Acts as the interface that allows users to retrieve and modify the
+		*   asset associated with a component. 
+		* @param label
+		*	The name of the asset.
+		* @param guid
+		*	The guid of the actual asset.
+		* @param expectedType
+		*	The expected asset type.
+		* @param errorFlag
+		*	Set to true if the wrong type of asset was used to modify an asset
+		*   slot.
+		**************************************************************************/
+		void DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag);
 	};
 
 
