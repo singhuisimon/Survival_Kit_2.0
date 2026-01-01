@@ -16,6 +16,7 @@
 #include "../Prefab/BehaviourTreePrefab.h"
 #include "../Component/PrefabComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"

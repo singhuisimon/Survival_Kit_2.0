@@ -22,6 +22,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 #include "../Utility/Logger.h"
 #include "../Asset/AssetManager.h"
 

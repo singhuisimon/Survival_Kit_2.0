@@ -25,6 +25,7 @@
 #include "../Utility/Logger.h"
 #include "../Component/ScriptComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 
  // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -734,6 +735,35 @@ namespace Engine {
                 [](const AnimatorComponent& c) { return c.playbackSpeed; },
                 [](AnimatorComponent& c, const float& v) { c.playbackSpeed = v; }
             );
+        }
+
+        // Register SpriteRenderer Component
+        {
+            auto& meta = REGISTER_COMPONENT(SpriteRendererComponent);
+
+            meta.AddProperty<SpriteRendererComponent, u64>(
+                "TextureGuid",
+                PropertyType::U64, 
+                [](const SpriteRendererComponent& c) {return static_cast<u64>(c.TextureGuid.m_Value); },
+                [](SpriteRendererComponent& c, const xresource::instance_guid& v) { c.TextureGuid = v; });
+
+			meta.AddProperty<SpriteRendererComponent, glm::vec4>(
+                "Color", 
+                PropertyType::Vec4,
+                [](const SpriteRendererComponent& c) { return c.Color; },
+                [](SpriteRendererComponent& c, const glm::vec4& v) { c.Color = v; });
+
+            meta.AddProperty<SpriteRendererComponent, u32>(
+                "Quad",
+                PropertyType::U32,
+                [](const SpriteRendererComponent& c) { return c.Quad; },
+                [](SpriteRendererComponent& c, const u32& v) { c.Quad = v; });
+
+            meta.AddProperty<SpriteRendererComponent, u32>(
+                "SpriteLayer",
+                PropertyType::U32,
+                [](const SpriteRendererComponent& c) { return c.SpriteLayer; },
+				[](SpriteRendererComponent& c, const u32& v) { c.SpriteLayer = v; });
         }
 
         LOG_INFO("Component reflection registration complete");
