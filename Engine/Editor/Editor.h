@@ -508,6 +508,15 @@ namespace Engine
 
 		/**************************************************************************
 		* @brief
+		* 	Displays the sprite renderer component when the sprite renderer 
+		*	component is added to the selected entity.
+		* @param buttonSize
+		*	The size of the button used for removing the component.
+		**************************************************************************/
+		void displaySpriteRendererComp(ImVec2& buttonSize);
+
+		/**************************************************************************
+		* @brief
 		* 	Display the add component when prefab component is added to the
 		*	selected entity.
 		* @param buttonSize

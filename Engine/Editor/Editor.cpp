@@ -15,6 +15,7 @@
 #include "../Component/ParticleComponent.h"
 #include "../Transform/TransformSystem.h"
 #include "../Component/LightComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 
 #include "../Serialization/SceneSerializer.h"
 #include "../Serialization/PrefabSerializer.h"
@@ -512,6 +513,9 @@ namespace Engine
 
 				// =========================== Display Animator Component ===========================
 				displayAnimatorComp(dotButtonSize);
+
+				// =========================== Display Sprite Renderer Component ===========================
+				displaySpriteRendererComp(dotButtonSize);
 
 				// ======================== Add Component Section ===============================
 				ImGui::Separator();
@@ -6217,6 +6221,48 @@ namespace Engine
 
 	}
 
+	void Editor::displaySpriteRendererComp(ImVec2& buttonSize) 
+	{
+		if (m_SelectedEntity.HasComponent<SpriteRendererComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool openSpriteRendererComponent = ImGui::CollapsingHeader("SpriteRenderer Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removeSpriteRenderer = false;
+
+			ImGui::NextColumn();
+
+			if (ImGui::Button("... ###SpriteRendereBtn", buttonSize)) 
+			{
+				ImGui::OpenPopup("SpriteRendererPopUp");
+			}
+			if (ImGui::BeginPopup("SpriteRendererPopUp")) 
+			{
+				if (ImGui::MenuItem("Remove Component")) 
+				{
+					removeSpriteRenderer = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openSpriteRendererComponent) 
+			{
+				auto& spriteRenderer = m_SelectedEntity.GetComponent<SpriteRendererComponent>();
+
+				// ======================= Asset Reference Section =======================
+				ImGui::SeparatorText("Asset References");
+
+				
+			}
+		}
+
+
+	}
+
 	void Editor::addComponents()
 	{
 		// -------------------- Add Transform Component -------------------------
@@ -6456,6 +6502,26 @@ namespace Engine
 			if (!hasAnimatorComponent)
 			{
 				ImGui::SetTooltip("Adds animation playback data (controller, clip index, time) to this object.");
+			}
+		}
+		ImGui::EndDisabled();
+
+		// ------------------------ Add Sprite Renderer Component ----------------------------
+		bool hasSpriteRendererComponent = m_SelectedEntity.HasComponent<SpriteRendererComponent>();
+		ImGui::BeginDisabled(hasSpriteRendererComponent);
+
+		if (ImGui::MenuItem("SpriteRenderer Component")) 
+		{
+			if (!hasSpriteRendererComponent) 
+			{
+				m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+			}
+		}
+		if (ImGui::IsItemHovered()) 
+		{
+			if (!hasSpriteRendererComponent) 
+			{
+				ImGui::SetTooltip("Adds a 2D renderer component to this object. Note: a 2D rendered and 3D rendered object are mutually exclusive!");
 			}
 		}
 		ImGui::EndDisabled();

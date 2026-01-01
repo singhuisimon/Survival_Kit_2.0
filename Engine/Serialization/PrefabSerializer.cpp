@@ -591,6 +591,36 @@ namespace Engine {
             componentsArray.PushBack(componentObj, allocator);
         }
 
+        // Serialize SpriteRendererComponent
+        if (entity.HasComponent<SpriteRendererComponent>())
+        {
+            LOG_TRACE(" - Serializing SpriteRendererComponent");
+            auto& SpriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+            rapidjson::Value componentObj(rapidjson::kObjectType);
+            componentObj.AddMember("Type", "SpriteRendererComponent", allocator);
+
+            rapidjson::Value propertiesObj(rapidjson::kObjectType);
+
+            std::string textureFilename = AM.getNameFromGuid(SpriteRenderer.TextureGuid);
+
+            propertiesObj.AddMember("Texture",
+                rapidjson::Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
+                allocator);
+
+            rapidjson::Value colorArr(rapidjson::kArrayType);
+            colorArr.PushBack(SpriteRenderer.Color.r, allocator);
+            colorArr.PushBack(SpriteRenderer.Color.g, allocator);
+            colorArr.PushBack(SpriteRenderer.Color.b, allocator);
+            colorArr.PushBack(SpriteRenderer.Color.a, allocator);
+
+            propertiesObj.AddMember("Color", colorArr, allocator);
+            propertiesObj.AddMember("Quad", SpriteRenderer.Quad, allocator);
+            propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
+
+            componentObj.AddMember("Properties", propertiesObj, allocator);
+            componentsArray.PushBack(componentObj, allocator);
+        }
+
         doc.AddMember("Components", componentsArray, allocator);
 
         // Convert to string

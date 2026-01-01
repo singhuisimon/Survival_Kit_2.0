@@ -525,6 +525,35 @@ namespace Engine
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
 			}
+			// Serialize SpriteRendererComponent
+			if (entity.HasComponent<SpriteRendererComponent>()) 
+			{
+				LOG_TRACE(" - Serializing SpriteRendererComponent");
+				auto& SpriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+				Value componentObj(kObjectType);
+				componentObj.AddMember("Type", "SpriteRendererComponent", allocator);
+				
+				Value propertiesObj(kObjectType);
+				
+				std::string textureFilename = AM.getNameFromGuid(SpriteRenderer.TextureGuid);
+
+				propertiesObj.AddMember("Texture", 
+					Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator), 
+					allocator);
+
+				Value colorArr(kArrayType);
+				colorArr.PushBack(SpriteRenderer.Color.r, allocator);
+				colorArr.PushBack(SpriteRenderer.Color.g, allocator);
+				colorArr.PushBack(SpriteRenderer.Color.b, allocator);
+				colorArr.PushBack(SpriteRenderer.Color.a, allocator);
+
+				propertiesObj.AddMember("Color", colorArr, allocator);
+				propertiesObj.AddMember("Quad", SpriteRenderer.Quad, allocator);
+				propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
+
+				componentObj.AddMember("Properties", propertiesObj, allocator);
+				componentsArray.PushBack(componentObj, allocator);
+			}
 
 			entityObj.AddMember("Components", componentsArray, allocator);
 			entitiesArray.PushBack(entityObj, allocator);
@@ -1153,6 +1182,38 @@ namespace Engine
 							animator.currentTime = properties["currentTime"].GetFloat();
 						if (properties.HasMember("playbackSpeed"))
 							animator.playbackSpeed = properties["playbackSpeed"].GetFloat();
+					}
+					else if (componentType == "SpriteRendererComponent") 
+					{
+						auto& spriterenderer = entity.AddComponent<SpriteRendererComponent>();
+						 
+						if (properties.HasMember("Texture") && properties["Texture"].IsString()) 
+						{
+							std::string texName = properties["Texture"].GetString();
+							spriterenderer.TextureGuid = AM.getGuidFromName(texName);
+						}
+
+						if (properties.HasMember("Color") && properties["Color"].IsArray()) 
+						{
+							const auto& colorArr = properties["Color"].GetArray();
+							if (colorArr.Size() >= 4)
+							{
+								spriterenderer.Color.r = colorArr[0].GetFloat();
+								spriterenderer.Color.g = colorArr[1].GetFloat();
+								spriterenderer.Color.b = colorArr[2].GetFloat();
+								spriterenderer.Color.a = colorArr[3].GetFloat();
+							}
+						}
+
+						if (properties.HasMember("Quad")) 
+						{
+							spriterenderer.Quad = properties["Quad"].GetUint();
+						}
+
+						if (properties.HasMember("Sprite Layer")) 
+						{
+							spriterenderer.SpriteLayer = properties["Sprite Layer"].GetUint();
+						}
 					}
 				}
 			}
