@@ -74,37 +74,9 @@ namespace Engine
 	class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
 	{
 	public:
-		/*****************************************************************************/
-		/*!
-		\brief      Constructs the interface and prepares the mapping table.
-		*/
-		/*****************************************************************************/
 		BPLayerInterfaceImpl();
-
-		/*****************************************************************************/
-		/*!
-		\brief      Returns the number of BroadPhase layers.
-		\return     BroadPhase layer count.
-		*/
-		/*****************************************************************************/
 		JPH::uint GetNumBroadPhaseLayers() const override;
-
-		/*****************************************************************************/
-		/*!
-		\brief      Maps an object layer to its BroadPhase layer.
-		\param      layer   Object layer value.
-		\return     BroadPhase layer corresponding to the object layer.
-		*/
-		/*****************************************************************************/
 		JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer layer) const override;
-
-		/*****************************************************************************/
-		/*!
-		\brief      Debug name for a BroadPhase layer.
-		\param      layer   BroadPhase layer.
-		\return     Null-terminated C string.
-		*/
-		/*****************************************************************************/
 		const char *GetBroadPhaseLayerName(JPH::BroadPhaseLayer layer) const override;
 
 	private:
@@ -120,14 +92,6 @@ namespace Engine
 	class ObjectLayerPairFilterImpl final : public JPH::ObjectLayerPairFilter
 	{
 	public:
-		/*****************************************************************************/
-		/*!
-		\brief      Returns whether two object layers should collide.
-		\param      a   First object layer.
-		\param      b   Second object layer.
-		\return     True if the pair should collide, false otherwise.
-		*/
-		/*****************************************************************************/
 		bool ShouldCollide(JPH::ObjectLayer a, JPH::ObjectLayer b) const override;
 	};
 
@@ -139,14 +103,6 @@ namespace Engine
 	class ObjectVsBroadPhaseLayerFilterImpl final : public JPH::ObjectVsBroadPhaseLayerFilter
 	{
 	public:
-		/*****************************************************************************/
-		/*!
-		\brief      Returns whether an object layer collides with a BroadPhase layer.
-		\param      layer   Object layer value.
-		\param      broad   BroadPhase layer value.
-		\return     True if the combination should collide.
-		*/
-		/*****************************************************************************/
 		bool ShouldCollide(JPH::ObjectLayer layer, JPH::BroadPhaseLayer broad) const override;
 	};
 
@@ -155,32 +111,17 @@ namespace Engine
 	\brief      Convert GLM vectors and quaternions to Jolt types.
 	*/
 	/*****************************************************************************/
-	inline JPH::Vec3 ToJPHVec3(const glm::vec3 &v)
-	{
-		return JPH::Vec3{ v.x, v.y, v.z };
-	}
-	inline JPH::RVec3 ToJPHRVec3(const glm::vec3 &v)
-	{
-		return JPH::RVec3{ v.x, v.y, v.z };
-	}
-	inline JPH::Quat ToJPHQuat(const glm::quat &q)
-	{
-		return JPH::Quat{ q.x, q.y, q.z, q.w };
-	}
+	inline JPH::Vec3 ToJPHVec3(const glm::vec3 &v) { return JPH::Vec3{ v.x, v.y, v.z }; }
+	inline JPH::RVec3 ToJPHRVec3(const glm::vec3 &v) { return JPH::RVec3{ v.x, v.y, v.z }; }
+	inline JPH::Quat ToJPHQuat(const glm::quat &q) { return JPH::Quat{ q.x, q.y, q.z, q.w }; }
 
 	/*****************************************************************************/
 	/*!
 	\brief      Convert Jolt vectors and quaternions to GLM types.
 	*/
 	/*****************************************************************************/
-	inline glm::vec3 ToGLM(const JPH::Vec3 &v)
-	{
-		return glm::vec3{ v.GetX(), v.GetY(), v.GetZ() };
-	}
-	inline glm::quat ToGLM(const JPH::Quat &q)
-	{
-		return glm::quat{ q.GetW(), q.GetX(), q.GetY(), q.GetZ() };
-	}
+	inline glm::vec3 ToGLM(const JPH::Vec3 &v) { return glm::vec3{ v.GetX(), v.GetY(), v.GetZ() }; }
+	inline glm::quat ToGLM(const JPH::Quat &q) { return glm::quat{ q.GetW(), q.GetX(), q.GetY(), q.GetZ() }; }
 
 	/*****************************************************************************/
 	/*!
@@ -203,25 +144,10 @@ namespace Engine
 		return glm::degrees(glm::vec3{ (float)roll, (float)pitch, (float)yaw });
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Hook to construct a Jolt shape for an entity.
-	\param      Scene*                Scene pointer.
-	\param      entt::entity          Entity id.
-	\param      TransformComponent&   Transform component.
-	\param      RigidbodyComponent&   Rigidbody component.
-	\return     Jolt shape reference.
-	*/
-	/*****************************************************************************/
 	using MakeEntityShapeFn = std::function<
 		JPH::Ref<JPH::Shape>(Scene *, entt::entity, const TransformComponent &, const RigidbodyComponent &)
 	>;
 
-	/*****************************************************************************/
-	/*!
-	\brief      Mesh data for building triangle or convex shapes.
-	*/
-	/*****************************************************************************/
 	struct MeshBuildInfo
 	{
 		std::vector<glm::vec3>     vertices;
@@ -232,11 +158,6 @@ namespace Engine
 		std::uint64_t              key{};
 	};
 
-	/*****************************************************************************/
-	/*!
-	\brief      Hook to fetch mesh data for an entity. Returns true on success.
-	*/
-	/*****************************************************************************/
 	using FetchMeshInfoFn = std::function<bool(Scene *, entt::entity, MeshBuildInfo &)>;
 
 	// Global Jolt systems and interfaces (owned/managed elsewhere)
@@ -253,27 +174,14 @@ namespace Engine
 	// Entity -> BodyID map
 	extern std::unordered_map<EntityID, JPH::BodyID> mBodyOf;
 
-	/*****************************************************************************/
-	/*!
-	\brief      Cache key for reusable shapes (by source mesh and options).
-	*/
-	/*****************************************************************************/
 	struct CacheKey
 	{
 		std::uint64_t key{};
 		std::uint8_t  kind{};
 		std::uint8_t  ds{};
-		bool operator==(const CacheKey &o) const
-		{
-			return key == o.key && kind == o.kind && ds == o.ds;
-		}
+		bool operator==(const CacheKey &o) const { return key == o.key && kind == o.kind && ds == o.ds; }
 	};
 
-	/*****************************************************************************/
-	/*!
-	\brief      Hash function for CacheKey.
-	*/
-	/*****************************************************************************/
 	struct CacheKeyHash
 	{
 		std::size_t operator()(const CacheKey &k) const
@@ -285,31 +193,46 @@ namespace Engine
 		}
 	};
 
-	// Shape cache shared by the bridge
 	extern std::unordered_map<CacheKey, JPH::Ref<JPH::Shape>, CacheKeyHash> mShapeCache;
 
-	/*****************************************************************************/
-	/*!
-	\brief      Snapshot of properties applied to a body for change tracking.
-	*/
-	/*****************************************************************************/
 	struct AppliedProps
 	{
-		bool        isKinematic{};
-		bool        useGravity{};
-		float       mass{};
+		bool         isKinematic{};
+		bool         useGravity{};
+		float        mass{};
 		std::uint64_t meshKey{};
 		std::uint8_t  shapeKind{};
 		std::uint8_t  shapeDS{};
-		glm::vec3   shapeScale{ 1, 1, 1 };
-		glm::vec3   lastPos{};
-		glm::quat   lastRot{};
+		glm::vec3    shapeScale{ 1, 1, 1 };
+		glm::vec3    lastPos{};
+		glm::quat    lastRot{};
 	};
 
-	// Per-entity applied properties
 	extern std::unordered_map<EntityID, AppliedProps> mApplied;
 
-	// Hooks registered by the engine
 	extern MakeEntityShapeFn mMakeEntityShape;
 	extern FetchMeshInfoFn   mFetchMeshInfo;
+
+	/*****************************************************************************/
+	/*!
+	\brief      Broadphase queries (BVH access for render culling).
+	\details    These helpers query Jolt's broadphase and return EntityIDs
+				via Body user data (BodyCreationSettings::mUserData).
+	*/
+	/*****************************************************************************/
+	void QueryEntitiesInAABB(const glm::vec3 &minWS, const glm::vec3 &maxWS, std::vector<EntityID> &outEntities);
+	void QueryEntitiesInSphere(const glm::vec3 &centerWS, float radius, std::vector<EntityID> &outEntities);
+
+	/*****************************************************************************/
+	/*!
+	\brief      Frustum culling query for render visibility.
+	\param      viewProjWS   World->Clip matrix (typically proj * view).
+	\param      outEntities  Visible entities (cleared by this call).
+	\details    Two-stage:
+				1) Broadphase CollideAABox using frustum's enclosing AABox.
+				2) Plane test against each body's world-space AABox.
+	*/
+	/*****************************************************************************/
+	void QueryEntitiesInFrustum(const glm::mat4 &viewProjWS, std::vector<EntityID> &outEntities);
+
 } // namespace Engine
