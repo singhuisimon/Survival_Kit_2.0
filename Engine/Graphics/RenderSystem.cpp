@@ -4,6 +4,7 @@
 #include "../Component/MeshRendererComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"   
+#include "../Component/SpriteRendererComponent.h"
 #include "Asset/ResourceHelpers.h"
 
 namespace Engine {
@@ -117,6 +118,27 @@ namespace Engine {
 			// Save indirect multiplier
 			L.indirectMultiplier = LgLightComp.IndirectMultiplier;
 			m_lightlist.emplace_back(L);
+		}	
+
+		// Save all 2D items
+		auto spriteView = scene->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
+		for (auto entity : spriteView) 
+		{
+			auto& renderable2d = spriteView.get<SpriteRendererComponent>(entity);
+			auto& r2dtransform = spriteView.get<TransformComponent>(entity);
+
+			m_drawitems.push_back({
+				.m_model_to_world_transform = r2dtransform.WorldTransform,
+				.m_entity_id = static_cast<u32>(entity),
+				.m_submesh_index = 0,
+				.m_default_mesh_handle = renderable2d.Quad,
+				.m_default_material_handle = 0,
+				.m_default_u32texture_handle = 0,
+				.m_color = renderable2d.Color,
+				.m_mesh_guid = 0,
+				.m_material_guid = 0,
+				.m_texture_guid = renderable2d.TextureGuid
+				});
 		}
 		
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());

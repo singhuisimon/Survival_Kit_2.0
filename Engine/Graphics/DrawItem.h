@@ -30,23 +30,27 @@ namespace Engine{
 	 */
 	struct DrawItem
 	{
-		glm::mat4 m_model_to_world_transform;
+		// Transformation matrix that describes rendered object from it's own local coordinates to world coordinates
+		glm::mat4 m_model_to_world_transform; // No default, most be provided
 
 		// Unique entity identifier
-		u32		  m_entity_id; 
+		u32		  m_entity_id = 0;
 
 		// Submesh index for multi-mesh objects
-		u32		  m_submesh_index;
+		u32		  m_submesh_index = 0;
 
 		// Fallback resource handles
-		u32       m_default_mesh_handle;
-		u32       m_default_material_handle;
-		u32       m_default_u32texture_handle;
+		u32       m_default_mesh_handle = 0;
+		u32       m_default_material_handle = 0;
+		u32       m_default_u32texture_handle = 0;
+
+		// Color if the rendered object has self defined colors
+		glm::vec4 m_color = { 0.f, 0.f, 0.f, 1.f };
 
 		// Resource GUIDs
-		xresource::instance_guid m_mesh_guid;
-		xresource::instance_guid m_material_guid;
-		xresource::instance_guid m_texture_guid;
+		xresource::instance_guid m_mesh_guid = 0;
+		xresource::instance_guid m_material_guid = 0;
+		xresource::instance_guid m_texture_guid = 0;
 	};
 
 }

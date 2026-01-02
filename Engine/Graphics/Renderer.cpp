@@ -83,7 +83,6 @@ namespace {
 		std::string fragment_bloom_downsample_path{ Engine::getAssetFilePath("Sources/Shaders/bloom_downsample.frag") };
 		std::string fragment_bloom_upsample_path{ Engine::getAssetFilePath("Sources/Shaders/bloom_upsample.frag") };
 
-
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
