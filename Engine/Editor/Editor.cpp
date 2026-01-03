@@ -11,7 +11,6 @@
 
 // Include Header Files
 #include "Editor.h"
-#include "../Editor/EditorMenu.h"
 #include "../Game/Game.h" 
 
 // Include other necessary 
@@ -74,6 +73,9 @@ namespace Engine
         m_EditorHierarchy->HierarchyPanel();
         
         m_EditorProperty->PropertyPanel();
+
+        m_EditorPerformance->PerformanceProfilePanel(ts);
+
         RenderViewport(texhandle);
 
         CompleteFrame();

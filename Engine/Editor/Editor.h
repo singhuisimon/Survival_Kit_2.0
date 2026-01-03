@@ -33,6 +33,9 @@
 #include "../Editor/EditorMenu.h"
 #include "../Editor/EditorHierarchyPanel.h"
 #include "../Editor/EditorPropertyPanel.h"
+#include "../Editor/EditorPerformancePanel.h"
+#include "../Utility/Timestep.h"
+#include "../Profiler/Profiler.h"
 #include "Graphics/GraphicsLoader.h"
 #include "Graphics/Renderer.h"
 
@@ -46,6 +49,7 @@ namespace Engine
 	class TracyProfiler;
 	class EditorHierarchyPanel;
 	class EditorPropertyPanel;
+	class EditorPerformancePanel;
 
 	/**
 	* @class Editor
@@ -72,6 +76,7 @@ namespace Engine
 		std::unique_ptr<EditorMenu> m_EditorMenu;
 		std::unique_ptr<EditorHierarchyPanel> m_EditorHierarchy;
 		std::unique_ptr<EditorPropertyPanel> m_EditorProperty;
+		std::unique_ptr<EditorPerformancePanel> m_EditorPerformance;
 
 		// gizmo
 		Entity m_SelectedEntity{};
@@ -87,7 +92,7 @@ namespace Engine
 		bool m_HierarchyWindow = true;
 		bool m_PropertyWindow = true;
 		bool m_AnimatorWindow = true;
-		bool m_PerformanceProfileWindow = false;
+		bool m_PerformanceProfileWindow = True;
 
 		std::string m_CurrentScenePath;
 		std::string m_CurrentSceneName; 
@@ -106,6 +111,7 @@ namespace Engine
 			m_EditorMenu = std::make_unique<EditorMenu>(this);
 			m_EditorHierarchy = std::make_unique<EditorHierarchyPanel>(this);
 			m_EditorProperty = std::make_unique<EditorPropertyPanel>(this);
+			m_EditorPerformance = std::make_unique<EditorPerformancePanel>(this);
 		};
 
 		~Editor() = default;
@@ -143,6 +149,8 @@ namespace Engine
 		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
 			m_Profiler = profiler; // still increases refcount, no extra copy on call
 		}
+		std::weak_ptr<TracyProfiler> GetProfiler() const { return m_Profiler; }
+
 		void RetrievePickedID(u32 id) { m_PickedID = id; }
 		u32 GetPickedID() { return m_PickedID; }
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
