@@ -30,7 +30,7 @@ namespace Engine {
 		SpriteRendererComponent()
 			: TextureGuid(0),
 			  Color(1.0f, 1.0f, 1.0f, 1.0f),
-			  Quad(0),
+			  Quad(3),
 			  SpriteLayer(0) { }
 	};
 
