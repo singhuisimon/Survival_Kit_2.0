@@ -33,11 +33,10 @@ namespace Engine
 		std::vector<Entity> entitiesToDelete;
 		std::vector<Entity> parentlessChildren;
 
-		Entity m_SelectedEntity {};
+	
 		Entity entityToAttach = Entity();
 		Entity parentOfPrefabEntity = Entity();
 
-		u32 m_PickedID = 0xFFFFFFFFu;
 
 	public:
 		EditorHierarchyPanel(Editor* editor) : m_Editor(editor) {};

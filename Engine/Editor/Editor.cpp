@@ -109,6 +109,10 @@ namespace Engine
         }
 
         ImGui::Begin("Viewport");
+
+
+        //ImGui::SetWindowFocus();
+
         if (texhandle)
         {
             ImVec2 imagePos = ImGui::GetCursorScreenPos();
@@ -129,18 +133,27 @@ namespace Engine
                 tl_client = tl_screen;
             }
 
-            // Save editor viewport data for OBJECT PICKING (client coordinates)
+            // Save editor viewport data for OBJECT PICKING
             editorViewportData.tl = tl_client;
             editorViewportData.size = viewportSize;
 
-            // Sync with renderer using the existing getEditorViewport() method
+            // Sync with renderer 
             if (m_Renderer)
             {
                 m_Renderer->getEditorViewport() = editorViewportData;
             }
-            ImGui::End();
-        
+
+            // ==================== GIZMO INTEGRATION ====================
+            m_ImGuizmoViewportData.tl = tl_screen;
+            m_ImGuizmoViewportData.size = actualSize;
+
+
+            if (m_Renderer && m_Renderer->getEditorCamToggle())
+            {
+                HandleGizmoPicked();
+            }
         }
+        ImGui::End();
     }
 
     void Editor::CompleteFrame()
@@ -265,6 +278,170 @@ namespace Engine
         SetScenePath(finalPath);
 
         LOG_INFO("Scene saved to: ", finalPath);
+    }
+
+    void Editor::HandleGizmoPicked()
+    {
+        std::cout << "\n=== FRAME START ===" << std::endl;
+        std::cout << "m_PickedID: " << m_PickedID << std::endl;
+        std::cout << "m_SelectedEntity: " << m_PickedID << std::endl;
+        std::cout << "m_SelectedEntity valid: " << (uint32_t)m_SelectedEntity.GetHandle() << std::endl;
+        std::cout << "ImGuizmo::IsUsing(): " << ImGuizmo::IsUsing() << std::endl;
+        std::cout << "ImGuizmo::IsOver(): " << ImGuizmo::IsOver() << std::endl; // ADD THIS
+
+        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            std::cout << "CLICK DETECTED!" << std::endl;
+
+            bool gizmoUsing = ImGuizmo::IsUsing();
+            bool gizmoOver = ImGuizmo::IsOver();
+
+            // force selection regardless of ImGuizmo state
+            if (!m_SelectedEntity || (!gizmoUsing && !gizmoOver))
+            {
+                if (m_PickedID != 0xFFFFFFFFu && m_ActiveScene)
+                {
+                    m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_ActiveScene->GetRegistry() };
+                    SetCurrSelectedEntity(m_SelectedEntity);
+                    //m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+                }
+                else
+                {
+                    m_SelectedEntity = Entity{};
+                    SetCurrSelectedEntity(m_SelectedEntity);
+                    std::cout << "[GIZMO] Deselected" << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "[GIZMO] Selection blocked - currently interacting with gizmo" << std::endl;
+            }
+        }
+
+        if (m_SelectedEntity)
+        {
+            ManipulateEntityTransform(m_SelectedEntity);
+        }
+
+        // Handle right-click context menu for gizmo operations
+        if (ImGui::BeginPopupContextWindow("GizmoContextMenu", ImGuiPopupFlags_MouseButtonRight))
+        {
+            if (ImGui::MenuItem("Move", "W"))
+                m_Operation = ImGuizmo::TRANSLATE;
+            if (ImGui::MenuItem("Rotate", "E"))
+                m_Operation = ImGuizmo::ROTATE;
+            if (ImGui::MenuItem("Scale", "R"))
+                m_Operation = ImGuizmo::SCALE;
+            ImGui::Separator();
+            if (ImGui::MenuItem("Disable", "Q"))
+                m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+            ImGui::EndPopup();
+        }
+
+        // Handle gizmo manipulation for selected entity
+        if (ImGui::IsWindowFocused())
+        {
+            if (ImGui::IsKeyPressed(ImGuiKey_W))
+            {
+                m_Operation = ImGuizmo::TRANSLATE;
+                std::cout << "GIZMO: TRANSLATE mode activated" << std::endl;
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_E))
+            {
+                m_Operation = ImGuizmo::ROTATE;
+                std::cout << "GIZMO: ROTATE mode activated" << std::endl;
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_R))
+            {
+                m_Operation = ImGuizmo::SCALE;
+                std::cout << "GIZMO: SCALE mode activated" << std::endl;
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_Q))
+            {
+                m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+                std::cout << "GIZMO: DISABLED" << std::endl;
+            }
+        }
+
+        std::cout << "=== FRAME END ===\n" << std::endl;
+    }
+
+    void Editor::ManipulateEntityTransform(Entity& entity)
+    {
+        if (!entity || !m_Renderer || !entity.HasComponent<TransformComponent>()) return;
+
+        // Get the camera
+        Camera3D& camera = m_Renderer->getEditorCamera();
+
+        // Get the transform component
+        auto& tc = entity.GetComponent<TransformComponent>();
+
+        // Build transform matrix from position, rotation, and scale
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Position);
+        transform = transform * glm::mat4_cast(tc.Rotation);
+        transform = glm::scale(transform, tc.Scale);
+
+        // Set up ImGuizmo
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+
+        // Use the stored viewport coordinates
+        float x = m_ImGuizmoViewportData.tl.x;
+        float y = m_ImGuizmoViewportData.tl.y;
+        float width = m_ImGuizmoViewportData.size.x;
+        float height = m_ImGuizmoViewportData.size.y;
+        ImGuizmo::SetRect(x, y, width, height);
+
+        // Get camera matrices
+        float aspect_ratio = (height > 0) ? (width / height) : 1.0f;
+        glm::mat4 view = camera.getLookAt();
+        glm::mat4 proj = camera.getPerspective(aspect_ratio);
+
+        // Only manipulate if an operation is selected
+        if (m_Operation != (ImGuizmo::OPERATION)-1)
+        {
+            // Perform the manipulation
+            ImGuizmo::Manipulate(
+                glm::value_ptr(view),
+                glm::value_ptr(proj),
+                m_Operation,
+                ImGuizmo::WORLD,
+                glm::value_ptr(transform)
+            );
+
+            // Apply the changes if the gizmo is being used
+            if (ImGuizmo::IsUsing())
+            {
+                if (m_Operation == ImGuizmo::TRANSLATE)
+                {
+                    // Extract and set new position
+                    glm::vec3 newPosition = glm::vec3(transform[3]);
+                    tc.SetPosition(newPosition);
+                }
+                else if (m_Operation == ImGuizmo::ROTATE)
+                {
+                    // Extract rotation matrix and convert to quaternion
+                    glm::mat3 rotationMatrix;
+                    rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
+                    rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
+                    rotationMatrix[2] = glm::normalize(glm::vec3(transform[2]));
+
+                    glm::quat newRotation = glm::quat_cast(rotationMatrix);
+                    tc.Rotation = newRotation;
+                    tc.IsDirty = true;
+                }
+                else if (m_Operation == ImGuizmo::SCALE)
+                {
+                    // Extract scale from matrix columns
+                    glm::vec3 newScale;
+                    newScale.x = glm::length(glm::vec3(transform[0]));
+                    newScale.y = glm::length(glm::vec3(transform[1]));
+                    newScale.z = glm::length(glm::vec3(transform[2]));
+
+                    tc.SetScale(newScale);
+                }
+            }
+        }
     }
 }
 

@@ -86,13 +86,15 @@ namespace Engine
 		EditorViewport editorViewportData;
 		EditorViewport m_ImGuizmoViewportData;
 
+		ImGuizmo::OPERATION m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+
 		// OnInit
 		bool m_Initialized = false;
 
 		bool m_HierarchyWindow = true;
 		bool m_PropertyWindow = true;
 		bool m_AnimatorWindow = true;
-		bool m_PerformanceProfileWindow = True;
+		bool m_PerformanceProfileWindow = true;
 
 		std::string m_CurrentScenePath;
 		std::string m_CurrentSceneName; 
@@ -155,6 +157,8 @@ namespace Engine
 		u32 GetPickedID() { return m_PickedID; }
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
+		void HandleGizmoPicked();
+		void ManipulateEntityTransform(Entity& entity);
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 

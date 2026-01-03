@@ -38,10 +38,8 @@ namespace Engine
 					newEntity.AddComponent<TagComponent>("New Entity");
 					newEntity.AddComponent<TransformComponent>();
 
-					m_SelectedEntity = newEntity;
-					m_PickedID = static_cast<uint32_t>(newEntity.GetHandle());
-					m_Editor->SetCurrSelectedEntity(m_SelectedEntity);
-					m_Editor->RetrievePickedID(m_PickedID);
+					m_Editor->SetCurrSelectedEntity(newEntity);
+					m_Editor->RetrievePickedID(static_cast<uint32_t>(newEntity.GetHandle()));
 				}
 				
 			}
@@ -135,11 +133,11 @@ namespace Engine
 
 	void EditorHierarchyPanel::DrawEntityTree(Entity& entity)
 	{
+		Entity currentSelectedEntity = m_Editor->GetSelectedEntity();
+		u32 currentPickedID = m_Editor->GetPickedID();
+
 		Scene* m_Scene = m_Editor->GetActiveScene();
 		if (!m_Scene) return;
-
-		u32 currentPickedID = m_Editor->GetPickedID();
-		Entity currentSelectedEntity = m_Editor->GetSelectedEntity();
 
 		// validate entity before accessing compon 
 		auto& registry = m_Scene->GetRegistry();
@@ -165,7 +163,7 @@ namespace Engine
 			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 		}
 
-		if (m_SelectedEntity == entity)
+		if (currentSelectedEntity == entity)
 		{
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
@@ -174,16 +172,15 @@ namespace Engine
 
 		if (ImGui::IsItemClicked())
 		{
-			entt::entity entityHandle = entity.GetHandle();
-			m_SelectedEntity = entity;
-			m_PickedID = static_cast<u32>(entityHandle);
 
-			m_Editor->SetCurrSelectedEntity(m_SelectedEntity);
-			m_Editor->RetrievePickedID(m_PickedID);
+			//entt::entity entityHandle = entity.GetHandle();
+
+			m_Editor->SetCurrSelectedEntity(entity);
+			m_Editor->RetrievePickedID(static_cast<u32>(entity.GetHandle()));
 
 			LOG_DEBUG("Selected entity: ", tag.Tag.c_str());
 			LOG_DEBUG("new currSelectedEntity: ", static_cast<uint32_t>(m_Editor->GetSelectedEntity().GetHandle()));
-			LOG_DEBUG("NEW m_PickedID: ", m_PickedID);
+			//LOG_DEBUG("NEW m_PickedID: ", m_PickedID);
 			LOG_DEBUG("Editor's picked ID: ", m_Editor->GetPickedID());
 		}
 
@@ -194,12 +191,10 @@ namespace Engine
 			{
 				entitiesToDelete.push_back(entity);
 
-				if (m_SelectedEntity == entity)
+				if (currentSelectedEntity == entity)
 				{
-					m_SelectedEntity = Entity();
-					m_PickedID = 0xFFFFFFFFu;
-					m_Editor->SetCurrSelectedEntity(m_SelectedEntity);
-					m_Editor->RetrievePickedID(m_PickedID);
+					m_Editor->SetCurrSelectedEntity(Entity{});
+					m_Editor->RetrievePickedID(0xFFFFFFFFu);
 
 				}
 
@@ -219,8 +214,8 @@ namespace Engine
 							Entity childEntity(static_cast<entt::entity>(childID), &m_Scene->GetRegistry());
 							if (currentSelectedEntity == childEntity)
 							{
-								currentSelectedEntity = Entity();
-								currentPickedID = 0xFFFFFFFFu;
+								m_Editor->SetCurrSelectedEntity(Entity{});
+								m_Editor->RetrievePickedID(0xFFFFFFFFu);
 							}
 							entitiesToDelete.push_back(childEntity);
 						}
