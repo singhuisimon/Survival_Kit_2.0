@@ -34,6 +34,7 @@ namespace Engine {
 			
 			m_drawitems.push_back({
 					.m_model_to_world_transform = transform.WorldTransform,
+					.m_drawitem_type = DrawItemType::MESH3D,
 					.m_entity_id = static_cast<u32>(entity),
 					.m_submesh_index = renderable.SubmeshIndex,
 					.m_default_mesh_handle = renderable.MeshType,
@@ -74,6 +75,7 @@ namespace Engine {
 					// Capture particle information
 					m_drawitems.push_back({
 						.m_model_to_world_transform = particle.Transform,
+						.m_drawitem_type = DrawItemType::Particle,
 						.m_entity_id = u32_max, // Particles are not associated with an entity for rendering purposes
 						.m_submesh_index = 0,
 						.m_default_mesh_handle = emitter.ParticleType,
@@ -129,6 +131,7 @@ namespace Engine {
 
 			m_drawitems.push_back({
 				.m_model_to_world_transform = r2dtransform.WorldTransform,
+				.m_drawitem_type = DrawItemType::SPRITE2D,
 				.m_entity_id = static_cast<u32>(entity),
 				.m_submesh_index = 0,
 				.m_default_mesh_handle = renderable2d.Quad,

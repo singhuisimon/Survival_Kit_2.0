@@ -729,7 +729,7 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 				prog.setUniform("useNormalMap", false);
 #pragma endregion
-
+			 
 			 // Check for material resource
 			 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			 {
