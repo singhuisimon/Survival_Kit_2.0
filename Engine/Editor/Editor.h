@@ -92,7 +92,7 @@ namespace Engine
 		bool m_HierarchyWindow = true;
 		bool m_PropertyWindow = true;
 		bool m_AnimatorWindow = true;
-		bool m_PerformanceProfileWindow = True;
+		bool m_PerformanceProfileWindow = true;
 
 		std::string m_CurrentScenePath;
 		std::string m_CurrentSceneName; 

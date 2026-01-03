@@ -670,19 +670,22 @@ namespace Engine
 						// Emission Strength
 						if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
 						{
-							material->emissionStrength = std::max(0.0f, material->emissionStrength);
+							// TODO
+							//material->emissionStrength = std::max(0.0f, material->emissionStrength);
 						}
 
 						// Alpha Threshold for alpha testing
 						if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f"))
 						{
-							material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
+							// TODO
+							//material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
 						}
 
 						// Alpha Threshold for ambient occlusion
 						if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f"))
 						{
-							material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
+							// TODO
+							//material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
 						}
 					}
 
@@ -692,9 +695,10 @@ namespace Engine
 						// Tiling
 						if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
 						{
+							// TODO
 							// Prevent zero or negative tiling
-							material->tiling[0] = std::max(0.1f, material->tiling[0]);
-							material->tiling[1] = std::max(0.1f, material->tiling[1]);
+							//material->tiling[0] = std::max(0.1f, material->tiling[0]);
+							//material->tiling[1] = std::max(0.1f, material->tiling[1]);
 						}
 
 						// Offset
