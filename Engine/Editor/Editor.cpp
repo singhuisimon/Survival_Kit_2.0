@@ -173,6 +173,9 @@ namespace Engine
 
     Scene* Editor::CreateNewScene(const std::string& name)
     {
+        SetCurrSelectedEntity(Entity{});
+        RetrievePickedID(0xFFFFFFFFu);
+
         if (!m_Game)
         {
             LOG_ERROR("Editor::CreateNewScene failed: Game is null");

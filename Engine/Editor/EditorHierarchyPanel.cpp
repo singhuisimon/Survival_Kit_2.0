@@ -17,7 +17,7 @@ namespace Engine
 	{
 		//bool& hierarchyWindow = m_Editor->GetHierarchyWindowRef();
 		if (!m_Editor->GetHierarchyWindowRef()) return;
-
+		
 		Scene* m_Scene = m_Editor->GetActiveScene();
 
 		if (ImGui::Begin("Hierarchy", &m_Editor->GetHierarchyWindowRef()))

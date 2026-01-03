@@ -18,6 +18,8 @@ namespace Engine
 				{
 					LOG_INFO("Creating new scene.");
 
+					
+
 					if (m_Editor)
 					{
 						m_NewScenePanel = true;
@@ -135,12 +137,13 @@ namespace Engine
 
 					if (newScene->LoadFromFile(scenesAsset.fullPath))
 					{
+						m_Editor->SetCurrSelectedEntity(Entity{});
+						m_Editor->RetrievePickedID(0xFFFFFFFFu);
+
 						m_Editor->SetActiveScene(newScene);
 						m_Editor->SetScenePath(scenesAsset.fullPath);
 						m_Editor->SetSceneName(newScene->GetName());
 
-						m_Editor->SetCurrSelectedEntity(Entity());
-						m_Editor->RetrievePickedID(0xFFFFFFFFu);
 
 						if (Renderer* renderer = m_Editor->GetRenderer())
 						{

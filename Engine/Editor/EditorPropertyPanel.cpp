@@ -13,7 +13,7 @@ namespace Engine
 	void EditorPropertyPanel::PropertyPanel()
 	{
 		if (!m_Editor->GetPropertyWindowRef()) return;
-
+		std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
 		//Bug - Scene Switching
 		m_Scene = m_Editor->GetActiveScene();
 		m_SelectedEntity = m_Editor->GetSelectedEntity();
