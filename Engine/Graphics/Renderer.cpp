@@ -466,6 +466,20 @@ namespace Engine {
 			.passtype = PassType::FULLSCREEN
 		};
 
+		m_UIPass = {
+			.pass_name = "UI Pass",
+			.fbo_handle = 2,
+			.shdpgm_handle = 5,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.blending = true,
+			.culling = false,
+			.passtype = PassType::FULLSCREEN
+		};
+
 #pragma region MATERIAL_LOAD_TEMP
 		{
 			Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
@@ -674,6 +688,7 @@ namespace Engine {
 		}
 
 		renderFinalPass(m_finalpass);
+		renderUIPass(m_UIPass, draw_items);
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -1067,10 +1082,68 @@ namespace Engine {
 		glDrawElements(m_fullscreen_quad.primitive_type, m_fullscreen_quad.draw_count, m_fullscreen_quad.index_type, nullptr);
 		glBindVertexArray(0);
 
-		
 		prog.programFree();
 		endFrame(pass);
 
+	}
+
+	void Renderer::renderUIPass(RenderPass& pass, std::span<const DrawItem> items) {
+
+		// Update pass viewport if allowed
+		if (pass.auto_aspect) {
+			int vp_w, vp_h;
+			glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
+
+			// Check if viewport needs update
+			if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+				pass.view_port.z = static_cast<float>(vp_w);
+				pass.view_port.w = static_cast<float>(vp_h);
+
+				// Resize FBO (2) for final pass
+				resizeFBO(pass.fbo_handle, vp_w, vp_h);
+
+				// Also update bloom source size (HDR scene size)
+				m_bloomSrcSize = { vp_w, vp_h };
+				resizeBloomMipChain(vp_w, vp_h);
+			}
+		}
+
+		beginFrame(pass);
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
+
+		glm::mat4 ortho = glm::ortho(pass.view_port.x, pass.view_port.z, pass.view_port.w, pass.view_port.y, -1.f, 1.f);
+
+		for (const auto& item : items) {
+
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D) {
+
+				prog.setUniform("u_World2D", item.m_model_to_world_transform);
+				prog.setUniform("u_Ortho", ortho);
+				prog.setUniform("uColor", item.m_color);
+
+				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(item.m_texture_guid))) {
+					glBindTextureUnit(6, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("uHasTexture", true);
+				}
+				else {
+					glBindTextureUnit(6, 0);
+					prog.setUniform("uHasTexture", false);
+				}
+
+				size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+
+				GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+				GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, nullptr);
+				glBindVertexArray(0);
+			}
+		}
+
+		prog.programFree();
+		endFrame(pass);
 	}
 
 	void Renderer::initBloomMipChain(int srcWidth, int srcHeight)

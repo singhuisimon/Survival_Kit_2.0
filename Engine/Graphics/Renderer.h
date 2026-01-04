@@ -193,6 +193,8 @@ namespace Engine {
 
 		void renderFinalPass(RenderPass& pass);
 
+		void renderUIPass(RenderPass& pass, std::span<const DrawItem> items);
+
 		// Helper to build a per-draw light list and upload it (returns count)
 		uint32_t buildAndUploadLightsForDraw(const glm::vec3& objCenter, float objRadius,
 			std::span<const LightCPU> sceneLights);
@@ -268,8 +270,7 @@ namespace Engine {
 		MeshGL m_fullscreen_quad;
 
 		RenderPass m_finalpass;
-
-
+		RenderPass m_UIPass;
 	};
 
 }
