@@ -161,9 +161,6 @@ namespace Engine
 		u32 GetPickedID() { return m_PickedID; }
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
-		void HandleGizmoPicked();
-		void ManipulateEntityTransform(Entity& entity);
-
 		void ViewportClickAndTeleport();
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
