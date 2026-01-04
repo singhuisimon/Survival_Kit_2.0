@@ -34,6 +34,7 @@
 #include "../Editor/EditorHierarchyPanel.h"
 #include "../Editor/EditorPropertyPanel.h"
 #include "../Editor/EditorPerformancePanel.h"
+#include "../Editor/EditorViewportPanel.h"
 #include "../Utility/Timestep.h"
 #include "../Profiler/Profiler.h"
 #include "Graphics/GraphicsLoader.h"
@@ -50,6 +51,7 @@ namespace Engine
 	class EditorHierarchyPanel;
 	class EditorPropertyPanel;
 	class EditorPerformancePanel;
+	class EditorViewportPanel;
 
 	/**
 	* @class Editor
@@ -77,7 +79,7 @@ namespace Engine
 		std::unique_ptr<EditorHierarchyPanel> m_EditorHierarchy;
 		std::unique_ptr<EditorPropertyPanel> m_EditorProperty;
 		std::unique_ptr<EditorPerformancePanel> m_EditorPerformance;
-
+		std::unique_ptr<EditorViewportPanel> m_EditorViewport;
 		// gizmo
 		Entity m_SelectedEntity{};
 		u32 m_PickedID = 0xFFFFFFFFu;
@@ -91,7 +93,6 @@ namespace Engine
 
 		// OnInit
 		bool m_Initialized = false;
-
 		bool m_HierarchyWindow = true;
 		bool m_PropertyWindow = true;
 		bool m_AnimatorWindow = true;
@@ -115,6 +116,8 @@ namespace Engine
 			m_EditorHierarchy = std::make_unique<EditorHierarchyPanel>(this);
 			m_EditorProperty = std::make_unique<EditorPropertyPanel>(this);
 			m_EditorPerformance = std::make_unique<EditorPerformancePanel>(this);
+			m_EditorViewport = std::make_unique<EditorViewportPanel>(this);
+
 		};
 
 		~Editor() = default;

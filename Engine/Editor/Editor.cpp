@@ -155,7 +155,8 @@ namespace Engine
 
             if (m_Renderer && m_Renderer->getEditorCamToggle())
             {
-                HandleGizmoPicked();
+                //HandleGizmoPicked();
+                m_EditorViewport->HandleGizmoPicked(m_ImGuizmoViewportData);
             }
         }
         ImGui::End();
@@ -292,6 +293,7 @@ namespace Engine
         LOG_INFO("Scene saved to: ", finalPath);
     }
 
+#if 0
     void Editor::HandleGizmoPicked()
     {
         static Entity doubleClickCandidate;
@@ -302,7 +304,7 @@ namespace Engine
         if (ImGui::IsItemHovered())
         {
 
-
+            
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
                 if (doubleClickCandidate && doubleClickCandidateID != 0xFFFFFFFFu)
@@ -314,10 +316,10 @@ namespace Engine
             }
             else
             {
-                std::cout << "CLICK DETECTED!" << std::endl;
                 bool gizmoUsing = ImGuizmo::IsUsing();
                 bool gizmoOver = ImGuizmo::IsOver();
-
+                std::cout << "CLICK DETECTED!" << std::endl;
+            
                 // force selection regardless of ImGuizmo state
                 if (!m_SelectedEntity || (!gizmoUsing && !gizmoOver))
                 {
@@ -347,7 +349,8 @@ namespace Engine
      
         if (m_SelectedEntity)
         {
-            ManipulateEntityTransform(m_SelectedEntity);
+            //ManipulateEntityTransform(m_SelectedEntity);
+            m_EditorViewport->ManipulateEntityTransform(m_SelectedEntity, m_ImGuizmoViewportData);
         }
 
         // Handle right-click context menu for gizmo operations
@@ -393,7 +396,6 @@ namespace Engine
 
         //std::cout << "=== FRAME END ===\n" << std::endl;
     }
-
     void Editor::ManipulateEntityTransform(Entity& entity)
     {
         if (!entity || !m_Renderer || !entity.HasComponent<TransformComponent>()) return;
@@ -471,6 +473,7 @@ namespace Engine
             }
         }
     }
+#endif
 #if 0
     void Editor::ViewportClickAndTeleport()
     {
@@ -507,7 +510,6 @@ namespace Engine
         //}
 
     }
-#endif
     void Editor::ViewportClickAndTeleport()
     {
         if (!m_SelectedEntity.HasComponent<TransformComponent>()) return;
@@ -540,5 +542,8 @@ namespace Engine
 
         LOG_DEBUG("Camera focused on entity front at {", newCamPos.x, ", ", newCamPos.y, ", ", newCamPos.z, "}");
     }
+#endif
+
+
 }
 
