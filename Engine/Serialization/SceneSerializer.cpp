@@ -577,7 +577,7 @@ namespace Engine
 	{
 		using namespace rapidjson;
 
-		LOG_TRACE("Parsing JSON...");
+		//LOG_TRACE("Parsing JSON...");
 
 		Document doc;
 		doc.Parse(jsonString.c_str());
@@ -633,7 +633,7 @@ namespace Engine
 			if (entityObj.HasMember("ID"))
 			{
 				entityId = static_cast<entt::entity>(entityObj["ID"].GetUint());
-				LOG_TRACE("Restoring entity with ID: ", (uint32_t)entityId);
+				//LOG_TRACE("Restoring entity with ID: ", (uint32_t)entityId);
 			}
 
 			// Create entity
@@ -642,7 +642,7 @@ namespace Engine
 			{
 				// Create entity with specific ID to preserve it across saves
 				entity = Entity(registry.create(entityId), &registry);
-				LOG_TRACE("Created entity '", entityName, "' with preserved ID: ", (uint32_t)entity);
+				//LOG_TRACE("Created entity '", entityName, "' with preserved ID: ", (uint32_t)entity);
 			}
 			else
 			{
@@ -1185,6 +1185,7 @@ namespace Engine
 		else {
 			LOG_ERROR("No settings array in scene file");
 			return false;
+			//LOG_WARNING("Settings exists but is not an array, using defaults");
 		}
 
 		LOG_INFO("Scene deserialized successfully");

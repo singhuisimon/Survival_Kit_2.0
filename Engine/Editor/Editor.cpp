@@ -173,8 +173,11 @@ namespace Engine
 
     Scene* Editor::CreateNewScene(const std::string& name)
     {
+        std::cout << "=== CreateNewScene called ===" << std::endl;
+        std::cout << "Before clearing - m_CurrentScenePath: " << m_CurrentScenePath << std::endl;
         SetCurrSelectedEntity(Entity{});
         RetrievePickedID(0xFFFFFFFFu);
+        std::cout << "After clearing selection" << std::endl;
 
         if (!m_Game)
         {
@@ -188,9 +191,10 @@ namespace Engine
             LOG_ERROR("Editor::CreateNewScene failed: Scene creation failed");
             return nullptr;
         }
-        
+       
         SetActiveScene(newScene);
-        
+        std::cout << "After clearing - m_CurrentScenePath: " << m_CurrentScenePath << std::endl;
+        std::cout << "=== CreateNewScene End ===" << std::endl;
         return newScene;
     }
 
@@ -285,12 +289,12 @@ namespace Engine
 
     void Editor::HandleGizmoPicked()
     {
-        std::cout << "\n=== FRAME START ===" << std::endl;
-        std::cout << "m_PickedID: " << m_PickedID << std::endl;
-        std::cout << "m_SelectedEntity: " << m_PickedID << std::endl;
-        std::cout << "m_SelectedEntity valid: " << (uint32_t)m_SelectedEntity.GetHandle() << std::endl;
-        std::cout << "ImGuizmo::IsUsing(): " << ImGuizmo::IsUsing() << std::endl;
-        std::cout << "ImGuizmo::IsOver(): " << ImGuizmo::IsOver() << std::endl; // ADD THIS
+        //std::cout << "\n=== FRAME START ===" << std::endl;
+        //std::cout << "m_PickedID: " << m_PickedID << std::endl;
+        //std::cout << "m_SelectedEntity: " << m_PickedID << std::endl;
+        //std::cout << "m_SelectedEntity valid: " << (uint32_t)m_SelectedEntity.GetHandle() << std::endl;
+        //std::cout << "ImGuizmo::IsUsing(): " << ImGuizmo::IsUsing() << std::endl;
+        //std::cout << "ImGuizmo::IsOver(): " << ImGuizmo::IsOver() << std::endl; // ADD THIS
 
         if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
@@ -366,7 +370,7 @@ namespace Engine
             }
         }
 
-        std::cout << "=== FRAME END ===\n" << std::endl;
+        //std::cout << "=== FRAME END ===\n" << std::endl;
     }
 
     void Editor::ManipulateEntityTransform(Entity& entity)
