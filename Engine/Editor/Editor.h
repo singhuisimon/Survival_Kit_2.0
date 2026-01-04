@@ -81,6 +81,7 @@ namespace Engine
 		// gizmo
 		Entity m_SelectedEntity{};
 		u32 m_PickedID = 0xFFFFFFFFu;
+		
 
 		// Editor Viewport 
 		EditorViewport editorViewportData;
@@ -159,6 +160,8 @@ namespace Engine
 
 		void HandleGizmoPicked();
 		void ManipulateEntityTransform(Entity& entity);
+
+		void ViewportClickAndTeleport();
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 

@@ -12,10 +12,15 @@
 // Include Header Files
 #include "Editor.h"
 #include "../Game/Game.h" 
+#include "../Component/MeshRendererComponent.h"
+#include "../Component/TransformComponent.h"
+#include "../Graphics/Renderer.h"
 
 // Include other necessary 
 #include <GLFW/glfw3.h>
 #include <cctype>
+#include <ImGuizmo.h>
+
 
 namespace Engine
 {
@@ -71,7 +76,7 @@ namespace Engine
         m_EditorMenu->EditorTopMenu();
 
         m_EditorHierarchy->HierarchyPanel();
-        
+
         m_EditorProperty->PropertyPanel();
 
         m_EditorPerformance->PerformanceProfilePanel(ts);
@@ -191,7 +196,7 @@ namespace Engine
             LOG_ERROR("Editor::CreateNewScene failed: Scene creation failed");
             return nullptr;
         }
-       
+
         SetActiveScene(newScene);
         std::cout << "After clearing - m_CurrentScenePath: " << m_CurrentScenePath << std::endl;
         std::cout << "=== CreateNewScene End ===" << std::endl;
@@ -231,7 +236,7 @@ namespace Engine
         if (!m_CurrentScenePath.empty())
         {
             std::filesystem::path p(m_CurrentScenePath);
-            return p.stem().string();  
+            return p.stem().string();
         }
 
         // Default
@@ -289,42 +294,57 @@ namespace Engine
 
     void Editor::HandleGizmoPicked()
     {
-        //std::cout << "\n=== FRAME START ===" << std::endl;
-        //std::cout << "m_PickedID: " << m_PickedID << std::endl;
-        //std::cout << "m_SelectedEntity: " << m_PickedID << std::endl;
-        //std::cout << "m_SelectedEntity valid: " << (uint32_t)m_SelectedEntity.GetHandle() << std::endl;
-        //std::cout << "ImGuizmo::IsUsing(): " << ImGuizmo::IsUsing() << std::endl;
-        //std::cout << "ImGuizmo::IsOver(): " << ImGuizmo::IsOver() << std::endl; // ADD THIS
+        static Entity doubleClickCandidate;
+        static uint32_t doubleClickCandidateID = 0xFFFFFFFFu;
+        static double lastClickTime = 0.0;
+        static const double DOUBLE_CLICK_TIME = 0.3;
 
-        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        if (ImGui::IsItemHovered())
         {
-            std::cout << "CLICK DETECTED!" << std::endl;
 
-            bool gizmoUsing = ImGuizmo::IsUsing();
-            bool gizmoOver = ImGuizmo::IsOver();
 
-            // force selection regardless of ImGuizmo state
-            if (!m_SelectedEntity || (!gizmoUsing && !gizmoOver))
+            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
-                if (m_PickedID != 0xFFFFFFFFu && m_ActiveScene)
+                if (doubleClickCandidate && doubleClickCandidateID != 0xFFFFFFFFu)
                 {
-                    m_SelectedEntity = Entity{ (entt::entity)m_PickedID, &m_ActiveScene->GetRegistry() };
-                    SetCurrSelectedEntity(m_SelectedEntity);
-                    //m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
-                }
-                else
-                {
-                    m_SelectedEntity = Entity{};
-                    SetCurrSelectedEntity(m_SelectedEntity);
-                    std::cout << "[GIZMO] Deselected" << std::endl;
+                    std::cout << "DOUBLE-CLICK teleport to ID: " << doubleClickCandidateID << "\n";
+                    ViewportClickAndTeleport();
+
                 }
             }
             else
             {
-                std::cout << "[GIZMO] Selection blocked - currently interacting with gizmo" << std::endl;
+                std::cout << "CLICK DETECTED!" << std::endl;
+                bool gizmoUsing = ImGuizmo::IsUsing();
+                bool gizmoOver = ImGuizmo::IsOver();
+
+                // force selection regardless of ImGuizmo state
+                if (!m_SelectedEntity || (!gizmoUsing && !gizmoOver))
+                {
+                    if (m_PickedID != 0xFFFFFFFFu && m_ActiveScene)
+                    {
+                        Entity newEntity = Entity{ (entt::entity)m_PickedID, &m_ActiveScene->GetRegistry() };
+                        m_SelectedEntity = newEntity;
+                        SetCurrSelectedEntity(m_SelectedEntity);
+                        //m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+
+                        doubleClickCandidate = newEntity;
+                        doubleClickCandidateID = m_PickedID;
+
+                    }
+                    else
+                    {
+                        m_SelectedEntity = Entity{};
+                        SetCurrSelectedEntity(m_SelectedEntity);
+                        doubleClickCandidate = Entity{};
+                        doubleClickCandidateID = 0xFFFFFFFFu;
+                        std::cout << "[GIZMO] Deselected" << std::endl;
+                    }
+                }
             }
         }
-
+        
+     
         if (m_SelectedEntity)
         {
             ManipulateEntityTransform(m_SelectedEntity);
@@ -369,6 +389,7 @@ namespace Engine
                 std::cout << "GIZMO: DISABLED" << std::endl;
             }
         }
+        
 
         //std::cout << "=== FRAME END ===\n" << std::endl;
     }
@@ -449,6 +470,75 @@ namespace Engine
                 }
             }
         }
+    }
+#if 0
+    void Editor::ViewportClickAndTeleport()
+    {
+        if (!m_SelectedEntity.HasComponent<TransformComponent>()) return;
+
+        TransformComponent& targetCamPos = m_SelectedEntity.GetComponent<TransformComponent>();
+        Camera3D& editorCam = m_Renderer->getEditorCamera();
+
+        glm::vec3 entityPos = targetCamPos.Position;
+        float offsetDistance = 5.f;
+        if (m_SelectedEntity.HasComponent<MeshRendererComponent>()) {
+            glm::vec3 scale = targetCamPos.Scale;
+            float maxScale = glm::max<float>(glm::max<float>(scale.x, scale.y), scale.z);
+            offsetDistance = maxScale * 1.5f;
+        }
+
+        glm::vec3 cameraPos = editorCam.getCamPos();
+        glm::vec3 cameraTarget = editorCam.getEditorCamTarget();
+
+        glm::vec3 viewDir = cameraTarget - cameraPos;
+        if (glm::dot(viewDir, viewDir) < 1e-8f) {
+
+            viewDir = glm::vec3(0.0f, 0.0f, -1.0f);
+        }
+        else {
+            viewDir = glm::normalize(viewDir);
+        }
+
+        glm::vec3 newCamPos = entityPos - viewDir * offsetDistance;
+
+        editorCam.setEditorCamPosition(newCamPos);
+        editorCam.setEditorCamTarget(entityPos);
+        LOG_DEBUG("Moved to Clicked ID {", newCamPos.x, ", ", newCamPos.y, ", ", newCamPos.z, "}");
+        //}
+
+    }
+#endif
+    void Editor::ViewportClickAndTeleport()
+    {
+        if (!m_SelectedEntity.HasComponent<TransformComponent>()) return;
+
+        TransformComponent& targetTransform = m_SelectedEntity.GetComponent<TransformComponent>();
+        Camera3D& editorCam = m_Renderer->getEditorCamera();
+
+        glm::vec3 entityPos = targetTransform.Position;
+        glm::quat entityRotation = targetTransform.Rotation; // Quaternion
+
+        // Calculate offset distance based on entity size
+        float offsetDistance = 5.0f;
+        if (m_SelectedEntity.HasComponent<MeshRendererComponent>()) {
+            glm::vec3 scale = targetTransform.Scale;
+            float maxScale = glm::max<float>(glm::max<float>(scale.x, scale.y), scale.z);
+
+            float minDistance = 3.0f;
+            float maxDistance = 15.0f;
+            offsetDistance = glm::clamp(maxScale * 1.5f, minDistance, maxDistance);
+        }
+
+        glm::vec3 entityForward = glm::normalize(entityRotation * glm::vec3(0.0f, 0.0f, -1.0f));
+
+        // Position camera in front of entity 
+        glm::vec3 cameraOffset = -entityForward * offsetDistance + glm::vec3(0.0f, offsetDistance * 0.15f, 0.0f);
+        glm::vec3 newCamPos = entityPos + cameraOffset;
+
+        editorCam.setEditorCamPosition(newCamPos);
+        editorCam.setEditorCamTarget(entityPos);
+
+        LOG_DEBUG("Camera focused on entity front at {", newCamPos.x, ", ", newCamPos.y, ", ", newCamPos.z, "}");
     }
 }
 
