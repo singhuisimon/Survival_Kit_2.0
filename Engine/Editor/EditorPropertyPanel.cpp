@@ -4,6 +4,7 @@
 #include "../Asset/AssetManager.h"
 #include "../Asset/ResourceManager.h"
 #include "../Asset/ResourceHelpers.h"
+#include "../BehaviourTree/BehaviourTreeEditor.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Texture.h"
 #include  "../Serialization/MaterialSerializer.h"
@@ -52,9 +53,7 @@ namespace Engine
 				DisplayAudioComponent(dotButtonSize);
 				DisplayReverbZoneComponent(dotButtonSize);
 				DisplayListenerComponent(dotButtonSize);
-
-				//DisplayBTComponent(ImVec2& buttonSize);
-
+				DisplayBTComponent(dotButtonSize);
 				DisplayParticleComponent(dotButtonSize);
 
 				//DisplayScriptComponent(dotButtonSize);
@@ -1196,7 +1195,316 @@ namespace Engine
 		}
 	}
 
-	//void EditorPropertyPanel::DisplayBTComponent(ImVec2& buttonSize)
+	void EditorPropertyPanel::DisplayBTComponent(ImVec2& buttonSize){
+		if (m_SelectedEntity.HasComponent<BehaviourTreeComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool openBTComponent = ImGui::CollapsingHeader("Behaviour Tree Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removeBTComponent = false;
+
+			ImGui::NextColumn();
+
+			if (ImGui::Button("...###BTBtn", buttonSize))
+			{
+				ImGui::OpenPopup("BTPopUp");
+			}
+			if (ImGui::BeginPopup("BTPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeBTComponent = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openBTComponent)
+			{
+				auto& ai_bt = m_SelectedEntity.GetComponent<BehaviourTreeComponent>();
+
+				// Getting BT itself
+				BehaviourTree& treeInstance = *(ai_bt.TreeInstance);
+				if (ai_bt.TreeInstance)
+				{
+					size_t stackDepth = treeInstance.GetStackDepth();
+					auto root = treeInstance.GetRootNode();
+
+					char treeBuffer[256];
+					strncpy_s(treeBuffer, sizeof(treeBuffer), treeInstance.GetName().c_str(), _TRUNCATE);
+					if (ImGui::InputText("Tree", treeBuffer, sizeof(treeBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+					{
+						std::string newName = treeBuffer;
+						newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+						newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+						if (!newName.empty())
+						{
+							treeInstance.SetName(newName);
+							ai_bt.TreeAssetPath = newName + ".json";
+						}
+
+					}
+
+					ImGui::Text("Current Asset Path: %s", ai_bt.TreeAssetPath.c_str());
+					ImGui::Text("Stack Depth: %zu", stackDepth);
+
+					if (root)
+					{
+						ImGui::Text("Current Root: %s [%s]", root->GetName().c_str(), root->GetTypeName());
+						DrawBTNodeEditor(root);
+					}
+					else
+					{
+						ImGui::TextDisabled("No root node.");
+						if (ImGui::Button("Create Root Node"))
+						{
+							auto rootNode = BehaviourTreeEditor::CreateNode("Selector");
+							treeInstance.SetRootNode(rootNode);
+						}
+					}
+
+					// --- Set Root Node ---
+					ImGui::Separator();
+					ImGui::Text("Root Node:");
+
+					static int rootNodeTypeIndex = 0;
+					auto allTypes = BehaviourTreeEditor::GetNodeTypesByCategory("Composite");
+					ImGui::SetNextItemWidth(200.0f);
+					if (ImGui::Combo("Node Type##Root", &rootNodeTypeIndex,
+						[](void* data, int idx, const char** outText) -> bool
+						{
+							auto& types = *static_cast<std::vector<std::string>*>(data);
+							*outText = types[idx].c_str();
+							return true;
+						},
+						static_cast<void*>(&allTypes), (int)allTypes.size()))
+					{
+						;
+					}
+
+					// Button to create/set the root node
+					if (ImGui::Button("Set Root Node"))
+					{
+						auto newRoot = BehaviourTreeEditor::CreateNode(allTypes[rootNodeTypeIndex]);
+						treeInstance.SetRootNode(newRoot);
+					}
+
+					ImGui::Separator();
+
+					// Reset the tree to initial state
+					if (ImGui::Button("Reset"))
+					{
+						ai_bt.Reset();
+					}
+
+					ImGui::BeginDisabled();
+
+					// Last execution status
+					BTStatus& lastStatus = ai_bt.LastStatus;
+					std::string lastStatusString{};
+					if (lastStatus == BTStatus::Success)
+					{
+						lastStatusString = "Success";
+					}
+					else if (lastStatus == BTStatus::Failure)
+					{
+						lastStatusString = "Failure";
+					}
+					else
+					{
+						lastStatusString = "Running";
+					}
+					ImGui::Text("Execution Status: %s", lastStatusString.c_str());
+
+					ImGui::EndDisabled();
+
+					// Whether tree executes every frame
+					bool& active = ai_bt.Active;
+					if (ImGui::Checkbox("Active###activeBT", &active))
+					{
+						ai_bt.Active = active;
+					}
+
+					// Reset the tree when it completes
+					bool& resetComplete = ai_bt.ResetOnComplete;
+					if (ImGui::Checkbox("Reset On Complete", &resetComplete))
+					{
+						ai_bt.ResetOnComplete = resetComplete;
+					}
+
+					// Reference to current asset path
+					std::string& treeAssetPath = ai_bt.TreeAssetPath;
+
+					// Find BT folder
+
+					std::filesystem::path repoRoot = getRepository();
+					std::filesystem::path btPath = repoRoot / "Resources" / "Sources";
+
+					auto folders = m_Editor->getAssetsInFolder(btPath.string());
+					std::string btFolderPath;
+					for (auto& folder : folders)
+					{
+						if (folder.name == "BT")
+						{
+							btFolderPath = folder.fullPath;
+							break;
+						}
+					}
+
+					// Collect all JSON assets in BT folder
+					std::vector<Editor::AssetEntry> btAssets;
+					if (!btFolderPath.empty())
+					{
+						auto files = m_Editor->getAssetsInFolder(btFolderPath);
+						for (auto& f : files)
+						{
+							if (f.name.size() >= 5 && f.name.substr(f.name.size() - 5) == ".json")
+								btAssets.push_back(f);
+						}
+					}
+
+					// Determine current selection index
+					int currentIndex = 0;
+					for (size_t i = 0; i < btAssets.size(); ++i)
+					{
+						if (btAssets[i].name == treeAssetPath)
+						{
+							currentIndex = (int)i;
+							break;
+						}
+					}
+
+					// Draw the combo box
+					ImGui::Text("Choose Tree Asset Path:");
+					ImGui::SetNextItemWidth(400.0f);
+					if (ImGui::Combo("##TreeAssetPath", &currentIndex,
+						[](void* data, int idx, const char** outText) -> bool
+						{
+							auto& assets = *static_cast<std::vector<Editor::AssetEntry>*>(data);
+							*outText = assets[idx].name.c_str();
+
+							return true;
+						},
+						static_cast<void*>(&btAssets), (int)btAssets.size()))
+					{
+						if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+						{
+							treeAssetPath = btAssets[currentIndex].name;
+						}
+					}
+
+					if (ImGui::Button("Load Tree"))
+					{
+						if (currentIndex >= 0 && currentIndex < (int)btAssets.size())
+						{
+							std::string chosenPath = btAssets[currentIndex].name;
+							ai_bt.TreeInstance = BehaviourTreeEditor::LoadTree(chosenPath);
+						}
+					}
+
+					if (ImGui::Button("Save Tree"))
+					{
+						BehaviourTreeEditor::SaveTree(treeInstance, ai_bt.TreeAssetPath);
+					}
+
+					static char changeNewNameBuffer[256] = "";
+					static char saveNewFileName[256] = "";  // Changed from saveNewTreePath - clearer naming
+					static char saveNewTreeName[256] = "";
+
+					if (ImGui::Button("Rename Tree File"))
+					{
+						strncpy_s(changeNewNameBuffer, sizeof(changeNewNameBuffer), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
+						ImGui::OpenPopup("TreeRename Panel");
+					}
+
+					if (ImGui::Button("Save Tree File As"))
+					{
+						strncpy_s(saveNewFileName, sizeof(saveNewFileName), ai_bt.TreeAssetPath.c_str(), _TRUNCATE);
+						strncpy_s(saveNewTreeName, sizeof(saveNewTreeName), treeInstance.GetName().c_str(), _TRUNCATE);
+						ImGui::OpenPopup("SaveTreeRename Panel");
+					}
+
+					// Rename Tree Panel
+					if (ImGui::BeginPopupModal("TreeRename Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ImGui::Text("Current file: %s", ai_bt.TreeAssetPath.c_str());
+						ImGui::Separator();
+
+						ImGui::Text("Enter file name ('.json' will be added automatically):");
+						ImGui::InputText("New Tree Filename", changeNewNameBuffer, sizeof(changeNewNameBuffer));
+
+						if (ImGui::Button("Rename File", ImVec2(120, 0)))
+						{
+							std::string newFileName = changeNewNameBuffer;
+							if (!newFileName.empty())
+							{
+								std::string saveTreeName = newFileName + ".json";
+								BehaviourTreeEditor::RenameFile(ai_bt.TreeAssetPath, saveTreeName, m_Scene);
+								ImGui::CloseCurrentPopup();
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Cancel###RenameCancel", ImVec2(120, 0)))
+						{  // Fixed ID
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+
+					// Save As Panel
+					if (ImGui::BeginPopupModal("SaveTreeRename Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ImGui::Text("Save tree as new file");
+						ImGui::Separator();
+
+						ImGui::Text("Current Asset Path: %s", ai_bt.TreeAssetPath.c_str());
+						ImGui::Text("Enter file name ('.json' will be added automatically):");
+						ImGui::InputText("New Filename", saveNewFileName, sizeof(saveNewFileName));
+						ImGui::InputText("New Tree Name", saveNewTreeName, sizeof(saveNewTreeName));
+
+						if (ImGui::Button("Save As Tree File", ImVec2(120, 0)))
+						{
+							std::string newSaveFileName = saveNewFileName;
+							std::string newSaveTreeName = saveNewTreeName;
+							if (!newSaveFileName.empty() && !newSaveTreeName.empty())
+							{
+								std::string saveFileName = newSaveFileName + ".json";
+								BehaviourTreeEditor::SaveAs(ai_bt.TreeAssetPath, saveFileName, newSaveTreeName, true);
+								ImGui::CloseCurrentPopup();
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Cancel###SaveAsCancel", ImVec2(120, 0)))
+						{  // Fixed ID
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+
+				}
+				else
+				{
+					ai_bt.TreeInstance = BehaviourTreeEditor::CreateNewTree("PlaceholderTreeName");
+				}
+
+			}
+			// ----------------------------------- Remove BT Component -----------------------
+			if (removeBTComponent)
+			{
+				m_SelectedEntity.RemoveComponent<BehaviourTreeComponent>();
+			}
+		}
+	}
 
 	void EditorPropertyPanel::DisplayParticleComponent(ImVec2& buttonSize){
 		if (m_SelectedEntity.HasComponent<ParticleComponent>())
@@ -1857,5 +2165,226 @@ namespace Engine
 			return "Sphere";
 		}
 		return "Unknown";
+	}
+
+	void EditorPropertyPanel::ReplaceChildNode(std::shared_ptr<BTNode> parent,
+		std::shared_ptr<BTNode> oldChild,
+		std::shared_ptr<BTNode> newChild)
+	{
+		auto& children = parent->GetChildren();
+		for (size_t i = 0; i < children.size(); ++i)
+		{
+			if (children[i] == oldChild)
+			{
+				// Replaces old child node with new child
+				children[i] = newChild;
+				break;
+			}
+		}
+	}
+
+	void EditorPropertyPanel::DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent)
+	{
+		if (!node) return;
+
+		// Unique label for ImGui to avoid ID collisions
+		std::string labelID = node->GetName() + "##" + std::to_string(reinterpret_cast<uintptr_t>(node.get()));
+
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		if (!node->GetChildren().empty()) {
+			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+		}
+		bool nodeOpen = ImGui::TreeNodeEx(labelID.c_str(), flags, "%s [%s]", node->GetName().c_str(), node->GetTypeName());
+
+		// --- Right-click context menu ---
+		if (ImGui::BeginPopupContextItem())
+		{
+			static int selectedType = 0;
+			static bool addChild = false;
+
+			// Add Child 
+			if (node->CanHaveChildren()) {
+				// Show Add Child submenu
+				if (ImGui::BeginMenu("Add Child"))
+				{
+					auto allTypes = BehaviourTreeEditor::GetAllNodeTypes();
+
+					ImGui::Text("Select Node Type:");
+					ImGui::Separator();
+
+					for (int i = 0; i < (int)allTypes.size(); ++i)
+					{
+						bool isSelected = (selectedType == i);
+						if (ImGui::Selectable(allTypes[i].c_str(), isSelected))
+						{
+							selectedType = i;
+							addChild = true;
+						}
+						if (isSelected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+
+					ImGui::EndMenu();
+				}
+
+				if (addChild)
+				{
+					addChild = false;
+					auto allTypes = BehaviourTreeEditor::GetAllNodeTypes();
+					auto newChild = BehaviourTreeEditor::CreateNode(allTypes[selectedType]);
+					BehaviourTreeEditor::AddChildNode(node, newChild);
+				}
+			}
+
+			// If not a root node
+			if (parent)
+			{
+				if (ImGui::MenuItem("Remove Node"))
+				{
+					// Leaf node that's child of decorator cannot delete without deleting decorator
+					BehaviourTreeEditor::RemoveChildNode(parent, node);
+					ImGui::EndPopup();
+
+					// If opened, pop tree node before returning
+					if (nodeOpen) {
+						ImGui::TreePop();
+					}
+
+					return;
+				}
+			}
+
+			ImGui::EndPopup();
+		}
+
+		// --- Node Editing ---
+		if (nodeOpen)
+		{
+			// Node name
+			char nameBuffer[128];
+			strncpy_s(nameBuffer, node->GetName().c_str(), _TRUNCATE);
+			if (ImGui::InputText(("Name##" + labelID).c_str(), nameBuffer, IM_ARRAYSIZE(nameBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				std::string newName = nameBuffer;
+				newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+				newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+				if (!newName.empty()) {
+					node->SetName(nameBuffer);
+				}
+
+			}
+
+			std::vector<std::string> allTypes = BehaviourTreeEditor::GetAllNodeTypes();
+			//Get current index of node type
+			int currentTypeIndex = 0;
+			for (size_t i = 0; i < allTypes.size(); ++i)
+			{
+				if (allTypes[i] == node->GetTypeName())
+				{
+					currentTypeIndex = (int)i;
+					break;
+				}
+			}
+
+			// Node type selector
+			if (ImGui::Combo(("Type##" + labelID).c_str(), &currentTypeIndex,
+				[](void* data, int idx, const char** outText) {
+					auto& types = *static_cast<std::vector<std::string>*>(data);
+					*outText = types[idx].c_str();
+					return true;
+				},
+				static_cast<void*>(&allTypes), (int)allTypes.size()))
+			{
+				// Only change the type if its not a root node
+				if (parent)
+				{
+					// Make new node of chosen type
+					auto newNode = BehaviourTreeEditor::CreateNode(allTypes[currentTypeIndex]);
+					newNode->SetName(node->GetName());
+
+					// Transfer children
+					for (auto& child : node->GetChildren()) {
+						newNode->AddChild(child);
+					}
+
+					// Replace node in parent's children list
+					ReplaceChildNode(parent, node, newNode);
+				}
+			}
+
+			std::vector<std::pair<std::string, std::string>> properties;
+			node->GetProperties(properties);
+
+			// Helper lambda function to determine if textbox only handles numeric
+			auto isNumeric = [](const std::string& s) {
+				if (s.empty()) {
+					return false;
+				}
+				bool hasDot = false;
+				bool hasDash = false;
+				for (unsigned char c : s) {
+					if (std::isdigit(c)) {
+						continue;
+					}
+					else if (c == '.') {
+						if (hasDot) {
+							return false;
+						}
+						hasDot = true;
+					}
+					else if (c == '-') {
+						if (hasDash) {
+							return false;
+						}
+						hasDash = true;
+					}
+					else {
+						return false;
+					}
+				}
+				return true;
+				};
+
+			// Node properties
+			for (auto& [name, value] : properties)
+			{
+				bool oldIsNumeric = isNumeric(value);
+
+				char valueBuffer[256];
+				snprintf(valueBuffer, sizeof(valueBuffer), "%s", value.c_str());
+
+				float fullWidth = ImGui::GetContentRegionAvail().x;
+				ImGui::PushItemWidth(fullWidth * 0.5f - ImGui::GetStyle().ItemSpacing.x * 0.5f);
+
+				if (ImGui::InputText(name.c_str(), valueBuffer, sizeof(valueBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+				{
+					std::string newValue = valueBuffer;
+					newValue.erase(newValue.find_last_not_of(" \t\n\r\f\v") + 1);
+					newValue.erase(0, newValue.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newValue.empty()) {
+
+						bool newIsNumeric = isNumeric(newValue);
+
+						if (!(oldIsNumeric && !newIsNumeric))
+						{
+							node->SetProperty(name, newValue);
+						}
+					}
+				}
+
+				ImGui::PopItemWidth();
+			}
+
+			// --- Draw children recursively ---
+			auto children = node->GetChildren();
+			for (auto& child : children)
+			{
+				DrawBTNodeEditor(child, node);
+			}
+			ImGui::TreePop();
+		}
 	}
 }

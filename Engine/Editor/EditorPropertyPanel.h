@@ -42,7 +42,7 @@ namespace Engine
 		void DisplayReverbZoneComponent(ImVec2& buttonSize);
 		void DisplayListenerComponent(ImVec2& buttonSize);
 		
-		//void DisplayBTComponent(ImVec2& buttonSize);
+		void DisplayBTComponent(ImVec2& buttonSize);
 		void DisplayParticleComponent(ImVec2& buttonSize);
 		//void DisplayScriptComponent(ImVec2& buttonSize);
 		
@@ -52,6 +52,10 @@ namespace Engine
 			   
 		void AddComponent();
 		const char* ColliderTypeToString(ColliderType& colliderType);
+		void ReplaceChildNode(std::shared_ptr<BTNode> parent,
+			std::shared_ptr<BTNode> oldChild,
+			std::shared_ptr<BTNode> newChild);
+		void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr);
 	};
 }
 #endif // END OF EDITOR_PROPERTYPANEL_H

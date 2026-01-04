@@ -58,12 +58,6 @@ namespace Engine
 	class Editor
 	{
 	private:
-		// For Getting AssetPath
-		struct AssetEntry
-		{
-			std::string name;
-			std::string fullPath;
-		};
 
 		Scene* m_ActiveScene = nullptr;
 		Renderer* m_Renderer = nullptr;
@@ -100,6 +94,13 @@ namespace Engine
 		std::string m_CurrentSceneName; 
 
 	public:
+
+		// For Getting AssetPath
+		struct AssetEntry
+		{
+			std::string name;
+			std::string fullPath;
+		};
 		
 		Editor(GLFWwindow* window) :
 			m_Window(window),
