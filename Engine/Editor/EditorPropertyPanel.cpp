@@ -7,6 +7,8 @@
 #include "../BehaviourTree/BehaviourTreeEditor.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Texture.h"
+#include "../Scripting/ScriptSerializer.h"
+#include "../Scripting/MonoScriptEngine.h"
 #include  "../Serialization/MaterialSerializer.h"
 
 namespace Engine
@@ -35,7 +37,7 @@ namespace Engine
 
 			if (m_SelectedEntity) { // If entity is selected
 				
-				// Display Tag Component
+				// Tag Component
 				DisplayTagComponent();
 				ImGui::Separator();
 
@@ -43,22 +45,40 @@ namespace Engine
 				ImVec2 dotTextSize = ImGui::CalcTextSize("...");
 				ImVec2 dotButtonSize(dotTextSize.x + 8.0f, dotTextSize.y + 8.0f);
 
-				// Display Prefab Component
+				// Prefab Component
 				//DisplayPrefabComponent(dotButtonSize);
 
-				// Display Transform Component
+				// Transform Component
 				DisplayTransformComponent(dotButtonSize);
+
+				// RigidBody Component - TODO: Check when scene runs
 				DisplayRigidBodyComponent(dotButtonSize);
+
+				// MeshRenderer Component
 				DisplayMeshRendererComponent(dotButtonSize);
+
+				// Audio Component - TODO: Check when scene runs
 				DisplayAudioComponent(dotButtonSize);
+
+				// Reverb Component
 				DisplayReverbZoneComponent(dotButtonSize);
+
+				// Listener Component
 				DisplayListenerComponent(dotButtonSize);
+
+				// BT Component - TODO: Check when scene runs
 				DisplayBTComponent(dotButtonSize);
+
+				// Particle Component - TODO: Check when scene runs
 				DisplayParticleComponent(dotButtonSize);
 
-				//DisplayScriptComponent(dotButtonSize);
+				// Script Component - TODO: Check when scripting is finished
+				DisplayScriptComponent(dotButtonSize);
 
+				// Light Component
 				DisplayLightComponent(dotButtonSize);
+
+				// Camera Component
 				DisplayCameraComponent(dotButtonSize);
 
 				//DisplayAnimatorComponent(dotButtonSize);
@@ -1666,7 +1686,99 @@ namespace Engine
 		}
 	}
 
-	//void EditorPropertyPanel::DisplayScriptComponent(ImVec2& buttonSize)
+	void EditorPropertyPanel::DisplayScriptComponent(ImVec2& buttonSize){
+		if (m_SelectedEntity.HasComponent<ScriptComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+			bool openScriptComp = ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removeScriptComp = false;
+			auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
+			std::string scriptPath = getRepository() + "\\Scripts\\Game";
+			auto scriptFiles = m_Editor->getAssetsInFolder(scriptPath);
+			ImGui::NextColumn();
+			if (ImGui::Button("...##ScriptBtn", buttonSize))
+				ImGui::OpenPopup("ScriptPopUp");
+			if (ImGui::BeginPopup("ScriptPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+					removeScriptComp = true;
+				ImGui::EndPopup();
+			}
+			ImGui::Columns(1);
+			if (openScriptComp)
+			{
+				ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+				ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
+
+				if (!scriptFiles.empty())
+				{
+					if (ImGui::BeginCombo("Select Script", scriptComp.ScriptClassName.empty() ? "None" : scriptComp.ScriptClassName.substr(scriptComp.ScriptClassName.find_last_of('.') + 1).c_str()))
+					{
+						for (const auto& asset : scriptFiles)
+						{
+							std::string className = asset.name;
+							if (className.ends_with(".cs"))
+								className = className.substr(0, className.size() - 3); // remove extension
+							std::string selectedClassName = "Game." + className;
+							bool isSelected = scriptComp.ScriptClassName == selectedClassName;
+							if (ImGui::Selectable(className.c_str(), isSelected))
+							{
+								// Destroy previous script instance if exists
+								if (scriptComp.ScriptInstance)
+								{
+									MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+									scriptComp.ScriptInstance = nullptr;
+									scriptComp.Started = false;
+								}
+
+								// Assign the new script class name
+								scriptComp.ScriptClassName = selectedClassName;
+
+								// DON'T create instance in editor - let ScriptSystem handle it!
+								// Just setting the class name is enough
+								// The instance will be created and EntityID will be bound when you play
+							}
+							if (isSelected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+
+					// ===== NEW: DISPLAY SERIALIZED FIELDS =====
+					ImGui::Separator();
+					ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), "Serialized Fields:");
+					ImGui::Separator();
+					// THIS IS THE KEY LINE - renders all [SerializeField] fields
+					if (scriptComp.ScriptInstance)
+					{
+						RenderSerializedFieldsInImGui((MonoObject*)scriptComp.ScriptInstance);
+					}
+					else
+					{
+						ImGui::TextDisabled("(No script instance - will be created when playing)");
+					}
+					if (ImGui::Button("Save Script Fields To JSON"))
+					{
+						if (scriptComp.ScriptInstance)
+							SerializeScriptToDiskRapidJSON((MonoObject*)scriptComp.ScriptInstance, "SavedScriptFields.json");
+					}
+					// Similarly, add a load button to test deserialization:
+					ImGui::SameLine();
+					if (ImGui::Button("Load Script Fields From JSON"))
+					{
+						if (scriptComp.ScriptInstance)
+							DeserializeScriptFromDiskRapidJSON((MonoObject*)scriptComp.ScriptInstance, "SavedScriptFields.json");
+					}
+					// ===== END NEW SERIALIZED FIELDS =====
+				}
+			}
+			// Remove Script Component
+			if (removeScriptComp)
+				m_SelectedEntity.RemoveComponent<ScriptComponent>();
+		}
+	}
 
 	void EditorPropertyPanel::DisplayLightComponent(ImVec2& buttonSize){
 	

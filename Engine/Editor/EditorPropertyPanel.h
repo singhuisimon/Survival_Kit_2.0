@@ -44,7 +44,7 @@ namespace Engine
 		
 		void DisplayBTComponent(ImVec2& buttonSize);
 		void DisplayParticleComponent(ImVec2& buttonSize);
-		//void DisplayScriptComponent(ImVec2& buttonSize);
+		void DisplayScriptComponent(ImVec2& buttonSize);
 		
 		void DisplayLightComponent(ImVec2& buttonSize);
 		void DisplayCameraComponent(ImVec2& buttonSize);
