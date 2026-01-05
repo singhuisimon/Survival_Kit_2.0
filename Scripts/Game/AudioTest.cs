@@ -9,19 +9,16 @@ namespace Game
     /// </summary>
     public class AudioTest : ScriptBehaviour
     {
-
         public override void OnStart()
         {
             AudioManager.SetGroupVolume(AudioType.SFX, 0.8f);
-            InternalCalls.Log("Audio API working!");
+            Log("Audio API working!");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             float vol = AudioManager.GetGroupVolume(AudioType.SFX);
-            string str = vol.ToString();
-            InternalCalls.Log("Audio API working! Groupvol is: ");
-            InternalCalls.Log(str);
+            Log("Audio API working! Groupvol is: " + vol.ToString());
         }
 
         public override void OnDestroy()
