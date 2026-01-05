@@ -1,3 +1,5 @@
+#include <windows.h>
+#include <algorithm>
 #include "EditorPropertyPanel.h"
 #include "../Utility/Logger.h"
 #include "../Engine/Editor/Editor.h"
@@ -46,7 +48,7 @@ namespace Engine
 				ImVec2 dotTextSize = ImGui::CalcTextSize("...");
 				ImVec2 dotButtonSize(dotTextSize.x + 8.0f, dotTextSize.y + 8.0f);
 
-				// Prefab Component - TODO - Finish when prefabs are revamped
+				// Prefab Component - TODO: Finish when prefabs are revamped
 				//DisplayPrefabComponent(dotButtonSize);
 
 				// Transform Component
@@ -55,7 +57,7 @@ namespace Engine
 				// RigidBody Component - TODO: Check when scene runs
 				DisplayRigidBodyComponent(dotButtonSize);
 
-				// MeshRenderer Component - TODO - std::max is not working
+				// MeshRenderer Component - TODO: Materials
 				DisplayMeshRendererComponent(dotButtonSize);
 
 				// Audio Component - TODO: Check when scene runs
@@ -82,7 +84,7 @@ namespace Engine
 				// Camera Component
 				DisplayCameraComponent(dotButtonSize);
 
-				// Animator Component - TODO: std::min is not working
+				// Animator Component
 				DisplayAnimatorComponent(dotButtonSize);
 
 				// Add Component Button
@@ -420,7 +422,7 @@ namespace Engine
 		}
 	}
 
-	// Mesh Component - TODO
+	// Mesh Component - TODO: Materials
 	void EditorPropertyPanel::DisplayMeshRendererComponent(ImVec2& buttonSize){
 		if (m_SelectedEntity.HasComponent<MeshRendererComponent>())
 		{
@@ -697,22 +699,19 @@ namespace Engine
 						// Emission Strength
 						if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
 						{
-							// TODO
-							//material->emissionStrength = std::max(0.0f, material->emissionStrength);
+							material->emissionStrength = std::max(0.0f, material->emissionStrength);
 						}
 
 						// Alpha Threshold for alpha testing
 						if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f"))
 						{
-							// TODO
-							//material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
+							material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
 						}
 
 						// Alpha Threshold for ambient occlusion
 						if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f"))
 						{
-							// TODO
-							//material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
+							material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
 						}
 					}
 
@@ -722,10 +721,9 @@ namespace Engine
 						// Tiling
 						if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
 						{
-							// TODO
 							// Prevent zero or negative tiling
-							//material->tiling[0] = std::max(0.1f, material->tiling[0]);
-							//material->tiling[1] = std::max(0.1f, material->tiling[1]);
+							material->tiling[0] = std::max(0.1f, material->tiling[0]);
+							material->tiling[1] = std::max(0.1f, material->tiling[1]);
 						}
 
 						// Offset
@@ -2156,7 +2154,7 @@ namespace Engine
 		}
 	}
 
-	// Animator Window - TODO
+	// Animator Window
 	void EditorPropertyPanel::AnimatorWindow(){
 		
 		if (!m_AnimatorWindow)
@@ -3736,154 +3734,154 @@ namespace Engine
 					return cPos.x + u * cSize.x;
 				};
 
-			//// Generic vec3 curve drawer (Position / Rotation / Scale)
-			//auto drawVec3Curves = [&](const auto& keys, auto getVec)
-			//	{
-			//		if (keys.size() < 2)
-			//			return;
+			// Generic vec3 curve drawer (Position / Rotation / Scale)
+			auto drawVec3Curves = [&](const auto& keys, auto getVec)
+				{
+					if (keys.size() < 2)
+						return;
 
-			//		std::vector<glm::vec3> values;
-			//		values.reserve(keys.size());
+					std::vector<glm::vec3> values;
+					values.reserve(keys.size());
 
-			//		float minVal = 0.0f, maxVal = 0.0f;
-			//		bool  first = true;
+					float minVal = 0.0f, maxVal = 0.0f;
+					bool  first = true;
 
-			//		for (size_t i = 0; i < keys.size(); ++i)
-			//		{
-			//			glm::vec3 v = getVec(keys[i]);
-			//			values.push_back(v);
+					for (size_t i = 0; i < keys.size(); ++i)
+					{
+						glm::vec3 v = getVec(keys[i]);
+						values.push_back(v);
 
-			//			float localMin = std::min(v.x, std::min(v.y, v.z));
-			//			float localMax = std::max(v.x, std::max(v.y, v.z));
+						float localMin = std::min(v.x, std::min(v.y, v.z));
+						float localMax = std::max(v.x, std::max(v.y, v.z));
 
-			//			if (first)
-			//			{
-			//				minVal = localMin;
-			//				maxVal = localMax;
-			//				first = false;
-			//			}
-			//			else
-			//			{
-			//				if (localMin < minVal) minVal = localMin;
-			//				if (localMax > maxVal) maxVal = localMax;
-			//			}
-			//		}
+						if (first)
+						{
+							minVal = localMin;
+							maxVal = localMax;
+							first = false;
+						}
+						else
+						{
+							if (localMin < minVal) minVal = localMin;
+							if (localMax > maxVal) maxVal = localMax;
+						}
+					}
 
-			//		if (maxVal - minVal < 1e-3f)
-			//		{
-			//			maxVal += 0.5f;
-			//			minVal -= 0.5f;
-			//		}
+					if (maxVal - minVal < 1e-3f)
+					{
+						maxVal += 0.5f;
+						minVal -= 0.5f;
+					}
 
-			//		auto valToY = [&](float v)
-			//			{
-			//				float u = (v - minVal) / (maxVal - minVal);
-			//				if (u < 0.0f) u = 0.0f;
-			//				if (u > 1.0f) u = 1.0f;
-			//				return cEnd.y - u * cSize.y;
-			//			};
+					auto valToY = [&](float v)
+						{
+							float u = (v - minVal) / (maxVal - minVal);
+							if (u < 0.0f) u = 0.0f;
+							if (u > 1.0f) u = 1.0f;
+							return cEnd.y - u * cSize.y;
+						};
 
-			//		auto drawAxis = [&](int axis, ImU32 color)
-			//			{
-			//				ImVec2 prev;
-			//				bool   hasPrev = false;
-			//				for (size_t i = 0; i < keys.size(); ++i)
-			//				{
-			//					float t = keys[i].time;
-			//					float x = timeToXCurve(t);
-			//					float v = (axis == 0) ? values[i].x :
-			//						(axis == 1) ? values[i].y : values[i].z;
-			//					float y = valToY(v);
+					auto drawAxis = [&](int axis, ImU32 color)
+						{
+							ImVec2 prev;
+							bool   hasPrev = false;
+							for (size_t i = 0; i < keys.size(); ++i)
+							{
+								float t = keys[i].time;
+								float x = timeToXCurve(t);
+								float v = (axis == 0) ? values[i].x :
+									(axis == 1) ? values[i].y : values[i].z;
+								float y = valToY(v);
 
-			//					ImVec2 cur(x, y);
-			//					if (hasPrev)
-			//						cDraw->AddLine(prev, cur, color, 2.0f);
-			//					prev = cur;
-			//					hasPrev = true;
-			//				}
-			//			};
+								ImVec2 cur(x, y);
+								if (hasPrev)
+									cDraw->AddLine(prev, cur, color, 2.0f);
+								prev = cur;
+								hasPrev = true;
+							}
+						};
 
-			//		// X/Y/Z curves
-			//		drawAxis(0, COL_X);
-			//		drawAxis(1, COL_Y);
-			//		drawAxis(2, COL_Z);
-			//	};
+					// X/Y/Z curves
+					drawAxis(0, COL_X);
+					drawAxis(1, COL_Y);
+					drawAxis(2, COL_Z);
+				};
 
 			// Vec2 curve drawer (UV Tiling / Offset)
-			//auto drawVec2Curves = [&](const auto& keys, auto getVec)
-			//	{
-			//		if (keys.size() < 2)
-			//			return;
+			auto drawVec2Curves = [&](const auto& keys, auto getVec)
+				{
+					if (keys.size() < 2)
+						return;
 
-			//		std::vector<glm::vec2> values;
-			//		values.reserve(keys.size());
+					std::vector<glm::vec2> values;
+					values.reserve(keys.size());
 
-			//		float minVal = 0.0f, maxVal = 0.0f;
-			//		bool  first = true;
+					float minVal = 0.0f, maxVal = 0.0f;
+					bool  first = true;
 
-			//		for (size_t i = 0; i < keys.size(); ++i)
-			//		{
-			//			glm::vec2 v = getVec(keys[i]);
-			//			values.push_back(v);
+					for (size_t i = 0; i < keys.size(); ++i)
+					{
+						glm::vec2 v = getVec(keys[i]);
+						values.push_back(v);
 
-			//			float localMin = std::min(v.x, v.y);
-			//			float localMax = std::max(v.x, v.y);
+						float localMin = std::min(v.x, v.y);
+						float localMax = std::max(v.x, v.y);
 
-			//			if (first)
-			//			{
-			//				minVal = localMin;
-			//				maxVal = localMax;
-			//				first = false;
-			//			}
-			//			else
-			//			{
-			//				if (localMin < minVal) minVal = localMin;
-			//				if (localMax > maxVal) maxVal = localMax;
-			//			}
-			//		}
+						if (first)
+						{
+							minVal = localMin;
+							maxVal = localMax;
+							first = false;
+						}
+						else
+						{
+							if (localMin < minVal) minVal = localMin;
+							if (localMax > maxVal) maxVal = localMax;
+						}
+					}
 
-			//		if (maxVal - minVal < 1e-3f)
-			//		{
-			//			maxVal += 0.5f;
-			//			minVal -= 0.5f;
-			//		}
+					if (maxVal - minVal < 1e-3f)
+					{
+						maxVal += 0.5f;
+						minVal -= 0.5f;
+					}
 
-			//		auto valToY = [&](float v)
-			//			{
-			//				float u = (v - minVal) / (maxVal - minVal);
-			//				if (u < 0.0f) u = 0.0f;
-			//				if (u > 1.0f) u = 1.0f;
-			//				return cEnd.y - u * cSize.y;
-			//			};
+					auto valToY = [&](float v)
+						{
+							float u = (v - minVal) / (maxVal - minVal);
+							if (u < 0.0f) u = 0.0f;
+							if (u > 1.0f) u = 1.0f;
+							return cEnd.y - u * cSize.y;
+						};
 
-			//		auto drawAxis = [&](int axis, ImU32 color)
-			//			{
-			//				ImVec2 prev;
-			//				bool   hasPrev = false;
-			//				for (size_t i = 0; i < keys.size(); ++i)
-			//				{
-			//					float t = keys[i].time;
-			//					float x = timeToXCurve(t);
-			//					float v = (axis == 0) ? values[i].x : values[i].y;
-			//					float y = valToY(v);
+					auto drawAxis = [&](int axis, ImU32 color)
+						{
+							ImVec2 prev;
+							bool   hasPrev = false;
+							for (size_t i = 0; i < keys.size(); ++i)
+							{
+								float t = keys[i].time;
+								float x = timeToXCurve(t);
+								float v = (axis == 0) ? values[i].x : values[i].y;
+								float y = valToY(v);
 
-			//					ImVec2 cur(x, y);
-			//					if (hasPrev)
-			//						cDraw->AddLine(prev, cur, color, 2.0f);
-			//					prev = cur;
-			//					hasPrev = true;
-			//				}
-			//			};
+								ImVec2 cur(x, y);
+								if (hasPrev)
+									cDraw->AddLine(prev, cur, color, 2.0f);
+								prev = cur;
+								hasPrev = true;
+							}
+						};
 
-			//		// U/V curves
-			//		drawAxis(0, COL_X);
-			//		drawAxis(1, COL_Y);
-			//	};
+					// U/V curves
+					drawAxis(0, COL_X);
+					drawAxis(1, COL_Y);
+				};
 
 			// Dispatch to correct curve drawer
 			switch (track)
 			{
-			/*case DopesheetTrackType::Position:
+			case DopesheetTrackType::Position:
 				drawVec3Curves(clip.positionKeys,
 					[](const PositionKeyframe& k) { return k.position; });
 				break;
@@ -3898,8 +3896,8 @@ namespace Engine
 			case DopesheetTrackType::Scale:
 				drawVec3Curves(clip.scaleKeys,
 					[](const ScaleKeyframe& k) { return k.scale; });
-				break;*/
-			/*case DopesheetTrackType::UVTiling:
+				break;
+			case DopesheetTrackType::UVTiling:
 				drawVec2Curves(clip.uvTilingKeys,
 					[](const UVKeyframe& k)
 					{
@@ -3912,7 +3910,7 @@ namespace Engine
 					{
 						return glm::vec2(k.value[0], k.value[1]);
 					});
-				break;*/
+				break;
 			default:
 				break;
 			}
