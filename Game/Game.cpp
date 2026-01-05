@@ -1468,6 +1468,13 @@ void Game::OnShutdown()
 
 Engine::Scene* Game::CreateScene(const std::string& name)
 {
+	if (m_ActiveScene)
+	{
+		m_ActiveScene->ShutdownSystems();
+		m_ActiveScene->GetRegistry().clear();
+	}
+
+	// ===== Create NEW scene =====
 	auto newScene = std::make_unique<Engine::Scene>(name);
 	Engine::Scene* scenePtr = newScene.get();
 	AddAllSystemsToScene(scenePtr);
