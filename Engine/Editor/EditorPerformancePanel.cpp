@@ -1,5 +1,6 @@
 #include "EditorPerformancePanel.h"
 #include "../Editor/Editor.h"
+#include "../Utility/Timestep.h"
 namespace Engine
 {
 	void EditorPerformancePanel::PerformanceProfilePanel(Timestep ts)

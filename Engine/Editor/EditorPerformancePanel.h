@@ -11,6 +11,7 @@
 namespace Engine
 {
 	class Editor;
+	class Timestep;
 	class EditorPerformancePanel
 	{
 	private:

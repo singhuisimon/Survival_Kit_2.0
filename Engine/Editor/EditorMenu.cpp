@@ -17,9 +17,6 @@ namespace Engine
 				if (ImGui::MenuItem("New Scene"))
 				{
 					LOG_INFO("Creating new scene.");
-
-					
-
 					if (m_Editor)
 					{
 						m_NewScenePanel = true;
@@ -112,10 +109,11 @@ namespace Engine
 
 	void EditorMenu::OpenScenePanel()
 	{
+		//std::cout << " ============================== Start of OpenScenePanel =========================\n\n";
 		if (!m_Editor) return;
 		// get all files inside scene
 		auto sceneFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Scenes"));
-		//Scene* m_ActiveScene = m_Editor->GetActiveScene();
+	
 		if (m_OpenScenePanel)
 		{
 			ImGui::OpenPopup("Scene Level Selection");
@@ -126,24 +124,25 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_Once);
 			for (auto& scenesAsset : sceneFiles)
 			{
+				
 				if (ImGui::Selectable(scenesAsset.name.c_str()))
 				{
+					m_Editor->SetScenePath(scenesAsset.fullPath);
+					m_CurrScenePath = m_Editor->GetScenePath();
 					Scene* newScene = m_Editor->CreateNewScene(scenesAsset.name);
 					if (!newScene)
 					{
 						LOG_ERROR("Failed to create new scene");
 						continue;
 					}
-
 					if (newScene->LoadFromFile(scenesAsset.fullPath))
 					{
+						LOG_DEBUG("====== LoadFromFile=====");
+						LOG_DEBUG("FilePath[m_CurrScenePath]: ", m_CurrScenePath);
 						m_Editor->SetCurrSelectedEntity(Entity{});
 						m_Editor->RetrievePickedID(0xFFFFFFFFu);
-
 						m_Editor->SetActiveScene(newScene);
-						m_Editor->SetScenePath(scenesAsset.fullPath);
 						m_Editor->SetSceneName(newScene->GetName());
-
 
 						if (Renderer* renderer = m_Editor->GetRenderer())
 						{
@@ -153,14 +152,13 @@ namespace Engine
 							renderer->getBloomFilterRadius() = settings.s_BloomFilterRadius;
 							renderer->getExposure() = settings.s_Exposure;
 						}
-
-						m_CurrScenePath = m_Editor->GetScenePath();
-
 						LOG_INFO("Scene loaded successfully: ", m_CurrScenePath);
 						ImGui::CloseCurrentPopup();
 					}
+					
 				}
 			}
+		
 			// --------------- Cancel Selection for Open Scene -----------------------
 			if (ImGui::Button("Cancel"))
 			{
@@ -169,7 +167,7 @@ namespace Engine
 			}
 			ImGui::EndPopup();
 		}
-
+		
 	}
 
 	void EditorMenu::SaveScenePanel()

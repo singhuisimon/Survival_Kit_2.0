@@ -16,18 +16,18 @@ namespace Engine
 	void EditorPropertyPanel::PropertyPanel()
 	{
 		if (!m_Editor->GetPropertyWindowRef()) return;
-		std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
+		//std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
 		//Bug - Scene Switching
 		m_Scene = m_Editor->GetActiveScene();
 		m_SelectedEntity = m_Editor->GetSelectedEntity();
 		m_ScenePath = m_Editor->GetScenePath();
 		m_SceneName = m_Editor->GetSceneName();
-
+		//std::cout << "m_ScenePath: " << m_ScenePath.c_str() << "\n";
 		bool& open = m_Editor->GetPropertyWindowRef();
 		if (ImGui::Begin("Properties", &open))
 		{
-			//ImGui::Text("m_Scene: %s", m_Scene->GetName().c_str());
-			//ImGui::Text("m_ScenePath: %s", m_ScenePath.c_str());
+			ImGui::Text("m_Scene: %s", m_Scene->GetName().c_str());
+			ImGui::Text("m_ScenePath: %s", m_ScenePath.c_str());
 			//ImGui::Text("m_SceneName: %s", m_SceneName.c_str());
 
 			// Determine selected entity handle
