@@ -833,7 +833,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//}
 
 	// When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
-	if (!m_EditorEnable /*|| (m_EditorEnable && m_Editor->getIsPlaying())*/)
+	if (!m_EditorEnable || (m_EditorEnable && m_Editor->GetEditorIsPlaying()))
 	{
 
 		if (m_EditorJustPaused)

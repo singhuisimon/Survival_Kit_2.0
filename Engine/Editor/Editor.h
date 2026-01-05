@@ -163,6 +163,7 @@ namespace Engine
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
 		void ViewportClickAndTeleport();
+		bool GetEditorIsPlaying();
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 

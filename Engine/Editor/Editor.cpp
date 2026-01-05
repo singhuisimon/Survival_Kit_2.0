@@ -308,7 +308,9 @@ namespace Engine
         LOG_INFO("Scene saved to: ", finalPath);
     }
 
-
+    bool Editor::GetEditorIsPlaying() {
+        return m_EditorViewport->IsPlaying();
+    }
 
 }
 
