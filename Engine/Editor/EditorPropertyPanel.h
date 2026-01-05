@@ -25,6 +25,37 @@ namespace Engine
 		std::string m_ScenePath{};
 		std::string m_SceneName{};
 
+		bool m_AnimatorWindow = false;			// Animator/dopesheet window toggle
+		bool m_FocusAnimatorNextFrame = false;	// Request Animator window focus next frame
+
+		// --- Animator / dopesheet editor state ---
+		enum class DopesheetTrackType
+		{
+			None,
+			Position,
+			Rotation,
+			Scale,
+			UVTiling,
+			UVOffset
+		};
+
+		enum class AnimatorViewMode
+		{
+			Dopesheet,
+			Curves
+		};
+
+		enum class AnimatorComponentTrack
+		{
+			Transform,
+			UVTransform
+		};
+
+		DopesheetTrackType m_DopesheetSelectedTrack = DopesheetTrackType::None;
+		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
+		AnimatorViewMode    m_AnimatorViewMode = AnimatorViewMode::Dopesheet;
+		AnimatorComponentTrack m_SelectedComponentTrack = AnimatorComponentTrack::Transform;
+
 	public:
 		EditorPropertyPanel(Editor* editor) : m_Editor(editor) {};
 		~EditorPropertyPanel() = default;
@@ -48,14 +79,19 @@ namespace Engine
 		
 		void DisplayLightComponent(ImVec2& buttonSize);
 		void DisplayCameraComponent(ImVec2& buttonSize);
-		//void DisplayAnimatorComponent(ImVec2& buttonSize);
+		void DisplayAnimatorComponent(ImVec2& buttonSize);
 			   
 		void AddComponent();
+		void AnimatorWindow();
 		const char* ColliderTypeToString(ColliderType& colliderType);
 		void ReplaceChildNode(std::shared_ptr<BTNode> parent,
 			std::shared_ptr<BTNode> oldChild,
 			std::shared_ptr<BTNode> newChild);
 		void DrawBTNodeEditor(std::shared_ptr<BTNode> node, std::shared_ptr<BTNode> parent = nullptr);
+		static void DrawCurveLegendRow(const char* label,
+			const char* c0Label, ImU32 c0,
+			const char* c1Label, ImU32 c1,
+			const char* c2Label, ImU32 c2);
 	};
 }
 #endif // END OF EDITOR_PROPERTYPANEL_H
