@@ -1,5 +1,11 @@
 using Engine;
 using System;
+using static Engine.Log;
+using static Engine.Scene;
+using static Engine.Event;
+using static Engine.Camera;
+using static Engine.Transform;
+
 
 namespace Game
 {
@@ -8,7 +14,7 @@ namespace Game
         // serialization fields
         [SerializeField]
         private string mainMenuCameraName = "MainMenuCamera";
-        
+
         [SerializeField]
         private string gameCameraName = "MainCamera";
 
@@ -17,7 +23,7 @@ namespace Game
 
         [SerializeField]
         private float buttonWidth = 2.4f;    // Set this to match button scale on the editor
-        
+
         [SerializeField]
         private float buttonHeight = 0.8f;   // Set this to match button scale on the editor
 
@@ -41,14 +47,14 @@ namespace Game
         private bool hasGameStarted = false;    //this is to ensure that when player click on MouseButton left, it wouldnt trigger the camera switch again
 
         //IDK ANYMORE
-       // private bool wasRightMouseButtonPressed = false;
+        // private bool wasRightMouseButtonPressed = false;
 
         public override void OnStart()
         {
-            Log("StartGameButton: Initializing...");
+            LogMessage("StartGameButton: Initializing...");
 
             // Find the actual button entity by name
-            buttonEntityID = InternalCalls.Scene_FindEntityByName(buttonEntityName);
+            buttonEntityID = SceneFindEntityByName(buttonEntityName);
 
             // checking if it exists
             if (buttonEntityID == 0)
@@ -56,17 +62,17 @@ namespace Game
                 LogError("StartGameButton: Button entity not found: " + buttonEntityName);
                 return;
             }
-            
+
             isShowingMainMenu = showMainMenuInitially;
-            
+
             // Find and cache camera entities
             InitializeCameras();
-            
+
             // Set initial camera state
             if (camerasInitialized)
             {
                 UpdateCameraStates();
-                Log("StartGameButton: Ready!");
+                LogMessage("StartGameButton: Ready!");
             }
             else
             {
@@ -85,13 +91,13 @@ namespace Game
                 UpdateCameraStates();
             }
 
-            EventSystem.Subscribe("GameRestart", OnGameRestart);
+            Subscribe("GameRestart", OnGameRestart);
 
         }
 
-        public override void OnUpdate(float deltaTime) 
+        public override void OnUpdate(float deltaTime)
         {
-            if (!camerasInitialized) 
+            if (!camerasInitialized)
             {
                 return;
             }
@@ -102,7 +108,7 @@ namespace Game
             enterWasPressed = enterIsPressed;
 
             // only allow starting the game if the main menu camera is actually active
-            bool mainMenuActive = InternalCalls.Camera_GetEnabled(mainMenuCameraID);
+            bool mainMenuActive = CameraGetEnabled(mainMenuCameraID);
 
             //Vector2 mousePos = Input.GetMousePosition();
 
@@ -117,7 +123,7 @@ namespace Game
             //     return;
             // }
 
-            // === DEBUG: Log mouse position constantly ===
+            // === DEBUG: LogMessage mouse position constantly ===
             //Vector2 mousePos = Input.GetMousePosition();
 
             //change key
@@ -125,72 +131,72 @@ namespace Game
             if (enterJustPressed && mainMenuActive)
             {
                 //Vector3 buttonPos = Transform.Position;
-                
-                Log("===================");
-                Log("CLICK DETECTED!");
-                Log("===================");
+
+                LogMessage("===================");
+                LogMessage("CLICK DETECTED!");
+                LogMessage("===================");
 
                 // check if the mouse is over the button (detecting the button entity?)
-                if (IsMouseOverButton()) 
+                if (IsMouseOverButton())
                 {
-                    Log("Click was over the button!");
+                    LogMessage("Click was over the button!");
                     OnButtonClicked();
                 }
-                else 
+                else
                 {
-                    Log("Click was NOT over the button");
+                    LogMessage("Click was NOT over the button");
                     OnButtonClicked();  // change camera anyway or else it will no longer change camera
                 }
-                
+
                 // float minX = buttonPos.X - (buttonWidth / 2f);
                 // float maxX = buttonPos.X + (buttonWidth / 2f);
                 // float minY = buttonPos.Y - (buttonHeight / 2f);
                 // float maxY = buttonPos.Y + (buttonHeight / 2f);
-                
+
                 // Try to switch anyway for testing
                 //OnButtonClicked();
             }
 
 
-        //    bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
-            
-        //     //if (Input.IsMouseButtonPressed(MouseButton.Left))
-        //     if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
-        //     {
-        //         //Vector3 buttonPos = Transform.Position;
-                
-        //         Log("===================");
-        //         Log("CLICK DETECTED!");
-        //         Log("===================");
+            //    bool isMouseLeftButtonPressed = Input.IsMouseButtonPressed(MouseButton.Left);
 
-        //         // check if the mouse is over the button (detecting the button entity?)
-        //         if (IsMouseOverButton()) 
-        //         {
-        //             Log("Click was over the button!");
-        //             OnButtonClicked();
-        //         }
-        //         else 
-        //         {
-        //             Log("Click was NOT over the button");
-        //             OnButtonClicked();  // change camera anyway or else it will no longer change camera
-        //         }
-                
-        //         // float minX = buttonPos.X - (buttonWidth / 2f);
-        //         // float maxX = buttonPos.X + (buttonWidth / 2f);
-        //         // float minY = buttonPos.Y - (buttonHeight / 2f);
-        //         // float maxY = buttonPos.Y + (buttonHeight / 2f);
-                
-        //         // Try to switch anyway for testing
-        //         //OnButtonClicked();
-        //     }
+            //     //if (Input.IsMouseButtonPressed(MouseButton.Left))
+            //     if (isMouseLeftButtonPressed && !wasMouseButtonPressed)
+            //     {
+            //         //Vector3 buttonPos = Transform.Position;
+
+            //         LogMessage("===================");
+            //         LogMessage("CLICK DETECTED!");
+            //         LogMessage("===================");
+
+            //         // check if the mouse is over the button (detecting the button entity?)
+            //         if (IsMouseOverButton()) 
+            //         {
+            //             LogMessage("Click was over the button!");
+            //             OnButtonClicked();
+            //         }
+            //         else 
+            //         {
+            //             LogMessage("Click was NOT over the button");
+            //             OnButtonClicked();  // change camera anyway or else it will no longer change camera
+            //         }
+
+            //         // float minX = buttonPos.X - (buttonWidth / 2f);
+            //         // float maxX = buttonPos.X + (buttonWidth / 2f);
+            //         // float minY = buttonPos.Y - (buttonHeight / 2f);
+            //         // float maxY = buttonPos.Y + (buttonHeight / 2f);
+
+            //         // Try to switch anyway for testing
+            //         //OnButtonClicked();
+            //     }
 
             // update previous state for next frame
             //wasMouseButtonPressed = isMouseLeftButtonPressed;
-            
+
             // Space to immediately test if Camera can toggle (debug, comment during actual gameplay)
             // if (Input.IsKeyPressed(KeyCode.Space))
             // {
-            //     Log("Space key pressed - toggling camera");
+            //     LogMessage("Space key pressed - toggling camera");
             //     OnButtonClicked();
             // }
 
@@ -209,16 +215,16 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Log("StartGameButton: Destroyed");
-            EventSystem.Unsubscribe("GameRestart", OnGameRestart);
+            LogMessage("StartGameButton: Destroyed");
+            Unsubscribe("GameRestart", OnGameRestart);
         }
 
-        public void OnGameRestart(string eventName, string payload) 
+        public void OnGameRestart(string eventName, string payload)
         {
             // reset internal state and cameras in order to sync with UIStateManager
             ResetToMainMenu();
         }
-        
+
         // wonky and not working :/
         private bool IsMouseOverButton()
         {
@@ -226,20 +232,20 @@ namespace Game
             Vector2 mousePos = Input.GetMousePosition();
             //Vector3 mouseWorld = ScreenToPseudoWorld(mousePos,0);
 
-            
+
             // getting button world position directly from engine
-            Vector3 buttonPos;         
-            InternalCalls.Transform_GetPosition(buttonEntityID, out buttonPos);
-            
+            Vector3 buttonPos;
+            buttonPos = GetPosition(buttonEntityID);
 
 
 
-            Log("Checking bounds...");
-            Log("Mouse pos: " + mousePos.X + ", " + mousePos.Y);
-            //Log("MouseWorld pos: " + mouseWorld.X + ", " + mouseWorld.Y);
-            Log("Button pos: " + buttonPos.X + ", " + buttonPos.Y);
 
-            
+            LogMessage("Checking bounds...");
+            LogMessage("Mouse pos: " + mousePos.X + ", " + mousePos.Y);
+            //LogMessage("MouseWorld pos: " + mouseWorld.X + ", " + mouseWorld.Y);
+            LogMessage("Button pos: " + buttonPos.X + ", " + buttonPos.Y);
+
+
             // Calculate button bounds
 
             float halfW = buttonWidth * 0.5f;
@@ -249,20 +255,20 @@ namespace Game
             float maxX = buttonPos.X + halfW;
             float minY = buttonPos.Y - halfH;
             float maxY = buttonPos.Y + halfH;
-            
+
             // Check if mouse is within bounds
-            Log("Bounds X: " + minX + " to " + maxX);
-            Log("Bounds Y: " + minY + " to " + maxY);
+            LogMessage("Bounds X: " + minX + " to " + maxX);
+            LogMessage("Bounds Y: " + minY + " to " + maxY);
 
             // Check if mouse is within bounds
             bool withinX = mousePos.X >= minX && mousePos.X <= maxX;
             bool withinY = mousePos.Y >= minY && mousePos.Y <= maxY;
 
-            Log("Within X: " + withinX + ", Within Y: " + withinY);
+            LogMessage("Within X: " + withinX + ", Within Y: " + withinY);
 
             bool hit = withinX && withinY;
-            Log("IsMouseOverButton result: " + hit);
-            
+            LogMessage("IsMouseOverButton result: " + hit);
+
             return hit;
 
 
@@ -273,27 +279,27 @@ namespace Game
         {
             if (hasGameStarted)
             {
-                Log("StartGameButton: Game already started, ignoring click.");
+                LogMessage("StartGameButton: Game already started, ignoring click.");
                 return;
             }
 
-            Log("StartGameButton: Clicked! Switching cameras...");
-            
+            LogMessage("StartGameButton: Clicked! Switching cameras...");
+
             // Toggle state
             isShowingMainMenu = false;
 
             hasGameStarted = true; //lets player know game has started
-            
+
             // Update which camera is active
             UpdateCameraStates();
-            
+
             // Optional: Add audio feedback
             // Audio.Play("ButtonClick");
         }
 
         private void ResetToMainMenu()
         {
-            Log("StartGameButton: Going back to main menu");
+            LogMessage("StartGameButton: Going back to main menu");
 
             // Set logical state
             isShowingMainMenu = true;
@@ -312,30 +318,30 @@ namespace Game
         private void InitializeCameras()
         {
             // Find entities by name (MainMenuCamera and GameCamera)
-            uint mainMenuID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
-            uint gameID = InternalCalls.Scene_FindEntityByName(gameCameraName);
-            
+            uint mainMenuID = SceneFindEntityByName(mainMenuCameraName);
+            uint gameID = SceneFindEntityByName(gameCameraName);
+
             // Convert to uint (EntityID is uint in the engine)
             mainMenuCameraID = mainMenuID;
             gameCameraID = gameID;
-            
+
             // Check if both cameras were found
             if (mainMenuID == 0)
             {
                 LogError("StartGameButton: Camera not found: " + mainMenuCameraName);
             }
-            
+
             if (gameID == 0)
             {
                 LogError("StartGameButton: Camera not found: " + gameCameraName);
             }
-            
+
             // put it as initialized only if both MainMenuCamera and GameCamera exists
             camerasInitialized = (mainMenuID != 0 && gameID != 0);
-            
+
             if (camerasInitialized)
             {
-                Log("StartGameButton: Cameras found - MainMenu ID: " + mainMenuCameraID + ", Game ID: " + gameCameraID);
+                LogMessage("StartGameButton: Cameras found - MainMenu ID: " + mainMenuCameraID + ", Game ID: " + gameCameraID);
             }
         }
 
@@ -350,16 +356,16 @@ namespace Game
 
             if (isShowingMainMenu)
             {
-                Log("StartGameButton: Switching to Main Menu Camera");
-                InternalCalls.Camera_SetEnabled(mainMenuCameraID, true);
-                InternalCalls.Camera_SetEnabled(gameCameraID, false);
+                LogMessage("StartGameButton: Switching to Main Menu Camera");
+                CameraSetEnabled(mainMenuCameraID, true);
+                CameraSetEnabled(gameCameraID, false);
             }
             else
             {
-                Log("StartGameButton: Switching to Game Camera");
-                InternalCalls.Camera_SetEnabled(mainMenuCameraID, false);
-                InternalCalls.Camera_SetEnabled(gameCameraID, true);
-                EventSystem.Publish("StartingGame", true.ToString());
+                LogMessage("StartGameButton: Switching to Game Camera");
+                CameraSetEnabled(mainMenuCameraID, false);
+                CameraSetEnabled(gameCameraID, true);
+                Publish("StartingGame", true.ToString());
             }
         }
 

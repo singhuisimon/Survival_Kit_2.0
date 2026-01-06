@@ -2,7 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using Engine;
-using static Engine.IC;
+
+using static Engine.Scene;
+using static Engine.Prefab;
+using static Engine.Audio;
+using static Engine.Transform;
+using static Engine.Log;
 
 namespace Game
 {
@@ -121,13 +126,13 @@ namespace Game
 
             EntityAddAudio((uint)EntityID);
 
-            EventSystem.Subscribe(BOTNETKILLED, UpdateBotnetKilled);
-            EventSystem.Subscribe(LOSTDETECTED, DeactiveSpawnCondition);
-            EventSystem.Subscribe(GAMESTARTDETECTED, ActivateSpawnManager);
+            Event.Subscribe(BOTNETKILLED, UpdateBotnetKilled);
+            Event.Subscribe(LOSTDETECTED, DeactiveSpawnCondition);
+            Event.Subscribe(GAMESTARTDETECTED, ActivateSpawnManager);
 
             StopInGameSounds();
 
-            Log("EnemySpawnManager initialized");
+            LogMessage("EnemySpawnManager initialized");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -153,7 +158,7 @@ namespace Game
 
             //     // botnetkilled = 0;
             //     ActiveSpawn();
-            //     Log("Cheatcode to start spawnmanager again when deactivate from any cam!");
+            //     LogMessage("Cheatcode to start spawnmanager again when deactivate from any cam!");
             // }
 
             // check if the game has started
@@ -166,7 +171,7 @@ namespace Game
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
 
-            // Spawning logic
+            // Spawning LogMessageic
             if (spawningAllowed)
             {
                 if (!isSpawning && waveEnemiesLeftToSpawn > 0)
@@ -192,16 +197,16 @@ namespace Game
 
         public override void OnDestroy()
         {
-            EventSystem.Unsubscribe(BOTNETKILLED, UpdateBotnetKilled);
-            EventSystem.Unsubscribe(LOSTDETECTED, DeactiveSpawnCondition);
-            EventSystem.Unsubscribe(GAMESTARTDETECTED, ActivateSpawnManager);
+            Event.Unsubscribe(BOTNETKILLED, UpdateBotnetKilled);
+            Event.Unsubscribe(LOSTDETECTED, DeactiveSpawnCondition);
+            Event.Unsubscribe(GAMESTARTDETECTED, ActivateSpawnManager);
         }
 
         #region setup
 
         private void InitializeSpawnPoints()
         {
-            Log("=== Initializing Spawn Points ===");
+            LogMessage("=== Initializing Spawn Points ===");
 
             // Wall A spawn points - register each one
             RegisterSpawnPointsForWall("A", spawnPointsA, new string[] {
@@ -280,12 +285,12 @@ namespace Game
                 "SpawnPointE_6"
             });
 
-            Log("SpawnManager is initializing spawnpoints for all wall");
+            LogMessage("SpawnManager is initializing spawnpoints for all wall");
         }
 
         private void RegisterSpawnPointsForWall(string wallName, List<SpawnPointData> targetList, string[] spawnPointNames)
         {
-            Log(string.Concat("Registering spawn points for Wall ", wallName));
+            LogMessage(string.Concat("Registering spawn points for Wall ", wallName));
 
             int successCount = 0;
             int totalCount = spawnPointNames.Length;
@@ -303,7 +308,7 @@ namespace Game
                     try
                     {
                         // Position from internal call
-                        spawnPosition = TransformGetPosition(entityID);
+                        spawnPosition = GetPosition(entityID);
                         // Rotation as QUAT from your Transform API
                         spawnRotation = Transform.GetRotation(entityID);
 
@@ -312,7 +317,7 @@ namespace Game
                         targetList.Add(spawnData);
                         successCount++;
 
-                        Log(string.Concat(
+                        LogMessage(string.Concat(
                             spawnPointName, " registered at position (",
                             spawnPosition.X.ToString(), ", ", spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(),
                             ") rotation (", spawnRotation.X.ToString(), ", ", spawnRotation.Y.ToString(), ", ",
@@ -320,17 +325,17 @@ namespace Game
                     }
                     catch (Exception ex)
                     {
-                        Log(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
+                        LogMessage(string.Concat("WARNING: Failed to get transform for ", spawnPointName, " - ", ex.Message));
                     }
                 }
                 else
                 {
-                    Log(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName,
+                    LogMessage(string.Concat("WARNING: Spawn point not found or invalid: ", spawnPointName,
                         " (EntityID: ", entityID.ToString(), ")"));
                 }
             }
 
-            Log(string.Concat("Wall ", wallName, " registered: ", successCount.ToString(),
+            LogMessage(string.Concat("Wall ", wallName, " registered: ", successCount.ToString(),
                 "/", totalCount.ToString(), " spawn points"));
         }
 
@@ -338,23 +343,23 @@ namespace Game
         {
             // Helper to create entity list with validation
             wallAActiveEntities = CreateValidEntityArray(new string[]{
-                "WallA1", "WallA2", "WallA3", "WallA4", "WallA5", "WallA6", "WallA_Logo", "WallA_Void"
+                "WallA1", "WallA2", "WallA3", "WallA4", "WallA5", "WallA6", "WallA_LogMessageo", "WallA_Void"
             });
 
             wallBActiveEntities = CreateValidEntityArray(new string[]{
-                "WallB1", "WallB2", "WallB3", "WallB4", "WallB5", "WallB6", "WallB_Logo", "WallB_Void"
+                "WallB1", "WallB2", "WallB3", "WallB4", "WallB5", "WallB6", "WallB_LogMessageo", "WallB_Void"
             });
 
             wallCActiveEntities = CreateValidEntityArray(new string[]{
-                "WallC1", "WallC2", "WallC3", "WallC4", "WallC5", "WallC6", "WallC_Logo", "WallC_Void"
+                "WallC1", "WallC2", "WallC3", "WallC4", "WallC5", "WallC6", "WallC_LogMessageo", "WallC_Void"
             });
 
             wallDActiveEntities = CreateValidEntityArray(new string[]{
-                "WallD1", "WallD2", "WallD3", "WallD4", "WallD5", "WallD6", "WallD_Logo", "WallD_Void"
+                "WallD1", "WallD2", "WallD3", "WallD4", "WallD5", "WallD6", "WallD_LogMessageo", "WallD_Void"
             });
 
             wallEActiveEntities = CreateValidEntityArray(new string[]{
-                "WallE1", "WallE2", "WallE3", "WallE4", "WallE5", "WallE6", "WallE_Logo", "WallE_Void"
+                "WallE1", "WallE2", "WallE3", "WallE4", "WallE5", "WallE6", "WallE_LogMessageo", "WallE_Void"
             });
 
             wallInactiveEntities = CreateValidEntityArray(new string[]{
@@ -373,13 +378,13 @@ namespace Game
             if (wallEActiveEntities != null && wallEActiveEntities.Length > 0)
                 wallActiveEntities.AddRange(wallEActiveEntities);
 
-            Log(string.Concat("Initialize wall entities - found ", wallActiveEntities.Count.ToString(), " active walls"));
-            Log(string.Concat("Found ", wallInactiveEntities.Length.ToString(), " inactive walls"));
+            LogMessage(string.Concat("Initialize wall entities - found ", wallActiveEntities.Count.ToString(), " active walls"));
+            LogMessage(string.Concat("Found ", wallInactiveEntities.Length.ToString(), " inactive walls"));
         }
 
         private void SetupEnemySpawning()
         {
-            Log("SpawnManager - Setting up enemy spawning");
+            LogMessage("SpawnManager - Setting up enemy spawning");
 
             E005_loveletter = 0;
             E004_botnet = 30;
@@ -391,7 +396,7 @@ namespace Game
             // Calculate total enemies to spawn
             waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
 
-            Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
+            LogMessage(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
 
             // Update walls based on loveletter routes
             WallChange(loveletterRoutes);
@@ -402,14 +407,14 @@ namespace Game
 
         private void SetupInfiniteBotnetSpawning()
         {
-            Log("SpawnManager - Setting up infinite botnet spawning");
+            LogMessage("SpawnManager - Setting up infinite botnet spawning");
 
             E004_botnet += 1;
 
             // Calculate total enemies to spawn
             waveEnemiesLeftToSpawn = E005_loveletter + E004_botnet;
 
-            Log(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
+            LogMessage(string.Concat("Total enemies to spawn: ", waveEnemiesLeftToSpawn.ToString()));
         }
 
         #endregion
@@ -432,7 +437,7 @@ namespace Game
 
             if (enemyType == -1)
             {
-                Log("No more enemies to spawn");
+                LogMessage("No more enemies to spawn");
                 isSpawning = false;
                 return;
             }
@@ -442,10 +447,10 @@ namespace Game
 
             waveEnemiesLeftToSpawn = E004_botnet + E005_loveletter;
 
-            Log(string.Concat("Spawned enemy type ", enemyType.ToString(),
+            LogMessage(string.Concat("Spawned enemy type ", enemyType.ToString(),
                 " - Remaining: ", waveEnemiesLeftToSpawn.ToString()));
-            Log("spawned botnet count: " + botnetSpawned.ToString());
-            Log("spawned loveletter count: " + loveletterSpawned.ToString());
+            LogMessage("spawned botnet count: " + botnetSpawned.ToString());
+            LogMessage("spawned loveletter count: " + loveletterSpawned.ToString());
         }
 
         private int DetermineEnemyTypeToSpawn()
@@ -471,7 +476,7 @@ namespace Game
             if (activeSpawnPoints == null || activeSpawnPoints.Count == 0)
             {
                 isSpawning = false;
-                Log("ERROR: No active spawn points!");
+                LogMessage("ERROR: No active spawn points!");
                 return;
             }
 
@@ -505,15 +510,15 @@ namespace Game
 
             uint enemyID = PrefabInstantiateWithTransform(
                 prefabpath,
-                spawnPos,
-                spawnRot,
-                spawnScale,
+                ref spawnPos,
+                ref spawnRot,
+                ref spawnScale,
                 false
             );
 
             if (enemyID == 0)
             {
-                Log("INVALID ID FOR SPAWNING");
+                LogMessage("INVALID ID FOR SPAWNING");
             }
             else
             {
@@ -522,14 +527,14 @@ namespace Game
                     botnetSpawned++;
                 }
                 EntityAddScript(enemyID, "Game.Botnet");
-                Log(string.Concat(
+                LogMessage(string.Concat(
                     "Spawn type: ", enemyType.ToString(), " at position ", spawnPos.X.ToString(), ", ",
                     spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), " and at rotation ",
                     spawnRot.X.ToString(), ", ", spawnRot.Y.ToString(), ", ",
                     spawnRot.Z.ToString(), ", ", spawnRot.W.ToString(), ")"));
             }
 
-            Log(string.Concat("Spawn ", prefabpath, " at position (",
+            LogMessage(string.Concat("Spawn ", prefabpath, " at position (",
                 spawnPos.X.ToString(), ", ", spawnPos.Y.ToString(), ", ", spawnPos.Z.ToString(), ")"));
         }
 
@@ -541,13 +546,13 @@ namespace Game
             // Find the spawn point entity by name
             uint spawnID = SceneFindEntityByName(spawnPointName);
 
-            Log("Spawn point name is: " + spawnPointName);
+            LogMessage("Spawn point name is: " + spawnPointName);
 
             // Get transform data directly using native calls
             Vector3 spawnPosition;
             Quat spawnRotation;
 
-            spawnPosition = TransformGetPosition(spawnID);
+            spawnPosition = GetPosition(spawnID);
             spawnRotation = Transform.GetRotation(spawnID);
 
             Vector3 spawnScale = new Vector3(0.002f, 0.002f, 0.002f);
@@ -563,20 +568,20 @@ namespace Game
 
             uint enemyID = PrefabInstantiateWithTransform(
                 prefabpath,
-                spawnPosition,
-                spawnRotation,
-                spawnScale,
+                ref spawnPosition,
+                ref spawnRotation,
+                ref spawnScale,
                 true
             );
 
             if (enemyID == 0)
             {
-                Log("LOVELETTERSPAWN FAIL");
+                LogMessage("LOVELETTERSPAWN FAIL");
             }
             else
             {
                 loveletterSpawned++;
-                Log(string.Concat(
+                LogMessage(string.Concat(
                     "Spawn type: loveletter at position ", spawnPosition.X.ToString(), ", ",
                     spawnPosition.Y.ToString(), ", ", spawnPosition.Z.ToString(),
                     " and at rotation ", spawnRotation.X.ToString(), ", ",
@@ -598,7 +603,7 @@ namespace Game
 
             botnetkilled += count;
 
-            Log("SpawnManager detected botnet is killed current count: " + botnetkilled.ToString());
+            LogMessage("SpawnManager detected botnet is killed current count: " + botnetkilled.ToString());
         }
 
         private void DeactiveSpawnCondition(string eventName, string payload)
@@ -609,11 +614,11 @@ namespace Game
             if (name == WINCAM || name == LOSECAM || name == MENUCAM)
             {
                 DisableSpawn();
-                Log("Detect win, lose, maincam so disabling spawn");
+                LogMessage("Detect win, lose, maincam so disabling spawn");
             }
             else
             {
-                Log("hey its not win or lose or mainmenu cam soo im not deactivating sadly");
+                LogMessage("hey its not win or lose or mainmenu cam soo im not deactivating sadly");
             }
         }
 
@@ -625,11 +630,11 @@ namespace Game
             if (camactive && !isActive)
             {
                 ActiveSpawn();
-                Log("detect cam is active for event " + eventName + "and curr spawn manager is just activated");
+                LogMessage("detect cam is active for event " + eventName + "and curr spawn manager is just activated");
             }
             else
             {
-                Log("game cam is not active");
+                LogMessage("game cam is not active");
             }
         }
 
@@ -637,7 +642,7 @@ namespace Game
 
         private void ActiveSpawn()
         {
-            Log("Activating Spawn/Setting up Spawn");
+            LogMessage("Activating Spawn/Setting up Spawn");
             isActive = true;
             stopmainsound();
 
@@ -657,12 +662,12 @@ namespace Game
             botnetkilled = 0;
 
             //feel free to add any event publish here for when spawn start
-            EventSystem.Publish("SMActivated", EntityID.ToString());
+            Event.Publish("SMActivated", EntityID.ToString());
         }
 
         private void DisableSpawn()
         {
-            Log("Disabling spawn rn");
+            LogMessage("Disabling spawn rn");
 
             enemiesLeft = 0;
 
@@ -674,10 +679,10 @@ namespace Game
             EnvironmentReset();
 
             //this event is being used by botnet !
-            EventSystem.Publish("DisablingSpawn", isActive.ToString());
+            Event.Publish("DisablingSpawn", isActive.ToString());
 
             //feel free to add more event for disabling spawn.
-            EventSystem.Publish("SMDeactivated", EntityID.ToString());
+            Event.Publish("SMDeactivated", EntityID.ToString());
         }
 
         private void CheckBotnetKilled()
@@ -685,11 +690,11 @@ namespace Game
             if (botnetkilled >= TARGETBOTNETKILLED)
             {
                 DisableSpawn();
-                Log("=== YIPPEE U KILLED ENOUGH ===");
+                LogMessage("=== YIPPEE U KILLED ENOUGH ===");
 
                 // publish the win event to be integrated with the win screen 
                 // this event is use by UI Spawn Manager
-                EventSystem.Publish("PlayerWin", botnetkilled.ToString());
+                Event.Publish("PlayerWin", botnetkilled.ToString());
             }
         }
 
@@ -708,19 +713,19 @@ namespace Game
             if (loveletter != null && loveletter.Length != 0)
             {
                 totalenemiesleft += loveletter.Length;
-                Log("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
+                LogMessage("adding loveletter to total enemies left. currently there is: " + loveletter.Length.ToString());
             }
 
             if (botnet != null && botnet.Length != 0)
             {
                 totalenemiesleft += botnet.Length;
-                //Log("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
+                //LogMessage("adding botnet to total enemies left. currently there is: " + botnet.Length.ToString());
             }
 
             if (totalenemiesleft <= 0 && waveEnemiesLeftToSpawn <= 0)
             {
                 DisableSpawn();
-                Log("=== Wave Complete ===");
+                LogMessage("=== Wave Complete ===");
             }
             else
             {
@@ -799,7 +804,7 @@ namespace Game
                     break;
             }
 
-            Log("Enable wall " + wallIndex);
+            LogMessage("Enable wall " + wallIndex);
         }
 
         private void WallSetup_ActiveWallVisibility(Entity[] entities, int wallIndex)
@@ -809,11 +814,11 @@ namespace Game
             {
                 if (entity.EntityID != 0) // Extra safety check
                 {
-                    MeshRendererSetVisible((uint)entity.EntityID, true);
+                    SetVisible((uint)entity.EntityID, true);
                 }
                 else
                 {
-                    Log("ERROR: Skipping invalid entity (ID=0) in WallSetup_ActiveWallVisibility");
+                    LogMessage("ERROR: Skipping invalid entity (ID=0) in WallSetup_ActiveWallVisibility");
                 }
             }
 
@@ -823,11 +828,11 @@ namespace Game
                 uint id = wallInactiveEntities[wallIndex].EntityID;
                 if (id != 0) // Extra safety check
                 {
-                    MeshRendererSetVisible(id, false);
+                    SetVisible(id, false);
                 }
                 else
                 {
-                    Log(string.Concat("ERROR: Invalid inactive wall entity at index ", wallIndex.ToString()));
+                    LogMessage(string.Concat("ERROR: Invalid inactive wall entity at index ", wallIndex.ToString()));
                 }
             }
         }
@@ -837,15 +842,15 @@ namespace Game
             // Enable all inactive walls
             if (wallInactiveEntities != null)
             {
-                Log(string.Concat("Enabling ", wallInactiveEntities.Length.ToString(), " inactive wall entities"));
+                LogMessage(string.Concat("Enabling ", wallInactiveEntities.Length.ToString(), " inactive wall entities"));
                 foreach (Entity wall in wallInactiveEntities)
                 {
                     if (wall.EntityID != 0)
                     {
-                        MeshRendererSetVisible((uint)wall.EntityID, true);
+                        SetVisible((uint)wall.EntityID, true);
                     }
                 }
-                Log("All inactive walls enabled");
+                LogMessage("All inactive walls enabled");
             }
         }
 
@@ -858,11 +863,11 @@ namespace Game
                 {
                     if (wall.EntityID != INVALID_ENTITY) // Extra safety check
                     {
-                        MeshRendererSetVisible((uint)wall.EntityID, false);
+                        SetVisible((uint)wall.EntityID, false);
                     }
                     else
                     {
-                        Log("ERROR: Skipping invalid entity (ID=0) in wallActiveEntities");
+                        LogMessage("ERROR: Skipping invalid entity (ID=0) in wallActiveEntities");
                     }
                 }
             }
@@ -895,15 +900,15 @@ namespace Game
                 if (entityID != 0) // Only add valid entities
                 {
                     validEntities.Add(new Entity(entityID));
-                    Log(string.Concat("Found entity: ", name, " (ID: ", entityID.ToString(), ")"));
+                    LogMessage(string.Concat("Found entity: ", name, " (ID: ", entityID.ToString(), ")"));
                 }
                 else
                 {
-                    Log(string.Concat("WARNING: Entity not found: ", name));
+                    LogMessage(string.Concat("WARNING: Entity not found: ", name));
                 }
             }
 
-            Log(string.Concat("CreateValidEntityArray: ", validEntities.Count.ToString(),
+            LogMessage(string.Concat("CreateValidEntityArray: ", validEntities.Count.ToString(),
                 " / ", entityNames.Length.ToString(), " entities found"));
             return validEntities.ToArray();
         }
@@ -913,7 +918,7 @@ namespace Game
             spawnmanagerID = SceneFindEntityByName("Spawn Manager");
             if (spawnmanagerID != INVALID_ENTITY)
             {
-                Log("Spawn Manager entity ID: " + spawnmanagerID.ToString());
+                LogMessage("Spawn Manager entity ID: " + spawnmanagerID.ToString());
             }
             AudioPlay(spawnmanagerID);
             PlayAllOtherGameAudio();
@@ -926,7 +931,7 @@ namespace Game
             spawnmanagerID = SceneFindEntityByName("Spawn Manager");
             if (spawnmanagerID != INVALID_ENTITY)
             {
-                Log("Spawn Manager entity ID: " + spawnmanagerID.ToString());
+                LogMessage("Spawn Manager entity ID: " + spawnmanagerID.ToString());
             }
             AudioStop(spawnmanagerID);
             StopAllOtherGameAudio();
@@ -973,7 +978,7 @@ namespace Game
                         AudioSetMaxDistance(Allies[i], 152.45f);
 
                         AudioPlay(Allies[i]);
-                        Log("SpawnManager: Playing ally audio right now - only gunship ambience");
+                        LogMessage("SpawnManager: Playing ally audio right now - only gunship ambience");
                     }
                 }
             }
@@ -990,7 +995,7 @@ namespace Game
                 AudioSetMaxDistance(coreID, 527.87f);
 
                 AudioPlay(coreID);
-                Log("SpawnManager: Playing core ambience now through core");
+                LogMessage("SpawnManager: Playing core ambience now through core");
             }
             else
             {
@@ -1017,7 +1022,7 @@ namespace Game
                         AudioSetFile(Allies[i], alliesambience);
 
                         AudioStop(Allies[i]);
-                        Log("SpawnManager: stopping gunship ambience");
+                        LogMessage("SpawnManager: stopping gunship ambience");
                     }
                 }
             }
@@ -1030,7 +1035,7 @@ namespace Game
                 AudioSetFile(coreID, coreambience);
 
                 AudioStop(coreID);
-                Log("SpawnManager: Stopping core ambience");
+                LogMessage("SpawnManager: Stopping core ambience");
             }
             else
             {
@@ -1045,7 +1050,7 @@ namespace Game
                 //AudioSetFile(emplacementID, coreambience);
 
                 AudioStop(emplacementID);
-                Log("SpawnManager: Stop emplacement from playing");
+                LogMessage("SpawnManager: Stop emplacement from playing");
             }
             else
             {
@@ -1060,7 +1065,7 @@ namespace Game
                 //AudioSetFile(emplacementID, coreambience);
 
                 AudioStop(a1ID);
-                Log("SpawnManager: Stop A1 from playing");
+                LogMessage("SpawnManager: Stop A1 from playing");
             }
             else
             {
@@ -1081,7 +1086,7 @@ namespace Game
             {
                 AudioSetLoop(officeambi, false);
                 AudioStop(officeambi);
-                Log("SpawnManager: Stopping office ambience");
+                LogMessage("SpawnManager: Stopping office ambience");
             }
             else
             {
@@ -1094,7 +1099,7 @@ namespace Game
             {
                 AudioSetLoop(roomambi, false);
                 AudioStop(roomambi);
-                Log("SpawnManager: Stopping room ambience");
+                LogMessage("SpawnManager: Stopping room ambience");
             }
             else
             {
@@ -1110,7 +1115,7 @@ namespace Game
             {
                 AudioSetLoop(officeambi, true);
                 AudioPlay(officeambi);
-                Log("SpawnManager: Playing office ambience");
+                LogMessage("SpawnManager: Playing office ambience");
             }
             else
             {
@@ -1123,7 +1128,7 @@ namespace Game
             {
                 AudioSetLoop(roomambi, true);
                 AudioPlay(roomambi);
-                Log("SpawnManager: Playing room ambience");
+                LogMessage("SpawnManager: Playing room ambience");
             }
             else
             {
@@ -1132,5 +1137,31 @@ namespace Game
         }
 
         #endregion
+
+        private void SetVisible(Entity e, bool visible)
+        {
+            if (e.EntityID == 0 || e.EntityID == INVALID_ENTITY)
+                return;
+
+            try
+            {
+                MeshRenderer mr = e.GetComponent<MeshRenderer>();
+                if (mr != null)
+                    mr.Visible = visible;
+            }
+            catch
+            {
+                // If entity has no MeshRenderer, ignore (or log if you want)
+            }
+        }
+
+        private void SetVisible(uint entityID, bool visible)
+        {
+            if (entityID == 0 || entityID == INVALID_ENTITY)
+                return;
+
+            SetVisible(new Entity(entityID), visible);
+        }
+
     }
 }

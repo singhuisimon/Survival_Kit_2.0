@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using static Engine.Log;
 
 namespace Game
 {
@@ -66,100 +67,114 @@ namespace Game
         {
             //apply initial setting
             ApplyAllSettings();
-            
+
             //Store initial value
             StoreCurrentValue();
 
-            InternalCalls.Log("OverallAudioControl intiialized - all audio settings applied");
+            LogMessage("OverallAudioControl intiialized - all audio settings applied");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             bool changed = false;
 
-            if(masterVolume != prevMasterVolume){
+            if (masterVolume != prevMasterVolume)
+            {
                 Engine.AudioManager.SetGroupVolume(AudioType.MASTER, masterVolume);
                 prevMasterVolume = masterVolume;
                 changed = true;
             }
 
-            if(masterPitch != prevMasterPitch){
+            if (masterPitch != prevMasterPitch)
+            {
                 Engine.AudioManager.SetGroupPitch(AudioType.MASTER, masterPitch);
                 prevMasterPitch = masterPitch;
                 changed = true;
             }
 
-            if(masterMute != prevMasterMute){
+            if (masterMute != prevMasterMute)
+            {
                 Engine.AudioManager.SetMuteGroup(AudioType.MASTER, masterMute);
                 prevMasterMute = masterMute;
                 changed = true;
             }
 
-            if(bgmVolume != prevBgmVolume){
+            if (bgmVolume != prevBgmVolume)
+            {
                 Engine.AudioManager.SetGroupVolume(AudioType.BGM, bgmVolume);
                 prevBgmVolume = bgmVolume;
                 changed = true;
             }
 
-            if(bgmPitch != prevBgmPitch){
+            if (bgmPitch != prevBgmPitch)
+            {
                 Engine.AudioManager.SetGroupPitch(AudioType.BGM, bgmPitch);
                 prevBgmPitch = bgmPitch;
                 changed = true;
             }
 
-            if(bgmMute != prevBgmMute){
+            if (bgmMute != prevBgmMute)
+            {
                 Engine.AudioManager.SetMuteGroup(AudioType.BGM, bgmMute);
                 prevBgmMute = bgmMute;
                 changed = true;
             }
 
-            if(sfxVolume != prevSfxVolume){
+            if (sfxVolume != prevSfxVolume)
+            {
                 Engine.AudioManager.SetGroupVolume(AudioType.SFX, sfxVolume);
                 prevSfxVolume = sfxVolume;
                 changed = true;
             }
 
-            if(sfxPitch != prevSfxPitch){
+            if (sfxPitch != prevSfxPitch)
+            {
                 Engine.AudioManager.SetGroupPitch(AudioType.SFX, sfxPitch);
                 prevSfxPitch = sfxPitch;
                 changed = true;
             }
 
-            if(sfxMute != prevSfxMute){
+            if (sfxMute != prevSfxMute)
+            {
                 Engine.AudioManager.SetMuteGroup(AudioType.SFX, sfxMute);
                 prevSfxMute = sfxMute;
                 changed = true;
             }
 
-            if(uiVolume != prevUiVolume){
+            if (uiVolume != prevUiVolume)
+            {
                 Engine.AudioManager.SetGroupVolume(AudioType.UI, uiVolume);
                 prevUiVolume = uiVolume;
                 changed = true;
             }
 
-            if(uiPitch != prevUiPitch){
+            if (uiPitch != prevUiPitch)
+            {
                 Engine.AudioManager.SetGroupPitch(AudioType.UI, uiPitch);
                 prevUiPitch = uiPitch;
                 changed = true;
             }
 
-            if(uiMute != prevUiMute){
+            if (uiMute != prevUiMute)
+            {
                 Engine.AudioManager.SetMuteGroup(AudioType.UI, uiMute);
                 prevUiMute = uiMute;
                 changed = true;
             }
 
-            if(changed){
-                InternalCalls.Log("OverallAudioControl Update - audio settings changes applied");
+            if (changed)
+            {
+                LogMessage("OverallAudioControl Update - audio settings changes applied");
             }
         }
 
         public override void OnDestroy()
         {
-            Log("PlayerController destroyed!");
+            LogMessage("PlayerController destroyed!");
         }
 
-        private void ApplyAllSettings(){
+        private void ApplyAllSettings()
+        {
             Engine.AudioManager.SetGroupVolume(AudioType.MASTER, masterVolume);
             Engine.AudioManager.SetGroupVolume(AudioType.BGM, bgmVolume);
             Engine.AudioManager.SetGroupVolume(AudioType.SFX, sfxVolume);
@@ -176,7 +191,8 @@ namespace Game
             Engine.AudioManager.SetMuteGroup(AudioType.UI, uiMute);
         }
 
-        private void StoreCurrentValue(){
+        private void StoreCurrentValue()
+        {
             prevMasterVolume = masterVolume;
             prevMasterPitch = masterPitch;
             prevMasterMute = masterMute;

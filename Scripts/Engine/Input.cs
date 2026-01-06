@@ -21,6 +21,8 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void GetMousePosition_Native(out Vector2 position);
 
+        [MethodImpl(MethodImplOptions.InternalCall)] public static extern void Input_GetMouseDelta(out float deltaX, out float deltaY);
+        public static void GetMouseDelta(out float deltaX, out float deltaY) => Input_GetMouseDelta(out deltaX, out deltaY);
         // Public API
         public static bool IsKeyPressed(KeyCode key)
         {

@@ -1,4 +1,5 @@
 using Engine;
+using static Engine.Log;
 using System;
 
 namespace Game
@@ -16,7 +17,7 @@ namespace Game
 
         public override void OnStart()
         {
-            Log("MouseFollower initialized");
+            LogMessage("MouseFollower initialized");
             lastMousePos = Input.GetMousePosition();
         }
 
@@ -46,8 +47,8 @@ namespace Game
             // Optional: Click to log position
             if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
-                Log($"Mouse clicked at screen pos: {mousePos}");
-                Log($"Object world pos: {Transform.Position}");
+                LogMessage($"Mouse clicked at screen pos: {mousePos}");
+                LogMessage($"Object world pos: {Transform.Position}");
             }
         }
     }

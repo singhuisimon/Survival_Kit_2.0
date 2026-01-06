@@ -1,7 +1,14 @@
 // Botnet.cs
 using Engine;
 using System;
-using static Engine.IC;
+using static Engine.Event;
+using static Engine.Log;
+using static Engine.Scene;
+using static Engine.Prefab;
+using static Engine.Physics;
+using static Engine.Rigidbody;
+using static Engine.Audio;
+using static Engine.Tag;
 
 namespace Game
 {
@@ -71,7 +78,7 @@ namespace Game
 
         public override void OnStart()
         {
-            Log("=== Botnet started (EntityID = " + EntityID + ") ===");
+            LogMessage("=== Botnet started (EntityID = " + EntityID + ") ===");
 
             // Seed RNG
             s_RngState ^= (uint)EntityID * 747796405u + 2891336453u;
@@ -96,8 +103,8 @@ namespace Game
 
             PhysicsEnableCollisionEvents();
 
-            EventSystem.Subscribe(EVENT_BULLET_HIT, OnBulletHit);
-            EventSystem.Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -134,15 +141,15 @@ namespace Game
 
         public override void OnDestroy()
         {
-            EventSystem.Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
-            EventSystem.Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         // ===== Public API =====
 
         public void Stunned()
         {
-            Log("Botnet (EntityID = " + EntityID + ") stunned");
+            LogMessage("Botnet (EntityID = " + EntityID + ") stunned");
             isStunned = true;
             stunTimer = stunnedTime;
             RigidbodyStop((uint)EntityID);
@@ -161,7 +168,7 @@ namespace Game
             if (hitId != (uint)EntityID)
                 return;
 
-            EventSystem.Publish("BotnetDeath", 1.ToString());
+            Publish("BotnetDeath", 1.ToString());
             Explode();
         }
 
@@ -178,14 +185,14 @@ namespace Game
                 isDead = true;
                 isExploding = false;
 
-                Log("Destroying itself as spawn is disabled");
+                LogMessage("Destroying itself as spawn is disabled");
                 SceneDestroyEntity((uint)EntityID);
             }
         }
 
         public void BruteForceAttack()
         {
-            Log("Botnet (EntityID = " + EntityID + ") entering brute force attack mode");
+            LogMessage("Botnet (EntityID = " + EntityID + ") entering brute force attack mode");
 
             topSpeed = bruteForceAttackSpeed;
 
@@ -209,7 +216,7 @@ namespace Game
             {
                 isStunned = false;
                 stunTimer = 0.0f;
-                Log("Botnet (EntityID = " + EntityID + ") stun ended");
+                LogMessage("Botnet (EntityID = " + EntityID + ") stun ended");
             }
         }
 
@@ -259,7 +266,7 @@ namespace Game
             {
                 targetID = chosen;
                 isMoving = true;
-                Log("Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
+                LogMessage("Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
             }
             else
             {
@@ -276,7 +283,7 @@ namespace Game
             string tag = TagGetTag(targetID);
             if (string.IsNullOrEmpty(tag))
             {
-                Log("Botnet (EntityID = " + EntityID + ") target " + targetID + " destroyed");
+                LogMessage("Botnet (EntityID = " + EntityID + ") target " + targetID + " destroyed");
                 targetID = INVALID_ENTITY;
                 isMoving = false;
                 chooseTargetTimer = 0.0f;
@@ -360,7 +367,7 @@ namespace Game
                 dir.Z * acceleration
             );
 
-            RigidbodyAddForce((uint)EntityID, force);
+            RigidbodyAddForce((uint)EntityID, ref force);
         }
 
         private void ClampSpeed()
@@ -385,7 +392,7 @@ namespace Game
             vel.Y *= scale;
             vel.Z *= scale;
 
-            RigidbodySetVelocity((uint)EntityID, vel);
+            RigidbodySetVelocity((uint)EntityID, ref vel);
         }
 
         // ===== Collision & Explosion =====
@@ -415,13 +422,13 @@ namespace Game
 
                 if (other == playerID)
                 {
-                    Log("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
-                    EventSystem.Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    LogMessage("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
+                    Publish("BotnetAttackedPlayer", EntityID.ToString());
                 }
 
                 if (other == targetID)
                 {
-                    Log("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
+                    LogMessage("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     isExploding = true;
                     break;
                 }
@@ -436,7 +443,7 @@ namespace Game
             isDead = true;
             isExploding = false;
 
-            Log("Botnet (EntityID = " + EntityID + ") exploding!");
+            LogMessage("Botnet (EntityID = " + EntityID + ") exploding!");
 
             ApplyBlastToTag(TAG_PLAYER);
             ApplyBlastToTag(TAG_SEMICONDUCTOR);

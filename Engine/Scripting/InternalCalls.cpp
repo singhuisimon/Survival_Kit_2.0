@@ -42,10 +42,22 @@ namespace Engine
 		static Input *s_InputSystem = nullptr;
 		static AudioManager *s_AudioManager = nullptr;
 
-		void SetCurrentScene(Scene *scene) { s_CurrentScene = scene; }
-		void SetInputSystem(Input *input) { s_InputSystem = input; }
-		void SetAudioManager(AudioManager *audioManager) { s_AudioManager = audioManager; }
-		AudioManager *GetAudioManager() { return s_AudioManager; }
+		void SetCurrentScene(Scene *scene)
+		{
+			s_CurrentScene = scene;
+		}
+		void SetInputSystem(Input *input)
+		{
+			s_InputSystem = input;
+		}
+		void SetAudioManager(AudioManager *audioManager)
+		{
+			s_AudioManager = audioManager;
+		}
+		AudioManager *GetAudioManager()
+		{
+			return s_AudioManager;
+		}
 
 		// =====================================================================
 		// Helpers
@@ -226,7 +238,7 @@ namespace Engine
 		// =====================================================================
 		// Logging
 		// =====================================================================
-		void Log(MonoString *message)
+		void LogMessage(MonoString *message)
 		{
 			if (!message) return;
 			char *cStr = mono_string_to_utf8(message);
@@ -424,7 +436,10 @@ namespace Engine
 		void Input_GetMousePosition(glm::vec2 *outPosition)
 		{
 			if (!outPosition) return;
-			if (!s_InputSystem) { *outPosition = { 0.0f, 0.0f }; return; }
+			if (!s_InputSystem)
+			{
+				*outPosition = { 0.0f, 0.0f }; return;
+			}
 			*outPosition = s_InputSystem->GetMousePosition();
 		}
 
@@ -564,12 +579,11 @@ namespace Engine
 				e.AddComponent<RigidbodyComponent>();
 		}
 
-		void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel)
+		glm::vec3 Rigidbody_GetVelocity(uint64_t entityID)
 		{
-			if (!outVel) return;
 			Entity e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<RigidbodyComponent>()) return;
-			*outVel = e.GetComponent<RigidbodyComponent>().GetVelocity();
+			if (!e || !e.HasComponent<RigidbodyComponent>()) return glm::vec3{};
+			return e.GetComponent<RigidbodyComponent>().GetVelocity();
 		}
 
 		void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel)
@@ -1281,13 +1295,19 @@ namespace Engine
 			if (nameStr)
 			{
 				char *cName = mono_string_to_utf8(nameStr);
-				if (cName) { ev.name = cName; mono_free(cName); }
+				if (cName)
+				{
+					ev.name = cName; mono_free(cName);
+				}
 			}
 
 			if (payloadStr)
 			{
 				char *cPayload = mono_string_to_utf8(payloadStr);
-				if (cPayload) { ev.payload = cPayload; mono_free(cPayload); }
+				if (cPayload)
+				{
+					ev.payload = cPayload; mono_free(cPayload);
+				}
 			}
 
 			EventSystem::Instance().Queue(ev);

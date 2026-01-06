@@ -1,97 +1,81 @@
-using System;
+using System.Runtime.CompilerServices;
 
 namespace Engine
 {
-    /// <summary>
-    /// Managed wrapper over AudioComponent � simple audio source control.
-    /// </summary>
     public class Audio : Component
     {
-        public float Volume
-        {
-            get { return InternalCalls.Audio_GetVolume(Entity.EntityID); }
-            set { InternalCalls.Audio_SetVolume(Entity.EntityID, value); }
-        }
+        // Component adder
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Entity_AddAudio(uint entityID);
 
-        public float Pitch
-        {
-            get { return InternalCalls.Audio_GetPitch(Entity.EntityID); }
-            set { InternalCalls.Audio_SetPitch(Entity.EntityID, value); }
-        }
+        // Audio bindings (register as: "Engine.Audio::Audio_*")
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Play(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Stop(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Pause(uint entityID);
 
-        public bool Loop
-        {
-            get { return InternalCalls.Audio_GetLoop(Entity.EntityID); }
-            set { InternalCalls.Audio_SetLoop(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetVolume(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetVolume(uint entityID, float volume);
 
-        public bool Mute
-        {
-            get { return InternalCalls.Audio_GetMute(Entity.EntityID); }
-            set { InternalCalls.Audio_SetMute(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetPitch(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetPitch(uint entityID, float pitch);
 
-        public bool Is3D
-        {
-            get { return InternalCalls.Audio_GetIs3D(Entity.EntityID); }
-            set { InternalCalls.Audio_SetIs3D(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Audio_GetLoop(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetLoop(uint entityID, bool loop);
 
-        public float MinDistance{
-            get{ return InternalCalls.Audio_GetMinDistance(Entity.EntityID); }
-            set{ InternalCalls.Audio_SetMinDistance(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Audio_GetMute(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetMute(uint entityID, bool mute);
 
-        public float MaxDistance{
-            get{ return InternalCalls.Audio_GetMaxDistance(Entity.EntityID); }
-            set{ InternalCalls.Audio_SetMaxDistance(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Audio_GetIs3D(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetIs3D(uint entityID, bool is3d);
 
-        public AudioRolloffMode RolloffMode
-        {
-            get { return (AudioRolloffMode)InternalCalls.Audio_GetRolloffMode(Entity.EntityID); }
-            set { InternalCalls.Audio_SetRolloffMode(Entity.EntityID, (int)value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetFile(uint entityID, string path);
 
-        public float DopplerLevel
-        {
-            get { return InternalCalls.Audio_GetDopplerLevel(Entity.EntityID); }
-            set { InternalCalls.Audio_SetDopplerLevel(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetMinDistance(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetMinDistance(uint entityID, float minDist);
 
-        public float Pan2D
-        {
-            get { return InternalCalls.Audio_GetPan2D(Entity.EntityID); }
-            set { InternalCalls.Audio_SetPan2D(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetMaxDistance(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetMaxDistance(uint entityID, float maxDist);
 
-        public float ReverbMix
-        {
-            get { return InternalCalls.Audio_GetReverbMix(Entity.EntityID); }
-            set { InternalCalls.Audio_SetReverbMix(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern int Audio_GetRolloffMode(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetRolloffMode(uint entityID, int mode);
 
-        /// <summary>
-        /// Change the audio asset used by this source.
-        /// </summary>
-        public string File
-        {
-            set { InternalCalls.Audio_SetFile(Entity.EntityID, value); }
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetDopplerLevel(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetDopplerLevel(uint entityID, float level);
 
-        public void Play()
-        {
-            InternalCalls.Audio_Play(Entity.EntityID);
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetPan2D(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetPan2D(uint entityID, float pan);
 
-        public void Stop()
-        {
-            InternalCalls.Audio_Stop(Entity.EntityID);
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetReverbMix(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetReverbMix(uint entityID, float mix);
 
-        public void Pause()
-        {
-            InternalCalls.Audio_Pause(Entity.EntityID);
-        }
+        // ===== Script-friendly static helpers (so scripts can `using static Engine.Audio;`) =====
+        public static void EntityAddAudio(uint entityID) => Entity_AddAudio(entityID);
+
+        public static void AudioPlay(uint entityID) => Audio_Play(entityID);
+        public static void AudioStop(uint entityID) => Audio_Stop(entityID);
+        public static void AudioPause(uint entityID) => Audio_Pause(entityID);
+
+        public static void AudioSetFile(uint entityID, string path) => Audio_SetFile(entityID, path ?? string.Empty);
+        public static void AudioSetLoop(uint entityID, bool loop) => Audio_SetLoop(entityID, loop);
+        public static void AudioSetIs3D(uint entityID, bool is3d) => Audio_SetIs3D(entityID, is3d);
+        public static void AudioSetMinDistance(uint entityID, float minDist) => Audio_SetMinDistance(entityID, minDist);
+        public static void AudioSetMaxDistance(uint entityID, float maxDist) => Audio_SetMaxDistance(entityID, maxDist);
+
+        // ===== Instance API (keep whatever you already had) =====
+        private uint ID => Entity.EntityID;
+
+        public float Volume { get => Audio_GetVolume(ID); set => Audio_SetVolume(ID, value); }
+        public float Pitch { get => Audio_GetPitch(ID); set => Audio_SetPitch(ID, value); }
+        public bool Loop { get => Audio_GetLoop(ID); set => Audio_SetLoop(ID, value); }
+        public bool Mute { get => Audio_GetMute(ID); set => Audio_SetMute(ID, value); }
+        public bool Is3D { get => Audio_GetIs3D(ID); set => Audio_SetIs3D(ID, value); }
+
+        public float MinDistance { get => Audio_GetMinDistance(ID); set => Audio_SetMinDistance(ID, value); }
+        public float MaxDistance { get => Audio_GetMaxDistance(ID); set => Audio_SetMaxDistance(ID, value); }
+
+        public string File { set => Audio_SetFile(ID, value ?? string.Empty); }
+
+        public void Play() => Audio_Play(ID);
+        public void Stop() => Audio_Stop(ID);
+        public void Pause() => Audio_Pause(ID);
     }
 }

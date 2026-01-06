@@ -938,7 +938,6 @@ namespace Engine
 		InternalCalls::SetAudioManager(audioManager);
 	}
 
-	// Put this at the top of MonoScriptEngine.cpp (file-scope), NOT inside the function.
 	static void BindInternalCall(const char *managedName, void *fn)
 	{
 		mono_add_internal_call(managedName, fn);
@@ -992,8 +991,8 @@ namespace Engine
 		// =====================================================================
 		// Logging
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Log",
-			reinterpret_cast<void *>(InternalCalls::Log));
+		BindInternalCall("Engine.InternalCalls::LogMessage",
+			reinterpret_cast<void *>(InternalCalls::LogMessage));
 		BindInternalCall("Engine.InternalCalls::LogError",
 			reinterpret_cast<void *>(InternalCalls::LogError));
 		BindInternalCall("Engine.InternalCalls::LogWarning",

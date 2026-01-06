@@ -1,5 +1,9 @@
 using Engine;
 using System;
+using static Engine.Log;
+using static Engine.Event;
+using static Engine.Transform;
+using static Engine.Scene;
 
 namespace Game
 {
@@ -22,9 +26,9 @@ namespace Game
             spawnTimer = SPAWN_GRACE_TIME;
 
             // Subscribe to bullet hits
-            Engine.EventSystem.Subscribe("BulletHit", OnBulletHit);
+            Subscribe("BulletHit", OnBulletHit);
 
-            Engine.InternalCalls.Log("Core " + EntityID + " Health initialized");
+            LogMessage("Core " + EntityID + " Health initialized");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -37,7 +41,7 @@ namespace Game
                 if (spawnTimer <= 0.0f)
                 {
                     isInvulnerable = false;
-                    Engine.InternalCalls.Log("Core " + EntityID + " is now vulnerable!");
+                    LogMessage("Core " + EntityID + " is now vulnerable!");
                 }
                 return;
             }
@@ -51,7 +55,7 @@ namespace Game
             // If this core was hit
             if (hitEntity == EntityID && !isInvulnerable)
             {
-                Engine.InternalCalls.Log("Core " + EntityID + " hit by bullet!");
+                LogMessage("Core " + EntityID + " hit by bullet!");
                 TakeDamage();
             }
         }
@@ -59,7 +63,7 @@ namespace Game
         private void TakeDamage()
         {
             CurrentHealth -= DamagePerHit;
-            Engine.InternalCalls.Log("Core " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
+            LogMessage("Core " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
             if (CurrentHealth <= 0.0f)
             {
@@ -72,19 +76,19 @@ namespace Game
             if (isDead) return;
             isDead = true;
 
-            uint parentEntityID = Engine.InternalCalls.Transform_GetParent((uint)EntityID);
+            uint parentEntityID = TransformGetParent((uint)EntityID);
 
             if (parentEntityID != 0)
             {
-                Engine.EventSystem.Publish("CoreDestroyed", parentEntityID.ToString());
+                Publish("CoreDestroyed", parentEntityID.ToString());
             }
 
-            Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            SceneDestroyEntity((uint)EntityID);
         }
 
         public override void OnDestroy()
         {
-            Engine.InternalCalls.Log("Core " + EntityID + " destroyed");
+            LogMessage("Core " + EntityID + " destroyed");
         }
     }
 }

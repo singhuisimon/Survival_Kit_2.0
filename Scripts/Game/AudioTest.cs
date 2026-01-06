@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using static Engine.Log;
 
 namespace Game
 {
@@ -12,18 +13,18 @@ namespace Game
         public override void OnStart()
         {
             AudioManager.SetGroupVolume(AudioType.SFX, 0.8f);
-            Log("Audio API working!");
+            LogMessage("Audio API working!");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             float vol = AudioManager.GetGroupVolume(AudioType.SFX);
-            Log("Audio API working! Groupvol is: " + vol.ToString());
+            LogMessage("Audio API working! Groupvol is: " + vol.ToString());
         }
 
         public override void OnDestroy()
         {
-            Log("PlayerController destroyed!");
+            LogMessage("PlayerController destroyed!");
         }
     }
 }

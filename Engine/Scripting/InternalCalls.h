@@ -29,7 +29,7 @@ namespace Engine
 		void     Entity_AddScript(uint64_t entityID, MonoString *classFullNameStr);
 
 		// ===== Logging =====
-		void Log(MonoString *message);
+		void LogMessage(MonoString *message);
 		void LogError(MonoString *message);
 		void LogWarning(MonoString *message);
 
@@ -76,7 +76,7 @@ namespace Engine
 		void Entity_AddRigidBody(uint64_t entityID);
 
 		// ---- Rigidbody velocity access (ECS-level) ----
-		void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel);
+		glm::vec3 Rigidbody_GetVelocity(uint64_t entityID);
 		void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel);
 		void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta);
 

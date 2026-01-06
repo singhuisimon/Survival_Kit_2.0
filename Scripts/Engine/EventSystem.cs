@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Engine
 {
@@ -8,9 +9,13 @@ namespace Engine
     /// Scripts can subscribe to named events and publish events
     /// that are visible to both scripts and native engine systems.
     /// </summary>
-    public static class EventSystem
+    public static class Event
     {
         public delegate void ScriptEventHandler(string name, string payload);
+
+        // Native binding (register as: "Engine.EventSystem::Event_Publish")
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Event_Publish(string name, string payload);
 
         // Managed subscribers per event name
         private static readonly Dictionary<string, List<ScriptEventHandler>> s_Handlers =
@@ -36,24 +41,18 @@ namespace Engine
                 return;
 
             if (s_Handlers.TryGetValue(eventName, out var list))
-            {
                 list.Remove(handler);
-            }
         }
 
         /// <summary>
         /// Publish a script event into the native event system.
-        /// Native systems can subscribe to Engine::ScriptEvent and
-        /// other scripts will receive it via RaiseFromNative.
         /// </summary>
         public static void Publish(string eventName, string payload = "")
         {
-            if (eventName == null)
-                eventName = string.Empty;
-            if (payload == null)
-                payload = string.Empty;
+            if (eventName == null) eventName = string.Empty;
+            if (payload == null) payload = string.Empty;
 
-            InternalCalls.Event_Publish(eventName, payload);
+            Event_Publish(eventName, payload);
         }
 
         /// <summary>
@@ -71,9 +70,7 @@ namespace Engine
             // Work on a snapshot in case handlers mutate subscription lists
             var snapshot = list.ToArray();
             for (int i = 0; i < snapshot.Length; ++i)
-            {
                 snapshot[i]?.Invoke(eventName, payload);
-            }
         }
     }
 }
