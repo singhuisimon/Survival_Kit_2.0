@@ -2,7 +2,7 @@
 using Engine;
 using System;
 using static Engine.Event;
-using static Engine.Log;
+using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Prefab;
 using static Engine.Physics;

@@ -4,9 +4,6 @@ namespace Engine
 {
     public class Audio : Component
     {
-        // Component adder
-        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Entity_AddAudio(uint entityID);
-
         // Audio bindings (register as: "Engine.Audio::Audio_*")
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Play(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Stop(uint entityID);
@@ -46,9 +43,6 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetReverbMix(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetReverbMix(uint entityID, float mix);
-
-        // ===== Script-friendly static helpers (so scripts can `using static Engine.Audio;`) =====
-        public static void EntityAddAudio(uint entityID) => Entity_AddAudio(entityID);
 
         public static void AudioPlay(uint entityID) => Audio_Play(entityID);
         public static void AudioStop(uint entityID) => Audio_Stop(entityID);

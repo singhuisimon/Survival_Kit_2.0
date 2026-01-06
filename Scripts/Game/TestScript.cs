@@ -1,7 +1,7 @@
 using System;
 using Engine;
 using static Engine.Transform;
-using static Engine.Log;
+using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Rigidbody;
@@ -175,6 +175,8 @@ namespace Game
                 moveDir.X += forward.X;
                 moveDir.Y += forward.Y;
                 moveDir.Z += forward.Z;
+
+                LogMessage("Send help pls");
             }
             if (Input.IsKeyPressed(KeyCode.S))  // S = Move toward camera (backward)
             {

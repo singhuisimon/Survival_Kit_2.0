@@ -7,7 +7,7 @@ using static Engine.Scene;
 using static Engine.Prefab;
 using static Engine.Audio;
 using static Engine.Transform;
-using static Engine.Log;
+using static Engine.Logger;
 
 namespace Game
 {

@@ -1,6 +1,6 @@
 using Engine;
 using System;
-using static Engine.Log;
+using static Engine.Logger;
 
 namespace Game
 {

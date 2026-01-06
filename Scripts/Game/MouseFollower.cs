@@ -1,5 +1,5 @@
 using Engine;
-using static Engine.Log;
+using static Engine.Logger;
 using System;
 
 namespace Game

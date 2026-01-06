@@ -957,45 +957,56 @@ namespace Engine
 		// =====================================================================
 		// ECS / Scene
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Scene_CreateEntity",
+		BindInternalCall("Engine.Scene::Scene_CreateEntity",
 			reinterpret_cast<void *>(InternalCalls::Scene_CreateEntity));
-		BindInternalCall("Engine.InternalCalls::Scene_DestroyEntity",
+		BindInternalCall("Engine.Scene::Scene_DestroyEntity",
 			reinterpret_cast<void *>(InternalCalls::Scene_DestroyEntity));
-		BindInternalCall("Engine.InternalCalls::Entity_AddScript",
-			reinterpret_cast<void *>(InternalCalls::Entity_AddScript));
-
-		BindInternalCall("Engine.InternalCalls::Scene_FindEntityByName",
+		BindInternalCall("Engine.Scene::Scene_FindEntityByName",
 			reinterpret_cast<void *>(InternalCalls::Scene_FindEntityByName));
+		BindInternalCall("Engine.Scene::Scene_FindEntitiesByTag",
+			reinterpret_cast<void *>(InternalCalls::Scene_FindEntitiesByTag));
+		BindInternalCall("Engine.Scene::Entity_AddScript",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddScript));
+		BindInternalCall("Engine.Scene::Entity_AddRigidBody",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddRigidBody));
+		BindInternalCall("Engine.Scene::Entity_AddCamera",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddCamera));
+		BindInternalCall("Engine.Scene::Entity_AddAudio",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddAudio));
+		BindInternalCall("Engine.Scene::Entity_AddMeshRenderer",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddMeshRenderer));
+		BindInternalCall("Engine.Scene::Entity_AddTag",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddTag));
 
 		// =====================================================================
 		// Transform
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Transform_GetParent",
+		BindInternalCall("Engine.Transform::Transform_GetParent",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetParent));
 
-		BindInternalCall("Engine.InternalCalls::Transform_GetPosition",
+		BindInternalCall("Engine.Transform::Transform_GetPosition",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetPosition));
-		BindInternalCall("Engine.InternalCalls::Transform_SetPosition",
+		BindInternalCall("Engine.Transform::Transform_SetPosition",
 			reinterpret_cast<void *>(InternalCalls::Transform_SetPosition));
 
-		BindInternalCall("Engine.InternalCalls::Transform_GetRotation",
+		BindInternalCall("Engine.Transform::Transform_GetRotation",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetRotation));
-		BindInternalCall("Engine.InternalCalls::Transform_SetRotation",
+		BindInternalCall("Engine.Transform::Transform_SetRotation",
 			reinterpret_cast<void *>(InternalCalls::Transform_SetRotation));
 
-		BindInternalCall("Engine.InternalCalls::Transform_GetScale",
+		BindInternalCall("Engine.Transform::Transform_GetScale",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetScale));
-		BindInternalCall("Engine.InternalCalls::Transform_SetScale",
+		BindInternalCall("Engine.Transform::Transform_SetScale",
 			reinterpret_cast<void *>(InternalCalls::Transform_SetScale));
 
 		// =====================================================================
 		// Logging
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::LogMessage",
+		BindInternalCall("Engine.Logger::LogMessage",
 			reinterpret_cast<void *>(InternalCalls::LogMessage));
-		BindInternalCall("Engine.InternalCalls::LogError",
+		BindInternalCall("Engine.Logger::LogError",
 			reinterpret_cast<void *>(InternalCalls::LogError));
-		BindInternalCall("Engine.InternalCalls::LogWarning",
+		BindInternalCall("Engine.Logger::LogWarning",
 			reinterpret_cast<void *>(InternalCalls::LogWarning));
 
 		// =====================================================================
@@ -1006,19 +1017,14 @@ namespace Engine
 		BindInternalCall("Engine.Entity::HasComponent_Native",
 			reinterpret_cast<void *>(InternalCalls::Entity_HasComponent));
 
-		BindInternalCall("Engine.InternalCalls::EntityHasCamera",
-			reinterpret_cast<void *>(InternalCalls::EntityHasCamera));
-		BindInternalCall("Engine.InternalCalls::EntityHasRigidBody",
-			reinterpret_cast<void *>(InternalCalls::EntityHasRigidBody));
-
 		// =====================================================================
 		// Prefab
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Prefab_Instantiate",
+		BindInternalCall("Engine.Prefab::Prefab_Instantiate",
 			reinterpret_cast<void *>(InternalCalls::Prefab_Instantiate));
-		BindInternalCall("Engine.InternalCalls::Prefab_InstantiateScene",
+		BindInternalCall("Engine.Prefab::Prefab_InstantiateScene",
 			reinterpret_cast<void *>(InternalCalls::Prefab_InstantiateScene));
-		BindInternalCall("Engine.InternalCalls::Prefab_InstantiateWithTransform",
+		BindInternalCall("Engine.Prefab::Prefab_InstantiateWithTransform",
 			reinterpret_cast<void *>(InternalCalls::Prefab_InstantiateWithTransform));
 
 		// =====================================================================
@@ -1032,192 +1038,177 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::Input_IsMouseButtonPressed));
 		BindInternalCall("Engine.Input::GetMousePosition_Native",
 			reinterpret_cast<void *>(InternalCalls::Input_GetMousePosition));
-
-		BindInternalCall("Engine.InternalCalls::Input_GetMouseDelta",
+		BindInternalCall("Engine.Input::Input_GetMouseDelta",
 			reinterpret_cast<void *>(InternalCalls::Input_GetMouseDelta));
 
 		// =====================================================================
-		// Physics / Rigidbody
+		// Rigidbody
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Entity_AddRigidBody",
-			reinterpret_cast<void *>(InternalCalls::Entity_AddRigidBody));
 
 		// Rigidbody velocity
-		BindInternalCall("Engine.InternalCalls::Rigidbody_GetVelocity",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetVelocity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetVelocity));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_SetVelocity",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetVelocity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetVelocity));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_AddVelocity",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddVelocity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddVelocity));
 
 		// Rigidbody scalar / flags
-		BindInternalCall("Engine.InternalCalls::Rigidbody_GetMass",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetMass",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetMass));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_SetMass",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetMass",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetMass));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_GetIsKinematic",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetIsKinematic",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetIsKinematic));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_SetIsKinematic",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetIsKinematic",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetIsKinematic));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_GetUseGravity",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetUseGravity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetUseGravity));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_SetUseGravity",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetUseGravity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetUseGravity));
 
 		// Rigidbody helpers / forces
-		BindInternalCall("Engine.InternalCalls::Rigidbody_GetSpeed",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetSpeed",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetSpeed));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_IsMoving",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_IsMoving",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_IsMoving));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_IsStatic",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_IsStatic",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_IsStatic));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_AddForce",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddForce",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddForce));
-		BindInternalCall("Engine.InternalCalls::Rigidbody_Stop",
+		BindInternalCall("Engine.Rigidbody::Rigidbody_Stop",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_Stop));
 
-		// Collision events (PhysicsAPI-only)
-		BindInternalCall("Engine.InternalCalls::Physics_EnableCollisionEvents",
+		// =====================================================================
+		// Physics
+		// =====================================================================		
+		BindInternalCall("Engine.Physics::Physics_EnableCollisionEvents",
 			reinterpret_cast<void *>(InternalCalls::Physics_EnableCollisionEvents));
-		BindInternalCall("Engine.InternalCalls::Physics_BeginCollisionFrame",
+		BindInternalCall("Engine.Physics::Physics_BeginCollisionFrame",
 			reinterpret_cast<void *>(InternalCalls::Physics_BeginCollisionFrame));
-		BindInternalCall("Engine.InternalCalls::Physics_GetCollisionCount",
+		BindInternalCall("Engine.Physics::Physics_GetCollisionCount",
 			reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionCount));
-		BindInternalCall("Engine.InternalCalls::Physics_GetCollisionPair",
+		BindInternalCall("Engine.Physics::Physics_GetCollisionPair",
 			reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionPair));
-
-		// =====================================================================
-		// Entity / component adders
-		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Entity_AddTag",
-			reinterpret_cast<void *>(InternalCalls::Entity_AddTag));
-		BindInternalCall("Engine.InternalCalls::Entity_AddCamera",
-			reinterpret_cast<void *>(InternalCalls::Entity_AddCamera));
-		BindInternalCall("Engine.InternalCalls::Entity_AddAudio",
-			reinterpret_cast<void *>(InternalCalls::Entity_AddAudio));
-		BindInternalCall("Engine.InternalCalls::Entity_AddMeshRenderer",
-			reinterpret_cast<void *>(InternalCalls::Entity_AddMeshRenderer));
 
 		// =====================================================================
 		// Tag
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Tag_GetTag",
+		BindInternalCall("Engine.Tag::Tag_GetTag",
 			reinterpret_cast<void *>(InternalCalls::Tag_GetTag));
-		BindInternalCall("Engine.InternalCalls::Tag_SetTag",
+		BindInternalCall("Engine.Tag::Tag_SetTag",
 			reinterpret_cast<void *>(InternalCalls::Tag_SetTag));
-		BindInternalCall("Engine.InternalCalls::Scene_FindEntitiesByTag",
-			reinterpret_cast<void *>(InternalCalls::Scene_FindEntitiesByTag));
 
 		// =====================================================================
 		// Camera
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Camera_GetEnabled",
+		BindInternalCall("Engine.Camera::Camera_GetEnabled",
 			reinterpret_cast<void *>(InternalCalls::Camera_GetEnabled));
-		BindInternalCall("Engine.InternalCalls::Camera_SetEnabled",
+		BindInternalCall("Engine.Camera::Camera_SetEnabled",
 			reinterpret_cast<void *>(InternalCalls::Camera_SetEnabled));
-		BindInternalCall("Engine.InternalCalls::Camera_GetPrimary",
+		BindInternalCall("Engine.Camera::Camera_GetPrimary",
 			reinterpret_cast<void *>(InternalCalls::Camera_GetPrimary));
-		BindInternalCall("Engine.InternalCalls::Camera_SetPrimary",
+		BindInternalCall("Engine.Camera::Camera_SetPrimary",
 			reinterpret_cast<void *>(InternalCalls::Camera_SetPrimary));
-		BindInternalCall("Engine.InternalCalls::Camera_GetFOV",
+		BindInternalCall("Engine.Camera::Camera_GetFOV",
 			reinterpret_cast<void *>(InternalCalls::Camera_GetFOV));
-		BindInternalCall("Engine.InternalCalls::Camera_SetFOV",
+		BindInternalCall("Engine.Camera::Camera_SetFOV",
 			reinterpret_cast<void *>(InternalCalls::Camera_SetFOV));
-		BindInternalCall("Engine.InternalCalls::Camera_GetNear",
+		BindInternalCall("Engine.Camera::Camera_GetNear",
 			reinterpret_cast<void *>(InternalCalls::Camera_GetNear));
-		BindInternalCall("Engine.InternalCalls::Camera_SetNear",
+		BindInternalCall("Engine.Camera::Camera_SetNear",
 			reinterpret_cast<void *>(InternalCalls::Camera_SetNear));
-		BindInternalCall("Engine.InternalCalls::Camera_GetFar",
+		BindInternalCall("Engine.Camera::Camera_GetFar",
 			reinterpret_cast<void *>(InternalCalls::Camera_GetFar));
-		BindInternalCall("Engine.InternalCalls::Camera_SetFar",
+		BindInternalCall("Engine.Camera::Camera_SetFar",
 			reinterpret_cast<void *>(InternalCalls::Camera_SetFar));
-		BindInternalCall("Engine.InternalCalls::Camera_GetTarget",
+		BindInternalCall("Engine.Camera::Camera_GetTarget",
 			reinterpret_cast<void *>(InternalCalls::Camera_GetTarget));
-		BindInternalCall("Engine.InternalCalls::Camera_SetTarget",
+		BindInternalCall("Engine.Camera::Camera_SetTarget",
 			reinterpret_cast<void *>(InternalCalls::Camera_SetTarget));
 
 		// =====================================================================
 		// MeshRenderer
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_GetVisible",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetVisible",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetVisible));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_SetVisible",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetVisible",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetVisible));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_GetShadowCast",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowCast",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowCast));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_SetShadowCast",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowCast",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowCast));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_GetShadowReceive",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowReceive",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowReceive));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_SetShadowReceive",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowReceive",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowReceive));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_GetGlobalIlluminate",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetGlobalIlluminate",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetGlobalIlluminate));
-		BindInternalCall("Engine.InternalCalls::MeshRenderer_SetGlobalIlluminate",
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetGlobalIlluminate",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetGlobalIlluminate));
 
 		// =====================================================================
 		// AudioComponent
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Audio_Play",
+		BindInternalCall("Engine.Audio::Audio_Play",
 			reinterpret_cast<void *>(InternalCalls::Audio_Play));
-		BindInternalCall("Engine.InternalCalls::Audio_Stop",
+		BindInternalCall("Engine.Audio::Audio_Stop",
 			reinterpret_cast<void *>(InternalCalls::Audio_Stop));
-		BindInternalCall("Engine.InternalCalls::Audio_Pause",
+		BindInternalCall("Engine.Audio::Audio_Pause",
 			reinterpret_cast<void *>(InternalCalls::Audio_Pause));
 
-		BindInternalCall("Engine.InternalCalls::Audio_GetVolume",
+		BindInternalCall("Engine.Audio::Audio_GetVolume",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetVolume));
-		BindInternalCall("Engine.InternalCalls::Audio_SetVolume",
+		BindInternalCall("Engine.Audio::Audio_SetVolume",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetVolume));
 
-		BindInternalCall("Engine.InternalCalls::Audio_GetPitch",
+		BindInternalCall("Engine.Audio::Audio_GetPitch",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetPitch));
-		BindInternalCall("Engine.InternalCalls::Audio_SetPitch",
+		BindInternalCall("Engine.Audio::Audio_SetPitch",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetPitch));
 
-		BindInternalCall("Engine.InternalCalls::Audio_GetLoop",
+		BindInternalCall("Engine.Audio::Audio_GetLoop",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetLoop));
-		BindInternalCall("Engine.InternalCalls::Audio_SetLoop",
+		BindInternalCall("Engine.Audio::Audio_SetLoop",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetLoop));
 
-		BindInternalCall("Engine.InternalCalls::Audio_GetMute",
+		BindInternalCall("Engine.Audio::Audio_GetMute",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetMute));
-		BindInternalCall("Engine.InternalCalls::Audio_SetMute",
+		BindInternalCall("Engine.Audio::Audio_SetMute",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetMute));
 
-		BindInternalCall("Engine.InternalCalls::Audio_GetIs3D",
+		BindInternalCall("Engine.Audio::Audio_GetIs3D",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetIs3D));
-		BindInternalCall("Engine.InternalCalls::Audio_SetIs3D",
+		BindInternalCall("Engine.Audio::Audio_SetIs3D",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetIs3D));
 
-		BindInternalCall("Engine.InternalCalls::Audio_SetFile",
+		BindInternalCall("Engine.Audio::Audio_SetFile",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetFile));
 
 		// AudioComponent extensions
-		BindInternalCall("Engine.InternalCalls::Audio_GetMinDistance",
+		BindInternalCall("Engine.Audio::Audio_GetMinDistance",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetMinDistance));
-		BindInternalCall("Engine.InternalCalls::Audio_SetMinDistance",
+		BindInternalCall("Engine.Audio::Audio_SetMinDistance",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetMinDistance));
-		BindInternalCall("Engine.InternalCalls::Audio_GetMaxDistance",
+		BindInternalCall("Engine.Audio::Audio_GetMaxDistance",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetMaxDistance));
-		BindInternalCall("Engine.InternalCalls::Audio_SetMaxDistance",
+		BindInternalCall("Engine.Audio::Audio_SetMaxDistance",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetMaxDistance));
-		BindInternalCall("Engine.InternalCalls::Audio_GetRolloffMode",
+		BindInternalCall("Engine.Audio::Audio_GetRolloffMode",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetRolloffMode));
-		BindInternalCall("Engine.InternalCalls::Audio_SetRolloffMode",
+		BindInternalCall("Engine.Audio::Audio_SetRolloffMode",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetRolloffMode));
-		BindInternalCall("Engine.InternalCalls::Audio_GetDopplerLevel",
+		BindInternalCall("Engine.Audio::Audio_GetDopplerLevel",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetDopplerLevel));
-		BindInternalCall("Engine.InternalCalls::Audio_SetDopplerLevel",
+		BindInternalCall("Engine.Audio::Audio_SetDopplerLevel",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetDopplerLevel));
-		BindInternalCall("Engine.InternalCalls::Audio_GetPan2D",
+		BindInternalCall("Engine.Audio::Audio_GetPan2D",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetPan2D));
-		BindInternalCall("Engine.InternalCalls::Audio_SetPan2D",
+		BindInternalCall("Engine.Audio::Audio_SetPan2D",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetPan2D));
-		BindInternalCall("Engine.InternalCalls::Audio_GetReverbMix",
+		BindInternalCall("Engine.Audio::Audio_GetReverbMix",
 			reinterpret_cast<void *>(InternalCalls::Audio_GetReverbMix));
-		BindInternalCall("Engine.InternalCalls::Audio_SetReverbMix",
+		BindInternalCall("Engine.Audio::Audio_SetReverbMix",
 			reinterpret_cast<void *>(InternalCalls::Audio_SetReverbMix));
 
 		// =====================================================================
@@ -1264,37 +1255,37 @@ namespace Engine
 		// =====================================================================
 		// Event System
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Event_Publish",
+		BindInternalCall("Engine.Event::Event_Publish",
 			reinterpret_cast<void *>(InternalCalls::Event_Publish));
 
 		// =====================================================================
 		// Quaternion
 		// =====================================================================
-		BindInternalCall("Engine.InternalCalls::Quat_FromAxisAngle",
+		BindInternalCall("Engine.QuatNative::Quat_FromAxisAngle",
 			reinterpret_cast<void *>(InternalCalls::Quat_FromAxisAngle));
-		BindInternalCall("Engine.InternalCalls::Quat_GetForward",
+		BindInternalCall("Engine.QuatNative::Quat_GetForward",
 			reinterpret_cast<void *>(InternalCalls::Quat_GetForward));
-		BindInternalCall("Engine.InternalCalls::Quat_GetRight",
+		BindInternalCall("Engine.QuatNative::Quat_GetRight",
 			reinterpret_cast<void *>(InternalCalls::Quat_GetRight));
-		BindInternalCall("Engine.InternalCalls::Quat_GetUp",
+		BindInternalCall("Engine.QuatNative::Quat_GetUp",
 			reinterpret_cast<void *>(InternalCalls::Quat_GetUp));
-		BindInternalCall("Engine.InternalCalls::Quat_RotateVector",
+		BindInternalCall("Engine.QuatNative::Quat_RotateVector",
 			reinterpret_cast<void *>(InternalCalls::Quat_RotateVector));
-		BindInternalCall("Engine.InternalCalls::Quat_Multiply",
+		BindInternalCall("Engine.QuatNative::Quat_Multiply",
 			reinterpret_cast<void *>(InternalCalls::Quat_Multiply));
-		BindInternalCall("Engine.InternalCalls::Quat_Slerp",
+		BindInternalCall("Engine.QuatNative::Quat_Slerp",
 			reinterpret_cast<void *>(InternalCalls::Quat_Slerp));
-		BindInternalCall("Engine.InternalCalls::Quat_Inverse",
+		BindInternalCall("Engine.QuatNative::Quat_Inverse",
 			reinterpret_cast<void *>(InternalCalls::Quat_Inverse));
-		BindInternalCall("Engine.InternalCalls::Quat_ToEuler",
+		BindInternalCall("Engine.QuatNative::Quat_ToEuler",
 			reinterpret_cast<void *>(InternalCalls::Quat_ToEuler));
-		BindInternalCall("Engine.InternalCalls::Quat_FromEuler",
+		BindInternalCall("Engine.QuatNative::Quat_FromEuler",
 			reinterpret_cast<void *>(InternalCalls::Quat_FromEuler));
-		BindInternalCall("Engine.InternalCalls::Quat_Normalize",
+		BindInternalCall("Engine.QuatNative::Quat_Normalize",
 			reinterpret_cast<void *>(InternalCalls::Quat_Normalize));
-		BindInternalCall("Engine.InternalCalls::Quat_Length",
+		BindInternalCall("Engine.QuatNative::Quat_Length",
 			reinterpret_cast<void *>(InternalCalls::Quat_Length));
-		BindInternalCall("Engine.InternalCalls::Quat_Dot",
+		BindInternalCall("Engine.QuatNative::Quat_Dot",
 			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
 
 		LOG_INFO("Internal calls registered");
