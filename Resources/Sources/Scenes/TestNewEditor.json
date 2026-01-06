@@ -1,7 +1,102 @@
 {
-    "Scene": "New Scene",
+    "Scene": "TestNewEditor",
     "Version": "1.0",
-    "Entities": [],
+    "Entities": [
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Test2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9666625279956435113",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            3.9000000953674316
+                        ],
+                        "Rotation": [
+                            0.0,
+                            41.000003814697266,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            2.700000047683716,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048576,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "TestEntity"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8417905526243754153",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            4.199999809265137,
+                            4.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        }
+    ],
     "Settings": [
         {
             "BloomToggle": false,

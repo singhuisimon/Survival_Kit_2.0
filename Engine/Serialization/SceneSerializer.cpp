@@ -154,6 +154,12 @@ namespace Engine
 				componentObj.AddMember("Type", "TransformComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(transform.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
+				
 
 				// Position
 				Value posArray(kArrayType);
@@ -689,6 +695,12 @@ namespace Engine
 					else if (componentType == "TransformComponent")
 					{
 						auto& transform = entity.AddComponent<TransformComponent>();
+						if (properties.HasMember("ComponentGUID"))
+						{
+							transform.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 
 						// Position
 						if (properties.HasMember("Position"))

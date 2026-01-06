@@ -247,6 +247,7 @@ namespace Engine
 
             m_PlayState = PlayState::PLAY;
             m_Editor->SetCurrSelectedEntity(Entity{});
+            m_Editor->RetrievePickedID(0xFFFFFFFFu);
             std::cout << "[VIEWPORT] State changed: STOP to PLAY" << std::endl;
         }
         else
@@ -297,6 +298,7 @@ namespace Engine
 
             m_PlayState = PlayState::STOP;
             m_Editor->SetCurrSelectedEntity(Entity{});
+            m_Editor->RetrievePickedID(0xFFFFFFFFu);
             std::cout << "[VIEWPORT] State changed: to STOP" << std::endl;
         }
         else
