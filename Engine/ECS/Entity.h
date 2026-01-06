@@ -74,7 +74,7 @@ namespace Engine {
         }
 
         entt::registry* GetRegistry() const { return m_Registry; }
-
+        entt::entity GetHandle() const { return m_EntityHandle; }
 
     private:
         entt::entity m_EntityHandle = entt::null;
