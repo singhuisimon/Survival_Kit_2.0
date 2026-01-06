@@ -1,3 +1,21 @@
+/**************************************************************************
+ * @file
+ * InternalCalls.cpp
+ * @author
+ * Varying amounts by team
+ * @date
+ * 2026/01/06 (YYYY/MM/DD)
+ * @brief
+ * This source file defines the native InternalCalls bridge used by the Mono
+ * scripting layer to invoke engine functionality (ECS, input, audio, physics,
+ * prefabs, events, math helpers, etc.).
+ *
+ * Each function in this file is registered with Mono and can be invoked from
+ * managed C# code. Functions generally assume the ScriptSystem has already
+ * provided valid engine context pointers via SetCurrentScene / SetInputSystem /
+ * SetAudioManager.
+***************************************************************************/
+
 #include "InternalCalls.h"
 #include "MonoScriptEngine.h"
 
@@ -42,18 +60,45 @@ namespace Engine
 		static Input *s_InputSystem = nullptr;
 		static AudioManager *s_AudioManager = nullptr;
 
+		/**************************************************************************
+		 * @brief
+		 * Sets the scene context used by InternalCalls.
+		 * @param scene
+		 * Pointer to the active scene used for subsequent internal calls.
+		***************************************************************************/
 		void SetCurrentScene(Scene *scene)
 		{
 			s_CurrentScene = scene;
 		}
+
+		/**************************************************************************
+		 * @brief
+		 * Sets the input system context used by InternalCalls.
+		 * @param input
+		 * Pointer to the engine input system used for subsequent internal calls.
+		***************************************************************************/
 		void SetInputSystem(Input *input)
 		{
 			s_InputSystem = input;
 		}
+
+		/**************************************************************************
+		 * @brief
+		 * Sets the audio manager context used by InternalCalls.
+		 * @param audioManager
+		 * Pointer to the engine audio manager used for subsequent internal calls.
+		***************************************************************************/
 		void SetAudioManager(AudioManager *audioManager)
 		{
 			s_AudioManager = audioManager;
 		}
+
+		/**************************************************************************
+		 * @brief
+		 * Gets the audio manager context used by InternalCalls.
+		 * @return
+		 * Pointer to the engine audio manager used for subsequent internal calls.
+		***************************************************************************/
 		AudioManager *GetAudioManager()
 		{
 			return s_AudioManager;
@@ -71,6 +116,12 @@ namespace Engine
 			return e;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Initializes and binds the ScriptComponent instance for an entity.
+		 * @param entity
+		 * Entity handle in the current scene.
+		***************************************************************************/
 		static void InitializeScriptComponentForEntity(Entity entity)
 		{
 			if (!entity)
@@ -110,12 +161,28 @@ namespace Engine
 		// =====================================================================
 		// Component presence helpers (registered as internal calls)
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Internal engine <-> scripting bridge call.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool EntityHasCamera(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
 			return e && e.HasComponent<CameraComponent>();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Internal engine <-> scripting bridge call.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool EntityHasRigidBody(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -125,6 +192,14 @@ namespace Engine
 		// =====================================================================
 		// Scene / Entity lifecycle
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Creates a new entity in the current scene.
+		 * @param nameStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @return
+		 * Entity identifier (0 if not found / invalid).
+		***************************************************************************/
 		uint64_t Scene_CreateEntity(MonoString *nameStr)
 		{
 			if (!s_CurrentScene)
@@ -145,6 +220,12 @@ namespace Engine
 			return static_cast<uint32_t>(e);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Destroys an entity in the current scene.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Scene_DestroyEntity(uint64_t entityID)
 		{
 			if (!s_CurrentScene)
@@ -160,6 +241,14 @@ namespace Engine
 			s_CurrentScene->DestroyEntity(e);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Attaches a managed script class to the specified entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param classFullNameStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void Entity_AddScript(uint64_t entityID, MonoString *classFullNameStr)
 		{
 			if (!s_CurrentScene)
@@ -216,6 +305,14 @@ namespace Engine
 			}
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Finds an entity by name in the current scene.
+		 * @param nameString
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @return
+		 * Entity identifier (0 if not found / invalid).
+		***************************************************************************/
 		uint64_t Scene_FindEntityByName(MonoString *nameString)
 		{
 			if (!s_CurrentScene || !nameString)
@@ -238,6 +335,12 @@ namespace Engine
 		// =====================================================================
 		// Logging
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Writes a message to the engine logging system.
+		 * @param message
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void LogMessage(MonoString *message)
 		{
 			if (!message) return;
@@ -246,6 +349,12 @@ namespace Engine
 			if (cStr) mono_free(cStr);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Writes a message to the engine logging system.
+		 * @param message
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void LogError(MonoString *message)
 		{
 			if (!message) return;
@@ -254,6 +363,12 @@ namespace Engine
 			if (cStr) mono_free(cStr);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Writes a message to the engine logging system.
+		 * @param message
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void LogWarning(MonoString *message)
 		{
 			if (!message) return;
@@ -265,6 +380,14 @@ namespace Engine
 		// =====================================================================
 		// Entity utilities
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Returns the native entity ID associated with a managed Entity wrapper.
+		 * @param entityObj
+		 * Managed object provided by the scripting runtime (MonoObject*).
+		 * @return
+		 * Unsigned integer result.
+		***************************************************************************/
 		uint64_t Entity_GetEntityID(MonoObject *entityObj)
 		{
 			if (!entityObj)
@@ -290,6 +413,16 @@ namespace Engine
 			return *reinterpret_cast<uint64_t *>(unboxed);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Checks whether an entity has a component identified by its short type name.
+		 * @param e
+		 * Entity handle in the current scene.
+		 * @param shortName
+		 * Short type name string.
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		static bool HasComponentByShortName(Entity e, const std::string &shortName)
 		{
 			if (!e) return false;
@@ -305,6 +438,16 @@ namespace Engine
 			return false;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Checks whether the entity has a component of the specified managed type.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param componentType
+		 * Managed reflection type used to resolve a native component type.
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Entity_HasComponent(uint64_t entityID, MonoReflectionType *componentType)
 		{
 			if (!s_CurrentScene || !componentType)
@@ -337,6 +480,14 @@ namespace Engine
 		// =====================================================================
 		// Transform
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Retrieves a transform property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outPosition
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition)
 		{
 			if (!outPosition) return;
@@ -346,6 +497,14 @@ namespace Engine
 			*outPosition = e.GetComponent<TransformComponent>().Position;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a transform property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param position
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position)
 		{
 			if (!position) return;
@@ -357,6 +516,14 @@ namespace Engine
 			t.IsDirty = true;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Retrieves a transform property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outRotation
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation)
 		{
 			if (!outRotation) return;
@@ -366,6 +533,14 @@ namespace Engine
 			*outRotation = e.GetComponent<TransformComponent>().Rotation;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a transform property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param rotation
+		 * Pointer/reference to a quaternion value.
+		***************************************************************************/
 		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation)
 		{
 			if (!rotation) return;
@@ -377,6 +552,14 @@ namespace Engine
 			t.IsDirty = true;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Retrieves a transform property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outScale
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale)
 		{
 			if (!outScale) return;
@@ -386,6 +569,14 @@ namespace Engine
 			*outScale = e.GetComponent<TransformComponent>().Scale;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a transform property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param scale
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale)
 		{
 			if (!scale) return;
@@ -397,6 +588,14 @@ namespace Engine
 			t.IsDirty = true;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Retrieves a transform property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested integer value.
+		***************************************************************************/
 		int Transform_GetParent(uint64_t entityID)
 		{
 			if (!s_CurrentScene)
@@ -415,24 +614,54 @@ namespace Engine
 		// =====================================================================
 		// Input
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Queries the current input state from the engine input system.
+		 * @param keyCode
+		 * Input parameter.
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Input_IsKeyPressed(int keyCode)
 		{
 			if (!s_InputSystem) return false;
 			return s_InputSystem->IsKeyPressed(keyCode);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries the current input state from the engine input system.
+		 * @param keyCode
+		 * Input parameter.
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Input_IsKeyReleased(int keyCode)
 		{
 			if (!s_InputSystem) return false;
 			return s_InputSystem->IsKeyJustReleased(keyCode);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries the current input state from the engine input system.
+		 * @param button
+		 * Input parameter.
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Input_IsMouseButtonPressed(int button)
 		{
 			if (!s_InputSystem) return false;
 			return s_InputSystem->IsMouseButtonPressed(button);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries the current input state from the engine input system.
+		 * @param outPosition
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Input_GetMousePosition(glm::vec2 *outPosition)
 		{
 			if (!outPosition) return;
@@ -443,6 +672,14 @@ namespace Engine
 			*outPosition = s_InputSystem->GetMousePosition();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries the current input state from the engine input system.
+		 * @param outX
+		 * Output parameter that receives the requested value.
+		 * @param outY
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Input_GetMouseDelta(float *outX, float *outY)
 		{
 			if (outX) *outX = 0.0f;
@@ -457,6 +694,14 @@ namespace Engine
 		// =====================================================================
 		// Prefabs
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Instantiates a prefab into the current scene.
+		 * @param prefabPathStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @return
+		 * Unsigned integer result.
+		***************************************************************************/
 		uint64_t Prefab_Instantiate(MonoString *prefabPathStr)
 		{
 			if (!s_CurrentScene || !prefabPathStr)
@@ -485,6 +730,14 @@ namespace Engine
 			return static_cast<uint64_t>(static_cast<uint32_t>(entity));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Instantiates a prefab into the current scene.
+		 * @param prefabPathStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @return
+		 * Unsigned integer result.
+		***************************************************************************/
 		uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr)
 		{
 			if (!s_CurrentScene || !prefabPathStr)
@@ -513,6 +766,22 @@ namespace Engine
 			return static_cast<uint64_t>(static_cast<uint32_t>(entity));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Instantiates a prefab into the current scene.
+		 * @param prefabPathStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @param position
+		 * Pointer/reference to a vector value.
+		 * @param rotation
+		 * Pointer/reference to a quaternion value.
+		 * @param scale
+		 * Pointer/reference to a vector value.
+		 * @param isScenePrefab
+		 * Input parameter.
+		 * @return
+		 * Unsigned integer result.
+		***************************************************************************/
 		uint64_t Prefab_InstantiateWithTransform(
 			MonoString *prefabPathStr,
 			glm::vec3 *position,
@@ -571,6 +840,12 @@ namespace Engine
 		// =====================================================================
 		// Physics / Rigidbody
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Adds the specified component to the entity if it does not already exist.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Entity_AddRigidBody(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -579,6 +854,14 @@ namespace Engine
 				e.AddComponent<RigidbodyComponent>();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Result value.
+		***************************************************************************/
 		glm::vec3 Rigidbody_GetVelocity(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -586,6 +869,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().GetVelocity();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a rigidbody property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param inVel
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel)
 		{
 			if (!inVel) return;
@@ -594,6 +885,14 @@ namespace Engine
 			e.GetComponent<RigidbodyComponent>().SetVelocity(*inVel);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes a rigidbody/physics operation on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param delta
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta)
 		{
 			if (!delta) return;
@@ -603,6 +902,14 @@ namespace Engine
 			rb.SetVelocity(rb.GetVelocity() + *delta);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Rigidbody_GetMass(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -610,6 +917,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().GetMass();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a rigidbody property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param mass
+		 * Input parameter.
+		***************************************************************************/
 		void Rigidbody_SetMass(uint64_t entityID, float mass)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -617,6 +932,14 @@ namespace Engine
 			e.GetComponent<RigidbodyComponent>().SetMass(mass);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Rigidbody_GetIsKinematic(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -624,6 +947,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().IsKinematicBody();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a rigidbody property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param isKinematic
+		 * Input parameter.
+		***************************************************************************/
 		void Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -631,6 +962,14 @@ namespace Engine
 			e.GetComponent<RigidbodyComponent>().SetKinematic(isKinematic);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Rigidbody_GetUseGravity(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -638,6 +977,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().IsGravityEnabled();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a rigidbody property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param useGravity
+		 * Input parameter.
+		***************************************************************************/
 		void Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -645,6 +992,14 @@ namespace Engine
 			e.GetComponent<RigidbodyComponent>().SetGravityEnabled(useGravity);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Rigidbody_GetSpeed(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -652,6 +1007,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().GetSpeed();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes a rigidbody/physics operation on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Rigidbody_IsMoving(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -659,6 +1022,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().IsMoving();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes a rigidbody/physics operation on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Rigidbody_IsStatic(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -666,6 +1037,14 @@ namespace Engine
 			return e.GetComponent<RigidbodyComponent>().IsStatic();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Applies a force/impulse to the entity's rigidbody.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param force
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force)
 		{
 			if (!force) return;
@@ -674,6 +1053,12 @@ namespace Engine
 			e.GetComponent<RigidbodyComponent>().AddForce(*force);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes a rigidbody/physics operation on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Rigidbody_Stop(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -684,21 +1069,47 @@ namespace Engine
 		// =====================================================================
 		// Physics collisions (PhysicsAPI only)
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Queries global physics system state or collision results.
+		***************************************************************************/
 		void Physics_EnableCollisionEvents()
 		{
 			PhysicsAPI::EnableCollisionEvents();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries global physics system state or collision results.
+		***************************************************************************/
 		void Physics_BeginCollisionFrame()
 		{
 			PhysicsAPI::BeginCollisionFrame();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries global physics system state or collision results.
+		 * @return
+		 * Requested integer value.
+		***************************************************************************/
 		int Physics_GetCollisionCount()
 		{
 			return (int)PhysicsAPI::GetInstance().GetCollisionEvents().size();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Queries global physics system state or collision results.
+		 * @param index
+		 * Zero-based index into the requested collection.
+		 * @param a
+		 * Output parameter receiving an entity identifier involved in a collision
+		 * pair.
+		 * @param b
+		 * Output parameter receiving an entity identifier involved in a collision
+		 * pair.
+		***************************************************************************/
 		void Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b)
 		{
 			if (!a || !b) return;
@@ -713,6 +1124,12 @@ namespace Engine
 		// =====================================================================
 		// Component adders
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Adds the specified component to the entity if it does not already exist.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Entity_AddTag(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -721,6 +1138,12 @@ namespace Engine
 				e.AddComponent<TagComponent>();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Adds the specified component to the entity if it does not already exist.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Entity_AddCamera(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -729,6 +1152,12 @@ namespace Engine
 				e.AddComponent<CameraComponent>();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Adds the specified component to the entity if it does not already exist.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Entity_AddAudio(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -737,6 +1166,12 @@ namespace Engine
 				e.AddComponent<AudioComponent>();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Adds the specified component to the entity if it does not already exist.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Entity_AddMeshRenderer(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -761,6 +1196,14 @@ namespace Engine
 			return mono_string_new(domain, tag.c_str());
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets or sets the entity tag.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param tag
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void Tag_SetTag(uint64_t entityID, MonoString *tagStr)
 		{
 			if (!tagStr) return;
@@ -775,6 +1218,24 @@ namespace Engine
 			mono_free(utf8);
 		}
 
+		/***************************************************************************
+		 * @brief Finds all entities in the current scene whose TagComponent matches
+		 * 		the provided tag string, and returns their entity IDs as a managed
+		 * 		Mono array.
+		 *
+		 * @details
+		 * Converts the incoming \p tagString (MonoString) to a UTF-8 std::string.
+		 * Iterates the registry view<TagComponent> and collects matching entities.
+		 * Returns a MonoArray of uint32 entity IDs.
+		 * If the Mono domain is unavailable, returns nullptr.
+		 * If the scene/tag is unavailable or conversion fails, returns an empty array.
+		 *
+		 * @param tagString
+		 * 		The tag to search for (managed string). If null, returns an empty array.
+		 *
+		 * @return A managed MonoArray (System.UInt32[]) containing matching entity IDs,
+		 * 		or nullptr if the current Mono domain/class lookup fails.
+		***************************************************************************/
 		MonoArray *Scene_FindEntitiesByTag(MonoString *tagString)
 		{
 			MonoDomain *domain = mono_domain_get();
@@ -819,6 +1280,14 @@ namespace Engine
 		// =====================================================================
 		// Camera
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Gets a camera property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Camera_GetEnabled(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -826,6 +1295,14 @@ namespace Engine
 			return e.GetComponent<CameraComponent>().Enabled;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a camera property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param enabled
+		 * Input parameter.
+		***************************************************************************/
 		void Camera_SetEnabled(uint64_t entityID, bool enabled)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -833,6 +1310,14 @@ namespace Engine
 			e.GetComponent<CameraComponent>().Enabled = enabled;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a camera property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Camera_GetPrimary(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -840,6 +1325,14 @@ namespace Engine
 			return e.GetComponent<CameraComponent>().Primary;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a camera property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param primary
+		 * Input parameter.
+		***************************************************************************/
 		void Camera_SetPrimary(uint64_t entityID, bool primary)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -847,6 +1340,14 @@ namespace Engine
 			e.GetComponent<CameraComponent>().Primary = primary;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a camera property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Camera_GetFOV(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -854,6 +1355,14 @@ namespace Engine
 			return e.GetComponent<CameraComponent>().FOV;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a camera property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param fov
+		 * Input parameter.
+		***************************************************************************/
 		void Camera_SetFOV(uint64_t entityID, float fov)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -861,6 +1370,14 @@ namespace Engine
 			e.GetComponent<CameraComponent>().FOV = fov;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a camera property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Camera_GetNear(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -868,6 +1385,14 @@ namespace Engine
 			return e.GetComponent<CameraComponent>().NearPlane;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a camera property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param nearPlane
+		 * Input parameter.
+		***************************************************************************/
 		void Camera_SetNear(uint64_t entityID, float nearPlane)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -875,6 +1400,14 @@ namespace Engine
 			e.GetComponent<CameraComponent>().NearPlane = nearPlane;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a camera property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Camera_GetFar(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -882,6 +1415,14 @@ namespace Engine
 			return e.GetComponent<CameraComponent>().FarPlane;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a camera property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param farPlane
+		 * Input parameter.
+		***************************************************************************/
 		void Camera_SetFar(uint64_t entityID, float farPlane)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -889,6 +1430,14 @@ namespace Engine
 			e.GetComponent<CameraComponent>().FarPlane = farPlane;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a camera property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outTarget
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget)
 		{
 			if (!outTarget) return;
@@ -897,6 +1446,14 @@ namespace Engine
 			*outTarget = e.GetComponent<CameraComponent>().Target;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a camera property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param inTarget
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget)
 		{
 			if (!inTarget) return;
@@ -908,6 +1465,14 @@ namespace Engine
 		// =====================================================================
 		// MeshRenderer
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Gets a mesh renderer property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool MeshRenderer_GetVisible(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -915,6 +1480,14 @@ namespace Engine
 			return e.GetComponent<MeshRendererComponent>().Visible;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a mesh renderer property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param visible
+		 * Input parameter.
+		***************************************************************************/
 		void MeshRenderer_SetVisible(uint64_t entityID, bool visible)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -922,6 +1495,14 @@ namespace Engine
 			e.GetComponent<MeshRendererComponent>().Visible = visible;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a mesh renderer property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool MeshRenderer_GetShadowCast(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -929,6 +1510,14 @@ namespace Engine
 			return e.GetComponent<MeshRendererComponent>().ShadowCast;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a mesh renderer property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param cast
+		 * Input parameter.
+		***************************************************************************/
 		void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -936,6 +1525,14 @@ namespace Engine
 			e.GetComponent<MeshRendererComponent>().ShadowCast = cast;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a mesh renderer property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool MeshRenderer_GetShadowReceive(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -943,6 +1540,14 @@ namespace Engine
 			return e.GetComponent<MeshRendererComponent>().ShadowReceive;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a mesh renderer property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param receive
+		 * Input parameter.
+		***************************************************************************/
 		void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -950,6 +1555,14 @@ namespace Engine
 			e.GetComponent<MeshRendererComponent>().ShadowReceive = receive;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets a mesh renderer property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -957,6 +1570,14 @@ namespace Engine
 			return e.GetComponent<MeshRendererComponent>().GlobalIlluminate;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets a mesh renderer property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param gi
+		 * Input parameter.
+		***************************************************************************/
 		void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -967,6 +1588,12 @@ namespace Engine
 		// =====================================================================
 		// AudioComponent
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Starts playback of the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Audio_Play(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -974,6 +1601,12 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetState(PlayState::PLAY);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Stops playback of the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Audio_Stop(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -981,6 +1614,12 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetState(PlayState::STOP);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Pauses playback of the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
 		void Audio_Pause(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -988,6 +1627,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetState(PlayState::PAUSE);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetVolume(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -995,6 +1642,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().Volume;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param volume
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetVolume(uint64_t entityID, float volume)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1002,6 +1657,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetVolume(volume);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetPitch(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1009,6 +1672,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().Pitch;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param pitch
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetPitch(uint64_t entityID, float pitch)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1016,6 +1687,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetPitch(pitch);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Audio_GetLoop(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1023,6 +1702,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().Loop;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param loop
+		 * New boolean value to apply.
+		***************************************************************************/
 		void Audio_SetLoop(uint64_t entityID, bool loop)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1030,6 +1717,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetLoop(loop);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Audio_GetMute(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1037,6 +1732,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().Mute;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param mute
+		 * New boolean value to apply.
+		***************************************************************************/
 		void Audio_SetMute(uint64_t entityID, bool mute)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1044,6 +1747,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetMute(mute);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool Audio_GetIs3D(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1051,6 +1762,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().Is3D;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param is3d
+		 * New boolean value to apply.
+		***************************************************************************/
 		void Audio_SetIs3D(uint64_t entityID, bool is3d)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1058,6 +1777,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().Set3D(is3d);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param path
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void Audio_SetFile(uint64_t entityID, MonoString *path)
 		{
 			if (!path) return;
@@ -1071,6 +1798,14 @@ namespace Engine
 			mono_free(utf8);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetMinDistance(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1078,6 +1813,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().MinDistance;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param minDist
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetMinDistance(uint64_t entityID, float minDist)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1085,6 +1828,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetMinDistance(minDist);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetMaxDistance(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1092,6 +1843,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().MaxDistance;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param maxDist
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetMaxDistance(uint64_t entityID, float maxDist)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1099,6 +1858,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetMaxDistance(maxDist);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested integer value.
+		***************************************************************************/
 		int Audio_GetRolloffMode(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1106,6 +1873,14 @@ namespace Engine
 			return static_cast<int>(e.GetComponent<AudioComponent>().RolloffMode);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param mode
+		 * New mode value to apply.
+		***************************************************************************/
 		void Audio_SetRolloffMode(uint64_t entityID, int mode)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1113,6 +1888,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetRolloffMode(static_cast<AudioRolloffMode>(mode));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetDopplerLevel(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1120,6 +1903,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().DopplerLevel;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param level
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetDopplerLevel(uint64_t entityID, float level)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1127,6 +1918,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetDopplerLevel(level);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetPan2D(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1134,6 +1933,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().Pan2D;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param pan
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetPan2D(uint64_t entityID, float pan)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1141,6 +1948,14 @@ namespace Engine
 			e.GetComponent<AudioComponent>().SetPan(pan);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Gets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Audio_GetReverbMix(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1148,6 +1963,14 @@ namespace Engine
 			return e.GetComponent<AudioComponent>().ReverbProperties;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets an audio property for the entity's audio component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param mix
+		 * New value to apply.
+		***************************************************************************/
 		void Audio_SetReverbMix(uint64_t entityID, float mix)
 		{
 			Entity e = GetEntityOrNull(entityID);
@@ -1158,6 +1981,14 @@ namespace Engine
 		// =====================================================================
 		// AudioManager
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param volume
+		 * New value to apply.
+		***************************************************************************/
 		void AudioManager_SetGroupVolume(int groupType, float volume)
 		{
 			auto *am = GetAudioManager();
@@ -1165,6 +1996,14 @@ namespace Engine
 			am->SetGroupVolume(static_cast<AudioType>(groupType), volume);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float AudioManager_GetGroupVolume(int groupType)
 		{
 			auto *am = GetAudioManager();
@@ -1174,6 +2013,14 @@ namespace Engine
 			return vol;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param pitch
+		 * New value to apply.
+		***************************************************************************/
 		void AudioManager_SetGroupPitch(int groupType, float pitch)
 		{
 			auto *am = GetAudioManager();
@@ -1181,6 +2028,14 @@ namespace Engine
 			am->SetGroupPitch(static_cast<AudioType>(groupType), pitch);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float AudioManager_GetGroupPitch(int groupType)
 		{
 			auto *am = GetAudioManager();
@@ -1190,6 +2045,14 @@ namespace Engine
 			return pitch;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param mute
+		 * New boolean value to apply.
+		***************************************************************************/
 		void AudioManager_SetGroupMute(int groupType, bool mute)
 		{
 			auto *am = GetAudioManager();
@@ -1197,6 +2060,14 @@ namespace Engine
 			am->MuteGroup(static_cast<AudioType>(groupType), mute);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @return
+		 * True if the condition is met; otherwise false.
+		***************************************************************************/
 		bool AudioManager_IsGroupMuted(int groupType)
 		{
 			auto *am = GetAudioManager();
@@ -1204,6 +2075,14 @@ namespace Engine
 			return am->IsGroupMuted(static_cast<AudioType>(groupType));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param pause
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_PauseGroup(int groupType, bool pause)
 		{
 			auto *am = GetAudioManager();
@@ -1211,6 +2090,12 @@ namespace Engine
 			am->PauseGroup(static_cast<AudioType>(groupType), pause);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param pause
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_PauseAll(bool pause)
 		{
 			auto *am = GetAudioManager();
@@ -1218,6 +2103,12 @@ namespace Engine
 			am->PauseAll(pause);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_StopByType(int groupType)
 		{
 			auto *am = GetAudioManager();
@@ -1225,6 +2116,10 @@ namespace Engine
 			am->StopByType(static_cast<AudioType>(groupType));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		***************************************************************************/
 		void AudioManager_StopAll()
 		{
 			auto *am = GetAudioManager();
@@ -1232,6 +2127,14 @@ namespace Engine
 			am->StopAll();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param effectType
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_CreateDSP(int groupType, int effectType)
 		{
 			auto *am = GetAudioManager();
@@ -1239,6 +2142,16 @@ namespace Engine
 			am->CreateDSP(static_cast<DSPEffectType>(effectType), static_cast<AudioType>(groupType));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param effectType
+		 * Input parameter.
+		 * @param enable
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_EnableDSP(int groupType, int effectType, bool enable)
 		{
 			auto *am = GetAudioManager();
@@ -1246,6 +2159,18 @@ namespace Engine
 			am->EnableDSP(static_cast<AudioType>(groupType), static_cast<DSPEffectType>(effectType), enable);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param effectType
+		 * Input parameter.
+		 * @param paramIndex
+		 * Input parameter.
+		 * @param value
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value)
 		{
 			auto *am = GetAudioManager();
@@ -1255,6 +2180,14 @@ namespace Engine
 				paramIndex, value);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		 * @param effectType
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType)
 		{
 			auto *am = GetAudioManager();
@@ -1263,6 +2196,12 @@ namespace Engine
 				static_cast<DSPEffectType>(effectType));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param groupType
+		 * Input parameter.
+		***************************************************************************/
 		void AudioManager_ReleaseDSPByGroup(int groupType)
 		{
 			auto *am = GetAudioManager();
@@ -1270,6 +2209,10 @@ namespace Engine
 			am->ReleaseDSPByGroup(static_cast<AudioType>(groupType));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		***************************************************************************/
 		void AudioManager_ReleaseAllDSPs()
 		{
 			auto *am = GetAudioManager();
@@ -1277,6 +2220,18 @@ namespace Engine
 			am->ReleaseAllDSPs();
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Invokes an AudioManager operation.
+		 * @param position
+		 * Pointer/reference to a vector value.
+		 * @param forward
+		 * Pointer to a vector that receives the computed result.
+		 * @param up
+		 * Pointer to a vector that receives the computed result.
+		 * @param velocity
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
 		void AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
 			glm::vec3 *up, glm::vec3 *velocity)
 		{
@@ -1288,6 +2243,14 @@ namespace Engine
 		// =====================================================================
 		// Event publish
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Publishes an event into the engine event system.
+		 * @param nameStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @param payloadStr
+		 * Managed string provided by the scripting runtime (MonoString*).
+		***************************************************************************/
 		void Event_Publish(MonoString *nameStr, MonoString *payloadStr)
 		{
 			ScriptEvent ev;
@@ -1316,78 +2279,194 @@ namespace Engine
 		// =====================================================================
 		// Quaternion helpers
 		// =====================================================================
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param axis
+		 * Pointer/reference to a vector value.
+		 * @param angleRadians
+		 * Input parameter.
+		 * @param outQuat
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat)
 		{
 			if (!axis || !outQuat) return;
 			*outQuat = glm::angleAxis(angleRadians, glm::normalize(*axis));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param outForward
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward)
 		{
 			if (!quat || !outForward) return;
 			*outForward = glm::rotate(*quat, glm::vec3(0.0f, 0.0f, -1.0f));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param outRight
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight)
 		{
 			if (!quat || !outRight) return;
 			*outRight = glm::rotate(*quat, glm::vec3(1.0f, 0.0f, 0.0f));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param outUp
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp)
 		{
 			if (!quat || !outUp) return;
 			*outUp = glm::rotate(*quat, glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param vec
+		 * Pointer/reference to a vector value.
+		 * @param outVec
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec)
 		{
 			if (!quat || !vec || !outVec) return;
 			*outVec = glm::rotate(*quat, *vec);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param q1
+		 * Pointer/reference to a quaternion value.
+		 * @param q2
+		 * Pointer/reference to a quaternion value.
+		 * @param outQuat
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat)
 		{
 			if (!q1 || !q2 || !outQuat) return;
 			*outQuat = (*q1) * (*q2);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param q1
+		 * Pointer/reference to a quaternion value.
+		 * @param q2
+		 * Pointer/reference to a quaternion value.
+		 * @param t
+		 * Interpolation parameter in [0, 1].
+		 * @param outQuat
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat)
 		{
 			if (!q1 || !q2 || !outQuat) return;
 			*outQuat = glm::slerp(*q1, *q2, t);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param outQuat
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_Inverse(glm::quat *quat, glm::quat *outQuat)
 		{
 			if (!quat || !outQuat) return;
 			*outQuat = glm::inverse(*quat);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param outEuler
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler)
 		{
 			if (!quat || !outEuler) return;
 			*outEuler = glm::eulerAngles(*quat);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param euler
+		 * Pointer/reference to a vector value.
+		 * @param outQuat
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat)
 		{
 			if (!euler || !outQuat) return;
 			*outQuat = glm::quat(*euler);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @param outQuat
+		 * Output parameter that receives the requested value.
+		***************************************************************************/
 		void Quat_Normalize(glm::quat *quat, glm::quat *outQuat)
 		{
 			if (!quat || !outQuat) return;
 			*outQuat = glm::normalize(*quat);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param quat
+		 * Pointer/reference to a quaternion value.
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Quat_Length(glm::quat *quat)
 		{
 			if (!quat) return 0.0f;
 			return glm::length(*quat);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Performs a quaternion math operation.
+		 * @param q1
+		 * Pointer/reference to a quaternion value.
+		 * @param q2
+		 * Pointer/reference to a quaternion value.
+		 * @return
+		 * Requested floating-point value.
+		***************************************************************************/
 		float Quat_Dot(glm::quat *q1, glm::quat *q2)
 		{
 			if (!q1 || !q2) return 0.0f;
