@@ -8,7 +8,7 @@ namespace Engine
 {
     void EditorViewportPanel::ManipulateEntityTransform(Entity& entity, EditorViewport m_ImGuizmoViewportData)
     {
-        if (m_PlayState != PlayState::STOP) return;
+        //if (m_PlayState != PlayState::STOP) return;
         Renderer* m_Renderer = m_Editor->GetRenderer();
         if (!entity || !m_Renderer || !entity.HasComponent<TransformComponent>()) return;
 
@@ -88,7 +88,7 @@ namespace Engine
 
     void EditorViewportPanel::HandleGizmoPicked(EditorViewport m_ImGuizmoViewportData)
     {
-        if (m_PlayState != PlayState::STOP) return;
+        //if (m_PlayState != PlayState::STOP) return;
         Entity m_SelectedEntity = m_Editor->GetSelectedEntity();
         u32 m_PickedID = m_Editor->GetPickedID();
         Scene* m_ActiveScene = m_Editor->GetActiveScene();
@@ -97,10 +97,9 @@ namespace Engine
         static double lastClickTime = 0.0;
         static const double DOUBLE_CLICK_TIME = 0.3;
 
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() &&
+            ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
-
-
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
                 if (doubleClickCandidate && doubleClickCandidateID != 0xFFFFFFFFu)
@@ -196,7 +195,7 @@ namespace Engine
 
     void EditorViewportPanel::ViewportClickAndTeleport()
     {
-        if (m_PlayState != PlayState::STOP) return;
+        //if (m_PlayState != PlayState::STOP) return;
         Entity m_SelectedEntity = m_Editor->GetSelectedEntity();
         Renderer* m_Renderer = m_Editor->GetRenderer();
 
@@ -246,7 +245,7 @@ namespace Engine
             }
 
             m_PlayState = PlayState::PLAY;
-            m_Editor->SetCurrSelectedEntity(Entity{});
+            //m_Editor->SetCurrSelectedEntity(Entity{});
             std::cout << "[VIEWPORT] State changed: STOP to PLAY" << std::endl;
         }
         else
@@ -296,7 +295,7 @@ namespace Engine
             }
 
             m_PlayState = PlayState::STOP;
-            m_Editor->SetCurrSelectedEntity(Entity{});
+            //m_Editor->SetCurrSelectedEntity(Entity{});
             std::cout << "[VIEWPORT] State changed: to STOP" << std::endl;
         }
         else
@@ -399,7 +398,7 @@ namespace Engine
         ImGui::SameLine();
 
         // ===== STOP BUTTON (ALWAYS says "Stop") =====
-        if (m_PlayState == PlayState::PLAY)
+        if (m_PlayState == PlayState::PLAY || m_PlayState == PlayState::PAUSE)
         {
             // Red Stop button - ENABLED in PLAY or PAUSE
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 0, 0, 255));
