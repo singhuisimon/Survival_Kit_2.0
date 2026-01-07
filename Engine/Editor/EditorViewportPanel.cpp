@@ -234,7 +234,7 @@ namespace Engine
     void EditorViewportPanel::Play()
     {
         // ONLY allow Play from STOP state
-        if (m_PlayState == PlayState::STOP)
+        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             // Store the original scene state before playing
             Scene* activeScene = m_Editor->GetActiveScene();
@@ -347,7 +347,7 @@ namespace Engine
         ImGui::SameLine(availWidth - totalButtonsWidth);
 
         // ===== PLAY BUTTON (ALWAYS says "Play") =====
-        if (m_PlayState == PlayState::STOP)
+        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             // Green Play button - ENABLED only in STOP state
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(144, 238, 144, 255));
@@ -373,7 +373,7 @@ namespace Engine
         ImGui::SameLine();
 
         // ===== PAUSE BUTTON (ALWAYS says "Pause") =====
-        if (m_PlayState == PlayState::STOP)
+        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             // Gray Pause button - DISABLED in STOP
             ImGui::BeginDisabled();
@@ -381,19 +381,6 @@ namespace Engine
             ImGui::Button("Pause");
             ImGui::PopStyleColor();
             ImGui::EndDisabled();
-        }
-        else if (m_PlayState == PlayState::PLAY)
-        {
-            // Yellow Pause button - ENABLED in PLAY
-            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 210, 100, 255));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(240, 190, 80, 255));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(220, 170, 60, 255));
-
-            if (ImGui::Button("Pause")) {
-                Pause();
-            }
-
-            ImGui::PopStyleColor(3);
         }
         else // PAUSE state
         {
@@ -412,7 +399,7 @@ namespace Engine
         ImGui::SameLine();
 
         // ===== STOP BUTTON (ALWAYS says "Stop") =====
-        if (m_PlayState == PlayState::PLAY || m_PlayState == PlayState::PAUSE)
+        if (m_PlayState == PlayState::PLAY)
         {
             // Red Stop button - ENABLED in PLAY or PAUSE
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 0, 0, 255));
