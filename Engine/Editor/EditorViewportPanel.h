@@ -60,6 +60,7 @@ namespace Engine
 
 		ImGuizmo::OPERATION GetOperation() { return m_Operation; }
 		void SetOperation(ImGuizmo::OPERATION operation) { m_Operation = operation; }
+		void CameraControl(Renderer* renderer);
 	};
 }
 #endif

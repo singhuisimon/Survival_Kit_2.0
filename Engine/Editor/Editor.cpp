@@ -176,6 +176,9 @@ namespace Engine
                 m_EditorViewport->HandleGizmoPicked(m_ImGuizmoViewportData);
             }
         }
+
+        m_EditorViewport->CameraControl(m_Renderer);
+
         ImGui::End();
     }
 

@@ -423,4 +423,18 @@ namespace Engine
 
         ImGui::SeparatorText("Viewport");
     }
+
+    void EditorViewportPanel::CameraControl(Renderer* renderer) {
+        ImGui::SeparatorText("Camera Controls");
+
+        Camera3D& editorCam = renderer->getEditorCamera();
+        float& camSpeed = editorCam.getEditorCamSpeed();
+        if (ImGui::DragFloat("Editor Camera Movement Speed", &camSpeed, 0.01f, 0.0f, 1e10f)) {
+            editorCam.setEditorCamSpeed(camSpeed);
+        }
+        float& zoomSpeed = editorCam.getEditorZoomSpeed();
+        if (ImGui::DragFloat("Editor Camera Zoom Speed", &zoomSpeed, 0.01f, 0.0f, 1e10f)) {
+            editorCam.setEditorZoomSpeed(zoomSpeed);
+        }
+    }
 }
