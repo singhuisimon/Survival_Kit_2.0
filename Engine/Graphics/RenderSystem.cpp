@@ -31,7 +31,7 @@ namespace Engine {
 
 			// Capture visible geometry information
 			if (!renderable.Visible) continue;
-			
+
 			m_drawitems.push_back({
 					.m_model_to_world_transform = transform.WorldTransform,
 					.m_drawitem_type = DrawItemType::MESH3D,
@@ -44,7 +44,7 @@ namespace Engine {
 					.m_material_guid = renderable.MaterialGuid,
 					.m_texture_guid = renderable.TextureGuid
 				});
-			
+
 		}
 
 		// Save all enabled cameras
@@ -120,10 +120,15 @@ namespace Engine {
 			// Save indirect multiplier
 			L.indirectMultiplier = LgLightComp.IndirectMultiplier;
 			m_lightlist.emplace_back(L);
-		}	
+		}
 
 		// Save all 2D items
-		auto spriteView = scene->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
+		//auto spriteView = scene->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
+
+		auto spriteView = scene->GetRegistry().group<TransformComponent, SpriteRendererComponent>();
+
+		spriteView.sort<SpriteRendererComponent>([](SpriteRendererComponent const& a, SpriteRendererComponent const& b) {return a.SpriteLayer < b.SpriteLayer; });
+
 		for (auto entity : spriteView) 
 		{
 			auto& renderable2d = spriteView.get<SpriteRendererComponent>(entity);
