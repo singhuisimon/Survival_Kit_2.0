@@ -35,6 +35,7 @@
 #include "../Editor/EditorPropertyPanel.h"
 #include "../Editor/EditorPerformancePanel.h"
 #include "../Editor/EditorViewportPanel.h"
+#include "../Editor/EditorAssetBrowserPanel.h"
 #include "../Utility/Timestep.h"
 #include "../Profiler/Profiler.h"
 #include "Graphics/GraphicsLoader.h"
@@ -52,6 +53,7 @@ namespace Engine
 	class EditorPropertyPanel;
 	class EditorPerformancePanel;
 	class EditorViewportPanel;
+	class EditorAssetBrowserPanel;
 
 	/**
 	* @class Editor
@@ -74,16 +76,14 @@ namespace Engine
 		std::unique_ptr<EditorPropertyPanel> m_EditorProperty;
 		std::unique_ptr<EditorPerformancePanel> m_EditorPerformance;
 		std::unique_ptr<EditorViewportPanel> m_EditorViewport;
+		std::unique_ptr<EditorAssetBrowserPanel> m_EditorAsset;
 		// gizmo
 		Entity m_SelectedEntity{};
 		u32 m_PickedID = 0xFFFFFFFFu;
-		
 
 		// Editor Viewport 
 		EditorViewport editorViewportData;
 		EditorViewport m_ImGuizmoViewportData;
-
-		ImGuizmo::OPERATION m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
 
 		// OnInit
 		bool m_Initialized = false;
@@ -123,7 +123,7 @@ namespace Engine
 			m_EditorProperty = std::make_unique<EditorPropertyPanel>(this);
 			m_EditorPerformance = std::make_unique<EditorPerformancePanel>(this);
 			m_EditorViewport = std::make_unique<EditorViewportPanel>(this);
-
+			m_EditorAsset = std::make_unique<EditorAssetBrowserPanel>(this);
 		};
 
 		~Editor() = default;
@@ -165,6 +165,10 @@ namespace Engine
 
 		void SetCurrSelectedEntity(const Entity& entity) { m_SelectedEntity = entity; }
 		const Entity GetSelectedEntity() const { return m_SelectedEntity; }
+
+		ImGuizmo::OPERATION GetOperation();
+		void SetOperation(ImGuizmo::OPERATION operation);
+
 		// =================== Use In Game.cpp ===================
 		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
 			m_Profiler = profiler; // still increases refcount, no extra copy on call

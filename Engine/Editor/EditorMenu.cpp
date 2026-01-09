@@ -89,11 +89,17 @@ namespace Engine
 
 			if (ImGui::BeginMenu("View"))
 			{
-				ImGui::MenuItem("Hierarchy", NULL, &m_Editor->GetHierarchyWindowRef());
-				ImGui::MenuItem("Property", NULL, &m_Editor->GetPropertyWindowRef());
-				ImGui::MenuItem("Performance", NULL, &m_Editor->GetPerformanceProfileWindowRef());
+				ImGui::MenuItem("Hierarchy", nullptr, &m_Editor->GetHierarchyWindowRef());
+				ImGui::MenuItem("Property", nullptr, &m_Editor->GetPropertyWindowRef());
+				ImGui::MenuItem("Performance", nullptr, &m_Editor->GetPerformanceProfileWindowRef());
+
+				ImGui::Separator();
+
+				ImGui::MenuItem("HDR Settings", nullptr, &m_ShowHDRSettings);
+
 				ImGui::EndMenu();
 			}
+
 
 			// ---------------- Display Current Scene Name ---------------------
 			if (!m_CurrScenePath.empty())
@@ -124,6 +130,8 @@ namespace Engine
 		OpenScenePanel();
 		SaveScenePanel();
 		OpenPrefabPanel();
+		DisplayHDRSettings();
+
 	}
 
 	void EditorMenu::OpenScenePanel()
@@ -358,4 +366,100 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 	}
+	void EditorMenu::DisplayHDRSettings()
+	{
+		if(!m_Editor || !m_Editor->GetRenderer())
+			return;
+
+		ImGui::Begin("HDR Settings", &m_ShowHDRSettings);
+
+		float& exposure = m_Editor->GetRenderer()->getExposure();
+
+		// Exposure control
+		if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 5.0f, "%.2f"))
+		{
+			// Exposure value changed
+		}
+
+		// Optional: Add a reset button
+		if (ImGui::Button("Reset to Default"))
+		{
+			exposure = 1.0f;
+		}
+
+		// Optional: Add tooltip
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset exposure to default value (1.0)");
+		}
+
+
+		ImGui::Separator();
+
+		// ======================
+		// Bloom toggle
+		// ======================
+		auto& bloomToggle = m_Editor->GetRenderer()->getBloomToggle();
+		auto& bloomStrength = m_Editor->GetRenderer()->getBloomStrength();
+		auto& bloomFilter = m_Editor->GetRenderer()->getBloomFilterRadius();
+		ImGui::Checkbox("Enable Bloom", &bloomToggle);
+
+		// ======================
+		// Bloom strength
+		// ======================
+		// Slider
+		if (ImGui::SliderFloat("Bloom Strength",
+			&bloomStrength,
+			0.0f, 1.0f, "%.3f"))
+		{
+			// Bloom strength changed
+		}
+
+		// Input box on the same line
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(80.0f);
+		ImGui::InputFloat("##BloomStrengthInput",
+			&bloomStrength,
+			0.0f, 0.0f, "%.3f");
+
+		// Clamp manually if you want to enforce range:
+		bloomStrength = std::clamp(bloomStrength, 0.0f, 1.0f);
+
+		// ======================
+		// Bloom filter radius
+		// ======================
+		// Slider (typical useful range is small around 0.001 to 0.02)
+		if (ImGui::SliderFloat("Filter Radius",
+			&bloomFilter,
+			0.001f, 0.02f, "%.4f"))
+		{
+			// Filter radius changed
+		}
+
+		// Input box on the same line
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(80.0f);
+		ImGui::InputFloat("##FilterRadiusInput",
+			&bloomFilter,
+			0.0f, 0.0f, "%.4f");
+
+		// Clamp to avoid nonsense values 
+		bloomFilter = std::clamp(bloomFilter, 0.0001f, 0.05f);
+
+		// Reset button for bloom settings
+		if (ImGui::Button("Reset to Default##Bloom"))
+		{
+			bloomStrength = 0.01f;
+			bloomFilter = 0.0025f;
+		}
+
+		// Tooltip for bloom settings
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset bloom strength (0.01) and filter radius (0.0025) to default values");
+		}
+
+		ImGui::End();
+	}
+
 }

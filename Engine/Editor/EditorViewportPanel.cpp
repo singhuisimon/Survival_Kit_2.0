@@ -8,7 +8,7 @@ namespace Engine
 {
     void EditorViewportPanel::ManipulateEntityTransform(Entity& entity, EditorViewport m_ImGuizmoViewportData)
     {
-        if (m_PlayState != PlayState::STOP) return;
+        //if (m_PlayState != PlayState::STOP) return;
         Renderer* m_Renderer = m_Editor->GetRenderer();
         if (!entity || !m_Renderer || !entity.HasComponent<TransformComponent>()) return;
 
@@ -88,7 +88,7 @@ namespace Engine
 
     void EditorViewportPanel::HandleGizmoPicked(EditorViewport m_ImGuizmoViewportData)
     {
-        if (m_PlayState != PlayState::STOP) return;
+        //if (m_PlayState != PlayState::STOP) return;
         Entity m_SelectedEntity = m_Editor->GetSelectedEntity();
         u32 m_PickedID = m_Editor->GetPickedID();
         Scene* m_ActiveScene = m_Editor->GetActiveScene();
@@ -97,10 +97,9 @@ namespace Engine
         static double lastClickTime = 0.0;
         static const double DOUBLE_CLICK_TIME = 0.3;
 
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered() &&
+            ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
-
-
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
                 if (doubleClickCandidate && doubleClickCandidateID != 0xFFFFFFFFu)
@@ -196,7 +195,7 @@ namespace Engine
 
     void EditorViewportPanel::ViewportClickAndTeleport()
     {
-        if (m_PlayState != PlayState::STOP) return;
+        //if (m_PlayState != PlayState::STOP) return;
         Entity m_SelectedEntity = m_Editor->GetSelectedEntity();
         Renderer* m_Renderer = m_Editor->GetRenderer();
 
@@ -234,7 +233,7 @@ namespace Engine
     void EditorViewportPanel::Play()
     {
         // ONLY allow Play from STOP state
-        if (m_PlayState == PlayState::STOP)
+        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             // Store the original scene state before playing
             Scene* activeScene = m_Editor->GetActiveScene();
@@ -246,8 +245,7 @@ namespace Engine
             }
 
             m_PlayState = PlayState::PLAY;
-            m_Editor->SetCurrSelectedEntity(Entity{});
-            m_Editor->RetrievePickedID(0xFFFFFFFFu);
+            //m_Editor->SetCurrSelectedEntity(Entity{});
             std::cout << "[VIEWPORT] State changed: STOP to PLAY" << std::endl;
         }
         else
@@ -297,8 +295,7 @@ namespace Engine
             }
 
             m_PlayState = PlayState::STOP;
-            m_Editor->SetCurrSelectedEntity(Entity{});
-            m_Editor->RetrievePickedID(0xFFFFFFFFu);
+            //m_Editor->SetCurrSelectedEntity(Entity{});
             std::cout << "[VIEWPORT] State changed: to STOP" << std::endl;
         }
         else
@@ -349,7 +346,7 @@ namespace Engine
         ImGui::SameLine(availWidth - totalButtonsWidth);
 
         // ===== PLAY BUTTON (ALWAYS says "Play") =====
-        if (m_PlayState == PlayState::STOP)
+        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             // Green Play button - ENABLED only in STOP state
             ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(144, 238, 144, 255));
@@ -375,7 +372,7 @@ namespace Engine
         ImGui::SameLine();
 
         // ===== PAUSE BUTTON (ALWAYS says "Pause") =====
-        if (m_PlayState == PlayState::STOP)
+        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             // Gray Pause button - DISABLED in STOP
             ImGui::BeginDisabled();
@@ -383,19 +380,6 @@ namespace Engine
             ImGui::Button("Pause");
             ImGui::PopStyleColor();
             ImGui::EndDisabled();
-        }
-        else if (m_PlayState == PlayState::PLAY)
-        {
-            // Yellow Pause button - ENABLED in PLAY
-            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(255, 210, 100, 255));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(240, 190, 80, 255));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(220, 170, 60, 255));
-
-            if (ImGui::Button("Pause")) {
-                Pause();
-            }
-
-            ImGui::PopStyleColor(3);
         }
         else // PAUSE state
         {
@@ -438,5 +422,19 @@ namespace Engine
         }
 
         ImGui::SeparatorText("Viewport");
+    }
+
+    void EditorViewportPanel::CameraControl(Renderer* renderer) {
+        ImGui::SeparatorText("Camera Controls");
+
+        Camera3D& editorCam = renderer->getEditorCamera();
+        float& camSpeed = editorCam.getEditorCamSpeed();
+        if (ImGui::DragFloat("Editor Camera Movement Speed", &camSpeed, 0.01f, 0.0f, 1e10f)) {
+            editorCam.setEditorCamSpeed(camSpeed);
+        }
+        float& zoomSpeed = editorCam.getEditorZoomSpeed();
+        if (ImGui::DragFloat("Editor Camera Zoom Speed", &zoomSpeed, 0.01f, 0.0f, 1e10f)) {
+            editorCam.setEditorZoomSpeed(zoomSpeed);
+        }
     }
 }

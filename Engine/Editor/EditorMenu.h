@@ -25,6 +25,7 @@ namespace Engine
 		void OpenScenePanel();
 		void SaveScenePanel();
 		void OpenPrefabPanel();
+		void DisplayHDRSettings();
 	
 	private:
 		Editor* m_Editor = nullptr;
@@ -33,6 +34,7 @@ namespace Engine
 		bool m_SaveScenePanel = false;
 		bool m_CloseSaveAsPanel = false;
 		bool m_OpenPrefabPanel = false;
+		bool m_ShowHDRSettings = false;
 
 		std::string m_CurrScenePath = "";
 		std::string m_CurrPrefabPath = "";
