@@ -1,0 +1,768 @@
+#include <windows.h>
+#include <algorithm>
+#include "EditorAssetBrowserPanel.h"
+#include "../Utility/Logger.h"
+#include "../Engine/Editor/Editor.h"
+#include "../Asset/AssetManager.h"
+#include "../Asset/ResourceManager.h"
+#include "../Asset/ResourceHelpers.h"
+
+/*#include "../Animation/AnimationStorage.h"
+#include "../BehaviourTree/BehaviourTreeEditor.h"
+#include "../Graphics/Camera.h"
+#include "../Graphics/Texture.h"
+#include "../Scripting/ScriptSerializer.h"
+#include "../Scripting/MonoScriptEngine.h"
+#include  "../Serialization/MaterialSerializer.h"*/
+
+namespace Engine
+{
+	void EditorAssetBrowserPanel::AssetBrowserPanel()
+	{
+		DisplayAssetsBrowser();
+		DisplayDescriptorEditorPanel();
+	}
+
+	void EditorAssetBrowserPanel::DisplayAssetsBrowser()
+	{
+		ImGui::SetNextWindowSize(ImVec2(600, 400));
+
+		// Begin properties dockable window
+		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		{
+			ImGui::Columns(2, nullptr, true);
+			//static std::string selectedFolder = "";
+			//static ResourceType selectedType = ResourceType::UNKNOWN;
+
+			// ================= Left column panel display all the resources folder ========================
+			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			ImGui::Text("Projects:");
+
+			// For resources handled by Asset Browser
+			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				std::set<ResourceType> availableTypes;
+				for (const auto* record : allAssets)
+				{
+					if (record && record->valid && record->type != ResourceType::UNKNOWN)
+					{
+						availableTypes.insert(record->type);
+					}
+				}
+
+				for (const auto& type : availableTypes)
+				{
+					std::string typeName = resourceTypeToString(type);
+					bool isSelected = (selectedType == type);
+
+					if (ImGui::Selectable(typeName.c_str(), isSelected))
+					{
+
+						raw_asset = true;
+						selectedType = type;
+						selectedFolder = typeName;
+						selectedResourcesIndex = -1;
+					}
+				}
+			}
+
+			// For resources handled by filepath (Prefabs and Scenes)
+			if (ImGui::CollapsingHeader("Composed Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto folders = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/"));
+
+				for (auto& folder : folders)
+				{
+					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" && folder.name != "Textures" && folder.name != "Material")
+					{
+						bool isSelected = (selectedFolder == folder.fullPath);
+						if (ImGui::Selectable(folder.name.c_str(), isSelected))
+						{
+							selectedType = ResourceType::UNKNOWN;
+							raw_asset = false;
+							selectedFolder = folder.fullPath;
+							selectedResourcesIndex = -1; // reset asset selection
+						}
+					}
+				}
+			}
+
+			ImGui::EndChild();
+
+			// ================= Right column panel - display assets of selected type ========================
+
+			auto& db = AM.db();
+			auto allAssets = db.AllMutable();
+
+			std::vector<const AssetRecord*> filteredAssets;
+			filteredAssets.reserve(allAssets.size());
+
+			for (const auto* record : allAssets)
+			{
+				if (!record || !record->valid) continue;
+				if (record->type == selectedType)
+				{
+					filteredAssets.push_back(record);
+				}
+			}
+
+			// To get the files in the selected folder
+			auto assetsList = m_Editor->getAssetsInFolder(selectedFolder);
+
+			ImGui::NextColumn();
+			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
+
+
+			if (raw_asset && selectedResourcesIndex != -1)
+			{
+				ImGui::Text("Asset Selected: %s", filteredAssets[selectedResourcesIndex]->sourcePath.c_str());
+			}
+			else if (!raw_asset && selectedResourcesIndex != -1)
+			{
+				ImGui::Text("Asset Selected: %s", assetsList[selectedResourcesIndex].fullPath.c_str());
+			}
+
+			// For resources handled by Asset Browser
+			if (!selectedFolder.empty() && raw_asset)
+			{
+
+				// Display filtered assets
+				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
+
+				if (ImGui::BeginTable("AssetGrid", itemsPerRow))
+				{
+					for (size_t i = 0; i < filteredAssets.size(); ++i)
+					{
+
+						const auto* record = filteredAssets[i];
+
+						std::filesystem::path assetPath(record->sourcePath);
+						std::string filename = assetPath.filename().string();
+						std::string extension = record->ext;
+						std::string hash = record->contentHash;
+						std::time_t writeTime = record->lastWriteTime;
+
+						ImGui::TableNextColumn();
+
+						bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+						// Optional background color for selected
+						if (isSelected)
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
+						}
+
+						// Unique ID per button
+						ImGui::PushID(static_cast<int>(i));
+
+						if (ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+						{
+							selectedResourcesIndex = static_cast<int>(i);
+							ImGui::OpenPopup("AssetContextMenu");
+						}
+
+						// ======================= DRAG-DROP SOURCE  =======================
+						// Enables dragging assets from the browser to component fields
+						if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+						{
+							// Package the GUID as the payload
+							xresource::instance_guid draggedGuid = record->guid;
+							ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", &draggedGuid, sizeof(xresource::instance_guid));
+
+							// Visual feedback while dragging
+							ImGui::Text("Dragging: %s", filename.c_str());
+							ImGui::Text("Type: %s", resourceTypeToString(record->type).c_str());
+
+							ImGui::EndDragDropSource();
+						}
+
+						if (ImGui::BeginPopupContextItem("AssetContextMenu"))
+						{
+							ImGui::Text("%s", filename.c_str());
+
+							// Only Texture and Meshes for now
+							if (record->type == ResourceType::TEXTURE || record->type == ResourceType::MESH)
+							{
+								ImGui::Separator();
+
+								if (ImGui::MenuItem("Edit"))
+								{
+									// open asset editor or show rename dialog
+									LOG_INFO("Edit asset: ", filename);
+
+									showDescriptorEditorPanel = true;
+									currentEditingGuid = record->guid;
+									editedAsset = filename;
+								}
+
+							}
+							ImGui::EndPopup();
+						}
+
+						if (isSelected)
+						{
+							ImGui::PopStyleColor(3);
+						}
+
+						// ==================== Display info detail ==========================
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("Name: %s", filename.c_str());
+							ImGui::Text("Type: %s", extension.c_str());
+							ImGui::Text("Content Hash: %s", hash.c_str());
+
+							char timeBuf[64];
+							std::tm* tm_local = std::localtime(&writeTime);
+							std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+							ImGui::Text("Last Write Time: %s", timeBuf);
+
+							ImGui::EndTooltip();
+						}
+
+						// ==================== To center text under thumbnail ================
+						ImVec2 textSize = ImGui::CalcTextSize(filename.c_str());
+						float textX = (thumbnailSize - textSize.x) * 0.5f;
+						if (textX < 0) textX = 0;
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+						ImGui::TextWrapped("%s", filename.c_str());
+
+						ImGui::PopID();
+						ImGui::NextColumn();
+					}
+					ImGui::EndTable();
+				}
+			}
+
+			// For resources handled by filepath
+			if (!selectedFolder.empty() && !raw_asset)
+			{
+				// display the selected folder name
+				std::filesystem::path folderPath(selectedFolder);
+				std::string folderName = folderPath.filename().string();
+				ImGui::Text(("Resources > " + folderName).c_str());
+
+				ImGui::Separator();
+
+				const float padding = 10.0f;
+				const float thumbnailSize = 64.0f;
+				const float cellSize = thumbnailSize + padding;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
+
+				// int textureCount = -1;
+				ImGui::Columns(itemsPerRow, nullptr, false);
+
+				// loop through files in selected folder
+				for (size_t i = 0; i < assetsList.size(); i++)
+				{
+					const auto& asset = assetsList[i];
+					std::string fileName = asset.name;
+					std::string filePath = asset.fullPath;
+
+					ImGui::PushID(fileName.c_str());
+
+					bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+					if (isSelected)
+					{
+						// Change the button background color
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f)); // selected color
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
+					}
+
+					if (ImGui::Button(fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+					{
+						selectedResourcesIndex = static_cast<int>(i);
+
+						std::string extension = asset.name.substr(asset.name.find_last_of('.'));
+						if (extension == ".json" && folderName != "BT") // For scene, not BT
+						{
+							LOG_DEBUG(" ==== Start Loading Scene ==== : ", fileName);
+							m_Editor->SetScenePath(filePath); // update curr file path
+							//currFileName = fileName; // store file name
+
+							LOG_DEBUG("m_Scene->SetName(fileName)", fileName);
+							if (m_Editor->GetActiveScene())
+							{
+								m_Editor->SetCurrSelectedEntity(Entity{});
+								//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+								//TODO: Prefab
+								/*isPrefabEditor = false;
+								LoadAllPrefabsIntoRegistry();*/
+								m_Editor->GetActiveScene()->GetRegistry().clear();
+								m_Editor->GetActiveScene()->LoadFromFile(filePath);
+
+							
+								m_Editor->RetrievePickedID(0xFFFFFFFFu);
+								m_Editor->SetOperation(static_cast<ImGuizmo::OPERATION>(-1));
+
+								// Update settings 
+								m_Editor->GetRenderer()->getBloomToggle() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomToggle;
+								m_Editor->GetRenderer()->getBloomStrength() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomStrength;
+								m_Editor->GetRenderer()->getBloomFilterRadius() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomFilterRadius;
+								m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
+
+							}
+							LOG_DEBUG(" ==== End Loading Scene ==== : ", fileName);
+						}
+						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
+						{
+							LOG_DEBUG("=====Start Load Prefab File=========");
+							/*	if (!isPrefabEditor)
+								{
+									if (!currScenePath.empty())
+									{
+										m_Scene->SaveToFile(currScenePath);
+										m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
+										LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
+									}
+								}*/
+
+							//TODO - Prefab
+							//currPrefabPath = filePath;
+							//auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+
+							//PrefabRegistry::Get().RegisterPrefab(prefab);
+
+							//if (prefab)
+							//{
+							//	m_Scene->GetRegistry().clear();
+
+							//	Entity entity;
+							//	if (prefab->GetType() == PrefabType::Scene)
+							//	{
+
+							//		LOG_INFO("Loading Scene prefab with hierarchy");
+							//		entity = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
+							//	}
+							//	else
+							//	{
+							//		LOG_INFO("Loading single Entity prefab");
+							//		entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
+							//	}
+
+
+							//	if (!currScenePath.empty())
+							//	{
+							//		currScenePath.clear();
+							//	}
+
+							//	m_SelectedEntity = Entity(); //reset entity
+							//	m_PickedID = 0xFFFFFFFFu;
+							//	isPrefabEditor = true;
+
+
+							//	LOG_INFO("Now editing prefab:", currPrefabPath);
+							//	LOG_DEBUG("=====End Load Prefab File=========");
+
+							//}
+						}
+					}
+					// to change the color of the selected
+					if (isSelected)
+					{
+						ImGui::PopStyleColor(3);
+					}
+
+					// ==================== Display info detail ==========================
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::BeginTooltip();
+						ImGui::Text("Name: %s", fileName.c_str());
+						std::string extension = fileName.substr(fileName.find_last_of('.') + 1);
+						ImGui::Text("Type: %s", extension.c_str());
+						ImGui::EndTooltip();
+					}
+
+					// ==================== To center text under thumbnail ================
+					ImVec2 textSize = ImGui::CalcTextSize(fileName.c_str());
+					float textX = (thumbnailSize - textSize.x) * 0.5f;
+					if (textX < 0) textX = 0;
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+					ImGui::TextWrapped("%s", fileName.c_str());
+
+					ImGui::PopID();
+					ImGui::NextColumn();
+
+				}
+
+			}
+
+			ImGui::EndChild();
+			ImGui::Columns(1);
+
+		}
+
+		ImGui::End();
+	}
+
+	void EditorAssetBrowserPanel::DisplayDescriptorEditorPanel()
+	{
+
+		if (!showDescriptorEditorPanel)
+		{
+			descriptorEditor.Clear();
+			return;
+		}
+
+		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel, ImGuiWindowFlags_NoDocking))
+		{
+			LOG_DEBUG("displayDescriptorEditorPanel OPEN");
+
+			if (!descriptorEditor.IsLoaded() || currentEditingGuid != descriptorEditor.GetGuid())
+			{
+				if (!descriptorEditor.Load(currentEditingGuid))
+				{
+					ImGui::Text("Failed to load descriptor for %s", editedAsset.c_str());
+				}
+			}
+			else
+			{
+				ImGui::Columns(2, nullptr, true);
+
+				// Drawing asset in descriptor editor if it is a texture
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE)
+				{
+					auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(currentEditingGuid));
+					if (texture != nullptr)
+					{
+						float tex_w = static_cast<float>(texture->width);
+						float tex_h = static_cast<float>(texture->height);
+
+
+						ImVec2 window_size = ImGui::GetWindowSize();
+						float win_w = window_size.x * 3 / 4;
+						float win_h = window_size.y * 3 / 4;
+
+						float aspect = tex_w / tex_h;
+
+						ImVec2 viewportSize;
+						if (win_w / win_h > aspect)
+						{
+							viewportSize.x = win_h * aspect;
+							viewportSize.y = win_h;
+						}
+						else
+						{
+							viewportSize.x = win_w;
+							viewportSize.y = win_w / aspect;
+						}
+
+						ImGui::Image(
+							(ImTextureID)(intptr_t)((GLuint)texture->textureID),
+							viewportSize,
+							ImVec2(0, 0), ImVec2(1, 1)
+						);
+					}
+				}
+
+				ImGui::NextColumn();
+
+				ImGui::SeparatorText("Asset Information");
+				ImGui::Text("Asset Name: %s", descriptorEditor.GetDisplayName().c_str());
+				ImGui::Text("Source: %s", descriptorEditor.GetSourcePath().c_str());
+
+				std::string assetType{};
+				switch (descriptorEditor.GetType())
+				{
+				case ResourceType::TEXTURE:
+					assetType = "Texture";
+					break;
+				case ResourceType::MESH:
+					assetType = "Mesh";
+					break;
+				default:
+					break;
+				}
+				ImGui::Text("Asset Type: %s", assetType.c_str());
+
+				ImGui::Spacing();
+				ImGui::SeparatorText("Editable Properties");
+
+				// Check type
+				if (descriptorEditor.GetType() == ResourceType::TEXTURE)
+				{
+
+					TextureSettings* settings = descriptorEditor.GetTextureSettings();
+
+					auto quality = settings->quality;
+					if (ImGui::SliderFloat("Quality", &quality, 0.0f, 1.0f))
+					{
+						settings->quality = quality;
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Minimaps", &settings->generateMipmaps))
+					{
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("sRGB", &settings->srgb))
+					{
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Compression", settings->compression.c_str()))
+					{
+						for (auto& option : descriptorEditor.GetCompressionOptions())
+						{
+							if (ImGui::Selectable(option.c_str()))
+							{
+								settings->compression = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					if (ImGui::BeginCombo("Usage", settings->usageType.c_str()))
+					{
+						for (auto& option : descriptorEditor.GetUsageTypeOptions())
+						{
+							if (ImGui::Selectable(option.c_str()))
+							{
+								settings->usageType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+				}
+				else if (descriptorEditor.GetType() == ResourceType::MESH)
+				{
+
+					MeshSettings* settings = descriptorEditor.GetMeshSettings();
+
+					// ========== TRANSFORM SECTION ==========
+					ImGui::SeparatorText("Transform");
+
+					// Scale
+					float meshScale = settings->scale;
+					if (ImGui::DragFloat("Scale", &meshScale, 0.001f, 0.0001f, 1000.0f, "%.4f"))
+					{
+						settings->scale = meshScale;
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Uniform scale factor (e.g., 0.001 for mm to m)");
+					}
+
+					ImGui::Spacing();
+
+					// Position
+					ImGui::Text("Position Offset:");
+					float position[3] = { settings->positionX, settings->positionY, settings->positionZ };
+					if (ImGui::DragFloat3("Position", position, 0.1f))
+					{
+						settings->positionX = position[0];
+						settings->positionY = position[1];
+						settings->positionZ = position[2];
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Position offset in mesh units (X, Y, Z)");
+					}
+
+					ImGui::Spacing();
+
+					// Rotation
+					ImGui::Text("Rotation (Degrees):");
+					float rotation[3] = { settings->rotationX, settings->rotationY, settings->rotationZ };
+					if (ImGui::DragFloat3("Rotation", rotation, 1.0f, -180.0f, 180.0f))
+					{
+						settings->rotationX = rotation[0];
+						settings->rotationY = rotation[1];
+						settings->rotationZ = rotation[2];
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Rotation in degrees (X=Pitch, Y=Yaw, Z=Roll)");
+					}
+
+
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== VERTEX DATA SECTION ==========
+					ImGui::SeparatorText("Vertex Data");
+
+					if (ImGui::Checkbox("Include Position", &settings->includePos))
+					{
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Normals", &settings->includeNormals))
+					{
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Colors", &settings->includeColors))
+					{
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::Checkbox("Include Texture Coordinates", &settings->includeTexCoords))
+					{
+						descriptorEditor.MarkModified();
+					}
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== OUTPUT SETTINGS SECTION ==========
+					ImGui::SeparatorText("Output Settings");
+
+					char formatBuffer[256];
+					strncpy_s(formatBuffer, sizeof(formatBuffer), settings->outputFormat.c_str(), _TRUNCATE);
+					if (ImGui::InputText("Output Format", formatBuffer, sizeof(formatBuffer), ImGuiInputTextFlags_EnterReturnsTrue))
+					{
+						settings->outputFormat = std::string(formatBuffer);
+						descriptorEditor.MarkModified();
+					}
+
+					if (ImGui::BeginCombo("Index Type", settings->indexType.c_str()))
+					{
+						for (auto& option : descriptorEditor.GetIndexTypeOptions())
+						{
+							if (ImGui::Selectable(option.c_str()))
+							{
+								settings->indexType = option;
+								descriptorEditor.MarkModified();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					// ========== OPTIMIZATION SECTION ==========
+					ImGui::SeparatorText("Optimization");
+
+					if (ImGui::Checkbox("Optimize Vertices", &settings->optimizeVertices))
+					{
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Remove duplicate vertices and optimize for cache");
+					}
+
+					if (ImGui::Checkbox("Generate Normals", &settings->generateNormals))
+					{
+						descriptorEditor.MarkModified();
+					}
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Generate normals if missing");
+					}
+
+				}
+
+				if (!descriptorEditor.GetTags().empty())
+				{
+					ImGui::SeparatorText("Tags");
+					for (auto& tag : descriptorEditor.GetTags())
+					{
+						ImGui::Text("%s", tag.c_str());
+					}
+				}
+
+				ImGui::SeparatorText("Last Imported");
+				std::time_t writeTime = descriptorEditor.GetLastImported();
+				char timeBuf[64];
+				std::tm* tm_local = std::localtime(&writeTime);
+				std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+				ImGui::Text("Last Write Time: %s", timeBuf);
+
+				static std::string notifMsg{};
+				static ImVec4 notifColour(0.0f, 0.0f, 0.0f, 0.0f);
+
+				if (ImGui::Button("Validate Descriptor"))
+				{
+					if (descriptorEditor.Validate())
+					{
+						notifMsg = "Descriptor is Valid";
+						notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+					}
+					else
+					{
+						notifMsg = "Descriptor is NOT Valid";
+						notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+					}
+				}
+
+				if (!notifMsg.empty())
+				{
+
+					ImGui::TextColored(notifColour, "%s", notifMsg.c_str());
+
+					static float notifTimer = 2.0f;
+					notifTimer -= ImGui::GetIO().DeltaTime;
+
+					if (notifTimer <= 0.0f)
+					{
+						notifTimer = 2.0f;
+						notifMsg.clear();
+					}
+				}
+
+				// Save button
+				if (descriptorEditor.IsModified())
+				{
+					if (ImGui::Button("Save & Compile"))
+					{
+						if (descriptorEditor.Save())
+						{
+							notifMsg = "Descriptor is Saved";
+							notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+
+							//compile
+							if (AM.CompileSingleAsset(currentEditingGuid, true))
+							{
+								notifMsg = "Saved and Compiled successfully!";
+								notifColour = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);//green 
+							}
+							else
+							{
+								notifMsg = "Saved but compilation FAILED";
+								notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red for error
+							}
+						}
+						else
+						{
+							notifMsg = "Descriptor is NOT Saved";
+							notifColour = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+						}
+					}
+
+
+				}
+			}
+
+			ImGui::End();
+		}
+	}
+
+}

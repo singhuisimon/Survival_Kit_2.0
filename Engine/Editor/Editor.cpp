@@ -81,6 +81,8 @@ namespace Engine
 
         m_EditorPerformance->PerformanceProfilePanel(ts);
 
+        m_EditorAsset->AssetBrowserPanel();
+
         RenderViewport(texhandle);
 
         CompleteFrame();
@@ -310,6 +312,14 @@ namespace Engine
 
     bool Editor::GetEditorIsPlaying() {
         return m_EditorViewport->IsPlaying();
+    }
+
+    ImGuizmo::OPERATION Editor::GetOperation() { 
+        return m_EditorViewport->GetOperation(); 
+    }
+
+    void Editor::SetOperation(ImGuizmo::OPERATION operation) { 
+        m_EditorViewport->SetOperation(operation); 
     }
 
 }

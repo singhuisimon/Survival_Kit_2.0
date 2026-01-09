@@ -24,6 +24,7 @@ namespace Engine
 		void EditorTopMenu();
 		void OpenScenePanel();
 		void SaveScenePanel();
+		void DisplayHDRSettings();
 	
 	private:
 		Editor* m_Editor = nullptr;
@@ -31,6 +32,7 @@ namespace Engine
 		bool m_OpenScenePanel = false;
 		bool m_SaveScenePanel = false;
 		bool m_CloseSaveAsPanel = false;
+		bool m_ShowHDRSettings = false;
 
 		std::string m_CurrScenePath = "";
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)

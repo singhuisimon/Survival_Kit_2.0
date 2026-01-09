@@ -58,6 +58,8 @@ namespace Engine
 			m_OriginalSceneName = name;
 		}
 
+		ImGuizmo::OPERATION GetOperation() { return m_Operation; }
+		void SetOperation(ImGuizmo::OPERATION operation) { m_Operation = operation; }
 	};
 }
 #endif
