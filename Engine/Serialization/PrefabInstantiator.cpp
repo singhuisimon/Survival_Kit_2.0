@@ -769,6 +769,16 @@ namespace Engine {
             {
                 spriterenderer.SpriteLayer = properties["Sprite Layer"].GetUint();
             }
+
+            if (properties.HasMember("IsActive"))
+            {
+                spriterenderer.IsActive = properties["IsActive"].GetBool();
+            }
+
+            if (properties.HasMember("IsVisible"))
+            {
+                spriterenderer.IsVisible = properties["IsVisible"].GetBool();
+			}
         }
     }
 

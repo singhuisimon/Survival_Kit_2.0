@@ -129,6 +129,8 @@ namespace Engine {
 			auto& renderable2d = spriteView.get<SpriteRendererComponent>(entity);
 			auto& r2dtransform = spriteView.get<TransformComponent>(entity);
 
+			if (!renderable2d.IsVisible) continue;
+
 			m_drawitems.push_back({
 				.m_model_to_world_transform = r2dtransform.WorldTransform,
 				.m_drawitem_type = DrawItemType::SPRITE2D,

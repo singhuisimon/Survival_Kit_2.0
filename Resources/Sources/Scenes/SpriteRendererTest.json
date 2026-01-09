@@ -44,7 +44,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -91,7 +93,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 3
+                        "Sprite Layer": 3,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -138,7 +142,9 @@
                             0.250980406999588
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]

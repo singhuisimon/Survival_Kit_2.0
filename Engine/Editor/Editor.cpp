@@ -6209,6 +6209,8 @@ namespace Engine
 				ImGui::ColorEdit4("Color", &spriteRenderer.Color.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB);
 				ImGui::DragInt("Quad", (int*)(&spriteRenderer.Quad), 1, 0, 10);
 				ImGui::DragInt("Layer",  (int *)(&spriteRenderer.SpriteLayer), 1, 0, 255);
+				ImGui::Checkbox("Set Active", &spriteRenderer.IsActive);
+				ImGui::Checkbox("Set Visible", &spriteRenderer.IsVisible);
 			}
 
 			if (removeSpriteRenderer) 

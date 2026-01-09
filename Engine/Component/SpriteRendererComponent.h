@@ -25,13 +25,17 @@ namespace Engine {
 		glm::vec4                Color;		  // RGBA
 		u32						 Quad;		  // Index to the quad geometry data in storage
 		u32                      SpriteLayer; // Layer for rendering order
+		bool                     IsActive;    // Enables interactivity
+		bool					 IsVisible;   // Enables rendering
 
 		// Default constructor
 		SpriteRendererComponent()
 			: TextureGuid(0),
 			  Color(1.0f, 1.0f, 1.0f, 1.0f),
 			  Quad(3),
-			  SpriteLayer(0) { }
+			  SpriteLayer(0),
+		      IsActive(true),
+		      IsVisible(true) { }
 	};
 
 }

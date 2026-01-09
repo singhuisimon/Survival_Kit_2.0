@@ -764,6 +764,18 @@ namespace Engine {
                 PropertyType::U32,
                 [](const SpriteRendererComponent& c) { return c.SpriteLayer; },
 				[](SpriteRendererComponent& c, const u32& v) { c.SpriteLayer = v; });
+
+            meta.AddProperty<SpriteRendererComponent, bool>(
+                "IsActive", 
+                PropertyType::Bool,
+                [](const SpriteRendererComponent& c) {return c.IsActive; },
+                [](SpriteRendererComponent& c, const bool& v) {c.IsActive = v; });
+
+            meta.AddProperty<SpriteRendererComponent, bool>(
+                "IsVisible",
+                PropertyType::Bool,
+                [](const SpriteRendererComponent& c) {return c.IsVisible; },
+                [](SpriteRendererComponent& c, const bool& v) {c.IsVisible = v; });
         }
 
         LOG_INFO("Component reflection registration complete");

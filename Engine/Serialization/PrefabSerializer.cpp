@@ -616,6 +616,8 @@ namespace Engine {
             propertiesObj.AddMember("Color", colorArr, allocator);
             propertiesObj.AddMember("Quad", SpriteRenderer.Quad, allocator);
             propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
+            propertiesObj.AddMember("IsActive", SpriteRenderer.IsActive, allocator);
+            propertiesObj.AddMember("IsVisible", SpriteRenderer.IsVisible, allocator);
 
             componentObj.AddMember("Properties", propertiesObj, allocator);
             componentsArray.PushBack(componentObj, allocator);
