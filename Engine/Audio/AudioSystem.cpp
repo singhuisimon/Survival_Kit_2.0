@@ -65,11 +65,58 @@ namespace Engine {
 		Initialized = false;
 	}
 
-	void AudioSystem::UpdateListenerPosition(Scene* scene) {
+	//use local -also adjusted rotation accordding to chatgpt suggestion. (please adjust back if its not needed) - Amanda
+	//void AudioSystem::UpdateListenerPosition(Scene* scene) {
+	//	auto& registry = scene->GetRegistry();
+	//	auto listenerview = registry.view<ListenerComponent>();
+
+	//	for (auto entityHandle : listenerview) {
+	//		Entity entity(entityHandle, &registry);
+	//		auto& listener = entity.GetComponent<ListenerComponent>();
+
+	//		if (!listener.Active)
+	//			continue;
+
+	//		RigidbodyComponent* rb = entity.HasComponent<RigidbodyComponent>()
+	//			? &entity.GetComponent<RigidbodyComponent>() : nullptr;
+
+	//		glm::vec3 position = glm::vec3(0.0f);
+	//		glm::vec3 rotation = glm::vec3(0.0f);
+	//		glm::vec3 velocity = rb ? rb->Velocity : glm::vec3(0.0f);
+
+	//		if (entity.HasComponent<TransformComponent>())
+	//		{
+	//			auto& transform = entity.GetComponent<TransformComponent>();
+
+	//			//before
+	//			position = transform.Position;
+
+	//			rotation = { transform.Rotation.x, transform.Rotation.y, transform.Rotation.z };
+	//		}
+
+	//		glm::vec3 forward(0, 0, -1);
+	//		glm::vec3 up(0, 1, 0);
+
+	//		//Basic forward direction based on Y rotation
+	//		float yaw = glm::radians(rotation.y);
+	//		forward.x = sin(yaw);
+	//		forward.z = -cos(yaw);
+
+	//		m_AudioManager->SetListenerAttributes(position, forward, up, velocity);
+
+	//		//only the first active listener is used
+	//		break;
+	//	}
+	//}
+
+	//updated update listener -> uses world transform to get world position and transform
+	void AudioSystem::UpdateListenerPosition(Scene* scene)
+	{
 		auto& registry = scene->GetRegistry();
 		auto listenerview = registry.view<ListenerComponent>();
 
-		for (auto entityHandle : listenerview) {
+		for (auto entityHandle : listenerview)
+		{
 			Entity entity(entityHandle, &registry);
 			auto& listener = entity.GetComponent<ListenerComponent>();
 
@@ -77,33 +124,36 @@ namespace Engine {
 				continue;
 
 			RigidbodyComponent* rb = entity.HasComponent<RigidbodyComponent>()
-				? &entity.GetComponent<RigidbodyComponent>() : nullptr;
+				? &entity.GetComponent<RigidbodyComponent>()
+				: nullptr;
 
-			glm::vec3 position = glm::vec3(0.0f);
-			glm::vec3 rotation = glm::vec3(0.0f);
+			glm::vec3 position(0.0f);
 			glm::vec3 velocity = rb ? rb->Velocity : glm::vec3(0.0f);
+
+			// Default orientation
+			glm::vec3 forward(0.0f, 0.0f, -1.0f);
+			glm::vec3 up(0.0f, 1.0f, 0.0f);
 
 			if (entity.HasComponent<TransformComponent>())
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
-				position = transform.Position;
-				rotation = { transform.Rotation.x, transform.Rotation.y, transform.Rotation.z };
+
+				// World position
+				position = glm::vec3(transform.WorldTransform[3]);
+
+
+				// World orientation
+				forward = glm::normalize(glm::vec3(transform.WorldTransform[2])) * -1.0f;
+				up = glm::normalize(glm::vec3(transform.WorldTransform[1]));
 			}
-
-			glm::vec3 forward(0, 0, -1);
-			glm::vec3 up(0, 1, 0);
-
-			//Basic forward direction based on Y rotation
-			float yaw = glm::radians(rotation.y);
-			forward.x = sin(yaw);
-			forward.z = -cos(yaw);
 
 			m_AudioManager->SetListenerAttributes(position, forward, up, velocity);
 
-			//only the first active listener is used
+			// Only first active listener is used
 			break;
 		}
 	}
+
 
 	void AudioSystem::ProcessAudioEntities(Scene* scene) {
 		auto& registry = scene->GetRegistry();

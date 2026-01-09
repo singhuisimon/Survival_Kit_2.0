@@ -1,12 +1,20 @@
 // Botnet.cs
 using Engine;
 using System;
+using static Engine.Event;
+using static Engine.Logger;
+using static Engine.Scene;
+using static Engine.Prefab;
+using static Engine.Physics;
+using static Engine.Rigidbody;
+using static Engine.Audio;
+using static Engine.Tag;
 
 namespace Game
 {
     /// <summary>
     /// Port of EnemyE004_BOTNET from Unity to custom engine script.
-    /// Uses rigidbody physics via InternalCalls and simple tag-based targeting.
+    /// Uses rigidbody physics via wrapped Engine functions and simple tag-based targeting.
     /// Now with look-at functionality using quaternion-only rotation.
     /// </summary>
     public class Botnet : ScriptBehaviour
@@ -14,65 +22,35 @@ namespace Game
         // ===== Serialized Fields (Editable in Inspector) =====
 
         // Movement
-        [SerializeField]
-        private float acceleration = 50.0f;
-
-        [SerializeField]
-        private float topSpeed = 30.0f;
+        [SerializeField] private float acceleration = 50.0f;
+        [SerializeField] private float topSpeed = 30.0f;
 
         // Rotation speed (how fast bot turns towards target)
-        [SerializeField]
-        private float rotateSpeed = 5.0f;
-
-        [SerializeField]
-        private bool enableLookAt = true; // Toggle look-at behavior
+        [SerializeField] private float rotateSpeed = 5.0f;
+        [SerializeField] private bool enableLookAt = true; // Toggle look-at behavior
 
         // Explosion properties
-        [SerializeField]
-        private float blastRadius = 5.0f;
-
-        // [SerializeField]
-        // private int blastDamage = 10;
-
-        // [SerializeField]
-        // private float blastImpulse = 0.0f;
+        [SerializeField] private float blastRadius = 5.0f;
 
         // Status effects
-        [SerializeField]
-        private bool isStunned = false;
-
-        [SerializeField]
-        private float stunnedTime = 1.0f;
+        [SerializeField] private bool isStunned = false;
+        [SerializeField] private float stunnedTime = 1.0f;
 
         // Brute-force attack (rage mode)
-        [SerializeField]
-        private float bruteForceAttackSpeed = 300.0f;
+        [SerializeField] private float bruteForceAttackSpeed = 300.0f;
 
         // Target selection timing
-        [SerializeField]
-        private float minInitialTargetDelay = 0.5f;
-
-        [SerializeField]
-        private float maxInitialTargetDelay = 0.8f;
-
-        [SerializeField]
-        private float minRetargetDelay = 1.0f;
-
-        [SerializeField]
-        private float maxRetargetDelay = 1.5f;
+        [SerializeField] private float minInitialTargetDelay = 0.5f;
+        [SerializeField] private float maxInitialTargetDelay = 0.8f;
+        [SerializeField] private float minRetargetDelay = 1.0f;
+        [SerializeField] private float maxRetargetDelay = 1.5f;
 
         // Death explosion prefab path
-        [SerializeField]
-        private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
-
-        // Health component
-        //[SerializeField]
-        //private Health health;
+        [SerializeField] private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
 
         // ===== Private Runtime State =====
 
         private const uint INVALID_ENTITY = 0xffffffffu;
-
         private uint targetID = INVALID_ENTITY;
 
         private bool isMoving = false;
@@ -87,7 +65,7 @@ namespace Game
         // Simple script-side RNG state (xorshift32)
         private static uint s_RngState = 0x12345678u;
 
-        // Tags
+        // Tags / events
         private const string TAG_PLAYER = "Player";
         private const string TAG_SEMICONDUCTOR = "SEMICONDUCTOR";
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
@@ -100,16 +78,16 @@ namespace Game
 
         public override void OnStart()
         {
-            Log("=== Botnet started (EntityID = " + EntityID + ") ===");
+            LogMessage("=== Botnet started (EntityID = " + EntityID + ") ===");
 
             // Seed RNG
             s_RngState ^= (uint)EntityID * 747796405u + 2891336453u;
 
-            // Setup rigidbody
-            InternalCalls.Entity_AddRigidBody((uint)EntityID);
-            InternalCalls.Rigidbody_SetIsKinematic((uint)EntityID, false);
-            InternalCalls.Rigidbody_SetUseGravity((uint)EntityID, false);
-            InternalCalls.Rigidbody_SetMass((uint)EntityID, 1.0f);
+            // Setup rigidbody (wrapped)
+            EntityAddRigidBody((uint)EntityID);
+            RigidbodySetIsKinematic((uint)EntityID, false);
+            RigidbodySetUseGravity((uint)EntityID, false);
+            RigidbodySetMass((uint)EntityID, 1.0f);
 
             // Reset runtime state
             isDead = false;
@@ -123,10 +101,10 @@ namespace Game
             hasChosenInitialTarget = false;
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
-            InternalCalls.Physics_EnableCollisionEvents();
+            PhysicsEnableCollisionEvents();
 
-            EventSystem.Subscribe(EVENT_BULLET_HIT, OnBulletHit);
-            EventSystem.Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -147,11 +125,8 @@ namespace Game
             // Movement and rotation
             if (isMoving && targetID != INVALID_ENTITY)
             {
-                // Look at target
                 if (enableLookAt)
-                {
                     RotateTowardsTarget(deltaTime);
-                }
 
                 MoveTowardsTarget(deltaTime);
                 ClampSpeed();
@@ -161,70 +136,63 @@ namespace Game
             HandleCollisionTriggers();
 
             if (isExploding)
-            {
                 Explode();
-            }
         }
 
         public override void OnDestroy()
         {
-            EventSystem.Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
-            EventSystem.Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         // ===== Public API =====
 
         public void Stunned()
         {
-            Log("Botnet (EntityID = " + EntityID + ") stunned");
+            LogMessage("Botnet (EntityID = " + EntityID + ") stunned");
             isStunned = true;
             stunTimer = stunnedTime;
-            InternalCalls.Rigidbody_Stop((uint)EntityID);
+            RigidbodyStop((uint)EntityID);
         }
 
         // ===== Event Handlers =====
 
         private void OnBulletHit(string eventName, string payload)
         {
-            // Ignore if already dead or wrong event
             if (isDead || eventName != EVENT_BULLET_HIT)
                 return;
 
-            // Payload is the EntityID of whatever the bullet hit
             if (!uint.TryParse(payload, out uint hitId))
                 return;
 
             if (hitId != (uint)EntityID)
                 return;
-            // ...or explode immediately:
 
-            EventSystem.Publish("BotnetDeath", 1.ToString());
-
+            Publish("BotnetDeath", 1.ToString());
             Explode();
         }
 
-        private void OnSpawnDisable(string eventName, string payload){
-            //Ignore if already dead or wrong event
-            if(isDead || eventName != EVENT_SPAWN_DISABLE)
-                return;
-            
-            if(!bool.TryParse(payload, out bool active))
+        private void OnSpawnDisable(string eventName, string payload)
+        {
+            if (isDead || eventName != EVENT_SPAWN_DISABLE)
                 return;
 
-            if(!active){
+            if (!bool.TryParse(payload, out bool active))
+                return;
+
+            if (!active)
+            {
                 isDead = true;
                 isExploding = false;
 
-                Log("Destroying itself as spawn is disabled");
-
-                InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                LogMessage("Destroying itself as spawn is disabled");
+                SceneDestroyEntity((uint)EntityID);
             }
         }
 
-
         public void BruteForceAttack()
         {
-            Log("Botnet (EntityID = " + EntityID + ") entering brute force attack mode");
+            LogMessage("Botnet (EntityID = " + EntityID + ") entering brute force attack mode");
 
             topSpeed = bruteForceAttackSpeed;
 
@@ -248,7 +216,7 @@ namespace Game
             {
                 isStunned = false;
                 stunTimer = 0.0f;
-                Log("Botnet (EntityID = " + EntityID + ") stun ended");
+                LogMessage("Botnet (EntityID = " + EntityID + ") stun ended");
             }
         }
 
@@ -290,30 +258,15 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
-            uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
-            //uint chosen = INVALID_ENTITY;
 
-            //switch (choice)
-            //{
-            //    case 0:
-            //        chosen = FindFirstEntityWithTag(TAG_PLAYER);
-            //        break;
-            //    case 1:
-            //        chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
-            //        break;
-            //    case 2:
-            //        chosen = FindFirstEntityWithTag(TAG_EMPLACEMENT);
-            //        break;
-            //    case 3:
-            //        chosen = FindRandomEntityWithTag(TAG_ALLIES);
-            //        break;
-            //}
+            // currently forced to Player (as per your commented switch)
+            uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
 
             if (chosen != INVALID_ENTITY)
             {
                 targetID = chosen;
                 isMoving = true;
-                Log("Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
+                LogMessage("Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
             }
             else
             {
@@ -327,10 +280,10 @@ namespace Game
             if (targetID == INVALID_ENTITY)
                 return;
 
-            string tag = InternalCalls.Tag_GetTag(targetID);
+            string tag = TagGetTag(targetID);
             if (string.IsNullOrEmpty(tag))
             {
-                Log("Botnet (EntityID = " + EntityID + ") target " + targetID + " destroyed");
+                LogMessage("Botnet (EntityID = " + EntityID + ") target " + targetID + " destroyed");
                 targetID = INVALID_ENTITY;
                 isMoving = false;
                 chooseTargetTimer = 0.0f;
@@ -414,17 +367,16 @@ namespace Game
                 dir.Z * acceleration
             );
 
-            InternalCalls.Rigidbody_AddForce((uint)EntityID, ref force);
+            RigidbodyAddForce((uint)EntityID, ref force);
         }
 
         private void ClampSpeed()
         {
-            float speed = InternalCalls.Rigidbody_GetSpeed((uint)EntityID);
+            float speed = RigidbodyGetSpeed((uint)EntityID);
             if (speed <= topSpeed || topSpeed <= 0.0f)
                 return;
 
-            Vector3 vel;
-            InternalCalls.Rigidbody_GetVelocity((uint)EntityID, out vel);
+            Vector3 vel = RigidbodyGetVelocity((uint)EntityID);
 
             float lenSq = vel.X * vel.X + vel.Y * vel.Y + vel.Z * vel.Z;
             if (lenSq <= 0.0001f)
@@ -440,14 +392,14 @@ namespace Game
             vel.Y *= scale;
             vel.Z *= scale;
 
-            InternalCalls.Rigidbody_SetVelocity((uint)EntityID, ref vel);
+            RigidbodySetVelocity((uint)EntityID, ref vel);
         }
 
         // ===== Collision & Explosion =====
 
         private void HandleCollisionTriggers()
         {
-            int count = InternalCalls.Physics_GetCollisionCount();
+            int count = PhysicsGetCollisionCount();
             if (count <= 0)
                 return;
 
@@ -456,12 +408,12 @@ namespace Game
                 return;
 
             uint self = (uint)EntityID;
-            uint playerID = InternalCalls.Scene_FindEntityByName("Player");
+            uint playerID = SceneFindEntityByName("Player");
 
             for (int i = 0; i < count; ++i)
             {
                 uint a, b;
-                InternalCalls.Physics_GetCollisionPair(i, out a, out b);
+                PhysicsGetCollisionPair(i, out a, out b);
 
                 if (a != self && b != self)
                     continue;
@@ -470,13 +422,13 @@ namespace Game
 
                 if (other == playerID)
                 {
-                    Log("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
-                    EventSystem.Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    LogMessage("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
+                    Publish("BotnetAttackedPlayer", EntityID.ToString());
                 }
 
                 if (other == targetID)
                 {
-                    Log("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
+                    LogMessage("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     isExploding = true;
                     break;
                 }
@@ -491,7 +443,7 @@ namespace Game
             isDead = true;
             isExploding = false;
 
-            Log("Botnet (EntityID = " + EntityID + ") exploding!");
+            LogMessage("Botnet (EntityID = " + EntityID + ") exploding!");
 
             ApplyBlastToTag(TAG_PLAYER);
             ApplyBlastToTag(TAG_SEMICONDUCTOR);
@@ -500,18 +452,18 @@ namespace Game
 
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
-                uint explosionID = InternalCalls.Prefab_Instantiate(deathExplosionPrefab);
+                uint explosionID = PrefabInstantiate(deathExplosionPrefab);
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
-                InternalCalls.Audio_Play(explosionID);
+                AudioPlay(explosionID);
             }
 
-            InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            SceneDestroyEntity((uint)EntityID);
         }
 
         private void ApplyBlastToTag(string tag)
         {
-            uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
+            uint[] entities = SceneFindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
                 return;
 
@@ -534,7 +486,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
-                    //DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    // DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }
@@ -649,7 +601,7 @@ namespace Game
 
         private static uint FindFirstEntityWithTag(string tag)
         {
-            uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
+            uint[] entities = SceneFindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
                 return INVALID_ENTITY;
 
@@ -658,7 +610,7 @@ namespace Game
 
         private static uint FindRandomEntityWithTag(string tag)
         {
-            uint[] entities = InternalCalls.Scene_FindEntitiesByTag(tag);
+            uint[] entities = SceneFindEntitiesByTag(tag);
             if (entities == null || entities.Length == 0)
                 return INVALID_ENTITY;
 

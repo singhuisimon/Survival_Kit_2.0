@@ -1,5 +1,11 @@
 using Engine;
 using System;
+using static Engine.Logger;
+using static Engine.Scene;
+using static Engine.Event;
+using static Engine.Transform;
+using static Engine.Quat;
+using static Engine.SimpleMath;
 
 namespace Game
 {
@@ -45,17 +51,17 @@ namespace Game
 
         private void OnAllCoresDestroyed()
         {
-            Engine.InternalCalls.Log("=== ALL CORES DESTROYED ===");
-            Engine.InternalCalls.Log("LoveLetter is defeated!");
+            LogMessage("=== ALL CORES DESTROYED ===");
+            LogMessage("LoveLetter is defeated!");
 
             // Destroy this entity
-            Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+            SceneDestroyEntity((uint)EntityID);
         }
 
         private void OnCoreDestroyed()
         {
             coresAlive--;
-            Engine.InternalCalls.Log("Core destroyed! Cores alive: " + coresAlive + "/" + totalCores);
+            LogMessage("Core destroyed! Cores alive: " + coresAlive + "/" + totalCores);
 
             if (coresAlive <= 0)
             {
@@ -75,19 +81,19 @@ namespace Game
         // ===== Lifecycle =====
         public override void OnStart()
         {
-            Engine.InternalCalls.Log("=== LoveLetter Started ===");
-            Engine.InternalCalls.Log("EntityID: " + EntityID);
-            Engine.InternalCalls.Log("Total Cores: " + totalCores);
+            LogMessage("=== LoveLetter Started ===");
+            LogMessage("EntityID: " + EntityID);
+            LogMessage("Total Cores: " + totalCores);
 
             // Initialize cores alive
             coresAlive = totalCores;
 
             // Subscribe to the "CoreDestroyed" channel
-            Engine.EventSystem.Subscribe("CoreDestroyed", OnCoreDestroyedEvent);
+            Subscribe("CoreDestroyed", OnCoreDestroyedEvent);
 
             // Get spawn position
-            Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out startPosition);
-            Engine.InternalCalls.Log("Spawn position: " + startPosition.X + ", " + startPosition.Y + ", " + startPosition.Z);
+            startPosition = GetPosition((uint)EntityID);
+            LogMessage("Spawn position: " + startPosition.X + ", " + startPosition.Y + ", " + startPosition.Z);
 
             // Create hardcoded waypoints
             waypoints = new Engine.Vector3[7];
@@ -99,20 +105,20 @@ namespace Game
             waypoints[5] = new Engine.Vector3(165.0f, -57.0f, -215.0f);
             waypoints[6] = new Engine.Vector3(165.0f, -115.0f, -131.0f);
 
-            Engine.InternalCalls.Log("Waypoints:");
-            Engine.InternalCalls.Log("  [0]: " + waypoints[0].X + ", " + waypoints[0].Y + ", " + waypoints[0].Z);
-            Engine.InternalCalls.Log("  [1]: " + waypoints[1].X + ", " + waypoints[1].Y + ", " + waypoints[1].Z);
-            Engine.InternalCalls.Log("  [2]: " + waypoints[2].X + ", " + waypoints[2].Y + ", " + waypoints[2].Z);
-            Engine.InternalCalls.Log("  [3]: " + waypoints[3].X + ", " + waypoints[3].Y + ", " + waypoints[3].Z);
-            Engine.InternalCalls.Log("  [4]: " + waypoints[4].X + ", " + waypoints[4].Y + ", " + waypoints[4].Z);
-            Engine.InternalCalls.Log("  [5]: " + waypoints[5].X + ", " + waypoints[5].Y + ", " + waypoints[5].Z);
-            Engine.InternalCalls.Log("  [6]: " + waypoints[6].X + ", " + waypoints[6].Y + ", " + waypoints[6].Z);
+            LogMessage("Waypoints:");
+            LogMessage("  [0]: " + waypoints[0].X + ", " + waypoints[0].Y + ", " + waypoints[0].Z);
+            LogMessage("  [1]: " + waypoints[1].X + ", " + waypoints[1].Y + ", " + waypoints[1].Z);
+            LogMessage("  [2]: " + waypoints[2].X + ", " + waypoints[2].Y + ", " + waypoints[2].Z);
+            LogMessage("  [3]: " + waypoints[3].X + ", " + waypoints[3].Y + ", " + waypoints[3].Z);
+            LogMessage("  [4]: " + waypoints[4].X + ", " + waypoints[4].Y + ", " + waypoints[4].Z);
+            LogMessage("  [5]: " + waypoints[5].X + ", " + waypoints[5].Y + ", " + waypoints[5].Z);
+            LogMessage("  [6]: " + waypoints[6].X + ", " + waypoints[6].Y + ", " + waypoints[6].Z);
 
             // Start with delay
             delayTimer = startDelay;
             currentWaypoint = 0;
 
-            Engine.InternalCalls.Log("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
+            LogMessage("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -124,7 +130,7 @@ namespace Game
 
                 if (delayTimer <= 0.0f)
                 {
-                    Engine.InternalCalls.Log("Delay finished - calling StartMoving");
+                    LogMessage("Delay finished - calling StartMoving");
                     StartMoving();
                 }
                 return;
@@ -144,7 +150,7 @@ namespace Game
 
             if (coresAlive <= 0)
             {
-                Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                SceneDestroyEntity((uint)EntityID);
                 return;
             }
         }
@@ -152,11 +158,11 @@ namespace Game
         // ===== Movement System =====
         private void StartMoving()
         {
-            Engine.InternalCalls.Log("=== StartMoving called ===");
+            LogMessage("=== StartMoving called ===");
 
             if (waypoints == null || waypoints.Length == 0)
             {
-                Engine.InternalCalls.LogWarning("No waypoints!");
+                LogWarning("No waypoints!");
                 return;
             }
 
@@ -164,14 +170,14 @@ namespace Game
             currentWaypoint = 0;
             StartRotationToWaypoint(currentWaypoint);
 
-            Engine.InternalCalls.Log("Starting rotation to waypoint 0");
+            LogMessage("Starting rotation to waypoint 0");
         }
 
         private void StartRotationToWaypoint(int waypointIndex)
         {
             // Get current position
             Engine.Vector3 currentPos;
-            Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out currentPos);
+            currentPos = GetPosition((uint)EntityID);
 
             // Get target waypoint
             Engine.Vector3 targetPos = waypoints[waypointIndex];
@@ -206,7 +212,7 @@ namespace Game
 
             // Optional: debug log in degrees
             float yawDeg = yaw * RAD2DEG;
-            Engine.InternalCalls.Log("Starting rotation to yaw (deg): " + yawDeg);
+            LogMessage("Starting rotation to yaw (deg): " + yawDeg);
 
             // Start rotating, stop moving for now
             isRotating = true;
@@ -242,7 +248,7 @@ namespace Game
                 isRotating = false;
                 isMoving = true;
 
-                Engine.InternalCalls.Log("Rotation complete! Starting movement to waypoint " + currentWaypoint);
+                LogMessage("Rotation complete! Starting movement to waypoint " + currentWaypoint);
                 return;
             }
 
@@ -253,8 +259,8 @@ namespace Game
 
             // Slerp towards target quaternion
             Engine.Quat newRot;
-            InternalCalls.Quat_Slerp(ref currentRot, ref targetRotation, t, out newRot);
-            //Engine.InternalCalls.Log("works");
+            newRot = Quat.Slerp(currentRot, targetRotation, t);
+            //LogMessage("works");
 
             Engine.Transform.SetRotation((uint)EntityID, ref newRot);
 
@@ -264,7 +270,7 @@ namespace Game
         {
             // Get current position
             Engine.Vector3 currentPos;
-            Engine.InternalCalls.Transform_GetPosition((uint)EntityID, out currentPos);
+            currentPos = GetPosition((uint)EntityID);
 
             // Get target waypoint
             Engine.Vector3 targetPos = waypoints[currentWaypoint];
@@ -286,7 +292,7 @@ namespace Game
             // Check if reached waypoint
             if (distance < waypointReachedDistance)
             {
-                Engine.InternalCalls.Log("Reached waypoint " + currentWaypoint);
+                LogMessage("Reached waypoint " + currentWaypoint);
 
                 // Move to next waypoint
                 currentWaypoint++;
@@ -294,15 +300,15 @@ namespace Game
                 // Check if this was the FINAL waypoint
                 if (currentWaypoint >= waypoints.Length)
                 {
-                    Engine.InternalCalls.Log("=== FINAL WAYPOINT REACHED ===");
-                    Engine.InternalCalls.Log("LoveLetter self-destructing...");
-                    Engine.InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                    LogMessage("=== FINAL WAYPOINT REACHED ===");
+                    LogMessage("LoveLetter self-destructing...");
+                    SceneDestroyEntity((uint)EntityID);
                     return;
                 }
 
                 // Not final waypoint, continue to next one
                 StartRotationToWaypoint(currentWaypoint);
-                Engine.InternalCalls.Log("Starting rotation to waypoint " + currentWaypoint);
+                LogMessage("Starting rotation to waypoint " + currentWaypoint);
 
                 return;
             }
@@ -334,7 +340,7 @@ namespace Game
             );
 
             // Apply new position
-            Engine.InternalCalls.Transform_SetPosition((uint)EntityID, ref newPos);
+            SetPosition((uint)EntityID, ref newPos);
         }
 
         /// <summary>
@@ -364,7 +370,7 @@ namespace Game
             Engine.Quat lookRot = Engine.Quat.FromAxisAngle(upAxis, yaw);
             Engine.Transform.SetRotation((uint)EntityID, ref lookRot);
 
-            Engine.InternalCalls.Log("Rotated to face waypoint. Yaw (deg): " + (yaw * RAD2DEG));
+            LogMessage("Rotated to face waypoint. Yaw (deg): " + (yaw * RAD2DEG));
         }
 
         // ===== Helper Functions =====
@@ -394,112 +400,9 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Engine.EventSystem.Unsubscribe("CoreDestroyed", OnCoreDestroyedEvent);
-            Engine.InternalCalls.Log("=== LoveLetter Destroyed ===");
+            Unsubscribe("CoreDestroyed", OnCoreDestroyedEvent);
+            LogMessage("=== LoveLetter Destroyed ===");
         }
     }
 }
 
-// Simple math helper class
-public static class SimpleMath
-{
-    private const float PI = 3.14159265359f;
-    private const float PI_2 = PI / 2.0f;
-    private const float PI_4 = PI / 4.0f;
-
-    public const float RAD_TO_DEG = 57.2957795f;
-    public const float DEG_TO_RAD = 0.0174532924f;
-
-    public static float Atan2(float y, float x)
-    {
-        // Handle special cases first
-        if (x == 0.0f)
-        {
-            if (y > 0.0f) return PI_2;
-            if (y < 0.0f) return -PI_2;
-            return 0.0f;
-        }
-
-        // Calculate the absolute angle
-        float absX = x < 0.0f ? -x : x;
-        float absY = y < 0.0f ? -y : y;
-
-        // Use the smaller ratio for better accuracy
-        float ratio;
-        bool useReciprocal = absY > absX;
-
-        if (useReciprocal)
-            ratio = absX / absY;
-        else
-            ratio = absY / absX;
-
-        // Rational approximation for atan (more stable than Taylor series)
-        float ratio2 = ratio * ratio;
-        float result = ratio / (1.0f + 0.28f * ratio2);  // Simple rational approximation
-
-        if (useReciprocal)
-            result = PI_2 - result;
-
-        // Adjust for quadrant
-        if (x < 0.0f)
-            result = PI - result;
-        if (y < 0.0f)
-            result = -result;
-
-        return result;
-    }
-
-    public static float Asin(float x)
-    {
-        // Clamp to [-1, 1]
-        if (x > 1.0f) x = 1.0f;
-        if (x < -1.0f) x = -1.0f;
-
-        // Approximation using Taylor series
-        float x2 = x * x;
-        float x3 = x2 * x;
-        float x5 = x3 * x2;
-        float x7 = x5 * x2;
-
-        return x + (x3 / 6.0f) + (3.0f * x5 / 40.0f) + (15.0f * x7 / 336.0f);
-    }
-
-    public static float Clamp(float value, float min, float max)
-    {
-        if (value < min) return min;
-        if (value > max) return max;
-        return value;
-    }
-
-    public static float Sqrt(float value)
-    {
-        if (value <= 0.0f) return 0.0f;
-        if (value == 1.0f) return 1.0f;
-
-        float x = value;
-
-        for (int i = 0; i < 6; i++)
-        {
-            if (x <= 0.0f) break;
-            x = 0.5f * (x + value / x);
-        }
-
-        return x;
-    }
-
-    public static float Abs(float value)
-    {
-        return value < 0.0f ? -value : value;
-    }
-
-    private static float ArcTan(float x)
-    {
-        float x2 = x * x;
-        float x3 = x2 * x;
-        float x5 = x3 * x2;
-        float x7 = x5 * x2;
-        float x9 = x7 * x2;
-
-        return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
-    }
-}

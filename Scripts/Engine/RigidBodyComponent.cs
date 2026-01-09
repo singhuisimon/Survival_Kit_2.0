@@ -1,100 +1,68 @@
-using System;
+using System.Runtime.CompilerServices;
 
 namespace Engine
 {
-    /// <summary>
-    /// Managed wrapper over native RigidbodyComponent.
-    /// Exposes mass, kinematic/gravity flags and velocity helpers.
-    /// </summary>
     public class Rigidbody : Component
     {
-        /// <summary>
-        /// Mass in kilograms.
-        /// Backed by RigidbodyComponent::Mass.
-        /// </summary>
-        public float Mass
-        {
-            get => InternalCalls.Rigidbody_GetMass(Entity.EntityID);
-            set => InternalCalls.Rigidbody_SetMass(Entity.EntityID, value);
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern Vector3 Rigidbody_GetVelocity(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetVelocity(uint entityID, ref Vector3 vel);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddVelocity(uint entityID, ref Vector3 delta);
 
-        /// <summary>
-        /// Whether this body is kinematic (moved by scripts instead of physics).
-        /// Backed by RigidbodyComponent::IsKinematic.
-        /// </summary>
-        public bool IsKinematic
-        {
-            get => InternalCalls.Rigidbody_GetIsKinematic(Entity.EntityID);
-            set => InternalCalls.Rigidbody_SetIsKinematic(Entity.EntityID, value);
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Rigidbody_GetMass(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetMass(uint entityID, float mass);
 
-        /// <summary>
-        /// Whether gravity affects this body.
-        /// Backed by RigidbodyComponent::UseGravity.
-        /// </summary>
-        public bool UseGravity
-        {
-            get => InternalCalls.Rigidbody_GetUseGravity(Entity.EntityID);
-            set => InternalCalls.Rigidbody_SetUseGravity(Entity.EntityID, value);
-        }
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Rigidbody_GetIsKinematic(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetIsKinematic(uint entityID, bool isKinematic);
 
-        /// <summary>
-        /// Linear velocity in world space.
-        /// Backed by RigidbodyComponent::Velocity.
-        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Rigidbody_GetUseGravity(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetUseGravity(uint entityID, bool useGravity);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Rigidbody_GetSpeed(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Rigidbody_IsMoving(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Rigidbody_IsStatic(uint entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddForce(uint entityID, ref Vector3 force);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_Stop(uint entityID);
+
+        public static Vector3 RigidbodyGetVelocity(uint entityID) => Rigidbody_GetVelocity(entityID);
+
+        public static void RigidbodySetVelocity(uint entityID, ref Vector3 vel) => Rigidbody_SetVelocity(entityID, ref vel);
+        public static void RigidbodyAddVelocity(uint entityID, ref Vector3 delta) => Rigidbody_AddVelocity(entityID, ref delta);
+
+        public static float RigidbodyGetMass(uint entityID) => Rigidbody_GetMass(entityID);
+        public static void RigidbodySetMass(uint entityID, float mass) => Rigidbody_SetMass(entityID, mass);
+
+        public static bool RigidbodyGetIsKinematic(uint entityID) => Rigidbody_GetIsKinematic(entityID);
+        public static void RigidbodySetIsKinematic(uint entityID, bool isKinematic) => Rigidbody_SetIsKinematic(entityID, isKinematic);
+
+        public static bool RigidbodyGetUseGravity(uint entityID) => Rigidbody_GetUseGravity(entityID);
+        public static void RigidbodySetUseGravity(uint entityID, bool useGravity) => Rigidbody_SetUseGravity(entityID, useGravity);
+
+        public static float RigidbodyGetSpeed(uint entityID) => Rigidbody_GetSpeed(entityID);
+        public static bool RigidbodyIsMoving(uint entityID) => Rigidbody_IsMoving(entityID);
+        public static bool RigidbodyIsStatic(uint entityID) => Rigidbody_IsStatic(entityID);
+
+        public static void RigidbodyAddForce(uint entityID, ref Vector3 force) => Rigidbody_AddForce(entityID, ref force);
+        public static void RigidbodyStop(uint entityID) => Rigidbody_Stop(entityID);
+
+        // Instance-style API still fine to keep
+        private uint ID => Entity.EntityID;
+
+        public float Mass { get => Rigidbody_GetMass(ID); set => Rigidbody_SetMass(ID, value); }
+        public bool IsKinematic { get => Rigidbody_GetIsKinematic(ID); set => Rigidbody_SetIsKinematic(ID, value); }
+        public bool UseGravity { get => Rigidbody_GetUseGravity(ID); set => Rigidbody_SetUseGravity(ID, value); }
+
         public Vector3 Velocity
         {
-            get
-            {
-                Vector3 v;
-                InternalCalls.Rigidbody_GetVelocity(Entity.EntityID, out v);
-                return v;
-            }
-            set
-            {
-                InternalCalls.Rigidbody_SetVelocity(Entity.EntityID, ref value);
-            }
+            get { return Rigidbody_GetVelocity(ID); }
+            set { Rigidbody_SetVelocity(ID, ref value); }
         }
 
-        /// <summary>
-        /// Current speed (length of Velocity).
-        /// Backed by RigidbodyComponent::GetSpeed().
-        /// </summary>
-        public float Speed => InternalCalls.Rigidbody_GetSpeed(Entity.EntityID);
+        public float Speed => Rigidbody_GetSpeed(ID);
+        public bool IsMoving => Rigidbody_IsMoving(ID);
+        public bool IsStatic => Rigidbody_IsStatic(ID);
 
-        /// <summary>
-        /// True if the body is currently moving.
-        /// </summary>
-        public bool IsMoving => InternalCalls.Rigidbody_IsMoving(Entity.EntityID);
-
-        /// <summary>
-        /// True if treated as static (zero mass and non-kinematic).
-        /// </summary>
-        public bool IsStatic => InternalCalls.Rigidbody_IsStatic(Entity.EntityID);
-
-        /// <summary>
-        /// Adds directly to the current velocity (v += delta).
-        /// </summary>
-        public void AddVelocity(Vector3 delta)
-        {
-            InternalCalls.Rigidbody_AddVelocity(Entity.EntityID, ref delta);
-        }
-
-        /// <summary>
-        /// Applies a force (affects velocity based on mass).
-        /// Backed by RigidbodyComponent::AddForce().
-        /// </summary>
-        public void AddForce(Vector3 force)
-        {
-            InternalCalls.Rigidbody_AddForce(Entity.EntityID, ref force);
-        }
-
-        /// <summary>
-        /// Stops all linear motion (Velocity = 0).
-        /// </summary>
-        public void Stop()
-        {
-            InternalCalls.Rigidbody_Stop(Entity.EntityID);
-        }
+        public void AddForce(Vector3 force) => Rigidbody_AddForce(ID, ref force);
+        public void Stop() => Rigidbody_Stop(ID);
     }
 }

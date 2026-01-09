@@ -1,4 +1,4 @@
-using System;
+using System.Runtime.CompilerServices;
 
 namespace Engine
 {
@@ -8,28 +8,55 @@ namespace Engine
     /// </summary>
     public class MeshRenderer : Component
     {
+        // Native bindings (register as: "Engine.MeshRenderer::MeshRenderer_*")
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool MeshRenderer_GetVisible(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetVisible(uint entityID, bool visible);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool MeshRenderer_GetShadowCast(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetShadowCast(uint entityID, bool cast);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool MeshRenderer_GetShadowReceive(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetShadowReceive(uint entityID, bool receive);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool MeshRenderer_GetGlobalIlluminate(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetGlobalIlluminate(uint entityID, bool gi);
+
+        public static bool GetVisible(uint entityID) => MeshRenderer_GetVisible(entityID);
+        public static void SetVisible(uint entityID, bool visible) => MeshRenderer_SetVisible(entityID, visible);
+
+        public static bool GetShadowCast(uint entityID) => MeshRenderer_GetShadowCast(entityID);
+        public static void SetShadowCast(uint entityID, bool cast) => MeshRenderer_SetShadowCast(entityID, cast);
+
+        public static bool GetShadowReceive(uint entityID) => MeshRenderer_GetShadowReceive(entityID);
+        public static void SetShadowReceive(uint entityID, bool receive) => MeshRenderer_SetShadowReceive(entityID, receive);
+
+        public static bool GetGlobalIlluminate(uint entityID) => MeshRenderer_GetGlobalIlluminate(entityID);
+        public static void SetGlobalIlluminate(uint entityID, bool gi) => MeshRenderer_SetGlobalIlluminate(entityID, gi);
+
+        private uint ID => Entity.EntityID;
+
         public bool Visible
         {
-            get { return InternalCalls.MeshRenderer_GetVisible(Entity.EntityID); }
-            set { InternalCalls.MeshRenderer_SetVisible(Entity.EntityID, value); }
+            get => MeshRenderer_GetVisible(ID);
+            set => MeshRenderer_SetVisible(ID, value);
         }
 
         public bool ShadowCast
         {
-            get { return InternalCalls.MeshRenderer_GetShadowCast(Entity.EntityID); }
-            set { InternalCalls.MeshRenderer_SetShadowCast(Entity.EntityID, value); }
+            get => MeshRenderer_GetShadowCast(ID);
+            set => MeshRenderer_SetShadowCast(ID, value);
         }
 
         public bool ShadowReceive
         {
-            get { return InternalCalls.MeshRenderer_GetShadowReceive(Entity.EntityID); }
-            set { InternalCalls.MeshRenderer_SetShadowReceive(Entity.EntityID, value); }
+            get => MeshRenderer_GetShadowReceive(ID);
+            set => MeshRenderer_SetShadowReceive(ID, value);
         }
 
         public bool GlobalIlluminate
         {
-            get { return InternalCalls.MeshRenderer_GetGlobalIlluminate(Entity.EntityID); }
-            set { InternalCalls.MeshRenderer_SetGlobalIlluminate(Entity.EntityID, value); }
+            get => MeshRenderer_GetGlobalIlluminate(ID);
+            set => MeshRenderer_SetGlobalIlluminate(ID, value);
         }
     }
 }

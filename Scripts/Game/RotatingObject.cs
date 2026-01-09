@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using static Engine.Logger;
 
 namespace Game
 {
@@ -23,7 +24,7 @@ namespace Game
 
         public override void OnStart()
         {
-            Log($"RotatingObject started on entity {EntityID}");
+            LogMessage($"RotatingObject started on entity {EntityID}");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -55,10 +56,10 @@ namespace Game
             // Track accumulated rotation in degrees just for logging
             totalRotation += Math.Abs(rotationThisFrameDeg);
 
-            // Log every full revolution
+            // LogMessage every full revolution
             if (totalRotation >= 360.0f)
             {
-                Log($"Completed a full rotation! Total accumulated: {totalRotation:F2} degrees");
+                LogMessage($"Completed a full rotation! Total accumulated: {totalRotation:F2} degrees");
                 totalRotation -= 360.0f;
             }
         }
