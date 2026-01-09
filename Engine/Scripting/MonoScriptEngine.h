@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <unordered_set>
-#include <cstdint>   // <-- add this
+#include <cstdint>
 
 // Forward declarations for Mono types
 typedef struct _MonoDomain MonoDomain;
@@ -14,21 +14,21 @@ typedef struct _MonoObject MonoObject;
 typedef struct _MonoMethod MonoMethod;
 typedef struct _MonoClassField MonoClassField;
 
-namespace Engine {
+namespace Engine
+{
 
 	class Scene;
 	class Entity;
 	class Input;
-	class AudioManager; //newly added in - amanda
+	class AudioManager;
 
 	// Functions to set context for internal calls
 	void SetScriptingCurrentScene(Scene *scene);
 	void SetScriptingInputSystem(Input *input);
-
-	//newly added - amanda
 	void SetScriptingAudioManager(AudioManager *audiomManager);
 
-	class MonoScriptEngine {
+	class MonoScriptEngine
+	{
 	public:
 		static MonoScriptEngine &GetInstance();
 
@@ -36,8 +36,23 @@ namespace Engine {
 		void Initialize(const std::string &assemblyPath);
 		void Shutdown();
 
-		// Script instance management
+		// ============================================================
+		// Script instance management (HANDLE-FIRST)
+		// ============================================================
+		// Preferred API:
+		//  - CreateScriptInstanceHandle returns a GCHandle that you store in ScriptComponent::GCHandle.
+		//  - Resolve later using GetObjectFromGCHandle(handle) or ScriptHandleUtil::Resolve(component).
+		//  - Destroy using DestroyScriptHandle(handle).
+		uint32_t   CreateScriptInstanceHandle(const std::string &className, MonoObject **outInstance = nullptr, bool pinned = false);
+		MonoObject *GetObjectFromGCHandle(uint32_t gcHandle);
+		void       DestroyScriptHandle(uint32_t gcHandle);
+
+		// Legacy API (NO LONGER ROOTS/OWNS LIFETIME):
+		// Returns a raw MonoObject*; caller must immediately create/store a GCHandle,
+		// otherwise the object can be moved/collected.
 		MonoObject *CreateScriptInstance(const std::string &className);
+
+		// Legacy: calls OnDestroy on the passed instance (does NOT free any handle).
 		void DestroyScriptInstance(MonoObject *instance);
 
 		bool IsValidMonoObject(MonoObject *instance);
@@ -45,59 +60,50 @@ namespace Engine {
 		// Script method invocation
 		void CallMethod(MonoObject *instance, const std::string &methodName);
 		void CallMethod(MonoObject *instance, const std::string &methodName,
-						void **params, int paramCount);
+			void **params, int paramCount);
 
 		// Class and method lookup
 		MonoClass *GetScriptClass(const std::string &className);
 		MonoMethod *GetMethod(MonoClass *klass, const std::string &methodName,
-							  int paramCount = 0);
+			int paramCount = 0);
 
 		// Field access
 		void SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value);
 		void *GetFieldValue(MonoObject *instance, const std::string &fieldName);
 
-		// NEW: convenience helper to bind the native entity ID to a script
+		// Bind native EntityID to managed script
 		void BindEntityID(MonoObject *instance, std::uint32_t entityID);
 
 		// Hot reload support
-		//void ReloadAssembly();
 		void EnsureCorrectDomain();
-
 		bool IsInCorrectDomain();
+
 		// Getters
-
-		MonoDomain* GetRootDomain() const { return m_RootDomain; }   //  NEW
-
-
-		MonoDomain* GetAppDomain() const { return m_AppDomain; }  //  NOT GetDomain!
-
-		MonoDomain *GetDomain() const {
+		MonoDomain *GetRootDomain() const
+		{
+			return m_RootDomain;
+		}
+		MonoDomain *GetAppDomain() const
+		{
 			return m_AppDomain;
 		}
-		MonoAssembly *GetAssembly() const {
+
+		MonoDomain *GetDomain() const
+		{
+			return m_AppDomain;
+		}
+		MonoAssembly *GetAssembly() const
+		{
 			return m_AppAssembly;
 		}
-		MonoImage *GetImage() const {
+		MonoImage *GetImage() const
+		{
 			return m_AppImage;
 		}
 
-		void RegisterInstance(MonoObject *instance) {
-			if(instance) m_ValidInstances.insert(instance);
-		}
-
-		void UnregisterInstance(MonoObject *instance) {
-			m_ValidInstances.erase(instance);
-		}
-
-		bool IsValidInstance(MonoObject *instance) {
-			return m_ValidInstances.find(instance) != m_ValidInstances.end();
-		}
-
-		void ClearAllInstances() {
-			m_ValidInstances.clear();
-		}
-
-		MonoObject* GetObjectFromHandle(void* instancePtr);
+		// Legacy helper kept for compilation safety (best-effort).
+		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
+		MonoObject *GetObjectFromHandle(void *instancePtr);
 
 	private:
 		MonoScriptEngine() = default;
@@ -118,7 +124,6 @@ namespace Engine {
 		MonoImage *m_AppImage = nullptr;
 		std::string   m_AssemblyPath;
 		std::unordered_map<std::string, MonoClass *> m_ClassCache;
-		std::unordered_map<MonoObject*, uint32_t> m_ObjectToHandle;
 	};
 
 } // namespace Engine

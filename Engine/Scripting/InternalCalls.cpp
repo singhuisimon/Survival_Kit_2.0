@@ -135,26 +135,63 @@ namespace Engine
 				return;
 
 			auto &se = MonoScriptEngine::GetInstance();
-
 			uint64_t eid = static_cast<uint32_t>(entity);
 
-			// If prefab clone already contains a managed instance, just rebind.
-			if (sc.ScriptInstance)
+			// If prefab clone already contains a handle, just rebind to the resolved object.
+			if (sc.GCHandle != 0)
 			{
-				se.BindEntityID(static_cast<MonoObject *>(sc.ScriptInstance), static_cast<std::uint32_t>(eid));
-				sc.Started = false;
-				return;
+				MonoObject *obj = se.GetObjectFromGCHandle(sc.GCHandle);
+				sc.ScriptInstance = obj; // keep cache synced
+
+				if (!obj)
+				{
+					// handle is stale/invalid -> clear and recreate next
+					se.DestroyScriptHandle(sc.GCHandle);
+					sc.GCHandle = 0;
+					sc.ScriptInstance = nullptr;
+				}
+				else
+				{
+					se.BindEntityID(obj, static_cast<std::uint32_t>(eid));
+					sc.Started = false;
+					return;
+				}
 			}
 
-			MonoObject *instance = se.CreateScriptInstance(sc.ScriptClassName);
-			if (!instance)
+			// Transitional: if old data has ScriptInstance but no handle, adopt it.
+			// (Optional, but helps when cloning prefabs that copied ScriptInstance pointer.)
+			if (sc.ScriptInstance && sc.GCHandle == 0)
+			{
+				MonoObject *legacy = static_cast<MonoObject *>(sc.ScriptInstance);
+				sc.GCHandle = mono_gchandle_new(legacy, /*pinned*/ false);
+				MonoObject *obj = se.GetObjectFromGCHandle(sc.GCHandle);
+				sc.ScriptInstance = obj;
+
+				if (obj)
+				{
+					se.BindEntityID(obj, static_cast<std::uint32_t>(eid));
+					sc.Started = false;
+					return;
+				}
+
+				// If legacy pointer was bad, clean it up and fall through to recreate
+				se.DestroyScriptHandle(sc.GCHandle);
+				sc.GCHandle = 0;
+				sc.ScriptInstance = nullptr;
+			}
+
+			// Create a NEW managed instance and store handle (handle-first)
+			MonoObject *instance = nullptr;
+			uint32_t handle = se.CreateScriptInstanceHandle(sc.ScriptClassName, &instance, /*pinned*/ false);
+			if (handle == 0 || !instance)
 			{
 				LOG_ERROR("[InternalCall] Prefab script init failed for class '", sc.ScriptClassName, "' on entity ", eid);
 				return;
 			}
 
 			se.BindEntityID(instance, static_cast<std::uint32_t>(eid));
-			sc.ScriptInstance = instance;
+			sc.GCHandle = handle;
+			sc.ScriptInstance = instance; // cache only
 			sc.Started = false;
 		}
 
@@ -280,8 +317,23 @@ namespace Engine
 			}
 
 			auto &se = MonoScriptEngine::GetInstance();
-			MonoObject *instance = se.CreateScriptInstance(klass);
-			if (!instance)
+
+			// If entity already has a script, destroy the old handle cleanly
+			if (e.HasComponent<ScriptComponent>())
+			{
+				auto &scOld = e.GetComponent<ScriptComponent>();
+				if (scOld.GCHandle != 0)
+				{
+					se.DestroyScriptHandle(scOld.GCHandle);
+					scOld.GCHandle = 0;
+				}
+				scOld.ScriptInstance = nullptr;
+				scOld.Started = false;
+			}
+
+			MonoObject *instance = nullptr;
+			uint32_t handle = se.CreateScriptInstanceHandle(klass, &instance, false);
+			if (handle == 0 || !instance)
 			{
 				LOG_ERROR("[InternalCall] Entity_AddScript: failed to create instance of ", klass);
 				return;
@@ -289,18 +341,21 @@ namespace Engine
 
 			se.BindEntityID(instance, static_cast<std::uint32_t>(entityID));
 
+			// Attach/update component with handle as source of truth
 			if (e.HasComponent<ScriptComponent>())
 			{
 				auto &sc = e.GetComponent<ScriptComponent>();
 				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
+				sc.GCHandle = handle;
+				sc.ScriptInstance = instance; // cache
 				sc.Started = false;
 			}
 			else
 			{
 				auto &sc = e.AddComponent<ScriptComponent>();
 				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
+				sc.GCHandle = handle;
+				sc.ScriptInstance = instance; // cache
 				sc.Started = false;
 			}
 		}
