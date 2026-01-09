@@ -10,84 +10,109 @@
 
 #include "PrefabRegistry.h"
 #include "../Utility/Logger.h"
+#include "../ECS/Entity.h"
+#include "../Serialization/PrefabSerializer.h"
+#include "../xresource_guid/include/xresource_guid.h"
 
+#include <algorithm>
 namespace Engine {
+    PrefabRegistry& PrefabRegistry::Get() {
+        static PrefabRegistry instance;
+        return instance;
+    }
 
-    void PrefabRegistry::RegisterPrefab(std::shared_ptr<Prefab> prefab) {
-        if (!prefab) {
-            LOG_ERROR("PrefabRegistry: Attempted to register null prefab");
-            return;
+    void PrefabRegistry::RegisterPrefab(xresource::instance_guid guid, const std::string& filePath, const std::string& name) {
+        u64 guidValue = guid.m_Value;
+
+        // Extract name from path if not provided
+        std::string prefabName = name;
+        if (prefabName.empty()) {
+            // Extract filename from path (without extension)
+            size_t lastSlash = filePath.find_last_of("/\\");
+            size_t lastDot = filePath.find_last_of(".");
+
+            if (lastSlash != std::string::npos && lastDot != std::string::npos) {
+                prefabName = filePath.substr(lastSlash + 1, lastDot - lastSlash - 1);
+            }
+            else if (lastDot != std::string::npos) {
+                prefabName = filePath.substr(0, lastDot);
+            }
+            else {
+                prefabName = filePath;
+            }
         }
 
-        xresource::instance_guid guid = prefab->GetGUID();
-       
-
-        // Check if already registered
-        if (m_Prefabs.find(guid) != m_Prefabs.end()) {
-            LOG_WARNING("PrefabRegistry: Prefab already registered: ", prefab->GetName());
-            return;
-        }
-
-        m_Prefabs[guid] = prefab;
-        m_PrefabsByName[prefab->GetName()] = guid;
-       
-
-        LOG_INFO("PrefabRegistry: Registered prefab '", prefab->GetName(),
-            "' (GUID: 0x", std::hex, guid.m_Value, std::dec, ")");
+        m_PrefabRegistry[guidValue] = { filePath, prefabName };
+        LOG_INFO("Registered prefab: ", prefabName.c_str(), " (GUID: ", static_cast<u64>(guidValue), ")");
     }
 
     void PrefabRegistry::UnregisterPrefab(xresource::instance_guid guid) {
-        auto it = m_Prefabs.find(guid);
-        if (it == m_Prefabs.end()) {
-            LOG_WARNING("PrefabRegistry: Attempted to unregister non-existent prefab");
-            return;
+        u64 guidValue = guid.m_Value;
+
+        auto it = m_PrefabRegistry.find(guidValue);
+        if (it != m_PrefabRegistry.end()) {
+            LOG_INFO("Unregistered prefab: ", it->second.second.c_str());
+            m_PrefabRegistry.erase(it);
         }
-
-        std::string name = it->second->GetName();
-        m_PrefabsByName.erase(name);
-        m_Prefabs.erase(it);
-
-        LOG_INFO("PrefabRegistry: Unregistered prefab '", name, "'");
     }
 
-    std::shared_ptr<Prefab> PrefabRegistry::GetPrefab(xresource::instance_guid guid) const {
-        auto it = m_Prefabs.find(guid);
-        if (it != m_Prefabs.end()) {
-            return it->second;
+    bool PrefabRegistry::LoadPrefab(xresource::instance_guid guid, Prefab& outPrefab) {
+        u64 guidValue = guid.m_Value;
+
+        auto it = m_PrefabRegistry.find(guidValue);
+        if (it == m_PrefabRegistry.end()) {
+            LOG_ERROR("Prefab not registered with GUID: ", static_cast<u64>(guidValue));
+            return false;
         }
-        return nullptr;
+
+        const std::string& filePath = it->second.first;
+        return LoadPrefabFromFile(filePath, outPrefab);
     }
 
-    std::shared_ptr<Prefab> PrefabRegistry::GetPrefabByName(const std::string& name) const {
-        auto it = m_PrefabsByName.find(name);
-        if (it != m_PrefabsByName.end()) {
-            return GetPrefab(it->second);
+    bool PrefabRegistry::LoadPrefabFromFile(const std::string& filePath, Prefab& outPrefab) {
+        if (!PrefabSerializer::DeserializePrefab(filePath, outPrefab)) {
+            LOG_ERROR("Failed to load prefab from file: ", filePath.c_str());
+            return false;
         }
-        return nullptr;
+
+        LOG_DEBUG("Successfully loaded prefab: ", outPrefab.name.c_str());
+        return true;
     }
 
-    bool PrefabRegistry::IsPrefabLoaded(xresource::instance_guid guid) const {
-        return m_Prefabs.find(guid) != m_Prefabs.end();
+    std::string PrefabRegistry::GetPrefabPath(xresource::instance_guid guid) const {
+        u64 guidValue = guid.m_Value;
+
+        auto it = m_PrefabRegistry.find(guidValue);
+        if (it != m_PrefabRegistry.end()) {
+            return it->second.first;
+        }
+
+        return "";
+    }
+
+    std::string PrefabRegistry::GetPrefabName(xresource::instance_guid guid) const {
+        u64 guidValue = guid.m_Value;
+
+        auto it = m_PrefabRegistry.find(guidValue);
+        if (it != m_PrefabRegistry.end()) {
+            return it->second.second;
+        }
+
+        return "";
+    }
+
+    bool PrefabRegistry::IsPrefabRegistered(xresource::instance_guid guid) const {
+        u64 guidValue = guid.m_Value;
+        return m_PrefabRegistry.find(guidValue) != m_PrefabRegistry.end();
+    }
+
+    const std::unordered_map<u64, std::pair<std::string, std::string>>& PrefabRegistry::GetAllPrefabs() const {
+        return m_PrefabRegistry;
     }
 
     void PrefabRegistry::Clear() {
-        LOG_INFO("PrefabRegistry: Clearing all prefabs (", m_Prefabs.size(), " prefabs)");
-        m_Prefabs.clear();
-        m_PrefabsByName.clear();
+        m_PrefabRegistry.clear();
+        LOG_INFO("Cleared prefab registry");
     }
-
-    void PrefabRegistry::UpdatePrefab(std::shared_ptr<Prefab> newPrefab)
-    {
-        xresource::instance_guid guid = newPrefab->GetGUID();
-        auto it = m_Prefabs.find(guid);
-        if (it != m_Prefabs.end())
-        {
-            it->second = newPrefab; // Replace the existing prefab
-        }
-        else
-        {
-            RegisterPrefab(newPrefab); // Fallback to register if not found
-        }
-    }
-
+ 
 } // namespace Engine

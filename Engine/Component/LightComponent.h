@@ -17,6 +17,7 @@
 
  // Types for u32
 #include "../Utility/Types.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -35,7 +36,10 @@ namespace Engine {
 
     struct LightComponent
     {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Light;
+        static constexpr const char* TypeName = "LightComponent";
 
+        xresource::instance_guid ComponentGUID;
         // --------- On/Off ---------
         bool Enabled = true;
 
@@ -82,7 +86,8 @@ namespace Engine {
             float indirectMult = 1.0f,
             LightMode mode = LightMode::Realtime,
             bool  enabled = true)
-            : Enabled(enabled),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Enabled(enabled),
             Type(type),
             Mode(mode),
             Color(color),

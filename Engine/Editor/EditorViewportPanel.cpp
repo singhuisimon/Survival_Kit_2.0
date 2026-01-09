@@ -114,7 +114,7 @@ namespace Engine
             {
                 bool gizmoUsing = ImGuizmo::IsUsing();
                 bool gizmoOver = ImGuizmo::IsOver();
-                std::cout << "CLICK DETECTED!" << std::endl;
+                //std::cout << "CLICK DETECTED!" << std::endl;
 
                 // force selection regardless of ImGuizmo state
                 if (!m_SelectedEntity || (!gizmoUsing && !gizmoOver))
@@ -136,7 +136,7 @@ namespace Engine
                         m_Editor->SetCurrSelectedEntity(m_SelectedEntity);
                         doubleClickCandidate = Entity{};
                         doubleClickCandidateID = 0xFFFFFFFFu;
-                        std::cout << "[GIZMO] Deselected" << std::endl;
+                        //std::cout << "[GIZMO] Deselected" << std::endl;
                     }
                 }
             }

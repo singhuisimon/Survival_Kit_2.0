@@ -93,9 +93,13 @@ namespace Engine
 		bool m_PerformanceProfileWindow = true;
 
 		std::string m_CurrentScenePath;
-		std::string m_CurrentSceneName; 
+		std::string m_CurrentSceneName;
 
+		std::string m_CurrentPrefabPath;
+		std::string m_CurrentPrefabName;
+	
 	public:
+		
 
 		// For Getting AssetPath
 		struct AssetEntry
@@ -103,6 +107,7 @@ namespace Engine
 			std::string name;
 			std::string fullPath;
 		};
+
 		
 		Editor(GLFWwindow* window) :
 			m_Window(window),
@@ -141,8 +146,16 @@ namespace Engine
 		void ClearScenePath() { m_CurrentScenePath.clear(); }
 		bool HasScenePath() const { return !m_CurrentScenePath.empty(); }
 
+		void SetPrefabPath(const std::string& path) { m_CurrentPrefabPath = path; }
+		const std::string& GetPrefabPath() const { return m_CurrentPrefabPath; }
+		void ClearPrefabPath() { m_CurrentPrefabPath.clear(); }
+		bool HasPrefabPath() const { return !m_CurrentPrefabPath.empty(); }
+
 		void SetSceneName(const std::string& name);
 		std::string GetSceneName() const;
+
+		void SetPrefabName(const std::string& name);
+		std::string GetPrefabName() const;
 
 		void SetRenderer(Renderer* renderer) { m_Renderer = renderer; }
 		Renderer* GetRenderer() const{ return m_Renderer; }

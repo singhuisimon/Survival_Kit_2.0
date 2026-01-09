@@ -716,13 +716,17 @@ namespace Engine
 
 			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
-			if (!prefab)
-				return 0;
+			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
+			/*if (!prefab)
+				return 0;*/
 
-			PrefabRegistry::Get().RegisterPrefab(prefab);
+			//PrefabRegistry::Get().RegisterPrefab(prefab);
 
-			Entity entity = PrefabInstantiator::InstantiateEntityPrefab(s_CurrentScene, prefab->GetGUID());
+			Entity entity = PrefabInstantiator::InstantiatePrefabFromFile(
+				s_CurrentScene,
+				prefabFullPath,
+				Entity{}  // No parent
+			);
 			if (!entity)
 				return 0;
 
@@ -752,13 +756,19 @@ namespace Engine
 
 			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
+			/*auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
 			if (!prefab)
 				return 0;
 
 			PrefabRegistry::Get().RegisterPrefab(prefab);
 
-			Entity entity = PrefabInstantiator::InstantiateScenePrefab(s_CurrentScene, prefab->GetGUID());
+			Entity entity = PrefabInstantiator::InstantiateScenePrefab(s_CurrentScene, prefab->GetGUID());*/
+
+			Entity entity = PrefabInstantiator::InstantiatePrefabFromFile(
+				s_CurrentScene,
+				prefabFullPath,
+				Entity{}  // No parent
+			);
 			if (!entity)
 				return 0;
 
@@ -801,17 +811,21 @@ namespace Engine
 
 			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
-			if (!prefab)
+			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
+		/*	if (!prefab)
 				return 0;
 
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			Entity entity;
-			if (isScenePrefab)
+			*/
+			Entity entity = PrefabInstantiator::InstantiatePrefabFromFile(
+				s_CurrentScene,
+				prefabFullPath,
+				Entity{}  // No parent
+			);
+			/*if (isScenePrefab)
 				entity = PrefabInstantiator::InstantiateScenePrefab(s_CurrentScene, prefab->GetGUID());
 			else
-				entity = PrefabInstantiator::InstantiateEntityPrefab(s_CurrentScene, prefab->GetGUID());
+				entity = PrefabInstantiator::InstantiateEntityPrefab(s_CurrentScene, prefab->GetGUID());*/
+
 
 			if (!entity)
 				return 0;

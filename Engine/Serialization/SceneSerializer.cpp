@@ -121,29 +121,94 @@ namespace Engine
 			if (entity.HasComponent<PrefabComponent>())
 			{
 				LOG_TRACE("  - Serializing PrefabComponent");
-				auto &prefab = entity.GetComponent<PrefabComponent>();
-
+				auto& prefabComp = entity.GetComponent<PrefabComponent>();
 				Value componentObj(kObjectType);
 				componentObj.AddMember("Type", "PrefabComponent", allocator);
 
 				Value propertiesObj(kObjectType);
 
-				// Prefab GUID
-				propertiesObj.AddMember(
-					"PrefabGUID",
-					Value(std::to_string(prefab.PrefabGUID.m_Value).c_str(), allocator),
-					allocator
-				);
+				// Basic prefab info
+				propertiesObj.AddMember("ComponentGUID",
+					Value(std::to_string(prefabComp.ComponentGUID.m_Value).c_str(), allocator),
+					allocator);
 
-				// Component GUID
-				propertiesObj.AddMember(
-					"ComponentGUID",
-					Value(std::to_string(prefab.ComponentGUID.m_Value).c_str(), allocator),
-					allocator
-				);
+				propertiesObj.AddMember("PrefabAssetGuid",
+					Value(std::to_string(prefabComp.PrefabAssetGuid.m_Value).c_str(), allocator),
+					allocator);
+
+				propertiesObj.AddMember("isPrefabRoot", prefabComp.isPrefabRoot, allocator);
+				propertiesObj.AddMember("isNestedPrefab", prefabComp.isNestedPrefab, allocator);
+
+				propertiesObj.AddMember("parentPrefabGuid",
+					Value(std::to_string(prefabComp.parentPrefabGuid.m_Value).c_str(), allocator),
+					allocator);
+
+				propertiesObj.AddMember("prefabName",
+					Value(prefabComp.prefabName.c_str(), allocator),
+					allocator);
+
+				propertiesObj.AddMember("prefabVersion", prefabComp.prefabVersion, allocator);
+
+				// Serialize component overrides
+				if (!prefabComp.componentOverrides.empty()) {
+					Value overridesArray(kArrayType);
+
+					for (const auto& override : prefabComp.componentOverrides) {
+						Value overrideObj(kObjectType);
+
+						overrideObj.AddMember("componentType",
+							static_cast<uint32_t>(override.componentType),
+							allocator);
+
+						overrideObj.AddMember("isAddedComponent",
+							override.isAddedComponent,
+							allocator);
+
+						overrideObj.AddMember("isRemovedComponent",
+							override.isRemovedComponent,
+							allocator);
+
+						// Store original component JSON
+						if (!override.originalComponentJSON.empty()) {
+							overrideObj.AddMember("originalComponentJSON",
+								Value(override.originalComponentJSON.c_str(), allocator),
+								allocator);
+						}
+
+						// Store current component JSON (if tracking)
+						if (!override.currentComponentJSON.empty()) {
+							overrideObj.AddMember("currentComponentJSON",
+								Value(override.currentComponentJSON.c_str(), allocator),
+								allocator);
+						}
+
+						// Store modified property names
+						if (!override.modifiedPropertyNames.empty()) {
+							Value propsArray(kArrayType);
+							for (const auto& propName : override.modifiedPropertyNames) {
+								propsArray.PushBack(Value(propName.c_str(), allocator), allocator);
+							}
+							overrideObj.AddMember("modifiedPropertyNames", propsArray, allocator);
+						}
+
+						overridesArray.PushBack(overrideObj, allocator);
+					}
+
+					propertiesObj.AddMember("componentOverrides", overridesArray, allocator);
+				}
+
+				// Serialize child entity IDs
+				if (!prefabComp.childEntityIDs.empty()) {
+					Value childrenArray(kArrayType);
+					for (u32 childID : prefabComp.childEntityIDs) {
+						childrenArray.PushBack(childID, allocator);
+					}
+					propertiesObj.AddMember("childEntityIDs", childrenArray, allocator);
+				}
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
+
 			}
 			// Serialize TransformComponent
 			if (entity.HasComponent<TransformComponent>())
@@ -245,6 +310,12 @@ namespace Engine
 				std::string meshFilename = AM.getNameFromGuid(mesh.MeshGuid);
 				std::string materialFilename = AM.getNameFromGuid(mesh.MaterialGuid);
 				std::string textureFilename = AM.getNameFromGuid(mesh.TextureGuid);
+				
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(mesh.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 
 				propertiesObj.AddMember("Mesh",
 					Value(meshFilename.empty() ? "" : meshFilename.c_str(), allocator),
@@ -272,9 +343,15 @@ namespace Engine
 				LOG_TRACE("  - Serializing RigidbodyComponent");
 				auto &rb = entity.GetComponent<RigidbodyComponent>();
 				Value componentObj(kObjectType);
+
 				componentObj.AddMember("Type", "RigidbodyComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(rb.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				propertiesObj.AddMember("Mass", rb.Mass, allocator);
 				propertiesObj.AddMember("IsKinematic", rb.IsKinematic, allocator);
 				propertiesObj.AddMember("IsTrigger", rb.IsTrigger, allocator);
@@ -319,6 +396,11 @@ namespace Engine
 				componentObj.AddMember("Type", "AudioComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(audio.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				propertiesObj.AddMember("FilePath", Value(audio.AudioFilePath.c_str(), allocator), allocator);
 				propertiesObj.AddMember("Type", static_cast<int>(audio.Type), allocator);
 				propertiesObj.AddMember("State", static_cast<int>(audio.State), allocator);
@@ -343,10 +425,17 @@ namespace Engine
 			{
 				LOG_TRACE("  - Serializing ListenerComponent");
 				auto &listener = entity.GetComponent<ListenerComponent>();
+
 				Value componentObj(kObjectType);
+
 				componentObj.AddMember("Type", "ListenerComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(listener.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				propertiesObj.AddMember("Active", listener.Active, allocator);
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
@@ -363,6 +452,11 @@ namespace Engine
 				componentObj.AddMember("Type", "ReverbComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(reverb.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				propertiesObj.AddMember("Preset", static_cast<int>(reverb.Preset), allocator);
 				propertiesObj.AddMember("MinDistance", reverb.MinDistance, allocator);
 				propertiesObj.AddMember("MaxDistance", reverb.MaxDistance, allocator);
@@ -402,7 +496,11 @@ namespace Engine
 				componentObj.AddMember("Type", "ParticleComponent", allocator);
 
 				rapidjson::Value propertiesObj(kObjectType);
-
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(emitter.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				// Initial Velocity
 				rapidjson::Value velArray(kArrayType);
 				velArray.PushBack(emitter.InitialVelocity.x, allocator);
@@ -495,6 +593,12 @@ namespace Engine
 				componentObj.AddMember("Type", "LightComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(light.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				propertiesObj.AddMember("Enabled", light.Enabled, allocator);
 				propertiesObj.AddMember("Type", static_cast<int>(light.Type), allocator);
 				//propertiesObj.AddMember("Mode", light.Mode, allocator); // For now only 1 mode, not required in scene file
@@ -516,10 +620,16 @@ namespace Engine
 			{
 				LOG_TRACE("  - Serializing AnimatorComponent");
 				auto &animator = entity.GetComponent<AnimatorComponent>();
+
 				Value componentObj(kObjectType);
 				componentObj.AddMember("Type", "AnimatorComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(animator.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
 				propertiesObj.AddMember("playing", animator.playing, allocator);
 				propertiesObj.AddMember("respectClipLoop", animator.respectClipLoop, allocator);
 				propertiesObj.AddMember("controller", animator.controller, allocator);
@@ -676,21 +786,107 @@ namespace Engine
 					}
 					else if (componentType == "PrefabComponent")
 					{
+						LOG_TRACE("  - Deserializing PrefabComponent");
 						auto& prefabComp = entity.AddComponent<PrefabComponent>();
 
-						// --- Prefab GUID ---
-						if (properties.HasMember("PrefabGUID"))
-							prefabComp.PrefabGUID = xresource::instance_guid(
-								std::stoull(properties["PrefabGUID"].GetString())
-							);
-
-						// --- PrefabComponent's own GUID ---
+						// Basic prefab info
 						if (properties.HasMember("ComponentGUID"))
+						{
 							prefabComp.ComponentGUID = xresource::instance_guid(
 								std::stoull(properties["ComponentGUID"].GetString())
 							);
+						}
 
+						if (properties.HasMember("PrefabAssetGuid"))
+						{
+							prefabComp.PrefabAssetGuid = xresource::instance_guid(
+								std::stoull(properties["PrefabAssetGuid"].GetString())
+							);
+						}
 
+						if (properties.HasMember("isPrefabRoot"))
+							prefabComp.isPrefabRoot = properties["isPrefabRoot"].GetBool();
+
+						if (properties.HasMember("isNestedPrefab"))
+							prefabComp.isNestedPrefab = properties["isNestedPrefab"].GetBool();
+
+						if (properties.HasMember("parentPrefabGuid"))
+						{
+							prefabComp.parentPrefabGuid = xresource::instance_guid(
+								std::stoull(properties["parentPrefabGuid"].GetString())
+							);
+						}
+
+						if (properties.HasMember("prefabName"))
+							prefabComp.prefabName = properties["prefabName"].GetString();
+
+						if (properties.HasMember("prefabVersion"))
+							prefabComp.prefabVersion = properties["prefabVersion"].GetUint();
+
+						// Deserialize component overrides
+						if (properties.HasMember("componentOverrides") && properties["componentOverrides"].IsArray())
+						{
+							const Value& overridesArray = properties["componentOverrides"];
+							prefabComp.componentOverrides.clear();
+
+							for (SizeType k = 0; k < overridesArray.Size(); k++)
+							{
+								const Value& overrideObj = overridesArray[k];
+								ComponentOverride override;
+
+								if (overrideObj.HasMember("componentType"))
+								{
+									override.componentType = static_cast<ComponentTypeID>(
+										overrideObj["componentType"].GetUint()
+										);
+								}
+
+								if (overrideObj.HasMember("isAddedComponent"))
+									override.isAddedComponent = overrideObj["isAddedComponent"].GetBool();
+
+								if (overrideObj.HasMember("isRemovedComponent"))
+									override.isRemovedComponent = overrideObj["isRemovedComponent"].GetBool();
+
+								if (overrideObj.HasMember("originalComponentJSON"))
+								{
+									override.originalComponentJSON = overrideObj["originalComponentJSON"].GetString();
+								}
+
+								if (overrideObj.HasMember("currentComponentJSON"))
+								{
+									override.currentComponentJSON = overrideObj["currentComponentJSON"].GetString();
+								}
+
+								// Deserialize modified property names
+								if (overrideObj.HasMember("modifiedPropertyNames") &&
+									overrideObj["modifiedPropertyNames"].IsArray())
+								{
+									const Value& propsArray = overrideObj["modifiedPropertyNames"];
+									override.modifiedPropertyNames.clear();
+
+									for (SizeType m = 0; m < propsArray.Size(); m++)
+									{
+										override.modifiedPropertyNames.push_back(
+											propsArray[m].GetString()
+										);
+									}
+								}
+
+								prefabComp.componentOverrides.push_back(override);
+							}
+						}
+
+						// Deserialize child entity IDs
+						if (properties.HasMember("childEntityIDs") && properties["childEntityIDs"].IsArray())
+						{
+							const Value& childrenArray = properties["childEntityIDs"];
+							prefabComp.childEntityIDs.clear();
+
+							for (SizeType k = 0; k < childrenArray.Size(); k++)
+							{
+								prefabComp.childEntityIDs.push_back(childrenArray[k].GetUint());
+							}
+						}
 					}
 					else if (componentType == "TransformComponent")
 					{
@@ -797,7 +993,12 @@ namespace Engine
 					else if (componentType == "MeshRendererComponent")
 					{
 						auto& mesh = entity.AddComponent<MeshRendererComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							mesh.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						// Handle filename fields (strings)
 						if (properties.HasMember("Mesh") && properties["Mesh"].IsString())
 						{
@@ -865,6 +1066,13 @@ namespace Engine
 					else if (componentType == "RigidbodyComponent")
 					{
 						auto &rb = entity.AddComponent<RigidbodyComponent>();
+
+						if (properties.HasMember("ComponentGUID"))
+						{
+							rb.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						if (properties.HasMember("Mass"))
 							rb.Mass = properties["Mass"].GetFloat();
 						if (properties.HasMember("IsKinematic"))
@@ -915,7 +1123,12 @@ namespace Engine
 					else if (componentType == "AudioComponent")
 					{
 						auto &audio = entity.AddComponent<AudioComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							audio.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						if (properties.HasMember("FilePath"))
 							audio.AudioFilePath = properties["FilePath"].GetString();
 						if (properties.HasMember("Type"))
@@ -948,14 +1161,24 @@ namespace Engine
 					else if (componentType == "ListenerComponent")
 					{
 						auto &listener = entity.AddComponent<ListenerComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							listener.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						if (properties.HasMember("Active"))
 							listener.Active = properties["Active"].GetBool();
 					}
 					else if (componentType == "ReverbComponent")
 					{
 						auto &reverb = entity.AddComponent<ReverbZoneComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							reverb.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						if (properties.HasMember("Preset"))
 							reverb.Preset = static_cast<ReverbPreset>(properties["Preset"].GetInt());
 						if (properties.HasMember("MinDistance"))
@@ -992,7 +1215,12 @@ namespace Engine
 					else if (componentType == "ParticleComponent")
 					{
 						auto &emitter = entity.AddComponent<ParticleComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							emitter.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						// Initial Velocity
 						if (properties.HasMember("Initial Velocity") && properties["Initial Velocity"].IsArray())
 						{
@@ -1122,7 +1350,12 @@ namespace Engine
 					else if (componentType == "LightComponent")
 					{
 						auto &light = entity.AddComponent<LightComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							light.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						if (properties.HasMember("Enabled"))
 							light.Enabled = properties["Enabled"].GetBool();
 						if (properties.HasMember("Type"))
@@ -1151,7 +1384,12 @@ namespace Engine
 					else if (componentType == "AnimatorComponent")
 					{
 						auto &animator = entity.AddComponent<AnimatorComponent>();
-
+						if (properties.HasMember("ComponentGUID"))
+						{
+							animator.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 						if (properties.HasMember("playing"))
 							animator.playing = properties["playing"].GetBool();
 						if (properties.HasMember("respectClipLoop"))

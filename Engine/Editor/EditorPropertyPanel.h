@@ -10,6 +10,7 @@
 #include "../Utility/AssetPath.h"
 #include "../Editor/Editor.h"
 #include "../Component/TransformComponent.h"
+#include "../Component/PrefabComponent.h"
 #include "../Transform/TransformSystem.h"
 
 namespace Engine
@@ -55,6 +56,12 @@ namespace Engine
 		int                m_DopesheetSelectedKey = -1;  // index into that track’s key array
 		AnimatorViewMode    m_AnimatorViewMode = AnimatorViewMode::Dopesheet;
 		AnimatorComponentTrack m_SelectedComponentTrack = AnimatorComponentTrack::Transform;
+
+		bool IsComponentOverridden(ComponentTypeID componentType);
+		void MarkComponentOverridden(ComponentTypeID componentType);
+		void MarkComponentRemoved(ComponentTypeID componentType);
+
+		
 
 	public:
 		EditorPropertyPanel(Editor* editor) : m_Editor(editor) {};

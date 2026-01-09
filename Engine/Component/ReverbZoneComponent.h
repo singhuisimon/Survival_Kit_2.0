@@ -11,6 +11,7 @@
 #pragma once
 #include <fmod.hpp>
 #include <string>
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -25,6 +26,10 @@ namespace Engine {
      * - This struct stays as POD data (no logic), as ECS best practices recommend.
      */
     struct ReverbZoneComponent {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::ReverbZone;
+        static constexpr const char* TypeName = "ReverbZoneComponent";
+
+        xresource::instance_guid ComponentGUID;
         // Serialized values
         ReverbPreset Preset;  // For easy presets (Generic, Cave, Room, etc.)
         float MinDistance;    // Reverb fade-in start distance
@@ -41,7 +46,9 @@ namespace Engine {
   
         // --- Constructor ---
         ReverbZoneComponent()
-            : Preset(ReverbPreset::Generic)
+            :
+            ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Preset(ReverbPreset::Generic)
             , MinDistance(1.0f)
             , MaxDistance(20.0f)
             , DecayTime(1500.0f)      // FMOD default-ish values
@@ -56,7 +63,8 @@ namespace Engine {
 
         // --- Constructor with filepath ---
         ReverbZoneComponent(ReverbPreset preset)
-            : Preset(preset)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Preset(preset)
             , MinDistance(1.0f)
             , MaxDistance(20.0f)
             , DecayTime(1500.0f)      // FMOD default-ish values

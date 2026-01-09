@@ -25,6 +25,7 @@
 
 // Resource types for xresource::instance_guid
 #include "../Asset/ResourceTypes.h"
+#include "../Component/AnimatorComponent.h"
 
 namespace Engine {
 
@@ -32,7 +33,10 @@ namespace Engine {
      * @brief Animator component
      */
     struct AnimatorComponent {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Animator;
+        static constexpr const char* TypeName = "AnimatorComponent";
 
+        xresource::instance_guid ComponentGUID;
         // Toggles
         bool playing = false;
         bool respectClipLoop = true;   // you can override clip.loop if needed

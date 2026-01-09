@@ -49,7 +49,8 @@ namespace Engine {
 
         // Default constructor
         MeshRendererComponent()
-            : MeshGuid(0),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            MeshGuid(0),
 			MaterialGuid(0),
 			TextureGuid(0),
     		Visible(true),

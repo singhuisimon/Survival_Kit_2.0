@@ -11,7 +11,6 @@ namespace Engine {
         Light = 4,
         ParticleSystem = 5,
         RigidBody = 6,
-        Collider = 7,
         Script = 8,
         Audio = 9,
         Listerner = 10,
