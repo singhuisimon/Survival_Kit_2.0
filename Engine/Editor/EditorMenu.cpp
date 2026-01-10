@@ -34,6 +34,8 @@ namespace Engine
 				if (ImGui::MenuItem("Open Scene"))
 				{
 					m_OpenScenePanel = true;
+					m_CurrPrefabPath = "";
+					m_Editor->SetPrefabPath(m_CurrPrefabPath);
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -73,6 +75,8 @@ namespace Engine
 				if (ImGui::MenuItem("Open Prefab File"))
 				{
 					m_OpenPrefabPanel = true;
+					m_CurrScenePath = "";
+					m_Editor->SetScenePath(m_CurrScenePath);
 				}
 				
 				ImGui::EndMenu();
@@ -102,6 +106,7 @@ namespace Engine
 
 
 			// ---------------- Display Current Scene Name ---------------------
+			
 			if (!m_CurrScenePath.empty())
 			{
 				std::filesystem::path filePath(m_CurrScenePath);
@@ -123,6 +128,7 @@ namespace Engine
 
 				ImGui::SameLine(menuBarWidth - textWidth - 10.0f);
 				ImGui::TextUnformatted(fileName.c_str());
+				
 			}
 
 			ImGui::EndMainMenuBar();
@@ -179,6 +185,7 @@ namespace Engine
 							renderer->getBloomFilterRadius() = settings.s_BloomFilterRadius;
 							renderer->getExposure() = settings.s_Exposure;
 						}
+						// to register entity that contain prefab
 						auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs"));
 						for (auto& prefabAsset : prefabFiles)
 						{

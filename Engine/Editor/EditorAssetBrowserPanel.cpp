@@ -6,6 +6,7 @@
 #include "../Asset/AssetManager.h"
 #include "../Asset/ResourceManager.h"
 #include "../Asset/ResourceHelpers.h"
+#include "../Prefab/PrefabRegistry.h"
 
 /*#include "../Animation/AnimationStorage.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
@@ -299,10 +300,7 @@ namespace Engine
 							if (m_Editor->GetActiveScene())
 							{
 								m_Editor->SetCurrSelectedEntity(Entity{});
-								//auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-								//TODO: Prefab
-								/*isPrefabEditor = false;
-								LoadAllPrefabsIntoRegistry();*/
+								
 								m_Editor->GetActiveScene()->GetRegistry().clear();
 								m_Editor->GetActiveScene()->LoadFromFile(filePath);
 
@@ -322,54 +320,39 @@ namespace Engine
 						else if (extension == ".prefab" && folderName != "BT") // FOr Prefab, not BT (To be fixed in M3)
 						{
 							LOG_DEBUG("=====Start Load Prefab File=========");
-							/*	if (!isPrefabEditor)
-								{
-									if (!currScenePath.empty())
-									{
-										m_Scene->SaveToFile(currScenePath);
-										m_Scene->SaveToFile(convertAssetPathToRootResources(currScenePath));
-										LOG_INFO("Scene auto-saved before switching to prefab:", currScenePath);
-									}
-								}*/
+							m_Editor->SetPrefabPath(filePath);
+							LOG_DEBUG("filePathName: ", filePath);
 
-							//TODO - Prefab
-							//currPrefabPath = filePath;
-							//auto prefab = PrefabSerializer::LoadPrefabFromFile(currPrefabPath);
+							std::string prefabName = "Prefab: " + fileName;
+							Scene* newScene = m_Editor->CreateNewScene(prefabName);
+							if (!newScene)
+							{
+								LOG_ERROR("Failed to create new scene");
+								continue;
+							}
+							Prefab loadedPrefab;
+							if (PrefabRegistry::Get().LoadPrefabFromFile(filePath, loadedPrefab))
+							{
+								LOG_INFO("Successfully loaded prefab: ", loadedPrefab.name);
+								LOG_INFO("Prefab has ", loadedPrefab.entities.size(), " entities");
 
-							//PrefabRegistry::Get().RegisterPrefab(prefab);
+								// Instantiate the prefab into the scene
+								Entity prefabRoot = PrefabInstantiator::InstantiatePrefab(
+									newScene,
+									loadedPrefab,
+									Entity{}  // No parent
+								);
 
-							//if (prefab)
-							//{
-							//	m_Scene->GetRegistry().clear();
+								if (prefabRoot) {
+									m_Editor->SetCurrSelectedEntity(prefabRoot);
+									m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabRoot.GetHandle()));
+									LOG_INFO("Prefab instantiated successfully");
+								}
+								else {
+									LOG_ERROR("Failed to instantiate prefab");
+								}
+							}
 
-							//	Entity entity;
-							//	if (prefab->GetType() == PrefabType::Scene)
-							//	{
-
-							//		LOG_INFO("Loading Scene prefab with hierarchy");
-							//		entity = PrefabInstantiator::InstantiateScenePrefab(m_Scene, prefab->GetGUID());
-							//	}
-							//	else
-							//	{
-							//		LOG_INFO("Loading single Entity prefab");
-							//		entity = PrefabInstantiator::InstantiateEntityPrefab(m_Scene, prefab->GetGUID());
-							//	}
-
-
-							//	if (!currScenePath.empty())
-							//	{
-							//		currScenePath.clear();
-							//	}
-
-							//	m_SelectedEntity = Entity(); //reset entity
-							//	m_PickedID = 0xFFFFFFFFu;
-							//	isPrefabEditor = true;
-
-
-							//	LOG_INFO("Now editing prefab:", currPrefabPath);
-							//	LOG_DEBUG("=====End Load Prefab File=========");
-
-							//}
 						}
 					}
 					// to change the color of the selected
