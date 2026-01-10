@@ -184,9 +184,24 @@ namespace Engine
             std::string jsonStr(componentData.serializedData.begin(),
                 componentData.serializedData.end());
 
-            // Deserialize component
-            if (!ComponentSerializer::DeserializeComponent(entity, componentData.type, jsonStr)) {
-                LOG_ERROR("Failed to deserialize component: ", componentData.typeName);
+
+            if (componentData.type == ComponentTypeID::Transform) {
+                if (!ComponentSerializer::DeserializeComponent(entity, componentData.type, jsonStr)) {
+                    LOG_ERROR("Failed to deserialize Transform for: ", entityData.name);
+                }
+                //  Clear the children array and reset parent 
+                if (entity.HasComponent<TransformComponent>()) {
+                    auto& transform = entity.GetComponent<TransformComponent>();
+                    transform.Children.clear(); // Clear prefab's children IDs
+                    transform.Parent = u32_max; // Reset parent - we'll set it properly later
+                    LOG_DEBUG("  Cleared Transform relationships (will rebuild with scene handles)");
+                }
+            }
+            else {
+                // Deserialize other components normally
+                if (!ComponentSerializer::DeserializeComponent(entity, componentData.type, jsonStr)) {
+                    LOG_ERROR("Failed to deserialize component: ", componentData.typeName);
+                }
             }
         }
 
@@ -203,6 +218,20 @@ namespace Engine
 
         LOG_DEBUG("  Added PrefabComponent - isRoot: ", prefabComp.isPrefabRoot);
 
+        auto children = prefab.GetChildren(entityData.localID);
+        LOG_DEBUG("  Entity has ", children.size(), " children in prefab");
+
+        for (const auto* childData : children) {
+            // Recursively instantiate child (pass Entity{} as sceneParent for now)
+            Entity childEntity = InstantiateEntity(scene, *childData, prefab, Entity{}, localIDToEntity);
+            if (!childEntity) {
+                LOG_ERROR("Failed to instantiate child entity: ", childData->name);
+            }
+            else {
+                LOG_DEBUG("  Successfully created child: ", childData->name);
+            }
+        }
+
         // 5. Set up PREFAB INTERNAL parent relationship (CRITICAL FIX!)
         if (entityData.parentLocalID != 0) {  // 0 = root in prefab
             auto parentIt = localIDToEntity.find(entityData.parentLocalID);
@@ -213,11 +242,19 @@ namespace Engine
                     prefabParent.HasComponent<TransformComponent>()) {
                     auto& childTransform = entity.GetComponent<TransformComponent>();
                     auto& parentTransform = prefabParent.GetComponent<TransformComponent>();
+                    childTransform.Parent = static_cast<u32>(prefabParent.GetHandle());
+                    u32 childID = static_cast<u32>(entity.GetHandle());
+                    auto it = std::find(parentTransform.Children.begin(),
+                        parentTransform.Children.end(),
+                        childID);
+                    if (it == parentTransform.Children.end()) {
+                        parentTransform.Children.push_back(childID);
+                        LOG_DEBUG("  Added to parent's children list: parent=",
+                            static_cast<u32>(prefabParent.GetHandle()),
+                            " child=", childID);
+                    }
 
-                    childTransform.SetParent(prefabParent);
-                    parentTransform.Children.push_back(static_cast<u32>(entity.GetHandle()));
-
-                    LOG_DEBUG("  Set prefab parent: localID ", entityData.parentLocalID);
+                    //LOG_DEBUG("  Set prefab parent: localID ", entityData.parentLocalID);
                 }
             }
             else {
@@ -228,25 +265,26 @@ namespace Engine
 
         // 6. Handle SCENE parent (only for root entity when called from InstantiatePrefab)
         if (sceneParent && entityData.parentLocalID == 0) {  // Only for root entity
-            if (entity.HasComponent<TransformComponent>() && sceneParent.HasComponent<TransformComponent>()) {
+            if (entity.HasComponent<TransformComponent>() &&
+                sceneParent.HasComponent<TransformComponent>()) {
+
                 auto& childTransform = entity.GetComponent<TransformComponent>();
                 auto& parentTransform = sceneParent.GetComponent<TransformComponent>();
 
-                childTransform.SetParent(sceneParent);
-                parentTransform.Children.push_back(static_cast<u32>(entity.GetHandle()));
+                childTransform.Parent = static_cast<u32>(sceneParent.GetHandle());
 
-                LOG_DEBUG("  Attached to scene parent");
+                u32 childID = static_cast<u32>(entity.GetHandle());
+                auto it = std::find(parentTransform.Children.begin(),
+                    parentTransform.Children.end(),
+                    childID);
+                if (it == parentTransform.Children.end()) {
+                    parentTransform.Children.push_back(childID);
+                }
+
+                LOG_DEBUG("  Attached to scene parent: ", static_cast<u32>(sceneParent.GetHandle()));
             }
         }
 
-        // 7. Recursively instantiate children
-        auto children = prefab.GetChildren(entityData.localID);
-        LOG_DEBUG("  Entity has ", children.size(), " children in prefab");
-
-        for (const auto* childData : children) {
-            // Pass Entity{} as sceneParent because children should be parented to their prefab parent
-            InstantiateEntity(scene, *childData, prefab, Entity{}, localIDToEntity);
-        }
 
         return entity;
     }
@@ -594,9 +632,7 @@ namespace Engine
             entityData = prefab.GetRootEntity();
         }
         else {
-            // For child entities, we need to find them by matching some identifier
-            // Since we don't have a direct mapping, we'll use the stored original data
-            // This is a simplified version - you may need to enhance this based on your needs
+        
             LOG_WARNING("Reverting child entity - using stored component data");
         }
 

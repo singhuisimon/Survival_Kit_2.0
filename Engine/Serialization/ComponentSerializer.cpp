@@ -176,8 +176,8 @@ namespace Engine
                 return "{}";
             }
             auto& rb = entity.GetComponent<RigidbodyComponent>();
-        
-            Value propertiesObj(kObjectType);
+
+            // FIXED: Create propertiesObj properly (it was already declared above in your code)
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(rb.ComponentGUID.m_Value).c_str(), allocator),
@@ -213,7 +213,8 @@ namespace Engine
             propertiesObj.AddMember("BoxHalfExtent", boxHalfExtent, allocator);
 
             propertiesObj.AddMember("SphereRadius", rb.SphereRadius, allocator);
-            break;
+            break; // CRITICAL: Add this break!
+        
         }
         case ComponentTypeID::Audio:{
             if (!entity.HasComponent<AudioComponent>()) {
@@ -290,7 +291,8 @@ namespace Engine
                 return "{}";
             }
             auto& animator = entity.GetComponent<AnimatorComponent>();
-            Value propertiesObj(kObjectType);
+
+            // FIXED: Properly add to propertiesObj
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(animator.ComponentGUID.m_Value).c_str(), allocator),
@@ -727,7 +729,7 @@ namespace Engine
                 entity.AddComponent<ListenerComponent>();
             }
            
-            auto& listener = entity.AddComponent<ListenerComponent>();
+            auto& listener = entity.GetComponent<ListenerComponent>();
             if (properties.HasMember("ComponentGUID"))
             {
                 listener.ComponentGUID = xresource::instance_guid(
@@ -742,7 +744,7 @@ namespace Engine
             if (!entity.HasComponent<LightComponent>()) {
                 entity.AddComponent<LightComponent>();
             }
-            auto& light = entity.AddComponent<LightComponent>();
+            auto& light = entity.GetComponent<LightComponent>();
             if (properties.HasMember("ComponentGUID"))
             {
                 light.ComponentGUID = xresource::instance_guid(
@@ -780,9 +782,9 @@ namespace Engine
            if (!entity.HasComponent<AnimatorComponent>()) {
                 entity.AddComponent<AnimatorComponent>();
            }
-           if (entity.HasComponent<AnimatorComponent>())
-           {
-               auto& animator = entity.AddComponent<AnimatorComponent>();
+           /*if (entity.HasComponent<AnimatorComponent>())
+           {*/
+               auto& animator = entity.GetComponent<AnimatorComponent>();
                if (properties.HasMember("ComponentGUID"))
                {
                    animator.ComponentGUID = xresource::instance_guid(
@@ -801,7 +803,7 @@ namespace Engine
                    animator.currentTime = properties["currentTime"].GetFloat();
                if (properties.HasMember("playbackSpeed"))
                    animator.playbackSpeed = properties["playbackSpeed"].GetFloat();
-           }
+           //}
             return true;
         }
 
@@ -809,7 +811,7 @@ namespace Engine
             if (!entity.HasComponent<ReverbZoneComponent>()) {
                 entity.AddComponent<ReverbZoneComponent>();
             }
-            auto& reverb = entity.AddComponent<ReverbZoneComponent>();
+            auto& reverb = entity.GetComponent<ReverbZoneComponent>();
             
             if (properties.HasMember("ComponentGUID"))
             {
@@ -845,7 +847,7 @@ namespace Engine
             if (!entity.HasComponent<ParticleComponent>()) {
                 entity.AddComponent<ParticleComponent>();
             }
-            auto& emitter = entity.AddComponent<ParticleComponent>();
+            auto& emitter = entity.GetComponent<ParticleComponent>();
             if (properties.HasMember("ComponentGUID"))
             {
                 emitter.ComponentGUID = xresource::instance_guid(

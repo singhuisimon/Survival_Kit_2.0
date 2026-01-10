@@ -342,16 +342,30 @@ namespace Engine
 						LOG_ERROR("Failed to create new scene");
 						continue;
 					}
+					Prefab loadedPrefab;
+					if (PrefabRegistry::Get().LoadPrefabFromFile(m_CurrPrefabPath, loadedPrefab))
+					{
+						LOG_INFO("Successfully loaded prefab: ", loadedPrefab.name);
+						LOG_INFO("Prefab has ", loadedPrefab.entities.size(), " entities");
 
-					Entity prefabRoot = PrefabInstantiator::InstantiatePrefabFromFile(
-						newScene,
-						m_CurrPrefabPath,
-						Entity{}  // No parent
-					);
-					if (prefabRoot) {
-						m_Editor->SetCurrSelectedEntity(prefabRoot);
-						m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabRoot.GetHandle()));
+						// Instantiate the prefab into the scene
+						Entity prefabRoot = PrefabInstantiator::InstantiatePrefab(
+							newScene,
+							loadedPrefab,
+							Entity{}  // No parent
+						);
 
+						if (prefabRoot) {
+							m_Editor->SetCurrSelectedEntity(prefabRoot);
+							m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabRoot.GetHandle()));
+							LOG_INFO("Prefab instantiated successfully");
+						}
+						else {
+							LOG_ERROR("Failed to instantiate prefab");
+						}
+					}
+					else {
+						LOG_ERROR("Failed to load prefab from file: ", m_CurrPrefabPath);
 					}
 					ImGui::CloseCurrentPopup();
 				}

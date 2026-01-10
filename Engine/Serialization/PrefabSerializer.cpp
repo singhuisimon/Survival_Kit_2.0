@@ -158,7 +158,6 @@ namespace Engine {
     void PrefabSerializer::SerializeEntityHierarchy(Entity entity, Prefab& prefab, u32& nextLocalID, u32 parentLocalID) {
         PrefabEntityData entityData;
 
-        // Get entity name from TagComponent
         if (entity.HasComponent<TagComponent>()) {
             entityData.name = entity.GetComponent<TagComponent>().Tag;
         }
@@ -166,70 +165,90 @@ namespace Engine {
             entityData.name = std::to_string(static_cast<u32>(entity));
         }
 
-        entityData.localID = nextLocalID++;
+        // CRITICAL FIX: Assign localID and parentLocalID to entityData
+        entityData.localID = nextLocalID;
         entityData.parentLocalID = parentLocalID;
 
-        // Serialize all components (except PrefabComponent - it's added on instantiation)
+        u32 currentLocalID = nextLocalID;  // Store current ID for children
+        nextLocalID++;  // Increment for next entity
+
+        LOG_INFO("Serializing entity: '", entityData.name, "' localID=", entityData.localID, " parentLocalID=", parentLocalID);
+
+        // Serialize all components (except PrefabComponent)
         if (entity.HasComponent<TransformComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Transform));
+            LOG_DEBUG("  + TransformComponent");
         }
 
         if (entity.HasComponent<TagComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Tag));
+            LOG_DEBUG("  + TagComponent");
         }
 
         if (entity.HasComponent<MeshRendererComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::MeshRenderer));
+            LOG_DEBUG("  + MeshRendererComponent");
         }
 
         if (entity.HasComponent<CameraComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Camera));
+            LOG_DEBUG("  + CameraComponent");
         }
 
         if (entity.HasComponent<RigidbodyComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::RigidBody));
+            LOG_DEBUG("  + RigidbodyComponent");
         }
 
         if (entity.HasComponent<AudioComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Audio));
+            LOG_DEBUG("  + AudioComponent");
         }
 
         if (entity.HasComponent<ListenerComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Listerner));
+            LOG_DEBUG("  + ListenerComponent");
         }
 
         if (entity.HasComponent<ReverbZoneComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::ReverbZone));
+            LOG_DEBUG("  + ReverbZoneComponent");
         }
 
         if (entity.HasComponent<BehaviourTreeComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::BehaviourTree));
+            LOG_DEBUG("  + BehaviourTreeComponent");
         }
 
         if (entity.HasComponent<ParticleComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::ParticleSystem));
+            LOG_DEBUG("  + ParticleComponent");
         }
 
         if (entity.HasComponent<ScriptComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Script));
+            LOG_DEBUG("  + ScriptComponent");
         }
 
         if (entity.HasComponent<LightComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Light));
+            LOG_DEBUG("  + LightComponent");
         }
 
         if (entity.HasComponent<AnimatorComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Animator));
+            LOG_DEBUG("  + AnimatorComponent");
         }
 
+        // Add to prefab BEFORE processing children
         prefab.entities.push_back(entityData);
-
-        u32 currentLocalID = entityData.localID;
 
         // Recursively serialize children using TransformComponent
         if (entity.HasComponent<TransformComponent>()) {
             auto& transform = entity.GetComponent<TransformComponent>();
             entt::registry* registry = entity.GetRegistry();
+
+            LOG_INFO("  Entity '", entityData.name, "' has ", transform.Children.size(), " children");
 
             for (u32 childID : transform.Children) {
                 entt::entity childHandle = static_cast<entt::entity>(childID);
@@ -237,7 +256,18 @@ namespace Engine {
                 // Check if child entity is valid
                 if (registry->valid(childHandle)) {
                     Entity childEntity(childHandle, registry);
+
+                    std::string childName = childEntity.HasComponent<TagComponent>()
+                        ? childEntity.GetComponent<TagComponent>().Tag
+                        : "Unknown";
+
+                    LOG_INFO("    -> Serializing child: '", childName, "' (handle=", childID, ")");
+
+                    // Pass currentLocalID as the parent for children
                     SerializeEntityHierarchy(childEntity, prefab, nextLocalID, currentLocalID);
+                }
+                else {
+                    LOG_ERROR("    -> Child entity handle ", childID, " is INVALID!");
                 }
             }
         }
@@ -288,9 +318,10 @@ namespace Engine {
                 const rapidjson::Value& entityObj = entitiesArray[i];
 
                 PrefabEntityData entityData;
-                if (entityObj.HasMember("name")) entityData.name = entityObj["name"].GetString();
-                if (entityObj.HasMember("localID")) entityData.localID = entityObj["localID"].GetUint64();
-                if (entityObj.HasMember("parentLocalID")) entityData.parentLocalID = entityObj["parentLocalID"].GetUint64();
+                // FIXED: Use correct member names
+                if (entityObj.HasMember("Name")) entityData.name = entityObj["Name"].GetString();
+                if (entityObj.HasMember("LocalID")) entityData.localID = entityObj["LocalID"].GetUint64();
+                if (entityObj.HasMember("ParentLocalID")) entityData.parentLocalID = entityObj["ParentLocalID"].GetUint64();
 
                 // Read components
                 if (entityObj.HasMember("components") && entityObj["components"].IsArray()) {
@@ -327,11 +358,6 @@ namespace Engine {
 
         outPrefab.m_IsValid = !outPrefab.entities.empty();
         if (outPrefab.m_IsValid) {
-          /*  if (outPrefab.guid == 0) {
-                outPrefab.guid = xresource::instance_guid::GenerateGUIDCopy();
-                LOG_WARNING("Generated GUID for prefab: ", outPrefab.guid.m_Value);
-            }*/
-
             if (!PrefabRegistry::Get().IsPrefabRegistered(outPrefab.guid)) {
                 PrefabRegistry::Get().RegisterPrefab(
                     outPrefab.guid,
