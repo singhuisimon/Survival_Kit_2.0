@@ -21,10 +21,10 @@ namespace Engine
 {
 	void EditorPropertyPanel::PropertyPanel()
 	{
-		if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>()) {
+		/*if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>()) {
 			auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 			ImGui::Text("[DEBUG] PrefabComponent overrides: %zu", prefabComp.componentOverrides.size());
-		}
+		}*/
 		if (!m_Editor->GetPropertyWindowRef()) return;
 		//std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
 		//Bug - Scene Switching

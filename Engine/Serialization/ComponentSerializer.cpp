@@ -221,7 +221,6 @@ namespace Engine
                 return "{}";
             }
             auto& audio = entity.GetComponent<AudioComponent>();
-            Value propertiesObj(kObjectType);
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(audio.ComponentGUID.m_Value).c_str(), allocator),
@@ -248,7 +247,6 @@ namespace Engine
                 return "{}";
             }
             auto& listener = entity.GetComponent<ListenerComponent>();
-            Value propertiesObj(kObjectType);
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(listener.ComponentGUID.m_Value).c_str(), allocator),
