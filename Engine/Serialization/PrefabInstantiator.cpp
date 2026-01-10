@@ -417,15 +417,158 @@ namespace Engine
 
         LOG_INFO("===== APPLYING OVERRIDES FROM ENTIRE PREFAB HIERARCHY =====");
         LOG_INFO("Prefab: ", prefab.name);
+        LOG_INFO("Current entities in prefab: ", prefab.entities.size());
+        LOG_INFO("Current child entities in instance: ", prefabComp.childEntityIDs.size());
 
-        // Apply overrides from root entity
-        ApplyEntityAndChildrenOverrides(entity, scene, prefab);
+        // Build a map of existing prefab entities by their scene handle
+        // We'll use the order to match them: root is first, then children in order
+        std::unordered_map<u32, PrefabEntityData*> handleToPrefabEntity;
 
-        // Apply overrides from all child entities
+        // Root entity
+        handleToPrefabEntity[static_cast<u32>(entity.GetHandle())] = &prefab.entities[0];
+
+        // Map existing children (up to the number of entities in prefab)
+        size_t childIndex = 0;
+        for (u32 childID : prefabComp.childEntityIDs) {
+            if (childIndex + 1 < prefab.entities.size()) {
+                handleToPrefabEntity[childID] = &prefab.entities[childIndex + 1];
+                childIndex++;
+            }
+            else {
+                // This is a NEW entity that doesn't exist in prefab yet
+                break;
+            }
+        }
+
+        // Step 1: Apply overrides to existing entities
+        LOG_INFO("Step 1: Applying overrides to existing entities");
+        ApplyEntityOverrides(entity, scene, handleToPrefabEntity[static_cast<u32>(entity.GetHandle())]);
+
         for (u32 childID : prefabComp.childEntityIDs) {
             Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
-            if (childEntity) {
-                ApplyEntityAndChildrenOverrides(childEntity, scene, prefab);
+            if (!childEntity) continue;
+
+            auto it = handleToPrefabEntity.find(childID);
+            if (it != handleToPrefabEntity.end()) {
+                // Existing entity - apply overrides
+                ApplyEntityOverrides(childEntity, scene, it->second);
+            }
+        }
+
+        // Step 2: Add new entities to prefab
+        LOG_INFO("Step 2: Adding new entities to prefab");
+        u32 nextLocalID = static_cast<u32>(prefab.entities.size()) + 1;
+
+        for (u32 childID : prefabComp.childEntityIDs) {
+            auto it = handleToPrefabEntity.find(childID);
+            if (it == handleToPrefabEntity.end()) {
+                // This is a NEW entity
+                Entity childEntity(static_cast<entt::entity>(childID), &scene->GetRegistry());
+                if (!childEntity) continue;
+
+                LOG_INFO("Adding new entity: ",
+                    childEntity.GetComponent<TagComponent>().Tag);
+
+                // Create new prefab entity data
+                PrefabEntityData newEntityData;
+                newEntityData.name = childEntity.GetComponent<TagComponent>().Tag;
+                newEntityData.localID = nextLocalID++;
+
+                // Find parent's localID in prefab
+                if (childEntity.HasComponent<TransformComponent>()) {
+                    auto& transform = childEntity.GetComponent<TransformComponent>();
+
+                    if (transform.Parent != u32_max) {
+                        Entity parentEntity(static_cast<entt::entity>(transform.Parent),
+                            &scene->GetRegistry());
+
+                        // Find parent's localID in prefab
+                        auto parentIt = handleToPrefabEntity.find(static_cast<u32>(parentEntity.GetHandle()));
+                        if (parentIt != handleToPrefabEntity.end()) {
+                            newEntityData.parentLocalID = parentIt->second->localID;
+                            LOG_INFO("  Parent localID: ", newEntityData.parentLocalID);
+                        }
+                        else {
+                            // Parent is root
+                            newEntityData.parentLocalID = 1; // Root's localID is 1
+                            LOG_INFO("  Parent is root, parentLocalID: 1");
+                        }
+                    }
+                }
+
+                // Serialize all components
+                if (childEntity.HasComponent<TransformComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Transform));
+                }
+
+                if (childEntity.HasComponent<TagComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Tag));
+                }
+
+                if (childEntity.HasComponent<MeshRendererComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::MeshRenderer));
+                }
+
+                if (childEntity.HasComponent<CameraComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Camera));
+                }
+
+                if (childEntity.HasComponent<RigidbodyComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::RigidBody));
+                }
+
+                if (childEntity.HasComponent<LightComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Light));
+                }
+
+                if (childEntity.HasComponent<AudioComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Audio));
+                }
+
+                if (childEntity.HasComponent<ListenerComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Listerner));
+                }
+
+                if (childEntity.HasComponent<ReverbZoneComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::ReverbZone));
+                }
+
+                if (childEntity.HasComponent<BehaviourTreeComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::BehaviourTree));
+                }
+
+                if (childEntity.HasComponent<ParticleComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::ParticleSystem));
+                }
+
+                if (childEntity.HasComponent<ScriptComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Script));
+                }
+
+                if (childEntity.HasComponent<AnimatorComponent>()) {
+                    newEntityData.components.push_back(
+                        SerializeEntityComponent(childEntity, ComponentTypeID::Animator));
+                }
+
+                // Add to prefab
+                prefab.entities.push_back(newEntityData);
+
+                // Add to map for potential children of this new entity
+                handleToPrefabEntity[childID] = &prefab.entities.back();
+
+                LOG_INFO("  Added with localID: ", newEntityData.localID);
             }
         }
 
@@ -442,6 +585,7 @@ namespace Engine
         }
 
         LOG_INFO("Saving prefab to: ", prefabPath.c_str());
+        LOG_INFO("Total entities in prefab: ", prefab.entities.size());
 
         if (!PrefabSerializer::SerializePrefab(prefab, prefabPath)) {
             LOG_ERROR("Failed to save prefab to: ", prefabPath);
@@ -451,7 +595,21 @@ namespace Engine
         LOG_INFO("Successfully applied all overrides to prefab: ", prefab.name);
 
         // Update stored original component data to match new prefab state
-        StoreOriginalComponentData(entity, prefab);
+        std::unordered_map<u64, Entity> localIDToEntity;
+        for (size_t i = 0; i < prefab.entities.size(); i++) {
+            if (i == 0) {
+                localIDToEntity[prefab.entities[i].localID] = entity;
+            }
+            else if (i - 1 < prefabComp.childEntityIDs.size()) {
+                Entity childEntity(static_cast<entt::entity>(prefabComp.childEntityIDs[i - 1]),
+                    &scene->GetRegistry());
+                if (childEntity) {
+                    localIDToEntity[prefab.entities[i].localID] = childEntity;
+                }
+            }
+        }
+
+        StoreOriginalComponentDataForAllEntities(scene, prefab, localIDToEntity);
 
         LOG_INFO("===== FINISHED APPLYING OVERRIDES =====");
 
@@ -699,7 +857,7 @@ namespace Engine
 
         LOG_INFO("Successfully reverted entity");
     }
-
+#if 0
     void PrefabInstantiator::ApplyEntityAndChildrenOverrides(Entity entity, Scene* scene, Prefab& prefab) {
         if (!entity.HasComponent<PrefabComponent>()) {
             return;
@@ -710,17 +868,45 @@ namespace Engine
         LOG_INFO("Applying overrides from entity: ",
             entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().Tag : "Unknown");
 
-        // Find corresponding entity data in prefab
+        // Find corresponding entity data in prefab by matching localID
         PrefabEntityData* mutableEntityData = nullptr;
 
+        // For root entity
         if (prefabComp.isPrefabRoot) {
             mutableEntityData = const_cast<PrefabEntityData*>(prefab.GetRootEntity());
         }
         else {
-            // For child entities, find by matching in prefab hierarchy
-            // This is simplified - enhance based on your entity identification system
-            LOG_WARNING("Applying child entity overrides - simplified implementation");
-            return; // Skip children for now, or implement proper lookup
+          
+            // Find the parent's PrefabComponent to get the child index
+            if (entity.HasComponent<TransformComponent>()) {
+                auto& transform = entity.GetComponent<TransformComponent>();
+
+                if (transform.Parent != u32_max) {
+                    Entity parentEntity(static_cast<entt::entity>(transform.Parent), &scene->GetRegistry());
+
+                    if (parentEntity.HasComponent<PrefabComponent>()) {
+                        auto& parentPrefabComp = parentEntity.GetComponent<PrefabComponent>();
+
+                        // Find this entity's index in the parent's child list
+                        u32 childIndex = 0;
+                        u32 currentEntityHandle = static_cast<u32>(entity.GetHandle());
+
+                        for (size_t i = 0; i < parentPrefabComp.childEntityIDs.size(); i++) {
+                            if (parentPrefabComp.childEntityIDs[i] == currentEntityHandle) {
+                                childIndex = static_cast<u32>(i);
+                                break;
+                            }
+                        }
+
+                        // Now find the corresponding entity in the prefab
+                        // The child entities in the prefab come after the root
+                        if (childIndex + 1 < prefab.entities.size()) {
+                            mutableEntityData = &prefab.entities[childIndex + 1];
+                            LOG_INFO("Found child entity in prefab at index: ", childIndex + 1);
+                        }
+                    }
+                }
+            }
         }
 
         if (!mutableEntityData) {
@@ -803,5 +989,114 @@ namespace Engine
         // Clear this entity's overrides
         prefabComp.ClearAllOverrides();
     }
+#endif
 
+    void PrefabInstantiator::ApplyEntityOverrides(Entity entity, Scene* scene, PrefabEntityData* entityData) {
+        if (!entity.HasComponent<PrefabComponent>() || !entityData) {
+            return;
+        }
+
+        auto& prefabComp = entity.GetComponent<PrefabComponent>();
+
+        LOG_INFO("Applying overrides for entity: ",
+            entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().Tag : "Unknown");
+
+        // Handle removed components
+        auto removedComponents = prefabComp.GetRemovedComponents();
+        for (ComponentTypeID removedType : removedComponents) {
+            auto& components = entityData->components;
+            components.erase(
+                std::remove_if(components.begin(), components.end(),
+                    [removedType](const PrefabComponentData& c) { return c.type == removedType; }),
+                components.end()
+            );
+            LOG_INFO("  Removed component from prefab: ",
+                ComponentSerializer::GetComponentTypeName(removedType));
+        }
+
+        // Handle added components
+        auto addedComponents = prefabComp.GetAddedComponents();
+        for (ComponentTypeID addedType : addedComponents) {
+            // Check if component already exists in prefab
+            bool existsInPrefab = false;
+            for (const auto& prefabComponent : entityData->components) {
+                if (prefabComponent.type == addedType) {
+                    existsInPrefab = true;
+                    break;
+                }
+            }
+
+            // Only add if it doesn't already exist in the prefab
+            if (!existsInPrefab) {
+                // Serialize the newly added component from the scene entity
+                std::string currentJSON = ComponentSerializer::SerializeComponent(entity, addedType);
+
+                if (!currentJSON.empty() && currentJSON != "{}") {
+                    PrefabComponentData newComponent;
+                    newComponent.type = addedType;
+                    newComponent.typeName = ComponentSerializer::GetComponentTypeName(addedType);
+                    newComponent.serializedData.assign(currentJSON.begin(), currentJSON.end());
+
+                    entityData->components.push_back(newComponent);
+
+                    LOG_INFO("  Added NEW component to prefab: ",
+                        ComponentSerializer::GetComponentTypeName(addedType),
+                        " (", currentJSON.length(), " bytes)");
+                }
+                else {
+                    LOG_WARNING("  Failed to serialize added component: ",
+                        ComponentSerializer::GetComponentTypeName(addedType));
+                }
+            }
+        }
+
+        // Apply modified components
+        for (const auto& override : prefabComp.componentOverrides) {
+            if (override.isAddedComponent || override.isRemovedComponent) {
+                continue;
+            }
+
+            if (!override.HasOverrides()) {
+                continue;
+            }
+
+            std::string currentJSON = ComponentSerializer::SerializeComponent(entity, override.componentType);
+
+            bool componentFound = false;
+            for (auto& prefabComponent : entityData->components) {
+                if (prefabComponent.type == override.componentType) {
+                    prefabComponent.serializedData.assign(currentJSON.begin(), currentJSON.end());
+                    componentFound = true;
+                    LOG_INFO("  Updated component in prefab: ",
+                        ComponentSerializer::GetComponentTypeName(override.componentType));
+                    break;
+                }
+            }
+
+            if (!componentFound) {
+                PrefabComponentData newComponent;
+                newComponent.type = override.componentType;
+                newComponent.typeName = ComponentSerializer::GetComponentTypeName(override.componentType);
+                newComponent.serializedData.assign(currentJSON.begin(), currentJSON.end());
+                entityData->components.push_back(newComponent);
+
+                LOG_WARNING("  Component not found in prefab - adding as fallback: ",
+                    ComponentSerializer::GetComponentTypeName(override.componentType));
+            }
+        }
+
+        // Clear overrides
+        prefabComp.ClearAllOverrides();
+    }
+
+    PrefabComponentData PrefabInstantiator::SerializeEntityComponent(Entity entity, ComponentTypeID type) {
+        PrefabComponentData data;
+        data.type = type;
+        data.typeName = ComponentSerializer::GetComponentTypeName(type);
+
+        std::string jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+        data.serializedData.assign(jsonStr.begin(), jsonStr.end());
+
+        return data;
+    }
 }

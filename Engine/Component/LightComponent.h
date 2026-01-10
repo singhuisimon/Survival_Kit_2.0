@@ -65,11 +65,15 @@ namespace Engine {
         u32  _Reserved0 = 0u;
 
         // Default constructor
-        LightComponent() = default;
+        LightComponent()
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+        {
+        }
 
         // Construct with type; sets a sensible default intensity per type
         explicit LightComponent(LightType type)
-            : Type(type)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Type(type)
         {
             // Unity-like default intensities:
             // - Directional: 0.5 (no distance falloff; easy to blow out otherwise)

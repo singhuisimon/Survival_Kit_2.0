@@ -262,10 +262,7 @@ namespace Engine
                 return "{}";
             }
             auto& light = entity.GetComponent<LightComponent>();
-            Value componentObj(kObjectType);
-            componentObj.AddMember("Type", "LightComponent", allocator);
-
-            Value propertiesObj(kObjectType);
+           
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(light.ComponentGUID.m_Value).c_str(), allocator),
@@ -292,7 +289,6 @@ namespace Engine
             }
             auto& animator = entity.GetComponent<AnimatorComponent>();
 
-            // FIXED: Properly add to propertiesObj
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(animator.ComponentGUID.m_Value).c_str(), allocator),
@@ -311,8 +307,6 @@ namespace Engine
                 return "{}";
             }
             auto& reverb = entity.GetComponent<ReverbZoneComponent>();
-       
-            Value propertiesObj(kObjectType);
             propertiesObj.AddMember(
                 "ComponentGUID",
                 Value(std::to_string(reverb.ComponentGUID.m_Value).c_str(), allocator),

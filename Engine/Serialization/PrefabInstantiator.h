@@ -30,6 +30,10 @@ namespace Engine {
             const std::unordered_map<u64, Entity>& localIDToEntity);
 
         static void RemoveComponentByTypeID(Entity entity, ComponentTypeID type);
+
+        static void ApplyEntityOverrides(Entity entity, Scene* scene, PrefabEntityData* entityData);
+
+        static PrefabComponentData SerializeEntityComponent(Entity entity, ComponentTypeID type);
     public:
         static bool CreatePrefabFromEntity(Entity rootEntity, const std::string& prefabName, const std::string& savePath);
 

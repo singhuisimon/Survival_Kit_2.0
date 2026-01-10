@@ -240,33 +240,41 @@ namespace Engine
 				else {
 					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No overrides");
 				}
-				ImGui::Separator();
-				if (ImGui::Button("Revert All Overrides", ImVec2(200, 0))) {
-					if (PrefabInstantiator::RevertToPrefab(m_SelectedEntity, m_Scene)) {
-						LOG_INFO("Reverted all overrides successfully");
+				
+				if (prefabComp.isPrefabRoot)
+				{
+					ImGui::Separator();
+					if (ImGui::Button("Revert All Overrides", ImVec2(200, 0))) {
+						if (PrefabInstantiator::RevertToPrefab(m_SelectedEntity, m_Scene)) {
+							LOG_INFO("Reverted all overrides successfully");
+						}
+						else {
+							LOG_ERROR("Failed to revert overrides");
+						}
 					}
-					else {
-						LOG_ERROR("Failed to revert overrides");
+					ImGui::Spacing();
+					if (ImGui::Button("Apply Overrides to Prefab", ImVec2(200, 0))) {
+						if (PrefabInstantiator::ApplyOverridesToPrefab(m_SelectedEntity, m_Scene)) {
+							LOG_INFO("Applied overrides to prefab successfully");
+						}
+						else {
+							LOG_ERROR("Failed to apply overrides to prefab");
+						}
 					}
+					// Warning text
+					ImGui::Spacing();
+					ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.0f, 1.0f),
+						"Warning: Apply will permanently modify the prefab asset!");
 				}
-
-				ImGui::Spacing();
-
-				if (ImGui::Button("Apply Overrides to Prefab", ImVec2(200, 0))) {
-					if (PrefabInstantiator::ApplyOverridesToPrefab(m_SelectedEntity, m_Scene)) {
-						LOG_INFO("Applied overrides to prefab successfully");
-					}
-					else {
-						LOG_ERROR("Failed to apply overrides to prefab");
-					}
+				else {
+					// Show message for child entities
+					ImGui::Separator();
+					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+						"Prefab operations only available on root entity");
+					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+						"Select the prefab root to modify overrides");
 				}
-				// Warning text
-				ImGui::Spacing();
-				ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.0f, 1.0f),
-					"Warning: Apply will permanently modify the prefab asset!");
 			}
-			
-
 			if (removePrefabComp) {
 				m_SelectedEntity.RemoveComponent<PrefabComponent>();
 			}
@@ -4356,6 +4364,14 @@ namespace Engine
 				if (!hasRigidBody)
 				{
 					m_SelectedEntity.AddComponent<RigidbodyComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::RigidBody);
+						prefabComp.MarkComponentAdded(ComponentTypeID::RigidBody, componentJSON);
+					}
+
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4376,6 +4392,13 @@ namespace Engine
 				if (!hasMeshRenderComponent)
 				{
 					m_SelectedEntity.AddComponent<MeshRendererComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::MeshRenderer);
+						prefabComp.MarkComponentAdded(ComponentTypeID::MeshRenderer, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4396,6 +4419,13 @@ namespace Engine
 				if (!hasAudioComponent)
 				{
 					m_SelectedEntity.AddComponent<AudioComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Audio);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Audio, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4416,6 +4446,13 @@ namespace Engine
 				if (!hasReverbComponent)
 				{
 					m_SelectedEntity.AddComponent<ReverbZoneComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ReverbZone);
+						prefabComp.MarkComponentAdded(ComponentTypeID::ReverbZone, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4436,6 +4473,13 @@ namespace Engine
 				if (!hasListenerComponent)
 				{
 					m_SelectedEntity.AddComponent<ListenerComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Listerner);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Listerner, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4456,6 +4500,13 @@ namespace Engine
 				if (!hasBehaviorTree)
 				{
 					m_SelectedEntity.AddComponent<BehaviourTreeComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::BehaviourTree);
+						prefabComp.MarkComponentAdded(ComponentTypeID::BehaviourTree, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4476,6 +4527,13 @@ namespace Engine
 				if (!hasParticleSystem)
 				{
 					m_SelectedEntity.AddComponent<ParticleComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ParticleSystem);
+						prefabComp.MarkComponentAdded(ComponentTypeID::ParticleSystem, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4496,6 +4554,13 @@ namespace Engine
 				if (!hasScriptComponent)
 				{
 					m_SelectedEntity.AddComponent<ScriptComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Script);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Script, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4515,6 +4580,13 @@ namespace Engine
 				if (!hasLightComponent)
 				{
 					m_SelectedEntity.AddComponent<LightComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Light);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Light, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4535,6 +4607,13 @@ namespace Engine
 				if (!hasCameraComponent)
 				{
 					m_SelectedEntity.AddComponent<CameraComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Camera);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Camera, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4555,6 +4634,13 @@ namespace Engine
 				if (!hasAnimatorComponent)
 				{
 					m_SelectedEntity.AddComponent<AnimatorComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Animator);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Animator, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
