@@ -107,30 +107,20 @@ namespace Engine
 
 			// ---------------- Display Current Scene Name ---------------------
 			
-			if (!m_CurrScenePath.empty())
+			std::string displayPath = m_Editor->HasScenePath() ? m_Editor->GetScenePath() :
+				m_Editor->HasPrefabPath() ? m_Editor->GetPrefabPath() : "";
+			if (!displayPath.empty())
 			{
-				std::filesystem::path filePath(m_CurrScenePath);
-				std::string fileName = filePath.string();
-
+			/*	std::string fileName = std::filesystem::path(displayPath).filename().string();
 				float textWidth = ImGui::CalcTextSize(fileName.c_str()).x;
 				float menuBarWidth = ImGui::GetWindowSize().x;
-
 				ImGui::SameLine(menuBarWidth - textWidth - 10.0f);
-				ImGui::TextUnformatted(fileName.c_str());
-			}
-			if (!m_CurrPrefabPath.empty())
-			{
-				std::filesystem::path filePath(m_CurrPrefabPath);
-				std::string fileName = filePath.string();
-
-				float textWidth = ImGui::CalcTextSize(fileName.c_str()).x;
+				ImGui::TextUnformatted(fileName.c_str());*/
+				float textWidth = ImGui::CalcTextSize(displayPath.c_str()).x;
 				float menuBarWidth = ImGui::GetWindowSize().x;
-
 				ImGui::SameLine(menuBarWidth - textWidth - 10.0f);
-				ImGui::TextUnformatted(fileName.c_str());
-				
+				ImGui::TextUnformatted(displayPath.c_str());
 			}
-
 			ImGui::EndMainMenuBar();
 		}
 		OpenScenePanel();
