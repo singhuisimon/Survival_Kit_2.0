@@ -302,6 +302,8 @@ namespace Engine {
 
 		RenderPass m_finalpass;
 		RenderPass m_UIPass;
+
+		enum class ShaderIndex : size_t { MAIN = 0, DEBUG_DRAW = 1, OBJECT_PICKING = 2, SKYBOX = 3, HDR = 4, UI = 5, BLOOM_DOWNSAMPLE = 6, BLOOM_UPSAMPLE = 7 };
 	};
 
 }

@@ -65,7 +65,7 @@ namespace Engine {
 		};
 
 		// Call for the object shader(s) that read material
-		bindMaterialBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // adjust accessor if different
+		bindMaterialBlock(m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::MAIN)].getShaderProgramHandle()); // adjust accessor if different
 
 		// -------- Lights UBO (binding = 0)  --------
 		glCreateBuffers(1, &m_lightsUBO);
@@ -80,7 +80,7 @@ namespace Engine {
 			};
 
 		// Call for the object shader(s) that read light
-		bindLightsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle());
+		bindLightsBlock(m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::MAIN)].getShaderProgramHandle());
 		
 		Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
 		Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
@@ -804,9 +804,7 @@ namespace Engine {
 		glm::mat4 viewNoTrans = glm::mat4(glm::mat3(m_lastView));
 		glm::mat4 skyboxVP = m_lastProj * viewNoTrans;
 
-		// Use skybox shader (index 3)
-		size_t skybox_shader_program_idx = 3;
-		auto& skybox_prog = m_gl.m_shader_storage[skybox_shader_program_idx];
+		auto& skybox_prog = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::SKYBOX)];
 		skybox_prog.programUse();
 
 		skybox_prog.setUniform("u_SkyboxViewProjection", skyboxVP);
@@ -1038,7 +1036,7 @@ namespace Engine {
 
 		auto& mipChain = m_bloomMips;
 
-		auto& downProg = m_gl.m_shader_storage[6]; // bloom_downsample
+		auto& downProg = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::BLOOM_DOWNSAMPLE)]; // bloom_downsample
 		downProg.programUse();
 
 		glDisable(GL_DEPTH_TEST);
@@ -1084,7 +1082,7 @@ namespace Engine {
 		if (!m_bloomInitialized) return;
 
 		auto& mipChain = m_bloomMips;
-		auto& upProg = m_gl.m_shader_storage[7]; // bloom_upsample
+		auto& upProg = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::BLOOM_UPSAMPLE)]; // bloom_upsample
 
 		upProg.programUse();
 		upProg.setUniform("filterRadius", filterRadius);
