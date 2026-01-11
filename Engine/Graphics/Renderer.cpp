@@ -39,35 +39,18 @@ namespace Engine {
 
 	Renderer::Renderer(Camera3D& cam) : editor_camera(cam) {}
 
-	// On first load, setup some simple stuff
 	void Renderer::setup() {
 
-		// Load OpenGL function pointers with GLAD
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			LOG_ERROR("Renderer::setup() - Failed to load OpenGL, GLAD failed to initialized");
-		}
-		else {
-			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
-			LOG_INFO("OpenGL initialized");
-			LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
-			LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
-			LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
-			LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-		}
+		loadGLFunctionPointers();
+		loadShaders();
+		initBasicGeometry();
+		setupFramebuffers();
+		setupPasses();
+		initBloomMipChain(width, height);
+		setDefaultState();
 
-		RenderBypassUtils::loadAllShaderPrograms(m_gl.m_shader_storage);
-		RenderBypassUtils::loadBasicPrimitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
-
-		// Load in-game skybox
-		MeshData skybox_cube = make_cube();
-		m_skybox = upload_mesh_data(skybox_cube);
-		m_skybox_texture = RenderBypassUtils::loadCubemapHDR();
-
-		// Create a fullscreen quad where the final render output is drawn onto
-		MeshData2D quad = make_quad();
-		m_fullscreen_quad = upload_mesh_data2D(quad);
-
-#pragma region TESTING LOADING UBO FOR MATERIALS
+		MeshData skybox_cube = make_cube(); m_skybox = upload_mesh_data(skybox_cube); m_skybox_texture = RenderBypassUtils::loadCubemapHDR();
+		
 		// -------- Materials UBO (binding = 1)  --------
 		glCreateBuffers(1, &m_materialUBO);
 		glNamedBufferData(m_materialUBO, sizeof(MaterialUBO_Std140), nullptr, GL_DYNAMIC_DRAW);
@@ -79,13 +62,11 @@ namespace Engine {
 			if (blockIndex != GL_INVALID_INDEX) {
 				glUniformBlockBinding(programID, blockIndex, 1);
 			}
-			};
+		};
 
 		// Call for the object shader(s) that read material
 		bindMaterialBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // adjust accessor if different
-#pragma endregion
 
-#pragma region TESTING LOADING UBO FOR LIGHTINGS
 		// -------- Lights UBO (binding = 0)  --------
 		glCreateBuffers(1, &m_lightsUBO);
 		glNamedBufferData(m_lightsUBO, sizeof(LightsBlockGPU), nullptr, GL_DYNAMIC_DRAW);
@@ -100,207 +81,12 @@ namespace Engine {
 
 		// Call for the object shader(s) that read light
 		bindLightsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle());
-#pragma endregion
+		
+		Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
+		Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
+		m_gl.t_testing_material.emplace_back(mat1);
+		m_gl.t_testing_material.emplace_back(mat2);
 
-		// Set default picked ID 
-		pickedID = NO_HIT;
-
-		// Set default editor camera toggle
-		isEditorCamOn = true;
-
-		// Create a framebuffer for ImGui editor and configure its settings
-		auto fp_fbo = FrameBuffer::create();
-		if (fp_fbo.has_value()) {
-			m_framebuffers.push_back(std::move(*fp_fbo));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to create framebuffer!");
-		}
-
-		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
-		auto fp_tex = Texture::alloc_storage_on_gpu(width, height, GL_RGBA16F);
-		if (fp_tex.has_value()) {
-			m_gl.m_textures.push_back(std::move(*fp_tex));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to allocate storage on the GPU!");
-		}
-
-		// Allocate extra attachments to the framebuffer
-		GLuint rboDepth;
-		glCreateRenderbuffers(1, &rboDepth);
-		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
-		temp_rbo = rboDepth;
-
-		auto& fpfbo_ = m_framebuffers[0];
-		auto& fptex_ = m_gl.m_textures[0];
-
-		// Use depth renderbuffer for attaching to editor
-		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
-		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
-
-		auto gpu_fbo = FrameBuffer::create();
-		if (gpu_fbo.has_value()) {
-			m_framebuffers.push_back(std::move(*gpu_fbo));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to create GPU ID framebuffer!");
-		}
-
-		// Create a single channel integer texture to store entity IDs
-		auto gpu_tex = Texture::alloc_storage_on_gpu(width, height, GL_R32UI);
-		if (gpu_tex.has_value()) {
-			m_gl.m_textures.push_back(std::move(*gpu_tex));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to allocate GPU ID storage on the GPU!");
-		}
-
-		// Use the same depth renderbuffer for render pass
-		auto& gpufbo_ = m_framebuffers[1];
-		auto& gputex_ = m_gl.m_textures[1];
-		gpufbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(gputex_.handle()));
-		gpufbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
-
-		// Make sure the GPU-ID FBO has correct draw/read buffers and is cleared
-		const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
-		gpufbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
-		gpufbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
-
-		// Check if fbo is successfully created
-		if (gpufbo_.complete()) {
-			LOG_INFO("Renderer::setup() - Successfully created GPU ID framebuffer.");
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to created GPU ID framebuffer!");
-		}
-
-		// Allocate a framebuffer for the final pass 
-		auto finalpass_fbo = FrameBuffer::create();
-		if (finalpass_fbo.has_value()) {
-			m_framebuffers.push_back(std::move(*finalpass_fbo));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to create final pass framebuffer!");
-		}
-
-		auto finalpass_tex = Texture::alloc_storage_on_gpu(width, height);
-		if (finalpass_tex.has_value()) {
-			m_gl.m_textures.push_back(std::move(*finalpass_tex));
-		}else {
-			LOG_ERROR("Renderer::setup() - Failed to allocate texture for final pass!");
-		}
-
-		auto& finalpass_fbo_ = m_framebuffers[2];
-		auto& finalpass_tex_ = m_gl.m_textures[2];
-
-		// Use depth renderbuffer for attaching to editor
-		finalpass_fbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(finalpass_tex_.handle()));
-
-		if (!finalpass_fbo_.complete()) {
-			LOG_ERROR("Renderer::setup() - LDR FBO is incomplete!");
-			throw std::runtime_error("");
-		}
-
-		// Create bloom mip chain based on initial HDR size
-		initBloomMipChain(width, height);
-
-		// Create a render pass for that framebuffer
-		RenderPass first_pass
-		{
-			.pass_name = "First Pass",
-			.fbo_handle = 0,
-			.shdpgm_handle = 0,
-			.auto_aspect = true,
-			.depth_test = true,
-			.depth_write = true,
-			.blending = true,
-			.culling = false
-		};
-
-		// Register the pass with the renderer
-		m_passes.push_back(first_pass);
-
-		RenderPass gpu_id_pass
-		{
-			.pass_name = "GPU ID",
-			.fbo_handle = 1,			// Render into the GPU-ID FBO
-			.shdpgm_handle = 2,         // Object_picking shader program
-			.auto_aspect = true,
-			.clear_color = false,		// Use integer clear below
-			.clear_depth = true,		
-			.depth_test = true,
-			.depth_write = true,		
-			.blending = false,
-			.culling = true,
-			.passtype = PassType::GEOMETRY
-		};
-
-		m_passes.push_back(gpu_id_pass);
-
-		RenderPass ui_pass
-		{
-			.pass_name = "UI Pass",
-			.fbo_handle = 0,
-			.shdpgm_handle = 5,
-			.auto_aspect = true,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_test = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::GEOMETRY
-		};
-
-		RenderPass debug_pass
-		{
-			.pass_name = "Debug Pass",
-			.fbo_handle = 0,
-			.shdpgm_handle = 1,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::DEBUGGING
-		};
-
-		//m_passes.push_back(debug_pass);
-
-		m_finalpass = {
-			.pass_name = "Final Pass",
-			.fbo_handle = 2,
-			.shdpgm_handle = 4,
-			.auto_aspect = true,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_test = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::FULLSCREEN
-		};
-
-		m_UIPass = {
-			.pass_name = "UI Pass",
-			.fbo_handle = 2,
-			.shdpgm_handle = 5,
-			.auto_aspect = true,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_test = false,
-			.depth_write = false,
-			.blending = true,
-			.culling = false,
-			.passtype = PassType::FULLSCREEN
-		};
-
-#pragma region MATERIAL_LOAD_TEMP
-		{
-			Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
-			Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
-			m_gl.t_testing_material.emplace_back(mat1);
-			m_gl.t_testing_material.emplace_back(mat2);
-		}
-#pragma endregion
 
 		LOG_TRACE("Renderer::setup() - Renderer started successfully!");
 	}
@@ -667,6 +453,202 @@ namespace Engine {
 		if (pass.passtype == PassType::FULLSCREEN) {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
+	}
+
+	/**
+	 * @brief Sets up the render passes used for multi-pass rendering.
+	 */
+	void Renderer::setupPasses() 
+	{
+		// Create a render pass for that framebuffer
+		RenderPass first_pass
+		{
+			.pass_name = "First Pass",
+			.fbo_handle = 0,
+			.shdpgm_handle = 0,
+			.auto_aspect = true,
+			.depth_test = true,
+			.depth_write = true,
+			.blending = true,
+			.culling = false
+		};
+
+		// Register the pass with the renderer
+		m_passes.push_back(first_pass);
+
+		RenderPass gpu_id_pass
+		{
+			.pass_name = "GPU ID",
+			.fbo_handle = 1,			// Render into the GPU-ID FBO
+			.shdpgm_handle = 2,         // Object_picking shader program
+			.auto_aspect = true,
+			.clear_color = false,		// Use integer clear below
+			.clear_depth = true,
+			.depth_test = true,
+			.depth_write = true,
+			.blending = false,
+			.culling = true,
+			.passtype = PassType::GEOMETRY
+		};
+
+		m_passes.push_back(gpu_id_pass);
+
+		RenderPass ui_pass
+		{
+			.pass_name = "UI Pass",
+			.fbo_handle = 0,
+			.shdpgm_handle = 5,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::GEOMETRY
+		};
+
+		RenderPass debug_pass
+		{
+			.pass_name = "Debug Pass",
+			.fbo_handle = 0,
+			.shdpgm_handle = 1,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::DEBUGGING
+		};
+
+		//m_passes.push_back(debug_pass);
+
+		m_finalpass = {
+			.pass_name = "Final Pass",
+			.fbo_handle = 2,
+			.shdpgm_handle = 4,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::FULLSCREEN
+		};
+
+		m_UIPass = {
+			.pass_name = "UI Pass",
+			.fbo_handle = 2,
+			.shdpgm_handle = 5,
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.blending = true,
+			.culling = false,
+			.passtype = PassType::FULLSCREEN
+		};
+	}
+
+	/**
+	 * @brief Sets up all the necessary framebuffers for rendering and compositing.
+	 */
+	void Renderer::setupFramebuffers() 
+	{
+		// Create a framebuffer for ImGui editor and configure its settings
+		auto fp_fbo = FrameBuffer::create();
+		if (fp_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*fp_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create framebuffer!");
+		}
+
+		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
+		auto fp_tex = Texture::alloc_storage_on_gpu(width, height, GL_RGBA16F);
+		if (fp_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*fp_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate storage on the GPU!");
+		}
+
+		// Allocate extra attachments to the framebuffer
+		GLuint rboDepth;
+		glCreateRenderbuffers(1, &rboDepth);
+		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
+		temp_rbo = rboDepth;
+
+		auto& fpfbo_ = m_framebuffers[0];
+		auto& fptex_ = m_gl.m_textures[0];
+
+		// Use depth renderbuffer for attaching to editor
+		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
+		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
+
+		auto gpu_fbo = FrameBuffer::create();
+		if (gpu_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*gpu_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create GPU ID framebuffer!");
+		}
+
+		// Create a single channel integer texture to store entity IDs
+		auto gpu_tex = Texture::alloc_storage_on_gpu(width, height, GL_R32UI);
+		if (gpu_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*gpu_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate GPU ID storage on the GPU!");
+		}
+
+		// Use the same depth renderbuffer for render pass
+		auto& gpufbo_ = m_framebuffers[1];
+		auto& gputex_ = m_gl.m_textures[1];
+		gpufbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(gputex_.handle()));
+		gpufbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
+
+		// Make sure the GPU-ID FBO has correct draw/read buffers and is cleared
+		const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+		gpufbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
+		gpufbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
+
+		// Check if fbo is successfully created
+		if (gpufbo_.complete()) {
+			LOG_INFO("Renderer::setup() - Successfully created GPU ID framebuffer.");
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to created GPU ID framebuffer!");
+		}
+
+		// Allocate a framebuffer for the final pass 
+		auto finalpass_fbo = FrameBuffer::create();
+		if (finalpass_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*finalpass_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create final pass framebuffer!");
+		}
+
+		auto finalpass_tex = Texture::alloc_storage_on_gpu(width, height);
+		if (finalpass_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*finalpass_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate texture for final pass!");
+		}
+
+		auto& finalpass_fbo_ = m_framebuffers[2];
+		auto& finalpass_tex_ = m_gl.m_textures[2];
+
+		// Use depth renderbuffer for attaching to editor
+		finalpass_fbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(finalpass_tex_.handle()));
+
+		if (!finalpass_fbo_.complete()) {
+			LOG_ERROR("Renderer::setup() - LDR FBO is incomplete!");
+			throw std::runtime_error("");
+		}
+
 	}
 
 	void Renderer::resizeFBO(u32 handle, int w, int h) {
@@ -1144,5 +1126,47 @@ namespace Engine {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	/**
+	 * @brief Loads the OpenGL function pointers.
+	 */
+	void Renderer::loadGLFunctionPointers() {
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+			LOG_ERROR("Renderer::setup() - Failed to load OpenGL, GLAD failed to initialized");
+		}
+		else {
+			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
+			LOG_INFO("OpenGL initialized");
+			LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
+			LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
+			LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
+			LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+		}
+	}
 
+	/**
+	 * @brief Loads shaders from disk.
+	 */
+	void Renderer::loadShaders() {
+		RenderBypassUtils::loadAllShaderPrograms(m_gl.m_shader_storage);
+	}
+
+	/**
+	 * @brief Initializes basic geometry into memory.
+	 *		  Geometry intialized: Cube, Plane, Sphere & Quad.
+	 */
+	void Renderer::initBasicGeometry() {
+		RenderBypassUtils::loadBasicPrimitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
+	}
+
+	/**
+	 * @brief Sets the default state of the renderer on startup.
+	 */
+	void Renderer::setDefaultState() {
+		// Set default picked entity ID
+		pickedID = NO_HIT;
+		isEditorCamOn = true;
+
+		// Used for final composite
+		MeshData2D quad = make_quad(); m_fullscreen_quad = upload_mesh_data2D(quad);
+	}
 }

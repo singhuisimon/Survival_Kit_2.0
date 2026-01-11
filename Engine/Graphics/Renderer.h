@@ -191,6 +191,37 @@ namespace Engine {
 		 */
 		void endFrame(RenderPass const& pass);
 
+		/**
+		 * @brief Loads the OpenGL function pointers.
+		 */
+		void loadGLFunctionPointers();
+
+		/**
+		 * @brief Loads shaders from disk.
+		 */
+		void loadShaders();
+
+		/**
+		 * @brief Initializes basic geometry into memory. 
+		 *		  Geometry intialized: Cube, Plane, Sphere & Quad.
+		 */
+		void initBasicGeometry();
+
+		/**
+		 * @brief Sets the default state of the renderer on startup.
+		 */
+		void setDefaultState();
+
+		/**
+		 * @brief Sets up the render passes used for multi-pass rendering.
+		 */
+		void setupPasses();
+
+		/**
+		 * @brief Sets up all the necessary framebuffers for rendering and compositing.
+		 */
+		void setupFramebuffers();
+
 		void renderFinalPass(RenderPass& pass);
 
 		void renderUIPass(RenderPass& pass, std::span<const DrawItem> items);
