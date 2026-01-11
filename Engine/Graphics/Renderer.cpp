@@ -227,7 +227,7 @@ namespace Engine {
 
 						// Read the ID
 						u32 id = 0; // (entt::null value)
-						auto& idFbo = m_framebuffers[1];
+						auto& idFbo = m_framebuffers[static_cast<size_t>(FramebufferIndex::PICKING)];
 						idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 						glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
 						glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
@@ -464,7 +464,7 @@ namespace Engine {
 		RenderPass first_pass
 		{
 			.pass_name = "First Pass",
-			.fbo_handle = 0,
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
 			.shdpgm_handle = 0,
 			.auto_aspect = true,
 			.depth_test = true,
@@ -479,7 +479,7 @@ namespace Engine {
 		RenderPass gpu_id_pass
 		{
 			.pass_name = "GPU ID",
-			.fbo_handle = 1,			// Render into the GPU-ID FBO
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::PICKING),			// Render into the GPU-ID FBO
 			.shdpgm_handle = 2,         // Object_picking shader program
 			.auto_aspect = true,
 			.clear_color = false,		// Use integer clear below
@@ -496,7 +496,7 @@ namespace Engine {
 		RenderPass ui_pass
 		{
 			.pass_name = "UI Pass",
-			.fbo_handle = 0,
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
 			.shdpgm_handle = 5,
 			.auto_aspect = true,
 			.clear_color = false,
@@ -510,7 +510,7 @@ namespace Engine {
 		RenderPass debug_pass
 		{
 			.pass_name = "Debug Pass",
-			.fbo_handle = 0,
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
 			.shdpgm_handle = 1,
 			.clear_color = false,
 			.clear_depth = false,
@@ -523,7 +523,7 @@ namespace Engine {
 
 		m_finalpass = {
 			.pass_name = "Final Pass",
-			.fbo_handle = 2,
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
 			.shdpgm_handle = 4,
 			.auto_aspect = true,
 			.clear_color = false,
@@ -536,7 +536,7 @@ namespace Engine {
 
 		m_UIPass = {
 			.pass_name = "UI Pass",
-			.fbo_handle = 2,
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
 			.shdpgm_handle = 5,
 			.auto_aspect = true,
 			.clear_color = false,
@@ -578,7 +578,7 @@ namespace Engine {
 		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
 		temp_rbo = rboDepth;
 
-		auto& fpfbo_ = m_framebuffers[0];
+		auto& fpfbo_ = m_framebuffers[static_cast<size_t>(FramebufferIndex::SCENE)];
 		auto& fptex_ = m_gl.m_textures[0];
 
 		// Use depth renderbuffer for attaching to editor
@@ -603,7 +603,7 @@ namespace Engine {
 		}
 
 		// Use the same depth renderbuffer for render pass
-		auto& gpufbo_ = m_framebuffers[1];
+		auto& gpufbo_ = m_framebuffers[static_cast<size_t>(FramebufferIndex::PICKING)];
 		auto& gputex_ = m_gl.m_textures[1];
 		gpufbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(gputex_.handle()));
 		gpufbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
@@ -638,7 +638,7 @@ namespace Engine {
 			LOG_ERROR("Renderer::setup() - Failed to allocate texture for final pass!");
 		}
 
-		auto& finalpass_fbo_ = m_framebuffers[2];
+		auto& finalpass_fbo_ = m_framebuffers[static_cast<size_t>(FramebufferIndex::COMPOSITION)];
 		auto& finalpass_tex_ = m_gl.m_textures[2];
 
 		// Use depth renderbuffer for attaching to editor
@@ -787,7 +787,7 @@ namespace Engine {
 		if (m_framebuffers.empty()) return;
 
 		// Bind the HDR scene framebuffer explicitly (FBO 0)
-		auto& hdrFbo = m_framebuffers[0];
+		auto& hdrFbo = m_framebuffers[static_cast<size_t>(FramebufferIndex::SCENE)];
 		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(hdrFbo.handle()));
 
 		// Use the bloom source size (matches HDR resolution)
