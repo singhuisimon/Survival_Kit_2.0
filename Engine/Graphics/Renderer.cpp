@@ -465,7 +465,7 @@ namespace Engine {
 		{
 			.pass_name = "First Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
-			.shdpgm_handle = 0,
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::MAIN),
 			.auto_aspect = true,
 			.depth_test = true,
 			.depth_write = true,
@@ -480,7 +480,7 @@ namespace Engine {
 		{
 			.pass_name = "GPU ID",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::PICKING),			// Render into the GPU-ID FBO
-			.shdpgm_handle = 2,         // Object_picking shader program
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::OBJECT_PICKING),         // Object_picking shader program
 			.auto_aspect = true,
 			.clear_color = false,		// Use integer clear below
 			.clear_depth = true,
@@ -497,7 +497,7 @@ namespace Engine {
 		{
 			.pass_name = "UI Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
-			.shdpgm_handle = 5,
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::UI),
 			.auto_aspect = true,
 			.clear_color = false,
 			.clear_depth = false,
@@ -511,7 +511,7 @@ namespace Engine {
 		{
 			.pass_name = "Debug Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
-			.shdpgm_handle = 1,
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::DEBUG_DRAW),
 			.clear_color = false,
 			.clear_depth = false,
 			.depth_write = false,
@@ -524,7 +524,7 @@ namespace Engine {
 		m_finalpass = {
 			.pass_name = "Final Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
-			.shdpgm_handle = 4,
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::HDR),
 			.auto_aspect = true,
 			.clear_color = false,
 			.clear_depth = false,
@@ -537,7 +537,7 @@ namespace Engine {
 		m_UIPass = {
 			.pass_name = "UI Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
-			.shdpgm_handle = 5,
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::UI),
 			.auto_aspect = true,
 			.clear_color = false,
 			.clear_depth = false,
