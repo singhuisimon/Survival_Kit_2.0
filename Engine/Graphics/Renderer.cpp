@@ -764,6 +764,9 @@ namespace Engine {
 		return (uint32_t)picked.size();
 	}
 
+	/**
+	 * @brief Renders the skybox in HDR color range.
+	 */
 	void Renderer::renderSkyboxHDR()
 	{
 		// If we don't have any bloom initialized or framebuffers, bail early
