@@ -2093,7 +2093,7 @@ namespace Engine
 			if (openLightComp)
 			{
 				auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
-				if (ImGui::Checkbox("Enabled", &lightComp.Enabled))
+				if (ImGui::Checkbox("Enabled###LightEnabled", &lightComp.Enabled))
 				{
 					MarkComponentOverridden(ComponentTypeID::Light);
 				}
@@ -2218,7 +2218,7 @@ namespace Engine
 				// -------------------------------------------------
 				// Enabled
 				// -------------------------------------------------
-				if (ImGui::Checkbox("Enabled", &camComp.Enabled))
+				if (ImGui::Checkbox("Enabled###CamEnabled", &camComp.Enabled))
 				{
 					MarkComponentOverridden(ComponentTypeID::Camera);
 				}
