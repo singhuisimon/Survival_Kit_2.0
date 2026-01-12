@@ -18,6 +18,7 @@
 #include "../Utility/AssetPath.h"
 #include "../Asset/ResourceHelpers.h"
 #include "../Asset/ResourceManager.h"
+#include "../Physics/Collision2D.h"
 
 // TESTING
 #include "../Graphics/stb_image.h"
@@ -894,6 +895,10 @@ namespace Engine {
 		for (const auto& item : items) {
 
 			if (item.m_drawitem_type == DrawItemType::SPRITE2D) {
+
+				
+				AABB2D testAABB = ComputeAABB(m_gl.m_mesh_data2d_storage[0].positions, ortho, item.m_model_to_world_transform, glm::vec2(pass.view_port.z, pass.view_port.w));
+				std::cout << testAABB;
 
 				prog.setUniform("u_World2D", item.m_model_to_world_transform);
 				prog.setUniform("u_Ortho", ortho);

@@ -82,4 +82,20 @@ namespace Engine {
 
 		return boundingBox;
 	}
+
+	/**
+	 * @brief	  Operator overload for writing AABB2D information to output stream.
+	 * @param[in] os
+	 *			  Output stream to write to.
+	 * @param[in] aabb
+	 *			  AABB to write data from.
+	 * @return    The output stream.
+	 */
+	std::ostream& operator<<(std::ostream& os, AABB2D const& aabb)
+	{
+		os << "AABB Test Results: " << "\n";
+		os << "AABB Min: " << aabb.min.x << "," << aabb.min.y << "\n";
+		os << "AABB Max: " << aabb.max.x << "," << aabb.max.y << "\n";
+		return os;
+	}
 }

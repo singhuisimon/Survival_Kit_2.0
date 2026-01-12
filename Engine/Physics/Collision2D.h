@@ -11,6 +11,7 @@
  */
 #pragma once
 #include <glm/glm.hpp>
+#include <ostream>
 #include "../Component/TransformComponent.h"
 
 namespace Engine {
@@ -19,6 +20,16 @@ namespace Engine {
 	 * @brief Represents a 2D bounding box.
 	 */
 	struct AABB2D { glm::vec2 min, max; };
+
+	/**
+	 * @brief	  Operator overload for writing AABB2D information to output stream.
+	 * @param[in] os
+	 *			  Output stream to write to.
+	 * @param[in] aabb
+	 *			  AABB to write data from.
+	 * @return    The output stream.
+	 */
+	std::ostream& operator<<(std::ostream& os, AABB2D const& aabb);
 
 	/**
 	 * @brief	  Performs a simple AABB collision test in 2D between the mouse position
@@ -53,4 +64,5 @@ namespace Engine {
 						 glm::mat4 const& projection, 
 						 glm::mat4 const& model_to_world, 
 						 glm::vec2 const& viewport);
+
 }
