@@ -5,10 +5,12 @@
 #include "../Component/TagComponent.h"
 #include "../Component/TransformComponent.h"
 #include "../Component/PrefabComponent.h"
-
+#include "../Serialization/PrefabInstantiator.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
 
+#include "../Prefab/Prefab.h"
+#include "../Prefab/PrefabRegistry.h"
 #include "../Transform/TransformSystem.h"
 
 namespace Engine
@@ -19,16 +21,28 @@ namespace Engine
 		if (!m_Editor->GetHierarchyWindowRef()) return;
 		
 		Scene* m_Scene = m_Editor->GetActiveScene();
-
+		bool isPrefabScene = false;
 		if (ImGui::Begin("Hierarchy", &m_Editor->GetHierarchyWindowRef()))
 		{
+			if (m_Scene) {
+				std::string sceneName = m_Scene->GetName();
+				// Check if scene name indicates it's a prefab
+				isPrefabScene = (sceneName.find("Prefab:") == 0) ||
+					(sceneName.find("prefab") != std::string::npos);
+			}
+			ImGui::BeginDisabled(isPrefabScene);
 			if (ImGui::Button("Create Entity"))
 			{
 				ImGui::OpenPopup("CreateEntityPopup");
 			}
+			ImGui::EndDisabled();
+			if (isPrefabScene && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+				ImGui::SetTooltip("Cannot create loose entities in prefab editing mode");
+			}
 		}
 		if (ImGui::BeginPopup("CreateEntityPopup"))
 		{
+			
 			if (ImGui::MenuItem("Create Entity"))
 			{
 				
@@ -43,6 +57,17 @@ namespace Engine
 				}
 				
 			}
+			
+			
+			auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+			ImGui::BeginDisabled(prefabFiles.empty());
+			if (ImGui::MenuItem("Create Entity From Prefab"))
+			{
+				parentOfPrefabEntity = Entity{};
+				ImGui::CloseCurrentPopup();
+				openPrefabList = true;
+			}
+			ImGui::EndDisabled();
 			ImGui::EndPopup(); // end pop up of CreateEntityPopup
 		}
 
@@ -53,6 +78,8 @@ namespace Engine
 			EntitiesList();
 		}
 		ImGui::End(); // end of hierarchy panel 
+		CreateEntityFromPrefabPanel();
+		OpenReplacePefabPanel();
 	}
 
 	void EditorHierarchyPanel::EntitiesList()
@@ -90,6 +117,78 @@ namespace Engine
 
 		if (ImGui::BeginPopupModal("Main Entity Selection", nullptr, ImGuiWindowFlags_NoDocking))
 		{
+#if 0
+			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
+			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
+			{
+				std::string attachName = entityToAttach.GetComponent<TagComponent>().Tag;
+				ImGui::Text("Select a main entity to attach '%s' to:", attachName.c_str());
+			}
+			ImGui::Separator();
+
+			// Store selected entity
+			static Entity selectedMainEntity; // Or make it a member variable
+
+			ImGui::BeginChild("##entity_list", ImVec2(0, 300), true);
+
+			for (auto entityHandle : viewEntities)
+			{
+				Entity entity(entityHandle, &m_Scene->GetRegistry());
+				if (!entity.HasComponent<TransformComponent>()) continue;
+
+				auto& transform = entity.GetComponent<TransformComponent>();
+
+				// Only show main entities (no parent) that aren't the entity itself
+				if (transform.Parent == u32_max && entity != entityToAttach)
+				{
+					std::string entityName = entity.GetComponent<TagComponent>().Tag;
+
+					// Make them selectable
+					if (ImGui::Selectable(entityName.c_str(), selectedMainEntity == entity))
+					{
+						selectedMainEntity = entity;
+					}
+				}
+			}
+			ImGui::EndChild();
+
+			ImGui::Separator();
+
+			// Attach button (only enabled when something is selected)
+			ImGui::BeginDisabled(!selectedMainEntity);
+			if (ImGui::Button("Attach"))
+			{
+				if (selectedMainEntity && entityToAttach)
+				{
+					auto& parentTransform = selectedMainEntity.GetComponent<TransformComponent>();
+					auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
+
+					parentTransform.Children.push_back((uint32_t)entityToAttach.GetHandle());
+					childTransform.SetParent(selectedMainEntity);
+
+					LOG_INFO("Attached '%s' as child of '%s'",
+						entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
+						selectedMainEntity.GetComponent<TagComponent>().Tag.c_str());
+
+					// Clear selection
+					selectedMainEntity = Entity{};
+					entityToAttach = Entity{};
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::EndDisabled();
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel"))
+			{
+				// Clear everything on cancel
+				selectedMainEntity = Entity{};
+				entityToAttach = Entity{};
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+#endif
 			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
 			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
 			{
@@ -129,6 +228,7 @@ namespace Engine
 		// ========================== Selected Prefab For Sub Entity Part ======================
 		CheckParentlessChildren(m_Scene);
 		ClearParentlessChildren(m_Scene);
+		
 	}
 
 	void EditorHierarchyPanel::DrawEntityTree(Entity& entity)
@@ -233,6 +333,41 @@ namespace Engine
 			ImGui::Separator();
 			if (!hasParent) // for main entities
 			{
+				if (ImGui::BeginMenu("Prefabs"))
+				{
+					if (ImGui::MenuItem("Create Prefab"))
+					{
+						if (currentSelectedEntity)
+						{
+							LOG_DEBUG(" ========== Start Create Prefab =========");
+							std::string entityName = currentSelectedEntity.GetComponent<TagComponent>().Tag;
+							//LOG_DEBUG(" entityName: ", entityName);
+							auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
+							
+							if (PrefabInstantiator::CreatePrefabFromEntity(currentSelectedEntity, entityName, prefabPath))
+							{
+									LOG_INFO(" -------- PrefabInstantiator::CreatePrefabFromEntity is called. ----------------------");
+									const auto& allPrefabs = PrefabRegistry::Get().GetAllPrefabs();
+									LOG_INFO("Registered Prefabs (", allPrefabs.size(), "):");
+									for (const auto& [guid, pathName] : allPrefabs) {
+										LOG_INFO("  - ", pathName.second);
+									}
+							}
+							else
+							{
+								LOG_ERROR("Failed to create prefab from entity: ");
+
+							}
+						}
+					}
+					if (ImGui::MenuItem("Replace Prefab"))
+					{
+						entityToReplace = entity;
+						openReplacePrefabPanel = true;
+
+					}
+					ImGui::EndMenu();
+				}
 				// ======================= Add New Sub Entity Section =======================
 				if (ImGui::BeginMenu("Add New Sub-Entity"))
 				{
@@ -252,16 +387,22 @@ namespace Engine
 						if (entity.HasComponent<PrefabComponent>())
 						{
 							auto& parentPrefab = entity.GetComponent<PrefabComponent>();
+
 							auto& childPrefab = newEntity.AddComponent<PrefabComponent>();
-							childPrefab.PrefabGUID = parentPrefab.PrefabGUID;
+							childPrefab.PrefabAssetGuid = parentPrefab.PrefabAssetGuid;
+							childPrefab.prefabName = parentPrefab.prefabName;
+							childPrefab.prefabVersion = parentPrefab.prefabVersion;
+							childPrefab.isPrefabRoot = false;
+							parentPrefab.childEntityIDs.push_back(static_cast<u32>(newEntity.GetHandle()));
 						}
+						
 					}
 					ImGui::Separator();
 
 					if (ImGui::MenuItem("Create Sub-Entity With Prefab"))
 					{
-						openSubEntityFromPrefabPopup = true;
 						parentOfPrefabEntity = entity;
+						openPrefabList = true;
 					}
 
 					ImGui::EndMenu();
@@ -284,10 +425,7 @@ namespace Engine
 						TransformSystem::UnParent(m_Scene, entity);
 
 					}
-					if (entity.HasComponent<PrefabComponent>())
-					{
-						entity.RemoveComponent<PrefabComponent>();
-					}
+					
 				}
 			}
 			ImGui::EndPopup();// end of the pop up context item
@@ -364,6 +502,290 @@ namespace Engine
 				scene->DestroyEntity(entity);
 			}
 			parentlessChildren.clear();
+		}
+	}
+
+#if 0
+	void EditorHierarchyPanel::CreateEntityFromPrefabPanel()
+	{
+		if (openPrefabList)
+		{
+			ImGui::OpenPopup("createEttPrefab");
+			openPrefabList = false;
+		}
+		if (ImGui::BeginPopupModal("createEttPrefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			ImGui::Text("Select a prefab to instantiate:");
+			ImGui::Separator();
+
+			if (prefabFiles.empty()) {
+				ImGui::Text("No prefabs found in Sources/Prefabs/");
+			}
+			else 
+			{
+				for (auto& file : prefabFiles)
+				{
+					if (ImGui::Selectable(file.name.c_str()))
+					{
+						Scene* scene = m_Editor->GetActiveScene();
+						if (!scene) 
+						{
+							LOG_ERROR("No active scene to instantiate prefab into");
+						}
+						else 
+						{
+							Entity prefabInstance = PrefabInstantiator::InstantiatePrefabFromFile(
+								scene,
+								file.fullPath,
+								Entity{} 
+							);
+
+							if (prefabInstance) 
+							{
+								// Select the newly created entity
+								m_Editor->SetCurrSelectedEntity(prefabInstance);
+								m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabInstance.GetHandle()));
+							}
+							else {
+								LOG_ERROR("Failed to instantiate prefab: ", file.fullPath);
+							}
+
+						}
+						ImGui::CloseCurrentPopup();
+						
+					}
+				}
+				if (ImGui::Button("Cancel"))
+				{
+					openPrefabList = false;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			
+			ImGui::EndPopup();
+		}
+	}
+#endif
+	void EditorHierarchyPanel::CreateEntityFromPrefabPanel()
+	{
+		if (openPrefabList)
+		{
+			ImGui::OpenPopup("createEttPrefab");
+			openPrefabList = false;
+		}
+
+		if (ImGui::BeginPopupModal("createEttPrefab", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			// Add parent info display
+			if (parentOfPrefabEntity)
+			{
+				std::string parentName = parentOfPrefabEntity.GetComponent<TagComponent>().Tag;
+				ImGui::Text("Will attach to: %s", parentName.c_str());
+				ImGui::Separator();
+			}
+
+			ImGui::Text("Select a prefab to instantiate:");
+			ImGui::Separator();
+
+			if (prefabFiles.empty()) {
+				ImGui::Text("No prefabs found in Sources/Prefabs/");
+			}
+			else
+			{
+				for (auto& file : prefabFiles)
+				{
+					if (ImGui::Selectable(file.name.c_str()))
+					{
+						Scene* scene = m_Editor->GetActiveScene();
+						if (!scene)
+						{
+							LOG_ERROR("No active scene to instantiate prefab into");
+						}
+						else
+						{
+							Entity prefabInstance = PrefabInstantiator::InstantiatePrefabFromFile(
+								scene,
+								file.fullPath,
+								parentOfPrefabEntity
+							);
+
+							if (prefabInstance)
+							{
+								// Select the newly created entity
+								m_Editor->SetCurrSelectedEntity(prefabInstance);
+								m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabInstance.GetHandle()));
+							}
+							else {
+								LOG_ERROR("Failed to instantiate prefab: ", file.fullPath);
+							}
+						}
+						ImGui::CloseCurrentPopup();
+					}
+				}
+			}
+
+			ImGui::Separator();
+			if (ImGui::Button("Cancel"))
+			{
+				// Clear the parent when cancelled
+				parentOfPrefabEntity = Entity{};
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+
+	void EditorHierarchyPanel::OpenReplacePefabPanel()
+	{
+		if (openReplacePrefabPanel)
+		{
+			ImGui::OpenPopup("Replace Prefab List");
+			openReplacePrefabPanel = false;
+		}
+
+		// Handle the popup modal
+		if (ImGui::BeginPopupModal("Replace Prefab List", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			Scene* m_Scene = m_Editor->GetActiveScene();
+
+			// Check if entityToReplace is valid
+			if (!m_Scene || !entityToReplace || !entityToReplace.HasComponent<TagComponent>())
+			{
+				ImGui::Text("Error: No entity selected to replace");
+
+				if (ImGui::Button("Close##ReplaceError"))
+				{
+					entityToReplace = Entity{};
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+				return;
+			}
+
+			std::string entityName = entityToReplace.GetComponent<TagComponent>().Tag;
+			ImGui::Text("Replace entity '%s' with prefab:", entityName.c_str());
+			ImGui::Separator();
+
+			// Get all prefab files
+			auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs/"));
+
+			if (prefabFiles.empty())
+			{
+				ImGui::Text("No prefabs found in Sources/Prefabs/");
+			}
+			else
+			{
+				// Display prefab selection list
+				for (auto& file : prefabFiles)
+				{
+					if (ImGui::Selectable(file.name.c_str()))
+					{
+						// Store parent info and position ONLY
+						Entity parentEntity;
+						glm::vec3 position = glm::vec3(0.0f);
+						std::string oldEntityName = entityName;
+
+						// Save parent and position if entity has TransformComponent
+						if (entityToReplace.HasComponent<TransformComponent>())
+						{
+							auto& oldTransform = entityToReplace.GetComponent<TransformComponent>();
+
+							// Save parent
+							if (oldTransform.Parent != u32_max)
+							{
+								parentEntity = Entity(static_cast<entt::entity>(oldTransform.Parent), &m_Scene->GetRegistry());
+							}
+
+							// Save position ONLY
+							position = oldTransform.Position;
+
+							// Unparent from old parent if exists
+							if (parentEntity)
+							{
+								TransformSystem::UnParent(m_Scene, entityToReplace);
+							}
+
+							// Remove children from old entity
+							std::vector<uint32_t> childrenCopy = oldTransform.Children;
+							for (uint32_t childID : childrenCopy)
+							{
+								Entity child(static_cast<entt::entity>(childID), &m_Scene->GetRegistry());
+								if (child)
+								{
+									TransformSystem::UnParent(m_Scene, child);
+								}
+							}
+						}
+
+						// Store selection state
+						bool wasSelected = (m_Editor->GetSelectedEntity() == entityToReplace);
+
+						// Delete the old entity
+						m_Scene->DestroyEntity(entityToReplace);
+
+						// Instantiate the new prefab with parent
+						Entity prefabInstance = PrefabInstantiator::InstantiatePrefabFromFile(
+							m_Scene,
+							file.fullPath,
+							parentEntity
+						);
+
+						if (prefabInstance)
+						{
+							// Change the name to match the old entity
+							if (prefabInstance.HasComponent<TagComponent>())
+							{
+								auto& tag = prefabInstance.GetComponent<TagComponent>();
+								tag.Tag = oldEntityName;
+							}
+
+							// Apply position ONLY - keep rotation and scale from prefab
+							if (prefabInstance.HasComponent<TransformComponent>())
+							{
+								auto& newTransform = prefabInstance.GetComponent<TransformComponent>();
+								newTransform.SetPosition(position);
+
+								LOG_DEBUG("Applied position - Pos: ", position.x, ",", position.y, ",", position.z);
+							}
+
+							// Restore selection if it was selected
+							if (wasSelected)
+							{
+								m_Editor->SetCurrSelectedEntity(prefabInstance);
+								m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabInstance.GetHandle()));
+							}
+
+							LOG_INFO("Replaced entity '", oldEntityName.c_str(), "' with prefab: ", file.name.c_str());
+						}
+						else
+						{
+							LOG_ERROR("Failed to instantiate prefab: ", file.fullPath.c_str());
+						}
+
+						// Clear and close
+						entityToReplace = Entity{};
+						ImGui::CloseCurrentPopup();
+						break;
+					}
+				}
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel##ReplacePrefab", ImVec2(100, 0)))
+			{
+				entityToReplace = Entity{};
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
 		}
 	}
 }

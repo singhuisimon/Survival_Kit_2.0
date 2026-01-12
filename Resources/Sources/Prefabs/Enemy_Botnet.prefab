@@ -1,7 +1,135 @@
 {
-    "PrefabVersion": "1.0",
-    "Name": "Enemy_Botnet",
-    "GUID": "7518742453276462767",
-    "Type": "Entity",
-    "EntityData": "{\"ID\":5243038,\"Components\":[{\"Type\":\"TagComponent\",\"Properties\":{\"ComponentGUID\":\"16742114490130125945\",\"Tag\":\"botnet\"}},{\"Type\":\"TransformComponent\",\"Properties\":{\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,0.0,0.0,1.0],\"Scale\":[0.006000000052154064,0.006000000052154064,0.006000000052154064],\"Parent\":4294967295,\"Children\":[]}},{\"Type\":\"MeshRendererComponent\",\"Properties\":{\"Mesh\":\"E004_botnet_v001.fbx\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"MeshType\":0,\"Material\":0,\"Texture\":0,\"SubmeshIndex\":0}},{\"Type\":\"RigidbodyComponent\",\"Properties\":{\"ComponentGUID\":\"601213425638908771\",\"Mass\":1.0,\"IsKinematic\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtents\":[5.0,5.0,5.0],\"SphereRadius\":0.5}},{\"Type\":\"AudioComponent\",\"Properties\":{\"AudioFilePath\":\"Botnet_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"Is3D\":true,\"MinDistance\":50.88399887084961,\"MaxDistance\":337.77301025390625,\"ReverbProperties\":1.0,\"RolloffMode\":0,\"DopplerLevel\":1.003999948501587,\"Pan2D\":0.0}},{\"Type\":\"ScriptComponent\",\"Properties\":{\"ScriptClassName\":\"Game.Botnet\"}}]}"
+    "Prefab Name": "Enemy_Botnet",
+    "Prefab GUID": 7518742453276462767,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Enemy_Botnet",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16742114490130125945",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.006000000052154064,
+                                0.006000000052154064,
+                                0.006000000052154064
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16742114490130125945",
+                            "Tag": "botnet"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16742114490130125945",
+                            "Mesh": "E004_botnet_v001.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "ShadowCast": false,
+                            "ShadowReceive": false,
+                            "GlobalIlluminate": true,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "601213425638908771",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": false,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                5.0,
+                                5.0,
+                                5.0
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "601213425638908771",
+                            "FilePath": "Botnet_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": true,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 50.88399887084961,
+                            "MaxDistance": 337.77301025390625,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.003999948501587,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ScriptClassName": "Game.Botnet"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
 }

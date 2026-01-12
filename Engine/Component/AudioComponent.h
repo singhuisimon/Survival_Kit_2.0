@@ -12,6 +12,7 @@
 #pragma once
 #include <fmod.hpp>
 #include <string>
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -23,6 +24,10 @@ namespace Engine {
      * @brief Audio playback component for SFX, BGM, and UI sounds
      */
     struct AudioComponent {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Audio;
+        static constexpr const char* TypeName = "AudioComponent";
+
+        xresource::instance_guid ComponentGUID;
         // --- Serialized Data ---
         std::string AudioFilePath;   // Path to audio asset
         AudioType Type;              // SFX, BGM, UI, Master
@@ -50,7 +55,8 @@ namespace Engine {
   
         // --- Constructor ---
         AudioComponent()
-            : AudioFilePath("")
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            AudioFilePath("")
             , Type(AudioType::SFX)
             , State(PlayState::STOP)
             , Volume(1.0f)
@@ -72,7 +78,8 @@ namespace Engine {
 
         // --- Constructor with filepath ---
         AudioComponent(const std::string& filepath)
-            : AudioFilePath(filepath)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , AudioFilePath(filepath)
             , Type(AudioType::SFX)
             , State(PlayState::STOP)
             , Volume(1.0f)

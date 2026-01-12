@@ -15,6 +15,7 @@
 #include "Utility/Types.h"
 #include "../Asset/ResourceTypes.h"
 #include "Asset/ResourceData.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -22,7 +23,10 @@ namespace Engine {
      * @brief Mesh renderer component (for future rendering system)
      */
     struct MeshRendererComponent {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::MeshRenderer;
+        static constexpr const char* TypeName = "MeshRendererComponent";
 
+        xresource::instance_guid ComponentGUID;
 		// Guids for resources
         xresource::instance_guid MeshGuid;
 		xresource::instance_guid MaterialGuid;
@@ -45,7 +49,8 @@ namespace Engine {
 
         // Default constructor
         MeshRendererComponent()
-            : MeshGuid(0),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            MeshGuid(0),
 			MaterialGuid(0),
 			TextureGuid(0),
     		Visible(true),

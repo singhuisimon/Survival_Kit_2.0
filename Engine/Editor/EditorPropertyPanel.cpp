@@ -12,12 +12,19 @@
 #include "../Graphics/Texture.h"
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"
-#include  "../Serialization/MaterialSerializer.h"
+#include "../Serialization/MaterialSerializer.h"
+#include "../Serialization/ComponentSerializer.h"
+#include "../Serialization/PrefabInstantiator.h"
+#include "../Serialization/PrefabSerializer.h"
 
 namespace Engine
 {
 	void EditorPropertyPanel::PropertyPanel()
 	{
+		/*if (m_SelectedEntity && m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+			ImGui::Text("[DEBUG] PrefabComponent overrides: %zu", prefabComp.componentOverrides.size());
+		}*/
 		if (!m_Editor->GetPropertyWindowRef()) return;
 		//std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
 		//Bug - Scene Switching
@@ -49,7 +56,7 @@ namespace Engine
 				ImVec2 dotButtonSize(dotTextSize.x + 8.0f, dotTextSize.y + 8.0f);
 
 				// Prefab Component - TODO: Finish when prefabs are revamped
-				//DisplayPrefabComponent(dotButtonSize);
+				DisplayPrefabComponent(dotButtonSize);
 
 				// Transform Component
 				DisplayTransformComponent(dotButtonSize);
@@ -110,6 +117,12 @@ namespace Engine
 		if (m_SelectedEntity.HasComponent<TagComponent>())
 		{
 			auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Tag);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
+
 			char buffer[256];
 			strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
 			if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
@@ -121,6 +134,8 @@ namespace Engine
 				if (!newTag.empty())
 				{
 					tag.Tag = newTag;
+					MarkComponentOverridden(ComponentTypeID::Tag);
+
 				}
 
 			}
@@ -128,26 +143,22 @@ namespace Engine
 	}
 
 	// Prefab Component - TODO
-	void EditorPropertyPanel::DisplayPrefabComponent(ImVec2& buttonSize)
-	{
-		if (m_SelectedEntity.HasComponent<PrefabComponent>())
-		{
+#if 1
+	void EditorPropertyPanel::DisplayPrefabComponent(ImVec2& buttonSize) {
+		if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool openPrefabComp = ImGui::CollapsingHeader("Prefab Component", ImGuiTreeNodeFlags_DefaultOpen);
+
 			bool removePrefabComp = false;
-			bool hasParent = true;
 			ImGui::NextColumn();
 
-			if (ImGui::Button("...###PrefabBtn", buttonSize))
-			{
+			if (ImGui::Button("...###PrefabBtn", buttonSize)) {
 				ImGui::OpenPopup("PrefabPopUp");
 			}
-			if (ImGui::BeginPopup("PrefabPopUp"))
-			{
-				if (ImGui::MenuItem("Remove Component"))
-				{
+			if (ImGui::BeginPopup("PrefabPopUp")) {
+				if (ImGui::MenuItem("Remove Component")) {
 					removePrefabComp = true;
 				}
 				ImGui::EndPopup();
@@ -155,98 +166,177 @@ namespace Engine
 
 			ImGui::Columns(1);
 
-			if (m_SelectedEntity.HasComponent<TransformComponent>())
-			{
-				auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
-				hasParent = transform.Parent == u32_max ? false : true;
-			}
-
-			if (openPrefabComp)
-			{
+			if (openPrefabComp) {
 				auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-				ImGui::Text("Prefab GUID: %llu", prefabComp.PrefabGUID.m_Value);
+				ImGui::SeparatorText("Prefab Info");
+				ImGui::Text("Component GUID: %llu", prefabComp.ComponentGUID.m_Value);
+				ImGui::Text("Prefab Asset GUID: %llu", prefabComp.PrefabAssetGuid.m_Value);
+				ImGui::Text("Prefab Name: %s", prefabComp.prefabName.c_str());
+				ImGui::Text("Prefab Version: %u", prefabComp.prefabVersion);
 
-				/*if (!isPrefabEditor)
+				ImGui::Separator();
+				ImGui::SeparatorText("Hierarchy");
+				ImGui::Text("Is Prefab Root: %s", prefabComp.isPrefabRoot ? "Yes" : "No");
+				ImGui::Text("Is Nested Prefab: %s", prefabComp.isNestedPrefab ? "Yes" : "No");
+
+				if (prefabComp.isNestedPrefab) {
+					ImGui::Text("Parent Prefab GUID: %llu", prefabComp.parentPrefabGuid.m_Value);
+				}
+
+				if (!prefabComp.childEntityIDs.empty()) {
+					ImGui::SeparatorText("Child Entities");
+					if (ImGui::BeginChild("ChildEntitiesRegion", ImVec2(0, 100), true)) {
+						for (u32 childID : prefabComp.childEntityIDs) {
+							Entity childEntity(static_cast<entt::entity>(childID), &m_Scene->GetRegistry());
+							if (childEntity.HasComponent<TagComponent>()) {
+								auto& tag = childEntity.GetComponent<TagComponent>();
+								ImGui::Text("  %s (ID: %u)", tag.Tag.c_str(), childID);
+							}
+							else {
+								ImGui::Text("  Entity ID: %u", childID);
+							}
+						}
+					}
+					ImGui::EndChild();
+				}
+
+				ImGui::Separator();
+				ImGui::SeparatorText("Overrides");
+
+				// DEBUG: Show override count
+				ImGui::Text("Total Overrides Tracked: %zu", prefabComp.componentOverrides.size());
+
+				if (prefabComp.HasOverrides()) {
+					if (ImGui::TreeNode("Component Overrides")) {
+						for (const auto& override : prefabComp.componentOverrides) {
+							if (override.HasOverrides()) {
+								std::string componentName = ComponentSerializer::GetComponentTypeName(override.componentType);
+								std::string label = componentName + "##" + std::to_string(static_cast<u32>(override.componentType));
+
+								if (ImGui::TreeNode(label.c_str())) {
+									if (override.isAddedComponent) {
+										ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Component Added");
+									}
+									if (override.isRemovedComponent) {
+										ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "Component Removed");
+									}
+
+									if (!override.modifiedPropertyNames.empty()) {
+										ImGui::Text("Modified Properties:");
+										for (const auto& propName : override.modifiedPropertyNames) {
+											ImGui::BulletText("%s", propName.c_str());
+										}
+									}
+
+									ImGui::TreePop();
+								}
+							}
+						}
+						ImGui::TreePop();
+					}
+					ImGui::Separator();
+				}
+				else {
+					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No overrides");
+				}
+				
+				if (prefabComp.isPrefabRoot)
 				{
-					if (hasParent)
-					{
-						ImGui::BeginDisabled();
+					ImGui::Separator();
+					if (ImGui::Button("Revert All Overrides", ImVec2(200, 0))) {
+						if (PrefabInstantiator::RevertToPrefab(m_SelectedEntity, m_Scene)) {
+							LOG_INFO("Reverted all overrides successfully");
+						}
+						else {
+							LOG_ERROR("Failed to revert overrides");
+						}
 					}
-					if (ImGui::Button("Revert to Prefab"))
-					{
-						//LoadAllPrefabsIntoRegistry();
-						RevertSelectedEntityToPrefab();
-						//PrefabInstantiator::ApplyOverrides(m_SelectedEntity, m_Scene);
+					ImGui::Spacing();
+					if (ImGui::Button("Apply Overrides to Prefab", ImVec2(200, 0))) {
+						if (PrefabInstantiator::ApplyOverridesToPrefab(m_SelectedEntity, m_Scene)) {
+							LOG_INFO("Applied overrides to prefab successfully");
+						}
+						else {
+							LOG_ERROR("Failed to apply overrides to prefab");
+						}
 					}
-					ImGui::SameLine();
-					if (ImGui::Button("Apply Overrides"))
-					{
-						ApplyPrefabOverrides(m_SelectedEntity);
-					}
-					if (hasParent)
-					{
-						ImGui::EndDisabled();
-					}
-				}*/
-
+					// Warning text
+					ImGui::Spacing();
+					ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.0f, 1.0f),
+						"Warning: Apply will permanently modify the prefab asset!");
+				}
+				else {
+					// Show message for child entities
+					ImGui::Separator();
+					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+						"Prefab operations only available on root entity");
+					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+						"Select the prefab root to modify overrides");
+				}
 			}
-			if (removePrefabComp)
-			{
+			if (removePrefabComp) {
 				m_SelectedEntity.RemoveComponent<PrefabComponent>();
 			}
 		}
 	}
+#endif
 
-	// Transform Component
-	void EditorPropertyPanel::DisplayTransformComponent(ImVec2& buttonSize){
-		if (m_SelectedEntity.HasComponent<TransformComponent>())
-		{
+#if 1
+	void EditorPropertyPanel::DisplayTransformComponent(ImVec2& buttonSize) {
+		if (m_SelectedEntity.HasComponent<TransformComponent>()) {
 
-			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-			{
+			// Check if component is overridden
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Transform);
+
+			// Visual indicator
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
+			bool headerOpen = ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen);
+
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
+
+			if (headerOpen) {
 				auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
 
 				// Position
 				glm::vec3 position = transform.Position;
-				if (ImGui::DragFloat3("Position", &position.x, 0.1f))
-				{
+				if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
 					transform.SetPosition(position);
+					MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
 				}
 
 				// Rotation (in degrees)
 				glm::vec3 rotation = glm::degrees(glm::eulerAngles(transform.Rotation));
-				if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f))
-				{
-					// Convert back to quaternion
+				if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
 					transform.SetRotation(rotation);
+					MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
 				}
 
 				// Scale
 				glm::vec3 scale = transform.Scale;
-				if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.001f))
-				{
+				if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.001f)) {
 					transform.SetScale(scale);
+					MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
 				}
 
 				u32 parent_id = transform.Parent;
-
-				if (parent_id != u32_max)
-				{
-					if (ImGui::InputScalar("Parent", ImGuiDataType_U32, &parent_id))
-					{
+				if (parent_id != u32_max) {
+					if (ImGui::InputScalar("Parent", ImGuiDataType_U32, &parent_id)) {
 						TransformSystem::SetParent(m_Scene, m_SelectedEntity, static_cast<entt::entity>(parent_id));
+						MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
 					}
 					ImGui::Text("Parent: %zu", parent_id);
 				}
-				else
-				{
+				else {
 					ImGui::Text("Parent: None");
 				}
 			}
 		}
 	}
-
+#endif
 	// RigidBody Component
 	void EditorPropertyPanel::DisplayRigidBodyComponent(ImVec2& buttonSize){
 		if (m_SelectedEntity.HasComponent<RigidbodyComponent>())
@@ -254,8 +344,16 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::RigidBody);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			// col 1: RigidBody component header
 			bool openRigidBody = ImGui::CollapsingHeader("Rigid Body", ImGuiTreeNodeFlags_DefaultOpen);
+
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
+
 			bool removeRigidBody = false; // for remove part
 			// col2: ...
 			ImGui::NextColumn();
@@ -268,6 +366,29 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeRigidBody = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::RigidBody);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::RigidBody, originalJSON);
+					}
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::RigidBody);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::RigidBody, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::RigidBody);
+									LOG_INFO("Reverted RigidBody component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -281,6 +402,7 @@ namespace Engine
 				if (ImGui::DragFloat("Mass", &rigidMass, 0.1f, 0.0f, 1000.0f))
 				{
 					rigidBody.SetMass(rigidMass);
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 				ImGui::Separator();
 
@@ -290,6 +412,7 @@ namespace Engine
 				if (ImGui::Checkbox("Is Kinematic", &isKinematic))
 				{
 					rigidBody.SetKinematic(isKinematic);
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 				ImGui::Separator();
 
@@ -299,6 +422,7 @@ namespace Engine
 				if (ImGui::Checkbox("Is Trigger", &isTrigger))
 				{
 					rigidBody.IsTrigger = isTrigger;
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 				ImGui::Separator();
 
@@ -308,6 +432,7 @@ namespace Engine
 				if (ImGui::Checkbox("Use Gravity", &useGravity))
 				{
 					rigidBody.SetGravityEnabled(useGravity);
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 				ImGui::Separator();
 
@@ -316,6 +441,7 @@ namespace Engine
 				if (ImGui::DragFloat3("Velocity", &vel.x, 0.1f))
 				{
 					rigidBody.SetVelocity(vel);
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 
 				// Angular Velocity
@@ -323,11 +449,13 @@ namespace Engine
 				if (ImGui::DragFloat3("Angular Velocity", &angVel.x, 0.1f))
 				{
 					rigidBody.AngularVelocity = angVel;
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 
 				if (ImGui::Button("Stop"))
 				{
 					rigidBody.Stop();
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 				ImGui::Separator();
 
@@ -336,6 +464,7 @@ namespace Engine
 				if (ImGui::DragFloat("Linear Damping", &linearDamping, 0.01f, 0.0f, 1.0f))
 				{
 					rigidBody.LinearDamping = linearDamping;
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 
 				// Angular Damping
@@ -343,6 +472,7 @@ namespace Engine
 				if (ImGui::DragFloat("Angular Damping", &angularDamping, 0.01f, 0.0f, 1.0f))
 				{
 					rigidBody.AngularDamping = angularDamping;
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 
 				// Restitution
@@ -350,6 +480,7 @@ namespace Engine
 				if (ImGui::DragFloat("Restitution", &restitution, 0.01f, 0.0f, 1.0f))
 				{
 					rigidBody.Restitution = restitution;
+					MarkComponentOverridden(ComponentTypeID::RigidBody);
 				}
 				ImGui::Separator();
 
@@ -364,6 +495,7 @@ namespace Engine
 						if (ImGui::Selectable(ColliderTypeToString(type), selected))
 						{
 							rigidBody.Shape = type;
+							MarkComponentOverridden(ComponentTypeID::RigidBody);
 						}
 						if (selected)
 						{
@@ -383,7 +515,7 @@ namespace Engine
 					ImGui::Text("Box Properties");
 					if (ImGui::DragFloat3("Box Half Extents", &rigidBody.BoxHalfExtents.x, 0.1f, 0.01f, 100.0f))
 					{
-						// Value updated directly
+						MarkComponentOverridden(ComponentTypeID::RigidBody);
 					}
 					break;
 				case ColliderType::SPHERE:
@@ -391,7 +523,7 @@ namespace Engine
 					ImGui::Text("Sphere radius is originally determined from the mesh.");
 					if (ImGui::DragFloat("Sphere Radius", &rigidBody.SphereRadius, 0.1f, 0.01f, 100.0f))
 					{
-						// Value updated directly
+						MarkComponentOverridden(ComponentTypeID::RigidBody);
 					}
 					break;
 				case ColliderType::MESH:
@@ -422,38 +554,55 @@ namespace Engine
 		}
 	}
 
-	// Mesh Component - TODO: Materials
-	void EditorPropertyPanel::DisplayMeshRendererComponent(ImVec2& buttonSize){
-		if (m_SelectedEntity.HasComponent<MeshRendererComponent>())
-		{
+#if 1
+	void EditorPropertyPanel::DisplayMeshRendererComponent(ImVec2& buttonSize) {
+		if (m_SelectedEntity.HasComponent<MeshRendererComponent>()) {
 			ImGui::Separator();
 
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 
+			// Check if this component is overridden
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::MeshRenderer);
+
+			// Visual indicator - highlight if overridden
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
 			bool openMeshComponent = ImGui::CollapsingHeader("Mesh Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
+
 			bool removeMesh = false;
 
 			// col2: ...
 			ImGui::NextColumn();
 
-			if (ImGui::Button("... ###MeshBtn", buttonSize))
-			{
+			if (ImGui::Button("... ###MeshBtn", buttonSize)) {
 				ImGui::OpenPopup("MeshPopUp");
 			}
-			if (ImGui::BeginPopup("MeshPopUp"))
-			{
-				if (ImGui::MenuItem("Remove Component"))
-				{
+			if (ImGui::BeginPopup("MeshPopUp")) {
+				if (ImGui::MenuItem("Remove Component")) {
 					removeMesh = true;
 				}
+
+				// Add revert option if component is overridden
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (PrefabInstantiator::RevertComponentToPrefab(m_SelectedEntity, ComponentTypeID::MeshRenderer)) {
+							LOG_INFO("Reverted MeshRenderer component to prefab state");
+						}
+					}
+				}
+
 				ImGui::EndPopup();
 			}
 
 			ImGui::Columns(1);
 
-			if (openMeshComponent)
-			{
+			if (openMeshComponent) {
 				auto& mesh = m_SelectedEntity.GetComponent<MeshRendererComponent>();
 
 				// ======================= Asset Reference Section =======================
@@ -462,95 +611,67 @@ namespace Engine
 				static bool showWrongType = false;
 
 				// Helper lambda to display asset field with drag-drop support
-				auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType)
-					{
-						// Get the filename from the GUID
-						std::string displayName = AM.getNameFromGuid(guid);
-						if (displayName.empty())
-						{
-							displayName = "<None>";
-						}
+				auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType) {
+					// Get the filename from the GUID
+					std::string displayName = AM.getNameFromGuid(guid);
+					if (displayName.empty()) {
+						displayName = "<None>";
+					}
 
-						// Create a buffer for the input text (read-only display)
-						char buffer[256];
-						strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
-						buffer[sizeof(buffer) - 1] = '\0';
+					// Create a buffer for the input text (read-only display)
+					char buffer[256];
+					strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
+					buffer[sizeof(buffer) - 1] = '\0';
 
-						ImGui::Text("%s", label);
-						ImGui::SameLine();
+					ImGui::Text("%s", label);
+					ImGui::SameLine();
 
-						// Input text field (read-only)
-						ImGui::PushID(label);
-						ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
+					// Input text field (read-only)
+					ImGui::PushID(label);
+					ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
 
-						// Drag-drop target
-						if (ImGui::BeginDragDropTarget())
-						{
-							// Accept payload from asset browser (assuming you use "ASSET_BROWSER_ITEM" as payload ID)
-							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
-							{
-								// Assuming payload contains xresource::instance_guid
-								xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
+					// Drag-drop target
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM")) {
+							xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
 
-								// Verify the asset type matches what's expected
-								const AssetRecord* record = AM.getAssetRecord(droppedGuid);
-								if (record && record->type == expectedType)
-								{
-									// Temporary fix for now: To be fully fixed by M3
-									std::string fileName = std::filesystem::path(m_Editor->GetScenePath()).filename().string();
-									std::string recordName = std::filesystem::path(record->sourcePath).filename().string();
-
-									if ((fileName == "LoveLetterAnimation.json" || fileName == "lovelettertest.json")
-										&& recordName != "E005_loveletter_v001.fbx")
-									{
-
-										showWrongType = true;
-									}
-									else
-									{
-
-										guid = droppedGuid;
-
-									}
-								}
-								else
-								{
-									showWrongType = true;
-								}
+							// Verify the asset type matches what's expected
+							const AssetRecord* record = AM.getAssetRecord(droppedGuid);
+							if (record && record->type == expectedType) {
+								guid = droppedGuid;
+								MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 							}
-							ImGui::EndDragDropTarget();
-						}
-
-						// Context menu to clear the reference
-						if (ImGui::BeginPopupContextItem())
-						{
-							if (ImGui::MenuItem("Clear Reference"))
-							{
-								guid = xresource::instance_guid(); // Reset to invalid/default
+							else {
+								showWrongType = true;
 							}
-							ImGui::EndPopup();
 						}
+						ImGui::EndDragDropTarget();
+					}
 
-						ImGui::PopID();
+					// Context menu to clear the reference
+					if (ImGui::BeginPopupContextItem()) {
+						if (ImGui::MenuItem("Clear Reference")) {
+							guid = xresource::instance_guid();
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+						}
+						ImGui::EndPopup();
+					}
+
+					ImGui::PopID();
 					};
 
 				// Display asset reference fields
 				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
 				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
 
-				if (showWrongType)
-				{
-
+				if (showWrongType) {
 					ImGui::OpenPopup("Incompatible Asset Type");
 					showWrongType = false;
 				}
 
-				// Popup for incompatible asset type
-				if (ImGui::BeginPopup("Incompatible Asset Type"))
-				{
+				if (ImGui::BeginPopup("Incompatible Asset Type")) {
 					ImGui::Text("The dropped asset type does not match the expected type.");
-					if (ImGui::Button("Close"))
-					{
+					if (ImGui::Button("Close")) {
 						ImGui::CloseCurrentPopup();
 					}
 					ImGui::EndPopup();
@@ -559,27 +680,27 @@ namespace Engine
 				ImGui::Spacing();
 
 				bool globalIlluminate = mesh.GlobalIlluminate;
-				if (ImGui::Checkbox("Global Illuminate", &globalIlluminate))
-				{
+				if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
 					mesh.GlobalIlluminate = globalIlluminate;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
 				bool shadowCast = mesh.ShadowCast;
-				if (ImGui::Checkbox("Shadow Cast", &shadowCast))
-				{
+				if (ImGui::Checkbox("Shadow Cast", &shadowCast)) {
 					mesh.ShadowCast = shadowCast;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
 				bool shadowReceive = mesh.ShadowReceive;
-				if (ImGui::Checkbox("Shadow Receive", &shadowReceive))
-				{
+				if (ImGui::Checkbox("Shadow Receive", &shadowReceive)) {
 					mesh.ShadowReceive = shadowReceive;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
 				bool visible = mesh.Visible;
-				if (ImGui::Checkbox("Visible", &visible))
-				{
+				if (ImGui::Checkbox("Visible", &visible)) {
 					mesh.Visible = visible;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
 				// Material Editor Section
@@ -589,49 +710,34 @@ namespace Engine
 				static char materialSaveName[256] = "";
 				ImGui::InputText("Material Name", materialSaveName, sizeof(materialSaveName));
 				ImGui::SameLine();
-				if (ImGui::Button("Save Material"))
-				{
-					if (strlen(materialSaveName) > 0)
-					{
+				if (ImGui::Button("Save Material")) {
+					if (strlen(materialSaveName) > 0) {
 						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
-						if (material)
-						{
+						if (material) {
 							std::string filename = std::string(materialSaveName);
 							serializeMaterial(material, filename);
 
-							// Refresh Asset Manager to recognize new material
 							AM.scanAndProcess();
-
-							// Optional: Clear the input field after saving
 							memset(materialSaveName, 0, sizeof(materialSaveName));
-
-							// Optional: Show confirmation message
 							ImGui::OpenPopup("Material Saved");
 						}
 					}
-					else
-					{
+					else {
 						ImGui::OpenPopup("Invalid Name");
 					}
 				}
 
-				// Popup for save confirmation
-				if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-				{
+				if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("Material saved successfully!");
-					if (ImGui::Button("OK"))
-					{
+					if (ImGui::Button("OK")) {
 						ImGui::CloseCurrentPopup();
 					}
 					ImGui::EndPopup();
 				}
 
-				// Popup for invalid name
-				if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-				{
+				if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("Please enter a valid material name.");
-					if (ImGui::Button("OK"))
-					{
+					if (ImGui::Button("OK")) {
 						ImGui::CloseCurrentPopup();
 					}
 					ImGui::EndPopup();
@@ -640,14 +746,10 @@ namespace Engine
 				// Get material reference
 				MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
 
-				if (material)
-				{
-					// Shader Name (read-only for now)
+				if (material) {
 					ImGui::Text("Shader: %s", material->shaderName.c_str());
 
-					// Texture Maps (PBR Metallic/Roughness)
-					if (ImGui::CollapsingHeader("Texture Maps"))
-					{
+					if (ImGui::CollapsingHeader("Texture Maps")) {
 						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE);
 						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE);
 						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE);
@@ -656,124 +758,99 @@ namespace Engine
 						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE);
 					}
 
-					// Color Properties
-					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
-					{
-
-						// Base Color (RGB) - no alpha, as opacity is separate
+					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
 						if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
-							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
-						{
-							// Material updated
+							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Emission Color
 						if (ImGui::ColorEdit3("Emission Color", material->emissionColor.data(),
-							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
-						{
-							// Material updated (To do in M3)
+							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 					}
 
-					// Material Properties
-					if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
-					{
-						// Metallic slider
-						if (ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0f, "%.2f"))
-						{
-							// Material updated
+					if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
+						if (ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0f, "%.2f")) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Roughness slider
-						if (ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f, "%.2f"))
-						{
-							// Material updated
+						if (ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f, "%.2f")) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Opacity slider
-						if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f"))
-						{
-							// Material updated
+						if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f")) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Emission Strength
-						if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
-						{
+						if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f")) {
 							material->emissionStrength = std::max(0.0f, material->emissionStrength);
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Alpha Threshold for alpha testing
-						if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f"))
-						{
+						if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f")) {
 							material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Alpha Threshold for ambient occlusion
-						if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f"))
-						{
+						if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f")) {
 							material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 					}
 
-					// UV Transform (Unchanged)
-					if (ImGui::CollapsingHeader("UV Transform"))
-					{
-						// Tiling
-						if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
-						{
-							// Prevent zero or negative tiling
+					if (ImGui::CollapsingHeader("UV Transform")) {
+						if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f")) {
 							material->tiling[0] = std::max(0.1f, material->tiling[0]);
 							material->tiling[1] = std::max(0.1f, material->tiling[1]);
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 
-						// Offset
-						if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f"))
-						{
-							// No clamping needed for offset
+						if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f")) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 						}
 					}
 
-					// Render Flags
-					if (ImGui::CollapsingHeader("Render Flags"))
-					{
-						ImGui::Checkbox("Enable Emission", &material->enableEmission);
-						ImGui::Checkbox("Alpha Test", &material->alphaTest);
-						ImGui::Checkbox("Double Sided", &material->doubleSided);
-						ImGui::Checkbox("Receive Shadows", &material->receiveShadows);
-						ImGui::Checkbox("Cast Shadows", &material->castShadows);
+					if (ImGui::CollapsingHeader("Render Flags")) {
+						if (ImGui::Checkbox("Enable Emission", &material->enableEmission)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+						}
+						if (ImGui::Checkbox("Alpha Test", &material->alphaTest)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+						}
+						if (ImGui::Checkbox("Double Sided", &material->doubleSided)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+						}
+						if (ImGui::Checkbox("Receive Shadows", &material->receiveShadows)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+						}
+						if (ImGui::Checkbox("Cast Shadows", &material->castShadows)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+						}
 					}
 				}
 
 				ImGui::SeparatorText("Values for Debugging:");
-
 				ImGui::Text("Material: %u", mesh.Material);
 
-				// For Ease of Gameplay Programmers to Use For the Time Being
 				ImU32 meshType = mesh.MeshType;
-				if (ImGui::InputScalar("Mesh Type", ImGuiDataType_U32, &meshType))
-				{
-					if (meshType == 0 || meshType == 1 || meshType == 2)
-					{
+				if (ImGui::InputScalar("Mesh Type", ImGuiDataType_U32, &meshType)) {
+					if (meshType == 0 || meshType == 1 || meshType == 2) {
 						mesh.MeshType = meshType;
-					}
-					else
-					{
-						meshType = mesh.MeshType;
+						MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 					}
 				}
 
-
 				ImGui::Text("Submesh Index: %u", mesh.SubmeshIndex);
 				ImGui::Text("Texture: %u", mesh.Texture);
-
 			}
-			// ---------------------- Remove Mesh Component by ... -------------------------
-			if (removeMesh)
-			{
+
+			if (removeMesh) {
 				m_SelectedEntity.RemoveComponent<MeshRendererComponent>();
 			}
 		}
 	}
+#endif
 
 	// Audio Component
 	void EditorPropertyPanel::DisplayAudioComponent(ImVec2& buttonSize) {
@@ -783,8 +860,12 @@ namespace Engine
 
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Audio);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openAudioComponent = ImGui::CollapsingHeader("Audio Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeAudio = false;
 
 			// col2: ...
@@ -799,7 +880,31 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeAudio = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Audio);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Audio, originalJSON);
+					}
 				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Audio);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::Audio, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::Audio);
+									LOG_INFO("Reverted Audio component to prefab state");
+								}
+							}
+						}
+					}
+				}
+
 				ImGui::EndPopup();
 			}
 
@@ -871,6 +976,7 @@ namespace Engine
 				if (ImGui::Combo(label.c_str(), &currentIndex, audioAssets.data(), static_cast<int>(audioAssets.size())))
 				{
 					audio.SetAudioFile(audioAssetNames[currentIndex]);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				if (audio.AudioFilePath.empty())
@@ -879,6 +985,7 @@ namespace Engine
 					if (ImGui::Button("Load File"))
 					{
 						audio.SetAudioFile(audioAssetNames[currentIndex]);
+						MarkComponentOverridden(ComponentTypeID::Audio);
 					}
 				}
 
@@ -893,14 +1000,17 @@ namespace Engine
 				if (ImGui::RadioButton("SFX", type == AudioType::SFX))
 				{
 					audio.SetAudioType(AudioType::SFX);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("BGM", type == AudioType::BGM))
 				{
 					audio.SetAudioType(AudioType::BGM);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("UI", type == AudioType::UI))
 				{
 					audio.SetAudioType(AudioType::UI);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::Separator();
@@ -909,14 +1019,17 @@ namespace Engine
 				if (ImGui::RadioButton("Play", playState == PlayState::PLAY))
 				{
 					audio.SetState(PlayState::PLAY);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("Pause", playState == PlayState::PAUSE))
 				{
 					audio.SetState(PlayState::PAUSE);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("Stop##Audio", playState == PlayState::STOP))
 				{
 					audio.SetState(PlayState::STOP);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::Separator();
@@ -925,12 +1038,14 @@ namespace Engine
 				if (ImGui::SliderFloat("Volume", &volume, 0.f, 1.f))
 				{
 					audio.SetVolume(volume);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				float pitch = audio.Pitch;
 				if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 1.f))
 				{
 					audio.SetPitch(pitch);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::Separator();
@@ -938,16 +1053,19 @@ namespace Engine
 				if (ImGui::Checkbox("Looping", &looping))
 				{
 					audio.SetLoop(looping);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				bool mute = audio.Mute;
 				if (ImGui::Checkbox("Mute", &mute))
 				{
 					audio.SetMute(mute);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				bool is_3d = audio.Is3D;
 				if (ImGui::Checkbox("3D", &is_3d))
 				{
 					audio.Set3D(is_3d);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::Separator();
@@ -955,6 +1073,7 @@ namespace Engine
 				if (ImGui::SliderFloat("Reverb", &reverb, 0.0f, 1.0f))
 				{
 					audio.SetReverbProperties(reverb);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::SeparatorText("Only for 3D");
@@ -979,10 +1098,12 @@ namespace Engine
 					if (is_3d)
 					{
 						audio.SetMinDistance(min_distance);
+						MarkComponentOverridden(ComponentTypeID::Audio);
 					}
 					else
 					{
 						audio.SetMinDistance(1.f);
+						MarkComponentOverridden(ComponentTypeID::Audio);
 					}
 				}
 
@@ -992,10 +1113,12 @@ namespace Engine
 					if (is_3d)
 					{
 						audio.SetMaxDistance(max_distance);
+						MarkComponentOverridden(ComponentTypeID::Audio);
 					}
 					else
 					{
 						audio.SetMaxDistance(10.f);
+						MarkComponentOverridden(ComponentTypeID::Audio);
 					}
 				}
 
@@ -1007,6 +1130,7 @@ namespace Engine
 				if (ImGui::SliderFloat("Doppler", &dopplerLevel, 0.f, 5.f))
 				{
 					audio.SetDopplerLevel(dopplerLevel);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::Text("RollOff Mode:");
@@ -1015,14 +1139,17 @@ namespace Engine
 				if (ImGui::RadioButton("INVERSE", mode == AudioRolloffMode::INVERSE))
 				{
 					audio.SetRolloffMode(AudioRolloffMode::INVERSE);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("LINEAR", mode == AudioRolloffMode::LINEAR))
 				{
 					audio.SetRolloffMode(AudioRolloffMode::LINEAR);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("LINEARSQUARE", mode == AudioRolloffMode::LINEARSQUARE))
 				{
 					audio.SetRolloffMode(AudioRolloffMode::LINEARSQUARE);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::SeparatorText("Only for 2D");
@@ -1044,6 +1171,7 @@ namespace Engine
 				if (ImGui::SliderFloat("Pan", &pan, -1.f, 1.f))
 				{
 					audio.SetPan(pan);
+					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				ImGui::EndDisabled();
@@ -1051,6 +1179,7 @@ namespace Engine
 				if (audio.AudioFilePath.empty())
 				{
 					ImGui::EndDisabled();
+
 				}
 
 			}
@@ -1070,8 +1199,13 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::ReverbZone);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeReverb = false;
 
 			// col2: ...
@@ -1086,6 +1220,29 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeReverb = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ReverbZone);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::ReverbZone, originalJSON);
+					}
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::ReverbZone);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::ReverbZone, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::ReverbZone);
+									LOG_INFO("Reverted Audio component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1111,6 +1268,7 @@ namespace Engine
 						{
 							// Update the enum when user picks a new item
 							reverbZone.Preset = static_cast<ReverbPreset>(i);
+							MarkComponentOverridden(ComponentTypeID::ReverbZone);
 						}
 
 						if (isSelected)
@@ -1128,30 +1286,35 @@ namespace Engine
 					if (ImGui::SliderFloat("Decay Time", &decayTime, 100.f, 20000.f))
 					{
 						reverbZone.SetDecayTime(decayTime);
+						MarkComponentOverridden(ComponentTypeID::ReverbZone);
 					}
 
 					float& hfDecayRatio = reverbZone.HfDecayRatio;
 					if (ImGui::SliderFloat("High-Frequency Decay Ratio", &hfDecayRatio, 0.f, 100.f))
 					{
 						reverbZone.SetHfDecayRatio(hfDecayRatio);
+						MarkComponentOverridden(ComponentTypeID::ReverbZone);
 					}
 
 					float& diffusion = reverbZone.Diffusion;
 					if (ImGui::SliderFloat("Diffusion", &diffusion, 0.f, 100.f))
 					{
 						reverbZone.SetDiffusion(diffusion);
+						MarkComponentOverridden(ComponentTypeID::ReverbZone);
 					}
 
 					float& density = reverbZone.Density;
 					if (ImGui::SliderFloat("Density", &density, 0.f, 100.f))
 					{
 						reverbZone.SetDensity(density);
+						MarkComponentOverridden(ComponentTypeID::ReverbZone);
 					}
 
 					float& wetLevel = reverbZone.WetLevel;
 					if (ImGui::SliderFloat("Wet Level", &wetLevel, -80.f, 20.f))
 					{
 						reverbZone.SetWetLevel(wetLevel);
+						MarkComponentOverridden(ComponentTypeID::ReverbZone);
 					}
 				}
 
@@ -1159,12 +1322,14 @@ namespace Engine
 				if (ImGui::InputFloat("MinDistance###minreverb", &minDistanceReverb))
 				{
 					reverbZone.SetMinDistance(minDistanceReverb);
+					MarkComponentOverridden(ComponentTypeID::ReverbZone);
 				}
 
 				float& maxDistanceReverb = reverbZone.MaxDistance;
 				if (ImGui::InputFloat("MaxDistance###maxreverb", &maxDistanceReverb))
 				{
 					reverbZone.SetMaxDistance(maxDistanceReverb);
+					MarkComponentOverridden(ComponentTypeID::ReverbZone);
 				}
 			}
 			//---------------------- Remove ReverbZone Component by ... -------------------------
@@ -1183,8 +1348,12 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Listerner);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeListener = false;
 
 			// col2: ...
@@ -1199,6 +1368,29 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeListener = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Listerner);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Listerner, originalJSON);
+					}
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Listerner);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::Listerner, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::Listerner);
+									LOG_INFO("Reverted Particle component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1213,6 +1405,7 @@ namespace Engine
 				if (ImGui::Checkbox("Active###activeListener", &active))
 				{
 					listener.Active = active;
+					MarkComponentOverridden(ComponentTypeID::Listerner);
 				}
 			}
 			// -------------------------- Remove ListernerComponent -------------------------
@@ -1543,8 +1736,14 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::ParticleSystem);
 
+			// Visual indicator
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openParticleComp = ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeParticleComp = false;
 
 			auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
@@ -1560,7 +1759,30 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeParticleComp = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ParticleSystem);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::ParticleSystem, originalJSON);
+					}
 					//return;
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::ParticleSystem);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::ParticleSystem, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::ParticleSystem);
+									LOG_INFO("Reverted Particle component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1571,9 +1793,15 @@ namespace Engine
 			{
 				// Playback Controls
 				ImGui::Text("Playback");
-				ImGui::Checkbox("Active###activeParticle", &particleComp.Active);
+				if (ImGui::Checkbox("Active###activeParticle", &particleComp.Active))
+				{
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+				}
 				ImGui::SameLine();
-				ImGui::Checkbox("Loop", &particleComp.Loop);
+				if (ImGui::Checkbox("Loop", &particleComp.Loop))
+				{
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+				}
 
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -1581,9 +1809,18 @@ namespace Engine
 				// Emission Settings
 				if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000);
-					ImGui::DragFloat("Emission Rate", &particleComp.EmissionRate, 0.1f, 0.0f, 1000.0f, "%.1f particles/sec");
-					ImGui::DragFloat("Particle Lifetime", &particleComp.ParticleLifetime, 0.1f, 0.1f, 100.0f, "%.1f seconds");
+					if (ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+					if (ImGui::DragFloat("Emission Rate", &particleComp.EmissionRate, 0.1f, 0.0f, 1000.0f, "%.1f particles/sec"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+					if (ImGui::DragFloat("Particle Lifetime", &particleComp.ParticleLifetime, 0.1f, 0.1f, 100.0f, "%.1f seconds"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
 					ImGui::TreePop();
 				}
 
@@ -1602,6 +1839,7 @@ namespace Engine
 							if (ImGui::Selectable(particleTypes[i], isSelected))
 							{
 								particleComp.ParticleType = i;
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 							}
 							if (isSelected)
 							{
@@ -1611,12 +1849,21 @@ namespace Engine
 						ImGui::EndCombo();
 					}
 
-					ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f");
+					if (ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
 
 					ImGui::Spacing();
 					ImGui::Text("Color Range");
-					ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x);
-					ImGui::ColorEdit4("Color Max", &particleComp.ColorMax.x);
+					if (ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+					if (ImGui::ColorEdit4("Color Max", &particleComp.ColorMax.x))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
 
 					ImGui::TreePop();
 				}
@@ -1625,15 +1872,34 @@ namespace Engine
 				if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					ImGui::Text("Velocity");
-					ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f);
-					ImGui::DragFloat("Min Speed", &particleComp.MinSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
-					ImGui::DragFloat("Max Speed", &particleComp.MaxSpeed, 0.01f, 0.0f, 10.0f, "%.2f");
-					ImGui::DragFloat("Spread Angle", &particleComp.SpreadAngle, 0.5f, 0.0f, 180.0f, "%.1f degrees");
+					if (ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+					if (ImGui::DragFloat("Min Speed", &particleComp.MinSpeed, 0.01f, 0.0f, 10.0f, "%.2f"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+					if (ImGui::DragFloat("Max Speed", &particleComp.MaxSpeed, 0.01f, 0.0f, 10.0f, "%.2f"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+					if (ImGui::DragFloat("Spread Angle", &particleComp.SpreadAngle, 0.5f, 0.0f, 180.0f, "%.1f degrees"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
 
 					ImGui::Spacing();
 					ImGui::Text("Rotation");
-					ImGui::Checkbox("Randomize Rotation", &particleComp.RandomizeRotation);
-					ImGui::DragFloat("Rotation Speed", &particleComp.RotationSpeed, 1.0f, -360.0f, 360.0f, "%.1f deg/sec");
+
+					if (ImGui::Checkbox("Randomize Rotation", &particleComp.RandomizeRotation))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
+					if (ImGui::DragFloat("Rotation Speed", &particleComp.RotationSpeed, 1.0f, -360.0f, 360.0f, "%.1f deg/sec"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
 
 					ImGui::TreePop();
 				}
@@ -1641,8 +1907,14 @@ namespace Engine
 				// Randomization
 				if (ImGui::TreeNodeEx("Randomization"))
 				{
-					ImGui::DragFloat("Velocity Randomness", &particleComp.VelocityRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
-					ImGui::DragFloat("Lifetime Randomness", &particleComp.LifetimeRandomness, 0.01f, 0.0f, 1.0f, "%.2f");
+					if (ImGui::DragFloat("Velocity Randomness", &particleComp.VelocityRandomness, 0.01f, 0.0f, 1.0f, "%.2f"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
+					if (ImGui::DragFloat("Lifetime Randomness", &particleComp.LifetimeRandomness, 0.01f, 0.0f, 1.0f, "%.2f"))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
 
 					// Optional: Add tooltips for clarity
 					if (ImGui::IsItemHovered())
@@ -1660,6 +1932,7 @@ namespace Engine
 					for (const auto& particle : particleComp.Particles)
 					{
 						if (particle.Alive) aliveCount++;
+						
 					}
 
 					ImGui::Text("Alive: %d / %u", aliveCount, particleComp.MaxParticles);
@@ -1800,8 +2073,12 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Light);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openLightComp = ImGui::CollapsingHeader("Light Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeLightComp = false;
 
 			ImGui::NextColumn();
@@ -1815,7 +2092,30 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeLightComp = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Light);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Light, originalJSON);
+					}
 					//return;
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Light);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::Light, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::Light);
+									LOG_INFO("Reverted Particle component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1825,7 +2125,10 @@ namespace Engine
 			if (openLightComp)
 			{
 				auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
-				ImGui::Checkbox("Enabled", &lightComp.Enabled);
+				if (ImGui::Checkbox("Enabled###LightEnabled", &lightComp.Enabled))
+				{
+					MarkComponentOverridden(ComponentTypeID::Light);
+				}
 
 				// --- Light Type Dropdown ---
 				const char* lightTypeNames[] = { "Directional", "Point", "Spot" };
@@ -1834,6 +2137,7 @@ namespace Engine
 				if (ImGui::Combo("Type", &currentType, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
 				{
 					lightComp.SetType(static_cast<LightType>(currentType));
+					MarkComponentOverridden(ComponentTypeID::Light);
 				}
 
 				// --- Color ---
@@ -1841,6 +2145,7 @@ namespace Engine
 				if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
 				{
 					lightComp.SetColorLinear(color); // uses setter
+					MarkComponentOverridden(ComponentTypeID::Light);
 				}
 
 
@@ -1849,6 +2154,7 @@ namespace Engine
 				if (ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, 100.0f, "%.2f"))
 				{
 					lightComp.SetIntensity(intensity); //  uses setter
+					MarkComponentOverridden(ComponentTypeID::Light);
 				}
 
 
@@ -1859,6 +2165,7 @@ namespace Engine
 					if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, 1000.0f, "%.2f"))
 					{
 						lightComp.SetRange(range); // uses setter
+						MarkComponentOverridden(ComponentTypeID::Light);
 					}
 				}
 
@@ -1868,6 +2175,7 @@ namespace Engine
 					if (ImGui::DragFloat("Spot Angle", &spotAngle, 0.1f, 1.0f, 179.0f, "%.2f"))
 					{
 						lightComp.SetSpotAngleDeg(spotAngle); // uses setter
+						MarkComponentOverridden(ComponentTypeID::Light);
 					}
 				}
 				// --- Indirect Multiplier ---
@@ -1875,6 +2183,7 @@ namespace Engine
 				if (ImGui::DragFloat("Indirect Multiplier", &indirectMult, 0.01f, 0.0f, 10.0f, "%.2f"))
 				{
 					lightComp.SetIndirectMultiplier(indirectMult); // uses setter
+					MarkComponentOverridden(ComponentTypeID::Light);
 				}
 
 			}
@@ -1893,8 +2202,12 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Camera);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openCameraComp = ImGui::CollapsingHeader("Camera Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeCameraComp = false;
 			ImGui::NextColumn();
 
@@ -1907,7 +2220,30 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeCameraComp = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Camera);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Camera, originalJSON);
+					}
 					//return;
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Camera);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::Camera, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::Camera);
+									LOG_INFO("Reverted Particle component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1921,7 +2257,10 @@ namespace Engine
 				// -------------------------------------------------
 				// Enabled
 				// -------------------------------------------------
-				ImGui::Checkbox("Enabled", &camComp.Enabled);
+				if (ImGui::Checkbox("Enabled###CamEnabled", &camComp.Enabled))
+				{
+					MarkComponentOverridden(ComponentTypeID::Camera);
+				}
 
 				// Only show the rest when the camera is enabled
 				if (camComp.Enabled)
@@ -1931,7 +2270,10 @@ namespace Engine
 					// -------------------------------------------------
 					// Auto aspect
 					// -------------------------------------------------
-					ImGui::Checkbox("Auto Aspect", &camComp.autoAspect);
+					if (ImGui::Checkbox("Auto Aspect", &camComp.autoAspect))
+					{
+						MarkComponentOverridden(ComponentTypeID::Camera);
+					}
 
 					if (!camComp.autoAspect)
 					{
@@ -1939,6 +2281,7 @@ namespace Engine
 						if (ImGui::DragFloat("Aspect", &aspect, 0.01f, 0.1f, 10.0f))
 						{
 							camComp.SetAspect(aspect);   // rebuilds projection
+							MarkComponentOverridden(ComponentTypeID::Camera);
 						}
 					}
 
@@ -1951,6 +2294,7 @@ namespace Engine
 					{
 						bool isOrtho = (projIndex == 1);
 						camComp.SetProjection(isOrtho);             // rebuilds projection
+						MarkComponentOverridden(ComponentTypeID::Camera);
 					}
 
 					// -------------------------------------------------
@@ -1963,6 +2307,7 @@ namespace Engine
 						if (ImGui::DragFloat("FOV", &fov, 0.1f, 10.0f, 120.0f))
 						{
 							camComp.SetFOV(fov);                    // rebuilds projection
+							MarkComponentOverridden(ComponentTypeID::Camera);
 						}
 					}
 					else
@@ -1972,6 +2317,7 @@ namespace Engine
 						if (ImGui::DragFloat("Ortho Height", &orthoHeight, 0.1f, 0.1f, 10000.0f))
 						{
 							camComp.SetSize({ camComp.Size.x, orthoHeight }); // x ignored, y used
+							MarkComponentOverridden(ComponentTypeID::Camera);
 						}
 					}
 
@@ -1982,12 +2328,14 @@ namespace Engine
 					if (ImGui::DragFloat("Near Plane", &nearPlane, 0.01f, 0.01f, camComp.FarPlane - 0.01f))
 					{
 						camComp.SetNearPlane(nearPlane);           // rebuilds projection
+						MarkComponentOverridden(ComponentTypeID::Camera);
 					}
 
 					float farPlane = camComp.FarPlane;
 					if (ImGui::DragFloat("Far Plane", &farPlane, 1.0f, camComp.NearPlane + 0.01f, 10000.0f))
 					{
 						camComp.SetFarPlane(farPlane);             // rebuilds projection
+						MarkComponentOverridden(ComponentTypeID::Camera);
 					}
 
 					// -------------------------------------------------
@@ -1997,6 +2345,7 @@ namespace Engine
 					if (ImGui::DragFloat3("Target", glm::value_ptr(target), 0.1f))
 					{
 						camComp.SetTarget(target);                 // only affects View
+						MarkComponentOverridden(ComponentTypeID::Camera);
 					}
 				}
 			}
@@ -2017,8 +2366,12 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
-
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Animator);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openAnimatorComponent = ImGui::CollapsingHeader("Animator Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeAnimator = false;
 
 			// Column 2: "..." button to remove component
@@ -2033,6 +2386,29 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeAnimator = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Animator);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Animator, originalJSON);
+					}
+				}
+				if (isComponentOverridden) {
+					ImGui::Separator();
+					if (ImGui::MenuItem("Revert to Prefab")) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Animator);
+
+							if (!originalJSON.empty()) {
+								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
+									ComponentTypeID::Animator, originalJSON)) {
+									prefabComp.ClearComponentOverride(ComponentTypeID::Animator);
+									LOG_INFO("Reverted Particle component to prefab state");
+								}
+							}
+						}
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -2100,6 +2476,7 @@ namespace Engine
 							animator.controller = controllerHandles[i];
 							animator.currentClipIndex = 0;
 							animator.currentTime = 0.0f;
+							MarkComponentOverridden(ComponentTypeID::Animator);
 						}
 
 						if (isSelected)
@@ -2114,15 +2491,29 @@ namespace Engine
 				ImGui::SeparatorText("Playback");
 
 				// Basic animator state controls
-				ImGui::Checkbox("Playing", &animator.playing);
+				if (ImGui::Checkbox("Playing", &animator.playing))
+				{
+					MarkComponentOverridden(ComponentTypeID::Animator);
+				}
 				ImGui::SameLine();
-				ImGui::Checkbox("Respect Clip Loop", &animator.respectClipLoop);
+				if (ImGui::Checkbox("Respect Clip Loop", &animator.respectClipLoop)) {
+					MarkComponentOverridden(ComponentTypeID::Animator);
+				}
 
-				ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f);
+				if (ImGui::DragFloat("Playback Speed", &animator.playbackSpeed, 0.01f, -5.0f, 5.0f))
+				{
+					MarkComponentOverridden(ComponentTypeID::Animator);
+				}
 
 				// We keep these for debugging / manual scrubbing
-				ImGui::DragInt("Current Clip Index", (int*)(&animator.currentClipIndex), 1.0f, 0, 100);
-				ImGui::DragFloat("Current Time", &animator.currentTime, 0.01f, 0.0f, 1000.0f);
+				if (ImGui::DragInt("Current Clip Index", (int*)(&animator.currentClipIndex), 1.0f, 0, 100))
+				{
+					MarkComponentOverridden(ComponentTypeID::Animator);
+				}
+				if (ImGui::DragFloat("Current Time", &animator.currentTime, 0.01f, 0.0f, 1000.0f))
+				{
+					MarkComponentOverridden(ComponentTypeID::Animator);
+				}
 
 				if (ImGui::Button("Restart Clip"))
 				{
@@ -3973,6 +4364,14 @@ namespace Engine
 				if (!hasRigidBody)
 				{
 					m_SelectedEntity.AddComponent<RigidbodyComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::RigidBody);
+						prefabComp.MarkComponentAdded(ComponentTypeID::RigidBody, componentJSON);
+					}
+
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -3993,6 +4392,13 @@ namespace Engine
 				if (!hasMeshRenderComponent)
 				{
 					m_SelectedEntity.AddComponent<MeshRendererComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::MeshRenderer);
+						prefabComp.MarkComponentAdded(ComponentTypeID::MeshRenderer, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4013,6 +4419,13 @@ namespace Engine
 				if (!hasAudioComponent)
 				{
 					m_SelectedEntity.AddComponent<AudioComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Audio);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Audio, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4033,6 +4446,13 @@ namespace Engine
 				if (!hasReverbComponent)
 				{
 					m_SelectedEntity.AddComponent<ReverbZoneComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ReverbZone);
+						prefabComp.MarkComponentAdded(ComponentTypeID::ReverbZone, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4053,6 +4473,13 @@ namespace Engine
 				if (!hasListenerComponent)
 				{
 					m_SelectedEntity.AddComponent<ListenerComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Listerner);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Listerner, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4073,6 +4500,13 @@ namespace Engine
 				if (!hasBehaviorTree)
 				{
 					m_SelectedEntity.AddComponent<BehaviourTreeComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::BehaviourTree);
+						prefabComp.MarkComponentAdded(ComponentTypeID::BehaviourTree, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4093,6 +4527,13 @@ namespace Engine
 				if (!hasParticleSystem)
 				{
 					m_SelectedEntity.AddComponent<ParticleComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ParticleSystem);
+						prefabComp.MarkComponentAdded(ComponentTypeID::ParticleSystem, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4113,6 +4554,13 @@ namespace Engine
 				if (!hasScriptComponent)
 				{
 					m_SelectedEntity.AddComponent<ScriptComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Script);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Script, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4132,6 +4580,13 @@ namespace Engine
 				if (!hasLightComponent)
 				{
 					m_SelectedEntity.AddComponent<LightComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Light);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Light, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4152,6 +4607,13 @@ namespace Engine
 				if (!hasCameraComponent)
 				{
 					m_SelectedEntity.AddComponent<CameraComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Camera);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Camera, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4172,6 +4634,13 @@ namespace Engine
 				if (!hasAnimatorComponent)
 				{
 					m_SelectedEntity.AddComponent<AnimatorComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Serialize the newly added component
+						std::string componentJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Animator);
+						prefabComp.MarkComponentAdded(ComponentTypeID::Animator, componentJSON);
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4453,5 +4922,32 @@ namespace Engine
 		drawEntry(c1Label, c1);
 		drawEntry(c2Label, c2);
 	}
+	bool EditorPropertyPanel::IsComponentOverridden(ComponentTypeID componentType) {
+		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			return false;
+		}
+
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		return prefabComp.IsComponentOverridden(componentType);
+	}
+
+	void EditorPropertyPanel::MarkComponentOverridden(ComponentTypeID componentType) {
+		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			return;
+		}
+
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		prefabComp.MarkComponentModified(componentType);
+	}
+
+	void EditorPropertyPanel::MarkComponentRemoved(ComponentTypeID componentType) {
+		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			return;
+		}
+
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		prefabComp.MarkComponentRemoved(componentType);
+	}
+
 
 }

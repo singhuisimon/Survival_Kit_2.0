@@ -11,183 +11,310 @@
 #pragma once
 
 #include "../Asset/ResourceTypes.h"
+#include "../Serialization/ComponentSerializer.h"
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace Engine {
+	struct ComponentOverride {
+		ComponentTypeID componentType;
+		bool isAddedComponent;      // Component added to instance
+		bool isRemovedComponent;    // Component removed from instance
 
-    /**
-     * @brief Prefab component - tracks prefab instances and their overrides
-     * @note This is an invisible component that marks an entity as a prefab instance
-     * @details Stores information about which prefab this entity is an instance of,
-     *          and tracks any modifications (overrides, additions, deletions) made to
-     *          the instance that differ from the original prefab.
-     */
-    struct PrefabComponent {
-        /// Unique identifier for this component instance
-        xresource::instance_guid ComponentGUID;
+		std::string originalComponentJSON;  // Full component state from prefab
+		std::string currentComponentJSON;   // Current component state (for comparison)
 
-        /// Reference to the prefab resource this entity is an instance of
-        xresource::instance_guid PrefabGUID;
+		// List of property names that were modified (for UI display only)
+		std::vector<std::string> modifiedPropertyNames;
 
-        /// Track added components (components not in original prefab)
-        std::vector<xresource::instance_guid> AddedComponents;
+		ComponentOverride()
+			: componentType(ComponentTypeID::None)
+			, isAddedComponent(false)
+			, isRemovedComponent(false) {
+		}
 
-        /// Track deleted components (components removed from prefab)
-        std::vector<xresource::instance_guid> DeletedComponents;
+		bool HasOverrides() const {
+			return !modifiedPropertyNames.empty() || isAddedComponent || isRemovedComponent;
+		}
+	};
 
-        /**
-         * @brief Represents a single overridden property in a prefab instance
-         */
-        struct OverriddenProperty {
-            xresource::instance_guid ComponentGUID;  ///< Which component contains this property
-            std::string PropertyPath;                 ///< Which property (e.g., "Position.x")
-            std::string Value;                        ///< Serialized value of the override
-        };
+	struct PrefabComponent
+	{
+		static constexpr ComponentTypeID TypeID = ComponentTypeID::Prefab;
+		static constexpr const char* TypeName = "PrefabComponent";
 
-        /// Track overridden properties (properties modified from prefab defaults)
-        std::vector<OverriddenProperty> OverriddenProperties;
+		xresource::instance_guid ComponentGUID;
+		xresource::instance_guid PrefabAssetGuid;
+		std::vector<ComponentOverride> componentOverrides;
 
-        /**
-         * @brief Default constructor - creates an invalid/unlinked prefab component
-         */
-        PrefabComponent()
-            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , PrefabGUID(xresource::instance_guid{}) {
-        }
+		bool isPrefabRoot;
+		bool isNestedPrefab;
+		xresource::instance_guid parentPrefabGuid;
+		std::vector<u32> childEntityIDs;
 
-        /**
-         * @brief Constructor with prefab GUID - links this instance to a specific prefab
-         * @param prefabGuid GUID of the prefab this entity is an instance of
-         */
-        explicit PrefabComponent(xresource::instance_guid prefabGuid)
-            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
-            , PrefabGUID(prefabGuid) {
-        }
+		std::string prefabName;
+		u32 prefabVersion;
 
-        /**
-         * @brief Check if this component is linked to a valid prefab
-         * @return True if PrefabGUID is valid (non-zero)
-         */
-        bool IsValid() const {
-            return PrefabGUID.m_Value != 0;
-        }
+		PrefabComponent()
+			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())  
+			, PrefabAssetGuid(0)
+			, isPrefabRoot(true)
+			, isNestedPrefab(false)
+			, parentPrefabGuid(0)
+			, prefabVersion(1)
+		{
+		}
 
-        /**
-         * @brief Check if this instance has any local modifications
-         * @return True if there are any overrides, additions, or deletions
-         */
-        bool HasModifications() const {
-            return !OverriddenProperties.empty() ||
-                !AddedComponents.empty() ||
-                !DeletedComponents.empty();
-        }
+		// Constructor with prefab asset GUID
+		explicit PrefabComponent(xresource::instance_guid assetGuid,
+			const std::string& name = "",
+			bool root = true)
+			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())  
+			, PrefabAssetGuid(assetGuid)
+			, isPrefabRoot(root)
+			, isNestedPrefab(false)
+			, parentPrefabGuid(0)
+			, prefabName(name)
+			, prefabVersion(1)
+		{
+		}
 
-        /**
-         * @brief Clear all local modifications (reset to prefab defaults)
-         */
-        void ClearModifications() {
-            OverriddenProperties.clear();
-            AddedComponents.clear();
-            DeletedComponents.clear();
-        }
+		bool HasOverrides() const {
+			for (const auto& override : componentOverrides) {
+				if (override.HasOverrides()) return true;
+			}
+			return false;
+		}
 
-        /**
-         * @brief Add a property override
-         * @param componentGuid GUID of the component containing the property
-         * @param propertyPath Path to the property (e.g., "Position.x")
-         * @param value Serialized value of the override
-         */
-        void AddPropertyOverride(xresource::instance_guid componentGuid,
-            const std::string& propertyPath,
-            const std::string& value) {
-            // Check if this property is already overridden
-            for (auto& override : OverriddenProperties) {
-                if (override.ComponentGUID.m_Value == componentGuid.m_Value &&
-                    override.PropertyPath == propertyPath) {
-                    // Update existing override
-                    override.Value = value;
-                    return;
-                }
-            }
+		bool IsComponentOverridden(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type && override.HasOverrides()) {
+					return true;
+				}
+			}
+			return false;
+		}
 
-            // Add new override
-            OverriddenProperties.push_back({ componentGuid, propertyPath, value });
-        }
+		std::vector<std::string> GetModifiedProperties(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type) {
+					return override.modifiedPropertyNames;
+				}
+			}
+			return {};
+		}
 
-        /**
-         * @brief Remove a property override
-         * @param componentGuid GUID of the component containing the property
-         * @param propertyPath Path to the property
-         * @return True if an override was removed
-         */
-        bool RemovePropertyOverride(xresource::instance_guid componentGuid,
-            const std::string& propertyPath) {
-            for (auto it = OverriddenProperties.begin(); it != OverriddenProperties.end(); ++it) {
-                if (it->ComponentGUID.m_Value == componentGuid.m_Value &&
-                    it->PropertyPath == propertyPath) {
-                    OverriddenProperties.erase(it);
-                    return true;
-                }
-            }
-            return false;
-        }
+		void MarkComponentModified(ComponentTypeID type, const std::string& propertyName = "") {
+			ComponentOverride* compOverride = nullptr;
 
-        /**
-         * @brief Mark a component as added (not in original prefab)
-         * @param componentGuid GUID of the added component
-         */
-        void MarkComponentAdded(xresource::instance_guid componentGuid) {
-            // Check if already marked
-            for (const auto& guid : AddedComponents) {
-                if (guid.m_Value == componentGuid.m_Value) {
-                    return;
-                }
-            }
-            AddedComponents.push_back(componentGuid);
-        }
+			// Find existing override for this component type
+			for (auto& override : componentOverrides) {
+				if (override.componentType == type) {
+					compOverride = &override;
+					break;
+				}
+			}
 
-        /**
-         * @brief Mark a component as deleted (removed from prefab)
-         * @param componentGuid GUID of the deleted component
-         */
-        void MarkComponentDeleted(xresource::instance_guid componentGuid) {
-            // Check if already marked
-            for (const auto& guid : DeletedComponents) {
-                if (guid.m_Value == componentGuid.m_Value) {
-                    return;
-                }
-            }
-            DeletedComponents.push_back(componentGuid);
-        }
+			// If not found, create new override
+			if (!compOverride) {
+				componentOverrides.emplace_back();
+				compOverride = &componentOverrides.back();
+				compOverride->componentType = type;
+			}
 
-        /**
-         * @brief Check if a component was added to this instance
-         * @param componentGuid GUID of the component to check
-         * @return True if the component is marked as added
-         */
-        bool IsComponentAdded(xresource::instance_guid componentGuid) const {
-            for (const auto& guid : AddedComponents) {
-                if (guid.m_Value == componentGuid.m_Value) {
-                    return true;
-                }
-            }
-            return false;
-        }
+			//// FIXED: Always add the component type itself as a property if no name given
+			//if (propertyName.empty()) {
+			//	// Add a generic marker to show component was modified
+			//	std::string marker = "ComponentModified";
+			//	auto it = std::find(compOverride->modifiedPropertyNames.begin(),
+			//		compOverride->modifiedPropertyNames.end(),
+			//		marker);
+			//	if (it == compOverride->modifiedPropertyNames.end()) {
+			//		compOverride->modifiedPropertyNames.push_back(marker);
+			//	}
+			//}
+			//else {
+			//	// Add specific property name if provided
+			//	auto it = std::find(compOverride->modifiedPropertyNames.begin(),
+			//		compOverride->modifiedPropertyNames.end(),
+			//		propertyName);
+			//	if (it == compOverride->modifiedPropertyNames.end()) {
+			//		compOverride->modifiedPropertyNames.push_back(propertyName);
+			//	}
+			//}
+			if (!propertyName.empty()) {
+				auto it = std::find(compOverride->modifiedPropertyNames.begin(),
+					compOverride->modifiedPropertyNames.end(),
+					propertyName);
+				if (it == compOverride->modifiedPropertyNames.end()) {
+					compOverride->modifiedPropertyNames.push_back(propertyName);
+				}
+			}
+		}
 
-        /**
-         * @brief Check if a component was deleted from this instance
-         * @param componentGuid GUID of the component to check
-         * @return True if the component is marked as deleted
-         */
-        bool IsComponentDeleted(xresource::instance_guid componentGuid) const {
-            for (const auto& guid : DeletedComponents) {
-                if (guid.m_Value == componentGuid.m_Value) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    };
+		void StoreOriginalComponent(ComponentTypeID type, const std::string& componentJSON) {
+			ComponentOverride* compOverride = nullptr;
+			for (auto& override : componentOverrides) {
+				if (override.componentType == type) {
+					compOverride = &override;
+					break;
+				}
+			}
 
+			if (!compOverride) {
+				componentOverrides.emplace_back();
+				compOverride = &componentOverrides.back();
+				compOverride->componentType = type;
+			}
+
+			compOverride->originalComponentJSON = componentJSON;
+		}
+
+		std::string GetOriginalComponentJSON(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type) {
+					return override.originalComponentJSON;
+				}
+			}
+			return "";
+		}
+
+		void ClearAllOverrides() {
+			componentOverrides.clear();
+		}
+
+		void ClearComponentOverride(ComponentTypeID type) {
+			componentOverrides.erase(
+				std::remove_if(componentOverrides.begin(), componentOverrides.end(),
+					[type](const ComponentOverride& o) {
+						return o.componentType == type;
+					}),
+				componentOverrides.end()
+			);
+		}
+
+		void MarkComponentRemoved(ComponentTypeID componentType, const std::string& originalComponentJSON = "") {
+			ComponentOverride* compOverride = nullptr;
+
+			for (auto& override : componentOverrides) {
+				if (override.componentType == componentType) {
+					compOverride = &override;
+					break;
+				}
+			}
+
+			if (!compOverride) {
+				componentOverrides.emplace_back();
+				compOverride = &componentOverrides.back();
+				compOverride->componentType = componentType;
+			}
+
+			// Store the original component state BEFORE removal
+			if (!originalComponentJSON.empty()) {
+				compOverride->originalComponentJSON = originalComponentJSON;
+			}
+
+			// Mark as removed
+			compOverride->isRemovedComponent = true;
+			compOverride->isAddedComponent = false;
+			compOverride->modifiedPropertyNames.clear();
+
+			LOG_DEBUG("Marked component as removed: ",
+				ComponentSerializer::GetComponentTypeName(componentType));
+		}
+
+		// ADD: MarkComponentAdded method
+		void MarkComponentAdded(ComponentTypeID componentType, const std::string& componentJSON = "") {
+			ComponentOverride* compOverride = nullptr;
+
+			for (auto& override : componentOverrides) {
+				if (override.componentType == componentType) {
+					compOverride = &override;
+					break;
+				}
+			}
+
+			if (!compOverride) {
+				componentOverrides.emplace_back();
+				compOverride = &componentOverrides.back();
+				compOverride->componentType = componentType;
+			}
+
+			// Mark as added
+			compOverride->isAddedComponent = true;
+			compOverride->isRemovedComponent = false;
+			compOverride->modifiedPropertyNames.clear();
+
+			// Store the added component's state for potential revert
+			if (!componentJSON.empty()) {
+				compOverride->currentComponentJSON = componentJSON;
+			}
+
+			LOG_DEBUG("Marked component as added: ",
+				ComponentSerializer::GetComponentTypeName(componentType));
+		}
+
+		// ADD: Helper methods
+		bool IsComponentRemoved(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type && override.isRemovedComponent) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		bool IsComponentAdded(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type && override.isAddedComponent) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		std::vector<ComponentTypeID> GetRemovedComponents() const {
+			std::vector<ComponentTypeID> removed;
+			for (const auto& override : componentOverrides) {
+				if (override.isRemovedComponent) {
+					removed.push_back(override.componentType);
+				}
+			}
+			return removed;
+		}
+
+		std::vector<ComponentTypeID> GetAddedComponents() const {
+			std::vector<ComponentTypeID> added;
+			for (const auto& override : componentOverrides) {
+				if (override.isAddedComponent) {
+					added.push_back(override.componentType);
+				}
+			}
+			return added;
+		}
+
+		// Clear removal flag (for revert functionality)
+		void ClearComponentRemoval(ComponentTypeID type) {
+			for (auto& override : componentOverrides) {
+				if (override.componentType == type) {
+					override.isRemovedComponent = false;
+					override.modifiedPropertyNames.clear();
+					break;
+				}
+			}
+		}
+
+		// ADD: Clear addition flag
+		void ClearComponentAddition(ComponentTypeID type) {
+			for (auto& override : componentOverrides) {
+				if (override.componentType == type) {
+					override.isAddedComponent = false;
+					override.modifiedPropertyNames.clear();
+					override.currentComponentJSON.clear();
+					break;
+				}
+			}
+		}
+	};
 } // namespace Engine

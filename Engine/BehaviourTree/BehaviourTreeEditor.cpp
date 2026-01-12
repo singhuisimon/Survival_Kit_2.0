@@ -158,21 +158,21 @@ namespace Engine {
     /**
      * @brief Convert tree to prefab for reuse
      */
-    xresource::instance_guid BehaviourTreeEditor::ConvertToPrefab(const BehaviourTree& tree, const std::string& prefabName) {
-        xresource::instance_guid guid = BehaviourTreePrefab::SaveAsPrefab(tree, prefabName);
-        if (guid.m_Value != 0) {
-            LOG_INFO("BehaviourTreeEditor: Converted tree '", tree.GetName(),
-                "' to prefab '", prefabName, "'");
-        }
-        return guid;
-    }
+    //xresource::instance_guid BehaviourTreeEditor::ConvertToPrefab(const BehaviourTree& tree, const std::string& prefabName) {
+    //    xresource::instance_guid guid = BehaviourTreePrefab::SaveAsPrefab(tree, prefabName);
+    //    if (guid.m_Value != 0) {
+    //        LOG_INFO("BehaviourTreeEditor: Converted tree '", tree.GetName(),
+    //            "' to prefab '", prefabName, "'");
+    //    }
+    //    return guid;
+    //}
 
     /**
      * @brief Load tree from prefab
      */
-    std::shared_ptr<BehaviourTree> BehaviourTreeEditor::LoadFromPrefab(xresource::instance_guid prefabGUID) {
+  /*  std::shared_ptr<BehaviourTree> BehaviourTreeEditor::LoadFromPrefab(xresource::instance_guid prefabGUID) {
         return BehaviourTreePrefab::LoadFromPrefab(prefabGUID);
-    }
+    }*/
 
     /**
      * @brief Validate tree structure (check for common errors)

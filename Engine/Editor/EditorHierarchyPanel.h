@@ -18,6 +18,7 @@
 #include "../Editor/Editor.h"
 #include "../ECS/Components.h"
 #include "../Utility/Logger.h"
+#include "../Serialization/PrefabInstantiator.h"
 
 namespace Engine
 {
@@ -29,6 +30,11 @@ namespace Engine
 
 		bool openAttachEntityPopup = false;
 		bool openSubEntityFromPrefabPopup = false;
+		bool openPrefabList = false;
+		bool openPrefabListAtRoot = false;
+		bool openPrefabListAsChild = false;
+		bool openReplacePrefabPanel = false;
+		
 
 		std::vector<Entity> entitiesToDelete;
 		std::vector<Entity> parentlessChildren;
@@ -36,7 +42,7 @@ namespace Engine
 	
 		Entity entityToAttach = Entity();
 		Entity parentOfPrefabEntity = Entity();
-
+		Entity entityToReplace = Entity();
 
 	public:
 		EditorHierarchyPanel(Editor* editor) : m_Editor(editor) {};
@@ -48,6 +54,10 @@ namespace Engine
 		void DeleteEntityTree(Scene* scene);
 		void CheckParentlessChildren(Scene* scene);
 		void ClearParentlessChildren(Scene* scene);
+		void CreateEntityFromPrefabPanel();
+		void OpenReplacePefabPanel();
+
+		
 	};
 }
 

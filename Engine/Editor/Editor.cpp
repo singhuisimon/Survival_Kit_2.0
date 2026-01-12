@@ -264,6 +264,41 @@ namespace Engine
         return "Untitled Scene";
     }
 
+    void Editor::SetPrefabName(const std::string& name)
+    {
+        m_CurrentPrefabName = name;
+
+        // Also update the active scene's name if it exists
+        if (m_ActiveScene)
+        {
+            m_ActiveScene->SetName(name);
+        }
+
+        LOG_INFO("Scene name set to: ", name);
+    }
+
+    std::string Editor::GetPrefabName() const
+    {
+        if (!m_CurrentPrefabName.empty())
+        {
+            return m_CurrentPrefabName;
+        }
+
+        if (m_ActiveScene)
+        {
+            return m_ActiveScene->GetName();
+        }
+
+        if (!m_CurrentPrefabPath.empty())
+        {
+            std::filesystem::path p(m_CurrentPrefabPath);
+            return p.stem().string();
+        }
+
+        // Default
+        return "Untitled Prefab";
+    }
+
     std::vector<Editor::AssetEntry> Editor::getAssetsInFolder(const std::string& folderPath)
     {
         std::vector<AssetEntry> entries;
