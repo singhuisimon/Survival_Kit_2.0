@@ -1139,6 +1139,16 @@ namespace Engine
 
 		static void Input_GetMouseDelta(float *outX, float *outY);
 
+		// SpriteRenderer Component
+		static void		Sprite_GetColor(uint64_t entityID, glm::vec4* outColor);
+		static void		Sprite_SetColor(uint64_t entityID, glm::vec4* Color);
+		static uint32_t Sprite_GetLayer(uint64_t entityID);
+		static void		Sprite_SetLayer(uint64_t entityID, uint32_t Layer);
+		static bool		Sprite_GetIsActive(uint64_t entityID);
+		static void		Sprite_SetActive(uint64_t entityID, bool Active);
+		static bool		Sprite_GetIsVisible(uint64_t entityID);
+		static void		Sprite_SetVisible(uint64_t entityID, bool visible);
+
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
@@ -1362,6 +1372,16 @@ namespace Engine
 		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
 		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
 		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
+
+		// Sprite Renderer Bindings
+		mono_add_internal_call("Engine.InternalCalls::Sprite_GetColor", (void*)InternalCalls::Sprite_GetColor);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_SetColor", (void*)InternalCalls::Sprite_SetColor);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_GetLayer", (void*)InternalCalls::Sprite_GetLayer);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_SetLayer", (void*)InternalCalls::Sprite_SetLayer);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_GetActive", (void*)InternalCalls::Sprite_GetIsActive);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_SetActive", (void*)InternalCalls::Sprite_SetActive);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_GetVisible", (void*)InternalCalls::Sprite_GetIsVisible);
+		mono_add_internal_call("Engine.InternalCalls::Sprite_SetVisible", (void*)InternalCalls::Sprite_SetVisible);
 
 		LOG_INFO("Internal calls registered");
 	}
@@ -2916,6 +2936,72 @@ namespace Engine
 			*outX = in_out.x;
 			*outY = in_out.y;
 		}
+
+		// Sprite Renderer
+		void Sprite_GetColor(uint64_t entityID, glm::vec4* outColor) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e || !outColor) return;
+			if (!e.HasComponent<SpriteRendererComponent>()) return;
+			*outColor = e.GetComponent<SpriteRendererComponent>().GetColor();
+		}
+
+		void Sprite_SetColor(uint64_t entityID, glm::vec4* Color) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e || !Color) return;
+			if (!e.HasComponent<SpriteRendererComponent>()) return;
+			e.GetComponent<SpriteRendererComponent>().SetColor(*Color);
+		}
+
+		uint32_t Sprite_GetLayer(uint64_t entityID) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return -1;
+			if (!e.HasComponent<SpriteRendererComponent>()) return -1;
+			return e.GetComponent<SpriteRendererComponent>().GetSpriteLayer();
+		}
+
+		void Sprite_SetLayer(uint64_t entityID, uint32_t Layer) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			if (!e.HasComponent<SpriteRendererComponent>()) return;
+			e.GetComponent<SpriteRendererComponent>().SetSpriteLayer(Layer);
+		}
+
+		bool Sprite_GetIsActive(uint64_t entityID) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return false;
+			if (!e.HasComponent<SpriteRendererComponent>()) return false;
+			return e.GetComponent<SpriteRendererComponent>().GetIsActive();
+		}
+
+		void Sprite_SetActive(uint64_t entityID, bool Active) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			if (!e.HasComponent<SpriteRendererComponent>()) return;
+			e.GetComponent<SpriteRendererComponent>().SetIsActive(Active);
+		}
+
+		bool Sprite_GetIsVisible(uint64_t entityID) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return false;
+			if (!e.HasComponent<SpriteRendererComponent>()) return false;
+			return e.GetComponent<SpriteRendererComponent>().GetIsVisible();
+		}
+
+		void Sprite_SetVisible(uint64_t entityID, bool visible) 
+		{
+			auto e = GetEntityOrNull(entityID);
+			if (!e) return;
+			if (!e.HasComponent<SpriteRendererComponent>()) return;
+			e.GetComponent<SpriteRendererComponent>().SetIsVisible(visible);
+		}
+
 	} // namespace internalcalls
 
 	// Expose these functions for external use
