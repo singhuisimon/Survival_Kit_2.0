@@ -108,6 +108,12 @@ namespace Engine {
 		inline const std::vector<MeshData>& getMeshDataStorage() { return m_gl.m_mesh_data_storage; }
 
 		/**
+		 * @brief Provides read-only access to mesh data 2D storage
+		 * @return Const reference to the mesh data 2D container
+		 */
+		inline const std::vector<MeshData2D>& getMeshData2DStorage() { return m_gl.m_mesh_data2d_storage; }
+
+		/**
 		 * @brief Provides read-only access to material storage
 		 * @return Const reference to the material container
 		 */
