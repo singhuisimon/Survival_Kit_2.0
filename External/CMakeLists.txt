@@ -206,6 +206,13 @@ target_include_directories(xresource_mgr INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/xresource_mgr/include
 )
 
+# freetype - Asset font loading (header-only)
+message(STATUS "Configuring freetype...")
+add_library(freetype INTERFACE)
+target_include_directories(freetype INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/freetype/include
+)
+
 
 # External Interface Library
 add_library(External INTERFACE)
@@ -223,6 +230,7 @@ target_link_libraries(External INTERFACE
     imgui
     xresource_guid
     xresource_mgr
+    freetype
 )
 
 message(STATUS "External libraries configured successfully")

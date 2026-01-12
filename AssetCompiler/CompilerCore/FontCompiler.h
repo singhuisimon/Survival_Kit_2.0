@@ -1,11 +1,14 @@
-#pragma once 
-#include <vector>
-#include <string>
-#include <cstdint>
 
+
+#pragma once 
 
 namespace AssetCompiler {
 
+#include "../External/freetype/include/ft2build.h"
+#include "../External/freetype/include/freetype/freetype.h"
+#include <vector>
+#include <string>
+#include <cstdint>
 
 	struct GlyphMetrics {
 		uint32_t charCode; //ASCII code value
