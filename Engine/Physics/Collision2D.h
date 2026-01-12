@@ -38,7 +38,7 @@ namespace Engine {
 	/**
 	 * @brief	  Computes the AABB of a 2D object.
 	 * @param[in] positions
-	 *			  The positions of the 2D object.
+	 *			  The positions of the 2D object in model space.
 	 * @param[in] projection
 	 *			  The orthographic projection matrix.
 	 * @param[in] model_to_world
@@ -47,7 +47,7 @@ namespace Engine {
 	 * @param[in] viewport
 	 *			  The viewport dimensions.
 	 * @return	  AABB2D
-	 *			  A 2D bounding box of the object.
+	 *			  A 2D bounding box of the object in screen space.
 	 */
 	AABB2D ComputeAABB(std::vector<glm::vec2> const& positions, 
 						 glm::mat4 const& projection, 
