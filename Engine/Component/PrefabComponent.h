@@ -35,7 +35,12 @@ namespace Engine {
 		}
 
 		bool HasOverrides() const {
-			return !modifiedPropertyNames.empty() || isAddedComponent || isRemovedComponent;
+			// If the override record exists at all, consider it modified
+			// unless it was explicitly marked as removed
+			return isAddedComponent ||
+				isRemovedComponent ||
+				!modifiedPropertyNames.empty() ||
+				!originalComponentJSON.empty(); 
 		}
 	};
 
@@ -55,6 +60,9 @@ namespace Engine {
 
 		std::string prefabName;
 		u32 prefabVersion;
+
+		u64 prefabLocalID = 0;
+		bool isPartOfHierarchy = true;
 
 		PrefabComponent()
 			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())  
@@ -106,21 +114,22 @@ namespace Engine {
 		}
 
 		void MarkComponentModified(ComponentTypeID type, const std::string& propertyName = "") {
-			ComponentOverride* compOverride = nullptr;
+			ComponentOverride* existingOverride = nullptr;
 
 			// Find existing override for this component type
 			for (auto& override : componentOverrides) {
 				if (override.componentType == type) {
-					compOverride = &override;
+					existingOverride = &override;
 					break;
 				}
 			}
 
 			// If not found, create new override
-			if (!compOverride) {
-				componentOverrides.emplace_back();
-				compOverride = &componentOverrides.back();
-				compOverride->componentType = type;
+			if (!existingOverride) {
+				ComponentOverride newOverride;
+				newOverride.componentType = type;
+				componentOverrides.push_back(newOverride);
+				existingOverride = &componentOverrides.back();
 			}
 
 			//// FIXED: Always add the component type itself as a property if no name given
@@ -144,11 +153,17 @@ namespace Engine {
 			//	}
 			//}
 			if (!propertyName.empty()) {
-				auto it = std::find(compOverride->modifiedPropertyNames.begin(),
-					compOverride->modifiedPropertyNames.end(),
+				auto it = std::find(existingOverride->modifiedPropertyNames.begin(),
+					existingOverride->modifiedPropertyNames.end(),
 					propertyName);
-				if (it == compOverride->modifiedPropertyNames.end()) {
-					compOverride->modifiedPropertyNames.push_back(propertyName);
+				if (it == existingOverride->modifiedPropertyNames.end()) {
+					existingOverride->modifiedPropertyNames.push_back(propertyName);
+				}
+			}
+			else {
+				// Generic marker that SOMETHING changed
+				if (existingOverride->modifiedPropertyNames.empty()) {
+					existingOverride->modifiedPropertyNames.push_back("modified");
 				}
 			}
 		}

@@ -134,7 +134,7 @@ namespace Engine
 				if (!newTag.empty())
 				{
 					tag.Tag = newTag;
-					MarkComponentOverridden(ComponentTypeID::Tag);
+					MarkComponentOverridden(ComponentTypeID::Tag, "Tag");
 
 				}
 
@@ -290,13 +290,13 @@ namespace Engine
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Transform);
 
 			// Visual indicator
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			/*if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));*/
 
 			bool headerOpen = ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen);
 
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+			/*if (isComponentOverridden)
+				ImGui::PopStyleColor();*/
 
 			if (headerOpen) {
 				auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
@@ -325,6 +325,28 @@ namespace Engine
 				u32 parent_id = transform.Parent;
 				if (parent_id != u32_max) {
 					if (ImGui::InputScalar("Parent", ImGuiDataType_U32, &parent_id)) {
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& oldPrefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+							if (!oldPrefabComp.isPrefabRoot) {
+								// This entity is a prefab child - remove it from old parent's tracking
+								Entity oldParent(static_cast<entt::entity>(transform.Parent),
+									&m_Scene->GetRegistry());
+
+								if (oldParent && oldParent.HasComponent<PrefabComponent>()) {
+									auto& oldParentPrefabComp = oldParent.GetComponent<PrefabComponent>();
+									u32 entityHandle = static_cast<u32>(m_SelectedEntity.GetHandle());
+
+									auto it = std::find(oldParentPrefabComp.childEntityIDs.begin(),
+										oldParentPrefabComp.childEntityIDs.end(),
+										entityHandle);
+									if (it != oldParentPrefabComp.childEntityIDs.end()) {
+										oldParentPrefabComp.childEntityIDs.erase(it);
+										LOG_INFO("Removed entity from parent's childEntityIDs");
+									}
+								}
+							}
+						}
 						TransformSystem::SetParent(m_Scene, m_SelectedEntity, static_cast<entt::entity>(parent_id));
 						MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
 					}
@@ -346,13 +368,13 @@ namespace Engine
 			ImGui::SetColumnWidth(0, 200.0f);
 
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::RigidBody);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			/*if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));*/
 			// col 1: RigidBody component header
 			bool openRigidBody = ImGui::CollapsingHeader("Rigid Body", ImGuiTreeNodeFlags_DefaultOpen);
 
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+			//if (isComponentOverridden)
+			//	ImGui::PopStyleColor();
 
 			bool removeRigidBody = false; // for remove part
 			// col2: ...
@@ -366,12 +388,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeRigidBody = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::RigidBody);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::RigidBody, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::RigidBody);
 				}
 				if (isComponentOverridden) {
 					ImGui::Separator();
@@ -564,16 +581,7 @@ namespace Engine
 
 			// Check if this component is overridden
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::MeshRenderer);
-
-			// Visual indicator - highlight if overridden
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
-
 			bool openMeshComponent = ImGui::CollapsingHeader("Mesh Component", ImGuiTreeNodeFlags_DefaultOpen);
-
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
-
 			bool removeMesh = false;
 
 			// col2: ...
@@ -861,11 +869,7 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Audio);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openAudioComponent = ImGui::CollapsingHeader("Audio Component", ImGuiTreeNodeFlags_DefaultOpen);
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
 			bool removeAudio = false;
 
 			// col2: ...
@@ -880,12 +884,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeAudio = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Audio);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::Audio, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::Audio);
 				}
 				if (isComponentOverridden) {
 					ImGui::Separator();
@@ -1200,12 +1199,7 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::ReverbZone);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			bool openReverbComponent = ImGui::CollapsingHeader("Reverb Zone Component", ImGuiTreeNodeFlags_DefaultOpen);
-
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
 			bool removeReverb = false;
 
 			// col2: ...
@@ -1220,12 +1214,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeReverb = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::ReverbZone);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::ReverbZone, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::ReverbZone);
 				}
 				if (isComponentOverridden) {
 					ImGui::Separator();
@@ -1349,11 +1338,9 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Listerner);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+		
 			bool openListenerComponent = ImGui::CollapsingHeader("Listener Component", ImGuiTreeNodeFlags_DefaultOpen);
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+		
 			bool removeListener = false;
 
 			// col2: ...
@@ -1368,12 +1355,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeListener = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Listerner);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::Listerner, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::Listerner);
 				}
 				if (isComponentOverridden) {
 					ImGui::Separator();
@@ -1739,11 +1721,9 @@ namespace Engine
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::ParticleSystem);
 
 			// Visual indicator
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			
 			bool openParticleComp = ImGui::CollapsingHeader("Particle System", ImGuiTreeNodeFlags_DefaultOpen);
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+			
 			bool removeParticleComp = false;
 
 			auto& particleComp = m_SelectedEntity.GetComponent<ParticleComponent>();
@@ -1759,12 +1739,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeParticleComp = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::ParticleSystem);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::ParticleSystem, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::ParticleSystem);
 					//return;
 				}
 				if (isComponentOverridden) {
@@ -2074,11 +2049,9 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Light);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			
 			bool openLightComp = ImGui::CollapsingHeader("Light Component", ImGuiTreeNodeFlags_DefaultOpen);
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+			
 			bool removeLightComp = false;
 
 			ImGui::NextColumn();
@@ -2092,12 +2065,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeLightComp = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Light);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::Light, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::Light);
 					//return;
 				}
 				if (isComponentOverridden) {
@@ -2203,11 +2171,9 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Camera);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			
 			bool openCameraComp = ImGui::CollapsingHeader("Camera Component", ImGuiTreeNodeFlags_DefaultOpen);
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+			
 			bool removeCameraComp = false;
 			ImGui::NextColumn();
 
@@ -2220,12 +2186,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeCameraComp = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Camera);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::Camera, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::Camera);
 					//return;
 				}
 				if (isComponentOverridden) {
@@ -2367,11 +2328,9 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Animator);
-			if (isComponentOverridden)
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+			
 			bool openAnimatorComponent = ImGui::CollapsingHeader("Animator Component", ImGuiTreeNodeFlags_DefaultOpen);
-			if (isComponentOverridden)
-				ImGui::PopStyleColor();
+			
 			bool removeAnimator = false;
 
 			// Column 2: "..." button to remove component
@@ -2386,12 +2345,7 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeAnimator = true;
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						std::string originalJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Animator);
-						prefabComp.MarkComponentRemoved(ComponentTypeID::Animator, originalJSON);
-					}
+					MarkComponentRemoved(ComponentTypeID::Animator);
 				}
 				if (isComponentOverridden) {
 					ImGui::Separator();
@@ -4931,13 +4885,13 @@ namespace Engine
 		return prefabComp.IsComponentOverridden(componentType);
 	}
 
-	void EditorPropertyPanel::MarkComponentOverridden(ComponentTypeID componentType) {
+	void EditorPropertyPanel::MarkComponentOverridden(ComponentTypeID componentType, const std::string& propertyName){
 		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
 			return;
 		}
 
 		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-		prefabComp.MarkComponentModified(componentType);
+		prefabComp.MarkComponentModified(componentType, propertyName);
 	}
 
 	void EditorPropertyPanel::MarkComponentRemoved(ComponentTypeID componentType) {
@@ -4946,6 +4900,8 @@ namespace Engine
 		}
 
 		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		std::string originalJSON = ComponentSerializer::SerializeComponent(
+			m_SelectedEntity, componentType);
 		prefabComp.MarkComponentRemoved(componentType);
 	}
 

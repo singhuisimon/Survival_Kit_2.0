@@ -29,11 +29,12 @@ namespace Engine
             const std::string& filePath);
 
 
+        static PrefabComponentData SerializeEntityComponent(Entity entity, ComponentTypeID type);
 
     private:
         static void SerializeEntityHierarchy(Entity entity, Prefab& prefab, u32& nextLocalID, u32 parentLocalID);
 
-        static PrefabComponentData SerializeEntityComponent(Entity entity, ComponentTypeID type);
+
     };
 }
 #endif // end of __PREFAB_SERIALIZER_H__

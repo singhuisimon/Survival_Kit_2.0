@@ -279,7 +279,21 @@ namespace Engine {
         data.typeName = ComponentSerializer::GetComponentTypeName(type);
 
         // Use ComponentSerializer
-        std::string jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+        std::string jsonStr;
+        if (type == ComponentTypeID::Transform && entity.HasComponent<TransformComponent>()) {
+            // Temporarily clear children for serialization
+            auto& transform = entity.GetComponent<TransformComponent>();
+            std::vector<u32> originalChildren = transform.Children;
+            transform.Children.clear();
+
+            jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+
+            // Restore children
+            transform.Children = originalChildren;
+        }
+        else {
+            jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+        }
         data.serializedData.assign(jsonStr.begin(), jsonStr.end());
 
         return data;

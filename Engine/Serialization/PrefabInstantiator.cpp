@@ -31,31 +31,7 @@
 
 namespace Engine
 {
-    bool PrefabInstantiator::CreatePrefabFromEntity(Entity rootEntity, const std::string& prefabName, const std::string& savePath) {
-        LOG_INFO("===== Start of PrefabInstantiator::CreatePrefabFromEntity ==== ");
-        if (!rootEntity) {
-            LOG_ERROR("Cannot create prefab from invalid entity");
-            return false;
-        }
-
-        if (!rootEntity.HasComponent<TagComponent>()) {
-            LOG_ERROR("Entity must have TagComponent to create prefab");
-            return false;
-        }
-
-        LOG_INFO("Creating prefab '", prefabName, "' from entity...");
-        // check if file path exists
-     
-        if (!PrefabSerializer::SerializeEntityToPrefabFile(rootEntity, prefabName, savePath)) {
-            LOG_ERROR("Failed to create and save prefab from entity: ", prefabName.c_str());
-            return false;
-        }
-      
-
-        LOG_INFO("Successfully created prefab: ", prefabName.c_str());
-        LOG_INFO("===== End of PrefabInstantiator::CreatePrefabFromEntity ==== ");
-        return true;
-    }
+   
 
     Entity PrefabInstantiator::InstantiatePrefabFromFile(Scene* scene, const std::string& filepath, Entity parent) {
         if (!scene) {
@@ -120,7 +96,8 @@ namespace Engine
         prefabComp->PrefabAssetGuid = prefab.guid;
         prefabComp->prefabName = prefab.name;
         prefabComp->prefabVersion = prefab.version;
-        prefabComp->isPrefabRoot = true;
+        //prefabComp->isPrefabRoot = true;
+
 
         // FIXED: Store original data AFTER all entities and components are fully instantiated
         StoreOriginalComponentDataForAllEntities(scene, prefab, localIDToEntity);
@@ -435,7 +412,7 @@ namespace Engine
                 childIndex++;
             }
             else {
-                // This is a NEW entity that doesn't exist in prefab yet
+                
                 break;
             }
         }
@@ -499,67 +476,67 @@ namespace Engine
                 // Serialize all components
                 if (childEntity.HasComponent<TransformComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Transform));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Transform));
                 }
 
                 if (childEntity.HasComponent<TagComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Tag));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Tag));
                 }
 
                 if (childEntity.HasComponent<MeshRendererComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::MeshRenderer));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::MeshRenderer));
                 }
 
                 if (childEntity.HasComponent<CameraComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Camera));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Camera));
                 }
 
                 if (childEntity.HasComponent<RigidbodyComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::RigidBody));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::RigidBody));
                 }
 
                 if (childEntity.HasComponent<LightComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Light));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Light));
                 }
 
                 if (childEntity.HasComponent<AudioComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Audio));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Audio));
                 }
 
                 if (childEntity.HasComponent<ListenerComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Listerner));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Listerner));
                 }
 
                 if (childEntity.HasComponent<ReverbZoneComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::ReverbZone));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::ReverbZone));
                 }
 
                 if (childEntity.HasComponent<BehaviourTreeComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::BehaviourTree));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::BehaviourTree));
                 }
 
                 if (childEntity.HasComponent<ParticleComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::ParticleSystem));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::ParticleSystem));
                 }
 
                 if (childEntity.HasComponent<ScriptComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Script));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Script));
                 }
 
                 if (childEntity.HasComponent<AnimatorComponent>()) {
                     newEntityData.components.push_back(
-                        SerializeEntityComponent(childEntity, ComponentTypeID::Animator));
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Animator));
                 }
 
                 // Add to prefab
@@ -753,10 +730,24 @@ namespace Engine
 
                 std::string componentName = ComponentSerializer::GetComponentTypeName(componentData.type);
 
-                // CRITICAL FIX: Serialize the current entity component to get its JSON
-                // This is important because we need the properly formatted JSON that matches
-                // what ComponentSerializer::DeserializeComponent expects
-                std::string jsonStr = ComponentSerializer::SerializeComponent(sceneEntity, componentData.type);
+               // to fix the serialize current entity component with special Transform handle
+                std::string jsonStr;
+                if (componentData.type == ComponentTypeID::Transform && sceneEntity.HasComponent<TransformComponent>()) {
+                    // Temporarily clear children for serialization
+                    auto& transform = sceneEntity.GetComponent<TransformComponent>();
+                    std::vector<u32> originalChildren = transform.Children;
+                    transform.Children.clear();
+
+                    jsonStr = ComponentSerializer::SerializeComponent(sceneEntity, componentData.type);
+
+                    // Restore children
+                    transform.Children = originalChildren;
+
+                    LOG_DEBUG("    Stored Transform without children");
+                }
+                else {
+                    jsonStr = ComponentSerializer::SerializeComponent(sceneEntity, componentData.type);
+                }
 
                 if (jsonStr.empty() || jsonStr == "{}") {
                     LOG_WARNING("Failed to serialize component: ", componentName, " in entity: ", prefabEntity.name);
@@ -1029,7 +1020,21 @@ namespace Engine
             // Only add if it doesn't already exist in the prefab
             if (!existsInPrefab) {
                 // Serialize the newly added component from the scene entity
-                std::string currentJSON = ComponentSerializer::SerializeComponent(entity, addedType);
+                std::string currentJSON;
+                if (addedType == ComponentTypeID::Transform) {
+                    // Temporarily clear children for serialization
+                    auto& transform = entity.GetComponent<TransformComponent>();
+                    std::vector<u32> originalChildren = transform.Children;
+                    transform.Children.clear();
+
+                    currentJSON = ComponentSerializer::SerializeComponent(entity, addedType);
+
+                    // Restore children
+                    transform.Children = originalChildren;
+                }
+                else {
+                    currentJSON = ComponentSerializer::SerializeComponent(entity, addedType);
+                }
 
                 if (!currentJSON.empty() && currentJSON != "{}") {
                     PrefabComponentData newComponent;
@@ -1060,7 +1065,23 @@ namespace Engine
                 continue;
             }
 
-            std::string currentJSON = ComponentSerializer::SerializeComponent(entity, override.componentType);
+            std::string currentJSON;
+            if (override.componentType == ComponentTypeID::Transform) {
+                // Temporarily clear children for serialization
+                auto& transform = entity.GetComponent<TransformComponent>();
+                std::vector<u32> originalChildren = transform.Children;
+                transform.Children.clear();
+
+                currentJSON = ComponentSerializer::SerializeComponent(entity, override.componentType);
+
+                // Restore children
+                transform.Children = originalChildren;
+
+                LOG_INFO("  Serialized Transform without children - JSON length: ", currentJSON.length());
+            }
+            else {
+                currentJSON = ComponentSerializer::SerializeComponent(entity, override.componentType);
+            }
 
             bool componentFound = false;
             for (auto& prefabComponent : entityData->components) {
@@ -1087,16 +1108,5 @@ namespace Engine
 
         // Clear overrides
         prefabComp.ClearAllOverrides();
-    }
-
-    PrefabComponentData PrefabInstantiator::SerializeEntityComponent(Entity entity, ComponentTypeID type) {
-        PrefabComponentData data;
-        data.type = type;
-        data.typeName = ComponentSerializer::GetComponentTypeName(type);
-
-        std::string jsonStr = ComponentSerializer::SerializeComponent(entity, type);
-        data.serializedData.assign(jsonStr.begin(), jsonStr.end());
-
-        return data;
     }
 }

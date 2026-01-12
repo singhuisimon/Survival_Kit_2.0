@@ -4,6 +4,8 @@
 #include "../Asset/ResourceManager.h"
 #include "../Serialization/PrefabSerializer.h"
 #include "../Prefab/PrefabRegistry.h"
+
+#include <algorithm>
 namespace Engine
 {
 	void EditorMenu::EditorTopMenu()
@@ -41,8 +43,9 @@ namespace Engine
 				{
 					ImGui::SetTooltip("Open scene from file.");
 				}
+				bool hasScenePath = !m_Editor->GetScenePath().empty();
 				// ----------------- Save Scene ------------------------
-				if (ImGui::MenuItem("Save Scene"))
+				if (ImGui::MenuItem("Save Scene", nullptr, false, hasScenePath))
 				{
 					m_CurrScenePath = m_Editor->GetScenePath();
 					Scene*m_Scene = m_Editor->GetActiveScene();
@@ -63,7 +66,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 				}
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As..."))
+				if (ImGui::MenuItem("Save Scene As...",  nullptr, false, hasScenePath))
 				{
 					m_SaveScenePanel = true;
 				}
@@ -72,11 +75,26 @@ namespace Engine
 					ImGui::SetTooltip("Save scene as a new file.");
 				}
 				// ----- Open Prefab temporary -----
-				if (ImGui::MenuItem("Open Prefab File"))
+				if (ImGui::MenuItem("Open Prefab"))
 				{
 					m_OpenPrefabPanel = true;
 					m_CurrScenePath = "";
 					m_Editor->SetScenePath(m_CurrScenePath);
+				}
+				bool hasPrefabPath = !m_Editor->GetPrefabPath().empty();
+				if (ImGui::MenuItem("Save Prefab", nullptr, false, hasPrefabPath))
+				{
+					if (m_Editor->HasPrefabPath() && !m_Editor->GetPrefabPath().empty()) {
+						SaveCurrentPrefab();
+					}
+					else {
+						// If no current prefab path, open "Save As" dialog
+						m_SavePrefabPanel = true;
+					}
+				}
+				if (ImGui::MenuItem("Save Prefab As...",  nullptr, false, hasPrefabPath))
+				{
+					m_SavePrefabPanel = true;
 				}
 				
 				ImGui::EndMenu();
@@ -126,6 +144,7 @@ namespace Engine
 		OpenScenePanel();
 		SaveScenePanel();
 		OpenPrefabPanel();
+		SavePrefabPanel();
 		DisplayHDRSettings();
 
 	}
@@ -473,4 +492,256 @@ namespace Engine
 		ImGui::End();
 	}
 
+	void EditorMenu::SavePrefabPanel()
+	{
+		if (!m_Editor) return;
+
+		Scene* currentScene = m_Editor->GetActiveScene();
+		if (!currentScene) return;
+
+		Entity selectedEntity = m_Editor->GetSelectedEntity();
+		if (!selectedEntity) {
+			// Show warning that no entity is selected
+			if (m_SavePrefabPanel) {
+				ImGui::OpenPopup("No Entity Selected");
+				m_SavePrefabPanel = false;
+			}
+
+			if (ImGui::BeginPopupModal("No Entity Selected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImGui::Text("Please select an entity to save as prefab.");
+				if (ImGui::Button("OK", ImVec2(120, 0))) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			return;
+		}
+
+		if (m_SavePrefabPanel) {
+			ImGui::OpenPopup("Save Prefab As");
+			memset(saveAsDefaultPrefabName, 0, sizeof(saveAsDefaultPrefabName));
+
+			// Pre-fill with selected entity's name if available
+			if (selectedEntity.HasComponent<TagComponent>()) {
+				std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
+				size_t copySize = entityName.size();
+				size_t maxSize = sizeof(saveAsDefaultPrefabName) - 1;
+				if (copySize > maxSize) {
+					copySize = maxSize;
+				}
+				strncpy(saveAsDefaultPrefabName, entityName.c_str(), copySize);
+				saveAsDefaultPrefabName[copySize] = '\0';
+			}
+
+			m_SavePrefabPanel = false;
+		}
+
+		if (ImGui::BeginPopupModal("Save Prefab As", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::Text("Save Selected Entity as Prefab");
+			ImGui::Separator();
+
+			// Show selected entity name
+			std::string selectedName = "None";
+			if (selectedEntity.HasComponent<TagComponent>()) {
+				selectedName = selectedEntity.GetComponent<TagComponent>().Tag;
+			}
+			ImGui::Text("Selected Entity: %s", selectedName.c_str());
+
+			ImGui::Spacing();
+			ImGui::InputText("Prefab Name", saveAsDefaultPrefabName, IM_ARRAYSIZE(saveAsDefaultPrefabName));
+
+			// Save button
+			if (ImGui::Button("Save", ImVec2(120, 0))) {
+				if (strlen(saveAsDefaultPrefabName) == 0) {
+					ImGui::OpenPopup("Empty Prefab Name");
+				}
+				else {
+					std::string defaultPrefabPath = getAssetFilePath("Sources/Prefabs/") + saveAsDefaultPrefabName;
+					if (!std::filesystem::path(defaultPrefabPath).has_extension()) {
+						defaultPrefabPath += ".prefab"; // Ensure .prefab extension
+					}
+
+					if (std::filesystem::exists(defaultPrefabPath)) {
+						ImGui::OpenPopup("Confirm Prefab Overwrite");
+					}
+					else {
+						// Actually save the prefab
+						if (PrefabSerializer::SerializeEntityToPrefabFile(
+							selectedEntity,
+							saveAsDefaultPrefabName,
+							defaultPrefabPath)) {
+
+							LOG_INFO("Prefab saved successfully: ", defaultPrefabPath);
+
+							// Update the current prefab path in editor
+							m_CurrPrefabPath = defaultPrefabPath;
+							m_Editor->SetPrefabPath(m_CurrPrefabPath);
+
+							// Register the prefab
+							Prefab savedPrefab;
+							if (PrefabSerializer::DeserializePrefab(defaultPrefabPath, savedPrefab)) {
+								if (!PrefabRegistry::Get().IsPrefabRegistered(savedPrefab.guid)) {
+									PrefabRegistry::Get().RegisterPrefab(
+										savedPrefab.guid,
+										defaultPrefabPath,
+										savedPrefab.name
+									);
+								}
+							}
+
+							m_SavePrefabPanel = false;
+							ImGui::CloseCurrentPopup();
+						}
+						else {
+							ImGui::OpenPopup("Save Failed");
+						}
+					}
+				}
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+				m_SavePrefabPanel = false;
+			}
+
+			// -------- Popup: Empty Prefab Name ----------
+			if (ImGui::BeginPopupModal("Empty Prefab Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImGui::Text("Please enter a prefab name.");
+				if (ImGui::Button("OK", ImVec2(120, 0))) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			// -------- Popup: Confirm Overwrite ----------
+			if (ImGui::BeginPopupModal("Confirm Prefab Overwrite", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImGui::Text("Prefab '%s' already exists.\nDo you want to replace it?", saveAsDefaultPrefabName);
+				ImGui::Separator();
+
+				if (ImGui::Button("Yes", ImVec2(120, 0))) {
+					std::string defaultPrefabPath = getAssetFilePath("Sources/Prefabs/") + saveAsDefaultPrefabName;
+					if (!std::filesystem::path(defaultPrefabPath).has_extension()) {
+						defaultPrefabPath += ".prefab";
+					}
+
+					if (PrefabSerializer::SerializeEntityToPrefabFile(
+						selectedEntity,
+						saveAsDefaultPrefabName,
+						defaultPrefabPath)) {
+
+						LOG_INFO("Prefab overwritten: ", defaultPrefabPath);
+
+						m_CurrPrefabPath = defaultPrefabPath;
+						m_Editor->SetPrefabPath(m_CurrPrefabPath);
+
+						// Update prefab registration
+						Prefab savedPrefab;
+						if (PrefabSerializer::DeserializePrefab(defaultPrefabPath, savedPrefab)) {
+							if (PrefabRegistry::Get().IsPrefabRegistered(savedPrefab.guid)) {
+								PrefabRegistry::Get().UnregisterPrefab(savedPrefab.guid);
+							}
+							PrefabRegistry::Get().RegisterPrefab(
+								savedPrefab.guid,
+								defaultPrefabPath,
+								savedPrefab.name
+							);
+						}
+
+						m_SavePrefabPanel = false;
+						m_CloseSavePrefabPanel = true;
+						ImGui::CloseCurrentPopup();
+					}
+					else {
+						ImGui::OpenPopup("Save Failed");
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("No", ImVec2(120, 0))) {
+					m_SavePrefabPanel = false;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			// Close the main popup if needed
+			if (m_CloseSavePrefabPanel) {
+				ImGui::CloseCurrentPopup();
+				m_SavePrefabPanel = false;
+				m_CloseSavePrefabPanel = false;
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void EditorMenu::SaveCurrentPrefab()
+	{
+		if (!m_Editor) return;
+
+		std::string currentPrefabPath = m_Editor->GetPrefabPath();
+		if (currentPrefabPath.empty()) {
+			LOG_ERROR("No current prefab path to save to");
+			return;
+		}
+
+		Scene* currentScene = m_Editor->GetActiveScene();
+		if (!currentScene) return;
+
+		// Find the prefab root entity in the scene
+		// This assumes the scene contains only the prefab we're editing
+		Entity prefabRoot = Entity{};
+
+		// Method 1: Try to find an entity with PrefabComponent that's a root
+		auto view = currentScene->GetRegistry().view<PrefabComponent>();
+		for (auto entity : view) {
+			Entity e(entity, &currentScene->GetRegistry());
+			auto& prefabComp = e.GetComponent<PrefabComponent>();
+			if (prefabComp.isPrefabRoot) {
+				prefabRoot = e;
+				break;
+			}
+		}
+
+		// Method 2: Use the currently selected entity if no root found
+		if (!prefabRoot) {
+			prefabRoot = m_Editor->GetSelectedEntity();
+			if (!prefabRoot) {
+				LOG_ERROR("No entity selected to save as prefab");
+				return;
+			}
+		}
+
+		// Extract prefab name from the file path
+		std::filesystem::path pathObj(currentPrefabPath);
+		std::string prefabName = m_Editor->GetPrefabName();  
+		LOG_INFO("Saving prefab to existing file: ", currentPrefabPath);
+
+		if (PrefabSerializer::SerializeEntityToPrefabFile(
+			prefabRoot,
+			prefabName,
+			currentPrefabPath)) {
+
+			LOG_INFO("Prefab saved successfully: ", currentPrefabPath);
+
+			// Update prefab in registry
+			Prefab savedPrefab;
+			if (PrefabSerializer::DeserializePrefab(currentPrefabPath, savedPrefab)) {
+				// Update registration
+				if (PrefabRegistry::Get().IsPrefabRegistered(savedPrefab.guid)) {
+					PrefabRegistry::Get().UnregisterPrefab(savedPrefab.guid);
+				}
+				PrefabRegistry::Get().RegisterPrefab(
+					savedPrefab.guid,
+					currentPrefabPath,
+					savedPrefab.name
+				);
+			}
+		}
+		else {
+			LOG_ERROR("Failed to save prefab to: ", currentPrefabPath);
+		}
+	}
 }

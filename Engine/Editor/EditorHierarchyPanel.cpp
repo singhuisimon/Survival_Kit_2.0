@@ -6,6 +6,7 @@
 #include "../Component/TransformComponent.h"
 #include "../Component/PrefabComponent.h"
 #include "../Serialization/PrefabInstantiator.h"
+#include "../Serialization/PrefabSerializer.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
 
@@ -287,6 +288,7 @@ namespace Engine
 		if (ImGui::BeginPopupContextItem())
 		{
 			// ==================== Selected Entity Section =======================
+			bool noPrefabPath = m_Editor->GetPrefabPath().empty();
 			if (ImGui::MenuItem("Delete Entity"))
 			{
 				entitiesToDelete.push_back(entity);
@@ -301,8 +303,23 @@ namespace Engine
 				// If this entity has a parent, unparent it first
 				if (entity.HasComponent<TransformComponent>()) 
 				{
-					if (hasParent) 
+					auto& transform = entity.GetComponent<TransformComponent>();
+					if (hasParent && transform.Parent != u32_max)
 					{
+						Entity parentEntity(static_cast<entt::entity>(transform.Parent), &m_Scene->GetRegistry());
+						// Remove from parent's PrefabComponent childEntityIDs
+						if (parentEntity.HasComponent<PrefabComponent>()) {
+							auto& parentPrefabComp = parentEntity.GetComponent<PrefabComponent>();
+							u32 entityID = static_cast<u32>(entity.GetHandle());
+
+							auto it = std::find(parentPrefabComp.childEntityIDs.begin(),
+								parentPrefabComp.childEntityIDs.end(),
+								entityID);
+							if (it != parentPrefabComp.childEntityIDs.end()) {
+								parentPrefabComp.childEntityIDs.erase(it);
+								LOG_DEBUG("Removed entity ", entityID, " from parent's PrefabComponent childEntityIDs");
+							}
+						}
 						TransformSystem::UnParent(m_Scene, entity);
 					}
 
@@ -344,7 +361,7 @@ namespace Engine
 							//LOG_DEBUG(" entityName: ", entityName);
 							auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 							
-							if (PrefabInstantiator::CreatePrefabFromEntity(currentSelectedEntity, entityName, prefabPath))
+							if (PrefabSerializer::SerializeEntityToPrefabFile(currentSelectedEntity, entityName, prefabPath))
 							{
 									LOG_INFO(" -------- PrefabInstantiator::CreatePrefabFromEntity is called. ----------------------");
 									const auto& allPrefabs = PrefabRegistry::Get().GetAllPrefabs();
@@ -418,13 +435,38 @@ namespace Engine
 			}
 			else // for sub-entities part
 			{
-				if (ImGui::MenuItem("Detach Sub-Entity"))
+				//bool hasPrefabPath = m_Editor->GetPrefabPath().empty();
+				if (ImGui::MenuItem("Detach Sub-Entity", nullptr, false, noPrefabPath))
 				{
 					if (entity.HasComponent<TransformComponent>()) 
 					{
-						TransformSystem::UnParent(m_Scene, entity);
+						auto& transform = entity.GetComponent<TransformComponent>();
+						if (hasParent && transform.Parent != u32_max)
+						{
+							Entity parentEntity(static_cast<entt::entity>(transform.Parent), &m_Scene->GetRegistry());
+							// Remove from parent's PrefabComponent childEntityIDs
+							if (parentEntity.HasComponent<PrefabComponent>()) {
+								auto& parentPrefabComp = parentEntity.GetComponent<PrefabComponent>();
+								u32 entityID = static_cast<u32>(entity.GetHandle());
 
+								auto it = std::find(parentPrefabComp.childEntityIDs.begin(),
+									parentPrefabComp.childEntityIDs.end(),
+									entityID);
+								if (it != parentPrefabComp.childEntityIDs.end()) {
+									parentPrefabComp.childEntityIDs.erase(it);
+									LOG_DEBUG("Removed entity ", entityID, " from parent's PrefabComponent childEntityIDs");
+								}
+							}
+						}
+						TransformSystem::UnParent(m_Scene, entity);
+						if (entity.HasComponent<PrefabComponent>())
+						{
+							entity.RemoveComponent<PrefabComponent>();
+							//LOG_DEBUG("Removed PrefabComponent from detached entity");
+						}
 					}
+
+					
 					
 				}
 			}

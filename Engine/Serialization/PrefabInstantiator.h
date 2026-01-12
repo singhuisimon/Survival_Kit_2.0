@@ -32,11 +32,7 @@ namespace Engine {
         static void RemoveComponentByTypeID(Entity entity, ComponentTypeID type);
 
         static void ApplyEntityOverrides(Entity entity, Scene* scene, PrefabEntityData* entityData);
-
-        static PrefabComponentData SerializeEntityComponent(Entity entity, ComponentTypeID type);
     public:
-        static bool CreatePrefabFromEntity(Entity rootEntity, const std::string& prefabName, const std::string& savePath);
-
         static Entity InstantiatePrefabFromFile(Scene* scene, const std::string& filepath, Entity parent);
 
         static Entity InstantiatePrefab(Scene* scene, const Prefab& prefab, Entity parent);

@@ -25,7 +25,10 @@ namespace Engine
 		void OpenScenePanel();
 		void SaveScenePanel();
 		void OpenPrefabPanel();
+		void SavePrefabPanel();
+		void SaveCurrentPrefab();
 		void DisplayHDRSettings();
+		
 	
 	private:
 		Editor* m_Editor = nullptr;
@@ -35,10 +38,13 @@ namespace Engine
 		bool m_CloseSaveAsPanel = false;
 		bool m_OpenPrefabPanel = false;
 		bool m_ShowHDRSettings = false;
+		bool m_SavePrefabPanel = false;
+		bool m_CloseSavePrefabPanel = false;
 
 		std::string m_CurrScenePath = "";
 		std::string m_CurrPrefabPath = "";
 		char saveAsDefaultSceneName[128] = {}; // default new scene path (in SaveAsScenePanel)
+		char saveAsDefaultPrefabName[256] = "";
 	};
 }
 

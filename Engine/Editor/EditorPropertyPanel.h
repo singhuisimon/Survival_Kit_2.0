@@ -58,7 +58,7 @@ namespace Engine
 		AnimatorComponentTrack m_SelectedComponentTrack = AnimatorComponentTrack::Transform;
 
 		bool IsComponentOverridden(ComponentTypeID componentType);
-		void MarkComponentOverridden(ComponentTypeID componentType);
+		void MarkComponentOverridden(ComponentTypeID componentType, const std::string& propertyName = "");
 		void MarkComponentRemoved(ComponentTypeID componentType);
 
 		
