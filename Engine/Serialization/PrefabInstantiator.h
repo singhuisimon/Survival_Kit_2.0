@@ -22,7 +22,7 @@ namespace Engine {
             const Prefab& prefab, Entity parent,
             std::unordered_map<u64, Entity>& localIDToEntity);
 
-        static void CreateComponentFromPrefab(Entity entity, const PrefabComponentData& componentData);
+        //static void CreateComponentFromPrefab(Entity entity, const PrefabComponentData& componentData);
 
         static void StoreOriginalComponentDataForAllEntities(
             Scene* scene,
@@ -37,7 +37,7 @@ namespace Engine {
 
         static Entity InstantiatePrefab(Scene* scene, const Prefab& prefab, Entity parent);
 
-        static void StoreOriginalComponentData(Entity entity, const Prefab& prefab);
+        //static void StoreOriginalComponentData(Entity entity, const Prefab& prefab);
 
         // Revert entity to match its prefab
         static bool RevertToPrefab(Entity entity, Scene* scene);
@@ -46,10 +46,17 @@ namespace Engine {
         static bool ApplyOverridesToPrefab(Entity entity, Scene* scene);
 
         // Revert a single component to its prefab state
-        static bool RevertComponentToPrefab(Entity entity, ComponentTypeID componentType);
+       /* static bool RevertComponentToPrefab(Entity entity, ComponentTypeID componentType);*/
 
         static void RevertEntityAndChildren(Entity entity, Scene* scene, const Prefab& prefab);
-        static void ApplyEntityAndChildrenOverrides(Entity entity, Scene* scene, Prefab& prefab);
+       
+        static void RebuildPrefabHierarchy(const Prefab& prefab,
+            const std::unordered_map<u64, Entity>& localIDToEntity,
+            Scene* scene);
+
+        static void UpdateExistingEntitiesPrefabLocalID(Entity root, Scene* scene, const Prefab& prefab);
+
+        // static void RemoveComponentsNotInPrefab(Entity entity, const PrefabEntityData& prefabData);
     };
 }
 #endif // end of __PREFAB_INSTANTIATOR_H__

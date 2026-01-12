@@ -398,6 +398,7 @@ namespace Engine
     }
 
     bool ComponentSerializer::DeserializeComponent(Entity entity, ComponentTypeID type, const std::string& jsonString) {
+        //LOG_INFO("=== Start of ComponentSerializer::DeserializeComponent ===");
         if (jsonString.empty() || jsonString == "{}") {
             LOG_WARNING("Empty JSON string for component type: ", static_cast<u32>(type));
             return false;
@@ -462,7 +463,7 @@ namespace Engine
                     posArray[2].GetFloat()
                 );
                 transform.SetPosition(pos);  // USE SETTER!
-                LOG_DEBUG("  Set Position to: ", pos.x, ", ", pos.y, ", ", pos.z);
+                //LOG_DEBUG("  Set Position to: ", pos.x, ", ", pos.y, ", ", pos.z);
             }
 
             if (properties.HasMember("Rotation")) {
@@ -474,7 +475,7 @@ namespace Engine
                 );
                 glm::quat quat = glm::quat(glm::radians(eulerRotation));
                 transform.SetRotation(eulerRotation);  // USE SETTER with degrees!
-                LOG_DEBUG("  Set Rotation to: ", eulerRotation.x, ", ", eulerRotation.y, ", ", eulerRotation.z);
+                //LOG_DEBUG("  Set Rotation to: ", eulerRotation.x, ", ", eulerRotation.y, ", ", eulerRotation.z);
             }
 
             if (properties.HasMember("Scale")) {
@@ -485,7 +486,7 @@ namespace Engine
                     scaleArray[2].GetFloat()
                 );
                 transform.SetScale(scale);  // USE SETTER!
-                LOG_DEBUG("  Set Scale to: ", scale.x, ", ", scale.y, ", ", scale.z);
+                //LOG_DEBUG("  Set Scale to: ", scale.x, ", ", scale.y, ", ", scale.z);
             }
 
             LOG_DEBUG("Transform component deserialized and applied to scene");
@@ -507,44 +508,44 @@ namespace Engine
             if (properties.HasMember("Mesh") && properties["Mesh"].IsString()) {
                 std::string meshName = properties["Mesh"].GetString();
                 mesh.MeshGuid = AM.getGuidFromName(meshName);
-                LOG_DEBUG("  Set Mesh to: ", meshName);
+                //LOG_DEBUG("  Set Mesh to: ", meshName);
             }
 
             if (properties.HasMember("Material") && properties["Material"].IsString()) {
                 std::string matName = properties["Material"].GetString();
                 mesh.MaterialGuid = AM.getGuidFromName(matName);
-                LOG_DEBUG("  Set Material to: ", matName);
+                //LOG_DEBUG("  Set Material to: ", matName);
             }
 
             if (properties.HasMember("Texture") && properties["Texture"].IsString()) {
                 std::string texName = properties["Texture"].GetString();
                 mesh.TextureGuid = AM.getGuidFromName(texName);
-                LOG_DEBUG("  Set Texture to: ", texName);
+                //LOG_DEBUG("  Set Texture to: ", texName);
             }
 
             if (properties.HasMember("Visible")) {
                 mesh.Visible = properties["Visible"].GetBool();
-                LOG_DEBUG("  Set Visible to: ", mesh.Visible);
+                //LOG_DEBUG("  Set Visible to: ", mesh.Visible);
             }
 
             if (properties.HasMember("ShadowCast")) {
                 mesh.ShadowCast = properties["ShadowCast"].GetBool();
-                LOG_DEBUG("  Set ShadowCast to: ", mesh.ShadowCast);
+                //LOG_DEBUG("  Set ShadowCast to: ", mesh.ShadowCast);
             }
 
             if (properties.HasMember("ShadowReceive")) {
                 mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
-                LOG_DEBUG("  Set ShadowReceive to: ", mesh.ShadowReceive);
+                //LOG_DEBUG("  Set ShadowReceive to: ", mesh.ShadowReceive);
             }
 
             if (properties.HasMember("GlobalIlluminate")) {
                 mesh.GlobalIlluminate = properties["GlobalIlluminate"].GetBool();
-                LOG_DEBUG("  Set GlobalIlluminate to: ", mesh.GlobalIlluminate);
+                //LOG_DEBUG("  Set GlobalIlluminate to: ", mesh.GlobalIlluminate);
             }
 
             if (properties.HasMember("MeshType")) {
                 mesh.MeshType = properties["MeshType"].GetUint();
-                LOG_DEBUG("  Set MeshType to: ", mesh.MeshType);
+                //LOG_DEBUG("  Set MeshType to: ", mesh.MeshType);
             }
 
             if (properties.HasMember("Material") && properties["Material"].IsNumber()) {
@@ -563,7 +564,7 @@ namespace Engine
 
             if (properties.HasMember("SubmeshIndex")) {
                 mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
-                LOG_DEBUG("  Set SubmeshIndex to: ", mesh.SubmeshIndex);
+                //LOG_DEBUG("  Set SubmeshIndex to: ", mesh.SubmeshIndex);
             }
 
             LOG_DEBUG("MeshRenderer component deserialized and applied to scene");
@@ -945,6 +946,7 @@ namespace Engine
             LOG_WARNING("Unknown component type: ", static_cast<u32>(type));
             return false;
         }
+        //LOG_INFO("=== End of ComponentSerializer::DeserializeComponent ===");
     }
 
     const char* ComponentSerializer::GetComponentTypeName(ComponentTypeID type)

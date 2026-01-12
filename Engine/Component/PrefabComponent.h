@@ -39,8 +39,8 @@ namespace Engine {
 			// unless it was explicitly marked as removed
 			return isAddedComponent ||
 				isRemovedComponent ||
-				!modifiedPropertyNames.empty() ||
-				!originalComponentJSON.empty(); 
+				!modifiedPropertyNames.empty(); //||
+				//!originalComponentJSON.empty(); 
 		}
 	};
 
@@ -87,6 +87,14 @@ namespace Engine {
 			, prefabVersion(1)
 		{
 		}
+		struct DeletedEntityData {
+			u64 prefabLocalID;
+			std::string entityName;
+			std::string serializedEntityData;  // Store full entity JSON for restoration
+		};
+
+		std::vector<DeletedEntityData> deletedEntities;
+		std::vector<u32> addedEntityHandles;
 
 		bool HasOverrides() const {
 			for (const auto& override : componentOverrides) {
@@ -330,6 +338,28 @@ namespace Engine {
 					break;
 				}
 			}
+		}
+
+		void MarkEntityDeleted(u64 prefabLocalID, const std::string& entityName, const std::string& entityData) {
+			DeletedEntityData deleted;
+			deleted.prefabLocalID = prefabLocalID;
+			deleted.entityName = entityName;
+			deleted.serializedEntityData = entityData;
+			deletedEntities.push_back(deleted);
+
+			// Remove from childEntityIDs
+			auto it = std::find(childEntityIDs.begin(), childEntityIDs.end(), static_cast<u32>(prefabLocalID));
+			if (it != childEntityIDs.end()) {
+				childEntityIDs.erase(it);
+			}
+		}
+
+		void MarkEntityAdded(u32 entityHandle) {
+			addedEntityHandles.push_back(entityHandle);
+		}
+
+		bool HasEntityChanges() const {
+			return !deletedEntities.empty() || !addedEntityHandles.empty();
 		}
 	};
 } // namespace Engine

@@ -34,7 +34,7 @@ namespace Engine {
             return false;
         }
 
-        LOG_INFO("PrefabSerializer: Saving prefab '", prefab.name, "' to ", filepath);
+        LOG_INFO("PrefabSerializer::SerializePrefab Saving prefab '", prefab.name);
         
         rapidjson::Document doc;
         doc.SetObject();
@@ -93,8 +93,8 @@ namespace Engine {
         file << buffer.GetString();
         file.close();
 
-        LOG_INFO("Prefab serialized successfully to: ", filepath.c_str());
-        LOG_INFO("--- End of PrefabSerializer::SerializePrefab ---- ");
+        LOG_INFO("Prefab serialized successfully");
+        LOG_INFO("--- End of PrefabSerializer::SerializePrefab ---- \n");
         return true;
     }
 
@@ -284,12 +284,14 @@ namespace Engine {
             // Temporarily clear children for serialization
             auto& transform = entity.GetComponent<TransformComponent>();
             std::vector<u32> originalChildren = transform.Children;
+            u32 originalParent = transform.Parent;
             transform.Children.clear();
-
+            transform.Parent = u32_max;
             jsonStr = ComponentSerializer::SerializeComponent(entity, type);
 
             // Restore children
             transform.Children = originalChildren;
+            transform.Parent = originalParent;
         }
         else {
             jsonStr = ComponentSerializer::SerializeComponent(entity, type);
@@ -300,6 +302,7 @@ namespace Engine {
     }
 
     bool PrefabSerializer::DeserializePrefab(const std::string& filepath, Prefab& outPrefab) {
+        LOG_INFO("====== Start of PrefabSerializer::DeserializePrefab ======");
         std::ifstream file(filepath);
         if (!file.is_open()) {
             LOG_ERROR("Failed to open prefab file: ", filepath.c_str());
@@ -381,7 +384,9 @@ namespace Engine {
                 LOG_INFO("Registered: ", outPrefab.name, " (GUID : ", outPrefab.guid.m_Value, ")");
             }
         }
-        LOG_INFO("Prefab deserialized successfully from: ", filepath.c_str());
+        LOG_INFO("Prefab deserialized successfully from: ", outPrefab.name);
+        LOG_INFO("====== End of PrefabSerializer::DeserializePrefab ======\n\n");
+
         return outPrefab.m_IsValid;
     }
 

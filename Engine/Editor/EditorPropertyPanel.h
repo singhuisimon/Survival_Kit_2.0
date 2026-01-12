@@ -59,6 +59,7 @@ namespace Engine
 
 		bool IsComponentOverridden(ComponentTypeID componentType);
 		void MarkComponentOverridden(ComponentTypeID componentType, const std::string& propertyName = "");
+		bool IsComponentRemoved(ComponentTypeID componentType);
 		void MarkComponentRemoved(ComponentTypeID componentType);
 
 		
