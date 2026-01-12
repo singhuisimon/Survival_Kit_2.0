@@ -473,7 +473,6 @@ namespace Engine {
 			.culling = false
 		};
 
-		// Register the pass with the renderer
 		m_passes.push_back(first_pass);
 
 		RenderPass gpu_id_pass
@@ -493,20 +492,6 @@ namespace Engine {
 
 		m_passes.push_back(gpu_id_pass);
 
-		RenderPass ui_pass
-		{
-			.pass_name = "UI Pass",
-			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
-			.shdpgm_handle = static_cast<size_t>(ShaderIndex::UI),
-			.auto_aspect = true,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_test = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::GEOMETRY
-		};
-
 		RenderPass debug_pass
 		{
 			.pass_name = "Debug Pass",
@@ -518,8 +503,6 @@ namespace Engine {
 			.culling = false,
 			.passtype = PassType::DEBUGGING
 		};
-
-		//m_passes.push_back(debug_pass);
 
 		m_finalpass = {
 			.pass_name = "Final Pass",
