@@ -6,6 +6,7 @@ namespace AssetCompiler {
 
 #include "../External/freetype/include/ft2build.h"
 #include "../External/freetype/include/freetype/freetype.h"
+
 #include <vector>
 #include <string>
 #include <cstdint>

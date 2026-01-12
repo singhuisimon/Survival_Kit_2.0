@@ -208,10 +208,7 @@ target_include_directories(xresource_mgr INTERFACE
 
 # freetype - Asset font loading (header-only)
 message(STATUS "Configuring freetype...")
-add_library(freetype INTERFACE)
-target_include_directories(freetype INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/freetype/include
-)
+add_subdirectory(freetype)
 
 
 # External Interface Library

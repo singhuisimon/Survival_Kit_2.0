@@ -2,6 +2,7 @@
  *
  * ftconfig.h
  *
+ *   ANSI-specific configuration file (specification only).
  *
  * Copyright (C) 1996-2025 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
