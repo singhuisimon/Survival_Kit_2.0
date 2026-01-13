@@ -376,5 +376,30 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float Input_GetMouseDelta(out float deltaX, out float deltaY);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Sprite_GetColor(ulong entityID, out Vector4 color);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Sprite_SetColor(ulong entityID, in Vector4 color);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint Sprite_GetLayer(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Sprite_SetLayer(ulong entityID, uint layer);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Sprite_GetIsActive(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Sprite_SetActive(ulong entityID, bool active);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Sprite_GetIsVisible(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Sprite_SetVisible(ulong entityID, bool visible);
+
     }
 }
