@@ -59,10 +59,11 @@ namespace Engine
 
 		bool IsComponentOverridden(ComponentTypeID componentType);
 		void MarkComponentOverridden(ComponentTypeID componentType, const std::string& propertyName = "");
-		bool IsComponentRemoved(ComponentTypeID componentType);
-		void MarkComponentRemoved(ComponentTypeID componentType);
+		// bool IsComponentRemoved(ComponentTypeID componentType);
+		//void MarkComponentRemoved(ComponentTypeID componentType);
 
-		
+		bool IsComponentAddedToInstance(ComponentTypeID type);
+		bool WasComponentInPrefab(ComponentTypeID type);
 
 	public:
 		EditorPropertyPanel(Editor* editor) : m_Editor(editor) {};

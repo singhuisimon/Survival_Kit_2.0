@@ -19,8 +19,8 @@
 namespace Engine {
 	struct ComponentOverride {
 		ComponentTypeID componentType;
-		bool isAddedComponent;      // Component added to instance
-		bool isRemovedComponent;    // Component removed from instance
+		bool isAddedComponent = false;      // Component added to instance
+		bool isRemovedComponent = false;    // Component removed from instance
 
 		std::string originalComponentJSON;  // Full component state from prefab
 		std::string currentComponentJSON;   // Current component state (for comparison)
@@ -360,6 +360,25 @@ namespace Engine {
 
 		bool HasEntityChanges() const {
 			return !deletedEntities.empty() || !addedEntityHandles.empty();
+		}
+
+		// Clear all overrides for a specific component
+		void ClearAllOverridesForComponent(ComponentTypeID type) {
+			componentOverrides.erase(
+				std::remove_if(componentOverrides.begin(), componentOverrides.end(),
+					[type](const ComponentOverride& o) { return o.componentType == type; }),
+				componentOverrides.end()
+			);
+		}
+
+		// Check if component was added locally
+		bool WasComponentAddedLocally(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type && override.isAddedComponent) {
+					return true;
+				}
+			}
+			return false;
 		}
 	};
 } // namespace Engine

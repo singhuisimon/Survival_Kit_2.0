@@ -388,25 +388,19 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeRigidBody = true;
-					MarkComponentRemoved(ComponentTypeID::RigidBody);
-				}
-				/*if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::RigidBody);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-							if (!originalJSON.empty()) {
-								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
-									ComponentTypeID::RigidBody, originalJSON)) {
-									prefabComp.ClearComponentOverride(ComponentTypeID::RigidBody);
-									LOG_INFO("Reverted RigidBody component to prefab state");
-								}
-							}
-						}
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::RigidBody);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::RigidBody, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
 					}
-				}*/
+				}
+			
 				ImGui::EndPopup();
 			}
 			ImGui::Columns(1);
@@ -597,19 +591,18 @@ namespace Engine
 			if (ImGui::BeginPopup("MeshPopUp")) {
 				if (ImGui::MenuItem("Remove Component")) {
 					removeMesh = true;
-					MarkComponentRemoved(ComponentTypeID::MeshRenderer);
-				}
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-				// Add revert option if component is overridden
-				/*if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (PrefabInstantiator::RevertComponentToPrefab(m_SelectedEntity, ComponentTypeID::MeshRenderer)) {
-							LOG_INFO("Reverted MeshRenderer component to prefab state");
-						}
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::MeshRenderer);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::MeshRenderer, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
 					}
-				}*/
-
+				}
 				ImGui::EndPopup();
 			}
 
@@ -893,26 +886,18 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeAudio = true;
-					MarkComponentRemoved(ComponentTypeID::Audio);
-				}
-				if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Audio);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-							if (!originalJSON.empty()) {
-								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
-									ComponentTypeID::Audio, originalJSON)) {
-									prefabComp.ClearComponentOverride(ComponentTypeID::Audio);
-									LOG_INFO("Reverted Audio component to prefab state");
-								}
-							}
-						}
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Audio);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Audio, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
 					}
 				}
-
 				ImGui::EndPopup();
 			}
 
@@ -1227,25 +1212,19 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeReverb = true;
-					MarkComponentRemoved(ComponentTypeID::ReverbZone);
-				}
-				/*if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::ReverbZone);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-							if (!originalJSON.empty()) {
-								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
-									ComponentTypeID::ReverbZone, originalJSON)) {
-									prefabComp.ClearComponentOverride(ComponentTypeID::ReverbZone);
-									LOG_INFO("Reverted Audio component to prefab state");
-								}
-							}
-						}
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ReverbZone);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::ReverbZone, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
 					}
-				}*/
+				}
+				
 				ImGui::EndPopup();
 			}
 
@@ -1370,25 +1349,19 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeListener = true;
-					MarkComponentRemoved(ComponentTypeID::Listerner);
-				}
-				/*if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Listerner);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-							if (!originalJSON.empty()) {
-								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
-									ComponentTypeID::Listerner, originalJSON)) {
-									prefabComp.ClearComponentOverride(ComponentTypeID::Listerner);
-									LOG_INFO("Reverted Particle component to prefab state");
-								}
-							}
-						}
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Listerner);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Listerner, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
 					}
-				}*/
+				}
+				
 				ImGui::EndPopup();
 			}
 
@@ -1757,26 +1730,20 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeParticleComp = true;
-					MarkComponentRemoved(ComponentTypeID::ParticleSystem);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::ParticleSystem);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::ParticleSystem, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
+					}
 					//return;
 				}
-				/*if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::ParticleSystem);
-
-							if (!originalJSON.empty()) {
-								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
-									ComponentTypeID::ParticleSystem, originalJSON)) {
-									prefabComp.ClearComponentOverride(ComponentTypeID::ParticleSystem);
-									LOG_INFO("Reverted Particle component to prefab state");
-								}
-							}
-						}
-					}
-				}*/
+				
 				ImGui::EndPopup();
 			}
 
@@ -1981,7 +1948,10 @@ namespace Engine
 			if (ImGui::BeginPopup("ScriptPopUp"))
 			{
 				if (ImGui::MenuItem("Remove Component"))
+				{
 					removeScriptComp = true;
+
+				}
 				ImGui::EndPopup();
 			}
 			ImGui::Columns(1);
@@ -2085,7 +2055,17 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeLightComp = true;
-					MarkComponentRemoved(ComponentTypeID::Light);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Light);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Light, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
+					}
 					//return;
 				}
 				/*if (isComponentOverridden) {
@@ -2208,7 +2188,17 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeCameraComp = true;
-					MarkComponentRemoved(ComponentTypeID::Camera);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Camera);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Camera, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
+					}
 					//return;
 				}
 				/*if (isComponentOverridden) {
@@ -2369,25 +2359,19 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeAnimator = true;
-					MarkComponentRemoved(ComponentTypeID::Animator);
-				}
-				/*if (isComponentOverridden) {
-					ImGui::Separator();
-					if (ImGui::MenuItem("Revert to Prefab")) {
-						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-							std::string originalJSON = prefabComp.GetOriginalComponentJSON(ComponentTypeID::Animator);
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
-							if (!originalJSON.empty()) {
-								if (ComponentSerializer::DeserializeComponent(m_SelectedEntity,
-									ComponentTypeID::Animator, originalJSON)) {
-									prefabComp.ClearComponentOverride(ComponentTypeID::Animator);
-									LOG_INFO("Reverted Particle component to prefab state");
-								}
-							}
-						}
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Animator);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Animator, originalJSON);
+						LOG_INFO("Marked RigidBody as REMOVED override");
 					}
-				}*/
+				}
+				
 				ImGui::EndPopup();
 			}
 
@@ -4349,7 +4333,42 @@ namespace Engine
 							m_SelectedEntity, ComponentTypeID::RigidBody);
 						prefabComp.MarkComponentAdded(ComponentTypeID::RigidBody, componentJSON);
 					}
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::RigidBody) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::RigidBody);
+							prefabComp.MarkComponentAdded(ComponentTypeID::RigidBody, componentJSON);
+							LOG_INFO("Marked RigidBody as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::RigidBody);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::RigidBody);
+							LOG_INFO("Marked RigidBody as RESTORED (was removed, now re-added)");
+						}
+					}
 				}
 			}
 			if (ImGui::IsItemHovered())
@@ -4372,10 +4391,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<MeshRendererComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::MeshRenderer);
-						prefabComp.MarkComponentAdded(ComponentTypeID::MeshRenderer, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::MeshRenderer) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::MeshRenderer);
+							prefabComp.MarkComponentAdded(ComponentTypeID::MeshRenderer, componentJSON);
+							LOG_INFO("Marked MeshRenderer as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::MeshRenderer);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::MeshRenderer);
+							LOG_INFO("Marked MeshRenderer as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4399,10 +4447,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<AudioComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Audio);
-						prefabComp.MarkComponentAdded(ComponentTypeID::Audio, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Audio) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Audio);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Audio, componentJSON);
+							LOG_INFO("Marked Audio as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Audio);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Audio);
+							LOG_INFO("Marked Audio as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4426,10 +4503,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<ReverbZoneComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::ReverbZone);
-						prefabComp.MarkComponentAdded(ComponentTypeID::ReverbZone, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::ReverbZone) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::ReverbZone);
+							prefabComp.MarkComponentAdded(ComponentTypeID::ReverbZone, componentJSON);
+							LOG_INFO("Marked ReverbZone as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::ReverbZone);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::ReverbZone);
+							LOG_INFO("Marked ReverbZone as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4453,10 +4559,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<ListenerComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Listerner);
-						prefabComp.MarkComponentAdded(ComponentTypeID::Listerner, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Listerner) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Listerner);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Listerner, componentJSON);
+							LOG_INFO("Marked Listerner as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Listerner);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Listerner);
+							LOG_INFO("Marked Listerner as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4480,10 +4615,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<BehaviourTreeComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::BehaviourTree);
-						prefabComp.MarkComponentAdded(ComponentTypeID::BehaviourTree, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::BehaviourTree) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::BehaviourTree);
+							prefabComp.MarkComponentAdded(ComponentTypeID::BehaviourTree, componentJSON);
+							LOG_INFO("Marked BehaviourTree as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::BehaviourTree);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::BehaviourTree);
+							LOG_INFO("Marked BehaviourTree as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4507,10 +4671,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<ParticleComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::ParticleSystem);
-						prefabComp.MarkComponentAdded(ComponentTypeID::ParticleSystem, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::ParticleSystem) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::ParticleSystem);
+							prefabComp.MarkComponentAdded(ComponentTypeID::ParticleSystem, componentJSON);
+							LOG_INFO("Marked ParticleSystem as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::ParticleSystem);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::ParticleSystem);
+							LOG_INFO("Marked ParticleSystem as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4534,10 +4727,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<ScriptComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Script);
-						prefabComp.MarkComponentAdded(ComponentTypeID::Script, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Script) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Script);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Script, componentJSON);
+							LOG_INFO("Marked Script as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Script);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Script);
+							LOG_INFO("Marked Script as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4560,10 +4782,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<LightComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Light);
-						prefabComp.MarkComponentAdded(ComponentTypeID::Light, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Light) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Light);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Light, componentJSON);
+							LOG_INFO("Marked Light as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Light);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Light);
+							LOG_INFO("Marked Light as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4587,10 +4838,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<CameraComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Camera);
-						prefabComp.MarkComponentAdded(ComponentTypeID::Camera, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Camera) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Camera);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Camera, componentJSON);
+							LOG_INFO("Marked Camera as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Camera);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Camera);
+							LOG_INFO("Marked Camera as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4614,10 +4894,39 @@ namespace Engine
 					m_SelectedEntity.AddComponent<AnimatorComponent>();
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-						// Serialize the newly added component
-						std::string componentJSON = ComponentSerializer::SerializeComponent(
-							m_SelectedEntity, ComponentTypeID::Animator);
-						prefabComp.MarkComponentAdded(ComponentTypeID::Animator, componentJSON);
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Animator) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Animator);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Animator, componentJSON);
+							LOG_INFO("Marked Animator as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Animator);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Animator);
+							LOG_INFO("Marked Animator as RESTORED (was removed, now re-added)");
+						}
 					}
 				}
 			}
@@ -4918,16 +5227,16 @@ namespace Engine
 		prefabComp.MarkComponentModified(componentType, propertyName);
 	}
 
-	bool EditorPropertyPanel::IsComponentRemoved(ComponentTypeID componentType) {
+	/*bool EditorPropertyPanel::IsComponentRemoved(ComponentTypeID componentType) {
 		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
 			return false;
 		}
 
 		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 		return prefabComp.IsComponentRemoved(componentType);
-	}
+	}*/
 
-	void EditorPropertyPanel::MarkComponentRemoved(ComponentTypeID componentType) {
+	/*void EditorPropertyPanel::MarkComponentRemoved(ComponentTypeID componentType) {
 		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
 			return;
 		}
@@ -4936,7 +5245,36 @@ namespace Engine
 		std::string originalJSON = ComponentSerializer::SerializeComponent(
 			m_SelectedEntity, componentType);
 		prefabComp.MarkComponentRemoved(componentType, originalJSON);
+	}*/
+
+	bool EditorPropertyPanel::IsComponentAddedToInstance(ComponentTypeID type) {
+		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			return false;
+		}
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		return prefabComp.IsComponentAdded(type);
 	}
 
-	
+	bool EditorPropertyPanel::WasComponentInPrefab(ComponentTypeID type) {
+		if (!m_SelectedEntity || !m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			return false;
+		}
+
+		auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+		Prefab prefab;
+		if (!PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+			return false;
+		}
+
+		const PrefabEntityData* entityData = prefabComp.isPrefabRoot ?
+			prefab.GetRootEntity() :
+			prefab.FindEntityByLocalID(prefabComp.prefabLocalID);
+
+		if (!entityData) return false;
+
+		for (const auto& comp : entityData->components) {
+			if (comp.type == type) return true;
+		}
+		return false;
+	}
 }
