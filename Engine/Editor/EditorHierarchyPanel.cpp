@@ -124,24 +124,21 @@ namespace Engine
 
 		if (ImGui::BeginPopupModal("Main Entity Selection", nullptr, ImGuiWindowFlags_NoDocking))
 		{
-#if 0
+
 			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
 			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
 			{
-				std::string attachName = entityToAttach.GetComponent<TagComponent>().Tag;
-				ImGui::Text("Select a main entity to attach '%s' to:", attachName.c_str());
+				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
 			}
 			ImGui::Separator();
-
-			// Store selected entity
-			static Entity selectedMainEntity; // Or make it a member variable
-
-			ImGui::BeginChild("##entity_list", ImVec2(0, 300), true);
+			ImGui::BeginChild("##EntityListAttach", ImVec2(0, 300), true);
 
 			for (auto entityHandle : viewEntities)
 			{
 				Entity entity(entityHandle, &m_Scene->GetRegistry());
-				if (!entity.HasComponent<TransformComponent>()) continue;
+
+				if (!entity.HasComponent<TransformComponent>())
+					continue;
 
 				auto& transform = entity.GetComponent<TransformComponent>();
 
@@ -150,89 +147,38 @@ namespace Engine
 				{
 					std::string entityName = entity.GetComponent<TagComponent>().Tag;
 
-					// Make them selectable
-					if (ImGui::Selectable(entityName.c_str(), selectedMainEntity == entity))
+					// Make them selectable - user must CLICK to attach
+					if (ImGui::Selectable(entityName.c_str()))
 					{
-						selectedMainEntity = entity;
+						// Attach entityToAttach as child of selected entity
+						auto& parentTransform = entity.GetComponent<TransformComponent>();
+						parentTransform.Children.push_back((uint32_t)entityToAttach.GetHandle());
+
+						auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
+						childTransform.SetParent(entity);
+
+						LOG_INFO("Attached '", entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
+							"' as child of '", entityName.c_str(), "'");
+
+						entityToAttach = Entity{};  // Clear after successful attach
+						ImGui::CloseCurrentPopup();
+						break;
 					}
 				}
 			}
-			ImGui::EndChild();
 
+			ImGui::EndChild();
 			ImGui::Separator();
 
-			// Attach button (only enabled when something is selected)
-			ImGui::BeginDisabled(!selectedMainEntity);
-			if (ImGui::Button("Attach"))
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
 			{
-				if (selectedMainEntity && entityToAttach)
-				{
-					auto& parentTransform = selectedMainEntity.GetComponent<TransformComponent>();
-					auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
-
-					parentTransform.Children.push_back((uint32_t)entityToAttach.GetHandle());
-					childTransform.SetParent(selectedMainEntity);
-
-					LOG_INFO("Attached '%s' as child of '%s'",
-						entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
-						selectedMainEntity.GetComponent<TagComponent>().Tag.c_str());
-
-					// Clear selection
-					selectedMainEntity = Entity{};
-					entityToAttach = Entity{};
-					ImGui::CloseCurrentPopup();
-				}
-			}
-			ImGui::EndDisabled();
-
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel"))
-			{
-				// Clear everything on cancel
-				selectedMainEntity = Entity{};
 				entityToAttach = Entity{};
 				ImGui::CloseCurrentPopup();
 			}
 
 			ImGui::EndPopup();
-#endif
-			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
-			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
-			{
-				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
-			}
-			ImGui::Separator();
-			bool selected = false;
-			for (auto entityHandle : viewEntities)
-			{
-				Entity entity(entityHandle, &m_Scene->GetRegistry());
-				auto& transform = entity.GetComponent<TransformComponent>();
-
-				// Only show main entities (no parent) that aren't the entity itself
-				if (transform.Parent == u32_max && entity != entityToAttach)
-				{
-					// Attach entityToAttach as child of selected entity
-					auto& parentTransform = entity.GetComponent<TransformComponent>();
-					parentTransform.Children.push_back((uint32_t)entityToAttach);
-					auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
-					childTransform.SetParent(entity);
-					selected = true;
-					break;
-				}
-			}
-			if (selected)
-			{
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::Separator();
-			if (ImGui::Button("Cancel"))
-			{
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
 		}
 
-		// ========================== Selected Prefab For Sub Entity Part ======================
 		CheckParentlessChildren(m_Scene);
 		ClearParentlessChildren(m_Scene);
 		
