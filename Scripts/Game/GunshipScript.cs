@@ -26,7 +26,7 @@ namespace Game
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
         [SerializeField] private float bulletSpeed = 3000f;
-        [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/GunshipBullet.prefab";
+        [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
 
         // Private State
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -146,6 +146,11 @@ namespace Game
                 for (int i = 0; i < enemies.Length; i++)
                 {
                     uint enemyID = enemies[i];
+
+                    // Trying to fix entity identiy returning 0
+                    if (enemyID == 0 || enemyID == INVALID_ENTITY)
+                    continue;
+
                     Vector3 enemyPos = GetPosition(enemyID);
                     float distSq = DistanceSquared(myPos, enemyPos);
                     
@@ -248,19 +253,20 @@ namespace Game
         {
             // Reset cooldown
             fireCooldown = fireRate;
-            
-            // Calculate spawn position (in front of turret)
+
+            // calculate spawn position (in front of turret)
             Vector3 myPos = GetPosition((uint)EntityID);
             Vector3 forward = turretRotation.Forward;
-            
+
+            // Spawn bullet infront of Gunship
             Vector3 spawnPos = new Vector3(
-                myPos.X + turretOffset.X + forward.X * 1.5f,
-                myPos.Y + turretOffset.Y + forward.Y * 1.5f,
-                myPos.Z + turretOffset.Z + forward.Z * 1.5f
+                myPos.X + forward.X * 1.5f,
+                myPos.Y + forward.Y * 1.5f,
+                myPos.Z + forward.Z * 1.5f
             );
-            
-            Vector3 bulletScale = new Vector3(0.3f, 0.3f, 0.5f);
-            
+
+            Vector3 bulletScale = new Vector3(0.3f, 0.2f, 0.15f);
+
             // Spawn the bullet prefab
             uint bulletID = PrefabInstantiateWithTransform(
                 bulletPrefabPath,
@@ -269,8 +275,8 @@ namespace Game
                 ref bulletScale,
                 false
             );
-            
-            if (bulletID != 0)
+
+            if (bulletID != 0) 
             {
                 // Give bullet velocity
                 Vector3 velocity = new Vector3(
@@ -278,12 +284,12 @@ namespace Game
                     forward.Y * bulletSpeed,
                     forward.Z * bulletSpeed
                 );
-                
+
                 RigidbodySetVelocity(bulletID, ref velocity);
-                
+
                 LogMessage("Gunship fired at target " + currentTarget);
-            }
-            else
+            } 
+            else 
             {
                 LogError("Failed to spawn bullet!");
             }

@@ -14,7 +14,7 @@ namespace Game
     /// 
     /// </summary>
 
-    public class GunshipBullet : ScriptBehaviour 
+    public class NormalTurretBullet : ScriptBehaviour 
     {
 
         // Settings
@@ -25,7 +25,7 @@ namespace Game
         [SerializeField] private string[] targetTags = { "botnet", "loveletter", "adware" };
         
         // This bullet's tag (should match your prefab)
-        [SerializeField] private string[] bulletTags = { "GunshipBullet" };
+        [SerializeField] private string[] bulletTags = { "NormalTurretBullet" };
         
         // Private States
         private float elapsedTime = 0.0f;
