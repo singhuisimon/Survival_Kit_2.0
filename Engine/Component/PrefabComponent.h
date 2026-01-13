@@ -91,6 +91,7 @@ namespace Engine {
 			u64 prefabLocalID;
 			std::string entityName;
 			std::string serializedEntityData;  // Store full entity JSON for restoration
+
 		};
 
 		std::vector<DeletedEntityData> deletedEntities;
@@ -348,10 +349,10 @@ namespace Engine {
 			deletedEntities.push_back(deleted);
 
 			// Remove from childEntityIDs
-			auto it = std::find(childEntityIDs.begin(), childEntityIDs.end(), static_cast<u32>(prefabLocalID));
+			/*auto it = std::find(childEntityIDs.begin(), childEntityIDs.end(), static_cast<u32>(prefabLocalID));
 			if (it != childEntityIDs.end()) {
 				childEntityIDs.erase(it);
-			}
+			}*/
 		}
 
 		void MarkEntityAdded(u32 entityHandle) {

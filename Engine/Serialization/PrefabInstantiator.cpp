@@ -272,7 +272,7 @@ namespace Engine
         // ========================================================================
         // STEP 1: Remove added entities (that don't exist in prefab)
         // ========================================================================
-        auto addedHandlesCopy = prefabComp.addedEntityHandles;
+    /*    auto addedHandlesCopy = prefabComp.addedEntityHandles;
         for (u32 addedHandle : addedHandlesCopy) {
             Entity addedEntity(static_cast<entt::entity>(addedHandle), &scene->GetRegistry());
             if (addedEntity) {
@@ -281,9 +281,53 @@ namespace Engine
                 LOG_INFO("Removing added entity: ", entityName);
                 scene->DestroyEntity(addedEntity);
             }
+        }*/
+        auto addedHandlesCopy = prefabComp.addedEntityHandles;
+        for (u32 addedHandle : addedHandlesCopy) {
+            Entity addedEntity(static_cast<entt::entity>(addedHandle), &scene->GetRegistry());
+            if (addedEntity) {
+                std::string entityName = addedEntity.HasComponent<TagComponent>()
+                    ? addedEntity.GetComponent<TagComponent>().Tag : "Unknown";
+                LOG_INFO("Removing added entity: ", entityName);
+                scene->DestroyEntity(addedEntity);
+
+                // ADD THIS: Also remove from childEntityIDs
+                auto it = std::find(prefabComp.childEntityIDs.begin(),
+                    prefabComp.childEntityIDs.end(),
+                    addedHandle);
+                if (it != prefabComp.childEntityIDs.end()) {
+                    prefabComp.childEntityIDs.erase(it);
+                    LOG_DEBUG("Removed destroyed entity from childEntityIDs: handle ", addedHandle);
+                }
+            }
         }
         prefabComp.addedEntityHandles.clear();
 
+        localIDToEntity.clear();
+        std::queue<Entity> rebuildQueue;
+        rebuildQueue.push(entity);
+        while (!rebuildQueue.empty()) {
+            Entity current = rebuildQueue.front();
+            rebuildQueue.pop();
+
+            if (!current) continue;
+
+            if (current.HasComponent<PrefabComponent>()) {
+                auto& currentPrefab = current.GetComponent<PrefabComponent>();
+                localIDToEntity[currentPrefab.prefabLocalID] = current;
+                LOG_DEBUG("RE-MAPPED entity localID: ", currentPrefab.prefabLocalID);
+            }
+
+            if (current.HasComponent<TransformComponent>()) {
+                auto& transform = current.GetComponent<TransformComponent>();
+                for (u32 childHandle : transform.Children) {
+                    Entity childEntity(static_cast<entt::entity>(childHandle), &scene->GetRegistry());
+                    if (childEntity) {
+                        rebuildQueue.push(childEntity);
+                    }
+                }
+            }
+        }
         // ========================================================================
         // STEP 2: Restore deleted entities
         // ========================================================================
@@ -327,6 +371,10 @@ namespace Engine
                     restoredPrefabComp.isPrefabRoot = false;
                     restoredPrefabComp.prefabLocalID = prefabEntity.localID;
 
+                    localIDToEntity[prefabEntity.localID] = restoredEntity;
+                    LOG_INFO("Restored entity: ", prefabEntity.name);
+                
+                  
                     if (prefabEntity.parentLocalID != 0) {
                         auto parentIt = localIDToEntity.find(prefabEntity.parentLocalID);
                         if (parentIt != localIDToEntity.end()) {
@@ -341,8 +389,13 @@ namespace Engine
                         auto& childTransform = restoredEntity.GetComponent<TransformComponent>();
                         childTransform.SetParent(entity);
                     }
-
-                    localIDToEntity[prefabEntity.localID] = restoredEntity;
+                    //  Update childEntityIDs
+                    if (restoredEntity != entity) {  // Don't add root
+                        u32 sceneHandle = static_cast<u32>(restoredEntity.GetHandle());
+                        prefabComp.childEntityIDs.push_back(sceneHandle);
+                        LOG_DEBUG("Added restored entity to childEntityIDs: handle ", sceneHandle);
+                    }
+                    //localIDToEntity[prefabEntity.localID] = restoredEntity;
                     LOG_INFO("Restored entity: ", prefabEntity.name);
                 }
             }
@@ -350,7 +403,20 @@ namespace Engine
 
         prefabComp.deletedEntities.clear();
         LOG_INFO("Cleared deleted entities list after restoration");
+        // ========================================================================
+        // STEP 2.5: Rebuild childEntityIDs with current scene handles
+        // ========================================================================
+        LOG_INFO("===== REBUILDING CHILDENTITYIDS =====");
+        prefabComp.childEntityIDs.clear();
 
+        for (const auto& [localID, sceneEntity] : localIDToEntity) {
+            if (sceneEntity != entity) {
+                u32 sceneHandle = static_cast<u32>(sceneEntity.GetHandle());
+                prefabComp.childEntityIDs.push_back(sceneHandle);
+            }
+        }
+
+        LOG_INFO("Rebuilt childEntityIDs with ", prefabComp.childEntityIDs.size(), " handles");
         // ========================================================================
         // STEP 3: Synchronize components with prefab
         // ========================================================================
@@ -492,6 +558,22 @@ namespace Engine
         // STEP 4: Rebuild hierarchy relationships
         // ========================================================================
         LOG_INFO("===== REBUILDING PREFAB HIERARCHY =====");
+        std::unordered_map<u64, std::vector<PrefabEntityData>> childrenByParent;
+        for (const auto& prefabEntity : prefab.entities) {
+            if (prefabEntity.parentLocalID != 0) {
+                childrenByParent[prefabEntity.parentLocalID].push_back(prefabEntity);
+            }
+        }
+
+        // Sort each parent's children by localID
+        for (auto& [parentID, children] : childrenByParent) {
+            std::sort(children.begin(), children.end(),
+                [](const PrefabEntityData& a, const PrefabEntityData& b) {
+                    return a.localID < b.localID;
+                });
+        }
+
+        // Now rebuild hierarchy in correct order
         for (const auto& prefabEntity : prefab.entities) {
             auto it = localIDToEntity.find(prefabEntity.localID);
             if (it == localIDToEntity.end()) {
@@ -504,6 +586,9 @@ namespace Engine
 
             auto& transform = sceneEntity.GetComponent<TransformComponent>();
 
+            // Clear existing children
+            transform.Children.clear();
+
             if (prefabEntity.parentLocalID != 0) {
                 auto parentIt = localIDToEntity.find(prefabEntity.parentLocalID);
                 if (parentIt != localIDToEntity.end()) {
@@ -515,9 +600,21 @@ namespace Engine
 
                         transform.Parent = static_cast<u32>(parentEntity.GetHandle());
 
-                        if (std::find(parentTransform.Children.begin(),
-                            parentTransform.Children.end(), childHandle) == parentTransform.Children.end()) {
-                            parentTransform.Children.push_back(childHandle);
+                        // Add child to parent's Children list in correct order
+                        // We need to find where this child should go based on sibling order
+
+                        // Get all siblings for this parent
+                        auto siblingsIt = childrenByParent.find(prefabEntity.parentLocalID);
+                        if (siblingsIt != childrenByParent.end()) {
+                            // Clear and rebuild parent's children in correct order
+                            parentTransform.Children.clear();
+                            for (const auto& sibling : siblingsIt->second) {
+                                auto siblingIt = localIDToEntity.find(sibling.localID);
+                                if (siblingIt != localIDToEntity.end()) {
+                                    Entity siblingEntity = siblingIt->second;
+                                    parentTransform.Children.push_back(static_cast<u32>(siblingEntity.GetHandle()));
+                                }
+                            }
                         }
 
                         LOG_DEBUG("Connected: ", prefabEntity.name, " -> parent localID ",
@@ -911,7 +1008,7 @@ namespace Engine
         const std::unordered_map<u64, Entity>& localIDToEntity) {
 
         LOG_INFO("===== STORING ORIGINAL COMPONENT DATA FOR ALL ENTITIES =====");
-
+        auto& registry = scene->GetRegistry();
         // Iterate through all entities in the prefab
         for (const auto& prefabEntity : prefab.entities) {
             // Find the corresponding instantiated entity
@@ -922,7 +1019,11 @@ namespace Engine
             }
 
             Entity sceneEntity = it->second;
-
+            if (!sceneEntity || !registry.valid(sceneEntity.GetHandle())) {
+                LOG_ERROR("Entity is INVALID! localID: ", prefabEntity.localID,
+                    " handle: ", static_cast<u32>(sceneEntity.GetHandle()));
+                continue;  // Skip invalid entities
+            }
             LOG_INFO("Processing entity: ", prefabEntity.name, " (localID: ", prefabEntity.localID, ")");
 
             // Ensure entity has PrefabComponent to store original data
