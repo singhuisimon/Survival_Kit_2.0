@@ -72,7 +72,7 @@ namespace Engine {
 
 		for (glm::vec2 const& pos : positions) {
 
-			glm::vec4 clip   = projection* model_to_world* glm::vec4(pos.x, pos.y, 0.f, 1.f);
+			glm::vec4 clip   = projection * model_to_world * glm::vec4(pos.x, pos.y, 0.f, 1.f);
 			glm::vec2 ndc    = glm::vec2(clip) / clip.w;
 			glm::vec2 screen = (ndc + 1.f) * 0.5f * vp;
 

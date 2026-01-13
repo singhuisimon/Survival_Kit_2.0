@@ -892,13 +892,21 @@ namespace Engine {
 
 		glm::mat4 ortho = glm::ortho(pass.view_port.x, pass.view_port.z, pass.view_port.w, pass.view_port.y, -1.f, 1.f);
 
+		double mp_x, mp_y; 
+		glfwGetCursorPos(glfwGetCurrentContext(), &mp_x, &mp_y);
+		glm::vec2 local_mouse(static_cast<float>(mp_x) - renderEditorVP.tl.x, static_cast<float>(mp_y) - renderEditorVP.tl.y);
+		local_mouse.y = renderEditorVP.size.y - local_mouse.y;
+
 		for (const auto& item : items) {
 
 			if (item.m_drawitem_type == DrawItemType::SPRITE2D) {
 
 				
 				AABB2D testAABB = ComputeAABB(m_gl.m_mesh_data2d_storage[0].positions, ortho, item.m_model_to_world_transform, glm::vec2(pass.view_port.z, pass.view_port.w));
-				std::cout << testAABB;
+				
+				if (Mouse2DCollision(testAABB.min, testAABB.max, local_mouse)) {
+					LOG_INFO("MOUSE IS COLLIDING WITH OBJECT {}", item.m_entity_id);
+				}
 
 				prog.setUniform("u_World2D", item.m_model_to_world_transform);
 				prog.setUniform("u_Ortho", ortho);
