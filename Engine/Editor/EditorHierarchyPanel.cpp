@@ -442,6 +442,16 @@ namespace Engine
 									for (const auto& [guid, pathName] : allPrefabs) {
 										LOG_INFO("  - ", pathName.second);
 									}
+
+									std::string resourcesPath = convertAssetPathToRootResources(prefabPath);
+
+									if (PrefabSerializer::SerializeEntityToPrefabFile(
+										currentSelectedEntity,
+										entityName,
+										resourcesPath)) {
+
+										LOG_INFO("Prefab also saved to Resources: ", resourcesPath);
+									}
 							}
 							else
 							{

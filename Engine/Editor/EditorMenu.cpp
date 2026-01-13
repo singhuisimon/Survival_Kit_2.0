@@ -595,6 +595,7 @@ namespace Engine
 						else {
 							ImGui::OpenPopup("Save Failed");
 						}
+						
 					}
 				}
 			}
@@ -624,17 +625,22 @@ namespace Engine
 					if (!std::filesystem::path(defaultPrefabPath).has_extension()) {
 						defaultPrefabPath += ".prefab";
 					}
-
+					
 					if (PrefabSerializer::SerializeEntityToPrefabFile(
 						selectedEntity,
 						saveAsDefaultPrefabName,
 						defaultPrefabPath)) {
 
 						LOG_INFO("Prefab overwritten: ", defaultPrefabPath);
-
+						std::string resourcesPath = convertAssetPathToRootResources(defaultPrefabPath);
+						PrefabSerializer::SerializeEntityToPrefabFile(
+							selectedEntity,
+							saveAsDefaultPrefabName,
+							resourcesPath
+						);
 						m_CurrPrefabPath = defaultPrefabPath;
 						m_Editor->SetPrefabPath(m_CurrPrefabPath);
-
+						
 						// Update prefab registration
 						Prefab savedPrefab;
 						if (PrefabSerializer::DeserializePrefab(defaultPrefabPath, savedPrefab)) {
@@ -725,7 +731,14 @@ namespace Engine
 			currentPrefabPath)) {
 
 			LOG_INFO("Prefab saved successfully: ", currentPrefabPath);
+			std::string resourcesPath = convertAssetPathToRootResources(currentPrefabPath);
+			if (PrefabSerializer::SerializeEntityToPrefabFile(
+				prefabRoot,
+				prefabName,
+				resourcesPath)) {
 
+				LOG_INFO("Prefab also saved to Resources: ", resourcesPath);
+			}
 			// Update prefab in registry
 			Prefab savedPrefab;
 			if (PrefabSerializer::DeserializePrefab(currentPrefabPath, savedPrefab)) {
