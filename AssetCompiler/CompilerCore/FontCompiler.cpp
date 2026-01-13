@@ -1,6 +1,6 @@
 
 
-#pragma once
+
 
 #include "FontCompiler.h"
 
@@ -11,6 +11,10 @@
 
 
 namespace AssetCompiler {
+
+	//static member initialization
+	FT_Library FontCompiler::ftLibrary;
+	bool FontCompiler::ftInitialized = false;
 
 	std::vector<uint32_t> FontCompiler::getCharacterSet() {
 		std::vector<uint32_t> chars;
@@ -23,12 +27,6 @@ namespace AssetCompiler {
 		return chars;
 	}
 
-	FontCompiler::GlyphRasterData  FontCompiler::rasterizeGlyph(FT_Face face, uint32_t charCode) {
 
-		GlyphRasterData result;
-
-		//set size
-		
-	}
 
 }//end of namespace AssetCompiler

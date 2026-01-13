@@ -2,14 +2,17 @@
 
 #pragma once 
 
-namespace AssetCompiler {
-
-#include "../External/freetype/include/ft2build.h"
-#include "../External/freetype/include/freetype/freetype.h"
-
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <algorithm>
+
+#include "../freetype/include/freetype/freetype.h"
+
+
+
+namespace AssetCompiler {
+
 
 	struct GlyphMetrics {
 		uint32_t charCode; //ASCII code value
@@ -131,6 +134,9 @@ namespace AssetCompiler {
 
 		//serialization
 		std::vector<uint8_t> serializeFontData(const FontMetrics& fontMetrics, const AtlasData& atlas);
+
+		static FT_Library ftLibrary;
+		static bool ftInitialized;
 	};
 
 } //namespace AssetCompiler
