@@ -10,8 +10,7 @@ using static Engine.Rigidbody;
 namespace Game 
 {
     /// <summary>
-    /// 
-    /// 
+    /// This file contains the script and behaviour of Gunship
     /// </summary>
     
     public class GunshipScript : ScriptBehaviour 
@@ -164,6 +163,7 @@ namespace Game
 
         // Turret Rotation
 
+        // Move the turret towards the enemy
         private void RotateTowardsTarget(float deltaTime)
         {
             if (currentTarget == INVALID_ENTITY)
