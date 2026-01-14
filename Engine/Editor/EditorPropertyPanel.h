@@ -58,10 +58,12 @@ namespace Engine
 		AnimatorComponentTrack m_SelectedComponentTrack = AnimatorComponentTrack::Transform;
 
 		bool IsComponentOverridden(ComponentTypeID componentType);
-		void MarkComponentOverridden(ComponentTypeID componentType);
-		void MarkComponentRemoved(ComponentTypeID componentType);
+		void MarkComponentOverridden(ComponentTypeID componentType, const std::string& propertyName = "");
+		// bool IsComponentRemoved(ComponentTypeID componentType);
+		//void MarkComponentRemoved(ComponentTypeID componentType);
 
-		
+		bool IsComponentAddedToInstance(ComponentTypeID type);
+		bool WasComponentInPrefab(ComponentTypeID type);
 
 	public:
 		EditorPropertyPanel(Editor* editor) : m_Editor(editor) {};

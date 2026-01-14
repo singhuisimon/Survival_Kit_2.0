@@ -6,12 +6,19 @@
 #include "../Component/TransformComponent.h"
 #include "../Component/PrefabComponent.h"
 #include "../Serialization/PrefabInstantiator.h"
+#include "../Serialization/PrefabSerializer.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
 
 #include "../Prefab/Prefab.h"
 #include "../Prefab/PrefabRegistry.h"
 #include "../Transform/TransformSystem.h"
+
+
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 
 namespace Engine
 {
@@ -117,24 +124,21 @@ namespace Engine
 
 		if (ImGui::BeginPopupModal("Main Entity Selection", nullptr, ImGuiWindowFlags_NoDocking))
 		{
-#if 0
+
 			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
 			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
 			{
-				std::string attachName = entityToAttach.GetComponent<TagComponent>().Tag;
-				ImGui::Text("Select a main entity to attach '%s' to:", attachName.c_str());
+				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
 			}
 			ImGui::Separator();
-
-			// Store selected entity
-			static Entity selectedMainEntity; // Or make it a member variable
-
-			ImGui::BeginChild("##entity_list", ImVec2(0, 300), true);
+			ImGui::BeginChild("##EntityListAttach", ImVec2(0, 300), true);
 
 			for (auto entityHandle : viewEntities)
 			{
 				Entity entity(entityHandle, &m_Scene->GetRegistry());
-				if (!entity.HasComponent<TransformComponent>()) continue;
+
+				if (!entity.HasComponent<TransformComponent>())
+					continue;
 
 				auto& transform = entity.GetComponent<TransformComponent>();
 
@@ -143,89 +147,38 @@ namespace Engine
 				{
 					std::string entityName = entity.GetComponent<TagComponent>().Tag;
 
-					// Make them selectable
-					if (ImGui::Selectable(entityName.c_str(), selectedMainEntity == entity))
+					// Make them selectable - user must CLICK to attach
+					if (ImGui::Selectable(entityName.c_str()))
 					{
-						selectedMainEntity = entity;
+						// Attach entityToAttach as child of selected entity
+						auto& parentTransform = entity.GetComponent<TransformComponent>();
+						parentTransform.Children.push_back((uint32_t)entityToAttach.GetHandle());
+
+						auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
+						childTransform.SetParent(entity);
+
+						LOG_INFO("Attached '", entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
+							"' as child of '", entityName.c_str(), "'");
+
+						entityToAttach = Entity{};  // Clear after successful attach
+						ImGui::CloseCurrentPopup();
+						break;
 					}
 				}
 			}
-			ImGui::EndChild();
 
+			ImGui::EndChild();
 			ImGui::Separator();
 
-			// Attach button (only enabled when something is selected)
-			ImGui::BeginDisabled(!selectedMainEntity);
-			if (ImGui::Button("Attach"))
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
 			{
-				if (selectedMainEntity && entityToAttach)
-				{
-					auto& parentTransform = selectedMainEntity.GetComponent<TransformComponent>();
-					auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
-
-					parentTransform.Children.push_back((uint32_t)entityToAttach.GetHandle());
-					childTransform.SetParent(selectedMainEntity);
-
-					LOG_INFO("Attached '%s' as child of '%s'",
-						entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
-						selectedMainEntity.GetComponent<TagComponent>().Tag.c_str());
-
-					// Clear selection
-					selectedMainEntity = Entity{};
-					entityToAttach = Entity{};
-					ImGui::CloseCurrentPopup();
-				}
-			}
-			ImGui::EndDisabled();
-
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel"))
-			{
-				// Clear everything on cancel
-				selectedMainEntity = Entity{};
 				entityToAttach = Entity{};
 				ImGui::CloseCurrentPopup();
 			}
 
 			ImGui::EndPopup();
-#endif
-			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
-			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
-			{
-				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
-			}
-			ImGui::Separator();
-			bool selected = false;
-			for (auto entityHandle : viewEntities)
-			{
-				Entity entity(entityHandle, &m_Scene->GetRegistry());
-				auto& transform = entity.GetComponent<TransformComponent>();
-
-				// Only show main entities (no parent) that aren't the entity itself
-				if (transform.Parent == u32_max && entity != entityToAttach)
-				{
-					// Attach entityToAttach as child of selected entity
-					auto& parentTransform = entity.GetComponent<TransformComponent>();
-					parentTransform.Children.push_back((uint32_t)entityToAttach);
-					auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
-					childTransform.SetParent(entity);
-					selected = true;
-					break;
-				}
-			}
-			if (selected)
-			{
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::Separator();
-			if (ImGui::Button("Cancel"))
-			{
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
 		}
 
-		// ========================== Selected Prefab For Sub Entity Part ======================
 		CheckParentlessChildren(m_Scene);
 		ClearParentlessChildren(m_Scene);
 		
@@ -258,6 +211,11 @@ namespace Engine
 			hasChildren = transform.Children.empty() ? false : true; // if chidren.empty(), hasChilren = false, otherwise true;
 			hasParent = transform.Parent == u32_max ? false : true;
 		}
+		if (entity.HasComponent<PrefabComponent>()) {
+			auto& prefabComp = entity.GetComponent<PrefabComponent>();
+			hasChildren = !prefabComp.childEntityIDs.empty();
+		}
+
 
 		if (!hasChildren) {
 			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
@@ -287,36 +245,114 @@ namespace Engine
 		if (ImGui::BeginPopupContextItem())
 		{
 			// ==================== Selected Entity Section =======================
+			bool noPrefabPath = m_Editor->GetPrefabPath().empty();
 			if (ImGui::MenuItem("Delete Entity"))
 			{
-				entitiesToDelete.push_back(entity);
+				// ===== ADDED: Track deletion if entity is part of prefab =====
+				Entity prefabRoot = FindPrefabRoot(entity);
 
-				if (currentSelectedEntity == entity)
-				{
-					m_Editor->SetCurrSelectedEntity(Entity{});
-					m_Editor->RetrievePickedID(0xFFFFFFFFu);
+				// STEP 2: Track deletion if part of prefab
+				if (prefabRoot && prefabRoot.HasComponent<PrefabComponent>()) {
+					auto& rootPrefabComp = prefabRoot.GetComponent<PrefabComponent>();
 
+					// Check if this entity itself has a PrefabComponent
+					if (entity.HasComponent<PrefabComponent>()) {
+						auto& entityPrefabComp = entity.GetComponent<PrefabComponent>();
+
+						// Only track if it has a valid prefabLocalID
+						if (entityPrefabComp.prefabLocalID != 0) {
+							std::string entityName = entity.HasComponent<TagComponent>()
+								? entity.GetComponent<TagComponent>().Tag : "Unknown";
+
+							// Serialize entity data BEFORE deletion
+							std::string entityData = SerializeEntityForRevert(entity);
+
+							// Mark as deleted
+							rootPrefabComp.MarkEntityDeleted(
+								entityPrefabComp.prefabLocalID,
+								entityName,
+								entityData
+							);
+
+							LOG_INFO("===== TRACKED DELETION =====");
+							LOG_INFO("Entity: ", entityName);
+							LOG_INFO("PrefabLocalID: ", entityPrefabComp.prefabLocalID);
+							LOG_INFO("Deleted entities count: ", rootPrefabComp.deletedEntities.size());
+						}
+						else {
+							LOG_WARNING("Entity has prefabLocalID of 0 - NOT tracked");
+						}
+					}
+				}
+				else {
+					LOG_DEBUG("No prefab root found - deletion not tracked");
 				}
 
-				// If this entity has a parent, unparent it first
-				if (entity.HasComponent<TransformComponent>()) 
-				{
-					if (hasParent) 
-					{
+				// STEP 3: Mark for deletion (actual deletion happens later)
+				entitiesToDelete.push_back(entity);
+
+				// STEP 4: Clear selection if this entity was selected
+				if (currentSelectedEntity == entity) {
+					m_Editor->SetCurrSelectedEntity(Entity{});
+					m_Editor->RetrievePickedID(0xFFFFFFFFu);
+				}
+
+				// STEP 5: Handle parent-child relationships
+				if (entity.HasComponent<TransformComponent>()) {
+					auto& transform = entity.GetComponent<TransformComponent>();
+
+					// Remove from parent's tracking
+					if (hasParent && transform.Parent != u32_max) {
+						Entity parentEntity(static_cast<entt::entity>(transform.Parent), &m_Scene->GetRegistry());
+
+						if (parentEntity.HasComponent<PrefabComponent>()) {
+							auto& parentPrefabComp = parentEntity.GetComponent<PrefabComponent>();
+							u32 entityID = static_cast<u32>(entity.GetHandle());
+
+							auto it = std::find(parentPrefabComp.childEntityIDs.begin(),
+								parentPrefabComp.childEntityIDs.end(),
+								entityID);
+							if (it != parentPrefabComp.childEntityIDs.end()) {
+								parentPrefabComp.childEntityIDs.erase(it);
+								LOG_DEBUG("Removed entity ", entityID, " from parent's childEntityIDs");
+							}
+						}
 						TransformSystem::UnParent(m_Scene, entity);
 					}
 
-					if (hasChildren) 
-					{
+					// Handle children
+					if (hasChildren) {
 						auto& transform = entity.GetComponent<TransformComponent>();
-						for (uint32_t childID : transform.Children)
-						{
+						for (uint32_t childID : transform.Children) {
 							Entity childEntity(static_cast<entt::entity>(childID), &m_Scene->GetRegistry());
-							if (currentSelectedEntity == childEntity)
-							{
+
+							// Track child deletion too
+							if (prefabRoot && prefabRoot.HasComponent<PrefabComponent>() &&
+								childEntity.HasComponent<PrefabComponent>()) {
+								auto& rootPrefabComp = prefabRoot.GetComponent<PrefabComponent>();
+								auto& childPrefabComp = childEntity.GetComponent<PrefabComponent>();
+
+								if (childPrefabComp.prefabLocalID != 0) {
+									std::string childName = childEntity.HasComponent<TagComponent>()
+										? childEntity.GetComponent<TagComponent>().Tag : "Unknown";
+
+									std::string childData = SerializeEntityForRevert(childEntity);
+
+									rootPrefabComp.MarkEntityDeleted(
+										childPrefabComp.prefabLocalID,
+										childName,
+										childData
+									);
+
+									LOG_INFO("Tracked deletion of child: ", childName);
+								}
+							}
+
+							if (currentSelectedEntity == childEntity) {
 								m_Editor->SetCurrSelectedEntity(Entity{});
 								m_Editor->RetrievePickedID(0xFFFFFFFFu);
 							}
+
 							entitiesToDelete.push_back(childEntity);
 						}
 					}
@@ -344,13 +380,23 @@ namespace Engine
 							//LOG_DEBUG(" entityName: ", entityName);
 							auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 							
-							if (PrefabInstantiator::CreatePrefabFromEntity(currentSelectedEntity, entityName, prefabPath))
+							if (PrefabSerializer::SerializeEntityToPrefabFile(currentSelectedEntity, entityName, prefabPath))
 							{
 									LOG_INFO(" -------- PrefabInstantiator::CreatePrefabFromEntity is called. ----------------------");
 									const auto& allPrefabs = PrefabRegistry::Get().GetAllPrefabs();
 									LOG_INFO("Registered Prefabs (", allPrefabs.size(), "):");
 									for (const auto& [guid, pathName] : allPrefabs) {
 										LOG_INFO("  - ", pathName.second);
+									}
+
+									std::string resourcesPath = convertAssetPathToRootResources(prefabPath);
+
+									if (PrefabSerializer::SerializeEntityToPrefabFile(
+										currentSelectedEntity,
+										entityName,
+										resourcesPath)) {
+
+										LOG_INFO("Prefab also saved to Resources: ", resourcesPath);
 									}
 							}
 							else
@@ -387,13 +433,22 @@ namespace Engine
 						if (entity.HasComponent<PrefabComponent>())
 						{
 							auto& parentPrefab = entity.GetComponent<PrefabComponent>();
-
 							auto& childPrefab = newEntity.AddComponent<PrefabComponent>();
 							childPrefab.PrefabAssetGuid = parentPrefab.PrefabAssetGuid;
 							childPrefab.prefabName = parentPrefab.prefabName;
 							childPrefab.prefabVersion = parentPrefab.prefabVersion;
 							childPrefab.isPrefabRoot = false;
-							parentPrefab.childEntityIDs.push_back(static_cast<u32>(newEntity.GetHandle()));
+							childPrefab.prefabLocalID = 0;
+
+							u32 newEntityHandle = static_cast<u32>(newEntity.GetHandle());
+							parentPrefab.childEntityIDs.push_back(newEntityHandle);
+							
+							Entity prefabRoot = FindPrefabRoot(entity);
+							if (prefabRoot && prefabRoot.HasComponent<PrefabComponent>()) {
+								auto& rootPrefabComp = prefabRoot.GetComponent<PrefabComponent>();
+								rootPrefabComp.MarkEntityAdded(newEntityHandle);
+								LOG_INFO("Tracked addition of new sub-entity");
+							}
 						}
 						
 					}
@@ -418,13 +473,38 @@ namespace Engine
 			}
 			else // for sub-entities part
 			{
-				if (ImGui::MenuItem("Detach Sub-Entity"))
+				//bool hasPrefabPath = m_Editor->GetPrefabPath().empty();
+				if (ImGui::MenuItem("Detach Sub-Entity", nullptr, false, noPrefabPath))
 				{
 					if (entity.HasComponent<TransformComponent>()) 
 					{
-						TransformSystem::UnParent(m_Scene, entity);
+						auto& transform = entity.GetComponent<TransformComponent>();
+						if (hasParent && transform.Parent != u32_max)
+						{
+							Entity parentEntity(static_cast<entt::entity>(transform.Parent), &m_Scene->GetRegistry());
+							// Remove from parent's PrefabComponent childEntityIDs
+							if (parentEntity.HasComponent<PrefabComponent>()) {
+								auto& parentPrefabComp = parentEntity.GetComponent<PrefabComponent>();
+								u32 entityID = static_cast<u32>(entity.GetHandle());
 
+								auto it = std::find(parentPrefabComp.childEntityIDs.begin(),
+									parentPrefabComp.childEntityIDs.end(),
+									entityID);
+								if (it != parentPrefabComp.childEntityIDs.end()) {
+									parentPrefabComp.childEntityIDs.erase(it);
+									LOG_DEBUG("Removed entity ", entityID, " from parent's PrefabComponent childEntityIDs");
+								}
+							}
+						}
+						TransformSystem::UnParent(m_Scene, entity);
+						if (entity.HasComponent<PrefabComponent>())
+						{
+							entity.RemoveComponent<PrefabComponent>();
+							//LOG_DEBUG("Removed PrefabComponent from detached entity");
+						}
 					}
+
+					
 					
 				}
 			}
@@ -739,21 +819,21 @@ namespace Engine
 
 						if (prefabInstance)
 						{
-							// Change the name to match the old entity
-							if (prefabInstance.HasComponent<TagComponent>())
-							{
-								auto& tag = prefabInstance.GetComponent<TagComponent>();
-								tag.Tag = oldEntityName;
-							}
+							//// Change the name to match the old entity
+							//if (prefabInstance.HasComponent<TagComponent>())
+							//{
+							//	auto& tag = prefabInstance.GetComponent<TagComponent>();
+							//	tag.Tag = oldEntityName;
+							//}
 
-							// Apply position ONLY - keep rotation and scale from prefab
-							if (prefabInstance.HasComponent<TransformComponent>())
-							{
-								auto& newTransform = prefabInstance.GetComponent<TransformComponent>();
-								newTransform.SetPosition(position);
+							//// Apply position ONLY - keep rotation and scale from prefab
+							//if (prefabInstance.HasComponent<TransformComponent>())
+							//{
+							//	auto& newTransform = prefabInstance.GetComponent<TransformComponent>();
+							//	newTransform.SetPosition(position);
 
-								LOG_DEBUG("Applied position - Pos: ", position.x, ",", position.y, ",", position.z);
-							}
+							//	LOG_DEBUG("Applied position - Pos: ", position.x, ",", position.y, ",", position.z);
+							//}
 
 							// Restore selection if it was selected
 							if (wasSelected)
@@ -787,5 +867,225 @@ namespace Engine
 
 			ImGui::EndPopup();
 		}
+	}
+
+	Entity EditorHierarchyPanel::FindPrefabRoot(Entity entity) {
+		Scene* m_Scene = m_Editor->GetActiveScene();
+		if (!m_Scene) return Entity{};
+
+		Entity current = entity;
+
+		while (current) {
+			if (current.HasComponent<PrefabComponent>()) {
+				auto& prefabComp = current.GetComponent<PrefabComponent>();
+				if (prefabComp.isPrefabRoot) {
+					return current;
+				}
+			}
+
+			// Move to parent
+			if (current.HasComponent<TransformComponent>()) {
+				auto& transform = current.GetComponent<TransformComponent>();
+				if (transform.Parent != u32_max) {
+					current = Entity(static_cast<entt::entity>(transform.Parent), &m_Scene->GetRegistry());
+				}
+				else {
+					break;
+				}
+			}
+			else {
+				break;
+			}
+		}
+
+		return Entity{}; // No prefab root found
+	}
+
+	std::string EditorHierarchyPanel::SerializeEntityForRevert(Entity entity) {
+		// This is a simplified version - you can expand it to serialize full entity state
+		if (!entity) {
+			return "";
+		}
+
+		rapidjson::Document doc;
+		doc.SetObject();
+		auto& allocator = doc.GetAllocator();
+
+		// Add entity name
+		if (entity.HasComponent<TagComponent>()) {
+			auto& tag = entity.GetComponent<TagComponent>();
+			doc.AddMember("Tag",
+				rapidjson::Value(tag.Tag.c_str(), allocator), allocator);
+		}
+
+		// Serialize ALL components
+		rapidjson::Value componentsArray(rapidjson::kArrayType);
+
+		// Transform Component
+		if (entity.HasComponent<TransformComponent>()) {
+			auto& transform = entity.GetComponent<TransformComponent>();
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Transform), allocator);
+			compObj.AddMember("typeName", "TransformComponent", allocator);
+
+			// Serialize transform data
+			std::string transformJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Transform);
+			compObj.AddMember("data", rapidjson::Value(transformJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Tag Component
+		if (entity.HasComponent<TagComponent>()) {
+			std::string tagJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Tag);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Tag), allocator);
+			compObj.AddMember("typeName", "TagComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(tagJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// MeshRenderer Component
+		if (entity.HasComponent<MeshRendererComponent>()) {
+			std::string meshJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::MeshRenderer);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::MeshRenderer), allocator);
+			compObj.AddMember("typeName", "MeshRendererComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(meshJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// RigidBody Component
+		if (entity.HasComponent<RigidbodyComponent>()) {
+			std::string rbJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::RigidBody);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::RigidBody), allocator);
+			compObj.AddMember("typeName", "RigidbodyComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(rbJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Light Component
+		if (entity.HasComponent<LightComponent>()) {
+			std::string lightJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Light);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Light), allocator);
+			compObj.AddMember("typeName", "LightComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(lightJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Audio Component
+		if (entity.HasComponent<AudioComponent>()) {
+			std::string audioJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Audio);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Audio), allocator);
+			compObj.AddMember("typeName", "AudioComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(audioJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Listener Component
+		if (entity.HasComponent<ListenerComponent>()) {
+			std::string listenerJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Listerner);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Listerner), allocator);
+			compObj.AddMember("typeName", "ListenerComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(listenerJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Reverb Component
+		if (entity.HasComponent<ReverbZoneComponent>()) {
+			std::string reverbJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::ReverbZone);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::ReverbZone), allocator);
+			compObj.AddMember("typeName", "ReverbZoneComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(reverbJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Particle Component
+		if (entity.HasComponent<ParticleComponent>()) {
+			std::string particleJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::ParticleSystem);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::ParticleSystem), allocator);
+			compObj.AddMember("typeName", "ParticleComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(particleJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Behaviour Tree Component
+		if (entity.HasComponent<BehaviourTreeComponent>()) {
+			std::string btJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::BehaviourTree);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::BehaviourTree), allocator);
+			compObj.AddMember("typeName", "BehaviourTreeComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(btJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Script Component
+		if (entity.HasComponent<ScriptComponent>()) {
+			std::string scriptJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Script);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Script), allocator);
+			compObj.AddMember("typeName", "ScriptComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(scriptJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Animator Component
+		if (entity.HasComponent<AnimatorComponent>()) {
+			std::string animatorJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Animator);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Animator), allocator);
+			compObj.AddMember("typeName", "AnimatorComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(animatorJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Camera Component
+		if (entity.HasComponent<CameraComponent>()) {
+			std::string cameraJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Camera);
+
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Camera), allocator);
+			compObj.AddMember("typeName", "CameraComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(cameraJSON.c_str(), allocator), allocator);
+
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		doc.AddMember("components", componentsArray, allocator);
+
+		rapidjson::StringBuffer buffer;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+		doc.Accept(writer);
+
+		return buffer.GetString();
 	}
 }

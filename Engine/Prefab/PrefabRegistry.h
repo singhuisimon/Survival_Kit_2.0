@@ -53,6 +53,8 @@ namespace Engine {
         // Get all registered prefabs
         const std::unordered_map<u64, std::pair<std::string, std::string>>& GetAllPrefabs() const;
 
+        bool SavePrefabToFile(const Prefab& prefab, const std::string& filePath);
+
         // Clear registry
         void Clear();
 

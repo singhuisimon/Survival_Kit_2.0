@@ -1,0 +1,214 @@
+{
+    "Prefab Name": "Prefab: TimerBar.prefab",
+    "Prefab GUID": 13243855585819394265,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "TimerBar",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16115208210199281807",
+                            "Position": [
+                                1.0,
+                                4.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                4.0,
+                                0.05000000074505806,
+                                0.05000000074505806
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15538747457895858317",
+                            "Tag": "TimerBar"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7468296925647929489",
+                            "Mesh": "",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "ShadowCast": false,
+                            "ShadowReceive": false,
+                            "GlobalIlluminate": true,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0
+                        }
+                    }
+                },
+                {
+                    "type": 11,
+                    "typeName": "AnimatorComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "playing": true,
+                            "respectClipLoop": true,
+                            "controller": 0,
+                            "currentClipIndex": 0,
+                            "currentTime": 0.0,
+                            "playbackSpeed": 1.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Sub1",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12087336479107809501",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15546100992928350427",
+                            "Tag": "Sub1"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Sub2",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15546100992928465123",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12663797231411347681",
+                            "Tag": "Sub2"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Sub3",
+            "LocalID": 4,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3440425194556702953",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11510875726804631783",
+                            "Tag": "Sub3"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -148,7 +148,18 @@ namespace Engine
 					allocator);
 
 				propertiesObj.AddMember("prefabVersion", prefabComp.prefabVersion, allocator);
+				
 
+				// NEW: Serialize the prefab file path
+				if (prefabComp.isPrefabRoot) {
+					std::string prefabPath = PrefabRegistry::Get().GetPrefabPath(prefabComp.PrefabAssetGuid);
+					if (!prefabPath.empty()) {
+						propertiesObj.AddMember("prefabFilePath",
+							Value(prefabPath.c_str(), allocator),
+							allocator);
+						LOG_DEBUG("Serialized prefab path: ", prefabPath);
+					}
+				}
 				// Serialize component overrides
 				if (!prefabComp.componentOverrides.empty()) {
 					Value overridesArray(kArrayType);
@@ -194,6 +205,7 @@ namespace Engine
 						overridesArray.PushBack(overrideObj, allocator);
 					}
 
+
 					propertiesObj.AddMember("componentOverrides", overridesArray, allocator);
 				}
 
@@ -204,6 +216,25 @@ namespace Engine
 						childrenArray.PushBack(childID, allocator);
 					}
 					propertiesObj.AddMember("childEntityIDs", childrenArray, allocator);
+				}
+
+				// Serialize deleted entities
+				if (!prefabComp.deletedEntities.empty()) {
+					Value deletedArray(kArrayType);
+
+					for (const auto& deleted : prefabComp.deletedEntities) {
+						Value deletedObj(kObjectType);
+
+						deletedObj.AddMember("prefabLocalID", deleted.prefabLocalID, allocator);
+						deletedObj.AddMember("entityName",
+							Value(deleted.entityName.c_str(), allocator), allocator);
+						deletedObj.AddMember("serializedEntityData",
+							Value(deleted.serializedEntityData.c_str(), allocator), allocator);
+
+						deletedArray.PushBack(deletedObj, allocator);
+					}
+
+					propertiesObj.AddMember("deletedEntities", deletedArray, allocator);
 				}
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
@@ -823,6 +854,32 @@ namespace Engine
 						if (properties.HasMember("prefabVersion"))
 							prefabComp.prefabVersion = properties["prefabVersion"].GetUint();
 
+						//// NEW: Load prefab file path from scene if available
+						//std::string prefabFilePath;
+						//if (properties.HasMember("prefabFilePath")) {
+						//	prefabFilePath = properties["prefabFilePath"].GetString();
+						//	LOG_DEBUG("Loaded prefab path from scene: ", prefabFilePath);
+						//}
+
+						//// Auto-register prefab if it's a root and not already registered
+						//if (prefabComp.isPrefabRoot && prefabComp.PrefabAssetGuid.m_Value != 0) {
+						//	if (!PrefabRegistry::Get().IsPrefabRegistered(prefabComp.PrefabAssetGuid)) {
+						//		// Use saved path if available, otherwise construct it
+						//		if (prefabFilePath.empty()) {
+						//			prefabFilePath = "Resources/Prefabs/" + prefabComp.prefabName + ".prefab";
+						//		}
+
+						//		LOG_INFO("Registering prefab: ", prefabComp.prefabName,
+						//			" from path: ", prefabFilePath);
+
+						//		PrefabRegistry::Get().RegisterPrefab(
+						//			prefabComp.PrefabAssetGuid,
+						//			prefabFilePath,
+						//			prefabComp.prefabName
+						//		);
+						//		LOG_INFO("Auto-registered prefab from scene: ", prefabComp.prefabName);
+						//	}
+						//}
 						// Deserialize component overrides
 						if (properties.HasMember("componentOverrides") && properties["componentOverrides"].IsArray())
 						{
@@ -887,6 +944,34 @@ namespace Engine
 								prefabComp.childEntityIDs.push_back(childrenArray[k].GetUint());
 							}
 						}
+
+						// Deserialize deleted entities
+						if (properties.HasMember("deletedEntities") && properties["deletedEntities"].IsArray())
+						{
+							const Value& deletedArray = properties["deletedEntities"];
+							prefabComp.deletedEntities.clear();
+
+							for (SizeType k = 0; k < deletedArray.Size(); k++)
+							{
+								const Value& deletedObj = deletedArray[k];
+
+								PrefabComponent::DeletedEntityData deleted;
+
+								if (deletedObj.HasMember("prefabLocalID"))
+									deleted.prefabLocalID = deletedObj["prefabLocalID"].GetUint64();
+
+								if (deletedObj.HasMember("entityName"))
+									deleted.entityName = deletedObj["entityName"].GetString();
+
+								if (deletedObj.HasMember("serializedEntityData"))
+									deleted.serializedEntityData = deletedObj["serializedEntityData"].GetString();
+
+								prefabComp.deletedEntities.push_back(deleted);
+							}
+
+							LOG_INFO("Deserialized ", prefabComp.deletedEntities.size(), " deleted entities");
+						}
+
 					}
 					else if (componentType == "TransformComponent")
 					{

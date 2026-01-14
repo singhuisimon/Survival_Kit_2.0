@@ -114,5 +114,16 @@ namespace Engine {
         m_PrefabRegistry.clear();
         LOG_INFO("Cleared prefab registry");
     }
+
+    bool PrefabRegistry::SavePrefabToFile(const Prefab& prefab, const std::string& filePath) {
+        if (!PrefabSerializer::SerializePrefab(prefab, filePath)) {
+            LOG_ERROR("Failed to save prefab to file: ", filePath.c_str());
+            return false;
+        }
+
+        LOG_INFO("Successfully saved prefab: ", prefab.name.c_str(), " to: ", filePath.c_str());
+        return true;
+    }
+
  
 } // namespace Engine
