@@ -20,11 +20,11 @@ namespace Engine
         public static Vector3 Down => new Vector3(0, -1, 0);
         public static Vector3 Left => new Vector3(-1, 0, 0);
         public static Vector3 Right => new Vector3(1, 0, 0);
-        public static Vector3 Forward => new Vector3(0, 0, 1);
-        public static Vector3 Back => new Vector3(0, 0, -1);
+        public static Vector3 Forward => new Vector3(0, 0, -1);
+        public static Vector3 Back => new Vector3(0, 0, 1);
 
         // Properties
-        public float Magnitude => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        public float Magnitude => SimpleMath.Sqrt(X * X + Y * Y + Z * Z);
         public float SqrMagnitude => X * X + Y * Y + Z * Z;
         public Vector3 Normalized
         {
@@ -44,6 +44,8 @@ namespace Engine
             new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         public static Vector3 operator *(Vector3 v, float scalar) =>
             new Vector3(v.X * scalar, v.Y * scalar, v.Z * scalar);
+        public static Vector3 operator *(float scalar, Vector3 v) =>
+            new Vector3(scalar * v.X, scalar * v.Y, scalar * v.Z);
         public static Vector3 operator /(Vector3 v, float scalar) =>
             new Vector3(v.X / scalar, v.Y / scalar, v.Z / scalar);
         public static Vector3 operator -(Vector3 v) =>
@@ -63,7 +65,8 @@ namespace Engine
 
         public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
         {
-            t = Math.Max(0, Math.Min(1, t));
+            //t = Math.Max(0, Math.Min(1, t));
+            t = SimpleMath.Clamp(t, 0.0f, 1.0f);
             return a + (b - a) * t;
         }
 
