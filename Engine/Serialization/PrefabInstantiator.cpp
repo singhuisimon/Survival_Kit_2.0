@@ -1001,7 +1001,7 @@ namespace Engine
             break;
         }
 
-        else if (componentType == "SpriteRendererComponent") {
+       /* else if (componentType == "SpriteRendererComponent") {
             auto& spriterenderer = entity.AddComponent<SpriteRendererComponent>();
 
             if (properties.HasMember("Texture") && properties["Texture"].IsString())
@@ -1041,7 +1041,7 @@ namespace Engine
             {
                 spriterenderer.IsVisible = properties["IsVisible"].GetBool();
 			}
-        }
+        }*/
     }
 
    
