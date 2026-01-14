@@ -7,6 +7,8 @@
 #include "../Utility/Types.h"
 #include "../Serialization/ComponentRegistry.h"
 
+#include <xresource_guid.h>
+
 namespace Engine {
 
     /**

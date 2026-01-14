@@ -94,6 +94,9 @@ namespace Engine
 				// Animator Component
 				DisplayAnimatorComponent(dotButtonSize);
 
+				// Sprite Renderer Component
+				DisplaySpriteRendererComponent(dotButtonSize);
+
 				// Add Component Button
 				AddComponent();
 
@@ -616,59 +619,9 @@ namespace Engine
 
 				static bool showWrongType = false;
 
-				// Helper lambda to display asset field with drag-drop support
-				auto DisplayAssetField = [&](const char* label, xresource::instance_guid& guid, ResourceType expectedType) {
-					// Get the filename from the GUID
-					std::string displayName = AM.getNameFromGuid(guid);
-					if (displayName.empty()) {
-						displayName = "<None>";
-					}
-
-					// Create a buffer for the input text (read-only display)
-					char buffer[256];
-					strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
-					buffer[sizeof(buffer) - 1] = '\0';
-
-					ImGui::Text("%s", label);
-					ImGui::SameLine();
-
-					// Input text field (read-only)
-					ImGui::PushID(label);
-					ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
-
-					// Drag-drop target
-					if (ImGui::BeginDragDropTarget()) {
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM")) {
-							xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
-
-							// Verify the asset type matches what's expected
-							const AssetRecord* record = AM.getAssetRecord(droppedGuid);
-							if (record && record->type == expectedType) {
-								guid = droppedGuid;
-								MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
-							}
-							else {
-								showWrongType = true;
-							}
-						}
-						ImGui::EndDragDropTarget();
-					}
-
-					// Context menu to clear the reference
-					if (ImGui::BeginPopupContextItem()) {
-						if (ImGui::MenuItem("Clear Reference")) {
-							guid = xresource::instance_guid();
-							MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
-						}
-						ImGui::EndPopup();
-					}
-
-					ImGui::PopID();
-					};
-
 				// Display asset reference fields
-				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH);
-				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL);
+				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH, showWrongType);
+				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL, showWrongType);
 
 				if (showWrongType) {
 					ImGui::OpenPopup("Incompatible Asset Type");
@@ -756,12 +709,12 @@ namespace Engine
 					ImGui::Text("Shader: %s", material->shaderName.c_str());
 
 					if (ImGui::CollapsingHeader("Texture Maps")) {
-						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE);
-						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE);
-						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE);
-						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE);
-						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE);
-						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE);
+						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongType);
 					}
 
 					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -2503,6 +2456,78 @@ namespace Engine
 			if (removeAnimator)
 			{
 				m_SelectedEntity.RemoveComponent<AnimatorComponent>();
+			}
+		}
+	}
+
+	void EditorPropertyPanel::DisplaySpriteRendererComponent(ImVec2& buttonSize)
+	{
+		if (m_SelectedEntity.HasComponent<SpriteRendererComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool openSpriteRendererComponent = ImGui::CollapsingHeader("SpriteRenderer Component", ImGuiTreeNodeFlags_DefaultOpen);
+			bool removeSpriteRenderer = false;
+
+			ImGui::NextColumn();
+
+			if (ImGui::Button("... ###SpriteRendereBtn", buttonSize))
+			{
+				ImGui::OpenPopup("SpriteRendererPopUp");
+			}
+			if (ImGui::BeginPopup("SpriteRendererPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeSpriteRenderer = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openSpriteRendererComponent)
+			{
+				auto& spriteRenderer = m_SelectedEntity.GetComponent<SpriteRendererComponent>();
+
+				// ======================= Asset Reference Section =======================
+				ImGui::SeparatorText("Asset References");
+
+				static bool showWrongType_ = false;
+
+				DisplayAssetField("Texture", spriteRenderer.TextureGuid, ResourceType::TEXTURE, showWrongType_);
+
+				if (showWrongType_)
+				{
+					ImGui::OpenPopup("Incompatible Asset Type");
+					showWrongType_ = false;
+				}
+
+				// Popup for incompatible asset type
+				if (ImGui::BeginPopup("Incompatible Asset Type"))
+				{
+					ImGui::Text("The dropped asset type does not match the expected type.");
+					if (ImGui::Button("Close"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Spacing();
+
+				ImGui::ColorEdit4("Color", &spriteRenderer.Color.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB);
+				ImGui::DragInt("Quad", (int*)(&spriteRenderer.Quad), 1, 0, 10);
+				ImGui::DragInt("Layer", (int*)(&spriteRenderer.SpriteLayer), 1, 0, 255);
+				ImGui::Checkbox("Set Active", &spriteRenderer.IsActive);
+				ImGui::Checkbox("Set Visible", &spriteRenderer.IsVisible);
+			}
+
+			if (removeSpriteRenderer)
+			{
+				m_SelectedEntity.RemoveComponent<SpriteRendererComponent>();
 			}
 		}
 	}
@@ -5277,4 +5302,54 @@ namespace Engine
 		}
 		return false;
 	}
+
+	void EditorPropertyPanel::DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag)
+	{
+		// Get the filename from the GUID
+		std::string displayName = AM.getNameFromGuid(guid);
+		if (displayName.empty()) {
+			displayName = "<None>";
+		}
+
+		// Create a buffer for the input text (read-only display)
+		char buffer[256];
+		strncpy(buffer, displayName.c_str(), sizeof(buffer) - 1);
+		buffer[sizeof(buffer) - 1] = '\0';
+
+		ImGui::Text("%s", label);
+		ImGui::SameLine();
+
+		// Input text field (read-only)
+		ImGui::PushID(label);
+		ImGui::InputText("##AssetRef", buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
+
+		// Drag-drop target
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM")) {
+				xresource::instance_guid droppedGuid = *(const xresource::instance_guid*)payload->Data;
+
+				// Verify the asset type matches what's expected
+				const AssetRecord* record = AM.getAssetRecord(droppedGuid);
+				if (record && record->type == expectedType) {
+					guid = droppedGuid;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+				}
+				else {
+					errorFlag = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		// Context menu to clear the reference
+		if (ImGui::BeginPopupContextItem()) {
+			if (ImGui::MenuItem("Clear Reference")) {
+				guid = xresource::instance_guid();
+				MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+			}
+			ImGui::EndPopup();
+		}
+
+		ImGui::PopID();
+    }
 }
