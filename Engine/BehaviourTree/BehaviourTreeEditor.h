@@ -82,12 +82,12 @@ namespace Engine {
         /**
          * @brief Convert tree to prefab for reuse
          */
-        static xresource::instance_guid ConvertToPrefab(const BehaviourTree& tree, const std::string& prefabName);
+        //static xresource::instance_guid ConvertToPrefab(const BehaviourTree& tree, const std::string& prefabName);
 
         /**
          * @brief Load tree from prefab
          */
-        static std::shared_ptr<BehaviourTree> LoadFromPrefab(xresource::instance_guid prefabGUID);
+        //static std::shared_ptr<BehaviourTree> LoadFromPrefab(xresource::instance_guid prefabGUID);
 
         /**
          * @brief Validate tree structure (check for common errors)

@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using static Engine.Logger;
 
 namespace Game
 {
@@ -9,24 +10,21 @@ namespace Game
     /// </summary>
     public class AudioTest : ScriptBehaviour
     {
-
         public override void OnStart()
         {
             AudioManager.SetGroupVolume(AudioType.SFX, 0.8f);
-            InternalCalls.Log("Audio API working!");
+            LogMessage("Audio API working!");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             float vol = AudioManager.GetGroupVolume(AudioType.SFX);
-            string str = vol.ToString();
-            InternalCalls.Log("Audio API working! Groupvol is: ");
-            InternalCalls.Log(str);
+            LogMessage("Audio API working! Groupvol is: " + vol.ToString());
         }
 
         public override void OnDestroy()
         {
-            Log("PlayerController destroyed!");
+            LogMessage("PlayerController destroyed!");
         }
     }
 }

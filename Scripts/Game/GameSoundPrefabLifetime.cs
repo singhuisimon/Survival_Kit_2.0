@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using static Engine.Scene;
 
 namespace Game
 {
@@ -22,7 +23,7 @@ namespace Game
             elapsedTime += deltaTime;
             if (elapsedTime >= Lifetime)
             {
-                InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                SceneDestroyEntity((uint)EntityID);
                 return;
             }
         }

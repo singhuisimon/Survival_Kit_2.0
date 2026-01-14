@@ -1,5 +1,8 @@
 using Engine;
 using System;
+using static Engine.Logger;
+using static Engine.Transform;
+using static Engine.Scene;
 
 namespace Game
 {
@@ -28,17 +31,17 @@ namespace Game
         public override void OnStart()
         {
             // Declare HealthBar Started
-            Engine.InternalCalls.Log("HealthBar started!");
+            LogMessage("HealthBar started!");
 
             // Find Own Entity
-            healthID = InternalCalls.Scene_FindEntityByName("HealthBar");
-            Engine.InternalCalls.Log("HealthBar EntityID: " + healthID.ToString());
+            healthID = SceneFindEntityByName("HealthBar");
+            LogMessage("HealthBar EntityID: " + healthID.ToString());
 
             // SETUP - Health to FULL
             health = fullHealth;
 
             // SETUP - Serialize Field values
-            Vector3 originalScale = Transform.GetScale((uint)healthID);
+            Vector3 originalScale = GetScale((uint)healthID);
             fullWidth = originalScale.X;
             currentWidth = originalScale.X;
 
@@ -47,9 +50,9 @@ namespace Game
             immunity = false;
 
             // SUBSCRIBE to Events
-            EventSystem.Subscribe("SMActivated", OnRestart); // SM Activated - SetUp, Immunity OFF
-            EventSystem.Subscribe("SMDeactivated", OnResult); // SM Deactivated - Immunity ON
-            EventSystem.Subscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
+            Event.Subscribe("SMActivated", OnRestart); // SM Activated - SetUp, Immunity OFF
+            Event.Subscribe("SMDeactivated", OnResult); // SM Deactivated - Immunity ON
+            Event.Subscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
 
         }
 
@@ -58,9 +61,9 @@ namespace Game
             // if (Input.IsKeyPressed(KeyCode.RightAlt))
             // {
             //     health = 0f;
-            //     Vector3 scale = Transform.GetScale((uint)healthID);
+            //     Vector3 scale = GetScale((uint)healthID);
             //     scale.X = 0;
-            //     Transform.SetScale((uint)healthID, ref scale);
+            //     SetScale((uint)healthID, ref scale);
             //     currentWidth = scale.X;
             // }
 
@@ -74,15 +77,15 @@ namespace Game
         public override void OnDestroy()
         {
             // UNSUBSCRIBE to Events
-            EventSystem.Unsubscribe("SMActivated", OnRestart); // SM Activated - SetUp, Immunity OFF
-            EventSystem.Unsubscribe("SMDeactivated", OnResult);
-            EventSystem.Unsubscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
+            Event.Unsubscribe("SMActivated", OnRestart); // SM Activated - SetUp, Immunity OFF
+            Event.Unsubscribe("SMDeactivated", OnResult);
+            Event.Unsubscribe("BotnetAttackedPlayer", OnBotnetAttackedPlayer);
         }
 
         private void Die()
         {
-            Engine.InternalCalls.Log("Player died!");
-            EventSystem.Publish("PlayerHasDied", healthID.ToString());
+            LogMessage("Player died!");
+            Event.Publish("PlayerHasDied", healthID.ToString());
         }
 
         private void OnBotnetAttackedPlayer(string eventName, string payload)
@@ -91,7 +94,7 @@ namespace Game
             {
                 // Find Bot
                 ulong botId = ulong.Parse(payload);
-                Engine.InternalCalls.Log("UI: Botnet attacked the player! Bot ID = " + botId);
+                LogMessage("UI: Botnet attacked the player! Bot ID = " + botId);
 
                 // Deduct health
                 health -= botnetAttack;
@@ -103,9 +106,9 @@ namespace Game
 
                 // Adjust length and apply to serialize field values
                 float ratio = health / fullHealth;
-                Vector3 scale = Transform.GetScale((uint)healthID);
+                Vector3 scale = GetScale((uint)healthID);
                 scale.X = fullWidth * ratio;
-                Transform.SetScale((uint)healthID, ref scale);
+                SetScale((uint)healthID, ref scale);
                 currentWidth = scale.X;
             }
         }
@@ -119,9 +122,9 @@ namespace Game
         {
             health = fullHealth;
 
-            Vector3 scale = Transform.GetScale((uint)healthID);
+            Vector3 scale = GetScale((uint)healthID);
             scale.X = fullWidth;
-            Transform.SetScale((uint)healthID, ref scale);
+            SetScale((uint)healthID, ref scale);
 
             currentWidth = fullWidth;
 

@@ -17,7 +17,7 @@ namespace Engine
 
         private bool subscribed = false;
         private string eventName;
-        private EventSystem.ScriptEventHandler handler;
+        private Event.ScriptEventHandler handler;
 
         /// <summary>
         /// Called by the engine when the script instance is created.
@@ -51,7 +51,7 @@ namespace Engine
             if (subscribed || string.IsNullOrEmpty(eventName) || handler == null)
                 return;
 
-            EventSystem.Subscribe(eventName, handler);
+            Event.Subscribe(eventName, handler);
             subscribed = true;
         }
 
@@ -60,7 +60,7 @@ namespace Engine
             if (!subscribed || string.IsNullOrEmpty(eventName) || handler == null)
                 return;
 
-            EventSystem.Unsubscribe(eventName, handler);
+            Event.Unsubscribe(eventName, handler);
             subscribed = false;
         }
 

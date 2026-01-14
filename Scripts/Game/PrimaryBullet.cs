@@ -1,5 +1,10 @@
 using Engine;
 using System;
+using static Engine.Logger;
+using static Engine.Scene;
+using static Engine.Physics;
+using static Engine.Tag;
+using static Engine.Event;
 
 namespace Game
 {
@@ -35,7 +40,7 @@ namespace Game
             elapsedTime += deltaTime;
             if (elapsedTime >= ProjectileLifetime)
             {
-                InternalCalls.Scene_DestroyEntity((uint)EntityID);
+                SceneDestroyEntity((uint)EntityID);
                 return;
             }
 
@@ -47,14 +52,14 @@ namespace Game
 
         private void CheckCollisions()
         {
-            int collisionCount = InternalCalls.Physics_GetCollisionCount();
+            int collisionCount = PhysicsGetCollisionCount();
 
             for (int i = 0; i < collisionCount; i++)
             {
-                InternalCalls.Physics_GetCollisionPair(i, out uint entityA, out uint entityB);
+                PhysicsGetCollisionPair(i, out uint entityA, out uint entityB);
 
-                string tagA = InternalCalls.Tag_GetTag(entityA);
-                string tagB = InternalCalls.Tag_GetTag(entityB);
+                string tagA = TagGetTag(entityA);
+                string tagB = TagGetTag(entityB);
 
                 // Case 1: A is bullet, B is valid target
                 if (IsBulletTag(tagA) && IsTargetTag(tagB))
@@ -102,7 +107,7 @@ namespace Game
                 }
             }
 
-            InternalCalls.Log("Failed to tag target: " + tag);
+            LogMessage("Failed to tag target: " + tag);
             return false;
         }
 
@@ -113,12 +118,12 @@ namespace Game
         private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
         {
             // Publish event
-            EventSystem.Publish("BulletHit", targetEntityID.ToString());
-            EventSystem.Publish("BulletHitEnemy", true.ToString());
-            Log("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
+            Publish("BulletHit", targetEntityID.ToString());
+            Publish("BulletHitEnemy", true.ToString());
+            LogMessage("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
 
             // Destroy the bullet that actually hit
-            InternalCalls.Scene_DestroyEntity(bulletEntityID);
+            SceneDestroyEntity(bulletEntityID);
         }
 
         public override void OnDestroy()

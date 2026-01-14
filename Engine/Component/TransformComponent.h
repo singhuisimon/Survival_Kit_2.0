@@ -5,6 +5,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "../Utility/Types.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -12,6 +13,10 @@ namespace Engine {
      * @brief Transform component - position, rotation, scale
      */
     struct TransformComponent {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Transform;
+        static constexpr const char* TypeName = "TransformComponent";
+        xresource::instance_guid ComponentGUID;
+
         glm::vec3 Position;
         glm::quat Rotation; // Rotation stored as a quaternion instead of euler angles -> to avoid gimbal lock
         glm::vec3 Scale;
@@ -29,13 +34,16 @@ namespace Engine {
 
         // Default constructor
         TransformComponent()
-            : Position(0.0f, 0.0f, 0.0f)
+            : ComponentGUID(0)
+            , Position(0.0f, 0.0f, 0.0f)
             , Rotation(1, 0, 0, 0)
             , Scale(1.0f, 1.0f, 1.0f)
             , LocalTransform(1.0f)
             , WorldTransform(1.0f)
             , IsDirty(true)
-            , Parent(u32_max){
+            , Parent(u32_max)
+        {
+            ComponentGUID.GenerateGUID();
         }
 
         // Constructor with position
@@ -46,7 +54,12 @@ namespace Engine {
             , LocalTransform(1.0f)
             , WorldTransform(1.0f)
             , IsDirty(true) 
-            , Parent(u32_max) {
+            , Parent(u32_max) 
+        {
+            
+             // Random GUID
+             ComponentGUID.GenerateGUID();
+            
         }
 
         void SetPosition(glm::vec3 const& pos) {
@@ -73,11 +86,39 @@ namespace Engine {
             SetParent(entt::null);
         }
 
-
         int GetParentEntity() const {
             return Parent;
         }
 
+        void ClearParent() {
+            Parent = entt::null;
+            IsDirty = true;
+        }
+        
+        void AddChild(u32 child) {
+            Children.push_back(child);
+            IsDirty = true;
+        }
+
+        void RemoveChild(u32 child) {
+            auto it = std::find(Children.begin(), Children.end(), child);
+            if (it != Children.end()) {
+                Children.erase(it);
+                IsDirty = true;
+            }
+        }
+
+        bool HasParent() const {
+            return Parent != entt::null;
+        }
+
+        bool HasChild(u32 child) const {
+            return std::find(Children.begin(), Children.end(), child) != Children.end();
+        }
+
+        bool IsRoot() const {
+            return !HasParent();
+        }
     };
 
 }

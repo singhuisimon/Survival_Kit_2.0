@@ -2,6 +2,7 @@
 #include  <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "../Utility/Types.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -18,7 +19,10 @@ namespace Engine {
 	};
 
 	struct ParticleComponent {
+		static constexpr ComponentTypeID TypeID = ComponentTypeID::ParticleSystem;
+		static constexpr const char* TypeName = "ParticleComponent";
 
+		xresource::instance_guid ComponentGUID;
 		std::vector<ParticleData> Particles;
 
 		glm::vec3 InitialVelocity = glm::vec3(0.f, 1.f, 0.f);

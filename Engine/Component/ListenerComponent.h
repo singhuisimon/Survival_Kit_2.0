@@ -10,17 +10,21 @@
 
 #pragma once
 #include <entt/entt.hpp>
-
+#include "../Serialization/ComponentRegistry.h"
 namespace Engine {
 
     /**
      * @brief Marks an entity as an FMOD 3D Listener (usually 1 per scene)
      */
     struct ListenerComponent {
-        
+        xresource::instance_guid ComponentGUID;
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Listerner;
+        static constexpr const char* TypeName = "ListenerComponent";
         bool Active; // Is this the primary active listener?
 
-        ListenerComponent() : Active(true){}
+        ListenerComponent() : 
+            ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Active(true){}
 
     };
 

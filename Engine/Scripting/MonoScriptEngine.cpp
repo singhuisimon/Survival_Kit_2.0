@@ -34,6 +34,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "InternalCalls.h"
 
 
 namespace Engine
@@ -44,7 +45,7 @@ namespace Engine
 		return instance;
 	}
 
-	bool MonoScriptEngine::IsValidMonoObject(MonoObject* instance)
+	bool MonoScriptEngine::IsValidMonoObject(MonoObject *instance)
 	{
 		if (!instance)
 			return false;
@@ -57,7 +58,7 @@ namespace Engine
 			return false;
 		}
 
-		MonoDomain* currentDomain = mono_domain_get();
+		MonoDomain *currentDomain = mono_domain_get();
 		if (!currentDomain)
 		{
 			LOG_WARNING("IsValidMonoObject: No current Mono domain");
@@ -67,7 +68,7 @@ namespace Engine
 		// Wrap in try-catch for safety (if using C++ exceptions)
 		try
 		{
-			MonoDomain* instanceDomain = mono_object_get_domain(instance);
+			MonoDomain *instanceDomain = mono_object_get_domain(instance);
 			if (!instanceDomain || instanceDomain != currentDomain)
 			{
 				LOG_WARNING("IsValidMonoObject: Instance is from a different/unloaded domain");
@@ -432,7 +433,7 @@ namespace Engine
 	}
 
 
-	void MonoScriptEngine::DestroyScriptInstance(MonoObject* instance)
+	void MonoScriptEngine::DestroyScriptInstance(MonoObject *instance)
 	{
 		if (!instance)
 			return;
@@ -446,17 +447,17 @@ namespace Engine
 		}
 
 		// Get fresh instance from handle
-		MonoObject* freshInstance = mono_gchandle_get_target(it->second);
+		MonoObject *freshInstance = mono_gchandle_get_target(it->second);
 
 		if (freshInstance)
 		{
 			// Try to call OnDestroy with the fresh instance
 			try
 			{
-				MonoClass* klass = mono_object_get_class(freshInstance);
+				MonoClass *klass = mono_object_get_class(freshInstance);
 				if (klass)
 				{
-					MonoMethod* destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
+					MonoMethod *destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
 					if (destroyMethod)
 					{
 						EnsureCorrectDomain();
@@ -553,12 +554,12 @@ namespace Engine
 
 	}
 
-	MonoObject* MonoScriptEngine::GetObjectFromHandle(void* instancePtr)
+	MonoObject *MonoScriptEngine::GetObjectFromHandle(void *instancePtr)
 	{
 		if (!instancePtr)
 			return nullptr;
 
-		MonoObject* obj = (MonoObject*)instancePtr;
+		MonoObject *obj = (MonoObject *)instancePtr;
 
 		auto it = m_ObjectToHandle.find(obj);
 		if (it == m_ObjectToHandle.end())
@@ -577,7 +578,7 @@ namespace Engine
 		EnsureCorrectDomain();
 
 		// Get the actual object from the GC handle
-		MonoObject* target = mono_gchandle_get_target(it->second);
+		MonoObject *target = mono_gchandle_get_target(it->second);
 
 		if (!target)
 		{
@@ -765,7 +766,7 @@ namespace Engine
 		const char *className = mono_class_get_name(klass);
 		const char *classNs = mono_class_get_namespace(klass);
 
-		//LOG_INFO("[BindEntityID] Attempting to bind EntityID=", entityID, " to instance of ",
+		//LOG_INFO("[BindEntityID] Attempting to BindInternalCall EntityID=", entityID, " to instance of ",
 		//	classNs ? classNs : "", classNs ? "." : "", className);
 
 		// Make a local copy - CRITICAL: pass the ADDRESS of this copy
@@ -894,7 +895,7 @@ namespace Engine
 		uint64_t eid = static_cast<uint32_t>(entity);
 
 		// If there's already a managed instance (e.g. cloned from prefab),
-		// just (re)bind EntityID to be safe.
+		// just (re)BindInternalCall EntityID to be safe.
 		if (sc.ScriptInstance)
 		{
 			LOG_INFO("[Prefab] Rebinding EntityID on existing script instance '",
@@ -921,2089 +922,6 @@ namespace Engine
 			"' for entity ", eid, " and bound EntityID");
 	}
 
-	// ============================================
-	// Internal Calls - C++ functions callable from C#
-	// ============================================
-
-	// Forward declarations for internal call functions
-	namespace InternalCalls
-	{
-		static uint64_t Scene_CreateEntity(MonoString *nameStr);
-		static void     Scene_DestroyEntity(uint64_t entityID);
-		static void     Entity_AddScript(uint64_t entityID, MonoString *classFullNameStr);
-
-		static void Log(MonoString *message);
-		static void LogError(MonoString *message);
-		static void LogWarning(MonoString *message);
-
-		static uint64_t Entity_GetEntityID(MonoObject *entityObj);
-		static uint64_t Scene_FindEntityByName(MonoString *nameString);
-		static bool Entity_HasComponent(uint64_t entityID, MonoReflectionType *componentType);
-
-		static void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition);
-		static void Transform_SetPosition(uint64_t entityID, glm::vec3 *position);
-		static void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation);
-		static void Transform_SetRotation(uint64_t entityID, glm::quat *rotation);
-		static void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale);
-		static void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);
-
-		static bool Input_IsKeyPressed(int keyCode);
-		static bool Input_IsMouseButtonPressed(int button);
-		static void Input_GetMousePosition(glm::vec2 *outPosition);
-		static bool Input_IsKeyReleased(int keyCode);
-		//static Input* s_InputSystem = nullptr;  // Will be set later!
-
-		// Event System
-		static void Event_Publish(MonoString *nameStr, MonoString *payloadStr);
-
-		// Prefab instantiation
-		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr);
-		static uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr);
-		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::quat *rotation, glm::vec3 *scale, bool isScenePrefab);
-
-		//Physics bindings
-		static void Entity_AddRigidBody(uint64_t entityID);
-
-		// ---- Rigidbody velocity access (ECS-level) ----
-		static void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel);
-		static void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel);
-		static void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta);
-
-		// ---- Rigidbody scalar properties ----
-		static float Rigidbody_GetMass(uint64_t entityID);
-		static void  Rigidbody_SetMass(uint64_t entityID, float mass);
-		static bool  Rigidbody_GetIsKinematic(uint64_t entityID);
-		static void  Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic);
-		static bool  Rigidbody_GetUseGravity(uint64_t entityID);
-		static void  Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity);
-
-		// ---- Rigidbody helpers ----
-		static float Rigidbody_GetSpeed(uint64_t entityID);
-		static bool  Rigidbody_IsMoving(uint64_t entityID);
-		static bool  Rigidbody_IsStatic(uint64_t entityID);
-
-		// ---- Rigidbody forces ----
-		static void  Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force);
-		static void  Rigidbody_Stop(uint64_t entityID);
-
-
-		// ---- Collision events (via PhysicsAPI only) ----
-		static void Physics_EnableCollisionEvents();
-		static void Physics_BeginCollisionFrame();
-		static int  Physics_GetCollisionCount();
-		static void Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b);
-
-		// Collision events
-		static void  Physics_EnableCollisionEvents();
-		static void  Physics_BeginCollisionFrame();
-		static int   Physics_GetCollisionCount();
-		static void  Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b);
-
-		// ===== Entity / component adders =====
-		static void Entity_AddTag(uint64_t entityID);
-		static void Entity_AddCamera(uint64_t entityID);
-		static void Entity_AddAudio(uint64_t entityID);
-		static void Entity_AddMeshRenderer(uint64_t entityID);
-
-		// ===== TagComponent =====
-		static MonoString *Tag_GetTag(uint64_t entityID);
-		static void        Tag_SetTag(uint64_t entityID, MonoString *tag);
-		static MonoArray *Scene_FindEntitiesByTag(MonoString *tagString);
-
-		// ===== CameraComponent =====
-		static bool  Camera_GetEnabled(uint64_t entityID);
-		static void  Camera_SetEnabled(uint64_t entityID, bool enabled);
-		static bool  Camera_GetPrimary(uint64_t entityID);
-		static void  Camera_SetPrimary(uint64_t entityID, bool primary);
-		static float Camera_GetFOV(uint64_t entityID);
-		static void  Camera_SetFOV(uint64_t entityID, float fov);
-		static float Camera_GetNear(uint64_t entityID);
-		static void  Camera_SetNear(uint64_t entityID, float nearPlane);
-		static float Camera_GetFar(uint64_t entityID);
-		static void  Camera_SetFar(uint64_t entityID, float farPlane);
-		static void  Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget);
-		static void  Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget);
-
-		// ===== MeshRendererComponent =====
-		static bool MeshRenderer_GetVisible(uint64_t entityID);
-		static void MeshRenderer_SetVisible(uint64_t entityID, bool visible);
-		static bool MeshRenderer_GetShadowCast(uint64_t entityID);
-		static void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast);
-		static bool MeshRenderer_GetShadowReceive(uint64_t entityID);
-		static void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive);
-		static bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID);
-		static void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi);
-
-		// ===== AudioComponent =====
-		static void  Audio_Play(uint64_t entityID);
-		static void  Audio_Stop(uint64_t entityID);
-		static void  Audio_Pause(uint64_t entityID);
-
-		static float Audio_GetVolume(uint64_t entityID);
-		static void  Audio_SetVolume(uint64_t entityID, float volume);
-
-		static float Audio_GetPitch(uint64_t entityID);
-		static void  Audio_SetPitch(uint64_t entityID, float pitch);
-
-		static bool  Audio_GetLoop(uint64_t entityID);
-		static void  Audio_SetLoop(uint64_t entityID, bool loop);
-
-		static bool  Audio_GetMute(uint64_t entityID);
-		static void  Audio_SetMute(uint64_t entityID, bool mute);
-
-		static bool  Audio_GetIs3D(uint64_t entityID);
-		static void  Audio_SetIs3D(uint64_t entityID, bool is3d);
-
-		static void  Audio_SetFile(uint64_t entityID, MonoString *path);
-
-		static float Audio_GetMinDistance(uint64_t entityID);
-		static void Audio_SetMinDistance(uint64_t entityID, float minDist);
-		static float Audio_GetMaxDistance(uint64_t entityID);
-		static void Audio_SetMaxDistance(uint64_t entityID, float maxDist);
-		static int Audio_GetRolloffMode(uint64_t entityID);
-		static void Audio_SetRolloffMode(uint64_t entityID, int mode);
-		static float Audio_GetDopplerLevel(uint64_t entityID);
-		static void Audio_SetDopplerLevel(uint64_t entityID, float level);
-		static float Audio_GetPan2D(uint64_t entityID);
-		static void Audio_SetPan2D(uint64_t entityID, float pan);
-		static float Audio_GetReverbMix(uint64_t entityID);
-		static void Audio_SetReverbMix(uint64_t entityID, float mix);
-
-		// ===== AudioManager =====
-		static void AudioManager_SetGroupVolume(int groupType, float volume);
-		static float AudioManager_GetGroupVolume(int groupType);
-		static void AudioManager_SetGroupPitch(int groupType, float pitch);
-		static float AudioManager_GetGroupPitch(int groupType);
-		static void AudioManager_SetGroupMute(int groupType, bool mute);
-		static bool AudioManager_IsGroupMuted(int groupType);
-
-		static void AudioManager_PauseGroup(int groupType, bool pause);
-		static void AudioManager_PauseAll(bool pause);
-		static void AudioManager_StopByType(int groupType);
-		static void AudioManager_StopAll();
-
-		static void AudioManager_CreateDSP(int groupType, int effectType);
-		static void AudioManager_EnableDSP(int groupType, int effectType, bool enable);
-		static void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value);
-		static void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType);
-		static void AudioManager_ReleaseDSPByGroup(int groupType);
-		static void AudioManager_ReleaseAllDSPs();
-
-		static void AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
-			glm::vec3 *up, glm::vec3 *velocity);
-
-
-		static bool EntityHasCamera(uint64_t entityID);
-		static bool EntityHasRigidBody(uint64_t entityID);
-		static int  Transform_GetParent(uint64_t entityID);
-
-		// GLM Functions exposed
-		// Quaternion creation from axis-angle
-		static void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat);
-
-		// Extract forward vector from quaternion
-		static void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward);
-
-		// Extract right vector
-		static void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight);
-
-		// Extract up vector
-		static void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp);
-
-		// Rotate vector by quaternion
-		static void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec);
-
-		// Multiply quaternions (combine rotations)
-		static void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat);
-
-		// SLERP interpolation
-		static void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat);
-
-		// Inverse quaternion
-		static void Quat_Inverse(glm::quat *quat, glm::quat *outQuat);
-
-		// Convert quaternion to Euler angles
-		static void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler);
-
-		// Create quaternion from Euler angles
-		static void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat);
-
-		// Normalize quaternion
-		static void Quat_Normalize(glm::quat *quat, glm::quat *outQuat);
-
-		// Get quaternion length
-		static float Quat_Length(glm::quat *quat);
-
-		// Quaternion dot product
-		static float Quat_Dot(glm::quat *q1, glm::quat *q2);
-
-		static void Input_GetMouseDelta(float *outX, float *outY);
-
-		// SpriteRenderer Component
-		static void		Sprite_GetColor(uint64_t entityID, glm::vec4* outColor);
-		static void		Sprite_SetColor(uint64_t entityID, glm::vec4* Color);
-		static uint32_t Sprite_GetLayer(uint64_t entityID);
-		static void		Sprite_SetLayer(uint64_t entityID, uint32_t Layer);
-		static bool		Sprite_GetIsActive(uint64_t entityID);
-		static void		Sprite_SetActive(uint64_t entityID, bool Active);
-		static bool		Sprite_GetIsVisible(uint64_t entityID);
-		static void		Sprite_SetVisible(uint64_t entityID, bool visible);
-
-	}
-
-	void MonoScriptEngine::RegisterInternalCalls()
-	{
-		LOG_INFO("Registering internal calls...");
-
-		// ECS Bindings
-		mono_add_internal_call("Engine.InternalCalls::Scene_CreateEntity", (void *)InternalCalls::Scene_CreateEntity);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddScript", (void *)InternalCalls::Entity_AddScript);
-		mono_add_internal_call("Engine.InternalCalls::Scene_DestroyEntity", (void *)InternalCalls::Scene_DestroyEntity);
-
-
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetParent", (void *)InternalCalls::Transform_GetParent);
-
-		// Logging
-		mono_add_internal_call("Engine.InternalCalls::Log", (void *)InternalCalls::Log);
-		mono_add_internal_call("Engine.InternalCalls::LogError", (void *)InternalCalls::LogError);
-		mono_add_internal_call("Engine.InternalCalls::LogWarning", (void *)InternalCalls::LogWarning);
-
-		// Entity
-		mono_add_internal_call("Engine.Entity::GetEntityID_Native", (void *)InternalCalls::Entity_GetEntityID);
-		mono_add_internal_call("Engine.Entity::HasComponent_Native", (void *)InternalCalls::Entity_HasComponent);
-
-		// Prefab
-		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void *)InternalCalls::Prefab_Instantiate);
-		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateScene", (void *)InternalCalls::Prefab_InstantiateScene);
-		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateWithTransform", (void *)InternalCalls::Prefab_InstantiateWithTransform);
-
-		// Transform
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void *)InternalCalls::Transform_GetPosition);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void *)InternalCalls::Transform_SetPosition);
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetRotation", (void *)InternalCalls::Transform_GetRotation);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetRotation", (void *)InternalCalls::Transform_SetRotation);
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetScale", (void *)InternalCalls::Transform_GetScale);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetScale", (void *)InternalCalls::Transform_SetScale);
-
-		// Input
-		mono_add_internal_call("Engine.Input::IsKeyPressed_Native", (void *)InternalCalls::Input_IsKeyPressed);
-		mono_add_internal_call("Engine.Input::IsMouseButtonPressed_Native", (void *)InternalCalls::Input_IsMouseButtonPressed);
-		mono_add_internal_call("Engine.Input::GetMousePosition_Native", (void *)InternalCalls::Input_GetMousePosition);
-		mono_add_internal_call("Engine.Input::IsKeyReleased_Native", (void *)InternalCalls::Input_IsKeyReleased);
-		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntityByName", (void *)InternalCalls::Scene_FindEntityByName);
-
-		// Physics
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddRigidBody", (void *)InternalCalls::Entity_AddRigidBody);
-
-		// Entity / components
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddTag", (void *)InternalCalls::Entity_AddTag);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddCamera", (void *)InternalCalls::Entity_AddCamera);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddAudio", (void *)InternalCalls::Entity_AddAudio);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddMeshRenderer", (void *)InternalCalls::Entity_AddMeshRenderer);
-
-
-		// Rigidbody (component-level velocity)
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetVelocity", (void *)InternalCalls::Rigidbody_GetVelocity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetVelocity", (void *)InternalCalls::Rigidbody_SetVelocity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddVelocity", (void *)InternalCalls::Rigidbody_AddVelocity);
-
-		// Rigidbody scalar/flag bindings
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetMass", (void *)InternalCalls::Rigidbody_GetMass);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetMass", (void *)InternalCalls::Rigidbody_SetMass);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetIsKinematic", (void *)InternalCalls::Rigidbody_GetIsKinematic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetIsKinematic", (void *)InternalCalls::Rigidbody_SetIsKinematic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetUseGravity", (void *)InternalCalls::Rigidbody_GetUseGravity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetUseGravity", (void *)InternalCalls::Rigidbody_SetUseGravity);
-
-		// Rigidbody helpers
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetSpeed", (void *)InternalCalls::Rigidbody_GetSpeed);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsMoving", (void *)InternalCalls::Rigidbody_IsMoving);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsStatic", (void *)InternalCalls::Rigidbody_IsStatic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddForce", (void *)InternalCalls::Rigidbody_AddForce);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_Stop", (void *)InternalCalls::Rigidbody_Stop);
-
-
-		// Physics collisions (keep using PhysicsAPI ONLY for this)
-		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
-		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
-
-		// Collision event access
-		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
-		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
-
-		// Tag
-		mono_add_internal_call("Engine.InternalCalls::Tag_GetTag", (void *)InternalCalls::Tag_GetTag);
-		mono_add_internal_call("Engine.InternalCalls::Tag_SetTag", (void *)InternalCalls::Tag_SetTag);
-		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntitiesByTag", (void *)InternalCalls::Scene_FindEntitiesByTag);
-
-		// Camera
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetEnabled", (void *)InternalCalls::Camera_GetEnabled);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetEnabled", (void *)InternalCalls::Camera_SetEnabled);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetPrimary", (void *)InternalCalls::Camera_GetPrimary);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetPrimary", (void *)InternalCalls::Camera_SetPrimary);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetFOV", (void *)InternalCalls::Camera_GetFOV);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetFOV", (void *)InternalCalls::Camera_SetFOV);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetNear", (void *)InternalCalls::Camera_GetNear);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetNear", (void *)InternalCalls::Camera_SetNear);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetFar", (void *)InternalCalls::Camera_GetFar);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetFar", (void *)InternalCalls::Camera_SetFar);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetTarget", (void *)InternalCalls::Camera_GetTarget);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetTarget", (void *)InternalCalls::Camera_SetTarget);
-
-
-		// MeshRenderer
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetVisible", (void *)InternalCalls::MeshRenderer_GetVisible);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetVisible", (void *)InternalCalls::MeshRenderer_SetVisible);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowCast", (void *)InternalCalls::MeshRenderer_GetShadowCast);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowCast", (void *)InternalCalls::MeshRenderer_SetShadowCast);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowReceive", (void *)InternalCalls::MeshRenderer_GetShadowReceive);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowReceive", (void *)InternalCalls::MeshRenderer_SetShadowReceive);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_GetGlobalIlluminate);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_SetGlobalIlluminate);
-
-		// Audio
-		mono_add_internal_call("Engine.InternalCalls::Audio_Play", (void *)InternalCalls::Audio_Play);
-		mono_add_internal_call("Engine.InternalCalls::Audio_Stop", (void *)InternalCalls::Audio_Stop);
-		mono_add_internal_call("Engine.InternalCalls::Audio_Pause", (void *)InternalCalls::Audio_Pause);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetVolume", (void *)InternalCalls::Audio_GetVolume);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetVolume", (void *)InternalCalls::Audio_SetVolume);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetPitch", (void *)InternalCalls::Audio_GetPitch);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetPitch", (void *)InternalCalls::Audio_SetPitch);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetLoop", (void *)InternalCalls::Audio_GetLoop);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetLoop", (void *)InternalCalls::Audio_SetLoop);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMute", (void *)InternalCalls::Audio_GetMute);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMute", (void *)InternalCalls::Audio_SetMute);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetIs3D", (void *)InternalCalls::Audio_GetIs3D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetIs3D", (void *)InternalCalls::Audio_SetIs3D);
-
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
-
-		mono_add_internal_call("Engine.InternalCalls::Event_Publish", (void *)InternalCalls::Event_Publish);
-
-		// ===== NEW: AudioComponent Extensions =====
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMinDistance",
-			(void *)InternalCalls::Audio_GetMinDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMinDistance",
-			(void *)InternalCalls::Audio_SetMinDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMaxDistance",
-			(void *)InternalCalls::Audio_GetMaxDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMaxDistance",
-			(void *)InternalCalls::Audio_SetMaxDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetRolloffMode",
-			(void *)InternalCalls::Audio_GetRolloffMode);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetRolloffMode",
-			(void *)InternalCalls::Audio_SetRolloffMode);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetDopplerLevel",
-			(void *)InternalCalls::Audio_GetDopplerLevel);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetDopplerLevel",
-			(void *)InternalCalls::Audio_SetDopplerLevel);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetPan2D",
-			(void *)InternalCalls::Audio_GetPan2D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetPan2D",
-			(void *)InternalCalls::Audio_SetPan2D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetReverbMix",
-			(void *)InternalCalls::Audio_GetReverbMix);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetReverbMix",
-			(void *)InternalCalls::Audio_SetReverbMix);
-
-		// ===== NEW: AudioManager Global Controls =====
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupVolume",
-			(void *)InternalCalls::AudioManager_SetGroupVolume);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupVolume",
-			(void *)InternalCalls::AudioManager_GetGroupVolume);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupPitch",
-			(void *)InternalCalls::AudioManager_SetGroupPitch);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupPitch",
-			(void *)InternalCalls::AudioManager_GetGroupPitch);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupMute",
-			(void *)InternalCalls::AudioManager_SetGroupMute);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_IsGroupMuted",
-			(void *)InternalCalls::AudioManager_IsGroupMuted);
-
-		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseGroup",
-			(void *)InternalCalls::AudioManager_PauseGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseAll",
-			(void *)InternalCalls::AudioManager_PauseAll);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_StopByType",
-			(void *)InternalCalls::AudioManager_StopByType);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_StopAll",
-			(void *)InternalCalls::AudioManager_StopAll);
-
-		mono_add_internal_call("Engine.AudioManager::AudioManager_CreateDSP",
-			(void *)InternalCalls::AudioManager_CreateDSP);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_EnableDSP",
-			(void *)InternalCalls::AudioManager_EnableDSP);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetDSPParameter",
-			(void *)InternalCalls::AudioManager_SetDSPParameter);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
-			(void *)InternalCalls::AudioManager_ReleaseSpecificDSPinGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
-			(void *)InternalCalls::AudioManager_ReleaseDSPByGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
-			(void *)InternalCalls::AudioManager_ReleaseAllDSPs);
-
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
-			(void *)InternalCalls::AudioManager_SetListenerAttributes);
-
-		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void *)InternalCalls::EntityHasCamera);
-		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void *)InternalCalls::EntityHasRigidBody);
-
-		// Quaternion Bindings
-		mono_add_internal_call("Engine.InternalCalls::Quat_FromAxisAngle", (void *)InternalCalls::Quat_FromAxisAngle);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetForward", (void *)InternalCalls::Quat_GetForward);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetRight", (void *)InternalCalls::Quat_GetRight);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetUp", (void *)InternalCalls::Quat_GetUp);
-		mono_add_internal_call("Engine.InternalCalls::Quat_RotateVector", (void *)InternalCalls::Quat_RotateVector);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Multiply", (void *)InternalCalls::Quat_Multiply);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Slerp", (void *)InternalCalls::Quat_Slerp);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Inverse", (void *)InternalCalls::Quat_Inverse);
-		mono_add_internal_call("Engine.InternalCalls::Quat_ToEuler", (void *)InternalCalls::Quat_ToEuler);
-		mono_add_internal_call("Engine.InternalCalls::Quat_FromEuler", (void *)InternalCalls::Quat_FromEuler);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
-		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
-
-		// Sprite Renderer Bindings
-		mono_add_internal_call("Engine.InternalCalls::Sprite_GetColor", (void*)InternalCalls::Sprite_GetColor);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_SetColor", (void*)InternalCalls::Sprite_SetColor);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_GetLayer", (void*)InternalCalls::Sprite_GetLayer);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_SetLayer", (void*)InternalCalls::Sprite_SetLayer);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_GetActive", (void*)InternalCalls::Sprite_GetIsActive);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_SetActive", (void*)InternalCalls::Sprite_SetActive);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_GetVisible", (void*)InternalCalls::Sprite_GetIsVisible);
-		mono_add_internal_call("Engine.InternalCalls::Sprite_SetVisible", (void*)InternalCalls::Sprite_SetVisible);
-
-		LOG_INFO("Internal calls registered");
-	}
-
-	// ============================================
-	// Internal Call Implementations
-	// ============================================
-
-	namespace InternalCalls
-	{
-		// Global scene pointer (set by ScriptSystem)
-		static Scene *s_CurrentScene = nullptr;
-		//auto& input = GetInput();
-		static Input *s_InputSystem = nullptr;
-
-		static AudioManager *s_AudioManager = nullptr;
-
-
-
-
-		bool EntityHasCamera(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-				return false;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity)
-				return false;
-
-			return entity.HasComponent<Engine::CameraComponent>();
-		}
-
-		int Transform_GetParent(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-				return false;
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-
-			if (!registry.valid(entity) || !entity.HasComponent<Engine::TransformComponent>())
-				return 0;
-
-			auto &transform = registry.get<TransformComponent>(entity);
-			return transform.GetParentEntity();
-		}
-
-		bool EntityHasRigidBody(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-				return false;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity)
-				return false;
-
-			return entity.HasComponent<Engine::RigidbodyComponent>();
-		}
-
-		uint64_t Scene_CreateEntity(MonoString *nameStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				//LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
-				return 0;
-			}
-
-			// Name (optional)
-			std::string name = "Entity";
-			if (nameStr)
-			{
-				char *c = mono_string_to_utf8(nameStr);
-				if (c)
-				{
-					name = c; mono_free(c);
-				}
-			}
-
-			// Create via your scene API
-			Entity e = InternalCalls::s_CurrentScene->CreateEntity(name.c_str());
-			const uint64_t id = static_cast<uint32_t>(e);
-			//LOG_INFO("[InternalCall] Created entity '", name, "' (ID=", id, ")");
-
-			return id;
-		}
-
-		static void Entity_AddScript(uint64_t entityID, MonoString *classFullNameStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: current scene is null");
-				return;
-			}
-			if (!classFullNameStr)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: class name is null");
-				return;
-			}
-
-			// Resolve target entity
-			Entity e = InternalCalls::s_CurrentScene->GetEntity(
-				static_cast<entt::entity>(entityID));
-			if (!e)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: entity ID=", entityID, " is invalid");
-				return;
-			}
-
-			// Managed class name (e.g., "Game.Bullet")
-			char *c = mono_string_to_utf8(classFullNameStr);
-			std::string klass = c ? c : "";
-			if (c) mono_free(c);
-			if (klass.empty())
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: empty class name");
-				return;
-			}
-
-			// Create managed instance
-			auto &se = MonoScriptEngine::GetInstance();
-			MonoObject *instance = se.CreateScriptInstance(klass);
-			if (!instance)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: failed to create instance of ", klass);
-				return;
-			}
-
-			// CRITICAL: Bind the native entity ID IMMEDIATELY after creation
-			se.BindEntityID(instance, static_cast<std::uint32_t>(entityID));
-			LOG_INFO("[InternalCall] Bound EntityID=", entityID, " to new script instance of ", klass);
-
-			// Store instance on the ScriptComponent
-			if (e.HasComponent<ScriptComponent>())
-			{
-				auto &sc = e.GetComponent<ScriptComponent>();
-				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
-				sc.Started = false;  // Mark as not started - ScriptSystem will call OnStart
-			}
-			else
-			{
-				auto &sc = e.AddComponent<ScriptComponent>();
-				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
-				sc.Started = false;  // Mark as not started - ScriptSystem will call OnStart
-			}
-
-			// DO NOT call OnStart here - let ScriptSystem handle it on next update
-			// This ensures EntityID is definitely set before OnStart runs
-			LOG_INFO("[InternalCall] Attached script '", klass, "' to entity ID=", entityID,
-				" (OnStart will be called on next update)");
-		}
-
-		static void Scene_DestroyEntity(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Scene_DestroyEntity: current scene is null");
-				return;
-			}
-			auto id = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			s_CurrentScene->DestroyEntity(id);
-			LOG_INFO("[InternalCall] Destroyed entity ID=", entityID);
-		}
-
-		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: current scene is null");
-				return 0;
-			}
-
-			if (!prefabPathStr)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: prefab path is null");
-				return 0;
-			}
-
-			// Convert MonoString to C++ string
-			char *c = mono_string_to_utf8(prefabPathStr);
-			std::string prefabPath = c ? c : "";
-			if (c) mono_free(c);
-
-			if (prefabPath.empty())
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: empty prefab path");
-				return 0;
-			}
-
-			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
-
-			// Resolve path to actual asset file
-			std::string prefabfullpath = getAssetFilePath(prefabPath);
-
-			// Load prefab from file
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
-			if (!prefab)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to load prefab from ", prefabfullpath);
-				return 0;
-			}
-
-			// Register prefab
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			// Instantiate entity from prefab
-			Entity entity = PrefabInstantiator::InstantiateEntityPrefab(
-				InternalCalls::s_CurrentScene,
-				prefab->GetGUID()
-			);
-
-			if (!entity)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to instantiate entity");
-				return 0;
-			}
-
-			// Initialize ScriptComponent on the newly spawned entity (if any)
-			InitializeScriptComponentForEntity(entity);
-
-			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Successfully instantiated prefab - Entity ID: ", entityID);
-
-			return entityID;
-		}
-
-		static uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: current scene is null");
-				return 0;
-			}
-
-			if (!prefabPathStr)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: prefab path is null");
-				return 0;
-			}
-
-			// Convert MonoString to C++ string
-			char *c = mono_string_to_utf8(prefabPathStr);
-			std::string prefabPath = c ? c : "";
-			if (c) mono_free(c);
-
-			if (prefabPath.empty())
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: empty prefab path");
-				return 0;
-			}
-
-			LOG_INFO("[InternalCall] Instantiating scene prefab: ", prefabPath);
-
-			// Resolve path to actual asset file
-			std::string prefabfullpath = getAssetFilePath(prefabPath);
-
-			// Load prefab from file
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
-			if (!prefab)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to load prefab from ", prefabfullpath);
-				return 0;
-			}
-
-			// Register prefab
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			// Instantiate root entity from scene prefab
-			Entity entity = PrefabInstantiator::InstantiateScenePrefab(
-				InternalCalls::s_CurrentScene,
-				prefab->GetGUID()
-			);
-
-			if (!entity)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to instantiate entity");
-				return 0;
-			}
-
-			// Initialize ScriptComponent on the root entity (if any)
-			InitializeScriptComponentForEntity(entity);
-
-			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Successfully instantiated scene prefab - root Entity ID: ", entityID);
-
-			return entityID;
-		}
-
-		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::quat *rotation, glm::vec3 *scale, bool isScenePrefab)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: current scene is null");
-				return 0;
-			}
-
-			if (!prefabPathStr)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: prefab path is null");
-				return 0;
-			}
-
-			char *c = mono_string_to_utf8(prefabPathStr);
-			std::string prefabPath = c ? c : "";
-			if (c) mono_free(c);
-
-			if (prefabPath.empty())
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: empty prefab path");
-				return 0;
-			}
-
-			std::string prefabFullPath = getAssetFilePath(prefabPath);
-
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
-			if (!prefab)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: failed to load prefab from ", prefabFullPath);
-				return 0;
-			}
-
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			Entity entity;
-			if (isScenePrefab)
-			{
-				entity = PrefabInstantiator::InstantiateScenePrefab(
-					InternalCalls::s_CurrentScene,
-					prefab->GetGUID());
-			}
-			else
-			{
-				entity = PrefabInstantiator::InstantiateEntityPrefab(
-					InternalCalls::s_CurrentScene,
-					prefab->GetGUID());
-			}
-
-			if (!entity)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: failed to instantiate entity from prefab");
-				return 0;
-			}
-
-			if (entity.HasComponent<TransformComponent>())
-			{
-				auto &transform = entity.GetComponent<TransformComponent>();
-
-				// **Quats only**: assign directly
-				transform.Position = *position;
-				transform.Rotation = *rotation;
-				transform.Scale = *scale;
-				transform.IsDirty = true;
-
-				// Build matrices from quat
-				glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
-				glm::mat4 rotation_matrix = glm::mat4_cast(transform.Rotation);
-				glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), transform.Scale);
-
-				glm::mat4 transform_matrix = translation_matrix * rotation_matrix * scale_matrix;
-
-				transform.LocalTransform = transform_matrix;
-				transform.WorldTransform = transform_matrix;
-			}
-
-			// Initialize ScriptComponent on the spawned entity (if any)
-			InitializeScriptComponentForEntity(entity);
-
-			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Prefab_InstantiateWithTransform: instantiated entity with ID ", entityID);
-			return entityID;
-		}
-
-
-		uint64_t Scene_FindEntityByName(MonoString *nameString)
-		{
-			if (!s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Scene not set!");
-				return 0; // 0 = invalid entity (entt::null)
-			}
-
-			if (!nameString)
-			{
-				LOG_ERROR("[InternalCall] Entity name string is null!");
-				return 0;
-			}
-
-			// Convert MonoString to C++ string
-			char *nameStr = mono_string_to_utf8(nameString);
-			if (!nameStr)
-			{
-				LOG_ERROR("[InternalCall] Failed to convert entity name string!");
-				return 0;
-			}
-
-			std::string name(nameStr);
-			mono_free(nameStr);
-
-			if (name.empty())
-			{
-				LOG_WARNING("[InternalCall] Empty entity name provided!");
-				return 0;
-			}
-
-			// Find entity by name
-			Entity entity = s_CurrentScene->FindEntityByName(name);
-
-			// Convert Entity to uint32_t using the conversion operator
-			// If entity is invalid (entt::null), this will return 0
-			return static_cast<uint32_t>(entity);
-		}
-
-		void SetCurrentScene(Scene *scene)
-		{
-			s_CurrentScene = scene;
-		}
-
-		void SetInputSystem(Input *input)
-		{
-			s_InputSystem = input;
-		}
-
-		// ADD THESE:
-		void SetAudioManager(AudioManager *audioManager)
-		{
-			s_AudioManager = audioManager;
-		}
-
-		AudioManager *GetAudioManager()
-		{
-			return s_AudioManager;
-		}
-
-		void Log(MonoString *message)
-		{
-			char *cStr = mono_string_to_utf8(message);
-			LOG_INFO("[C#] ", cStr);
-			mono_free(cStr);
-		}
-
-		void LogError(MonoString *message)
-		{
-			char *cStr = mono_string_to_utf8(message);
-			LOG_ERROR("[C#] ", cStr);
-			mono_free(cStr);
-		}
-
-		void LogWarning(MonoString *message)
-		{
-			char *cStr = mono_string_to_utf8(message);
-			LOG_WARNING("[C#] ", cStr);  // Fixed: was LOG_ERROR
-			mono_free(cStr);
-		}
-
-		uint64_t Entity_GetEntityID(MonoObject *entityObj)
-		{
-			// entityObj is the C# Engine.Entity instance passed from GetEntityID_Native(this)
-
-			if (!entityObj)
-			{
-				LOG_WARNING("[InternalCall] Entity_GetEntityID: entity object is null");
-				return 0;
-			}
-
-			// Get the Entity class of this object
-			MonoClass *entityClass = mono_object_get_class(entityObj);
-			if (!entityClass)
-			{
-				LOG_ERROR("[InternalCall] Entity_GetEntityID: failed to get class from object");
-				return 0;
-			}
-
-			// Look for the auto-property getter: public ulong EntityID { get; internal set; }
-			MonoMethod *getIdMethod = mono_class_get_method_from_name(entityClass, "get_EntityID", 0);
-			if (!getIdMethod)
-			{
-				LOG_ERROR("[InternalCall] Entity_GetEntityID: could not find get_EntityID on Entity");
-				return 0;
-			}
-
-			MonoObject *exception = nullptr;
-			MonoObject *result = mono_runtime_invoke(getIdMethod, entityObj, nullptr, &exception);
-
-			// If the getter threw, log and bail out
-			if (exception)
-			{
-				MonoString *excStr = mono_object_to_string(exception, nullptr);
-				char *cStr = excStr ? mono_string_to_utf8(excStr) : nullptr;
-				LOG_ERROR("[InternalCall] Entity_GetEntityID: exception while invoking get_EntityID: ",
-					cStr ? cStr : "<null>");
-				if (cStr)
-					mono_free(cStr);
-				return 0;
-			}
-
-			if (!result)
-			{
-				LOG_WARNING("[InternalCall] Entity_GetEntityID: get_EntityID returned null");
-				return 0;
-			}
-
-			// EntityID is a managed System.UInt64, so unbox to a raw uint64_t
-			void *unboxed = mono_object_unbox(result);
-			if (!unboxed)
-			{
-				LOG_WARNING("[InternalCall] Entity_GetEntityID: failed to unbox result");
-				return 0;
-			}
-
-			uint64_t id = *reinterpret_cast<uint64_t *>(unboxed);
-			return id;
-		}
-
-
-		bool Entity_HasComponent(uint64_t entityID, MonoReflectionType *componentType)
-		{
-			if (!s_CurrentScene) return false;
-			(void)componentType;
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			// Check if entity exists in registry
-			if (!registry.valid(handle)) return false;
-
-			// Check component type (you'll need to map C# component types to C++ component types)
-			// This is a simplified version
-			return false; // Implement based on your component system
-		}
-
-
-
-		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition)
-		{
-			if (!s_CurrentScene || !outPosition) return;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity || !entity.HasComponent<TransformComponent>()) return;
-
-			auto &transform = entity.GetComponent<TransformComponent>();
-			*outPosition = transform.Position;
-		}
-
-		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position)
-		{
-			if (!s_CurrentScene || !position) return;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity || !entity.HasComponent<TransformComponent>()) return;
-
-			auto &transform = entity.GetComponent<TransformComponent>();
-			transform.Position = *position;
-			transform.IsDirty = true;
-		}
-
-		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation)
-		{
-			if (!s_CurrentScene || !outRotation) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			*outRotation = transform.Rotation;
-		}
-
-		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation)
-		{
-			if (!s_CurrentScene || !rotation) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			transform.Rotation = *rotation;
-			transform.IsDirty = true;
-		}
-
-		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale)
-		{
-			if (!s_CurrentScene || !outScale) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			*outScale = transform.Scale;
-		}
-
-		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale)
-		{
-			if (!s_CurrentScene || !scale) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			transform.Scale = *scale;
-		}
-
-		bool Input_IsKeyPressed(int keyCode)
-		{
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return false;
-			}
-			return s_InputSystem->IsKeyPressed(keyCode);
-		}
-
-
-		bool Input_IsMouseButtonPressed(int button)
-		{
-
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return false;
-			}
-			return s_InputSystem->IsMouseButtonPressed(button);
-		}
-
-
-		void Input_GetMousePosition(glm::vec2 *outPosition)
-		{
-			if (!outPosition) return;
-
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				*outPosition = glm::vec2(0.0f, 0.0f);
-				return;
-			}
-
-			// Call the Input system's GetMousePosition method
-			*outPosition = s_InputSystem->GetMousePosition();
-		}
-
-		bool Input_IsKeyReleased(int keyCode)
-		{
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return false;
-			}
-			return s_InputSystem->IsKeyJustReleased(keyCode);
-		}
-
-		// Helper to fetch entity from current scene
-		static inline Entity GetEntityOrNull(uint64_t id)
-		{
-			if (!s_CurrentScene) return {};
-			return s_CurrentScene->GetEntity(static_cast<entt::entity>(id));
-		}
-
-		// =============== Physics (bodies) ===============
-
-		void Entity_AddRigidBody(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<RigidbodyComponent>();
-		}
-
-		void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !outVel) return;
-			if (!e.HasComponent<RigidbodyComponent>()) return;
-			*outVel = e.GetComponent<RigidbodyComponent>().GetVelocity();
-		}
-
-		void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!inVel) return;
-			e.GetComponent<RigidbodyComponent>().SetVelocity(*inVel);
-		}
-
-		void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *inVel)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!inVel) return;
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetVelocity(rb.GetVelocity() + *inVel);
-		}
-
-		float Rigidbody_GetMass(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.GetMass();
-		}
-
-		void Rigidbody_SetMass(uint64_t entityID, float mass)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetMass(mass);
-		}
-
-		bool Rigidbody_GetIsKinematic(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsKinematicBody();
-		}
-
-		void Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetKinematic(isKinematic);
-		}
-
-		bool Rigidbody_GetUseGravity(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsGravityEnabled();
-		}
-
-		void Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetGravityEnabled(useGravity);
-		}
-
-		float Rigidbody_GetSpeed(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.GetSpeed();
-		}
-
-		bool Rigidbody_IsMoving(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsMoving();
-		}
-
-		bool Rigidbody_IsStatic(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsStatic();
-		}
-
-		void Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!force) return;
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.AddForce(*force);
-		}
-
-		void Rigidbody_Stop(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.Stop();
-		}
-
-		// ==================================
-		// Collision events (via PhysicsAPI)
-		// ==================================
-
-		void Physics_EnableCollisionEvents()
-		{
-			Engine::PhysicsAPI::EnableCollisionEvents();
-		}
-
-		void Physics_BeginCollisionFrame()
-		{
-			Engine::PhysicsAPI::BeginCollisionFrame();
-		}
-
-		int Physics_GetCollisionCount()
-		{
-			return (int)Engine::PhysicsAPI::GetInstance().GetCollisionEvents().size();
-		}
-
-		void Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b)
-		{
-			if (!a || !b) return;
-			const auto &evs = Engine::PhysicsAPI::GetInstance().GetCollisionEvents();
-			if (index < 0 || index >= (int)evs.size()) return;
-			*a = (uint32_t)evs[index].entA;
-			*b = (uint32_t)evs[index].entB;
-		}
-
-		void Entity_AddTag(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<TagComponent>();
-		}
-
-		void Entity_AddCamera(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<CameraComponent>();
-		}
-
-		void Entity_AddAudio(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<AudioComponent>();
-		}
-
-		void Entity_AddMeshRenderer(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<MeshRendererComponent>();
-		}
-
-		MonoString *Tag_GetTag(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<TagComponent>())
-				return mono_string_new(mono_domain_get(), "");
-
-			auto &tagComp = e.GetComponent<TagComponent>();
-			const std::string &tag = tagComp.GetTag();
-			return mono_string_new(mono_domain_get(), tag.c_str());
-		}
-
-		void Tag_SetTag(uint64_t entityID, MonoString *tagStr)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<TagComponent>() || !tagStr)
-				return;
-
-			char *utf8 = mono_string_to_utf8(tagStr);
-			if (!utf8) return;
-
-			e.GetComponent<TagComponent>().SetTag(utf8);
-			mono_free(utf8);
-		}
-
-		bool Camera_GetEnabled(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<CameraComponent>()) return false;
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.Enabled;
-		}
-
-		void Camera_SetEnabled(uint64_t entityID, bool enabled)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.Enabled = enabled;
-		}
-
-		bool Camera_GetPrimary(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.Primary;
-		}
-
-		void Camera_SetPrimary(uint64_t entityID, bool primary)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.Primary = primary;
-		}
-
-		float Camera_GetFOV(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.FOV;
-		}
-
-		void Camera_SetFOV(uint64_t entityID, float fov)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.FOV = fov;
-		}
-
-		float Camera_GetNear(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.NearPlane;
-		}
-
-		void Camera_SetNear(uint64_t entityID, float nearPlane)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.NearPlane = nearPlane;
-		}
-
-		float Camera_GetFar(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.FarPlane;
-		}
-
-		void Camera_SetFar(uint64_t entityID, float farPlane)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.FarPlane = farPlane;
-		}
-
-		void Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!outTarget) return;
-			auto &cam = e.GetComponent<CameraComponent>();
-			*outTarget = cam.Target;
-		}
-
-		void Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!inTarget) return;
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.SetTarget(*inTarget); // marks dirty internally
-		}
-
-
-		bool MeshRenderer_GetVisible(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.Visible;
-		}
-
-		void MeshRenderer_SetVisible(uint64_t entityID, bool visible)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.Visible = visible;
-		}
-
-		bool MeshRenderer_GetShadowCast(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.ShadowCast;
-		}
-
-		void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.ShadowCast = cast;
-		}
-
-		bool MeshRenderer_GetShadowReceive(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.ShadowReceive;
-		}
-
-		void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.ShadowReceive = receive;
-		}
-
-		bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.GlobalIlluminate;
-		}
-
-		void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.GlobalIlluminate = gi;
-		}
-
-		void Audio_Play(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetState(PlayState::PLAY);
-		}
-
-		void Audio_Stop(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetState(PlayState::STOP);
-		}
-
-		void Audio_Pause(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetState(PlayState::PAUSE);
-		}
-
-		float Audio_GetVolume(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Volume;
-		}
-
-		void Audio_SetVolume(uint64_t entityID, float volume)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetVolume(volume);
-		}
-
-		float Audio_GetPitch(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Pitch;
-		}
-
-		void Audio_SetPitch(uint64_t entityID, float pitch)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetPitch(pitch);
-		}
-
-		bool Audio_GetLoop(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Loop;
-		}
-
-		void Audio_SetLoop(uint64_t entityID, bool loop)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetLoop(loop);
-		}
-
-		bool Audio_GetMute(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Mute;
-		}
-
-		void Audio_SetMute(uint64_t entityID, bool mute)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetMute(mute);
-		}
-
-		bool Audio_GetIs3D(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Is3D;
-		}
-
-		void Audio_SetIs3D(uint64_t entityID, bool is3d)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.Set3D(is3d);
-		}
-
-		void Audio_SetFile(uint64_t entityID, MonoString *path)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!path) return;
-
-			auto &audio = e.GetComponent<AudioComponent>();
-
-			char *utf8 = mono_string_to_utf8(path);
-			if (!utf8) return;
-
-			audio.SetAudioFile(utf8);
-			mono_free(utf8);
-		}
-
-		// ===== NEW AudioComponent Extensions =====
-
-		float Audio_GetMinDistance(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 1.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.MinDistance;
-		}
-
-		void Audio_SetMinDistance(uint64_t entityID, float minDist)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetMinDistance(minDist);
-		}
-
-		float Audio_GetMaxDistance(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 10000.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.MaxDistance;
-		}
-
-		void Audio_SetMaxDistance(uint64_t entityID, float maxDist)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetMaxDistance(maxDist);
-		}
-
-		int Audio_GetRolloffMode(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 0;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return static_cast<int>(audio.RolloffMode);
-		}
-
-		void Audio_SetRolloffMode(uint64_t entityID, int mode)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetRolloffMode(static_cast<AudioRolloffMode>(mode));
-		}
-
-		float Audio_GetDopplerLevel(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 1.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.DopplerLevel;
-		}
-
-		void Audio_SetDopplerLevel(uint64_t entityID, float level)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetDopplerLevel(level);
-		}
-
-		float Audio_GetPan2D(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 0.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Pan2D;
-		}
-
-		void Audio_SetPan2D(uint64_t entityID, float pan)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetPan(pan);
-		}
-
-		float Audio_GetReverbMix(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 0.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.ReverbProperties;
-		}
-
-		void Audio_SetReverbMix(uint64_t entityID, float mix)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetReverbProperties(mix);
-		}
-
-		// ===== NEW AudioManager Global Controls =====
-
-		void AudioManager_SetGroupVolume(int groupType, float volume)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->SetGroupVolume(static_cast<AudioType>(groupType), volume);
-		}
-
-		float AudioManager_GetGroupVolume(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return 0.0f;
-			float vol = 0.0f;
-			am->GetGroupVolume(static_cast<AudioType>(groupType), vol);
-			return vol;
-		}
-
-		void AudioManager_SetGroupPitch(int groupType, float pitch)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->SetGroupPitch(static_cast<AudioType>(groupType), pitch);
-		}
-
-		float AudioManager_GetGroupPitch(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return 1.0f;
-			float pitch = 1.0f;
-			am->GetGroupPitch(static_cast<AudioType>(groupType), pitch);
-			return pitch;
-		}
-
-		void AudioManager_SetGroupMute(int groupType, bool mute)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->MuteGroup(static_cast<AudioType>(groupType), mute);
-		}
-
-		bool AudioManager_IsGroupMuted(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return false;
-			return am->IsGroupMuted(static_cast<AudioType>(groupType));
-		}
-
-		void Event_Publish(MonoString *nameStr, MonoString *payloadStr)
-		{
-			ScriptEvent ev;
-
-			if (nameStr)
-			{
-				char *cName = mono_string_to_utf8(nameStr);
-				if (cName)
-				{
-					ev.name = cName;
-					mono_free(cName);
-				}
-			}
-
-			if (payloadStr)
-			{
-				char *cPayload = mono_string_to_utf8(payloadStr);
-				if (cPayload)
-				{
-					ev.payload = cPayload;
-					mono_free(cPayload);
-				}
-			}
-
-			EventSystem::Instance().Queue(ev);
-		}
-
-		/*void AudioManager_SetMasterVolume(float volume) {
-			auto* am = GetAudioManager();
-			if (!am) return;
-			am->SetMasterVolume(volume);
-		}
-
-		float AudioManager_GetMasterVolume() {
-			auto* am = GetAudioManager();
-			if (!am) return 0.0f;
-			float vol = 0.0f;
-			am->GetMasterVolume(vol);
-			return vol;
-		}
-
-		void AudioManager_SetMasterPitch(float pitch) {
-			auto* am = GetAudioManager();
-			if (!am) return;
-			am->SetMasterPitch(pitch);
-		}
-
-		float AudioManager_GetMasterPitch() {
-			auto* am = GetAudioManager();
-			if (!am) return 1.0f;
-			float pitch = 1.0f;
-			am->GetMasterPitch(pitch);
-			return pitch;
-		}
-
-		void AudioManager_MuteMaster(bool mute) {
-			auto* am = GetAudioManager();
-			if (!am) return;
-			am->MuteMaster(mute);
-		}
-
-		bool AudioManager_IsMasterMuted() {
-			auto* am = GetAudioManager();
-			if (!am) return false;
-			return am->IsMasterMuted();
-		}*/
-
-		void AudioManager_PauseGroup(int groupType, bool pause)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->PauseGroup(static_cast<AudioType>(groupType), pause);
-		}
-
-		void AudioManager_PauseAll(bool pause)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->PauseAll(pause);
-		}
-
-		void AudioManager_StopByType(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->StopByType(static_cast<AudioType>(groupType));
-		}
-
-		void AudioManager_StopAll()
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->StopAll();
-		}
-
-		void AudioManager_CreateDSP(int groupType, int effectType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->CreateDSP(static_cast<DSPEffectType>(effectType),
-				static_cast<AudioType>(groupType));
-		}
-
-		void AudioManager_EnableDSP(int groupType, int effectType, bool enable)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->EnableDSP(static_cast<AudioType>(groupType),
-				static_cast<DSPEffectType>(effectType), enable);
-		}
-
-		void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->SetDSPParameter(static_cast<AudioType>(groupType),
-				static_cast<DSPEffectType>(effectType),
-				paramIndex, value);
-		}
-
-		void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->ReleaseSpecificDSPinGroup(static_cast<AudioType>(groupType),
-				static_cast<DSPEffectType>(effectType));
-		}
-
-		void AudioManager_ReleaseDSPByGroup(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->ReleaseDSPByGroup(static_cast<AudioType>(groupType));
-		}
-
-		void AudioManager_ReleaseAllDSPs()
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->ReleaseAllDSPs();
-		}
-
-		void AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
-			glm::vec3 *up, glm::vec3 *velocity)
-		{
-			auto *am = GetAudioManager();
-			if (!am || !position || !forward || !up || !velocity) return;
-			am->SetListenerAttributes(*position, *forward, *up, *velocity);
-		}
-
-		// NEW: return managed uint[] of all entities with a given tag
-		MonoArray *Scene_FindEntitiesByTag(MonoString *tagString)
-		{
-			MonoDomain *domain = mono_domain_get();
-			if (!domain)
-				return nullptr;
-
-			MonoClass *uintClass = mono_get_uint32_class();
-			if (!uintClass)
-				return nullptr;
-
-			auto make_empty = [&]() -> MonoArray *
-				{
-					return mono_array_new(domain, uintClass, 0);
-				};
-
-			if (!s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Scene_FindEntitiesByTag: current scene is null");
-				return make_empty();
-			}
-
-			if (!tagString)
-			{
-				LOG_WARNING("[InternalCall] Scene_FindEntitiesByTag: tag string is null");
-				return make_empty();
-			}
-
-			char *tagCStr = mono_string_to_utf8(tagString);
-			if (!tagCStr)
-			{
-				LOG_ERROR("[InternalCall] Scene_FindEntitiesByTag: failed to convert tag string");
-				return make_empty();
-			}
-
-			std::string tag(tagCStr);
-			mono_free(tagCStr);
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			std::vector<uint32_t> results;
-
-			auto view = registry.view<TagComponent>();
-			for (auto entity : view)
-			{
-				const auto &tagComp = view.get<TagComponent>(entity);
-				if (tagComp.GetTag() == tag)
-				{
-					results.push_back(static_cast<uint32_t>(entity));
-				}
-			}
-
-			MonoArray *resultArray = mono_array_new(domain, uintClass, (uintptr_t)results.size());
-			for (uintptr_t i = 0; i < results.size(); ++i)
-			{
-				uint32_t id = results[i];
-				mono_array_set(resultArray, uint32_t, i, id);
-			}
-
-			return resultArray;
-		}
-
-		// Quaternion creation from axis-angle
-		void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat)
-		{
-			*outQuat = glm::angleAxis(angleRadians, *axis);
-		}
-
-		// Extract forward vector from quaternion
-		void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward)
-		{
-			*outForward = glm::rotate(*quat, glm::vec3(0.0f, 0.0f, -1.0f));
-		}
-
-		// Extract right vector
-		void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight)
-		{
-			*outRight = glm::rotate(*quat, glm::vec3(1.0f, 0.0f, 0.0f));
-		}
-
-		// Extract up vector
-		void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp)
-		{
-			*outUp = glm::rotate(*quat, glm::vec3(0.0f, 1.0f, 0.0f));
-		}
-
-		// Rotate vector by quaternion
-		void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec)
-		{
-			*outVec = glm::rotate(*quat, *vec);
-		}
-
-		// Multiply quaternions (combine rotations)
-		void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat)
-		{
-			*outQuat = (*q1) * (*q2);
-		}
-
-		// SLERP interpolation
-		void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat)
-		{
-			*outQuat = glm::slerp(*q1, *q2, t);
-		}
-
-		// Inverse quaternion
-		void Quat_Inverse(glm::quat *quat, glm::quat *outQuat)
-		{
-			*outQuat = glm::inverse(*quat);
-		}
-
-		// Convert quaternion to Euler angles
-		void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler)
-		{
-			*outEuler = glm::eulerAngles(*quat);
-		}
-
-		// Create quaternion from Euler angles
-		void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat)
-		{
-			*outQuat = glm::quat(*euler);
-		}
-
-		// Normalize quaternion
-		void Quat_Normalize(glm::quat *quat, glm::quat *outQuat)
-		{
-			*outQuat = glm::normalize(*quat);
-		}
-
-		// Get quaternion length
-		float Quat_Length(glm::quat *quat)
-		{
-			return glm::length(*quat);
-		}
-
-		// Quaternion dot product
-		float Quat_Dot(glm::quat *q1, glm::quat *q2)
-		{
-			return glm::dot(*q1, *q2);
-		}
-
-		static void Input_GetMouseDelta(float *outX, float *outY)
-		{
-			if (outX) *outX = 0.0f;
-			if (outY) *outY = 0.0f;
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return;
-			}
-			glm::vec2 in_out;
-			in_out = s_InputSystem->GetMouseDelta();
-			*outX = in_out.x;
-			*outY = in_out.y;
-		}
-
-		// Sprite Renderer
-		void Sprite_GetColor(uint64_t entityID, glm::vec4* outColor) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !outColor) return;
-			if (!e.HasComponent<SpriteRendererComponent>()) return;
-			*outColor = e.GetComponent<SpriteRendererComponent>().GetColor();
-		}
-
-		void Sprite_SetColor(uint64_t entityID, glm::vec4* Color) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !Color) return;
-			if (!e.HasComponent<SpriteRendererComponent>()) return;
-			e.GetComponent<SpriteRendererComponent>().SetColor(*Color);
-		}
-
-		uint32_t Sprite_GetLayer(uint64_t entityID) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return -1;
-			if (!e.HasComponent<SpriteRendererComponent>()) return -1;
-			return e.GetComponent<SpriteRendererComponent>().GetSpriteLayer();
-		}
-
-		void Sprite_SetLayer(uint64_t entityID, uint32_t Layer) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			if (!e.HasComponent<SpriteRendererComponent>()) return;
-			e.GetComponent<SpriteRendererComponent>().SetSpriteLayer(Layer);
-		}
-
-		bool Sprite_GetIsActive(uint64_t entityID) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return false;
-			if (!e.HasComponent<SpriteRendererComponent>()) return false;
-			return e.GetComponent<SpriteRendererComponent>().GetIsActive();
-		}
-
-		void Sprite_SetActive(uint64_t entityID, bool Active) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			if (!e.HasComponent<SpriteRendererComponent>()) return;
-			e.GetComponent<SpriteRendererComponent>().SetIsActive(Active);
-		}
-
-		bool Sprite_GetIsVisible(uint64_t entityID) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return false;
-			if (!e.HasComponent<SpriteRendererComponent>()) return false;
-			return e.GetComponent<SpriteRendererComponent>().GetIsVisible();
-		}
-
-		void Sprite_SetVisible(uint64_t entityID, bool visible) 
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			if (!e.HasComponent<SpriteRendererComponent>()) return;
-			e.GetComponent<SpriteRendererComponent>().SetIsVisible(visible);
-		}
-
-	} // namespace internalcalls
-
 	// Expose these functions for external use
 	void SetScriptingInputSystem(Input *input)
 	{
@@ -3015,10 +933,362 @@ namespace Engine
 		InternalCalls::SetCurrentScene(scene);
 	}
 
-	// ADD THIS:
 	void SetScriptingAudioManager(AudioManager *audioManager)
 	{
 		InternalCalls::SetAudioManager(audioManager);
+	}
+
+	static void BindInternalCall(const char *managedName, void *fn)
+	{
+		mono_add_internal_call(managedName, fn);
+	}
+
+	template <typename T>
+	static void BindInternalCall(const char *managedName, T fn)
+	{
+		mono_add_internal_call(managedName, reinterpret_cast<void *>(fn));
+	}
+
+
+	void MonoScriptEngine::RegisterInternalCalls()
+	{
+		LOG_INFO("Registering internal calls...");
+
+		// =====================================================================
+		// ECS / Scene
+		// =====================================================================
+		BindInternalCall("Engine.Scene::Scene_CreateEntity",
+			reinterpret_cast<void *>(InternalCalls::Scene_CreateEntity));
+		BindInternalCall("Engine.Scene::Scene_DestroyEntity",
+			reinterpret_cast<void *>(InternalCalls::Scene_DestroyEntity));
+		BindInternalCall("Engine.Scene::Scene_FindEntityByName",
+			reinterpret_cast<void *>(InternalCalls::Scene_FindEntityByName));
+		BindInternalCall("Engine.Scene::Scene_FindEntitiesByTag",
+			reinterpret_cast<void *>(InternalCalls::Scene_FindEntitiesByTag));
+		BindInternalCall("Engine.Scene::Entity_AddScript",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddScript));
+		BindInternalCall("Engine.Scene::Entity_AddRigidBody",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddRigidBody));
+		BindInternalCall("Engine.Scene::Entity_AddCamera",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddCamera));
+		BindInternalCall("Engine.Scene::Entity_AddAudio",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddAudio));
+		BindInternalCall("Engine.Scene::Entity_AddMeshRenderer",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddMeshRenderer));
+		BindInternalCall("Engine.Scene::Entity_AddTag",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddTag));
+
+		// =====================================================================
+		// Transform
+		// =====================================================================
+		BindInternalCall("Engine.Transform::Transform_GetParent",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetParent));
+
+		BindInternalCall("Engine.Transform::Transform_GetPosition",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetPosition));
+		BindInternalCall("Engine.Transform::Transform_SetPosition",
+			reinterpret_cast<void *>(InternalCalls::Transform_SetPosition));
+
+		BindInternalCall("Engine.Transform::Transform_GetRotation",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetRotation));
+		BindInternalCall("Engine.Transform::Transform_SetRotation",
+			reinterpret_cast<void *>(InternalCalls::Transform_SetRotation));
+
+		BindInternalCall("Engine.Transform::Transform_GetScale",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetScale));
+		BindInternalCall("Engine.Transform::Transform_SetScale",
+			reinterpret_cast<void *>(InternalCalls::Transform_SetScale));
+
+		// =====================================================================
+		// Logging
+		// =====================================================================
+		BindInternalCall("Engine.Logger::LogMessage",
+			reinterpret_cast<void *>(InternalCalls::LogMessage));
+		BindInternalCall("Engine.Logger::LogError",
+			reinterpret_cast<void *>(InternalCalls::LogError));
+		BindInternalCall("Engine.Logger::LogWarning",
+			reinterpret_cast<void *>(InternalCalls::LogWarning));
+
+		// =====================================================================
+		// Entity helpers
+		// =====================================================================
+		BindInternalCall("Engine.Entity::GetEntityID_Native",
+			reinterpret_cast<void *>(InternalCalls::Entity_GetEntityID));
+		BindInternalCall("Engine.Entity::HasComponent_Native",
+			reinterpret_cast<void *>(InternalCalls::Entity_HasComponent));
+
+		// =====================================================================
+		// Prefab
+		// =====================================================================
+		BindInternalCall("Engine.Prefab::Prefab_Instantiate",
+			reinterpret_cast<void *>(InternalCalls::Prefab_Instantiate));
+		BindInternalCall("Engine.Prefab::Prefab_InstantiateScene",
+			reinterpret_cast<void *>(InternalCalls::Prefab_InstantiateScene));
+		BindInternalCall("Engine.Prefab::Prefab_InstantiateWithTransform",
+			reinterpret_cast<void *>(InternalCalls::Prefab_InstantiateWithTransform));
+
+		// =====================================================================
+		// Input
+		// =====================================================================
+		BindInternalCall("Engine.Input::IsKeyPressed_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_IsKeyPressed));
+		BindInternalCall("Engine.Input::IsKeyReleased_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_IsKeyReleased));
+		BindInternalCall("Engine.Input::IsMouseButtonPressed_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_IsMouseButtonPressed));
+		BindInternalCall("Engine.Input::GetMousePosition_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_GetMousePosition));
+		BindInternalCall("Engine.Input::Input_GetMouseDelta",
+			reinterpret_cast<void *>(InternalCalls::Input_GetMouseDelta));
+
+		// =====================================================================
+		// Rigidbody
+		// =====================================================================
+
+		// Rigidbody velocity
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetVelocity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetVelocity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddVelocity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddVelocity));
+
+		// Rigidbody scalar / flags
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetMass",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetMass));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetMass",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetMass));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetIsKinematic",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetIsKinematic));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetIsKinematic",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetIsKinematic));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetUseGravity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetUseGravity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetUseGravity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetUseGravity));
+
+		// Rigidbody helpers / forces
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetSpeed",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetSpeed));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_IsMoving",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_IsMoving));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_IsStatic",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_IsStatic));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddForce",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddForce));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_Stop",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_Stop));
+
+		// =====================================================================
+		// Physics
+		// =====================================================================		
+		BindInternalCall("Engine.Physics::Physics_EnableCollisionEvents",
+			reinterpret_cast<void *>(InternalCalls::Physics_EnableCollisionEvents));
+		BindInternalCall("Engine.Physics::Physics_BeginCollisionFrame",
+			reinterpret_cast<void *>(InternalCalls::Physics_BeginCollisionFrame));
+		BindInternalCall("Engine.Physics::Physics_GetCollisionCount",
+			reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionCount));
+		BindInternalCall("Engine.Physics::Physics_GetCollisionPair",
+			reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionPair));
+
+		// =====================================================================
+		// Tag
+		// =====================================================================
+		BindInternalCall("Engine.Tag::Tag_GetTag",
+			reinterpret_cast<void *>(InternalCalls::Tag_GetTag));
+		BindInternalCall("Engine.Tag::Tag_SetTag",
+			reinterpret_cast<void *>(InternalCalls::Tag_SetTag));
+
+		// =====================================================================
+		// Camera
+		// =====================================================================
+		BindInternalCall("Engine.Camera::Camera_GetEnabled",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetEnabled));
+		BindInternalCall("Engine.Camera::Camera_SetEnabled",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetEnabled));
+		BindInternalCall("Engine.Camera::Camera_GetPrimary",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetPrimary));
+		BindInternalCall("Engine.Camera::Camera_SetPrimary",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetPrimary));
+		BindInternalCall("Engine.Camera::Camera_GetFOV",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetFOV));
+		BindInternalCall("Engine.Camera::Camera_SetFOV",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetFOV));
+		BindInternalCall("Engine.Camera::Camera_GetNear",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetNear));
+		BindInternalCall("Engine.Camera::Camera_SetNear",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetNear));
+		BindInternalCall("Engine.Camera::Camera_GetFar",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetFar));
+		BindInternalCall("Engine.Camera::Camera_SetFar",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetFar));
+		BindInternalCall("Engine.Camera::Camera_GetTarget",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetTarget));
+		BindInternalCall("Engine.Camera::Camera_SetTarget",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetTarget));
+
+		// =====================================================================
+		// MeshRenderer
+		// =====================================================================
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetVisible",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetVisible));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetVisible",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetVisible));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowCast",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowCast));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowCast",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowCast));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowReceive",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowReceive));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowReceive",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowReceive));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetGlobalIlluminate",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetGlobalIlluminate));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetGlobalIlluminate",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetGlobalIlluminate));
+
+		// =====================================================================
+		// AudioComponent
+		// =====================================================================
+		BindInternalCall("Engine.Audio::Audio_Play",
+			reinterpret_cast<void *>(InternalCalls::Audio_Play));
+		BindInternalCall("Engine.Audio::Audio_Stop",
+			reinterpret_cast<void *>(InternalCalls::Audio_Stop));
+		BindInternalCall("Engine.Audio::Audio_Pause",
+			reinterpret_cast<void *>(InternalCalls::Audio_Pause));
+
+		BindInternalCall("Engine.Audio::Audio_GetVolume",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetVolume));
+		BindInternalCall("Engine.Audio::Audio_SetVolume",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetVolume));
+
+		BindInternalCall("Engine.Audio::Audio_GetPitch",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetPitch));
+		BindInternalCall("Engine.Audio::Audio_SetPitch",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetPitch));
+
+		BindInternalCall("Engine.Audio::Audio_GetLoop",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetLoop));
+		BindInternalCall("Engine.Audio::Audio_SetLoop",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetLoop));
+
+		BindInternalCall("Engine.Audio::Audio_GetMute",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetMute));
+		BindInternalCall("Engine.Audio::Audio_SetMute",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetMute));
+
+		BindInternalCall("Engine.Audio::Audio_GetIs3D",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetIs3D));
+		BindInternalCall("Engine.Audio::Audio_SetIs3D",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetIs3D));
+
+		BindInternalCall("Engine.Audio::Audio_SetFile",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetFile));
+
+		// AudioComponent extensions
+		BindInternalCall("Engine.Audio::Audio_GetMinDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetMinDistance));
+		BindInternalCall("Engine.Audio::Audio_SetMinDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetMinDistance));
+		BindInternalCall("Engine.Audio::Audio_GetMaxDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetMaxDistance));
+		BindInternalCall("Engine.Audio::Audio_SetMaxDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetMaxDistance));
+		BindInternalCall("Engine.Audio::Audio_GetRolloffMode",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetRolloffMode));
+		BindInternalCall("Engine.Audio::Audio_SetRolloffMode",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetRolloffMode));
+		BindInternalCall("Engine.Audio::Audio_GetDopplerLevel",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetDopplerLevel));
+		BindInternalCall("Engine.Audio::Audio_SetDopplerLevel",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetDopplerLevel));
+		BindInternalCall("Engine.Audio::Audio_GetPan2D",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetPan2D));
+		BindInternalCall("Engine.Audio::Audio_SetPan2D",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetPan2D));
+		BindInternalCall("Engine.Audio::Audio_GetReverbMix",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetReverbMix));
+		BindInternalCall("Engine.Audio::Audio_SetReverbMix",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetReverbMix));
+
+		// =====================================================================
+		// AudioManager (global controls)
+		// =====================================================================
+		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupVolume",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupVolume",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_GetGroupVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupPitch",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupPitch));
+		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupPitch",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_GetGroupPitch));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupMute",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupMute));
+		BindInternalCall("Engine.AudioManager::AudioManager_IsGroupMuted",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_IsGroupMuted));
+
+		BindInternalCall("Engine.AudioManager::AudioManager_PauseGroup",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_PauseGroup));
+		BindInternalCall("Engine.AudioManager::AudioManager_PauseAll",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_PauseAll));
+		BindInternalCall("Engine.AudioManager::AudioManager_StopByType",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_StopByType));
+		BindInternalCall("Engine.AudioManager::AudioManager_StopAll",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_StopAll));
+
+		BindInternalCall("Engine.AudioManager::AudioManager_CreateDSP",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_CreateDSP));
+		BindInternalCall("Engine.AudioManager::AudioManager_EnableDSP",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_EnableDSP));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetDSPParameter",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetDSPParameter));
+		BindInternalCall("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_ReleaseSpecificDSPinGroup));
+		BindInternalCall("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_ReleaseDSPByGroup));
+		BindInternalCall("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_ReleaseAllDSPs));
+
+		BindInternalCall("Engine.AudioManager::AudioManager_SetListenerAttributes",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetListenerAttributes));
+
+		// =====================================================================
+		// Event System
+		// =====================================================================
+		BindInternalCall("Engine.Event::Event_Publish",
+			reinterpret_cast<void *>(InternalCalls::Event_Publish));
+
+		// =====================================================================
+		// Quaternion
+		// =====================================================================
+		BindInternalCall("Engine.QuatNative::Quat_FromAxisAngle",
+			reinterpret_cast<void *>(InternalCalls::Quat_FromAxisAngle));
+		BindInternalCall("Engine.QuatNative::Quat_GetForward",
+			reinterpret_cast<void *>(InternalCalls::Quat_GetForward));
+		BindInternalCall("Engine.QuatNative::Quat_GetRight",
+			reinterpret_cast<void *>(InternalCalls::Quat_GetRight));
+		BindInternalCall("Engine.QuatNative::Quat_GetUp",
+			reinterpret_cast<void *>(InternalCalls::Quat_GetUp));
+		BindInternalCall("Engine.QuatNative::Quat_RotateVector",
+			reinterpret_cast<void *>(InternalCalls::Quat_RotateVector));
+		BindInternalCall("Engine.QuatNative::Quat_Multiply",
+			reinterpret_cast<void *>(InternalCalls::Quat_Multiply));
+		BindInternalCall("Engine.QuatNative::Quat_Slerp",
+			reinterpret_cast<void *>(InternalCalls::Quat_Slerp));
+		BindInternalCall("Engine.QuatNative::Quat_Inverse",
+			reinterpret_cast<void *>(InternalCalls::Quat_Inverse));
+		BindInternalCall("Engine.QuatNative::Quat_ToEuler",
+			reinterpret_cast<void *>(InternalCalls::Quat_ToEuler));
+		BindInternalCall("Engine.QuatNative::Quat_FromEuler",
+			reinterpret_cast<void *>(InternalCalls::Quat_FromEuler));
+		BindInternalCall("Engine.QuatNative::Quat_Normalize",
+			reinterpret_cast<void *>(InternalCalls::Quat_Normalize));
+		BindInternalCall("Engine.QuatNative::Quat_Length",
+			reinterpret_cast<void *>(InternalCalls::Quat_Length));
+		BindInternalCall("Engine.QuatNative::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
+
+		LOG_INFO("Internal calls registered");
 	}
 
 } // namespace Engine
