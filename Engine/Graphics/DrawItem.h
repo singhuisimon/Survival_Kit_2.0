@@ -58,6 +58,8 @@ namespace Engine{
 		u32						 m_default_material_handle   = 0;
 		u32						 m_default_u32texture_handle = 0;
 
+		u32						 m_render_layer			     = 0;
+
 		// Color if the rendered object has self defined colors
 		glm::vec4				 m_color = { 0.f, 0.f, 0.f, 1.f };
 

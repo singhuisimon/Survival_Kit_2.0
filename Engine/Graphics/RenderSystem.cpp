@@ -144,6 +144,7 @@ namespace Engine {
 				.m_default_mesh_handle = renderable2d.Quad,
 				.m_default_material_handle = 0,
 				.m_default_u32texture_handle = 0,
+				.m_render_layer = renderable2d.SpriteLayer,
 				.m_color = renderable2d.Color,
 				.m_mesh_guid = 0,
 				.m_material_guid = 0,

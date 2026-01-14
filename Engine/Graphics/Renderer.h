@@ -356,6 +356,8 @@ namespace Engine {
 
 		RenderPass m_finalpass;
 		RenderPass m_UIPass;
+
+		u32 activeLayer = 1;
 	};
 
 }
