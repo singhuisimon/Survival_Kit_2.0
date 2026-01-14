@@ -57,6 +57,9 @@ namespace Engine
 		void CreateEntityFromPrefabPanel();
 		void OpenReplacePefabPanel();
 
+		Entity FindPrefabRoot(Entity entity);
+		std::string SerializeEntityForRevert(Entity entity);
+
 		
 	};
 }

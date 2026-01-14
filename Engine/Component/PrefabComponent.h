@@ -19,8 +19,8 @@
 namespace Engine {
 	struct ComponentOverride {
 		ComponentTypeID componentType;
-		bool isAddedComponent;      // Component added to instance
-		bool isRemovedComponent;    // Component removed from instance
+		bool isAddedComponent = false;      // Component added to instance
+		bool isRemovedComponent = false;    // Component removed from instance
 
 		std::string originalComponentJSON;  // Full component state from prefab
 		std::string currentComponentJSON;   // Current component state (for comparison)
@@ -35,7 +35,12 @@ namespace Engine {
 		}
 
 		bool HasOverrides() const {
-			return !modifiedPropertyNames.empty() || isAddedComponent || isRemovedComponent;
+			// If the override record exists at all, consider it modified
+			// unless it was explicitly marked as removed
+			return isAddedComponent ||
+				isRemovedComponent ||
+				!modifiedPropertyNames.empty(); //||
+				//!originalComponentJSON.empty(); 
 		}
 	};
 
@@ -55,6 +60,9 @@ namespace Engine {
 
 		std::string prefabName;
 		u32 prefabVersion;
+
+		u64 prefabLocalID = 0;
+		bool isPartOfHierarchy = true;
 
 		PrefabComponent()
 			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())  
@@ -79,6 +87,15 @@ namespace Engine {
 			, prefabVersion(1)
 		{
 		}
+		struct DeletedEntityData {
+			u64 prefabLocalID;
+			std::string entityName;
+			std::string serializedEntityData;  // Store full entity JSON for restoration
+
+		};
+
+		std::vector<DeletedEntityData> deletedEntities;
+		std::vector<u32> addedEntityHandles;
 
 		bool HasOverrides() const {
 			for (const auto& override : componentOverrides) {
@@ -106,21 +123,22 @@ namespace Engine {
 		}
 
 		void MarkComponentModified(ComponentTypeID type, const std::string& propertyName = "") {
-			ComponentOverride* compOverride = nullptr;
+			ComponentOverride* existingOverride = nullptr;
 
 			// Find existing override for this component type
 			for (auto& override : componentOverrides) {
 				if (override.componentType == type) {
-					compOverride = &override;
+					existingOverride = &override;
 					break;
 				}
 			}
 
 			// If not found, create new override
-			if (!compOverride) {
-				componentOverrides.emplace_back();
-				compOverride = &componentOverrides.back();
-				compOverride->componentType = type;
+			if (!existingOverride) {
+				ComponentOverride newOverride;
+				newOverride.componentType = type;
+				componentOverrides.push_back(newOverride);
+				existingOverride = &componentOverrides.back();
 			}
 
 			//// FIXED: Always add the component type itself as a property if no name given
@@ -144,11 +162,17 @@ namespace Engine {
 			//	}
 			//}
 			if (!propertyName.empty()) {
-				auto it = std::find(compOverride->modifiedPropertyNames.begin(),
-					compOverride->modifiedPropertyNames.end(),
+				auto it = std::find(existingOverride->modifiedPropertyNames.begin(),
+					existingOverride->modifiedPropertyNames.end(),
 					propertyName);
-				if (it == compOverride->modifiedPropertyNames.end()) {
-					compOverride->modifiedPropertyNames.push_back(propertyName);
+				if (it == existingOverride->modifiedPropertyNames.end()) {
+					existingOverride->modifiedPropertyNames.push_back(propertyName);
+				}
+			}
+			else {
+				// Generic marker that SOMETHING changed
+				if (existingOverride->modifiedPropertyNames.empty()) {
+					existingOverride->modifiedPropertyNames.push_back("modified");
 				}
 			}
 		}
@@ -315,6 +339,47 @@ namespace Engine {
 					break;
 				}
 			}
+		}
+
+		void MarkEntityDeleted(u64 prefabLocalID, const std::string& entityName, const std::string& entityData) {
+			DeletedEntityData deleted;
+			deleted.prefabLocalID = prefabLocalID;
+			deleted.entityName = entityName;
+			deleted.serializedEntityData = entityData;
+			deletedEntities.push_back(deleted);
+
+			// Remove from childEntityIDs
+			/*auto it = std::find(childEntityIDs.begin(), childEntityIDs.end(), static_cast<u32>(prefabLocalID));
+			if (it != childEntityIDs.end()) {
+				childEntityIDs.erase(it);
+			}*/
+		}
+
+		void MarkEntityAdded(u32 entityHandle) {
+			addedEntityHandles.push_back(entityHandle);
+		}
+
+		bool HasEntityChanges() const {
+			return !deletedEntities.empty() || !addedEntityHandles.empty();
+		}
+
+		// Clear all overrides for a specific component
+		void ClearAllOverridesForComponent(ComponentTypeID type) {
+			componentOverrides.erase(
+				std::remove_if(componentOverrides.begin(), componentOverrides.end(),
+					[type](const ComponentOverride& o) { return o.componentType == type; }),
+				componentOverrides.end()
+			);
+		}
+
+		// Check if component was added locally
+		bool WasComponentAddedLocally(ComponentTypeID type) const {
+			for (const auto& override : componentOverrides) {
+				if (override.componentType == type && override.isAddedComponent) {
+					return true;
+				}
+			}
+			return false;
 		}
 	};
 } // namespace Engine
