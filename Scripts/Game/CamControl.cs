@@ -151,17 +151,25 @@ namespace Game{
                 return;
             }
 
+            //works but jittery
+            // Vector3 playerPos = GetPosition(playerEntityID);
+            // Vector3 currentPos = GetPosition(cameraEntityID);
+            // Vector3 targetpos = playerPos;
+            // targetpos.Y = targetpos.Y + 15.0f;
+            // targetpos.Z = targetpos.Z + 35.0f; 
+
+            // float t = SimpleMath.Clamp(camFollowSpeed * deltaTime, 0.0f, 1.0f);
+            // Vector3 newCamControlPos = Vector3.Lerp(targetpos, playerPos, t);
+
+            // SetPosition(cameraEntityID, ref newCamControlPos);
+
             Vector3 playerPos = GetPosition(playerEntityID);
-            Vector3 currentPos = GetPosition(cameraEntityID);
-            //Vector3 camControlPos = GetPosition(camControlEntityID);
+            Vector3 camPos = GetPosition(cameraEntityID);
             Vector3 targetpos = playerPos;
             targetpos.Y = targetpos.Y + 15.0f;
-            targetpos.Z = targetpos.Z + 35.0f; 
+            targetpos.Z = targetpos.Z + 35.0f;
 
-            float t = SimpleMath.Clamp(camFollowSpeed * deltaTime, 0.0f, 1.0f);
-            Vector3 newCamControlPos = Vector3.Lerp(targetpos, playerPos, t);
-
-            SetPosition(cameraEntityID, ref newCamControlPos);
+            SetPosition(cameraEntityID, ref targetpos);
         }
 
         private void UpdateCameraTarget(){
