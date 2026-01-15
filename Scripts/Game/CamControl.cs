@@ -99,7 +99,7 @@ namespace Game{
 
             Quat yawRotation = Quat.FromAxisAngle(Vector3.Up, currentYaw);
 
-            Vector3 localRight = yawRotation.Rotate(Vector3.Right);
+            Vector3 localRight = yawRotation.RotateVector(Vector3.Right);
 
             Quat pitchRotation = Quat.FromAxisAngle(localRight, currentPitch);
             Quat finalRotation = yawRotation * pitchRotation;
@@ -147,7 +147,7 @@ namespace Game{
                 //LogMessage("[CamControl] Camera control forward for handle movment: X: " +
                 //camForward.X + ", Y:" + camForward.Y + ", Z: " + camForward.Z);
 
-                Vector3 moveDir = camRotation.Rotate(localMoveDir);
+                Vector3 moveDir = camRotation.RotateVector(localMoveDir);
 
                 LogMessage("[CamControl] local move dir for handle movment: X: " +
                 localMoveDir.X + ", Y:" + localMoveDir.Y + ", Z: " + localMoveDir.Z);
