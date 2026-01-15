@@ -26,40 +26,37 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] public static extern float Quat_Dot(ref Quat q1, ref Quat q2);
     }
 
+    /// <summary>
+    /// Blittable quaternion value type (X,Y,Z,W) that works with internal calls using ref/out.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct Quat
     {
-        public float X, Y, Z, W;
+        public float X;
+        public float Y;
+        public float Z;
+        public float W;
+
 
         public Quat(float x, float y, float z, float w)
         {
-            X = x;
-            Y = y;
-            Z = z;
-            W = w;
+            X = x; Y = y; Z = z; W = w;
         }
 
+        /// <summary>Identity quaternion (no rotation).</summary>
         public static Quat Identity => new Quat(0f, 0f, 0f, 1f);
 
-        public float SqrLength => X * X + Y * Y + Z * Z + W * W;
-
-        // Prefer native if you have it (consistent + fast)
-        public float Length => QuatNative.Quat_Length(ref this);
-
-        public Quat Normalized
-        {
-            get
-            {
-                QuatNative.Quat_Normalize(ref this, out Quat outQ);
-                return outQ;
-            }
-        }
+        // --------------------------------------------------------------------
+        // Direction vectors (computed via native calls)
+        // NOTE: avoid `ref this` in getters (treats `this` as readonly)
+        // --------------------------------------------------------------------
 
         public Vector3 Forward
         {
             get
             {
-                QuatNative.Quat_GetForward(ref this, out Vector3 v);
+                var q = this;
+                QuatNative.Quat_GetForward(ref q, out var v);
                 return v;
             }
         }
@@ -68,7 +65,8 @@ namespace Engine
         {
             get
             {
-                QuatNative.Quat_GetRight(ref this, out Vector3 v);
+                var q = this;
+                QuatNative.Quat_GetRight(ref q, out var v);
                 return v;
             }
         }
@@ -77,64 +75,128 @@ namespace Engine
         {
             get
             {
-                QuatNative.Quat_GetUp(ref this, out Vector3 v);
+                var q = this;
+                QuatNative.Quat_GetUp(ref q, out var v);
                 return v;
             }
         }
 
-        public static Quat operator *(Quat lhs, Quat rhs)
+        // --------------------------------------------------------------------
+        // Core ops (routed to native)
+        // --------------------------------------------------------------------
+
+
+        public float Length()
         {
-            QuatNative.Quat_Multiply(ref lhs, ref rhs, out Quat outQ);
+            var q = this;
+            return QuatNative.Quat_Length(ref q);
+        }
+
+
+        public Quat Normalized()
+        {
+            var q = this;
+            QuatNative.Quat_Normalize(ref q, out var outQ);
             return outQ;
         }
 
-        public static Quat FromAxisAngle(Vector3 axis, float angleRadians)
+
+        public void NormalizeInPlace()
         {
-            QuatNative.Quat_FromAxisAngle(ref axis, angleRadians, out Quat outQ);
-            return outQ;
+            var q = this;
+            QuatNative.Quat_Normalize(ref q, out var outQ);
+            this = outQ;
         }
 
-        public static Quat FromEuler(Vector3 euler)
-        {
-            QuatNative.Quat_FromEuler(ref euler, out Quat outQ);
-            return outQ;
-        }
-
-        public static float Dot(Quat a, Quat b)
-        {
-            return QuatNative.Quat_Dot(ref a, ref b);
-        }
-
-        public static Quat Slerp(Quat from, Quat to, float t)
-        {
-            if (t < 0.0f) t = 0.0f;
-            else if (t > 1.0f) t = 1.0f;
-
-            QuatNative.Quat_Slerp(ref from, ref to, t, out Quat outQ);
-            return outQ;
-        }
-
-        public Vector3 Rotate(Vector3 vec)
-        {
-            QuatNative.Quat_RotateVector(ref this, ref vec, out Vector3 outV);
-            return outV;
-        }
 
         public Quat Inverse()
         {
-            QuatNative.Quat_Inverse(ref this, out Quat outQ);
+            var q = this;
+            QuatNative.Quat_Inverse(ref q, out var outQ);
             return outQ;
         }
 
+
         public Vector3 ToEuler()
         {
-            QuatNative.Quat_ToEuler(ref this, out Vector3 euler);
-            return euler;
+            var q = this;
+            QuatNative.Quat_ToEuler(ref q, out var e);
+            return e;
         }
 
-        public override string ToString()
+
+        public Vector3 RotateVector(Vector3 v)
         {
-            return $"Quat({X:F2}, {Y:F2}, {Z:F2}, {W:F2})";
+            var q = this;
+            QuatNative.Quat_RotateVector(ref q, ref v, out var outV);
+            return outV;
         }
+
+
+        public static float Dot(Quat a, Quat b)
+            => QuatNative.Quat_Dot(ref a, ref b);
+
+
+        public static Quat operator *(Quat a, Quat b)
+        {
+            QuatNative.Quat_Multiply(ref a, ref b, out var outQ);
+            return outQ;
+        }
+
+
+        public static Quat Multiply(Quat a, Quat b)
+        {
+            QuatNative.Quat_Multiply(ref a, ref b, out var outQ);
+            return outQ;
+        }
+
+
+        public static Quat Slerp(Quat a, Quat b, float t)
+        {
+            QuatNative.Quat_Slerp(ref a, ref b, t, out var outQ);
+            return outQ;
+        }
+
+
+        public static Quat FromAxisAngle(Vector3 axis, float angleRadians)
+        {
+            QuatNative.Quat_FromAxisAngle(ref axis, angleRadians, out var outQ);
+            return outQ;
+        }
+
+
+        public static Quat FromEuler(Vector3 eulerRadians)
+        {
+            QuatNative.Quat_FromEuler(ref eulerRadians, out var outQ);
+            return outQ;
+        }
+
+        // --------------------------------------------------------------------
+        // Equality / Hash (no System.HashCode dependency)
+        // --------------------------------------------------------------------
+
+        public bool Equals(Quat other)
+            => X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+
+        public override bool Equals(object obj)
+            => obj is Quat q && Equals(q);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int h = 17;
+                h = (h * 31) + X.GetHashCode();
+                h = (h * 31) + Y.GetHashCode();
+                h = (h * 31) + Z.GetHashCode();
+                h = (h * 31) + W.GetHashCode();
+                return h;
+            }
+        }
+
+        public static bool operator ==(Quat a, Quat b) => a.Equals(b);
+        public static bool operator !=(Quat a, Quat b) => !a.Equals(b);
+
+        public override string ToString() => $"Quat({X}, {Y}, {Z}, {W})";
     }
 }

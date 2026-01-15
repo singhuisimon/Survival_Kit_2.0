@@ -111,7 +111,7 @@ namespace Game
             else if (t < 0.0f) t = 0.0f;
 
             Quat newRotation = Quat.Slerp(currentRotation, targetRotation, t);
-            newRotation = newRotation.Normalized;
+            newRotation = newRotation.Normalized();
 
             currentRotation = newRotation;
             SetRotation((uint)EntityID, ref currentRotation);
