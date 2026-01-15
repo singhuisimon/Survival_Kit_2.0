@@ -7,6 +7,7 @@
 #include "../Asset/ResourceManager.h"
 #include "../Asset/ResourceHelpers.h"
 #include "../Prefab/PrefabRegistry.h"
+#include "../Serialization/PrefabSerializer.h"
 
 /*#include "../Animation/AnimationStorage.h"
 #include "../BehaviourTree/BehaviourTreeEditor.h"
@@ -352,6 +353,23 @@ namespace Engine
 								m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
 
 							}
+							auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs"));
+							for (auto& prefabAsset : prefabFiles)
+							{
+								// Filter for .prefab files only
+								if (prefabAsset.name.find(".prefab") == std::string::npos) {
+									continue;
+								}
+
+								Prefab prefab;
+								if (PrefabSerializer::DeserializePrefab(prefabAsset.fullPath, prefab)) {
+									if (prefab.guid.m_Value != 0 && !PrefabRegistry::Get().IsPrefabRegistered(prefab.guid)) {
+										PrefabRegistry::Get().RegisterPrefab(prefab.guid, prefabAsset.fullPath, prefab.name);
+										LOG_INFO("Registered prefab: ", prefab.name.c_str(),
+											" (GUID: ", prefab.guid.m_Value, ")");
+									}
+								}
+							}
 
 							LOG_DEBUG(" ==== End Loading Scene ==== : ", fileName);
 						}
@@ -391,7 +409,7 @@ namespace Engine
 									LOG_ERROR("Failed to instantiate prefab");
 								}
 							}
-
+							
 						}
 					}
 					// to change the color of the selected

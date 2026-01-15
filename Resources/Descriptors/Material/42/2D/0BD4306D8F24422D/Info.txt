@@ -1,0 +1,7 @@
+{
+  "name": "PlayerBackWings.mat",
+  "guid": "0BD4306D8F24422D",
+  "tags": [],
+  "lastImported": "000000006966F34B",
+  "resourceLinks": []
+}

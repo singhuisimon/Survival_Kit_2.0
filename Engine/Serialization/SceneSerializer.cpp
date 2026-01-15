@@ -16,6 +16,7 @@
 #include "../Prefab/BehaviourTreePrefab.h"
 #include "../Component/PrefabComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"
@@ -148,7 +149,18 @@ namespace Engine
 					allocator);
 
 				propertiesObj.AddMember("prefabVersion", prefabComp.prefabVersion, allocator);
+				
 
+				// NEW: Serialize the prefab file path
+				if (prefabComp.isPrefabRoot) {
+					std::string prefabPath = PrefabRegistry::Get().GetPrefabPath(prefabComp.PrefabAssetGuid);
+					if (!prefabPath.empty()) {
+						propertiesObj.AddMember("prefabFilePath",
+							Value(prefabPath.c_str(), allocator),
+							allocator);
+						LOG_DEBUG("Serialized prefab path: ", prefabPath);
+					}
+				}
 				// Serialize component overrides
 				if (!prefabComp.componentOverrides.empty()) {
 					Value overridesArray(kArrayType);
@@ -194,6 +206,7 @@ namespace Engine
 						overridesArray.PushBack(overrideObj, allocator);
 					}
 
+
 					propertiesObj.AddMember("componentOverrides", overridesArray, allocator);
 				}
 
@@ -204,6 +217,25 @@ namespace Engine
 						childrenArray.PushBack(childID, allocator);
 					}
 					propertiesObj.AddMember("childEntityIDs", childrenArray, allocator);
+				}
+
+				// Serialize deleted entities
+				if (!prefabComp.deletedEntities.empty()) {
+					Value deletedArray(kArrayType);
+
+					for (const auto& deleted : prefabComp.deletedEntities) {
+						Value deletedObj(kObjectType);
+
+						deletedObj.AddMember("prefabLocalID", deleted.prefabLocalID, allocator);
+						deletedObj.AddMember("entityName",
+							Value(deleted.entityName.c_str(), allocator), allocator);
+						deletedObj.AddMember("serializedEntityData",
+							Value(deleted.serializedEntityData.c_str(), allocator), allocator);
+
+						deletedArray.PushBack(deletedObj, allocator);
+					}
+
+					propertiesObj.AddMember("deletedEntities", deletedArray, allocator);
 				}
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
@@ -640,6 +672,37 @@ namespace Engine
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
 			}
+			// Serialize SpriteRendererComponent
+			if (entity.HasComponent<SpriteRendererComponent>()) 
+			{
+				LOG_TRACE(" - Serializing SpriteRendererComponent");
+				auto& SpriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+				Value componentObj(kObjectType);
+				componentObj.AddMember("Type", "SpriteRendererComponent", allocator);
+				
+				Value propertiesObj(kObjectType);
+				
+				std::string textureFilename = AM.getNameFromGuid(SpriteRenderer.TextureGuid);
+
+				propertiesObj.AddMember("Texture", 
+					Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator), 
+					allocator);
+
+				Value colorArr(kArrayType);
+				colorArr.PushBack(SpriteRenderer.Color.r, allocator);
+				colorArr.PushBack(SpriteRenderer.Color.g, allocator);
+				colorArr.PushBack(SpriteRenderer.Color.b, allocator);
+				colorArr.PushBack(SpriteRenderer.Color.a, allocator);
+
+				propertiesObj.AddMember("Color", colorArr, allocator);
+				propertiesObj.AddMember("Quad", SpriteRenderer.Quad, allocator);
+				propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
+				propertiesObj.AddMember("IsActive", SpriteRenderer.IsActive, allocator);
+				propertiesObj.AddMember("IsVisible", SpriteRenderer.IsVisible, allocator);
+
+				componentObj.AddMember("Properties", propertiesObj, allocator);
+				componentsArray.PushBack(componentObj, allocator);
+			}
 
 			entityObj.AddMember("Components", componentsArray, allocator);
 			entitiesArray.PushBack(entityObj, allocator);
@@ -823,6 +886,32 @@ namespace Engine
 						if (properties.HasMember("prefabVersion"))
 							prefabComp.prefabVersion = properties["prefabVersion"].GetUint();
 
+						//// NEW: Load prefab file path from scene if available
+						//std::string prefabFilePath;
+						//if (properties.HasMember("prefabFilePath")) {
+						//	prefabFilePath = properties["prefabFilePath"].GetString();
+						//	LOG_DEBUG("Loaded prefab path from scene: ", prefabFilePath);
+						//}
+
+						//// Auto-register prefab if it's a root and not already registered
+						//if (prefabComp.isPrefabRoot && prefabComp.PrefabAssetGuid.m_Value != 0) {
+						//	if (!PrefabRegistry::Get().IsPrefabRegistered(prefabComp.PrefabAssetGuid)) {
+						//		// Use saved path if available, otherwise construct it
+						//		if (prefabFilePath.empty()) {
+						//			prefabFilePath = "Resources/Prefabs/" + prefabComp.prefabName + ".prefab";
+						//		}
+
+						//		LOG_INFO("Registering prefab: ", prefabComp.prefabName,
+						//			" from path: ", prefabFilePath);
+
+						//		PrefabRegistry::Get().RegisterPrefab(
+						//			prefabComp.PrefabAssetGuid,
+						//			prefabFilePath,
+						//			prefabComp.prefabName
+						//		);
+						//		LOG_INFO("Auto-registered prefab from scene: ", prefabComp.prefabName);
+						//	}
+						//}
 						// Deserialize component overrides
 						if (properties.HasMember("componentOverrides") && properties["componentOverrides"].IsArray())
 						{
@@ -887,6 +976,34 @@ namespace Engine
 								prefabComp.childEntityIDs.push_back(childrenArray[k].GetUint());
 							}
 						}
+
+						// Deserialize deleted entities
+						if (properties.HasMember("deletedEntities") && properties["deletedEntities"].IsArray())
+						{
+							const Value& deletedArray = properties["deletedEntities"];
+							prefabComp.deletedEntities.clear();
+
+							for (SizeType k = 0; k < deletedArray.Size(); k++)
+							{
+								const Value& deletedObj = deletedArray[k];
+
+								PrefabComponent::DeletedEntityData deleted;
+
+								if (deletedObj.HasMember("prefabLocalID"))
+									deleted.prefabLocalID = deletedObj["prefabLocalID"].GetUint64();
+
+								if (deletedObj.HasMember("entityName"))
+									deleted.entityName = deletedObj["entityName"].GetString();
+
+								if (deletedObj.HasMember("serializedEntityData"))
+									deleted.serializedEntityData = deletedObj["serializedEntityData"].GetString();
+
+								prefabComp.deletedEntities.push_back(deleted);
+							}
+
+							LOG_INFO("Deserialized ", prefabComp.deletedEntities.size(), " deleted entities");
+						}
+
 					}
 					else if (componentType == "TransformComponent")
 					{
@@ -1402,6 +1519,49 @@ namespace Engine
 							animator.currentTime = properties["currentTime"].GetFloat();
 						if (properties.HasMember("playbackSpeed"))
 							animator.playbackSpeed = properties["playbackSpeed"].GetFloat();
+					}
+					else if (componentType == "SpriteRendererComponent") 
+					{
+						auto& spriterenderer = entity.AddComponent<SpriteRendererComponent>();
+						 
+						if (properties.HasMember("Texture") && properties["Texture"].IsString()) 
+						{
+							std::string texName = properties["Texture"].GetString();
+							spriterenderer.TextureGuid = AM.getGuidFromName(texName);
+						}
+
+						if (properties.HasMember("Color") && properties["Color"].IsArray()) 
+						{
+							const auto& colorArr = properties["Color"].GetArray();
+							if (colorArr.Size() >= 4)
+							{
+								spriterenderer.Color.r = colorArr[0].GetFloat();
+								spriterenderer.Color.g = colorArr[1].GetFloat();
+								spriterenderer.Color.b = colorArr[2].GetFloat();
+								spriterenderer.Color.a = colorArr[3].GetFloat();
+							}
+						}
+
+						if (properties.HasMember("Quad")) 
+						{
+							spriterenderer.Quad = properties["Quad"].GetUint();
+						}
+
+						if (properties.HasMember("Sprite Layer")) 
+						{
+							spriterenderer.SpriteLayer = properties["Sprite Layer"].GetUint();
+						}
+
+						if (properties.HasMember("IsActive"))
+						{
+							spriterenderer.IsActive = properties["IsActive"].GetBool();
+						}
+
+						if (properties.HasMember("IsVisible"))
+						{
+							spriterenderer.IsVisible = properties["IsVisible"].GetBool();
+						}
+
 					}
 				}
 			}

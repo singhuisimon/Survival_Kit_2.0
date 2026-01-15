@@ -12,6 +12,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 #include "../Utility/Logger.h"
 #include "../Asset/AssetManager.h"
 #include "../Serialization/ComponentSerializer.h"
@@ -34,7 +35,7 @@ namespace Engine {
             return false;
         }
 
-        LOG_INFO("PrefabSerializer: Saving prefab '", prefab.name, "' to ", filepath);
+        LOG_INFO("PrefabSerializer::SerializePrefab Saving prefab '", prefab.name);
         
         rapidjson::Document doc;
         doc.SetObject();
@@ -93,8 +94,8 @@ namespace Engine {
         file << buffer.GetString();
         file.close();
 
-        LOG_INFO("Prefab serialized successfully to: ", filepath.c_str());
-        LOG_INFO("--- End of PrefabSerializer::SerializePrefab ---- ");
+        LOG_INFO("Prefab serialized successfully");
+        LOG_INFO("--- End of PrefabSerializer::SerializePrefab ---- \n");
         return true;
     }
 
@@ -240,6 +241,39 @@ namespace Engine {
             LOG_DEBUG("  + AnimatorComponent");
         }
 
+        //// Serialize SpriteRendererComponent
+        //if (entity.HasComponent<SpriteRendererComponent>())
+        //{
+        //    LOG_TRACE(" - Serializing SpriteRendererComponent");
+        //    auto& SpriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+        //    rapidjson::Value componentObj(rapidjson::kObjectType);
+        //    componentObj.AddMember("Type", "SpriteRendererComponent", allocator);
+
+        //    rapidjson::Value propertiesObj(rapidjson::kObjectType);
+
+        //    std::string textureFilename = AM.getNameFromGuid(SpriteRenderer.TextureGuid);
+
+        //    propertiesObj.AddMember("Texture",
+        //        rapidjson::Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
+        //        allocator);
+
+        //    rapidjson::Value colorArr(rapidjson::kArrayType);
+        //    colorArr.PushBack(SpriteRenderer.Color.r, allocator);
+        //    colorArr.PushBack(SpriteRenderer.Color.g, allocator);
+        //    colorArr.PushBack(SpriteRenderer.Color.b, allocator);
+        //    colorArr.PushBack(SpriteRenderer.Color.a, allocator);
+
+        //    propertiesObj.AddMember("Color", colorArr, allocator);
+        //    propertiesObj.AddMember("Quad", SpriteRenderer.Quad, allocator);
+        //    propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
+        //    propertiesObj.AddMember("IsActive", SpriteRenderer.IsActive, allocator);
+        //    propertiesObj.AddMember("IsVisible", SpriteRenderer.IsVisible, allocator);
+
+        //    componentObj.AddMember("Properties", propertiesObj, allocator);
+        //    componentsArray.PushBack(componentObj, allocator);
+        //}
+
+        //doc.AddMember("Components", componentsArray, allocator);
         // Add to prefab BEFORE processing children
         prefab.entities.push_back(entityData);
 
@@ -279,13 +313,30 @@ namespace Engine {
         data.typeName = ComponentSerializer::GetComponentTypeName(type);
 
         // Use ComponentSerializer
-        std::string jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+        std::string jsonStr;
+        if (type == ComponentTypeID::Transform && entity.HasComponent<TransformComponent>()) {
+            // Temporarily clear children for serialization
+            auto& transform = entity.GetComponent<TransformComponent>();
+            std::vector<u32> originalChildren = transform.Children;
+            u32 originalParent = transform.Parent;
+            transform.Children.clear();
+            transform.Parent = u32_max;
+            jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+
+            // Restore children
+            transform.Children = originalChildren;
+            transform.Parent = originalParent;
+        }
+        else {
+            jsonStr = ComponentSerializer::SerializeComponent(entity, type);
+        }
         data.serializedData.assign(jsonStr.begin(), jsonStr.end());
 
         return data;
     }
 
     bool PrefabSerializer::DeserializePrefab(const std::string& filepath, Prefab& outPrefab) {
+        LOG_INFO("====== Start of PrefabSerializer::DeserializePrefab ======");
         std::ifstream file(filepath);
         if (!file.is_open()) {
             LOG_ERROR("Failed to open prefab file: ", filepath.c_str());
@@ -367,7 +418,9 @@ namespace Engine {
                 LOG_INFO("Registered: ", outPrefab.name, " (GUID : ", outPrefab.guid.m_Value, ")");
             }
         }
-        LOG_INFO("Prefab deserialized successfully from: ", filepath.c_str());
+        LOG_INFO("Prefab deserialized successfully from: ", outPrefab.name);
+        LOG_INFO("====== End of PrefabSerializer::DeserializePrefab ======\n\n");
+
         return outPrefab.m_IsValid;
     }
 

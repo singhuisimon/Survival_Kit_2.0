@@ -3,6 +3,211 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 1048579,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Part1"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15761543699200311585",
+                        "PrefabAssetGuid": "14887247236118298981",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: MyEnemy.prefab",
+                        "prefabVersion": 15,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1571651250325995743\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048580,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13677327048697888989\",\"Tag\":\"Part1\"}}"
+                            },
+                            {
+                                "componentType": 3,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{}}"
+                            },
+                            {
+                                "componentType": 4,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17777476277785051353\",\"Enabled\":true,\"Type\":1,\"Color\":[1.0,1.0,1.0],\"Intensity\":1.0,\"Range\":5.0,\"SpotAngleDeg\":30.0,\"IndirectMultiplier\":1.0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1571651250325995743",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048580,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": false,
+                        "Projection": false,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.7777777910232544,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Properties": {
+                        "ComponentGUID": "17777476277785051353",
+                        "Enabled": true,
+                        "Type": 1,
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Intensity": 1.0,
+                        "Range": 5.0,
+                        "SpotAngleDeg": 30.0,
+                        "IndirectMultiplier": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048580,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "MyEnemy"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "9996936176166076695",
+                        "PrefabAssetGuid": "14887247236118298981",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: MyEnemy.prefab",
+                        "prefabVersion": 16,
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit2/build/bin/Debug/Resources/Sources/Prefabs/MyEnemy.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1571651250325618905\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,3.5,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2148112002629042391\",\"Tag\":\"MyEnemy\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7912719525663490267\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1048579
+                        ],
+                        "deletedEntities": [
+                            {
+                                "prefabLocalID": 3,
+                                "entityName": "Part2",
+                                "serializedEntityData": "{\"Tag\":\"Part2\",\"components\":[{\"type\":1,\"typeName\":\"TransformComponent\",\"data\":\"{\\\"Properties\\\":{\\\"ComponentGUID\\\":\\\"9420475423862735141\\\",\\\"Position\\\":[0.0,0.0,0.0],\\\"Rotation\\\":[0.0,-0.0,0.0],\\\"Scale\\\":[1.0,1.0,1.0],\\\"Parent\\\":1048580,\\\"Children\\\":[]}}\"},{\"type\":101,\"typeName\":\"TagComponent\",\"data\":\"{\\\"Properties\\\":{\\\"ComponentGUID\\\":\\\"12302779185379852579\\\",\\\"Tag\\\":\\\"Part2\\\"}}\"},{\"type\":2,\"typeName\":\"MeshRendererComponent\",\"data\":\"{\\\"Properties\\\":{\\\"ComponentGUID\\\":\\\"773564139311563049\\\",\\\"Mesh\\\":\\\"\\\",\\\"Material\\\":\\\"\\\",\\\"Texture\\\":\\\"\\\",\\\"Visible\\\":true,\\\"ShadowCast\\\":false,\\\"ShadowReceive\\\":false,\\\"GlobalIlluminate\\\":true,\\\"MeshType\\\":0,\\\"MaterialIdx\\\":0,\\\"TextureIdx\\\":0,\\\"SubmeshIndex\\\":0}}\"}]}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1571651250325618905",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            3.5,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1048579
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "7912719525663490267",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
+                    }
+                }
+            ]
+        },
+        {
             "ID": 3145728,
             "Components": [
                 {
