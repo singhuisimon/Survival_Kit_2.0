@@ -13,6 +13,8 @@ namespace Engine
 
         public Vector3(float scalar) : this(scalar, scalar, scalar) { }
 
+        public Vector3(Vector3 other) : this(other.X, other.Y, other.Z) { }
+
         // Static properties
         public static Vector3 Zero => new Vector3(0, 0, 0);
         public static Vector3 One => new Vector3(1, 1, 1);
@@ -24,7 +26,7 @@ namespace Engine
         public static Vector3 Back => new Vector3(0, 0, -1);
 
         // Properties
-        public float Magnitude => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        public float Magnitude => (float)SimpleMath.Sqrt(X * X + Y * Y + Z * Z);
         public float SqrMagnitude => X * X + Y * Y + Z * Z;
         public Vector3 Normalized
         {
@@ -63,11 +65,9 @@ namespace Engine
 
         public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
         {
-            t = Math.Max(0, Math.Min(1, t));
+            t = SimpleMath.Max(0, SimpleMath.Min(1, t));
             return a + (b - a) * t;
         }
-
-        public override string ToString() => $"({X:F2}, {Y:F2}, {Z:F2})";
     }
 
     public struct Vector4
@@ -90,7 +90,7 @@ namespace Engine
 
         public static Vector4 Lerp(Vector4 a, Vector4 b, float t)
         {
-            t = Math.Max(0, Math.Min(1, t));
+            t = SimpleMath.Max(0, SimpleMath.Min(1, t));
             return a + (b - a) * t;
         }
     }
@@ -102,6 +102,6 @@ namespace Engine
         public Vector2(float x, float y) { X = x; Y = y; }
 
         public static float Distance(Vector2 a, Vector2 b) =>
-            (float)Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
+            (float)SimpleMath.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
     }
 }
