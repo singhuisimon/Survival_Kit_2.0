@@ -16,9 +16,9 @@
                     "Properties": {
                         "ComponentGUID": "13040771389902225703",
                         "Position": [
-                            215.0,
-                            185.0,
-                            200.0
+                            430.0,
+                            370.0,
+                            425.0
                         ],
                         "Rotation": [
                             0.0,
@@ -26,11 +26,11 @@
                             0.0
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            1.0
+                            0.003000000026077032,
+                            0.003000000026077032,
+                            0.003000000026077032
                         ],
-                        "Parent": 12,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
@@ -38,7 +38,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "9005546123779047721",
-                        "Mesh": "",
+                        "Mesh": "E004_botnet_v001.fbx",
                         "Material": "",
                         "Texture": "",
                         "Visible": true,
@@ -310,6 +310,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "player",
                         "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -339,7 +340,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ],
                         "childEntityIDs": [
@@ -419,7 +423,7 @@
                             0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
+                        "LinearDamping": 10.0,
                         "AngularDamping": 0.05000000074505806,
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
@@ -1102,9 +1106,7 @@
                             1.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            14
-                        ]
+                        "Children": []
                     }
                 },
                 {
@@ -1121,7 +1123,8 @@
                             "playerFollowSpeed": 5.0,
                             "camFollowSpeed": 10.0,
                             "pitchLimitedDegree": 85.0,
-                            "offsetCamHeight": 15.0
+                            "offsetCamHeight": 15.0,
+                            "cameraOffSet": 5.0
                         }
                     }
                 }
