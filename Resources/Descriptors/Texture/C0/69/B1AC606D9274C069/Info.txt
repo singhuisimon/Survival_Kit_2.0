@@ -1,0 +1,7 @@
+{
+  "name": "mouse_kenny.png",
+  "guid": "B1AC606D9274C069",
+  "tags": [],
+  "lastImported": "00000000692ACF53",
+  "resourceLinks": []
+}
