@@ -17,7 +17,7 @@ namespace Engine {
         Animator = 11,
         ReverbZone = 12,
         BehaviourTree = 13,
-
+        SpriteRenderer = 14,
         Prefab = 100,
         Tag = 101,
 
