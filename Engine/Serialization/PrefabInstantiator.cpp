@@ -15,6 +15,7 @@
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
@@ -999,6 +1000,48 @@ namespace Engine
             LOG_WARNING("Unknown component type for removal: ", static_cast<u32>(type));
             break;
         }
+
+       /* else if (componentType == "SpriteRendererComponent") {
+            auto& spriterenderer = entity.AddComponent<SpriteRendererComponent>();
+
+            if (properties.HasMember("Texture") && properties["Texture"].IsString())
+            {
+                std::string texName = properties["Texture"].GetString();
+                spriterenderer.TextureGuid = AM.getGuidFromName(texName);
+            }
+
+            if (properties.HasMember("Color") && properties["Color"].IsArray())
+            {
+                const auto& colorArr = properties["Color"].GetArray();
+                if (colorArr.Size() >= 4)
+                {
+                    spriterenderer.Color.r = colorArr[0].GetFloat();
+                    spriterenderer.Color.g = colorArr[1].GetFloat();
+                    spriterenderer.Color.b = colorArr[2].GetFloat();
+                    spriterenderer.Color.a = colorArr[3].GetFloat();
+                }
+            }
+
+            if (properties.HasMember("Quad"))
+            {
+                spriterenderer.Quad = properties["Quad"].GetUint();
+            }
+
+            if (properties.HasMember("Sprite Layer"))
+            {
+                spriterenderer.SpriteLayer = properties["Sprite Layer"].GetUint();
+            }
+
+            if (properties.HasMember("IsActive"))
+            {
+                spriterenderer.IsActive = properties["IsActive"].GetBool();
+            }
+
+            if (properties.HasMember("IsVisible"))
+            {
+                spriterenderer.IsVisible = properties["IsVisible"].GetBool();
+			}
+        }*/
     }
 
    

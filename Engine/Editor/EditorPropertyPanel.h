@@ -12,6 +12,7 @@
 #include "../Component/TransformComponent.h"
 #include "../Component/PrefabComponent.h"
 #include "../Transform/TransformSystem.h"
+#include "../Component/SpriteRendererComponent.h"
 
 namespace Engine
 {
@@ -89,6 +90,9 @@ namespace Engine
 		void DisplayLightComponent(ImVec2& buttonSize);
 		void DisplayCameraComponent(ImVec2& buttonSize);
 		void DisplayAnimatorComponent(ImVec2& buttonSize);
+		void DisplaySpriteRendererComponent(ImVec2& buttonSize);
+		void DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag);
+		
 			   
 		void AddComponent();
 		void AnimatorWindow();

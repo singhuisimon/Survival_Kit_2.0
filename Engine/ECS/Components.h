@@ -16,6 +16,7 @@
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
+#include "../Component/SpriteRendererComponent.h"
 
 namespace Engine {
     // All components are now defined in their respective headers

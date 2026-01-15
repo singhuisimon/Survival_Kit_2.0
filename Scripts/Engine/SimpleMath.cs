@@ -116,5 +116,15 @@ namespace Engine
             if (value > max) return max;
             return value;
         }
+
+        public static float Min(float x, float y)
+        {
+            return (x > y) ? y : x;
+        }
+
+        public static float Max(float x, float y)
+        {
+            return (x > y) ? x : y;
+        }
     }
 }
