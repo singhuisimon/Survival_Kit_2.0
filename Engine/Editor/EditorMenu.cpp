@@ -26,8 +26,11 @@ namespace Engine
 						m_Editor->CreateNewScene("New Scene");
 						m_CurrScenePath = "";
 						m_Editor->SetScenePath(m_CurrScenePath);
+						m_SceneIsNew = true;
+						
 					}
 				}
+				
 				if (ImGui::IsItemHovered())
 				{
 					ImGui::SetTooltip("Create new scene.");
@@ -38,6 +41,7 @@ namespace Engine
 					m_OpenScenePanel = true;
 					m_CurrPrefabPath = "";
 					m_Editor->SetPrefabPath(m_CurrPrefabPath);
+					m_SceneIsNew = false;
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -45,7 +49,7 @@ namespace Engine
 				}
 				bool hasScenePath = !m_Editor->GetScenePath().empty();
 				// ----------------- Save Scene ------------------------
-				if (ImGui::MenuItem("Save Scene", nullptr, false, hasScenePath))
+				if (ImGui::MenuItem("Save Scene", nullptr, false, hasScenePath || m_SceneIsNew))
 				{
 					m_CurrScenePath = m_Editor->GetScenePath();
 					Scene*m_Scene = m_Editor->GetActiveScene();
@@ -66,7 +70,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 				}
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...",  nullptr, false, hasScenePath))
+				if (ImGui::MenuItem("Save Scene As...",  nullptr, false, hasScenePath || m_SceneIsNew))
 				{
 					m_SaveScenePanel = true;
 				}
@@ -80,6 +84,7 @@ namespace Engine
 					m_OpenPrefabPanel = true;
 					m_CurrScenePath = "";
 					m_Editor->SetScenePath(m_CurrScenePath);
+					m_SceneIsNew = false;
 				}
 				bool hasPrefabPath = !m_Editor->GetPrefabPath().empty();
 				if (ImGui::MenuItem("Save Prefab", nullptr, false, hasPrefabPath))
