@@ -17,6 +17,7 @@
 
  // Types for u32
 #include "../Utility/Types.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -35,7 +36,10 @@ namespace Engine {
 
     struct LightComponent
     {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Light;
+        static constexpr const char* TypeName = "LightComponent";
 
+        xresource::instance_guid ComponentGUID;
         // --------- On/Off ---------
         bool Enabled = true;
 
@@ -61,11 +65,15 @@ namespace Engine {
         u32  _Reserved0 = 0u;
 
         // Default constructor
-        LightComponent() = default;
+        LightComponent()
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+        {
+        }
 
         // Construct with type; sets a sensible default intensity per type
         explicit LightComponent(LightType type)
-            : Type(type)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Type(type)
         {
             // Unity-like default intensities:
             // - Directional: 0.5 (no distance falloff; easy to blow out otherwise)
@@ -82,7 +90,8 @@ namespace Engine {
             float indirectMult = 1.0f,
             LightMode mode = LightMode::Realtime,
             bool  enabled = true)
-            : Enabled(enabled),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Enabled(enabled),
             Type(type),
             Mode(mode),
             Color(color),

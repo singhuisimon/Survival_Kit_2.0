@@ -51,6 +51,61 @@
 
 namespace Engine
 {
+	namespace
+	{
+		static inline bool IsFinite(float v)
+		{
+			return std::isfinite(v) != 0;
+		}
+
+		static inline bool IsFiniteVec3(const glm::vec3 &v)
+		{
+			return IsFinite(v.x) && IsFinite(v.y) && IsFinite(v.z);
+		}
+
+		static inline bool IsFiniteQuat(const glm::quat &q)
+		{
+			return IsFinite(q.x) && IsFinite(q.y) && IsFinite(q.z) && IsFinite(q.w);
+		}
+
+		static inline glm::quat SafeNormalizeQuat(const glm::quat &q)
+		{
+			// Reject NaNs/Infs early
+			if (!IsFiniteQuat(q))
+				return glm::quat(1.f, 0.f, 0.f, 0.f); // identity (w,x,y,z) ctor in glm
+
+			const float len2 = glm::length2(q);
+			// If too small, return identity to avoid divide-by-zero / blow-ups
+			if (!(len2 > 1e-12f))
+				return glm::quat(1.f, 0.f, 0.f, 0.f);
+
+			return glm::normalize(q);
+		}
+
+		static inline glm::vec3 SafeVec3OrZero(const glm::vec3 &v)
+		{
+			return IsFiniteVec3(v) ? v : glm::vec3(0.f);
+		}
+
+		static inline glm::vec3 SafeScale(const glm::vec3 &s)
+		{
+			// If you want to preserve negative scale (mirroring), keep it.
+			// Only clean NaN/Inf. Optionally clamp away from 0 to avoid singular matrices.
+			glm::vec3 out = s;
+			if (!IsFinite(out.x)) out.x = 1.f;
+			if (!IsFinite(out.y)) out.y = 1.f;
+			if (!IsFinite(out.z)) out.z = 1.f;
+
+			// Optional: avoid exact zero scale if your TRS->matrix code divides by scale
+			// const float eps = 1e-6f;
+			// if (std::abs(out.x) < eps) out.x = (out.x < 0.f ? -eps : eps);
+			// if (std::abs(out.y) < eps) out.y = (out.y < 0.f ? -eps : eps);
+			// if (std::abs(out.z) < eps) out.z = (out.z < 0.f ? -eps : eps);
+
+			return out;
+		}
+	}
+
 	namespace InternalCalls
 	{
 		// =====================================================================
@@ -480,111 +535,98 @@ namespace Engine
 		// =====================================================================
 		// Transform
 		// =====================================================================
-		/**************************************************************************
-		 * @brief
-		 * Retrieves a transform property from the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param outPosition
-		 * Output parameter that receives the requested value.
-		***************************************************************************/
 		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition)
 		{
 			if (!outPosition) return;
+			*outPosition = glm::vec3(0.f); // deterministic default
+
+			// RequireMainThread();
+
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
-			*outPosition = e.GetComponent<TransformComponent>().Position;
+			const auto &t = e.GetComponent<TransformComponent>();
+			*outPosition = SafeVec3OrZero(t.Position);
 		}
 
-		/**************************************************************************
-		 * @brief
-		 * Sets a transform property on the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param position
-		 * Pointer/reference to a vector value.
-		***************************************************************************/
 		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position)
 		{
 			if (!position) return;
+
+			// RequireMainThread();
+
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
+			glm::vec3 p = SafeVec3OrZero(*position);
+
 			auto &t = e.GetComponent<TransformComponent>();
-			t.Position = *position;
+			t.Position = p;
 			t.IsDirty = true;
 		}
 
-		/**************************************************************************
-		 * @brief
-		 * Retrieves a transform property from the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param outRotation
-		 * Output parameter that receives the requested value.
-		***************************************************************************/
+		// ---- Rotation -----------------------------------------------------------
+
 		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation)
 		{
 			if (!outRotation) return;
+			*outRotation = glm::quat(1.f, 0.f, 0.f, 0.f); // identity default
+
+			// RequireMainThread();
+
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
-			*outRotation = e.GetComponent<TransformComponent>().Rotation;
+			const auto &t = e.GetComponent<TransformComponent>();
+			// Optionally normalize on get to keep scripts safe even if native code set bad values
+			*outRotation = SafeNormalizeQuat(t.Rotation);
 		}
 
-		/**************************************************************************
-		 * @brief
-		 * Sets a transform property on the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param rotation
-		 * Pointer/reference to a quaternion value.
-		***************************************************************************/
 		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation)
 		{
 			if (!rotation) return;
+
+			// RequireMainThread();
+
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
+			glm::quat r = SafeNormalizeQuat(*rotation);
+
 			auto &t = e.GetComponent<TransformComponent>();
-			t.Rotation = *rotation;
+			t.Rotation = r;
 			t.IsDirty = true;
 		}
 
-		/**************************************************************************
-		 * @brief
-		 * Retrieves a transform property from the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param outScale
-		 * Output parameter that receives the requested value.
-		***************************************************************************/
+		// ---- Scale --------------------------------------------------------------
+
 		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale)
 		{
 			if (!outScale) return;
+			*outScale = glm::vec3(1.f); // deterministic default
+
+			// RequireMainThread();
+
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
-			*outScale = e.GetComponent<TransformComponent>().Scale;
+			const auto &t = e.GetComponent<TransformComponent>();
+			*outScale = SafeScale(t.Scale);
 		}
 
-		/**************************************************************************
-		 * @brief
-		 * Sets a transform property on the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param scale
-		 * Pointer/reference to a vector value.
-		***************************************************************************/
 		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale)
 		{
 			if (!scale) return;
+
+			// RequireMainThread();
+
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
+			glm::vec3 s = SafeScale(*scale);
+
 			auto &t = e.GetComponent<TransformComponent>();
-			t.Scale = *scale;
+			t.Scale = s;
 			t.IsDirty = true;
 		}
 
@@ -716,13 +758,17 @@ namespace Engine
 
 			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
-			if (!prefab)
-				return 0;
+			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
+			/*if (!prefab)
+				return 0;*/
 
-			PrefabRegistry::Get().RegisterPrefab(prefab);
+				//PrefabRegistry::Get().RegisterPrefab(prefab);
 
-			Entity entity = PrefabInstantiator::InstantiateEntityPrefab(s_CurrentScene, prefab->GetGUID());
+			Entity entity = PrefabInstantiator::InstantiatePrefabFromFile(
+				s_CurrentScene,
+				prefabFullPath,
+				Entity{}  // No parent
+			);
 			if (!entity)
 				return 0;
 
@@ -752,13 +798,19 @@ namespace Engine
 
 			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
+			/*auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
 			if (!prefab)
 				return 0;
 
 			PrefabRegistry::Get().RegisterPrefab(prefab);
 
-			Entity entity = PrefabInstantiator::InstantiateScenePrefab(s_CurrentScene, prefab->GetGUID());
+			Entity entity = PrefabInstantiator::InstantiateScenePrefab(s_CurrentScene, prefab->GetGUID());*/
+
+			Entity entity = PrefabInstantiator::InstantiatePrefabFromFile(
+				s_CurrentScene,
+				prefabFullPath,
+				Entity{}  // No parent
+			);
 			if (!entity)
 				return 0;
 
@@ -801,17 +853,21 @@ namespace Engine
 
 			std::string prefabFullPath = getAssetFilePath(prefabPath);
 
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
-			if (!prefab)
+			//auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
+		/*	if (!prefab)
 				return 0;
 
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			Entity entity;
-			if (isScenePrefab)
+			*/
+			Entity entity = PrefabInstantiator::InstantiatePrefabFromFile(
+				s_CurrentScene,
+				prefabFullPath,
+				Entity{}  // No parent
+			);
+			/*if (isScenePrefab)
 				entity = PrefabInstantiator::InstantiateScenePrefab(s_CurrentScene, prefab->GetGUID());
 			else
-				entity = PrefabInstantiator::InstantiateEntityPrefab(s_CurrentScene, prefab->GetGUID());
+				entity = PrefabInstantiator::InstantiateEntityPrefab(s_CurrentScene, prefab->GetGUID());*/
+
 
 			if (!entity)
 				return 0;

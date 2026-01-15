@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Engine
@@ -28,138 +29,131 @@ namespace Engine
         // (so scripts can: using static Engine.Transform;)
         // =========================
 
+        private uint _entityID;
+
+        internal void __Bind(uint entityID) => _entityID = entityID;
+
+        public uint EntityID => _entityID;
+
+        // ------------------------------------------------------------
+        // Hierarchy
+        // ------------------------------------------------------------
+
+        /// <summary>
+        /// Returns parent entity ID (0 if none, depending on your engine convention).
+        /// </summary>
+        public uint Parent => Transform_GetParent(_entityID);
+
+        // ------------------------------------------------------------
+        // TRS
+        // ------------------------------------------------------------
+
+        public Vector3 Position
+        {
+            get
+            {
+                Transform_GetPosition(_entityID, out var p);
+                return p;
+            }
+            set
+            {
+                Transform_SetPosition(_entityID, ref value);
+            }
+        }
+
+        public Quat Rotation
+        {
+            get
+            {
+                Transform_GetRotation(_entityID, out var r);
+                return r;
+            }
+            set
+            {
+                Transform_SetRotation(_entityID, ref value);
+            }
+        }
+
+        public Vector3 Scale
+        {
+            get
+            {
+                Transform_GetScale(_entityID, out var s);
+                return s;
+            }
+            set
+            {
+                Transform_SetScale(_entityID, ref value);
+            }
+        }
+
+        // ------------------------------------------------------------
+        // Convenience (derived from Rotation)
+        // ------------------------------------------------------------
+
+        public Vector3 Forward => Rotation.Forward;
+        public Vector3 Right => Rotation.Right;
+        public Vector3 Up => Rotation.Up;
+
         public static uint TransformGetParent(uint entityID) => Transform_GetParent(entityID);
 
-        public static Vector3 TransformGetPosition(uint entityID)
+        public static Vector3 GetPosition(uint entityID)
         {
-            Transform_GetPosition(entityID, out Vector3 pos);
-            return pos;
+            Transform_GetPosition(entityID, out var p);
+            return p;
         }
 
-        public static void TransformSetPosition(uint entityID, ref Vector3 position) => Transform_SetPosition(entityID, ref position);
+        public static void SetPosition(uint entityID, ref Vector3 position) => Transform_SetPosition(entityID, ref position);
 
-        public static Quat TransformGetRotation(uint entityID)
+        public static Quat GetRotation(uint entityID)
         {
-            Transform_GetRotation(entityID, out Quat rot);
-            return rot;
+            Transform_GetRotation(entityID, out var r);
+            return r;
         }
 
-        public static void TransformSetRotation(uint entityID, ref Quat rotation) => Transform_SetRotation(entityID, ref rotation);
+        public static void SetRotation(uint entityID, ref Quat rotation) => Transform_SetRotation(entityID, ref rotation);
 
-        public static Vector3 TransformGetScale(uint entityID)
+        public static Vector3 GetScale(uint entityID)
         {
-            Transform_GetScale(entityID, out Vector3 s);
+            Transform_GetScale(entityID, out var s);
             return s;
         }
 
-        public static void TransformSetScale(uint entityID, ref Vector3 scale) => Transform_SetScale(entityID, ref scale);
-        public static Vector3 GetPosition(uint entityID) => TransformGetPosition(entityID);
-        public static void SetPosition(uint entityID, ref Vector3 position) => TransformSetPosition(entityID, ref position);
-        public static Quat GetRotation(uint entityID) => TransformGetRotation(entityID);
-        public static void SetRotation(uint entityID, ref Quat rotation) => TransformSetRotation(entityID, ref rotation);
-        public static Vector3 GetScale(uint entityID) => TransformGetScale(entityID);
-        public static void SetScale(uint entityID, ref Vector3 scale) => TransformSetScale(entityID, ref scale);
+        public static void SetScale(uint entityID, ref Vector3 scale) => Transform_SetScale(entityID, ref scale);
 
-        // =========================
-        // Instance API (Component)
-        // =========================
-
-        private uint ID => Entity.EntityID;
-
-        public uint ParentID => Transform_GetParent(ID);
-
-        /// <summary>World position of this entity.</summary>
-        public Vector3 Position
+        // ------------------------------------------------------------
+        // Transform helpers
+        // ------------------------------------------------------------
+        /// <summary>
+        /// Returns a quaternion representing a rotation of <paramref name="angleRadians"/>
+        /// around <paramref name="axis"/>.
+        /// </summary>
+        public static Quat RotateAxisAngle(Vector3 axis, float angleRadians)
         {
-            get => TransformGetPosition(ID);
-            set => Transform_SetPosition(ID, ref value);
+            // If you want safety, normalize axis here (optional):
+            // axis = axis.Normalized();
+
+            return Quat.FromAxisAngle(axis, angleRadians);
         }
 
-        /// <summary>World rotation as a quaternion.</summary>
-        public Quat Rotation
-        {
-            get => TransformGetRotation(ID);
-            set => Transform_SetRotation(ID, ref value);
-        }
-
-        /// <summary>Local scale of this entity.</summary>
-        public Vector3 Scale
-        {
-            get => TransformGetScale(ID);
-            set => Transform_SetScale(ID, ref value);
-        }
-
-        public void Rotate(Quat rotation)
-        {
-            Quat r = Rotation;
-            r = r * rotation;
-            Transform_SetRotation(ID, ref r);
-        }
-
-        public void RotateAxisAngle(Vector3 axis, float angleRadians)
+        /// <summary>
+        /// Rotates an existing quaternion by an axis-angle delta.
+        /// If <paramref name="localSpace"/> is true, applies delta in local space (q * delta),
+        /// else world space (delta * q).
+        /// </summary>
+        public static Quat RotateAxisAngle(in Quat q, Vector3 axis, float angleRadians, bool localSpace = true)
         {
             Quat delta = Quat.FromAxisAngle(axis, angleRadians);
-            Quat r = Rotation;
-            r = r * delta;
-            Transform_SetRotation(ID, ref r);
+            return localSpace ? (q * delta) : (delta * q);
         }
 
-        // =========================
-        // LookAt helper (pure math)
-        // =========================
-        public static void LookAt(uint entityID, Vector3 target)
+        /// <summary>
+        /// In-place version: modifies <paramref name="q"/>.
+        /// </summary>
+        public static void RotateAxisAngleInPlace(ref Quat q, Vector3 axis, float angleRadians, bool localSpace = true)
         {
-            Vector3 myPos = TransformGetPosition(entityID);
-            Vector3 direction = new Vector3(
-                target.X - myPos.X,
-                target.Y - myPos.Y,
-                target.Z - myPos.Z
-            );
-
-            float lenSq = direction.X * direction.X +
-                          direction.Y * direction.Y +
-                          direction.Z * direction.Z;
-            if (lenSq <= 0.0001f)
-                return;
-
-            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-            direction.X *= invLen;
-            direction.Y *= invLen;
-            direction.Z *= invLen;
-
-            // Engine convention: identity faces +Z
-            Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
-
-            float dot = forward.X * direction.X +
-                        forward.Y * direction.Y +
-                        forward.Z * direction.Z;
-
-            Quat rotation;
-
-            if (dot < -0.9999f)
-            {
-                rotation = new Quat(0.0f, 1.0f, 0.0f, 0.0f);
-            }
-            else
-            {
-                Vector3 cross = new Vector3(
-                    forward.Y * direction.Z - forward.Z * direction.Y,
-                    forward.Z * direction.X - forward.X * direction.Z,
-                    forward.X * direction.Y - forward.Y * direction.X
-                );
-
-                float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
-                float invS = 1.0f / s;
-
-                rotation = new Quat(
-                    cross.X * invS,
-                    cross.Y * invS,
-                    cross.Z * invS,
-                    0.5f * s
-                );
-            }
-
-            Transform_SetRotation(entityID, ref rotation);
+            Quat delta = Quat.FromAxisAngle(axis, angleRadians);
+            q = localSpace ? (q * delta) : (delta * q);
         }
     }
 }
