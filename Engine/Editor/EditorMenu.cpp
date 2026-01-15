@@ -49,7 +49,7 @@ namespace Engine
 				}
 				bool hasScenePath = !m_Editor->GetScenePath().empty();
 				// ----------------- Save Scene ------------------------
-				if (ImGui::MenuItem("Save Scene", nullptr, false, hasScenePath || m_SceneIsNew))
+				if (ImGui::MenuItem("Save Scene")/*, nullptr, false, hasScenePath)*/)
 				{
 					m_CurrScenePath = m_Editor->GetScenePath();
 					Scene*m_Scene = m_Editor->GetActiveScene();
@@ -70,7 +70,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 				}
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...",  nullptr, false, hasScenePath || m_SceneIsNew))
+				if (ImGui::MenuItem("Save Scene As...")/*,  nullptr, false, hasScenePath)*/)
 				{
 					m_SaveScenePanel = true;
 				}
