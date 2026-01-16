@@ -1,0 +1,7 @@
+{
+  "name": "E003_trojan_v001.fbx",
+  "guid": "4051086A3E190021",
+  "tags": [],
+  "lastImported": "00000000691D7DE4",
+  "resourceLinks": []
+}

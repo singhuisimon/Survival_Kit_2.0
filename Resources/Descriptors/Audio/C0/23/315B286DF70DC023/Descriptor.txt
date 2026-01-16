@@ -1,0 +1,10 @@
+{
+  "sourcePath": "\\Resources\\Sources\\Audio\\office_ambience.wav",
+  "audioSettings": {
+    "outputFormat": "OGG",
+    "compression": "VORBIS",
+    "quality": 0.7,
+    "sampleRate": 44100,
+    "channelMode": "STEREO"
+  }
+}

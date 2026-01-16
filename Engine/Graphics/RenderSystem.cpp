@@ -4,6 +4,7 @@
 #include "../Component/MeshRendererComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"   
+#include "../Component/SpriteRendererComponent.h"
 #include "Asset/ResourceHelpers.h"
 
 namespace Engine {
@@ -30,9 +31,10 @@ namespace Engine {
 
 			// Capture visible geometry information
 			if (!renderable.Visible) continue;
-			
+
 			m_drawitems.push_back({
 					.m_model_to_world_transform = transform.WorldTransform,
+					.m_drawitem_type = DrawItemType::MESH3D,
 					.m_entity_id = static_cast<u32>(entity),
 					.m_submesh_index = renderable.SubmeshIndex,
 					.m_default_mesh_handle = renderable.MeshType,
@@ -42,7 +44,7 @@ namespace Engine {
 					.m_material_guid = renderable.MaterialGuid,
 					.m_texture_guid = renderable.TextureGuid
 				});
-			
+
 		}
 
 		// Save all enabled cameras
@@ -73,6 +75,7 @@ namespace Engine {
 					// Capture particle information
 					m_drawitems.push_back({
 						.m_model_to_world_transform = particle.Transform,
+						.m_drawitem_type = DrawItemType::Particle,
 						.m_entity_id = u32_max, // Particles are not associated with an entity for rendering purposes
 						.m_submesh_index = 0,
 						.m_default_mesh_handle = emitter.ParticleType,
@@ -117,6 +120,36 @@ namespace Engine {
 			// Save indirect multiplier
 			L.indirectMultiplier = LgLightComp.IndirectMultiplier;
 			m_lightlist.emplace_back(L);
+		}
+
+		// Save all 2D items
+		//auto spriteView = scene->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
+
+		auto spriteView = scene->GetRegistry().group<TransformComponent, SpriteRendererComponent>();
+
+		spriteView.sort<SpriteRendererComponent>([](SpriteRendererComponent const& a, SpriteRendererComponent const& b) {return a.SpriteLayer < b.SpriteLayer; });
+
+		for (auto entity : spriteView) 
+		{
+			auto& renderable2d = spriteView.get<SpriteRendererComponent>(entity);
+			auto& r2dtransform = spriteView.get<TransformComponent>(entity);
+
+			if (!renderable2d.IsVisible) continue;
+
+			m_drawitems.push_back({
+				.m_model_to_world_transform = r2dtransform.WorldTransform,
+				.m_drawitem_type = DrawItemType::SPRITE2D,
+				.m_entity_id = static_cast<u32>(entity),
+				.m_submesh_index = 0,
+				.m_default_mesh_handle = renderable2d.Quad,
+				.m_default_material_handle = 0,
+				.m_default_u32texture_handle = 0,
+				.m_render_layer = renderable2d.SpriteLayer,
+				.m_color = renderable2d.Color,
+				.m_mesh_guid = 0,
+				.m_material_guid = 0,
+				.m_texture_guid = renderable2d.TextureGuid
+				});
 		}
 		
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());

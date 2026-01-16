@@ -3,7 +3,7 @@
   "textureSettings": {
     "usageType": "COLOR",
     "compression": "BC7",
-    "quality": 0.8,
+    "quality": 1,
     "generateMipmaps": true,
     "srgb": true
   }
