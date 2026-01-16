@@ -1,85 +1,371 @@
 {
-  "Entities": [
-    {
-      "ID": 0,
-      "Name": "Main Camera",
-      "Components": [
+    "Scene": "EpilepsyWarning",
+    "Version": "1.0",
+    "Entities": [
         {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Main Camera",
-            "Active": true
-          }
+            "ID": 6,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Install Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2441215419310686495",
+                        "Position": [
+                            810.0,
+                            450.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            28.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "InstallButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
         },
         {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 10.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Credits Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9358744446951768347",
+                        "Position": [
+                            1200.0,
+                            300.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            55.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "CreditsButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
         },
         {
-          "Type": "CameraComponent",
-          "Properties": {
-            "Enabled": true,
-            "Primary": true,
-            "Projection": true,
-            "autoAspect": true,
-            "Size": [0.0, 20.0],
-            "Depth": 0,
-            "Aspect": 1.7777777910232544,
-            "FOV": 45.0,
-            "NearPlane": 0.5,
-            "FarPlane": 1000.0,
-            "Target": [0.0, 0.0, 0.0]
-          }
+            "ID": 4,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "HowToPlay Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15699812722289426711",
+                        "Position": [
+                            1200.0,
+                            190.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlayButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Settings Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8782283694648344851",
+                        "Position": [
+                            1200.0,
+                            80.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            55.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "SettingsButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Shutdown Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8782283694648344847",
+                        "Position": [
+                            65.0,
+                            695.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ShutdownButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Main Menu Background"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13393969713075732747",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "WindowsBG.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Main Menu Camera"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12241048208468885765",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            10.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": true,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.6347382068634033,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ]
+                    }
+                }
+            ]
         }
-      ]
-    },
-    {
-      "ID": 1,
-      "Name": "Epilepsy Warning",
-      "Components": [
+    ],
+    "Settings": [
         {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Epilepsy Warning",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [650.0, 400.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [700.0, 500.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "EpilepsyWarning.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 0,
-            "IsActive": true,
-            "IsVisible": true
-          }
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0
         }
-      ]
-    }
-  ],
-  "Settings": [
-    {
-      "BloomToggle": false,
-      "BloomStrength": 0.009999999776482582,
-      "BloomFilterRadius": 0.0024999999441206455,
-      "Exposure": 1.0
-    }
-  ]
+    ]
 }
