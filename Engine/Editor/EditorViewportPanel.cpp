@@ -1,6 +1,6 @@
 #include "EditorViewportPanel.h"
 #include "Editor.h"
-
+#include "../Scripting/MonoScriptEngine.h"
 #include <algorithm>
 #include <ImGuizmo.h>
 
@@ -235,6 +235,9 @@ namespace Engine
         // ONLY allow Play from STOP state
         if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
+            auto &se = Engine::MonoScriptEngine::GetInstance();
+            se.HotReloadOnPlay(true);
+
             // Store the original scene state before playing
             Scene* activeScene = m_Editor->GetActiveScene();
             if (activeScene && m_Editor->HasScenePath())
