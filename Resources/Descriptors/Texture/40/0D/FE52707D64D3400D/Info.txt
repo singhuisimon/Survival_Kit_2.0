@@ -1,0 +1,7 @@
+{
+  "name": "Example_PlayerHPHeal.png",
+  "guid": "FE52707D64D3400D",
+  "tags": [],
+  "lastImported": "00000000696A18CD",
+  "resourceLinks": []
+}
