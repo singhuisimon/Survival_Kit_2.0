@@ -620,8 +620,8 @@ namespace Engine
 				static bool showWrongType = false;
 
 				// Display asset reference fields
-				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH, showWrongType);
-				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL, showWrongType);
+				DisplayAssetField("Mesh", mesh.MeshGuid, ResourceType::MESH, showWrongType, ComponentTypeID::MeshRenderer);
+				DisplayAssetField("Material", mesh.MaterialGuid, ResourceType::MATERIAL, showWrongType, ComponentTypeID::MeshRenderer);
 
 				if (showWrongType) {
 					ImGui::OpenPopup("Incompatible Asset Type");
@@ -709,12 +709,12 @@ namespace Engine
 					ImGui::Text("Shader: %s", material->shaderName.c_str());
 
 					if (ImGui::CollapsingHeader("Texture Maps")) {
-						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongType);
-						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongType);
-						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongType);
-						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongType);
-						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongType);
-						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongType);
+						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
 					}
 
 					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -2468,7 +2468,13 @@ namespace Engine
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
 
+			bool isComponentOverriden = IsComponentOverridden(ComponentTypeID::SpriteRenderer);
+			if (isComponentOverriden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
 			bool openSpriteRendererComponent = ImGui::CollapsingHeader("SpriteRenderer Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverriden)
+				ImGui::PopStyleColor();
 			bool removeSpriteRenderer = false;
 
 			ImGui::NextColumn();
@@ -2482,6 +2488,19 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeSpriteRenderer = true;
+
+					if (m_SelectedEntity.HasComponent<PrefabComponent>())
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::SpriteRenderer);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::SpriteRenderer, originalJSON);
+						LOG_INFO("Marked SpriteRenderer as REMOVED override");
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -2497,7 +2516,7 @@ namespace Engine
 
 				static bool showWrongType_ = false;
 
-				DisplayAssetField("Texture", spriteRenderer.TextureGuid, ResourceType::TEXTURE, showWrongType_);
+				DisplayAssetField("Texture", spriteRenderer.TextureGuid, ResourceType::TEXTURE, showWrongType_, ComponentTypeID::SpriteRenderer);
 
 				if (showWrongType_)
 				{
@@ -2518,11 +2537,20 @@ namespace Engine
 
 				ImGui::Spacing();
 
-				ImGui::ColorEdit4("Color", &spriteRenderer.Color.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB);
-				ImGui::DragInt("Quad", (int*)(&spriteRenderer.Quad), 1, 0, 10);
-				ImGui::DragInt("Layer", (int*)(&spriteRenderer.SpriteLayer), 1, 0, 255);
-				ImGui::Checkbox("Set Active", &spriteRenderer.IsActive);
-				ImGui::Checkbox("Set Visible", &spriteRenderer.IsVisible);
+				if (ImGui::ColorEdit4("Color", &spriteRenderer.Color.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+					MarkComponentOverridden(ComponentTypeID::SpriteRenderer);
+
+				if (ImGui::DragInt("Quad", (int*)(&spriteRenderer.Quad), 1, 0, 10))
+					MarkComponentOverridden(ComponentTypeID::SpriteRenderer);
+
+				if (ImGui::DragInt("Layer", (int*)(&spriteRenderer.SpriteLayer), 1, 0, 255))
+					MarkComponentOverridden(ComponentTypeID::SpriteRenderer);
+				
+				if (ImGui::Checkbox("Set Active", &spriteRenderer.IsActive))
+					MarkComponentOverridden(ComponentTypeID::SpriteRenderer);
+
+				if (ImGui::Checkbox("Set Visible", &spriteRenderer.IsVisible))
+					MarkComponentOverridden(ComponentTypeID::SpriteRenderer);
 			}
 
 			if (removeSpriteRenderer)
@@ -5358,7 +5386,7 @@ namespace Engine
 		return false;
 	}
 
-	void EditorPropertyPanel::DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag)
+	void EditorPropertyPanel::DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag, ComponentTypeID type)
 	{
 		// Get the filename from the GUID
 		std::string displayName = AM.getNameFromGuid(guid);
@@ -5387,7 +5415,7 @@ namespace Engine
 				const AssetRecord* record = AM.getAssetRecord(droppedGuid);
 				if (record && record->type == expectedType) {
 					guid = droppedGuid;
-					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+					MarkComponentOverridden(type);  // MARK AS OVERRIDDEN
 				}
 				else {
 					errorFlag = true;
@@ -5400,7 +5428,7 @@ namespace Engine
 		if (ImGui::BeginPopupContextItem()) {
 			if (ImGui::MenuItem("Clear Reference")) {
 				guid = xresource::instance_guid();
-				MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+				MarkComponentOverridden(type);  // MARK AS OVERRIDDEN
 			}
 			ImGui::EndPopup();
 		}
