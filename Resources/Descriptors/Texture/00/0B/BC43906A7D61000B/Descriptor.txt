@@ -1,0 +1,10 @@
+{
+  "sourcePath": "\\Resources\\Sources\\Textures\\front.jpg",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 1,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}

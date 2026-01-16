@@ -13,83 +13,62 @@
 #define __PREFAB_REGISTRY_H__
 
 #include "Prefab.h"
+#include "../xresource_guid/include/xresource_guid.h"
+
 #include <unordered_map>
 #include <memory>
 #include <string>
 
+
 namespace Engine {
 
-    /**
-     * @brief Singleton registry for managing loaded prefabs
-     * @details Provides centralized access to all prefab resources
-     */
+	class Entity;
+    class Scene;
     class PrefabRegistry {
     public:
-        static PrefabRegistry& Get() {
-            static PrefabRegistry instance;
-            return instance;
-        }
+        // Get singleton instance
+        static PrefabRegistry& Get();
 
-        PrefabRegistry(const PrefabRegistry&) = delete;
-        PrefabRegistry& operator=(const PrefabRegistry&) = delete;
+        // Register a prefab in memory
+        void RegisterPrefab(xresource::instance_guid guid, const std::string& filePath, const std::string& name);
 
-        /**
-         * @brief Register a prefab in the registry
-         * @param prefab Shared pointer to the prefab
-         */
-        void RegisterPrefab(std::shared_ptr<Prefab> prefab);
-
-        /**
-         * @brief Unregister a prefab from the registry
-         * @param guid GUID of the prefab to unregister
-         */
+        // Unregister a prefab
         void UnregisterPrefab(xresource::instance_guid guid);
 
-        /**
-         * @brief Get a prefab by GUID
-         * @param guid GUID of the prefab
-         * @return Shared pointer to prefab, or nullptr if not found
-         */
-        std::shared_ptr<Prefab> GetPrefab(xresource::instance_guid guid) const;
+        // Load a prefab from disk by GUID
+        bool LoadPrefab(xresource::instance_guid guid, Prefab& outPrefab);
 
-        /**
-         * @brief Get a prefab by name
-         * @param name Name of the prefab
-         * @return Shared pointer to prefab, or nullptr if not found
-         */
-        std::shared_ptr<Prefab> GetPrefabByName(const std::string& name) const;
+        // Load a prefab from file path
+        bool LoadPrefabFromFile(const std::string& filePath, Prefab& outPrefab);
 
-        /**
-         * @brief Check if a prefab is loaded
-         * @param guid GUID of the prefab
-         * @return True if prefab is loaded
-         */
-        bool IsPrefabLoaded(xresource::instance_guid guid) const;
+        // Get prefab file path by GUID
+        std::string GetPrefabPath(xresource::instance_guid guid) const;
 
-        /**
-         * @brief Clear all prefabs from registry
-         */
+        // Get prefab name by GUID
+        std::string GetPrefabName(xresource::instance_guid guid) const;
+
+        // Check if prefab is registered
+        bool IsPrefabRegistered(xresource::instance_guid guid) const;
+
+        // Get all registered prefabs
+        const std::unordered_map<u64, std::pair<std::string, std::string>>& GetAllPrefabs() const;
+
+        bool SavePrefabToFile(const Prefab& prefab, const std::string& filePath);
+
+        // Clear registry
         void Clear();
-
-        /**
-         * @brief Get all registered prefabs
-         * @return Map of all prefabs (GUID -> Prefab)
-         */
-        const std::unordered_map<xresource::instance_guid, std::shared_ptr<Prefab>>& GetAllPrefabs() const {
-            return m_Prefabs;
-        }
-
-        void UpdatePrefab(std::shared_ptr<Prefab> newPrefab);
-
 
     private:
         PrefabRegistry() = default;
         ~PrefabRegistry() = default;
 
-        std::unordered_map<xresource::instance_guid, std::shared_ptr<Prefab>> m_Prefabs;
-        std::unordered_map<std::string, xresource::instance_guid> m_PrefabsByName;
-    };
+        // Prevent copying
+        PrefabRegistry(const PrefabRegistry&) = delete;
+        PrefabRegistry& operator=(const PrefabRegistry&) = delete;
 
+        // Map of GUID -> (FilePath, PrefabName)
+        std::unordered_map<u64, std::pair<std::string, std::string>> m_PrefabRegistry;
+    };
 } // namespace Engine
 
 #endif // __PREFAB_REGISTRY_H__

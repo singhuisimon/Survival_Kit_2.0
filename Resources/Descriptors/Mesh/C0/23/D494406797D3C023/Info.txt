@@ -1,0 +1,7 @@
+{
+  "name": "E007_adware_v001.fbx",
+  "guid": "D494406797D3C023",
+  "tags": [],
+  "lastImported": "000000006966F34B",
+  "resourceLinks": []
+}

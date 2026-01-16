@@ -1,8 +1,9 @@
 #pragma once
+#include "Editor/Editor.h"
 #include "Core/Application.h"
 #include "ECS/Scene.h"
 #include "Audio/AudioManager.h"
-#include "Editor/Editor.h"
+
 #include "Utility/Logger.h"
 #include "Profiler/Profiler.h"
 #include <memory>
@@ -21,6 +22,9 @@ public:
 
     Engine::AudioManager* GetAudioManager() { return m_AudioManager.get(); }
 
+    Engine::Scene* CreateScene(const std::string& name);
+
+    void RequestNewSceneFromEditor(const std::string& name);
 protected:
     /**
      * @brief Initialize your game
@@ -40,8 +44,10 @@ protected:
     void OnShutdown() override;
 
 private:
-    std::unique_ptr<Engine::Scene> m_Scene;
+    std::vector<std::unique_ptr<Engine::Scene>> m_Scenes;
+    Engine::Scene* m_ActiveScene = nullptr;
     // Editor 
+
     std::unique_ptr<Engine::Editor> m_Editor; 
     std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
     float m_ColorShift = 0.0f;
@@ -52,9 +58,12 @@ private:
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
 
     void AddAllSystems();
+    void AddAllSystemsToScene(Engine::Scene* scene);
 
     /**
      * @brief Create a default scene if loading from file fails
      */
     void CreateDefaultScene();
+
+    
 };

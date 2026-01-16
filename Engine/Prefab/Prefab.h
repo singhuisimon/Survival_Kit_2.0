@@ -15,65 +15,60 @@
 #include <string>
 #include <memory>
 #include "../xresource_guid/include/xresource_guid.h"
+#include "../Serialization/ComponentRegistry.h"
+#include "../Asset/ResourceTypes.h"
 
 namespace Engine {
 
-    /**
-     * @brief Type of prefab
-     */
-    enum class PrefabType {
-        Entity,  // Single entity prefab
-        Scene    // Multi-entity scene prefab
-    };
+	struct PrefabComponentData
+	{
+		ComponentTypeID type;
+		std::string typeName;
+		std::vector<u8> serializedData;
+		PrefabComponentData() : type(ComponentTypeID::None) {}
+	};
+	struct PrefabEntityData {
+		std::string name;
+		u64 localID;
+		u64 parentLocalID;
+		std::vector<PrefabComponentData> components;
 
-    /**
-     * @brief Prefab resource - template for creating entities
-     * @details Stores serialized entity/scene data and metadata
-     */
-    class Prefab {
+		PrefabEntityData() : localID(0), parentLocalID(0) {}
+	};
+
+    class Prefab 
+    {
+ 
     public:
-        Prefab(PrefabType type = PrefabType::Entity);
-        ~Prefab() = default;
+        xresource::instance_guid guid;
+        std::string name;
+        u32 version;
+        std::vector<PrefabEntityData> entities;
+        bool m_IsValid;
+        Prefab() : guid(0),
+            version(1),
+            m_IsValid(false) {
+        }
 
-        // Resource identification
-        xresource::instance_guid GetGUID() const { return m_GUID; }
-        void SetGUID(xresource::instance_guid guid) { m_GUID = guid; }
+        ~Prefab() { Clear(); }
 
-        PrefabType GetType() const { return m_Type; }
-        void SetType(PrefabType type) { m_Type = type; }
+        const PrefabEntityData* GetRootEntity() const;
+        const PrefabEntityData* FindEntityByLocalID(u64 localID) const;
+        std::vector<const PrefabEntityData*> GetChildren(u64 parentLocalID) const;
 
-        // For Entity Prefabs
-        void SetEntityData(const std::string& jsonData);
-        const std::string& GetEntityData() const { return m_EntityData; }
+        bool IsValid() const;
+        void Clear();
 
-        // For Scene Prefabs
-        void SetSceneData(const std::string& jsonData);
-        const std::string& GetSceneData() const { return m_SceneData; }
-
-        xresource::instance_guid GetRootEntityGUID() const { return m_RootEntityGUID; }
-        void SetRootEntityGUID(xresource::instance_guid guid) { m_RootEntityGUID = guid; }
-
-        // Metadata
-        const std::string& GetName() const { return m_Name; }
-        void SetName(const std::string& name) { m_Name = name; }
-
-        const std::string& GetSourcePath() const { return m_SourcePath; }
-        void SetSourcePath(const std::string& path) { m_SourcePath = path; }
-
-    private:
-        xresource::instance_guid m_GUID;
-        PrefabType m_Type;
-        std::string m_Name;
-        std::string m_SourcePath;
-
-        // Serialized entity/scene data (JSON format)
-        std::string m_EntityData;  // For entity prefabs
-        std::string m_SceneData;   // For scene prefabs
-
-        // For scene prefabs - track the root entity
-        xresource::instance_guid m_RootEntityGUID;
+        const PrefabComponentData* GetComponent(u64 entityLocalID, ComponentTypeID type) const;
     };
 
+    struct PrefabResource {
+        Prefab prefabData;
+        std::string sourcePath;
+        xresource::instance_guid guid;
+
+        PrefabResource() = default;
+    };
 } // namespace Engine
 
 #endif // __PREFAB_H__
