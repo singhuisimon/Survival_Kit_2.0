@@ -23,7 +23,8 @@ namespace Engine {
 
 		// Default constructor
 		SpriteRendererComponent()
-			: TextureGuid(0),
+			: ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+			TextureGuid(0),
 			Color(1.0f, 1.0f, 1.0f, 1.0f),
 			Quad(3),
 			SpriteLayer(0),
@@ -31,10 +32,9 @@ namespace Engine {
 			IsVisible(true) {
 		}
 
-		xresource::instance_guid const& GetTextureGuid() const { return TextureGuid; }
-		void SetTextureGuid(xresource::instance_guid const& guid) { TextureGuid = guid; }
-
 		// Getters
+		xresource::instance_guid const& GetComponentGUID() const { return ComponentGUID; }
+		xresource::instance_guid const& GetTextureGuid() const { return TextureGuid; }
 		glm::vec4 const& GetColor() const { return Color; }
 		u32 const GetMeshIndex() const { return Quad; }
 		u32 const GetSpriteLayer() const { return SpriteLayer; }
@@ -42,11 +42,19 @@ namespace Engine {
 		bool const GetIsVisible() const { return IsVisible; }
 
 		// Setters
+		void SetComponentGUID(xresource::instance_guid const& guid) { ComponentGUID = guid; }
+		void SetTextureGuid(xresource::instance_guid const& guid) { TextureGuid = guid; }
 		void SetColor(glm::vec4 const& clr) { Color = clr; }
 		void SetMeshIndex(u32 quad) { Quad = quad; }
 		void SetSpriteLayer(u32 sprite_layer) { SpriteLayer = sprite_layer; }
 		void SetIsActive(bool status) { IsActive = status; }
 		void SetIsVisible(bool status) { IsVisible = status; }
+
+
+		static constexpr ComponentTypeID TypeID = ComponentTypeID::SpriteRenderer;
+		static constexpr const char* TypeName = "SpriteRendererComponent";
+
+		xresource::instance_guid ComponentGUID;
 
 		xresource::instance_guid TextureGuid; // Guid for the texture resource
 		glm::vec4                Color;		  // RGBA

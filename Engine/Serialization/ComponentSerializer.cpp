@@ -25,6 +25,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Component/SpriteRendererComponent.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -381,6 +382,35 @@ namespace Engine
             propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
             propertiesObj.AddMember("Loop", emitter.Loop, allocator);
             propertiesObj.AddMember("Active", emitter.Active, allocator);
+            break;
+        }
+        case ComponentTypeID::SpriteRenderer : {
+            if (!entity.HasComponent<SpriteRendererComponent>()) {
+				return "{}";
+            }
+			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+            propertiesObj.AddMember("ComponentGUID",
+				Value(std::to_string(spriteRenderer.ComponentGUID.m_Value).c_str(), allocator),
+				allocator
+            );
+
+            std::string textureFilename = AM.getNameFromGuid(spriteRenderer.TextureGuid);
+
+            propertiesObj.AddMember("Texture",
+                rapidjson::Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
+                allocator);
+
+            rapidjson::Value colorArr(rapidjson::kArrayType);
+            colorArr.PushBack(spriteRenderer.Color.r, allocator);
+            colorArr.PushBack(spriteRenderer.Color.g, allocator);
+            colorArr.PushBack(spriteRenderer.Color.b, allocator);
+            colorArr.PushBack(spriteRenderer.Color.a, allocator);
+
+            propertiesObj.AddMember("Color", colorArr, allocator);
+            propertiesObj.AddMember("Quad", spriteRenderer.Quad, allocator);
+            propertiesObj.AddMember("Sprite Layer", spriteRenderer.SpriteLayer, allocator);
+            propertiesObj.AddMember("IsActive", spriteRenderer.IsActive, allocator);
+            propertiesObj.AddMember("IsVisible", spriteRenderer.IsVisible, allocator);
             break;
         }
         default:
@@ -942,6 +972,58 @@ namespace Engine
             LOG_WARNING("Script deserialization not fully implemented - skipping");
             return true;
         }
+        case ComponentTypeID::SpriteRenderer : {
+			if (!entity.HasComponent<SpriteRendererComponent>()) {
+                entity.AddComponent<SpriteRendererComponent>();
+			}
+			auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
+            if (properties.HasMember("ComponentGUID"))
+            {
+                spriteRenderer.ComponentGUID = xresource::instance_guid(
+                    std::stoull(properties["ComponentGUID"].GetString())
+                );
+            }
+
+            if (properties.HasMember("Texture") && properties["Texture"].IsString())
+            {
+                std::string texName = properties["Texture"].GetString();
+                spriteRenderer.TextureGuid = AM.getGuidFromName(texName);
+            }
+
+            if (properties.HasMember("Color") && properties["Color"].IsArray())
+            {
+                const auto& colorArr = properties["Color"].GetArray();
+                if (colorArr.Size() >= 4)
+                {
+                    spriteRenderer.Color.r = colorArr[0].GetFloat();
+                    spriteRenderer.Color.g = colorArr[1].GetFloat();
+                    spriteRenderer.Color.b = colorArr[2].GetFloat();
+                    spriteRenderer.Color.a = colorArr[3].GetFloat();
+                }
+            }
+
+            if (properties.HasMember("Quad"))
+            {
+                spriteRenderer.Quad = properties["Quad"].GetUint();
+            }
+
+            if (properties.HasMember("Sprite Layer"))
+            {
+                spriteRenderer.SpriteLayer = properties["Sprite Layer"].GetUint();
+            }
+
+            if (properties.HasMember("IsActive"))
+            {
+                spriteRenderer.IsActive = properties["IsActive"].GetBool();
+            }
+
+            if (properties.HasMember("IsVisible"))
+            {
+                spriteRenderer.IsVisible = properties["IsVisible"].GetBool();
+            }
+
+            return true;
+        }
         default:
             LOG_WARNING("Unknown component type: ", static_cast<u32>(type));
             return false;
@@ -966,6 +1048,7 @@ namespace Engine
         case ComponentTypeID::BehaviourTree: return "BehaviourTreeComponent";
         case ComponentTypeID::Prefab: return "PrefabComponent";
         case ComponentTypeID::Tag: return "TagComponent";
+		case ComponentTypeID::SpriteRenderer: return "SpriteRendererComponent";
         default: return "UnknownComponent";
         }
     }

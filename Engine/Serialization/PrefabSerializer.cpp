@@ -241,6 +241,11 @@ namespace Engine {
             LOG_DEBUG("  + AnimatorComponent");
         }
 
+        if (entity.HasComponent<SpriteRendererComponent>()) {
+            entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::SpriteRenderer));
+			LOG_DEBUG("  + SpriteRendererComponent");
+        }
+
         //// Serialize SpriteRendererComponent
         //if (entity.HasComponent<SpriteRendererComponent>())
         //{

@@ -436,7 +436,8 @@ namespace Engine
             ComponentTypeID::ReverbZone,
             ComponentTypeID::ParticleSystem,
             ComponentTypeID::Script,
-            ComponentTypeID::BehaviourTree
+            ComponentTypeID::BehaviourTree,
+			ComponentTypeID::SpriteRenderer
         };
 
         for (const auto& prefabEntity : prefab.entities) {
@@ -512,6 +513,9 @@ namespace Engine
                 case ComponentTypeID::BehaviourTree:
                     existsOnEntity = sceneEntity.HasComponent<BehaviourTreeComponent>();
                     break;
+                case ComponentTypeID::SpriteRenderer:
+                    existsOnEntity = sceneEntity.HasComponent<SpriteRendererComponent>();
+					break;
                 default:
                     break;
                 }
@@ -892,6 +896,10 @@ namespace Engine
                     newEntityData.components.push_back(
                         PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Animator));
                 }
+                if (childEntity.HasComponent<SpriteRendererComponent>()) {
+                    newEntityData.components.push_back(
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::SpriteRenderer));
+                }
 
                 prefab.entities.push_back(newEntityData);
                 sceneHandleToPrefabLocalID[childID] = newEntityData.localID;
@@ -995,6 +1003,10 @@ namespace Engine
         case ComponentTypeID::Animator:
             if (entity.HasComponent<AnimatorComponent>())
                 entity.RemoveComponent<AnimatorComponent>();
+            break;
+        case ComponentTypeID::SpriteRenderer:
+            if (entity.HasComponent<SpriteRendererComponent>())
+                entity.RemoveComponent<SpriteRendererComponent>();
             break;
         default:
             LOG_WARNING("Unknown component type for removal: ", static_cast<u32>(type));

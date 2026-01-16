@@ -326,6 +326,8 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D) continue;
+
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
 
