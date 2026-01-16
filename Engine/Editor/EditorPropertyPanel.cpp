@@ -4963,8 +4963,63 @@ namespace Engine
 				}
 			}
 			ImGui::EndDisabled();
-			ImGui::EndPopup(); // end pop up for Add Component  
 
+			// ------------------------ Add SpriteRenderer Component ----------------------------
+			bool hasSpriteRenderer = m_SelectedEntity.HasComponent<SpriteRendererComponent>();
+			ImGui::BeginDisabled(hasSpriteRenderer);
+
+			if (ImGui::MenuItem("Sprite Renderer Component"))
+			{
+				if (!hasSpriteRenderer)
+				{
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::SpriteRenderer) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::SpriteRenderer);
+							prefabComp.MarkComponentAdded(ComponentTypeID::SpriteRenderer, componentJSON);
+							LOG_INFO("Marked SpriteRenderer as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::SpriteRenderer);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::SpriteRenderer);
+							LOG_INFO("Marked SpriteRenderer as RESTORED (was removed, now re-added)");
+						}
+					}
+				}
+			}
+			if (ImGui::IsItemHovered())
+			{
+				if (!hasSpriteRenderer)
+				{
+					ImGui::SetTooltip("Adds 2D sprite data to this object.");
+				}
+			}
+			ImGui::EndDisabled();
+			ImGui::EndPopup(); // end pop up for Add Component  
 		}
 	}
 

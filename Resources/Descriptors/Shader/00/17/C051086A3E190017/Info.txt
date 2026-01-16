@@ -1,0 +1,7 @@
+{
+  "name": "skybox.vert",
+  "guid": "C051086A3E190017",
+  "tags": [],
+  "lastImported": "00000000691DAFDD",
+  "resourceLinks": []
+}

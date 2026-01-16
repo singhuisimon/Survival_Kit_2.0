@@ -1,0 +1,7 @@
+{
+  "name": "wood_color.jpg",
+  "guid": "A08C686A46A58001",
+  "tags": [],
+  "lastImported": "00000000691DAFDE",
+  "resourceLinks": []
+}
