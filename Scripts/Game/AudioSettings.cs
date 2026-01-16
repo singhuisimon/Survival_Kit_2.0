@@ -1,0 +1,355 @@
+/**
+ * @file AudioSettings.cs
+ * @brief Simple audio settings manager with JSON persistence
+ * @author Jack
+ * @date January 2026
+ */
+
+using System;
+using System.Collections.Generic;
+using Engine;
+
+namespace Game
+{
+    /// <summary>
+    /// Manages audio settings with automatic JSON persistence
+    /// </summary>
+    public class AudioSettings : ScriptBehaviour
+    {
+        // Singleton instance
+        private static AudioSettings instance = null;
+
+        public static AudioSettings Instance
+        {
+            get { return instance; }
+        }
+
+        // Settings values
+        private float masterVolume = 1.0f;
+        private float bgmVolume = 0.7f;
+        private float sfxVolume = 0.8f;
+        private float uiVolume = 0.9f;
+        private bool masterMuted = false;
+        private bool bgmMuted = false;
+        private bool sfxMuted = false;
+        private bool uiMuted = false;
+
+        // File paths
+        private const string SAVE_FILE = "SaveData/UserAudioSettings.json";
+        private const string DEFAULT_FILE = "Config/DefaultAudioSettings.json";
+
+        // Debug logging
+        private float logTimer = 0.0f;
+        private const float LOG_INTERVAL = 2.0f;
+
+        public override void OnStart()
+        {
+            if (instance != null && instance != this)
+            {
+                Logger.LogWarning("[AudioSettings] Instance already exists - destroying duplicate");
+                Scene.SceneDestroyEntity(this.EntityID);
+                return;
+            }
+
+            instance = this;
+
+            // Load settings from JSON
+            LoadSettings();
+
+            // Apply to AudioManager
+            ApplyAllSettings();
+
+            Logger.LogMessage("[AudioSettings] Initialized with persistent data");
+            Logger.LogMessage("[AudioSettings] Controls: UP/DOWN = Master, LEFT/RIGHT = BGM, M = Mute");
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
+            logTimer += deltaTime;
+            if (logTimer >= LOG_INTERVAL)
+            {
+                logTimer = 0.0f;
+                Logger.LogMessage("[AudioSettings] Volumes - Master: " + masterVolume.ToString("F2") +
+                                ", BGM: " + bgmVolume.ToString("F2") +
+                                ", SFX: " + sfxVolume.ToString("F2") +
+                                ", UI: " + uiVolume.ToString("F2"));
+            }
+
+            if (Input.IsKeyPressed(KeyCode.Up))
+            {
+                SetMasterVolume(masterVolume + 0.1f);
+                Logger.LogMessage("[AudioSettings] UP - Master: " + masterVolume.ToString("F2"));
+            }
+
+            if (Input.IsKeyPressed(KeyCode.Down))
+            {
+                SetMasterVolume(masterVolume - 0.1f);
+                Logger.LogMessage("[AudioSettings] DOWN - Master: " + masterVolume.ToString("F2"));
+            }
+
+            if (Input.IsKeyPressed(KeyCode.Left))
+            {
+                SetBGMVolume(bgmVolume - 0.1f);
+                Logger.LogMessage("[AudioSettings] LEFT - BGM: " + bgmVolume.ToString("F2"));
+            }
+
+            if (Input.IsKeyPressed(KeyCode.Right))
+            {
+                SetBGMVolume(bgmVolume + 0.1f);
+                Logger.LogMessage("[AudioSettings] RIGHT - BGM: " + bgmVolume.ToString("F2"));
+            }
+
+            if (Input.IsKeyPressed(KeyCode.M))
+            {
+                ToggleMasterMute();
+                Logger.LogMessage("[AudioSettings] M - Mute: " + masterMuted.ToString());
+            }
+        }
+
+        public override void OnDestroy()
+        {
+            if (instance == this)
+            {
+                instance = null;
+            }
+        }
+
+        // Volume Controls
+        public void SetMasterVolume(float volume)
+        {
+            masterVolume = Clamp01(volume);
+            AudioManager.SetGroupVolume(AudioType.MASTER, masterVolume);
+            SaveSettings();
+        }
+
+        public float GetMasterVolume() { return masterVolume; }
+
+        public void SetBGMVolume(float volume)
+        {
+            bgmVolume = Clamp01(volume);
+            AudioManager.SetGroupVolume(AudioType.BGM, bgmVolume);
+            SaveSettings();
+        }
+
+        public float GetBGMVolume() { return bgmVolume; }
+
+        public void SetSFXVolume(float volume)
+        {
+            sfxVolume = Clamp01(volume);
+            AudioManager.SetGroupVolume(AudioType.SFX, sfxVolume);
+            SaveSettings();
+        }
+
+        public float GetSFXVolume() { return sfxVolume; }
+
+        public void SetUIVolume(float volume)
+        {
+            uiVolume = Clamp01(volume);
+            AudioManager.SetGroupVolume(AudioType.UI, uiVolume);
+            SaveSettings();
+        }
+
+        public float GetUIVolume() { return uiVolume; }
+
+        // Mute Controls
+        public void ToggleMasterMute()
+        {
+            masterMuted = !masterMuted;
+            AudioManager.SetMuteGroup(AudioType.MASTER, masterMuted);
+            SaveSettings();
+        }
+
+        public void SetMasterMute(bool mute)
+        {
+            masterMuted = mute;
+            AudioManager.SetMuteGroup(AudioType.MASTER, masterMuted);
+            SaveSettings();
+        }
+
+        public bool IsMasterMuted() { return masterMuted; }
+
+        public void ToggleBGMMute()
+        {
+            bgmMuted = !bgmMuted;
+            AudioManager.SetMuteGroup(AudioType.BGM, bgmMuted);
+            SaveSettings();
+        }
+
+        public void SetBGMMute(bool mute)
+        {
+            bgmMuted = mute;
+            AudioManager.SetMuteGroup(AudioType.BGM, bgmMuted);
+            SaveSettings();
+        }
+
+        public bool IsBGMMuted() { return bgmMuted; }
+
+        public void ToggleSFXMute()
+        {
+            sfxMuted = !sfxMuted;
+            AudioManager.SetMuteGroup(AudioType.SFX, sfxMuted);
+            SaveSettings();
+        }
+
+        public void SetSFXMute(bool mute)
+        {
+            sfxMuted = mute;
+            AudioManager.SetMuteGroup(AudioType.SFX, sfxMuted);
+            SaveSettings();
+        }
+
+        public bool IsSFXMuted() { return sfxMuted; }
+
+        public void ToggleUIMute()
+        {
+            uiMuted = !uiMuted;
+            AudioManager.SetMuteGroup(AudioType.UI, uiMuted);
+            SaveSettings();
+        }
+
+        public void SetUIMute(bool mute)
+        {
+            uiMuted = mute;
+            AudioManager.SetMuteGroup(AudioType.UI, uiMuted);
+            SaveSettings();
+        }
+
+        public bool IsUIMuted() { return uiMuted; }
+
+        // Save/Load with JSON
+        private void LoadSettings()
+        {
+            try
+            {
+                if (FileIO.FileExists(SAVE_FILE))
+                {
+                    Logger.LogMessage("[AudioSettings] Loading user settings from: " + SAVE_FILE);
+                    LoadFromJson(SAVE_FILE);
+                    return;
+                }
+
+                if (FileIO.FileExists(DEFAULT_FILE))
+                {
+                    Logger.LogMessage("[AudioSettings] Loading default settings from: " + DEFAULT_FILE);
+                    LoadFromJson(DEFAULT_FILE);
+                    return;
+                }
+
+                Logger.LogWarning("[AudioSettings] No settings file found, using hardcoded defaults");
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("[AudioSettings] Failed to load settings: " + e.Message);
+            }
+        }
+
+        private void LoadFromJson(string filePath)
+        {
+            try
+            {
+                string json = FileIO.ReadAllText(filePath);
+                var data = ParseSimpleJson(json);
+
+                masterVolume = Clamp01(GetFloatValue(data, "masterVolume", 1.0f));
+                bgmVolume = Clamp01(GetFloatValue(data, "bgmVolume", 0.7f));
+                sfxVolume = Clamp01(GetFloatValue(data, "sfxVolume", 0.8f));
+                uiVolume = Clamp01(GetFloatValue(data, "uiVolume", 0.9f));
+                masterMuted = GetBoolValue(data, "masterMuted", false);
+                bgmMuted = GetBoolValue(data, "bgmMuted", false);
+                sfxMuted = GetBoolValue(data, "sfxMuted", false);
+                uiMuted = GetBoolValue(data, "uiMuted", false);
+
+                Logger.LogMessage("[AudioSettings] Loaded successfully");
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("[AudioSettings] Failed to load JSON: " + e.Message);
+            }
+        }
+
+        private void SaveSettings()
+        {
+            try
+            {
+                string json = "{\n";
+                json += "  \"masterVolume\": " + masterVolume + ",\n";
+                json += "  \"bgmVolume\": " + bgmVolume + ",\n";
+                json += "  \"sfxVolume\": " + sfxVolume + ",\n";
+                json += "  \"uiVolume\": " + uiVolume + ",\n";
+                json += "  \"masterMuted\": " + masterMuted.ToString().ToLower() + ",\n";
+                json += "  \"bgmMuted\": " + bgmMuted.ToString().ToLower() + ",\n";
+                json += "  \"sfxMuted\": " + sfxMuted.ToString().ToLower() + ",\n";
+                json += "  \"uiMuted\": " + uiMuted.ToString().ToLower() + "\n";
+                json += "}";
+
+                if (FileIO.WriteAllText(SAVE_FILE, json))
+                {
+                    Logger.LogMessage("[AudioSettings] Saved to: " + SAVE_FILE);
+                }
+                else
+                {
+                    Logger.LogError("[AudioSettings] Failed to save file");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("[AudioSettings] Save error: " + e.Message);
+            }
+        }
+
+        // JSON Parser
+        private Dictionary<string, string> ParseSimpleJson(string json)
+        {
+            var result = new Dictionary<string, string>();
+            json = json.Trim().TrimStart('{').TrimEnd('}');
+            string[] pairs = json.Split(',');
+
+            foreach (string pair in pairs)
+            {
+                string[] keyValue = pair.Split(':');
+                if (keyValue.Length == 2)
+                {
+                    string key = keyValue[0].Trim().Trim('"');
+                    string value = keyValue[1].Trim().Trim('"');
+                    result[key] = value;
+                }
+            }
+            return result;
+        }
+
+        private float GetFloatValue(Dictionary<string, string> data, string key, float defaultValue)
+        {
+            if (data.ContainsKey(key) && float.TryParse(data[key], out float value))
+                return value;
+            return defaultValue;
+        }
+
+        private bool GetBoolValue(Dictionary<string, string> data, string key, bool defaultValue)
+        {
+            if (data.ContainsKey(key) && bool.TryParse(data[key], out bool value))
+                return value;
+            return defaultValue;
+        }
+
+        // Utility
+        private void ApplyAllSettings()
+        {
+            AudioManager.SetGroupVolume(AudioType.MASTER, masterVolume);
+            AudioManager.SetGroupVolume(AudioType.BGM, bgmVolume);
+            AudioManager.SetGroupVolume(AudioType.SFX, sfxVolume);
+            AudioManager.SetGroupVolume(AudioType.UI, uiVolume);
+
+            AudioManager.SetMuteGroup(AudioType.MASTER, masterMuted);
+            AudioManager.SetMuteGroup(AudioType.BGM, bgmMuted);
+            AudioManager.SetMuteGroup(AudioType.SFX, sfxMuted);
+            AudioManager.SetMuteGroup(AudioType.UI, uiMuted);
+        }
+
+        private float Clamp01(float value)
+        {
+            if (value < 0.0f) return 0.0f;
+            if (value > 1.0f) return 1.0f;
+            return value;
+        }
+    }
+}

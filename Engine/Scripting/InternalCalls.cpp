@@ -48,6 +48,14 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#ifdef _WIN32
+#include <direct.h>   // For _mkdir on Windows
+#else
+#include <sys/stat.h> // For mkdir on Unix/Linux
+#endif
+
 
 namespace Engine
 {
@@ -2576,5 +2584,154 @@ namespace Engine
 			if (!q1 || !q2) return 0.0f;
 			return glm::dot(*q1, *q2);
 		}
+
+		// ========================================
+// File I/O
+// ========================================
+
+/**
+ * @brief Checks if a file exists at the given path.
+ * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+ * @return True if the file exists, otherwise false.
+ */
+		bool FileExists(MonoString* pathStr)
+		{
+			if (!pathStr)
+				return false;
+
+			char* pathCStr = mono_string_to_utf8(pathStr);
+			if (!pathCStr)
+				return false;
+
+			std::string path(pathCStr);
+			mono_free(pathCStr);
+
+			// Use fopen for reliable cross-platform existence check
+			FILE* file = fopen(path.c_str(), "r");
+			if (file)
+			{
+				fclose(file);
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * @brief Reads the entire content of a text file.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return Managed string containing file content, or empty string on failure.
+		 */
+		MonoString* FileReadAllText(MonoString* pathStr)
+		{
+			MonoDomain* domain = mono_domain_get();
+			if (!domain)
+				return nullptr;
+
+			if (!pathStr)
+				return mono_string_new(domain, "");
+
+			char* pathCStr = mono_string_to_utf8(pathStr);
+			if (!pathCStr)
+				return mono_string_new(domain, "");
+
+			std::string path(pathCStr);
+			mono_free(pathCStr);
+
+			// Open file for reading
+			std::ifstream file(path);
+			if (!file.is_open())
+			{
+				LOG_ERROR("[FileIO] Failed to open file for reading: {0}", path);
+				return mono_string_new(domain, "");
+			}
+
+			// Read entire file into string
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			file.close();
+
+			std::string content = buffer.str();
+			return mono_string_new(domain, content.c_str());
+		}
+
+		/**
+		 * @brief Helper function to create directory recursively (cross-platform).
+		 * @param path Directory path to create.
+		 */
+		static void CreateDirectoriesRecursive(const std::string& path)
+		{
+			if (path.empty())
+				return;
+
+			// Find parent directory
+			size_t pos = path.find_last_of("/\\");
+			if (pos != std::string::npos)
+			{
+				std::string parent = path.substr(0, pos);
+				CreateDirectoriesRecursive(parent);
+			}
+
+			// Try to create this directory (ignore errors if it already exists)
+#ifdef _WIN32
+			_mkdir(path.c_str());
+#else
+			mkdir(path.c_str(), 0755);
+#endif
+		}
+
+		/**
+		 * @brief Writes text content to a file, creating parent directories if needed.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @param contentStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return True if write succeeded, otherwise false.
+		 */
+		bool FileWriteAllText(MonoString* pathStr, MonoString* contentStr)
+		{
+			if (!pathStr || !contentStr)
+				return false;
+
+			// Convert path
+			char* pathCStr = mono_string_to_utf8(pathStr);
+			if (!pathCStr)
+				return false;
+
+			std::string path(pathCStr);
+			mono_free(pathCStr);
+
+			// Convert content
+			char* contentCStr = mono_string_to_utf8(contentStr);
+			if (!contentCStr)
+				return false;
+
+			std::string content(contentCStr);
+			mono_free(contentCStr);
+
+			// Create parent directories if needed
+			size_t lastSlash = path.find_last_of("/\\");
+			if (lastSlash != std::string::npos)
+			{
+				std::string parentDir = path.substr(0, lastSlash);
+				CreateDirectoriesRecursive(parentDir);
+			}
+
+			// Write file
+			std::ofstream file(path);
+			if (!file.is_open())
+			{
+				LOG_ERROR("[FileIO] Failed to open file for writing: {0}", path);
+				return false;
+			}
+
+			file << content;
+			file.close();
+
+			LOG_INFO("[FileIO] File written successfully: {0}", path);
+			return true;
+		}
+
+
+
+
+
 	} // namespace InternalCalls
 } // namespace Engine
