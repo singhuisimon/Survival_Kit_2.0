@@ -1,0 +1,7 @@
+{
+  "name": "Loveletter_Warp_Warning.wav",
+  "guid": "3C7C507D63D9C0D5",
+  "tags": [],
+  "lastImported": "00000000696A14E7",
+  "resourceLinks": []
+}

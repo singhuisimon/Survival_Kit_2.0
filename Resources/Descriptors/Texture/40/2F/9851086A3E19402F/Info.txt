@@ -1,7 +1,0 @@
-{
-  "name": "bottom.jpg",
-  "guid": "9851086A3E19402F",
-  "tags": [],
-  "lastImported": "00000000691DAFDD",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "SecondaryBullet.mat",
-  "guid": "615B286DF70DC043",
-  "tags": [],
-  "lastImported": "0000000069330641",
-  "resourceLinks": []
-}

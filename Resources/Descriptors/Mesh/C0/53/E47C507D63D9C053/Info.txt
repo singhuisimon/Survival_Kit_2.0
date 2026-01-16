@@ -1,0 +1,7 @@
+{
+  "name": "E002_worm_child_v001.fbx",
+  "guid": "E47C507D63D9C053",
+  "tags": [],
+  "lastImported": "00000000696A14E7",
+  "resourceLinks": []
+}
