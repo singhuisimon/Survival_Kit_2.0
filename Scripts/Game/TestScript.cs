@@ -110,7 +110,6 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            LogMessage("Rebuild successful");
             if (!moveAllowed || !initialized)
                 return;
 

@@ -368,12 +368,6 @@ namespace Engine
 
 		LOG_INFO("[Mono] Assembly path set to: ", monoLibPathStr);
 
-		if (!std::filesystem::exists(monoLibPath))
-		{
-			LOG_ERROR("[Mono] ERROR: mono/lib not found at: ", monoLibPathStr);
-			LOG_ERROR("[Mono] Make sure Mono runtime is in the build output directory");
-		}
-
 		m_RootDomain = mono_jit_init("EngineRuntime");
 		if (!m_RootDomain)
 		{
@@ -382,14 +376,29 @@ namespace Engine
 		}
 
 		LOG_INFO(" Mono JIT initialized");
-		LOG_INFO(" Root domain created: " + std::to_string((uintptr_t)m_RootDomain));
 
-		// Single-domain mode (your current setup)
+		// RECOMMENDED: Use multi-domain mode for proper hot reload
+#if 1  // Change to 0 to use single-domain mode
+		const char *domainName = "GameScriptsDomain";
+		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+
+		if (!m_AppDomain)
+		{
+			LOG_WARNING("Failed to create separate app domain, falling back to root domain");
+			LOG_WARNING("  Hot reload will be limited in single-domain mode");
+			m_AppDomain = m_RootDomain;
+		}
+		else
+		{
+			LOG_INFO("Using multi-domain mode for proper hot reload support");
+			LOG_INFO("  Root domain:  ", (uintptr_t)m_RootDomain);
+			LOG_INFO("  App domain:   ", (uintptr_t)m_AppDomain);
+		}
+#else
+// Single-domain mode (limited hot reload)
 		m_AppDomain = m_RootDomain;
-
-		LOG_INFO("Using single domain mode (no separate app domain)");
-		LOG_INFO("  Root domain: " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App domain:  " + std::to_string((uintptr_t)m_AppDomain) + " (same as root)");
+		LOG_WARNING("Using single-domain mode (hot reload will be imperfect)");
+#endif
 
 		mono_domain_set(m_AppDomain, false);
 
@@ -399,7 +408,6 @@ namespace Engine
 		{
 			LOG_WARNING("Assembly not found: ", assemblyPath);
 			LOG_WARNING("Mono initialized but no scripts will be loaded");
-			LOG_WARNING("ScriptComponents will be ignored");
 		}
 
 		RegisterInternalCalls();
@@ -1200,30 +1208,51 @@ namespace Engine
 			return false;
 		}
 
-		if (m_AppDomain && m_AppDomain != m_RootDomain)
+		// FIXED: Handle both single-domain and multi-domain modes
+		if (m_AppDomain)
 		{
+			// Switch to root domain before unloading
 			mono_domain_set(m_RootDomain, false);
 
-			LOG_INFO("[HotReloadOnPlay] Unloading previous script domain...");
-			mono_domain_unload(m_AppDomain);
+			if (m_AppDomain != m_RootDomain)
+			{
+				// Multi-domain mode: unload the separate app domain
+				LOG_INFO("[HotReloadOnPlay] Unloading separate app domain...");
+				mono_domain_unload(m_AppDomain);
+			}
+			else
+			{
+				// Single-domain mode: can't unload root domain
+				// Instead, we rely on assembly hot-swapping if supported by Mono
+				LOG_WARNING("[HotReloadOnPlay] Single-domain mode: cannot unload assemblies cleanly.");
+				LOG_WARNING("  Recommend switching to multi-domain mode for proper hot reload.");
+				LOG_WARNING("  Current reload will attempt to load new assembly but old one remains in memory.");
+			}
+
 			m_AppDomain = nullptr;
 		}
 
+		// Clear old assembly references
 		UnloadAssembly();
 
+		// Create new domain for scripts
 		const char *domainName = "GameScriptsDomain";
 		MonoDomain *newDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+
 		if (!newDomain)
 		{
-			LOG_ERROR("[HotReloadOnPlay] Failed to create appdomain (fallback to root).");
+			LOG_ERROR("[HotReloadOnPlay] Failed to create new app domain");
+			LOG_WARNING("  Falling back to root domain (hot reload will be imperfect)");
 			m_AppDomain = m_RootDomain;
-			mono_domain_set(m_AppDomain, false);
 		}
 		else
 		{
 			m_AppDomain = newDomain;
-			mono_domain_set(m_AppDomain, false);
+			LOG_INFO("[HotReloadOnPlay] Created new app domain: ", (uintptr_t)newDomain);
 		}
+
+		// Switch to the app domain
+		mono_domain_set(m_AppDomain, false);
 
 		if (m_AssemblyPath.empty())
 		{
@@ -1231,6 +1260,7 @@ namespace Engine
 			return false;
 		}
 
+		// Load the new assembly
 		LoadAssembly(m_AssemblyPath);
 
 		if (!m_AppAssembly || !m_AppImage)
@@ -1239,6 +1269,7 @@ namespace Engine
 			return false;
 		}
 
+		LOG_INFO("[HotReloadOnPlay] Successfully loaded new assembly");
 		return true;
 	}
 
@@ -1247,13 +1278,13 @@ namespace Engine
 		Scene *scene = Engine::s_ScriptingSceneContext;
 		if (!scene)
 		{
-			LOG_ERROR("[HotReloadOnPlay] RebindAllScriptComponents: no scene context set (did SetScriptingCurrentScene run?)");
+			LOG_ERROR("[RebindAllScriptComponents] No scene context");
 			return;
 		}
 
 		if (!m_AppDomain || !m_AppImage)
 		{
-			LOG_ERROR("[HotReloadOnPlay] RebindAllScriptComponents: Mono app domain/image not ready");
+			LOG_ERROR("[RebindAllScriptComponents] App domain/image not ready");
 			return;
 		}
 
@@ -1272,37 +1303,48 @@ namespace Engine
 			if (sc.ScriptClassName.empty())
 				continue;
 
-			// IMPORTANT:
-			// Any GCHandle from the old domain is now stale. Free it unconditionally.
+			// FIXED: Safe cleanup of old handles
 			if (sc.GCHandle != 0)
 			{
-				mono_gchandle_free(sc.GCHandle);
+				// In multi-domain mode, the old domain is already unloaded,
+				// so we can't validate. Just free the handle number.
+				// Mono will handle the case where the domain is gone.
+				try
+				{
+					mono_gchandle_free(sc.GCHandle);
+				}
+				catch (...)
+				{
+					LOG_WARNING("[RebindAllScriptComponents] Exception freeing old GCHandle (expected if domain unloaded)");
+				}
 				sc.GCHandle = 0;
 			}
 
 			sc.ScriptInstance = nullptr;
 			sc.Started = false;
 
-			// Recreate in the *new* domain
+			// Create new instance in the new domain
 			MonoObject *created = nullptr;
-			uint32_t handle = CreateScriptInstanceHandle(sc.ScriptClassName, &created, /*pinned*/ false);
+			uint32_t handle = CreateScriptInstanceHandle(sc.ScriptClassName, &created, false);
+
 			if (handle == 0 || !created)
 			{
-				LOG_WARNING("[HotReloadOnPlay] Rebind failed (class not found or ctor failed): ", sc.ScriptClassName);
+				LOG_WARNING("[RebindAllScriptComponents] Failed to create: ", sc.ScriptClassName);
 				++failed;
 				continue;
 			}
 
+			// Bind entity ID to the new instance
 			BindEntityID(created, static_cast<std::uint32_t>(ent));
 
 			sc.GCHandle = handle;
-			sc.ScriptInstance = created; // cache only
+			sc.ScriptInstance = created;
 			sc.Started = false;
 
 			++rebuilt;
 		}
 
-		LOG_INFO("[HotReloadOnPlay] RebindAllScriptComponents complete. rebuilt=", rebuilt, " failed=", failed);
+		LOG_INFO("[RebindAllScriptComponents] Complete: rebuilt=", rebuilt, " failed=", failed);
 	}
 
 	// Context setters
