@@ -108,13 +108,6 @@ namespace Engine
 
 	namespace InternalCalls
 	{
-		// =====================================================================
-		// Global context (set from ScriptSystem via MonoScriptEngine helpers)
-		// =====================================================================
-		static Scene *s_CurrentScene = nullptr;
-		static Input *s_InputSystem = nullptr;
-		static AudioManager *s_AudioManager = nullptr;
-
 		/**************************************************************************
 		 * @brief
 		 * Sets the scene context used by InternalCalls.

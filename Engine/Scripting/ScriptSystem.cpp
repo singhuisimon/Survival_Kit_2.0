@@ -56,7 +56,12 @@ namespace Engine
 				script.Started = false;
 			}
 
-			MonoObject *inst = ScriptHandleUtil::Resolve(script);
+			MonoObject *inst = nullptr;
+			if (script.GCHandle != 0)
+				inst = se.GetObjectFromGCHandle(script.GCHandle);
+			else
+				inst = reinterpret_cast<MonoObject *>(script.ScriptInstance);
+
 			if (!inst)
 			{
 				// If domain was unloaded / handle broken, clear and try again next frame

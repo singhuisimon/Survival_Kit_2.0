@@ -10,7 +10,6 @@
 #include "Core/Application.h"
 #include "../Audio/AudioManager.h"
 #include "../Event/EventSystem.h"
-#include "ScriptReloader.h"
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
@@ -23,6 +22,8 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
+#include <mono/metadata/appdomain.h>
+#include <mono/metadata/mono-gc.h>
 
 #include <filesystem>
 #include <iostream>
@@ -34,8 +35,223 @@
 
 #include "InternalCalls.h"
 
+namespace
+{
+	enum class SnapType : uint8_t
+	{
+		Invalid = 0,
+		Bool = 1,
+		I1 = 2,
+		U1 = 3,
+		I2 = 4,
+		U2 = 5,
+		I4 = 6,
+		U4 = 7,
+		I8 = 8,
+		U8 = 9,
+		R4 = 10,
+		R8 = 11,
+		StringUtf8 = 12,
+		RawValue = 13
+	};
+
+	static inline void AppendBytes(std::vector<uint8_t> &out, const void *p, size_t n)
+	{
+		const uint8_t *b = static_cast<const uint8_t *>(p);
+		out.insert(out.end(), b, b + n);
+	}
+
+	static bool HasAttribute(MonoClassField *field, const char *ns, const char *name)
+	{
+		if (!field) return false;
+
+		MonoClass *parent = mono_field_get_parent(field);
+		if (!parent) return false;
+
+		MonoCustomAttrInfo *attrs = mono_custom_attrs_from_field(parent, field);
+		if (!attrs) return false;
+
+		// Try find the attribute class in the current domain by name
+		// (If not found, just treat as "not present".)
+		MonoClass *attrKlass = nullptr;
+
+		// First: corlib/System.* common attrs
+		MonoImage *corlib = mono_get_corlib();
+		if (corlib)
+			attrKlass = mono_class_from_name(corlib, ns, name);
+
+		bool has = (attrKlass && mono_custom_attrs_has_attr(attrs, attrKlass));
+		mono_custom_attrs_free(attrs);
+		return has;
+	}
+
+	static bool ShouldSerializeField(MonoClassField *field)
+	{
+		if (!field) return false;
+
+		const uint32_t flags = mono_field_get_flags(field);
+
+		if (flags & MONO_FIELD_ATTR_STATIC)
+			return false;
+
+		if (flags & MONO_FIELD_ATTR_NOT_SERIALIZED)
+			return false;
+
+		// [NonSerialized]
+		if (HasAttribute(field, "System", "NonSerializedAttribute"))
+			return false;
+
+		// Public => ok
+		if (flags & MONO_FIELD_ATTR_PUBLIC)
+			return true;
+
+		// Non-public => only if [SerializeField] (support either namespace)
+		if (HasAttribute(field, "UnityEngine", "SerializeField"))
+			return true;
+
+		if (HasAttribute(field, "Engine", "SerializeField"))
+			return true;
+
+		return false;
+	}
+
+	static std::vector<uint8_t> SerializeFieldValue(MonoObject *instance, MonoClassField *field)
+	{
+		std::vector<uint8_t> payload;
+		if (!instance || !field) return payload;
+
+		MonoType *mt = mono_field_get_type(field);
+		if (!mt) return payload;
+
+		const MonoTypeEnum t = static_cast<MonoTypeEnum>(mono_type_get_type(mt));
+
+#define SER_PRIM(TAG, CPP_T)                              \
+		do {                                              \
+			CPP_T v{};                                    \
+			mono_field_get_value(instance, field, &v);     \
+			payload.push_back(static_cast<uint8_t>(TAG)); \
+			AppendBytes(payload, &v, sizeof(CPP_T));       \
+			return payload;                               \
+		} while (0)
+
+		switch (t)
+		{
+		case MONO_TYPE_BOOLEAN: SER_PRIM(SnapType::Bool, uint8_t);
+		case MONO_TYPE_I1:      SER_PRIM(SnapType::I1, int8_t);
+		case MONO_TYPE_U1:      SER_PRIM(SnapType::U1, uint8_t);
+		case MONO_TYPE_I2:      SER_PRIM(SnapType::I2, int16_t);
+		case MONO_TYPE_U2:      SER_PRIM(SnapType::U2, uint16_t);
+		case MONO_TYPE_I4:      SER_PRIM(SnapType::I4, int32_t);
+		case MONO_TYPE_U4:      SER_PRIM(SnapType::U4, uint32_t);
+		case MONO_TYPE_I8:      SER_PRIM(SnapType::I8, int64_t);
+		case MONO_TYPE_U8:      SER_PRIM(SnapType::U8, uint64_t);
+		case MONO_TYPE_R4:      SER_PRIM(SnapType::R4, float);
+		case MONO_TYPE_R8:      SER_PRIM(SnapType::R8, double);
+
+		case MONO_TYPE_STRING:
+		{
+			MonoString *ms = nullptr;
+			mono_field_get_value(instance, field, &ms);
+
+			payload.push_back(static_cast<uint8_t>(SnapType::StringUtf8));
+
+			if (!ms)
+			{
+				uint32_t len = 0;
+				AppendBytes(payload, &len, sizeof(len));
+				return payload;
+			}
+
+			char *utf8 = mono_string_to_utf8(ms);
+			const uint32_t len = utf8 ? static_cast<uint32_t>(std::strlen(utf8)) : 0;
+
+			AppendBytes(payload, &len, sizeof(len));
+			if (len && utf8)
+				AppendBytes(payload, utf8, len);
+
+			if (utf8)
+				mono_free(utf8);
+
+			return payload;
+		}
+
+		case MONO_TYPE_VALUETYPE:
+		{
+			MonoClass *vc = mono_type_get_class(mt);
+			if (!vc) return {};
+
+			// Enums
+			if (mono_class_is_enum(vc))
+			{
+				int32_t v{};
+				mono_field_get_value(instance, field, &v);
+				payload.push_back(static_cast<uint8_t>(SnapType::I4));
+				AppendBytes(payload, &v, sizeof(v));
+				return payload;
+			}
+
+			uint32_t align = 0;
+			const int sz = mono_class_value_size(vc, &align);
+			if (sz <= 0) return {};
+
+			payload.push_back(static_cast<uint8_t>(SnapType::RawValue));
+			const uint32_t usz = static_cast<uint32_t>(sz);
+			AppendBytes(payload, &usz, sizeof(usz));
+
+			const size_t start = payload.size();
+			payload.resize(start + static_cast<size_t>(sz));
+			mono_field_get_value(instance, field, payload.data() + start);
+			return payload;
+		}
+
+		default:
+			break;
+		}
+
+#undef SER_PRIM
+		return {};
+	}
+} // anonymous namespace
+
 namespace Engine
 {
+	template <typename T, typename = void>
+	struct has_gchandle : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_gchandle<T, std::void_t<decltype(std::declval<T &>().GCHandle)>> : std::true_type
+	{
+	};
+
+	template <typename T, typename = void>
+	struct has_started : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_started<T, std::void_t<decltype(std::declval<T &>().Started)>> : std::true_type
+	{
+	};
+
+	template <typename T, typename = void>
+	struct has_scriptinstance : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_scriptinstance<T, std::void_t<decltype(std::declval<T &>().ScriptInstance)>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	concept HasScriptInstancePtr = requires(T t)
+	{
+		{
+			t.ScriptInstance
+		};
+	};
+
+	static Scene *s_ScriptingSceneContext = nullptr;
+
 	MonoScriptEngine &MonoScriptEngine::GetInstance()
 	{
 		static MonoScriptEngine instance;
@@ -572,6 +788,523 @@ namespace Engine
 		SetFieldValue(instance, "EntityID", &idCopy);
 	}
 
+	bool MonoScriptEngine::HotReloadOnPlay(bool preserveManagedState)
+	{
+		ManagedFieldSnapshot snap{};
+		if (preserveManagedState)
+			snap = CaptureManagedState();
+
+		if (!BuildGameScripts())
+			return false;
+
+		if (!ReloadDomainAndAssembly())
+			return false;
+
+		RebindAllScriptComponents();
+
+		if (preserveManagedState)
+			RestoreManagedState(snap);
+
+		return true;
+	}
+
+
+	ManagedFieldSnapshot MonoScriptEngine::CaptureManagedState()
+	{
+		ManagedFieldSnapshot out{};
+
+		Scene *scene = InternalCalls::s_CurrentScene;
+		if (!scene)
+			return out;
+
+		auto &reg = scene->GetRegistry();
+
+		auto view = reg.view<ScriptComponent>();
+		for (auto ent : view)
+		{
+			auto &sc = view.get<ScriptComponent>(ent);
+			if (!sc.ScriptInstance)
+				continue;
+
+			MonoObject *instance = static_cast<MonoObject *>(sc.ScriptInstance);
+			MonoClass *klass = mono_object_get_class(instance);
+			if (!klass)
+				continue;
+
+			const uint64_t eid = static_cast<uint64_t>(static_cast<uint32_t>(ent));
+			const std::string classKey = sc.ScriptClassName.empty()
+				? std::string(mono_class_get_name(klass))
+				: sc.ScriptClassName;
+
+			void *iter = nullptr;
+			MonoClassField *field = nullptr;
+
+			while ((field = mono_class_get_fields(klass, &iter)) != nullptr)
+			{
+				if (!ShouldSerializeField(field))
+					continue;
+
+				const char *fname = mono_field_get_name(field);
+				if (!fname || !fname[0])
+					continue;
+
+				std::vector<uint8_t> payload = SerializeFieldValue(instance, field);
+				if (payload.empty())
+					continue;
+
+				out.data[eid][classKey][fname] = std::move(payload);
+			}
+		}
+
+		return out;
+	}
+
+	void MonoScriptEngine::RestoreManagedState(const ManagedFieldSnapshot &snap)
+	{
+		Scene *scene = InternalCalls::s_CurrentScene;
+		if (!scene)
+			return;
+
+		EnsureCorrectDomain();
+
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
+
+		for (auto ent : view)
+		{
+			const std::uint32_t eid = static_cast<std::uint32_t>(ent);
+
+			auto itEnt = snap.data.find(eid);
+			if (itEnt == snap.data.end())
+				continue;
+
+			auto &sc = view.get<ScriptComponent>(ent);
+
+			MonoObject *instance = nullptr;
+
+			// Prefer GCHandle if the component has it
+			if constexpr (has_gchandle<ScriptComponent>::value)
+			{
+				if (sc.GCHandle != 0)
+					instance = GetObjectFromGCHandle(sc.GCHandle);
+			}
+
+			// Fallback to raw ScriptInstance if present
+			if (!instance)
+			{
+				if constexpr (has_scriptinstance<ScriptComponent>::value)
+					instance = static_cast<MonoObject *>(sc.ScriptInstance);
+			}
+
+			if (!instance || !IsValidMonoObject(instance))
+				continue;
+
+			MonoClass *klass = mono_object_get_class(instance);
+			if (!klass)
+				continue;
+
+			// Snapshot groups by class name; we only restore the block matching this component's class
+			const std::string classKey = sc.ScriptClassName.empty()
+				? std::string(mono_class_get_name(klass))
+				: sc.ScriptClassName;
+
+			auto itClass = itEnt->second.find(classKey);
+			if (itClass == itEnt->second.end())
+				continue;
+
+			for (const auto &[fieldName, bytes] : itClass->second)
+			{
+				if (bytes.empty())
+					continue;
+
+				// Resolve field (walk parents like your SetFieldValue does)
+				MonoClass *cur = klass;
+				MonoClassField *field = nullptr;
+				while (cur && !field)
+				{
+					field = mono_class_get_field_from_name(cur, fieldName.c_str());
+					if (field) break;
+					cur = mono_class_get_parent(cur);
+				}
+				if (!field)
+					continue;
+
+				const uint8_t tag = bytes[0];
+				const uint8_t *p = bytes.data() + 1;
+				const size_t n = bytes.size() - 1;
+
+				auto need = [&](size_t k)
+					{
+						return n >= k;
+					};
+
+				switch (static_cast<SnapType>(tag))
+				{
+				case SnapType::Bool:
+				{
+					if (!need(sizeof(uint8_t))) break;
+					uint8_t v;
+					std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I1:
+				{
+					if (!need(sizeof(int8_t))) break;
+					int8_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U1:
+				{
+					if (!need(sizeof(uint8_t))) break;
+					uint8_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I2:
+				{
+					if (!need(sizeof(int16_t))) break;
+					int16_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U2:
+				{
+					if (!need(sizeof(uint16_t))) break;
+					uint16_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I4:
+				{
+					if (!need(sizeof(int32_t))) break;
+					int32_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U4:
+				{
+					if (!need(sizeof(uint32_t))) break;
+					uint32_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I8:
+				{
+					if (!need(sizeof(int64_t))) break;
+					int64_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U8:
+				{
+					if (!need(sizeof(uint64_t))) break;
+					uint64_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::R4:
+				{
+					if (!need(sizeof(float))) break;
+					float v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::R8:
+				{
+					if (!need(sizeof(double))) break;
+					double v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::StringUtf8:
+				{
+					if (!need(sizeof(uint32_t))) break;
+
+					uint32_t len = 0;
+					std::memcpy(&len, p, sizeof(len));
+					p += sizeof(uint32_t);
+
+					if ((bytes.data() + bytes.size()) < (p + len))
+						break;
+
+					MonoString *ms = mono_string_new_len(m_AppDomain, reinterpret_cast<const char *>(p), static_cast<uint32_t>(len));
+					mono_field_set_value(instance, field, &ms); // note: pass address for ref types
+					break;
+				}
+				case SnapType::RawValue:
+				{
+					if (!need(sizeof(uint32_t))) break;
+
+					uint32_t sz = 0;
+					std::memcpy(&sz, p, sizeof(sz));
+					p += sizeof(uint32_t);
+
+					if ((bytes.data() + bytes.size()) < (p + sz))
+						break;
+
+					// Set raw bytes for blittable valuetype
+					std::vector<uint8_t> tmp(sz);
+					std::memcpy(tmp.data(), p, sz);
+					mono_field_set_value(instance, field, tmp.data());
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	bool MonoScriptEngine::BuildGameScripts()
+	{
+#if defined(_DEBUG) || defined(DEBUG)
+		const char *cfg = "Debug";
+#else
+		const char *cfg = "Release";
+#endif
+
+		WCHAR exePathW[MAX_PATH] = { 0 };
+		GetModuleFileNameW(NULL, exePathW, MAX_PATH);
+		std::filesystem::path exeDir = std::filesystem::path(exePathW).parent_path();
+
+		std::filesystem::path projectRoot = exeDir.parent_path().parent_path().parent_path();
+		std::filesystem::path scriptProjectPath = projectRoot / "Scripts" / "GameScripts.csproj";
+		std::filesystem::path scriptsDir = scriptProjectPath.parent_path();
+
+		if (!std::filesystem::exists(scriptProjectPath))
+		{
+			LOG_ERROR("[HotReloadOnPlay] Missing csproj: ", scriptProjectPath.string());
+			return false;
+		}
+
+		// Build command
+		std::string cmd = "cmd.exe /C \"dotnet build \"" + scriptProjectPath.string() + "\" --configuration " + cfg + "\"";
+
+		STARTUPINFOA si{};
+		PROCESS_INFORMATION pi{};
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW;
+		si.wShowWindow = SW_HIDE;
+
+		std::vector<char> cmdBuf(cmd.begin(), cmd.end());
+		cmdBuf.push_back('\0');
+
+		const std::string workDir = projectRoot.string();
+
+		BOOL ok = CreateProcessA(
+			nullptr,
+			cmdBuf.data(),
+			nullptr, nullptr,
+			FALSE,
+			CREATE_NO_WINDOW,
+			nullptr,
+			workDir.c_str(),
+			&si, &pi);
+
+		if (!ok)
+		{
+			DWORD err = GetLastError();
+			LOG_ERROR("[HotReloadOnPlay] Failed to start build. GetLastError=", (int)err);
+			LOG_ERROR("[HotReloadOnPlay] Cmd: ", cmd);
+			LOG_ERROR("[HotReloadOnPlay] WorkDir: ", workDir);
+			return false;
+		}
+
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		DWORD exitCode = 1;
+		GetExitCodeProcess(pi.hProcess, &exitCode);
+
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+
+		if (exitCode != 0)
+		{
+			LOG_ERROR("[HotReloadOnPlay] dotnet build failed, exit code: ", exitCode);
+			return false;
+		}
+
+		std::vector<std::filesystem::path> candidates = {
+			scriptsDir / "obj" / cfg / "GameScripts.dll",
+			scriptsDir / "bin" / cfg / "GameScripts.dll"
+		};
+
+		std::filesystem::path builtDll;
+		for (auto &c : candidates)
+		{
+			if (std::filesystem::exists(c))
+			{
+				builtDll = c;
+				break;
+			}
+		}
+
+		if (builtDll.empty())
+		{
+			// fallback: recursive search in Scripts/bin + Scripts/obj
+			for (auto root : { scriptsDir / "bin", scriptsDir / "obj" })
+			{
+				if (!std::filesystem::exists(root)) continue;
+				for (auto &e : std::filesystem::recursive_directory_iterator(root))
+				{
+					if (e.is_regular_file() && e.path().filename() == "GameScripts.dll")
+					{
+						builtDll = e.path();
+						break;
+					}
+				}
+				if (!builtDll.empty()) break;
+			}
+		}
+
+		if (builtDll.empty())
+		{
+			LOG_ERROR("[HotReloadOnPlay] Build succeeded but GameScripts.dll not found under Scripts/bin or Scripts/obj");
+			return false;
+		}
+
+		// Copy beside exe and load that
+		std::filesystem::path outDll = exeDir / "GameScripts.dll";
+		std::filesystem::path tmpDll = exeDir / "GameScripts.dll.tmp";
+
+		try
+		{
+			std::filesystem::copy_file(builtDll, tmpDll, std::filesystem::copy_options::overwrite_existing);
+			if (std::filesystem::exists(outDll))
+				std::filesystem::remove(outDll);
+			std::filesystem::rename(tmpDll, outDll);
+		}
+		catch (const std::exception &e)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Failed to swap output DLL: ", e.what());
+			return false;
+		}
+
+		m_AssemblyPath = outDll.string();
+
+		LOG_INFO("[HotReloadOnPlay] Build OK");
+		LOG_INFO("  csproj:    ", scriptProjectPath.string());
+		LOG_INFO("  built:     ", builtDll.string());
+		LOG_INFO("  output:    ", m_AssemblyPath);
+
+		return true;
+	}
+
+	bool MonoScriptEngine::ReloadDomainAndAssembly()
+	{
+		if (!m_RootDomain)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Mono not initialized");
+			return false;
+		}
+
+		if (m_AppDomain && m_AppDomain != m_RootDomain)
+		{
+			mono_domain_set(m_RootDomain, false);
+
+			LOG_INFO("[HotReloadOnPlay] Unloading previous script domain...");
+			mono_domain_unload(m_AppDomain);
+			m_AppDomain = nullptr;
+		}
+
+		UnloadAssembly();
+
+		const char *domainName = "GameScriptsDomain";
+		MonoDomain *newDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+		if (!newDomain)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Failed to create appdomain (fallback to root).");
+			m_AppDomain = m_RootDomain;
+			mono_domain_set(m_AppDomain, false);
+		}
+		else
+		{
+			m_AppDomain = newDomain;
+			mono_domain_set(m_AppDomain, false);
+		}
+
+		if (m_AssemblyPath.empty())
+		{
+			LOG_ERROR("[HotReloadOnPlay] m_AssemblyPath is empty; did BuildGameScripts() run?");
+			return false;
+		}
+
+		LoadAssembly(m_AssemblyPath);
+
+		if (!m_AppAssembly || !m_AppImage)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Assembly load failed: ", m_AssemblyPath);
+			return false;
+		}
+
+		return true;
+	}
+
+	void MonoScriptEngine::RebindAllScriptComponents()
+	{
+		Scene *scene = Engine::s_ScriptingSceneContext;
+		if (!scene)
+		{
+			LOG_ERROR("[HotReloadOnPlay] RebindAllScriptComponents: no scene context set (did SetScriptingCurrentScene run?)");
+			return;
+		}
+
+		if (!m_AppDomain || !m_AppImage)
+		{
+			LOG_ERROR("[HotReloadOnPlay] RebindAllScriptComponents: Mono app domain/image not ready");
+			return;
+		}
+
+		EnsureCorrectDomain();
+
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
+
+		std::uint32_t rebuilt = 0;
+		std::uint32_t failed = 0;
+
+		for (auto ent : view)
+		{
+			auto &sc = view.get<ScriptComponent>(ent);
+
+			if (sc.ScriptClassName.empty())
+				continue;
+
+			// IMPORTANT:
+			// Any GCHandle from the old domain is now stale. Free it unconditionally.
+			if (sc.GCHandle != 0)
+			{
+				mono_gchandle_free(sc.GCHandle);
+				sc.GCHandle = 0;
+			}
+
+			sc.ScriptInstance = nullptr;
+			sc.Started = false;
+
+			// Recreate in the *new* domain
+			MonoObject *created = nullptr;
+			uint32_t handle = CreateScriptInstanceHandle(sc.ScriptClassName, &created, /*pinned*/ false);
+			if (handle == 0 || !created)
+			{
+				LOG_WARNING("[HotReloadOnPlay] Rebind failed (class not found or ctor failed): ", sc.ScriptClassName);
+				++failed;
+				continue;
+			}
+
+			BindEntityID(created, static_cast<std::uint32_t>(ent));
+
+			sc.GCHandle = handle;
+			sc.ScriptInstance = created; // cache only
+			sc.Started = false;
+
+			++rebuilt;
+		}
+
+		LOG_INFO("[HotReloadOnPlay] RebindAllScriptComponents complete. rebuilt=", rebuilt, " failed=", failed);
+	}
+
 	// Context setters
 	void SetScriptingInputSystem(Input *input)
 	{
@@ -579,6 +1312,7 @@ namespace Engine
 	}
 	void SetScriptingCurrentScene(Scene *scene)
 	{
+		Engine::s_ScriptingSceneContext = scene;
 		InternalCalls::SetCurrentScene(scene);
 	}
 	void SetScriptingAudioManager(AudioManager *audioManager)

@@ -31,7 +31,6 @@
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/ScriptSystem.h"        // ADD THIS
 #include "Scripting/MonoScriptEngine.h"    // ADD THIS
-#include "Scripting/ScriptReloader.h" 
 #include "BehaviourTree/BehaviourTreeSystem.h"
 #include "ParticleSystem/ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
@@ -344,21 +343,6 @@ void Game::OnInit()
 			Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
 			LOG_INFO("  -> Mono Scripting Engine initialized successfully");
 		}
-
-		WCHAR exePath[MAX_PATH] = { 0 };
-		GetModuleFileNameW(NULL, exePath, MAX_PATH);
-		std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
-
-		std::filesystem::path projectRoot = exeDir.parent_path().parent_path().parent_path();
-		std::filesystem::path scriptSourcePath = projectRoot / "Scripts" / "Game";
-		std::filesystem::path scriptProjectPath = projectRoot / "Scripts" / "GameScripts.csproj";
-		std::string outputDllPath = (exeDir / "GameScripts.dll").string();
-
-		Engine::ScriptReloader::GetInstance().Initialize(
-			scriptSourcePath.string(),
-			scriptProjectPath.string(),
-			outputDllPath
-		);
 	}
 	catch (const std::exception &e)
 	{
@@ -804,9 +788,6 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 		LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
-
-
-	Engine::ScriptReloader::GetInstance().Update();
 
 	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
 	//{

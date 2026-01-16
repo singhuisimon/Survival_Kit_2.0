@@ -22,6 +22,15 @@ namespace Engine
 	class Input;
 	class AudioManager;
 
+	struct ManagedFieldSnapshot
+	{
+		// entity id -> (class name -> (field name -> serialized bytes/string))
+		// Keep this aligned with what your engine already supports (int/float/bool/string/vec3/quat/etc).
+		std::unordered_map<std::uint32_t,
+			std::unordered_map<std::string,
+			std::unordered_map<std::string, std::vector<std::uint8_t>>>> data;
+	};
+
 	// Functions to set context for internal calls
 	void SetScriptingCurrentScene(Scene *scene);
 	void SetScriptingInputSystem(Input *input);
@@ -83,14 +92,9 @@ namespace Engine
 		{
 			return m_RootDomain;
 		}
-		MonoDomain *GetAppDomain() const
-		{
-			return m_AppDomain;
-		}
-
 		MonoDomain *GetDomain() const
 		{
-			return m_AppDomain;
+			return m_AppDomain ? m_AppDomain : m_RootDomain;
 		}
 		MonoAssembly *GetAssembly() const
 		{
@@ -104,6 +108,7 @@ namespace Engine
 		// Legacy helper kept for compilation safety (best-effort).
 		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
 		MonoObject *GetObjectFromHandle(void *instancePtr);
+		bool HotReloadOnPlay(bool preserveManagedState);
 
 	private:
 		MonoScriptEngine() = default;
@@ -117,7 +122,13 @@ namespace Engine
 		void LoadAssembly(const std::string &path);
 		void UnloadAssembly();
 
-	private:
+		ManagedFieldSnapshot CaptureManagedState();
+		void RestoreManagedState(const ManagedFieldSnapshot &snap);
+
+		bool BuildGameScripts();          // you already have something like this (dotnet build/msbuild)
+		bool ReloadDomainAndAssembly();   // your existing unload/load flow
+		void RebindAllScriptComponents(); // recreate instances + BindEntityID for all entities
+
 		MonoDomain *m_RootDomain = nullptr;
 		MonoDomain *m_AppDomain = nullptr;
 		MonoAssembly *m_AppAssembly = nullptr;

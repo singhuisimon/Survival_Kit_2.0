@@ -110,6 +110,7 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            LogMessage("Rebuild successful");
             if (!moveAllowed || !initialized)
                 return;
 
@@ -175,8 +176,6 @@ namespace Game
                 moveDir.X += forward.X;
                 moveDir.Y += forward.Y;
                 moveDir.Z += forward.Z;
-
-                LogMessage("Send help pls");
             }
             if (Input.IsKeyPressed(KeyCode.S))  // S = Move toward camera (backward)
             {
