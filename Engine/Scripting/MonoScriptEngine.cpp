@@ -1704,6 +1704,16 @@ namespace Engine
 		BindInternalCall("Engine.QuatNative::Quat_Dot",
 			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
 
+		BindInternalCall("Engine.RNG::Seed",
+			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandInt));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandFloat));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
+
+
 		LOG_INFO("Internal calls registered");
 	}
 } // namespace Engine

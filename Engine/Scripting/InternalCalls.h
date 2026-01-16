@@ -1254,6 +1254,10 @@ namespace Engine
 		***************************************************************************/
 		float Quat_Dot(glm::quat *q1, glm::quat *q2);
 
+		void  RNG_Seed(std::uint32_t seed);
+		int   RNG_RandInt(int min, int max);
+		float RNG_RandFloat(float min, float max);
+		bool  RNG_RandBool();
 
 		// =====================================================================
 		// Global context (set from ScriptSystem via MonoScriptEngine helpers)

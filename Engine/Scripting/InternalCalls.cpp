@@ -2576,5 +2576,65 @@ namespace Engine
 			if (!q1 || !q2) return 0.0f;
 			return glm::dot(*q1, *q2);
 		}
+
+		static std::uint32_t g_rngState = 0x6D2B79F5u; // non-zero default
+
+		static inline std::uint32_t NextU32()
+		{
+			// xorshift32
+			std::uint32_t x = g_rngState;
+			if (x == 0u) x = 0x6D2B79F5u; // never allow 0 state
+
+			x ^= (x << 13);
+			x ^= (x >> 17);
+			x ^= (x << 5);
+
+			g_rngState = x;
+			return x;
+		}
+
+		void RNG_Seed(std::uint32_t seed)
+		{
+			g_rngState = (seed == 0u) ? 0x6D2B79F5u : seed;
+			(void)NextU32(); // diffuse a bit
+		}
+
+		int RNG_RandInt(int min, int max)
+		{
+			if (min == max) return min;
+			if (min > max)
+			{
+				int tmp = min; min = max; max = tmp;
+			}
+
+			// Inclusive range [min, max]
+			std::uint32_t span = static_cast<std::uint32_t>(max - min) + 1u;
+
+			// Simple modulo (tiny bias, fine for games)
+			std::uint32_t r = NextU32();
+			int val = min + static_cast<int>(r % span);
+			return val;
+		}
+
+		float RNG_RandFloat(float min, float max)
+		{
+			if (min == max) return min;
+			if (min > max)
+			{
+				float tmp = min; min = max; max = tmp;
+			}
+
+			// Convert to [0,1) using 24 bits
+			std::uint32_t r = NextU32();
+			r >>= 8; // 24 bits
+			float t = static_cast<float>(r) * (1.0f / 16777216.0f); // 2^24
+
+			return min + (max - min) * t; // [min, max)
+		}
+
+		bool RNG_RandBool()
+		{
+			return (NextU32() & 1u) != 0u;
+		}
 	} // namespace InternalCalls
 } // namespace Engine
