@@ -52,6 +52,18 @@ layout(std140, binding = 0) uniform LightsBlock {
     LightGPU lights[64];
 };
 
+// ===== Shadows UBO (binding = 2), matches renderer =====
+layout(std140, binding = 2) uniform ShadowsBlock
+{
+    mat4 lightViewProj[4];
+    vec4 cascadeSplits;     // future use
+    vec4 shadowParams;      // x=strength, y=bias, z=texelSize(1/res), w=shadowType(0/1/2)
+    vec4 lightDirEnabled;   // xyz=lightDir(world), w=enabled
+};
+
+uniform sampler2DShadow u_ShadowMap;
+uniform int u_ReceiveShadows;
+
 struct Material_
 {
     vec3  albedo;
@@ -147,6 +159,52 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+////////////////////////////////////////////////////////////////////
+// Shadow sampling helper (Hard + Soft PCF)
+////////////////////////////////////////////////////////////////////
+float ComputeShadowFactor(vec3 worldPos, vec3 normalWS, vec3 lightDirWS)
+{
+    if (lightDirEnabled.w < 0.5) return 0.0;
+    if (u_ReceiveShadows == 0)   return 0.0;
+
+    vec4 ls = lightViewProj[0] * vec4(worldPos, 1.0);
+    vec3 proj = ls.xyz / ls.w;
+    proj = proj * 0.5 + 0.5;
+
+    // outside shadow map => no shadow
+    if (proj.x < 0.0 || proj.x > 1.0 || proj.y < 0.0 || proj.y > 1.0 || proj.z > 1.0)
+        return 0.0;
+
+    float strength = shadowParams.x;
+    float baseBias = shadowParams.y;
+    float texel    = shadowParams.z;
+    float type     = shadowParams.w; // 1=Hard, 2=Soft
+
+    // slope-scaled receiver bias (reduces acne without huge peter-panning)
+    float ndotl = max(dot(normalWS, lightDirWS), 0.0);
+    float bias  = max(baseBias * (1.0 - ndotl), baseBias * 0.25);
+
+    float visibility = 1.0;
+
+    if (type < 1.5) {
+        // Hard
+        visibility = texture(u_ShadowMap, vec3(proj.xy, proj.z - bias));
+    } else {
+        // Soft 3x3 PCF
+        float sum = 0.0;
+        for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x)
+        {
+            vec2 offset = vec2(x, y) * texel;
+            sum += texture(u_ShadowMap, vec3(proj.xy + offset, proj.z - bias));
+        }
+        visibility = sum / 9.0;
+    }
+
+    float shadow = (1.0 - visibility) * strength;
+    return shadow;
+}
+
 void main()
 {
     // ===== Normal computation =====
@@ -193,7 +251,7 @@ void main()
         vec3  color     = Lg.color_intensity.rgb;
         float intensity = Lg.color_intensity.a;
         vec3 dir = normalize(Lg.direction_type.xyz); 
-        vec3 pos = Lg.position_range.xyz;
+        vec3 pos = Lg.position_range.xyz; // Light position, xyz
         uint type = uint(Lg.direction_type.w + 0.5);
 
         // ===== Light direction setup =====
@@ -252,8 +310,20 @@ void main()
         float denominator = 4.0 * NdotV * NdotL + 0.0001;
         vec3 specular = numerator / denominator;
 
-        // Add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+//        // Add to outgoing radiance Lo
+//        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+
+        // Shadowing: apply only to the shadow-casting directional light for now
+        float shadow = 0.0;
+        if (type == LIGHT_DIRECTIONAL)
+        {
+            // ComputeShadowFactor returns [0..strength]
+            shadow = ComputeShadowFactor(Position, N, L);
+        }
+
+        vec3 direct = (kD * albedo / PI + specular) * radiance * NdotL;
+        direct *= (1.0 - shadow);
+        Lo += direct;
     }
 
     // ===== Ambient lighting =====

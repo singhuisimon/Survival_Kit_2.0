@@ -1,0 +1,113 @@
+{
+    "Prefab Name": "SpriteRendererEntity",
+    "Prefab GUID": 7110682972758999239,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "SpriteRendererEntity",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17486976514217869497",
+                            "Position": [
+                                919.5,
+                                432.7999877929687,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                50.0,
+                                50.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12298829743487058103",
+                            "Tag": "SpriteRendererEntity"
+                        }
+                    }
+                },
+                {
+                    "type": 14,
+                    "typeName": "SpriteRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6534222220452823227",
+                            "Texture": "DefenceSuccess.png",
+                            "Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Quad": 3,
+                            "Sprite Layer": 3,
+                            "IsActive": true,
+                            "IsVisible": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "New Entity",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12875290495790514367",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11145908238880243901",
+                            "Tag": "New Entity"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

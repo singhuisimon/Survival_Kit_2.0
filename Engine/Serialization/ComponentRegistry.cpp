@@ -198,12 +198,12 @@ namespace Engine {
                 [](MeshRendererComponent& c, const bool& v) { c.ShadowReceive = v; }
             );
 
-            meta.AddProperty<MeshRendererComponent, bool>(
-                "ShadowCast",
-                PropertyType::Bool,
-                [](const MeshRendererComponent& c) { return c.ShadowCast; },
-                [](MeshRendererComponent& c, const bool& v) { c.ShadowCast = v; }
-            );
+            //meta.AddProperty<MeshRendererComponent, bool>(
+            //    "ShadowCast",
+            //    PropertyType::Bool,
+            //    [](const MeshRendererComponent& c) { return c.ShadowCast; },
+            //    [](MeshRendererComponent& c, const bool& v) { c.ShadowCast = v; }
+            //);
 
             meta.AddProperty<MeshRendererComponent, bool>(
                 "GlobalIlluminate",

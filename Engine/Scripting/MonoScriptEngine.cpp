@@ -1,23 +1,20 @@
-#include <windows.h>  // Add at top
+#include <windows.h>
 
 #include "MonoScriptEngine.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
 #include "../ECS/Scene.h"
-#include "../ECS/Entity.h" 
+#include "../ECS/Entity.h"
 #include "../ECS/Components.h"
 #include "../Core/input.h"
 #include "Core/Application.h"
 #include "../Audio/AudioManager.h"
 #include "../Event/EventSystem.h"
-#include "ScriptReloader.h"
-
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../Prefab/PrefabRegistry.h"
-
 #include "../Physics/PhysicsAPI.h"
 
 // Mono headers
@@ -25,20 +22,236 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
+#include <mono/metadata/appdomain.h>
+#include <mono/metadata/mono-gc.h>
 
 #include <filesystem>
 #include <iostream>
 
 #define GLM_ENABLE_EXPERIMENTAL
-
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+
 #include "InternalCalls.h"
 
+namespace
+{
+	enum class SnapType : uint8_t
+	{
+		Invalid = 0,
+		Bool = 1,
+		I1 = 2,
+		U1 = 3,
+		I2 = 4,
+		U2 = 5,
+		I4 = 6,
+		U4 = 7,
+		I8 = 8,
+		U8 = 9,
+		R4 = 10,
+		R8 = 11,
+		StringUtf8 = 12,
+		RawValue = 13
+	};
+
+	static inline void AppendBytes(std::vector<uint8_t> &out, const void *p, size_t n)
+	{
+		const uint8_t *b = static_cast<const uint8_t *>(p);
+		out.insert(out.end(), b, b + n);
+	}
+
+	static bool HasAttribute(MonoClassField *field, const char *ns, const char *name)
+	{
+		if (!field) return false;
+
+		MonoClass *parent = mono_field_get_parent(field);
+		if (!parent) return false;
+
+		MonoCustomAttrInfo *attrs = mono_custom_attrs_from_field(parent, field);
+		if (!attrs) return false;
+
+		// Try find the attribute class in the current domain by name
+		// (If not found, just treat as "not present".)
+		MonoClass *attrKlass = nullptr;
+
+		// First: corlib/System.* common attrs
+		MonoImage *corlib = mono_get_corlib();
+		if (corlib)
+			attrKlass = mono_class_from_name(corlib, ns, name);
+
+		bool has = (attrKlass && mono_custom_attrs_has_attr(attrs, attrKlass));
+		mono_custom_attrs_free(attrs);
+		return has;
+	}
+
+	static bool ShouldSerializeField(MonoClassField *field)
+	{
+		if (!field) return false;
+
+		const uint32_t flags = mono_field_get_flags(field);
+
+		if (flags & MONO_FIELD_ATTR_STATIC)
+			return false;
+
+		if (flags & MONO_FIELD_ATTR_NOT_SERIALIZED)
+			return false;
+
+		// [NonSerialized]
+		if (HasAttribute(field, "System", "NonSerializedAttribute"))
+			return false;
+
+		// Public => ok
+		if (flags & MONO_FIELD_ATTR_PUBLIC)
+			return true;
+
+		// Non-public => only if [SerializeField] (support either namespace)
+		if (HasAttribute(field, "UnityEngine", "SerializeField"))
+			return true;
+
+		if (HasAttribute(field, "Engine", "SerializeField"))
+			return true;
+
+		return false;
+	}
+
+	static std::vector<uint8_t> SerializeFieldValue(MonoObject *instance, MonoClassField *field)
+	{
+		std::vector<uint8_t> payload;
+		if (!instance || !field) return payload;
+
+		MonoType *mt = mono_field_get_type(field);
+		if (!mt) return payload;
+
+		const MonoTypeEnum t = static_cast<MonoTypeEnum>(mono_type_get_type(mt));
+
+#define SER_PRIM(TAG, CPP_T)                              \
+		do {                                              \
+			CPP_T v{};                                    \
+			mono_field_get_value(instance, field, &v);     \
+			payload.push_back(static_cast<uint8_t>(TAG)); \
+			AppendBytes(payload, &v, sizeof(CPP_T));       \
+			return payload;                               \
+		} while (0)
+
+		switch (t)
+		{
+		case MONO_TYPE_BOOLEAN: SER_PRIM(SnapType::Bool, uint8_t);
+		case MONO_TYPE_I1:      SER_PRIM(SnapType::I1, int8_t);
+		case MONO_TYPE_U1:      SER_PRIM(SnapType::U1, uint8_t);
+		case MONO_TYPE_I2:      SER_PRIM(SnapType::I2, int16_t);
+		case MONO_TYPE_U2:      SER_PRIM(SnapType::U2, uint16_t);
+		case MONO_TYPE_I4:      SER_PRIM(SnapType::I4, int32_t);
+		case MONO_TYPE_U4:      SER_PRIM(SnapType::U4, uint32_t);
+		case MONO_TYPE_I8:      SER_PRIM(SnapType::I8, int64_t);
+		case MONO_TYPE_U8:      SER_PRIM(SnapType::U8, uint64_t);
+		case MONO_TYPE_R4:      SER_PRIM(SnapType::R4, float);
+		case MONO_TYPE_R8:      SER_PRIM(SnapType::R8, double);
+
+		case MONO_TYPE_STRING:
+		{
+			MonoString *ms = nullptr;
+			mono_field_get_value(instance, field, &ms);
+
+			payload.push_back(static_cast<uint8_t>(SnapType::StringUtf8));
+
+			if (!ms)
+			{
+				uint32_t len = 0;
+				AppendBytes(payload, &len, sizeof(len));
+				return payload;
+			}
+
+			char *utf8 = mono_string_to_utf8(ms);
+			const uint32_t len = utf8 ? static_cast<uint32_t>(std::strlen(utf8)) : 0;
+
+			AppendBytes(payload, &len, sizeof(len));
+			if (len && utf8)
+				AppendBytes(payload, utf8, len);
+
+			if (utf8)
+				mono_free(utf8);
+
+			return payload;
+		}
+
+		case MONO_TYPE_VALUETYPE:
+		{
+			MonoClass *vc = mono_type_get_class(mt);
+			if (!vc) return {};
+
+			// Enums
+			if (mono_class_is_enum(vc))
+			{
+				int32_t v{};
+				mono_field_get_value(instance, field, &v);
+				payload.push_back(static_cast<uint8_t>(SnapType::I4));
+				AppendBytes(payload, &v, sizeof(v));
+				return payload;
+			}
+
+			uint32_t align = 0;
+			const int sz = mono_class_value_size(vc, &align);
+			if (sz <= 0) return {};
+
+			payload.push_back(static_cast<uint8_t>(SnapType::RawValue));
+			const uint32_t usz = static_cast<uint32_t>(sz);
+			AppendBytes(payload, &usz, sizeof(usz));
+
+			const size_t start = payload.size();
+			payload.resize(start + static_cast<size_t>(sz));
+			mono_field_get_value(instance, field, payload.data() + start);
+			return payload;
+		}
+
+		default:
+			break;
+		}
+
+#undef SER_PRIM
+		return {};
+	}
+} // anonymous namespace
 
 namespace Engine
 {
+	template <typename T, typename = void>
+	struct has_gchandle : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_gchandle<T, std::void_t<decltype(std::declval<T &>().GCHandle)>> : std::true_type
+	{
+	};
+
+	template <typename T, typename = void>
+	struct has_started : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_started<T, std::void_t<decltype(std::declval<T &>().Started)>> : std::true_type
+	{
+	};
+
+	template <typename T, typename = void>
+	struct has_scriptinstance : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_scriptinstance<T, std::void_t<decltype(std::declval<T &>().ScriptInstance)>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	concept HasScriptInstancePtr = requires(T t)
+	{
+		{
+			t.ScriptInstance
+		};
+	};
+
+	static Scene *s_ScriptingSceneContext = nullptr;
+
 	MonoScriptEngine &MonoScriptEngine::GetInstance()
 	{
 		static MonoScriptEngine instance;
@@ -50,9 +263,7 @@ namespace Engine
 		if (!instance)
 			return false;
 
-		// Check if pointer looks valid (basic sanity check)
-		if ((uintptr_t)instance == 0xFFFFFFFFFFFFFFFF ||
-			(uintptr_t)instance < 0x10000)
+		if ((uintptr_t)instance == 0xFFFFFFFFFFFFFFFF || (uintptr_t)instance < 0x10000)
 		{
 			LOG_WARNING("IsValidMonoObject: Invalid pointer detected");
 			return false;
@@ -65,7 +276,6 @@ namespace Engine
 			return false;
 		}
 
-		// Wrap in try-catch for safety (if using C++ exceptions)
 		try
 		{
 			MonoDomain *instanceDomain = mono_object_get_domain(instance);
@@ -89,7 +299,6 @@ namespace Engine
 		if (!m_AppDomain) return;
 
 		MonoDomain *current = mono_domain_get();
-
 		if (current != m_AppDomain)
 		{
 			LOG_WARNING("EnsureCorrectDomain: Wrong domain active!");
@@ -101,14 +310,9 @@ namespace Engine
 
 			MonoDomain *after = mono_domain_get();
 			if (after == m_AppDomain)
-			{
 				LOG_INFO("  Successfully switched to correct domain");
-			}
 			else
-			{
 				LOG_ERROR("   FAILED to switch domain!");
-				LOG_ERROR("  After switch: " + std::to_string((uintptr_t)after));
-			}
 		}
 	}
 
@@ -121,13 +325,10 @@ namespace Engine
 	// Pointer to Engine.EventSystem.RaiseFromNative(string, string)
 	static MonoMethod *s_EventSystemRaiseFromNative = nullptr;
 
-	// Refresh the managed event binding whenever the C# assembly is (re)loaded
 	static void RefreshEventBindings(MonoImage *appImage)
 	{
 		s_EventSystemRaiseFromNative = nullptr;
-
-		if (!appImage)
-			return;
+		if (!appImage) return;
 
 		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "EventSystem");
 		if (!eventSystemClass)
@@ -140,14 +341,11 @@ namespace Engine
 			mono_class_get_method_from_name(eventSystemClass, "RaiseFromNative", 2);
 
 		if (!s_EventSystemRaiseFromNative)
-		{
 			LOG_WARNING("[Mono] Engine.EventSystem.RaiseFromNative(string,string) not found");
-		}
 	}
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
 	{
-		// Guard against double initialization
 		static bool s_Initialized = false;
 		if (s_Initialized)
 		{
@@ -159,7 +357,6 @@ namespace Engine
 
 		m_AssemblyPath = assemblyPath;
 
-		// Get the exe directory on Windows
 		WCHAR exePath[MAX_PATH] = { 0 };
 		GetModuleFileNameW(NULL, exePath, MAX_PATH);
 
@@ -171,14 +368,6 @@ namespace Engine
 
 		LOG_INFO("[Mono] Assembly path set to: ", monoLibPathStr);
 
-		// Verify mono/lib exists
-		if (!std::filesystem::exists(monoLibPath))
-		{
-			LOG_ERROR("[Mono] ERROR: mono/lib not found at: ", monoLibPathStr);
-			LOG_ERROR("[Mono] Make sure Mono runtime is in the build output directory");
-		}
-
-		// Initialize Mono JIT
 		m_RootDomain = mono_jit_init("EngineRuntime");
 		if (!m_RootDomain)
 		{
@@ -187,42 +376,42 @@ namespace Engine
 		}
 
 		LOG_INFO(" Mono JIT initialized");
-		LOG_INFO(" Root domain created: " + std::to_string((uintptr_t)m_RootDomain));
+
+		// RECOMMENDED: Use multi-domain mode for proper hot reload
+#if 1  // Change to 0 to use single-domain mode
+		const char *domainName = "GameScriptsDomain";
+		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+
+		if (!m_AppDomain)
+		{
+			LOG_WARNING("Failed to create separate app domain, falling back to root domain");
+			LOG_WARNING("  Hot reload will be limited in single-domain mode");
+			m_AppDomain = m_RootDomain;
+		}
+		else
+		{
+			LOG_INFO("Using multi-domain mode for proper hot reload support");
+			LOG_INFO("  Root domain:  ", (uintptr_t)m_RootDomain);
+			LOG_INFO("  App domain:   ", (uintptr_t)m_AppDomain);
+		}
+#else
+// Single-domain mode (limited hot reload)
 		m_AppDomain = m_RootDomain;
-		// Create app domain
-		//m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+		LOG_WARNING("Using single-domain mode (hot reload will be imperfect)");
+#endif
 
-		LOG_INFO("Using single domain mode (no separate app domain)");
-		LOG_INFO("  Root domain: " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App domain:  " + std::to_string((uintptr_t)m_AppDomain) + " (same as root)");
-
-
-
-		/*	if (!m_AppDomain)
-			{
-				LOG_ERROR("Failed to create Mono app domain");
-				return;
-			}*/
 		mono_domain_set(m_AppDomain, false);
 
-
-
-		// Load assembly (only if it exists)
 		if (!assemblyPath.empty() && std::filesystem::exists("GameScripts.dll"))
-		{
 			LoadAssembly("GameScripts.dll");
-		}
 		else
 		{
 			LOG_WARNING("Assembly not found: ", assemblyPath);
 			LOG_WARNING("Mono initialized but no scripts will be loaded");
-			LOG_WARNING("ScriptComponents will be ignored");
 		}
 
-		// Register internal calls (C++ functions callable from C#)
 		RegisterInternalCalls();
 
-		// Hook native ScriptEvent channel into managed Engine.EventSystem
 		EventSystem::Instance().Subscribe<ScriptEvent>(
 			[](ScriptEvent const &ev)
 			{
@@ -242,30 +431,19 @@ namespace Engine
 
 		s_Initialized = true;
 		LOG_INFO("Mono Script Engine initialized");
-
 	}
-
-
 
 	void MonoScriptEngine::Shutdown()
 	{
 		LOG_INFO("Shutting down Mono Script Engine...");
 
-		// Unload assembly (clears mAppAssembly and mAppImage)
 		UnloadAssembly();
 
-		// The OS will clean up Mono memory when the process exits
-
-
-		// Just null the pointers
 		m_RootDomain = nullptr;
 		m_AppDomain = nullptr;
 
-
-
 		LOG_INFO("Mono Script Engine shut down");
 	}
-
 
 	void MonoScriptEngine::LoadAssembly(const std::string &path)
 	{
@@ -277,7 +455,6 @@ namespace Engine
 			return;
 		}
 
-		// Load assembly from file
 		m_AppAssembly = mono_domain_assembly_open(m_AppDomain, path.c_str());
 		if (!m_AppAssembly)
 		{
@@ -293,8 +470,6 @@ namespace Engine
 		}
 
 		LOG_INFO("Assembly loaded successfully");
-
-		// NEW: refresh event bindings to Engine.EventSystem
 		RefreshEventBindings(m_AppImage);
 	}
 
@@ -305,54 +480,22 @@ namespace Engine
 		m_AppAssembly = nullptr;
 	}
 
-	//void MonoScriptEngine::ReloadAssembly()
-	//{
-	//	LOG_INFO("Hot-reload: Starting...");
-	//	ClearAllInstances();
-	//	LOG_INFO("Hot-reload: Cleared instance tracking");
-	//
-	//	UnloadAssembly();
-	//	mono_domain_set(m_RootDomain, false);
-	//	mono_domain_unload(m_AppDomain);
-	//
-	//	LOG_INFO("Hot-reload: Domain unloaded");
-	//
-	//	ScriptReloader::GetInstance().FinalizeDllSwap();
-	//	LOG_INFO("Hot-reload: DLL swapped");
-	//
-	//	m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
-	//	mono_domain_set(m_AppDomain, true);
-	//
-	//	LoadAssembly(m_AssemblyPath);
-	//	RegisterInternalCalls();
-	//
-	//	LOG_INFO("Hot-reload: Domain reloaded");
-	//	LOG_INFO("Hot-reload: Complete!");
-	//}
-
-
 	MonoClass *MonoScriptEngine::GetScriptClass(const std::string &className)
 	{
-		// Check if app image is loaded
 		if (!m_AppImage)
 		{
 			LOG_ERROR("Cannot get script class '", className, "': Assembly not loaded");
 			return nullptr;
 		}
 
-		// Check cache first
 		auto it = m_ClassCache.find(className);
 		if (it != m_ClassCache.end())
-		{
 			return it->second;
-		}
 
-		// Parse namespace and class name
 		size_t lastDot = className.find_last_of('.');
 		std::string namespaceName = lastDot != std::string::npos ? className.substr(0, lastDot) : "";
 		std::string classNameOnly = lastDot != std::string::npos ? className.substr(lastDot + 1) : className;
 
-		// Get class from image
 		MonoClass *klass = mono_class_from_name(
 			m_AppImage,
 			namespaceName.c_str(),
@@ -365,57 +508,24 @@ namespace Engine
 			return nullptr;
 		}
 
-		// Cache for future use
 		m_ClassCache[className] = klass;
 		return klass;
 	}
 
-
+	// ------------------------------------------------------------------------
+	// Legacy raw instance creation (caller must store a GCHandle immediately).
+	// ------------------------------------------------------------------------
 	MonoObject *MonoScriptEngine::CreateScriptInstance(const std::string &className)
 	{
 		if (!m_AppImage)
-		{
-			// Assembly not loaded - silently skip
 			return nullptr;
-		}
-		EnsureCorrectDomain();
-		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		MonoDomain *current = mono_domain_get();
-		//LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
-		//LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
-		//LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
 
-		if (current != m_AppDomain)
-		{
-			LOG_ERROR("   Still in wrong domain after EnsureCorrectDomain!");
-			//LOG_ERROR("  Switching to APP domain...");
-			//mono_domain_set(m_AppDomain, false);
-			//current = mono_domain_get();
-			//LOG_INFO("  Switched to: " + std::to_string((uintptr_t)current));
-		}
+		EnsureCorrectDomain();
+
 		MonoClass *klass = GetScriptClass(className);
 		if (!klass)
-		{
 			return nullptr;
-		}
 
-		MonoDomain *currentDomain = mono_domain_get();
-
-		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		//LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
-		//LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
-		//LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
-
-		if (currentDomain != m_RootDomain)
-		{
-			LOG_ERROR("   WRONG DOMAIN! Currently in ROOT domain!");
-			LOG_ERROR("  Switching to APP domain...");
-			mono_domain_set(m_AppDomain, false);
-			currentDomain = mono_domain_get();
-			LOG_INFO("  Switched to: " + std::to_string((uintptr_t)currentDomain));
-		}
-
-		// Allocate object
 		MonoObject *instance = mono_object_new(m_AppDomain, klass);
 		if (!instance)
 		{
@@ -423,69 +533,71 @@ namespace Engine
 			return nullptr;
 		}
 
-		// Call constructor
 		mono_runtime_object_init(instance);
-
-		uint32_t handle = mono_gchandle_new(instance, false);
-		m_ObjectToHandle[instance] = handle;
-
 		return instance;
 	}
 
+	// ------------------------------------------------------------------------
+	// Handle-first creation (what ScriptComponent should use).
+	// ------------------------------------------------------------------------
+	uint32_t MonoScriptEngine::CreateScriptInstanceHandle(const std::string &className, MonoObject **outInstance, bool pinned)
+	{
+		MonoObject *obj = CreateScriptInstance(className);
+		if (!obj)
+		{
+			if (outInstance) *outInstance = nullptr;
+			return 0;
+		}
+
+		uint32_t handle = mono_gchandle_new(obj, pinned ? 1 : 0);
+		if (outInstance) *outInstance = obj;
+		return handle;
+	}
+
+	MonoObject *MonoScriptEngine::GetObjectFromGCHandle(uint32_t gcHandle)
+	{
+		if (gcHandle == 0)
+			return nullptr;
+
+		EnsureCorrectDomain();
+		return mono_gchandle_get_target(gcHandle);
+	}
+
+	void MonoScriptEngine::DestroyScriptHandle(uint32_t gcHandle)
+	{
+		if (gcHandle == 0)
+			return;
+
+		EnsureCorrectDomain();
+
+		MonoObject *obj = mono_gchandle_get_target(gcHandle);
+		if (obj && IsValidMonoObject(obj))
+		{
+			// Let CallMethod do lookup + exception printing
+			CallMethod(obj, "OnDestroy");
+		}
+
+		mono_gchandle_free(gcHandle);
+	}
 
 	void MonoScriptEngine::DestroyScriptInstance(MonoObject *instance)
 	{
 		if (!instance)
 			return;
 
-		// Look up the GC handle first
-		auto it = m_ObjectToHandle.find(instance);
-		if (it == m_ObjectToHandle.end())
-		{
-			LOG_WARNING("No GC handle found for instance during destroy");
+		EnsureCorrectDomain();
+
+		if (!IsValidMonoObject(instance))
 			return;
-		}
 
-		// Get fresh instance from handle
-		MonoObject *freshInstance = mono_gchandle_get_target(it->second);
-
-		if (freshInstance)
-		{
-			// Try to call OnDestroy with the fresh instance
-			try
-			{
-				MonoClass *klass = mono_object_get_class(freshInstance);
-				if (klass)
-				{
-					MonoMethod *destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
-					if (destroyMethod)
-					{
-						EnsureCorrectDomain();
-						mono_runtime_invoke(destroyMethod, freshInstance, nullptr, nullptr);
-					}
-				}
-			}
-			catch (...)
-			{
-				LOG_WARNING("Exception during OnDestroy call");
-			}
-		}
-
-		// Free the GC handle
-		mono_gchandle_free(it->second);
-		m_ObjectToHandle.erase(it);
-		LOG_INFO("Freed GC handle for script instance");
+		// Legacy: call OnDestroy only. Handle freeing is the caller's responsibility now.
+		CallMethod(instance, "OnDestroy");
 	}
 
 	MonoMethod *MonoScriptEngine::GetMethod(MonoClass *klass, const std::string &methodName, int paramCount)
 	{
-		if (!klass)
-		{
-			return nullptr;
-		}
-
-		MonoMethod *method = mono_class_get_method_from_name(klass, methodName.c_str(), paramCount);
-		return method;
+		if (!klass) return nullptr;
+		return mono_class_get_method_from_name(klass, methodName.c_str(), paramCount);
 	}
 
 	void MonoScriptEngine::CallMethod(MonoObject *instance, const std::string &methodName)
@@ -496,9 +608,8 @@ namespace Engine
 	void MonoScriptEngine::CallMethod(MonoObject *instance, const std::string &methodName, void **params, int paramCount)
 	{
 		if (!instance)
-		{
 			return;
-		}
+
 		EnsureCorrectDomain();
 
 		if (!IsValidMonoObject(instance))
@@ -506,16 +617,12 @@ namespace Engine
 			LOG_WARNING("CallMethod: Instance is from unloaded domain, skipping ", methodName);
 			return;
 		}
+
 		MonoClass *klass = mono_object_get_class(instance);
 		MonoMethod *method = GetMethod(klass, methodName, paramCount);
-
 		if (!method)
-		{
-			// Method doesn't exist, which is fine (not all scripts need all methods)
 			return;
-		}
 
-		// Invoke method
 		MonoObject *exception = nullptr;
 		mono_runtime_invoke(method, instance, params, &exception);
 
@@ -539,7 +646,6 @@ namespace Engine
 				exceptionName
 			);
 
-			// Get full managed exception string (includes stack trace)
 			MonoString *excStr = mono_object_to_string(exception, nullptr);
 			if (excStr)
 			{
@@ -551,44 +657,25 @@ namespace Engine
 				}
 			}
 		}
-
 	}
 
 	MonoObject *MonoScriptEngine::GetObjectFromHandle(void *instancePtr)
 	{
+		// Best-effort legacy helper:
+		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
 		if (!instancePtr)
 			return nullptr;
 
 		MonoObject *obj = (MonoObject *)instancePtr;
-
-		auto it = m_ObjectToHandle.find(obj);
-		if (it == m_ObjectToHandle.end())
-		{
-			LOG_WARNING("No GC handle found for instance");
+		if (!IsValidMonoObject(obj))
 			return nullptr;
-		}
 
-		// Verify handle is valid
-		if (it->second == 0)
-		{
-			LOG_WARNING("Invalid GC handle (0)");
-			return nullptr;
-		}
-
-		EnsureCorrectDomain();
-
-		// Get the actual object from the GC handle
-		MonoObject *target = mono_gchandle_get_target(it->second);
-
-		if (!target)
-		{
-			LOG_WARNING("GC handle target is null (object was collected)");
-			return nullptr;
-		}
-
-		return target;
+		return obj;
 	}
-	// Replace the existing SetFieldValue method in MonoScriptEngine with this corrected version:
+
+	// =========================
+	// Field access (unchanged)
+	// =========================
 
 	void MonoScriptEngine::SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value)
 	{
@@ -604,7 +691,6 @@ namespace Engine
 			return;
 		}
 
-		// Walk the inheritance chain to find a field or property called `fieldName`.
 		MonoClass *klass = mono_object_get_class(instance);
 		if (!klass)
 		{
@@ -612,11 +698,9 @@ namespace Engine
 			return;
 		}
 
-		// Get class name for logging
 		const char *className = mono_class_get_name(klass);
 		const char *classNs = mono_class_get_namespace(klass);
 
-		// 1) Try to find a FIELD with this name in the type hierarchy.
 		MonoClass *currentClass = klass;
 		MonoClassField *field = nullptr;
 
@@ -624,28 +708,16 @@ namespace Engine
 		{
 			field = mono_class_get_field_from_name(currentClass, fieldName.c_str());
 			if (field)
-			{
-				//LOG_INFO("[SetFieldValue] Found FIELD '", fieldName, "' in class ",
-				//	classNs ? classNs : "", classNs ? "." : "", className);
 				break;
-			}
 			currentClass = mono_class_get_parent(currentClass);
 		}
 
 		if (field)
 		{
-			// For fields, mono_field_set_value expects a POINTER to the value
 			mono_field_set_value(instance, field, value);
-
-			// Verify it was set (for uint32)
-			uint32_t readBack = 0;
-			mono_field_get_value(instance, field, &readBack);
-			//LOG_INFO("[SetFieldValue] Set field '", fieldName, "' to ", *(uint32_t *)value,
-			//	", read back: ", readBack);
 			return;
 		}
 
-		// 2) Fall back to a PROPERTY setter (supports auto-properties).
 		currentClass = klass;
 		MonoProperty *prop = nullptr;
 
@@ -653,11 +725,7 @@ namespace Engine
 		{
 			prop = mono_class_get_property_from_name(currentClass, fieldName.c_str());
 			if (prop)
-			{
-				LOG_INFO("[SetFieldValue] Found PROPERTY '", fieldName, "' in class ",
-					classNs ? classNs : "", classNs ? "." : "", className);
 				break;
-			}
 			currentClass = mono_class_get_parent(currentClass);
 		}
 
@@ -675,12 +743,7 @@ namespace Engine
 			return;
 		}
 
-		// CRITICAL FIX: For property setters, we need to pass a POINTER TO A POINTER
-		// The value pointer itself becomes the argument
 		void *args[1] = { value };
-
-		LOG_INFO("[SetFieldValue] Calling property setter for '", fieldName,
-			"' with value ", *(uint32_t *)value);
 
 		MonoObject *exception = nullptr;
 		mono_runtime_invoke(setter, instance, args, &exception);
@@ -695,41 +758,15 @@ namespace Engine
 				mono_free(excCStr);
 			return;
 		}
-
-		// Verify it was set by reading it back
-		MonoMethod *getter = mono_property_get_get_method(prop);
-		if (getter)
-		{
-			MonoObject *result = mono_runtime_invoke(getter, instance, nullptr, nullptr);
-			if (result)
-			{
-				void *unboxed = mono_object_unbox(result);
-				if (unboxed)
-				{
-					uint32_t readBack = *(uint32_t *)unboxed;
-					LOG_INFO("[SetFieldValue] Property '", fieldName, "' set to ",
-						*(uint32_t *)value, ", read back: ", readBack);
-
-					if (readBack != *(uint32_t *)value)
-					{
-						LOG_ERROR("[SetFieldValue] VALUE MISMATCH! Expected ", *(uint32_t *)value,
-							" but got ", readBack);
-					}
-				}
-			}
-		}
 	}
 
 	void *MonoScriptEngine::GetFieldValue(MonoObject *instance, const std::string &fieldName)
 	{
 		if (!instance)
-		{
 			return nullptr;
-		}
 
 		MonoClass *klass = mono_object_get_class(instance);
 		MonoClassField *field = mono_class_get_field_from_name(klass, fieldName.c_str());
-
 		if (!field)
 		{
 			LOG_ERROR("Field not found: ", fieldName);
@@ -749,190 +786,577 @@ namespace Engine
 			return;
 		}
 
-		// Verify instance is from current domain
 		if (!IsValidMonoObject(instance))
 		{
 			LOG_ERROR("[BindEntityID] instance is from wrong/unloaded domain!");
 			return;
 		}
 
-		MonoClass *klass = mono_object_get_class(instance);
-		if (!klass)
-		{
-			LOG_ERROR("[BindEntityID] Failed to get class from instance");
-			return;
-		}
-
-		const char *className = mono_class_get_name(klass);
-		const char *classNs = mono_class_get_namespace(klass);
-
-		//LOG_INFO("[BindEntityID] Attempting to BindInternalCall EntityID=", entityID, " to instance of ",
-		//	classNs ? classNs : "", classNs ? "." : "", className);
-
-		// Make a local copy - CRITICAL: pass the ADDRESS of this copy
 		std::uint32_t idCopy = entityID;
-
-		//LOG_INFO("[BindEntityID] Calling SetFieldValue with idCopy address: ",
-		//	(void *)&idCopy, ", value: ", idCopy);
-
-		// SetFieldValue needs the ADDRESS of the value
 		SetFieldValue(instance, "EntityID", &idCopy);
+	}
 
-		// VERIFICATION: Try to read it back multiple ways
-		//LOG_INFO("[BindEntityID] === Verification Phase ===");
+	bool MonoScriptEngine::HotReloadOnPlay(bool preserveManagedState)
+	{
+		ManagedFieldSnapshot snap{};
+		if (preserveManagedState)
+			snap = CaptureManagedState();
 
-		// Method 1: Try reading as a property
-		MonoProperty *prop = nullptr;
-		MonoClass *currentClass = klass;
+		if (!BuildGameScripts())
+			return false;
 
-		while (currentClass && !prop)
+		if (!ReloadDomainAndAssembly())
+			return false;
+
+		RebindAllScriptComponents();
+
+		if (preserveManagedState)
+			RestoreManagedState(snap);
+
+		return true;
+	}
+
+
+	ManagedFieldSnapshot MonoScriptEngine::CaptureManagedState()
+	{
+		ManagedFieldSnapshot out{};
+
+		Scene *scene = InternalCalls::s_CurrentScene;
+		if (!scene)
+			return out;
+
+		auto &reg = scene->GetRegistry();
+
+		auto view = reg.view<ScriptComponent>();
+		for (auto ent : view)
 		{
-			prop = mono_class_get_property_from_name(currentClass, "EntityID");
-			currentClass = mono_class_get_parent(currentClass);
+			auto &sc = view.get<ScriptComponent>(ent);
+			if (!sc.ScriptInstance)
+				continue;
+
+			MonoObject *instance = static_cast<MonoObject *>(sc.ScriptInstance);
+			MonoClass *klass = mono_object_get_class(instance);
+			if (!klass)
+				continue;
+
+			const uint64_t eid = static_cast<uint64_t>(static_cast<uint32_t>(ent));
+			const std::string classKey = sc.ScriptClassName.empty()
+				? std::string(mono_class_get_name(klass))
+				: sc.ScriptClassName;
+
+			void *iter = nullptr;
+			MonoClassField *field = nullptr;
+
+			while ((field = mono_class_get_fields(klass, &iter)) != nullptr)
+			{
+				if (!ShouldSerializeField(field))
+					continue;
+
+				const char *fname = mono_field_get_name(field);
+				if (!fname || !fname[0])
+					continue;
+
+				std::vector<uint8_t> payload = SerializeFieldValue(instance, field);
+				if (payload.empty())
+					continue;
+
+				out.data[eid][classKey][fname] = std::move(payload);
+			}
 		}
 
-		if (prop)
-		{
-			MonoMethod *getter = mono_property_get_get_method(prop);
-			if (getter)
-			{
-				MonoObject *exception = nullptr;
-				MonoObject *result = mono_runtime_invoke(getter, instance, nullptr, &exception);
+		return out;
+	}
 
-				if (exception)
+	void MonoScriptEngine::RestoreManagedState(const ManagedFieldSnapshot &snap)
+	{
+		Scene *scene = InternalCalls::s_CurrentScene;
+		if (!scene)
+			return;
+
+		EnsureCorrectDomain();
+
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
+
+		for (auto ent : view)
+		{
+			const std::uint32_t eid = static_cast<std::uint32_t>(ent);
+
+			auto itEnt = snap.data.find(eid);
+			if (itEnt == snap.data.end())
+				continue;
+
+			auto &sc = view.get<ScriptComponent>(ent);
+
+			MonoObject *instance = nullptr;
+
+			// Prefer GCHandle if the component has it
+			if constexpr (has_gchandle<ScriptComponent>::value)
+			{
+				if (sc.GCHandle != 0)
+					instance = GetObjectFromGCHandle(sc.GCHandle);
+			}
+
+			// Fallback to raw ScriptInstance if present
+			if (!instance)
+			{
+				if constexpr (has_scriptinstance<ScriptComponent>::value)
+					instance = static_cast<MonoObject *>(sc.ScriptInstance);
+			}
+
+			if (!instance || !IsValidMonoObject(instance))
+				continue;
+
+			MonoClass *klass = mono_object_get_class(instance);
+			if (!klass)
+				continue;
+
+			// Snapshot groups by class name; we only restore the block matching this component's class
+			const std::string classKey = sc.ScriptClassName.empty()
+				? std::string(mono_class_get_name(klass))
+				: sc.ScriptClassName;
+
+			auto itClass = itEnt->second.find(classKey);
+			if (itClass == itEnt->second.end())
+				continue;
+
+			for (const auto &[fieldName, bytes] : itClass->second)
+			{
+				if (bytes.empty())
+					continue;
+
+				// Resolve field (walk parents like your SetFieldValue does)
+				MonoClass *cur = klass;
+				MonoClassField *field = nullptr;
+				while (cur && !field)
 				{
-					MonoString *excStr = mono_object_to_string(exception, nullptr);
-					char *cStr = excStr ? mono_string_to_utf8(excStr) : nullptr;
-					//LOG_ERROR("[BindEntityID] Exception reading EntityID property: ",
-					//	cStr ? cStr : "<null>");
-					if (cStr) mono_free(cStr);
+					field = mono_class_get_field_from_name(cur, fieldName.c_str());
+					if (field) break;
+					cur = mono_class_get_parent(cur);
 				}
-				else if (result)
-				{
-					void *unboxed = mono_object_unbox(result);
-					if (unboxed)
+				if (!field)
+					continue;
+
+				const uint8_t tag = bytes[0];
+				const uint8_t *p = bytes.data() + 1;
+				const size_t n = bytes.size() - 1;
+
+				auto need = [&](size_t k)
 					{
-						uint32_t verifyID = *reinterpret_cast<uint32_t *>(unboxed);
-						if (verifyID == entityID)
-						{
-							//LOG_INFO("[BindEntityID] SUCCESS! EntityID=", entityID,
-							//	" verified via property getter");
-						}
-						else
-						{
-							//LOG_ERROR("[BindEntityID] FAILED! Set ", entityID,
-							//	" but property getter returned ", verifyID);
-						}
-						return; // Exit after property check
-					}
-					else
-					{
-						LOG_ERROR("[BindEntityID] Failed to unbox property result");
-					}
-				}
-				else
+						return n >= k;
+					};
+
+				switch (static_cast<SnapType>(tag))
 				{
-					LOG_ERROR("[BindEntityID] Property getter returned null");
+				case SnapType::Bool:
+				{
+					if (!need(sizeof(uint8_t))) break;
+					uint8_t v;
+					std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
 				}
+				case SnapType::I1:
+				{
+					if (!need(sizeof(int8_t))) break;
+					int8_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U1:
+				{
+					if (!need(sizeof(uint8_t))) break;
+					uint8_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I2:
+				{
+					if (!need(sizeof(int16_t))) break;
+					int16_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U2:
+				{
+					if (!need(sizeof(uint16_t))) break;
+					uint16_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I4:
+				{
+					if (!need(sizeof(int32_t))) break;
+					int32_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U4:
+				{
+					if (!need(sizeof(uint32_t))) break;
+					uint32_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I8:
+				{
+					if (!need(sizeof(int64_t))) break;
+					int64_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U8:
+				{
+					if (!need(sizeof(uint64_t))) break;
+					uint64_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::R4:
+				{
+					if (!need(sizeof(float))) break;
+					float v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::R8:
+				{
+					if (!need(sizeof(double))) break;
+					double v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::StringUtf8:
+				{
+					if (!need(sizeof(uint32_t))) break;
+
+					uint32_t len = 0;
+					std::memcpy(&len, p, sizeof(len));
+					p += sizeof(uint32_t);
+
+					if ((bytes.data() + bytes.size()) < (p + len))
+						break;
+
+					MonoString *ms = mono_string_new_len(m_AppDomain, reinterpret_cast<const char *>(p), static_cast<uint32_t>(len));
+					mono_field_set_value(instance, field, &ms); // note: pass address for ref types
+					break;
+				}
+				case SnapType::RawValue:
+				{
+					if (!need(sizeof(uint32_t))) break;
+
+					uint32_t sz = 0;
+					std::memcpy(&sz, p, sizeof(sz));
+					p += sizeof(uint32_t);
+
+					if ((bytes.data() + bytes.size()) < (p + sz))
+						break;
+
+					// Set raw bytes for blittable valuetype
+					std::vector<uint8_t> tmp(sz);
+					std::memcpy(tmp.data(), p, sz);
+					mono_field_set_value(instance, field, tmp.data());
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	bool MonoScriptEngine::BuildGameScripts()
+	{
+#if defined(_DEBUG) || defined(DEBUG)
+		const char *cfg = "Debug";
+#else
+		const char *cfg = "Release";
+#endif
+
+		WCHAR exePathW[MAX_PATH] = { 0 };
+		GetModuleFileNameW(NULL, exePathW, MAX_PATH);
+		std::filesystem::path exeDir = std::filesystem::path(exePathW).parent_path();
+
+		std::filesystem::path projectRoot = exeDir.parent_path().parent_path().parent_path();
+		std::filesystem::path scriptProjectPath = projectRoot / "Scripts" / "GameScripts.csproj";
+		std::filesystem::path scriptsDir = scriptProjectPath.parent_path();
+
+		if (!std::filesystem::exists(scriptProjectPath))
+		{
+			LOG_ERROR("[HotReloadOnPlay] Missing csproj: ", scriptProjectPath.string());
+			return false;
+		}
+
+		// Build command
+		std::string cmd = "cmd.exe /C \"dotnet build \"" + scriptProjectPath.string() + "\" --configuration " + cfg + "\"";
+
+		STARTUPINFOA si{};
+		PROCESS_INFORMATION pi{};
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW;
+		si.wShowWindow = SW_HIDE;
+
+		std::vector<char> cmdBuf(cmd.begin(), cmd.end());
+		cmdBuf.push_back('\0');
+
+		const std::string workDir = projectRoot.string();
+
+		BOOL ok = CreateProcessA(
+			nullptr,
+			cmdBuf.data(),
+			nullptr, nullptr,
+			FALSE,
+			CREATE_NO_WINDOW,
+			nullptr,
+			workDir.c_str(),
+			&si, &pi);
+
+		if (!ok)
+		{
+			DWORD err = GetLastError();
+			LOG_ERROR("[HotReloadOnPlay] Failed to start build. GetLastError=", (int)err);
+			LOG_ERROR("[HotReloadOnPlay] Cmd: ", cmd);
+			LOG_ERROR("[HotReloadOnPlay] WorkDir: ", workDir);
+			return false;
+		}
+
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		DWORD exitCode = 1;
+		GetExitCodeProcess(pi.hProcess, &exitCode);
+
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+
+		if (exitCode != 0)
+		{
+			LOG_ERROR("[HotReloadOnPlay] dotnet build failed, exit code: ", exitCode);
+			return false;
+		}
+
+		std::vector<std::filesystem::path> candidates = {
+			scriptsDir / "obj" / cfg / "GameScripts.dll",
+			scriptsDir / "bin" / cfg / "GameScripts.dll"
+		};
+
+		std::filesystem::path builtDll;
+		for (auto &c : candidates)
+		{
+			if (std::filesystem::exists(c))
+			{
+				builtDll = c;
+				break;
+			}
+		}
+
+		if (builtDll.empty())
+		{
+			// fallback: recursive search in Scripts/bin + Scripts/obj
+			for (auto root : { scriptsDir / "bin", scriptsDir / "obj" })
+			{
+				if (!std::filesystem::exists(root)) continue;
+				for (auto &e : std::filesystem::recursive_directory_iterator(root))
+				{
+					if (e.is_regular_file() && e.path().filename() == "GameScripts.dll")
+					{
+						builtDll = e.path();
+						break;
+					}
+				}
+				if (!builtDll.empty()) break;
+			}
+		}
+
+		if (builtDll.empty())
+		{
+			LOG_ERROR("[HotReloadOnPlay] Build succeeded but GameScripts.dll not found under Scripts/bin or Scripts/obj");
+			return false;
+		}
+
+		// Copy beside exe and load that
+		std::filesystem::path outDll = exeDir / "GameScripts.dll";
+		std::filesystem::path tmpDll = exeDir / "GameScripts.dll.tmp";
+
+		try
+		{
+			std::filesystem::copy_file(builtDll, tmpDll, std::filesystem::copy_options::overwrite_existing);
+			if (std::filesystem::exists(outDll))
+				std::filesystem::remove(outDll);
+			std::filesystem::rename(tmpDll, outDll);
+		}
+		catch (const std::exception &e)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Failed to swap output DLL: ", e.what());
+			return false;
+		}
+
+		m_AssemblyPath = outDll.string();
+
+		LOG_INFO("[HotReloadOnPlay] Build OK");
+		LOG_INFO("  csproj:    ", scriptProjectPath.string());
+		LOG_INFO("  built:     ", builtDll.string());
+		LOG_INFO("  output:    ", m_AssemblyPath);
+
+		return true;
+	}
+
+	bool MonoScriptEngine::ReloadDomainAndAssembly()
+	{
+		if (!m_RootDomain)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Mono not initialized");
+			return false;
+		}
+
+		// FIXED: Handle both single-domain and multi-domain modes
+		if (m_AppDomain)
+		{
+			// Switch to root domain before unloading
+			mono_domain_set(m_RootDomain, false);
+
+			if (m_AppDomain != m_RootDomain)
+			{
+				// Multi-domain mode: unload the separate app domain
+				LOG_INFO("[HotReloadOnPlay] Unloading separate app domain...");
+				mono_domain_unload(m_AppDomain);
 			}
 			else
 			{
-				LOG_WARNING("[BindEntityID] Property has no getter");
+				// Single-domain mode: can't unload root domain
+				// Instead, we rely on assembly hot-swapping if supported by Mono
+				LOG_WARNING("[HotReloadOnPlay] Single-domain mode: cannot unload assemblies cleanly.");
+				LOG_WARNING("  Recommend switching to multi-domain mode for proper hot reload.");
+				LOG_WARNING("  Current reload will attempt to load new assembly but old one remains in memory.");
 			}
+
+			m_AppDomain = nullptr;
 		}
 
-		// Method 2: Try reading as a field
-		currentClass = klass;
-		MonoClassField *field = nullptr;
+		// Clear old assembly references
+		UnloadAssembly();
 
-		while (currentClass && !field)
+		// Create new domain for scripts
+		const char *domainName = "GameScriptsDomain";
+		MonoDomain *newDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+
+		if (!newDomain)
 		{
-			field = mono_class_get_field_from_name(currentClass, "EntityID");
-			currentClass = mono_class_get_parent(currentClass);
-		}
-
-		if (field)
-		{
-			uint32_t verifyID = 0;
-			mono_field_get_value(instance, field, &verifyID);
-
-			if (verifyID == entityID)
-			{
-				LOG_INFO("[BindEntityID] SUCCESS! EntityID=", entityID,
-					" verified via field access");
-			}
-			else
-			{
-				LOG_ERROR("[BindEntityID] FAILED! Set ", entityID,
-					" but field access returned ", verifyID);
-			}
+			LOG_ERROR("[HotReloadOnPlay] Failed to create new app domain");
+			LOG_WARNING("  Falling back to root domain (hot reload will be imperfect)");
+			m_AppDomain = m_RootDomain;
 		}
 		else
 		{
-			LOG_ERROR("[BindEntityID] Could not find EntityID as field or property!");
+			m_AppDomain = newDomain;
+			LOG_INFO("[HotReloadOnPlay] Created new app domain: ", (uintptr_t)newDomain);
 		}
+
+		// Switch to the app domain
+		mono_domain_set(m_AppDomain, false);
+
+		if (m_AssemblyPath.empty())
+		{
+			LOG_ERROR("[HotReloadOnPlay] m_AssemblyPath is empty; did BuildGameScripts() run?");
+			return false;
+		}
+
+		// Load the new assembly
+		LoadAssembly(m_AssemblyPath);
+
+		if (!m_AppAssembly || !m_AppImage)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Assembly load failed: ", m_AssemblyPath);
+			return false;
+		}
+
+		LOG_INFO("[HotReloadOnPlay] Successfully loaded new assembly");
+		return true;
 	}
 
-	// ------------------------------------------------
-	// Helper: Initialize ScriptComponent for new entity
-	// ------------------------------------------------
-	static void InitializeScriptComponentForEntity(Entity entity)
+	void MonoScriptEngine::RebindAllScriptComponents()
 	{
-		if (!entity)
-			return;
-
-		if (!entity.HasComponent<ScriptComponent>())
-			return;
-
-		auto &sc = entity.GetComponent<ScriptComponent>();
-
-		// No script assigned on this entity
-		if (sc.ScriptClassName.empty())
-			return;
-
-		auto &se = MonoScriptEngine::GetInstance();
-
-		uint64_t eid = static_cast<uint32_t>(entity);
-
-		// If there's already a managed instance (e.g. cloned from prefab),
-		// just (re)BindInternalCall EntityID to be safe.
-		if (sc.ScriptInstance)
+		Scene *scene = Engine::s_ScriptingSceneContext;
+		if (!scene)
 		{
-			LOG_INFO("[Prefab] Rebinding EntityID on existing script instance '",
-				sc.ScriptClassName, "' for entity ", eid);
-			se.BindEntityID(static_cast<MonoObject *>(sc.ScriptInstance), eid);
+			LOG_ERROR("[RebindAllScriptComponents] No scene context");
 			return;
 		}
 
-		// Otherwise create a fresh managed instance
-		MonoObject *instance = se.CreateScriptInstance(sc.ScriptClassName);
-		if (!instance)
+		if (!m_AppDomain || !m_AppImage)
 		{
-			LOG_ERROR("[Prefab] Failed to create script instance for class '",
-				sc.ScriptClassName, "' on entity ", eid);
+			LOG_ERROR("[RebindAllScriptComponents] App domain/image not ready");
 			return;
 		}
 
-		se.BindEntityID(instance, eid);
+		EnsureCorrectDomain();
 
-		sc.ScriptInstance = instance;
-		sc.Started = false; // ScriptSystem will call OnStart on next update
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
 
-		LOG_INFO("[Prefab] Initialized script '", sc.ScriptClassName,
-			"' for entity ", eid, " and bound EntityID");
+		std::uint32_t rebuilt = 0;
+		std::uint32_t failed = 0;
+
+		for (auto ent : view)
+		{
+			auto &sc = view.get<ScriptComponent>(ent);
+
+			if (sc.ScriptClassName.empty())
+				continue;
+
+			// FIXED: Safe cleanup of old handles
+			if (sc.GCHandle != 0)
+			{
+				// In multi-domain mode, the old domain is already unloaded,
+				// so we can't validate. Just free the handle number.
+				// Mono will handle the case where the domain is gone.
+				try
+				{
+					mono_gchandle_free(sc.GCHandle);
+				}
+				catch (...)
+				{
+					LOG_WARNING("[RebindAllScriptComponents] Exception freeing old GCHandle (expected if domain unloaded)");
+				}
+				sc.GCHandle = 0;
+			}
+
+			sc.ScriptInstance = nullptr;
+			sc.Started = false;
+
+			// Create new instance in the new domain
+			MonoObject *created = nullptr;
+			uint32_t handle = CreateScriptInstanceHandle(sc.ScriptClassName, &created, false);
+
+			if (handle == 0 || !created)
+			{
+				LOG_WARNING("[RebindAllScriptComponents] Failed to create: ", sc.ScriptClassName);
+				++failed;
+				continue;
+			}
+
+			// Bind entity ID to the new instance
+			BindEntityID(created, static_cast<std::uint32_t>(ent));
+
+			sc.GCHandle = handle;
+			sc.ScriptInstance = created;
+			sc.Started = false;
+
+			++rebuilt;
+		}
+
+		LOG_INFO("[RebindAllScriptComponents] Complete: rebuilt=", rebuilt, " failed=", failed);
 	}
 
-	// Expose these functions for external use
+	// Context setters
 	void SetScriptingInputSystem(Input *input)
 	{
 		InternalCalls::SetInputSystem(input);
 	}
-
 	void SetScriptingCurrentScene(Scene *scene)
 	{
+		Engine::s_ScriptingSceneContext = scene;
 		InternalCalls::SetCurrentScene(scene);
 	}
-
 	void SetScriptingAudioManager(AudioManager *audioManager)
 	{
 		InternalCalls::SetAudioManager(audioManager);
@@ -948,7 +1372,6 @@ namespace Engine
 	{
 		mono_add_internal_call(managedName, reinterpret_cast<void *>(fn));
 	}
-
 
 	void MonoScriptEngine::RegisterInternalCalls()
 	{
@@ -983,17 +1406,14 @@ namespace Engine
 		// =====================================================================
 		BindInternalCall("Engine.Transform::Transform_GetParent",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetParent));
-
 		BindInternalCall("Engine.Transform::Transform_GetPosition",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetPosition));
 		BindInternalCall("Engine.Transform::Transform_SetPosition",
 			reinterpret_cast<void *>(InternalCalls::Transform_SetPosition));
-
 		BindInternalCall("Engine.Transform::Transform_GetRotation",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetRotation));
 		BindInternalCall("Engine.Transform::Transform_SetRotation",
 			reinterpret_cast<void *>(InternalCalls::Transform_SetRotation));
-
 		BindInternalCall("Engine.Transform::Transform_GetScale",
 			reinterpret_cast<void *>(InternalCalls::Transform_GetScale));
 		BindInternalCall("Engine.Transform::Transform_SetScale",
@@ -1044,8 +1464,6 @@ namespace Engine
 		// =====================================================================
 		// Rigidbody
 		// =====================================================================
-
-		// Rigidbody velocity
 		BindInternalCall("Engine.Rigidbody::Rigidbody_GetVelocity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetVelocity));
 		BindInternalCall("Engine.Rigidbody::Rigidbody_SetVelocity",
@@ -1053,7 +1471,6 @@ namespace Engine
 		BindInternalCall("Engine.Rigidbody::Rigidbody_AddVelocity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddVelocity));
 
-		// Rigidbody scalar / flags
 		BindInternalCall("Engine.Rigidbody::Rigidbody_GetMass",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetMass));
 		BindInternalCall("Engine.Rigidbody::Rigidbody_SetMass",
@@ -1067,7 +1484,6 @@ namespace Engine
 		BindInternalCall("Engine.Rigidbody::Rigidbody_SetUseGravity",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetUseGravity));
 
-		// Rigidbody helpers / forces
 		BindInternalCall("Engine.Rigidbody::Rigidbody_GetSpeed",
 			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetSpeed));
 		BindInternalCall("Engine.Rigidbody::Rigidbody_IsMoving",
@@ -1081,7 +1497,7 @@ namespace Engine
 
 		// =====================================================================
 		// Physics
-		// =====================================================================		
+		// =====================================================================
 		BindInternalCall("Engine.Physics::Physics_EnableCollisionEvents",
 			reinterpret_cast<void *>(InternalCalls::Physics_EnableCollisionEvents));
 		BindInternalCall("Engine.Physics::Physics_BeginCollisionFrame",
@@ -1134,10 +1550,6 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetVisible));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetVisible",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetVisible));
-		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowCast",
-			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowCast));
-		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowCast",
-			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowCast));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowReceive",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowReceive));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowReceive",
@@ -1288,7 +1700,16 @@ namespace Engine
 		BindInternalCall("Engine.QuatNative::Quat_Dot",
 			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
 
+		BindInternalCall("Engine.RNG::Seed",
+			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandInt));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandFloat));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
+
+
 		LOG_INFO("Internal calls registered");
 	}
-
 } // namespace Engine

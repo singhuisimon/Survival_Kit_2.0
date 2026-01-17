@@ -36,15 +36,22 @@ namespace Engine {
 	std::string AssetDatabase::NormalizePath(const std::string& path)
 	{
 		// Convert to a canonical, forward-slash style so map keys are stable
-		namespace fs = std::filesystem;
 		fs::path p(path);
 		p = p.lexically_normal();
-		return p.generic_string();
+
+		//always use forward slashes for internal storage in assetdb.txt
+		std::string result =  p.generic_string();
+
+		//remove the trailing slash for consistency
+		if (!result.empty() && result.back() == '/') {
+			result.pop_back();
+		}
+
+		return result;
 	}
 
 	std::string AssetDatabase::ExtensionLower(const std::string& path)
 	{
-		namespace fs = std::filesystem;
 		std::string ext = fs::path(path).extension().string();
 		std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) {
 			return static_cast<char>(std::tolower(c));
@@ -88,7 +95,7 @@ namespace Engine {
 			if (!std::getline(ss, timeStr, '|')) continue;
 			if (!std::getline(ss, validStr, '|')) continue;
 
-			// NEW: Try to read new fields (backwards compatible)
+			// NEW: Try to read new fields 
 			bool hasNewFields = false;
 			if (std::getline(ss, descModTimeStr, '|')) {
 				hasNewFields = true;
@@ -111,18 +118,16 @@ namespace Engine {
 					else if (pathWithoutResources.find("/Resources/") == 0) {
 						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 					}
-					std::replace(pathWithoutResources.begin(), pathWithoutResources.end(), '\\', '/');
-					std::string sourceRoot = Engine::getAssetsPath();
+
+					//editor load from the root repo resources
+					std::string sourceRoot = Engine::getRootResourcesPath();
 					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
-					//normalize here
-					std::string result = fullPath.string(); 
-					std::replace(result.begin(), result.end(), '\\', '/');
-
-					rec.sourcePath = result;
+					//normalize with function NormalizePath
+					rec.sourcePath = NormalizePath(fullPath.string());
 				}
 				else {
-					rec.sourcePath = sourcePath;
+					rec.sourcePath = NormalizePath(sourcePath);
 				}
 
 				rec.ext = ext;
@@ -143,6 +148,7 @@ namespace Engine {
 					rec.needsRecompile = false;
 				}
 
+				//use normalized path as key 
 				byId[rec.guid] = rec;
 				bySourcePath[rec.sourcePath] = rec.guid;
 				loadedCount++;
@@ -207,8 +213,9 @@ namespace Engine {
 		const std::string key = NormalizePath(path);
 
 
-		if (auto it = bySourcePath.find(key); it != bySourcePath.end())
+		if (auto it = bySourcePath.find(key); it != bySourcePath.end()) {
 			return it->second;
+		}
 
 
 		// Create new record with generated guid

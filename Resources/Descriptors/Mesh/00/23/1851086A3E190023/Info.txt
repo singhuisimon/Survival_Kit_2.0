@@ -1,7 +1,0 @@
-{
-  "name": "E004_botnet_v001.fbx",
-  "guid": "1851086A3E190023",
-  "tags": [],
-  "lastImported": "00000000691D7DE4",
-  "resourceLinks": []
-}

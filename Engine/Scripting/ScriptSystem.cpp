@@ -1,174 +1,118 @@
 #include "ScriptSystem.h"
 #include "MonoScriptEngine.h"
+#include "ScriptHandleUtils.h"
+
 #include "../Component/ScriptComponent.h"
 #include "../ECS/Scene.h"
 #include "../Utility/Logger.h"
-#include <mono/metadata/object.h>
-// #include "ScriptReloader.h"         // Hot-reload disabled
-// #include <filesystem>               // Hot-reload disabled
 
 namespace Engine
 {
+	static Scene *s_CurrentScene = nullptr;
 
-    static Scene *s_CurrentScene = nullptr;
+	void ScriptSystem::OnInit(Scene *scene)
+	{
+		s_CurrentScene = scene;
+		SetScriptingCurrentScene(scene);
 
-    void ScriptSystem::OnInit(Scene *scene)
-    {
-        s_CurrentScene = scene;
-        SetScriptingCurrentScene(scene);
+		m_Scene = scene;
+		LOG_INFO("[ScriptSystem] Initialized");
+	}
 
-        m_Scene = scene;  // Store it in member variable too
-        LOG_INFO("[ScriptSystem] Initialized");
-    }
+	void ScriptSystem::OnUpdate(Scene *scene, Timestep ts)
+	{
+		if (m_IsShuttingDown)
+			return;
 
-    void ScriptSystem::OnUpdate(Scene *scene, Timestep ts)
-    {
-        // ==========================
-        // Hot-reload logic disabled
-        // ==========================
-        /*
-        // Hot-reload check: Only reload if DLL file has actually changed
-        static std::filesystem::file_time_type lastModifiedTime;
-        static bool initialized = false;
-        std::string dllPath = "GameScripts.dll.tmp";
+		float deltaTime = ts.GetSeconds();
 
-        // Initialize the last modified time on first run
-        if (!initialized && std::filesystem::exists(dllPath))
-        {
-            lastModifiedTime = std::filesystem::last_write_time(dllPath);
-            initialized = true;
-        }
+		auto &registry = scene->GetRegistry();
+		auto view = registry.view<ScriptComponent>();
 
-        // Check if DLL has been modified
-        bool shouldReload = false;
-        if (std::filesystem::exists(dllPath))
-        {
-            auto currentModifiedTime = std::filesystem::last_write_time(dllPath);
-            if (currentModifiedTime != lastModifiedTime)
-            {
-                shouldReload = true;
-                lastModifiedTime = currentModifiedTime;
-            }
-        }
+		auto &se = MonoScriptEngine::GetInstance();
 
-        // Only reload if file actually changed
-        if (shouldReload)
-        {
-            LOG_INFO("[Hot-Reload] DLL change detected, reloading scripts...");
+		for (auto entity : view)
+		{
+			auto &script = view.get<ScriptComponent>(entity);
 
-            // Step 1: Destroy all script instances
-            auto& registryHR = scene->GetRegistry();
-            auto viewHR = registryHR.view<ScriptComponent>();
+			if (script.ScriptClassName.empty())
+				continue;
 
-            for (auto entityHR : viewHR)
-            {
-                auto& scriptHR = viewHR.get<ScriptComponent>(entityHR);
-                if (scriptHR.ScriptInstance)
-                {
-                    MonoScriptEngine::GetInstance().DestroyScriptInstance(
-                        (MonoObject*)scriptHR.ScriptInstance);
-                    scriptHR.ScriptInstance = nullptr;
-                    scriptHR.Started = false;
-                }
-            }
+			// Heal legacy components (pointer present but no handle)
+			ScriptHandleUtil::EnsureHandleIfLegacyPointerPresent(script, false);
 
-            std::filesystem::copy_file(ScriptReloader::GetInstance().GetTempDllPath(), dllPath,
-                std::filesystem::copy_options::overwrite_existing);
-            LOG_INFO("Copying .tmp to .dll to replace existing");
+			// Create instance if needed (HANDLE-FIRST)
+			if (script.GCHandle == 0)
+			{
+				MonoObject *created = nullptr;
+				uint32_t handle = se.CreateScriptInstanceHandle(script.ScriptClassName, &created, false);
+				if (handle == 0 || !created)
+					continue;
 
-            // Step 2: Reload assembly (releases old DLL lock)
-            LOG_INFO("[Hot-Reload] Reloading assembly...");
-            MonoScriptEngine::GetInstance().ReloadAssembly();
+				se.BindEntityID(created, static_cast<std::uint32_t>(entity));
 
-            LOG_INFO("[Hot-Reload] Complete!");
-        }
-        */
+				script.GCHandle = handle;
+				script.ScriptInstance = created; // cache
+				script.Started = false;
+			}
 
-        // ==========================
-        // Normal script update logic
-        // ==========================
-        if (m_IsShuttingDown)  // Add this check at the very top
-            return;
-        float deltaTime = ts.GetSeconds();
-        auto& registry = scene->GetRegistry();
-        auto view = registry.view<ScriptComponent>();
+			MonoObject *inst = nullptr;
+			if (script.GCHandle != 0)
+				inst = se.GetObjectFromGCHandle(script.GCHandle);
+			else
+				inst = reinterpret_cast<MonoObject *>(script.ScriptInstance);
 
-        for (auto entity : view)
-        {
-            auto& script = view.get<ScriptComponent>(entity);
+			if (!inst)
+			{
+				// If domain was unloaded / handle broken, clear and try again next frame
+				LOG_WARNING("[ScriptSystem] Script instance resolve failed for: ", script.ScriptClassName);
+				if (script.GCHandle != 0)
+					se.DestroyScriptHandle(script.GCHandle);
 
-            if (script.ScriptClassName.empty())
-                continue;
+				script.GCHandle = 0;
+				script.ScriptInstance = nullptr;
+				script.Started = false;
+				continue;
+			}
 
-            // Create instance if needed
-            if (!script.ScriptInstance)
-            {
-                script.ScriptInstance = MonoScriptEngine::GetInstance()
-                    .CreateScriptInstance(script.ScriptClassName);
+			// Call OnStart once
+			if (!script.Started)
+			{
+				se.CallMethod(inst, "OnStart");
+				script.Started = true;
+			}
 
-                if (!script.ScriptInstance)
-                    continue;
+			// Call OnUpdate every frame
+			void *params[1] = { &deltaTime };
+			se.CallMethod(inst, "OnUpdate", params, 1);
+		}
+	}
 
-                MonoScriptEngine::GetInstance().SetFieldValue(
-                    (MonoObject*)script.ScriptInstance, "EntityID", &entity);
-            }
+	void ScriptSystem::OnShutdown(Scene *scene)
+	{
+		m_IsShuttingDown = true;
 
-            if (script.ScriptInstance)
-            {
-                MonoObject* freshInstance = MonoScriptEngine::GetInstance()
-                    .GetObjectFromHandle(script.ScriptInstance);
+		auto &registry = scene->GetRegistry();
+		auto view = registry.view<ScriptComponent>();
 
-                if (!freshInstance)
-                {
-                    LOG_WARNING("Script instance was garbage collected: ", script.ScriptClassName);
-                    script.ScriptInstance = nullptr;
-                    script.Started = false;
-                    continue;
-                }
+		auto &se = MonoScriptEngine::GetInstance();
 
-                // Call OnStart once
-                if (!script.Started)
-                {
-                    // ===== CHANGED: Use freshInstance, not script.ScriptInstance =====
-                    MonoScriptEngine::GetInstance().CallMethod(
-                        freshInstance, "OnStart");  // CHANGED THIS LINE
-                    script.Started = true;
-                }
+		for (auto entity : view)
+		{
+			auto &script = view.get<ScriptComponent>(entity);
 
-                // Call OnUpdate every frame
-                void* params[1] = { &deltaTime };
-                // ===== CHANGED: Use freshInstance, not script.ScriptInstance =====
-                MonoScriptEngine::GetInstance().CallMethod(
-                    freshInstance, "OnUpdate", params, 1);  // CHANGED THIS LINE
-            }
-        }
-    }
+			if (script.GCHandle != 0)
+			{
+				se.DestroyScriptHandle(script.GCHandle);
+				script.GCHandle = 0;
+			}
 
-    void ScriptSystem::OnShutdown(Scene* scene)
-    {
-        m_IsShuttingDown = true;
+			script.ScriptInstance = nullptr;
+			script.Started = false;
+		}
 
-        auto& registry = scene->GetRegistry();
-        auto view = registry.view<ScriptComponent>();
-
-        for (auto entity : view)
-        {
-            auto& script = view.get<ScriptComponent>(entity);
-
-            if (script.ScriptInstance)
-            {
-                // DestroyScriptInstance will handle calling OnDestroy internally
-                MonoScriptEngine::GetInstance().DestroyScriptInstance(
-                    (MonoObject*)script.ScriptInstance);
-
-                script.ScriptInstance = nullptr;
-                script.Started = false;
-            }
-        }
-
-        s_CurrentScene = nullptr;
-        m_Scene = nullptr;
-        LOG_INFO("[ScriptSystem] Shutdown");
-    }
-
+		s_CurrentScene = nullptr;
+		m_Scene = nullptr;
+		LOG_INFO("[ScriptSystem] Shutdown");
+	}
 } // namespace Engine
