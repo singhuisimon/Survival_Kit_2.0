@@ -128,13 +128,14 @@ namespace Engine
                 Value(textureFilename.empty() ? "" : textureFilename.c_str(), allocator),
                 allocator);
             propertiesObj.AddMember("Visible", mesh.Visible, allocator);
-            propertiesObj.AddMember("ShadowCast", mesh.ShadowCast, allocator);
-            propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
+            //propertiesObj.AddMember("ShadowCast", mesh.ShadowCast, allocator);
             propertiesObj.AddMember("GlobalIlluminate", mesh.GlobalIlluminate, allocator);
+            propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
             propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
             propertiesObj.AddMember("MaterialIdx", mesh.Material, allocator);
             propertiesObj.AddMember("TextureIdx", mesh.Texture, allocator);
             propertiesObj.AddMember("SubmeshIndex", mesh.SubmeshIndex, allocator);
+            propertiesObj.AddMember("CastType", static_cast<int>(mesh.CastType), allocator);
 
             break;
         }
@@ -279,6 +280,11 @@ namespace Engine
             propertiesObj.AddMember("Range", light.Range, allocator);
             propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
             propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
+            propertiesObj.AddMember("TypeShadow", static_cast<int>(light.TypeShadow), allocator);
+            propertiesObj.AddMember("Resolution", light.Resolution, allocator);
+            propertiesObj.AddMember("Strength", light.Strength, allocator);
+            propertiesObj.AddMember("Bias", light.Bias, allocator);
+            propertiesObj.AddMember("NearPlane", light.NearPlane, allocator);
             break;
         }
         case ComponentTypeID::Animator:
@@ -558,11 +564,6 @@ namespace Engine
                 //LOG_DEBUG("  Set Visible to: ", mesh.Visible);
             }
 
-            if (properties.HasMember("ShadowCast")) {
-                mesh.ShadowCast = properties["ShadowCast"].GetBool();
-                //LOG_DEBUG("  Set ShadowCast to: ", mesh.ShadowCast);
-            }
-
             if (properties.HasMember("ShadowReceive")) {
                 mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
                 //LOG_DEBUG("  Set ShadowReceive to: ", mesh.ShadowReceive);
@@ -595,6 +596,10 @@ namespace Engine
             if (properties.HasMember("SubmeshIndex")) {
                 mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
                 //LOG_DEBUG("  Set SubmeshIndex to: ", mesh.SubmeshIndex);
+            }
+
+            if (properties.HasMember("CastType")) {
+                mesh.CastType = static_cast<ShadowCastType>(properties["CastType"].GetUint());
             }
 
             LOG_DEBUG("MeshRenderer component deserialized and applied to scene");
@@ -798,6 +803,18 @@ namespace Engine
                 light.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
             if (properties.HasMember("IndirectMultiplier"))
                 light.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+            if (properties.HasMember("TypeShadow"))
+                light.TypeShadow = static_cast<ShadowType>(properties["TypeShadow"].GetInt()); // 0 = No,1 = Hard ,2 = Soft
+            if (properties.HasMember("Resolution"))
+                light.Resolution = properties["Resolution"].GetUint();
+            if (properties.HasMember("Strength"))
+                light.Strength = properties["Strength"].GetFloat();
+            if (properties.HasMember("Bias"))
+                light.Bias = properties["Bias"].GetFloat();
+            if (properties.HasMember("NearPlane"))
+                light.NearPlane = properties["NearPlane"].GetFloat();
+
+
             return true;
         }
 
