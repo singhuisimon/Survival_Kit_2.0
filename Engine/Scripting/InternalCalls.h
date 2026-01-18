@@ -252,6 +252,22 @@ namespace Engine
 		***************************************************************************/
 		void Input_GetMouseDelta(float *outX, float *outY);
 
+		/**************************************************************************
+		 * @brief
+		 * Sets the visibility of the system cursor.
+		 * @param visible
+		 * Input parameter.
+		 **************************************************************************/
+		void Input_SetCursorVisible(bool visible);
+
+		/**************************************************************************
+		 * @brief
+		 * Gets the visibility of the system cursor.
+		 * @return
+		 * True if the cursor is visible; otherwise false.
+		 **************************************************************************/
+		bool Input_GetCursorVisible();
+
 		// ===== Event System =====
 		/**************************************************************************
 		 * @brief
