@@ -27,6 +27,7 @@ namespace Engine
 						m_CurrScenePath = "";
 						m_Editor->SetScenePath(m_CurrScenePath);
 						m_SceneIsNew = true;
+						m_Editor->SetPrefabPath("");
 						
 					}
 				}
@@ -47,9 +48,13 @@ namespace Engine
 				{
 					ImGui::SetTooltip("Open scene from file.");
 				}
+
 				bool hasScenePath = !m_Editor->GetScenePath().empty();
+				bool hasPrefabPath = !m_Editor->GetPrefabPath().empty();
+				bool isInSceneMode = !hasPrefabPath && (hasScenePath || m_SceneIsNew);
+
 				// ----------------- Save Scene ------------------------
-				if (ImGui::MenuItem("Save Scene")/*, nullptr, false, hasScenePath)*/)
+				if (ImGui::MenuItem("Save Scene", nullptr, false, isInSceneMode))
 				{
 					m_CurrScenePath = m_Editor->GetScenePath();
 					Scene*m_Scene = m_Editor->GetActiveScene();
@@ -59,6 +64,7 @@ namespace Engine
 					if (!m_CurrScenePath.empty())
 					{
 						m_Editor->SaveActiveSceneToPath(m_CurrScenePath);
+						m_SceneIsNew = false;
 					}
 					else
 					{
@@ -70,7 +76,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 				}
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...")/*,  nullptr, false, hasScenePath)*/)
+				if (ImGui::MenuItem("Save Scene As...", nullptr, false, isInSceneMode))
 				{
 					m_SaveScenePanel = true;
 				}
@@ -86,18 +92,20 @@ namespace Engine
 					m_Editor->SetScenePath(m_CurrScenePath);
 					m_SceneIsNew = false;
 				}
-				bool hasPrefabPath = !m_Editor->GetPrefabPath().empty();
+				
 				if (ImGui::MenuItem("Save Prefab", nullptr, false, hasPrefabPath))
 				{
 					if (m_Editor->HasPrefabPath() && !m_Editor->GetPrefabPath().empty()) {
 						SaveCurrentPrefab();
+
 					}
 					else {
 						// If no current prefab path, open "Save As" dialog
 						m_SavePrefabPanel = true;
 					}
 				}
-				if (ImGui::MenuItem("Save Prefab As...",  nullptr, false, hasPrefabPath))
+				bool isInPrefabMode = hasPrefabPath;
+				if (ImGui::MenuItem("Save Prefab As...",  nullptr, false, isInPrefabMode))
 				{
 					m_SavePrefabPanel = true;
 				}
