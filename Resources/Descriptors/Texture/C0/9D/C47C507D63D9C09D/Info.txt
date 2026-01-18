@@ -2,6 +2,6 @@
   "name": "right.jpg",
   "guid": "C47C507D63D9C09D",
   "tags": [],
-  "lastImported": "00000000696B59B5",
+  "lastImported": "00000000696D128C",
   "resourceLinks": []
 }
