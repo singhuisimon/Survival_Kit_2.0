@@ -346,6 +346,7 @@ namespace Engine
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
 	{
+
 		static bool s_Initialized = false;
 		if (s_Initialized)
 		{
@@ -411,7 +412,11 @@ namespace Engine
 		}
 
 		RegisterInternalCalls();
+		uint32_t timeSeed = static_cast<uint32_t>(
+			std::chrono::system_clock::now().time_since_epoch().count() & 0xFFFFFFFF
+			);
 
+		InternalCalls::RNG_Seed(timeSeed);
 		EventSystem::Instance().Subscribe<ScriptEvent>(
 			[](ScriptEvent const &ev)
 			{
@@ -1702,11 +1707,11 @@ namespace Engine
 
 		BindInternalCall("Engine.RNG::Seed",
 			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
-		BindInternalCall("Engine.RNG::Quat_Dot",
+		BindInternalCall("Engine.RNG::RandInt",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandInt));
-		BindInternalCall("Engine.RNG::Quat_Dot",
+		BindInternalCall("Engine.RNG::RandFloat",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandFloat));
-		BindInternalCall("Engine.RNG::Quat_Dot",
+		BindInternalCall("Engine.RNG::RandBool",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
 
 

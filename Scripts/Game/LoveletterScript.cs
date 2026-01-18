@@ -11,7 +11,7 @@ namespace Game
     public class LoveLetterScript : ScriptBehaviour
     {
         // ===== NAME OF ENTITY =====
-        [SerializeField] private string loveletterEntity;
+        [SerializeField] private string loveletterEntity = "loveletter";
         private uint loveletterEntityID = 0;
 
         // ===== MULTIPLE CORES =====
