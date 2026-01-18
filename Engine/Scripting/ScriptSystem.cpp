@@ -19,74 +19,95 @@ namespace Engine
 		LOG_INFO("[ScriptSystem] Initialized");
 	}
 
-	void ScriptSystem::OnUpdate(Scene *scene, Timestep ts)
-	{
-		if (m_IsShuttingDown)
-			return;
+  void ScriptSystem::OnUpdate(Scene *scene, Timestep ts)
+  {
+    if (m_IsShuttingDown) return;
 
-		float deltaTime = ts.GetSeconds();
+    float deltaTime = ts.GetSeconds();
+    auto &registry = scene->GetRegistry();
+    auto view = registry.view<ScriptComponent>();
+    auto &se = MonoScriptEngine::GetInstance();
 
-		auto &registry = scene->GetRegistry();
-		auto view = registry.view<ScriptComponent>();
+    m_FixedAccumulator += deltaTime;
+    if (m_FixedAccumulator > m_FixedDeltaSeconds * m_MaxFixedSubsteps)
+      m_FixedAccumulator = m_FixedDeltaSeconds * m_MaxFixedSubsteps;
 
-		auto &se = MonoScriptEngine::GetInstance();
+    std::vector<entt::entity> entities(view.begin(), view.end());
 
-		for (auto entity : view)
-		{
-			auto &script = view.get<ScriptComponent>(entity);
+    for (auto entity : entities)
+    {
+      if (!registry.valid(entity)) continue;
+      auto *script = registry.try_get<ScriptComponent>(entity);
+      if (!script || script->ScriptClassName.empty()) continue;
 
-			if (script.ScriptClassName.empty())
-				continue;
+      if (script->GCHandle == 0)
+      {
+        MonoObject *created = nullptr;
+        uint32_t handle = se.CreateScriptInstanceHandle(
+          script->ScriptClassName, &created, false);
 
-			// Heal legacy components (pointer present but no handle)
-			ScriptHandleUtil::EnsureHandleIfLegacyPointerPresent(script, false);
+        if (handle == 0 || !created) continue;
 
-			// Create instance if needed (HANDLE-FIRST)
-			if (script.GCHandle == 0)
-			{
-				MonoObject *created = nullptr;
-				uint32_t handle = se.CreateScriptInstanceHandle(script.ScriptClassName, &created, false);
-				if (handle == 0 || !created)
-					continue;
+        se.BindEntityID(created, static_cast<uint32_t>(entity));
+        script->GCHandle = handle;
+        script->Started = false;
+      }
 
-				se.BindEntityID(created, static_cast<std::uint32_t>(entity));
+      MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
+      if (!inst)
+      {
+        LOG_WARNING("[ScriptSystem] Failed to resolve: ", script->ScriptClassName);
+        se.DestroyScriptHandle(script->GCHandle);
+        script->GCHandle = 0;
+        script->Started = false;
+        continue;
+      }
 
-				script.GCHandle = handle;
-				script.ScriptInstance = created; // cache
-				script.Started = false;
-			}
+      if (!script->Started)
+      {
+        se.CallMethod(inst, "OnStart");
+        script->Started = true;
+      }
+    }
 
-			MonoObject *inst = nullptr;
-			if (script.GCHandle != 0)
-				inst = se.GetObjectFromGCHandle(script.GCHandle);
-			else
-				inst = reinterpret_cast<MonoObject *>(script.ScriptInstance);
+    int steps = 0;
+    while (m_FixedAccumulator >= m_FixedDeltaSeconds && steps < m_MaxFixedSubsteps)
+    {
+      float fixedDt = m_FixedDeltaSeconds;
+      void *fixedParams[1] = { &fixedDt };
 
-			if (!inst)
-			{
-				// If domain was unloaded / handle broken, clear and try again next frame
-				LOG_WARNING("[ScriptSystem] Script instance resolve failed for: ", script.ScriptClassName);
-				if (script.GCHandle != 0)
-					se.DestroyScriptHandle(script.GCHandle);
+      for (auto entity : entities)
+      {
+        if (!registry.valid(entity)) continue;
+        auto *script = registry.try_get<ScriptComponent>(entity);
+        if (!script || !script->Started || script->GCHandle == 0) continue;
 
-				script.GCHandle = 0;
-				script.ScriptInstance = nullptr;
-				script.Started = false;
-				continue;
-			}
+        MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
+        if (inst)
+        {
+          se.CallMethod(inst, "OnFixedUpdate", fixedParams, 1);
+        }
+      }
 
-			// Call OnStart once
-			if (!script.Started)
-			{
-				se.CallMethod(inst, "OnStart");
-				script.Started = true;
-			}
+      m_FixedAccumulator -= m_FixedDeltaSeconds;
+      ++steps;
+    }
 
-			// Call OnUpdate every frame
-			void *params[1] = { &deltaTime };
-			se.CallMethod(inst, "OnUpdate", params, 1);
-		}
-	}
+    // Pass 3: Update (once per frame)
+    void *params[1] = { &deltaTime };
+    for (auto entity : entities)
+    {
+      if (!registry.valid(entity)) continue;
+      auto *script = registry.try_get<ScriptComponent>(entity);
+      if (!script || !script->Started || script->GCHandle == 0) continue;
+
+      MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
+      if (inst)
+      {
+        se.CallMethod(inst, "OnUpdate", params, 1);
+      }
+    }
+  }
 
 	void ScriptSystem::OnShutdown(Scene *scene)
 	{
