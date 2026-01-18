@@ -3,22 +3,22 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 6,
+            "ID": 1048583,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "NormalTurretBullet"
+                        "Tag": "GUNSHIP"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "14708449052447573071",
+                        "ComponentGUID": "6979445261110608225",
                         "Position": [
-                            9.139241218566895,
+                            -25.5,
                             0.0,
-                            0.03385651111602783
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -26,9 +26,9 @@
                             0.0
                         ],
                         "Scale": [
-                            0.30000001192092896,
-                            0.20000000298023224,
-                            0.15000000596046448
+                            0.07999999821186066,
+                            0.07999999821186066,
+                            0.07999999821186066
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -37,9 +37,9 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "3179234006381429845",
-                        "Mesh": "Temp_PlayerPrimaryBullet.fbx",
-                        "Material": "PrimaryBullet.mat",
+                        "ComponentGUID": "9861749022628577637",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "",
                         "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
@@ -51,11 +51,11 @@
                 {
                     "Type": "RigidbodyComponent",
                     "Properties": {
-                        "ComponentGUID": "8367380777110881361",
+                        "ComponentGUID": "15626356545662796131",
                         "Mass": 1.0,
                         "IsKinematic": false,
                         "IsTrigger": false,
-                        "UseGravity": false,
+                        "UseGravity": true,
                         "Velocity": [
                             0.0,
                             0.0,
@@ -79,175 +79,18 @@
                     }
                 },
                 {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "12402606043238302807",
-                        "FilePath": "Player_primary_alt_fire.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 0.45100000500679016,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 4.185999870300293,
-                        "MaxDistance": 104.63200378417969,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ScriptClassName": "Game.NormalTurretBullet",
+                        "ScriptClassName": "Game.GunshipScript",
                         "Fields": {
-                            "projectileLifetime": 2.0,
-                            "damage": 1.0
+                            "gunshipEntity": "GUNSHIP",
+                            "maxHealth": 75.0,
+                            "fireRate": 0.10000000149011612,
+                            "turretRange": 600.0,
+                            "turretRotationSpeed": 5.0,
+                            "bulletSpeed": 3000.0,
+                            "bulletPrefabPath": "Sources/Prefabs/NormalTurretBullet.prefab"
                         }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 5,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "PrimaryBullet"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "3179234006367650891",
-                        "PrefabAssetGuid": "6492704592064227665",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "PrimaryBullet",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14563155124308708717\",\"Position\":[0.0,0.0,5.960464477539063e-8],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.15000000596046448,0.15000000596046448,0.05000000074505806],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14563155124308708717\",\"Tag\":\"PrimaryBullet\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14563155124308708717\",\"Mesh\":\"Temp_PrimarySecondaryBullet.fbx\",\"Material\":\"PrimaryBullet.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14563155124308894535\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.0,0.0,0.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14563155124308894535\",\"FilePath\":\"Player_Primary_Fire.wav\",\"Type\":1,\"State\":2,\"Volume\":0.4580000042915344,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":4.165999889373779,\"MaxDistance\":104.14900207519531,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14563155124308708717",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            5.960464477539063e-8
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.15000000596046448,
-                            0.15000000596046448,
-                            0.05000000074505806
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "14563155124308708717",
-                        "Mesh": "Temp_PrimarySecondaryBullet.fbx",
-                        "Material": "PrimaryBullet.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "14563155124308894535",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "14563155124308894535",
-                        "FilePath": "Player_Primary_Fire.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 0.4580000042915344,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 4.165999889373779,
-                        "MaxDistance": 104.14900207519531,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -417,6 +260,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Adware",
                         "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Adware.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -544,98 +388,6 @@
                         ],
                         "Parent": 4294967295,
                         "Children": []
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048583,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "ALLIES"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6979445261110608225",
-                        "Position": [
-                            -25.5,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.07999999821186066,
-                            0.07999999821186066,
-                            0.07999999821186066
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "9861749022628577637",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "15626356545662796131",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ScriptClassName": "Game.GunshipScript",
-                        "Fields": {
-                            "maxHealth": 75.0,
-                            "fireRate": 0.10000000149011612,
-                            "turretRange": 600.0,
-                            "turretRotationSpeed": 5.0,
-                            "bulletSpeed": 3000.0,
-                            "bulletPrefabPath": "Sources/Prefabs/NormalTurretBullet.prefab"
-                        }
                     }
                 }
             ]
