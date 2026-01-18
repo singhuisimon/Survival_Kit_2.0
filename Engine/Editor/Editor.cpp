@@ -338,6 +338,7 @@ namespace Engine
         settings.s_BloomStrength = renderer->getBloomStrength();
         settings.s_BloomFilterRadius = renderer->getBloomFilterRadius();
         settings.s_Exposure = renderer->getExposure();
+        settings.s_GlobalBias = renderer->getGlobalBias();
 
         scene->SaveToFile(finalPath);
         scene->SaveToFile(convertAssetPathToRootResources(finalPath));

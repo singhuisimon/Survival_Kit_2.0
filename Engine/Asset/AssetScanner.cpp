@@ -24,8 +24,6 @@
 #include <algorithm>
 #include <unordered_set>
 
-
-
 namespace fs = std::filesystem;
 
 namespace Engine {
@@ -105,8 +103,8 @@ namespace Engine {
 	//scanning
 	std::vector<ScanChange> AssetScanner::Scan()
 	{
-		std::vector<ScanChange> changes;                 
-		std::unordered_set<std::string> seen;            
+		std::vector<ScanChange> changes;
+		std::unordered_set<std::string> seen;
 
 		fs::directory_options opts = fs::directory_options::skip_permission_denied;
 
@@ -129,11 +127,13 @@ namespace Engine {
 					if (shouldIgnore(path) || !extAllowed(path))
 						continue;
 
-                    //get the file path (metadata)
-					 std::string pathStr = path.string();
+                    //get the file path  Normalize to forward slashes with generic string)
+					 std::string pathStr = path.lexically_normal().generic_string();
 
-					// Normalize path to forward slashes for consistent comparison
-					std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+					//remove the trailing slash 
+					 if (!pathStr.empty() && pathStr.back() == '/') {
+						 pathStr.pop_back();
+					 }
 
 					const std::time_t t = toTimeT(entry.last_write_time());
 					const std::uintmax_t sz = entry.file_size();
@@ -199,11 +199,14 @@ namespace Engine {
 	{
 		std::ofstream out(file, std::ios::trunc);
 		if (!out.is_open()) return false;
+
 		for (const auto& kv : m_snapshot)
 		{
 
 			//convert absolute path to relative path before writing 
 			std::string pathToWrite = getRelativeAssetPath(kv.first);
+			std::replace(pathToWrite.begin(), pathToWrite.end(), '\\', '/');
+
 			// Write one record per line: path|timestamp|size\n
 			out << pathToWrite << '|' << kv.second.lastWrite << '|' << kv.second.size << '\n';
 		}
@@ -240,16 +243,24 @@ namespace Engine {
 				else if (pathWithoutResources.find("/Resources/") == 0) {
 					pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 				}
-				std::string sourceRoot = Engine::getAssetsPath();
+				std::string sourceRoot = Engine::getRootResourcesPath();
 				fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
 				//normalize here as well for safety
-				std::string result = fullPath.string(); 
-				std::replace(result.begin(), result.end(), '\\', '/');
-				absolutePath = result;
+				absolutePath = fullPath.lexically_normal().generic_string(); 
+				if (!absolutePath.empty() && absolutePath.back() == '/') {
+					absolutePath.pop_back();
+				}
 			}
 			else {
-				absolutePath = path;
+				
+				//normalize it is already absolute 
+				fs::path p(path);
+				absolutePath = p.lexically_normal().generic_string();
+				if (!absolutePath.empty() && absolutePath.back() == '/') {
+					absolutePath.pop_back();
+				}
+
 			}
 
 			FileStamp st{};

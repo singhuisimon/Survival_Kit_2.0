@@ -1,7 +1,0 @@
-{
-  "name": "Loveletter_Logic_Bomb_Explosion.wav",
-  "guid": "1E2B006DCA0EC00F",
-  "tags": [],
-  "lastImported": "000000006966F34B",
-  "resourceLinks": []
-}
