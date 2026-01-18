@@ -47,21 +47,21 @@ namespace Engine {
         return serializer.Deserialize(filepath);
     }
 
-    Entity Scene::CreateEntityFromPrefab(
-        xresource::instance_guid prefabGUID,
-        const std::string& name) {
+    //Entity Scene::CreateEntityFromPrefab(
+    //    xresource::instance_guid prefabGUID,
+    //    const std::string& name) {
 
-        Entity entity = PrefabInstantiator::InstantiateEntityPrefab(this, prefabGUID);
+    //    Entity entity = PrefabInstantiator::InstantiateEntityPrefab(this, prefabGUID);
 
-        if (entity && !name.empty()) {
-            // Override the entity name if provided
-            if (entity.HasComponent<TagComponent>()) {
-                entity.GetComponent<TagComponent>().Tag = name;
-            }
-        }
+    //    if (entity && !name.empty()) {
+    //        // Override the entity name if provided
+    //        if (entity.HasComponent<TagComponent>()) {
+    //            entity.GetComponent<TagComponent>().Tag = name;
+    //        }
+    //    }
 
-        return entity;
-    }
+    //    return entity;
+    //}
 
     Entity Scene::GetEntity(entt::entity entityId) {
         if (!m_Registry.valid(entityId)) {
@@ -89,20 +89,22 @@ namespace Engine {
         LOG_WARNING("Scene: Entity with name '", name, "' not found");
         return Entity(); // Invalid entity
     }
-    Entity Scene::InstantiateScenePrefab(xresource::instance_guid prefabGUID) {
-        return PrefabInstantiator::InstantiateScenePrefab(this, prefabGUID);
-    }
 
-    void Scene::UnpackPrefabInstance(Entity entity) {
-        if (!entity.HasComponent<PrefabComponent>()) {
-            LOG_WARNING("Scene: Entity is not a prefab instance");
-            return;
-        }
+ 
+    //Entity Scene::InstantiateScenePrefab(xresource::instance_guid prefabGUID) {
+    //    return PrefabInstantiator::InstantiateScenePrefab(this, prefabGUID);
+    //}
 
-        // Remove the PrefabComponent to break the prefab link
-        entity.RemoveComponent<PrefabComponent>();
+    //void Scene::UnpackPrefabInstance(Entity entity) {
+    //    if (!entity.HasComponent<PrefabComponent>()) {
+    //        LOG_WARNING("Scene: Entity is not a prefab instance");
+    //        return;
+    //    }
 
-        LOG_INFO("Scene: Unpacked prefab instance (Entity ID: ", static_cast<uint32_t>(entity), ")");
-    }
+    //    // Remove the PrefabComponent to break the prefab link
+    //    entity.RemoveComponent<PrefabComponent>();
+
+    //    LOG_INFO("Scene: Unpacked prefab instance (Entity ID: ", static_cast<uint32_t>(entity), ")");
+    //}
 
 } // namespace Engine

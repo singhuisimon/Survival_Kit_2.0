@@ -316,24 +316,24 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
 
         success = compiler.compile(descriptor.descriptorFile, output, config.verbose);
     }
-    else if (descriptor.resourceType == "Audio") {
-        // TODO: Implement AudioCompiler
-        if (config.verbose) {
-            std::cout << "    TODO: Audio compilation not yet implemented\n";
-        }
-        // Simulate work for now
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        success = true;
-    }
-    else if (descriptor.resourceType == "Shader") {
-        // TODO: Implement ShaderCompiler
-        if (config.verbose) {
-            std::cout << "    TODO: Shader compilation not yet implemented\n";
-        }
-        // Simulate work for now
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        success = true;
-    }
+    //else if (descriptor.resourceType == "Audio") {
+    //    // TODO: Implement AudioCompiler
+    //    if (config.verbose) {
+    //        std::cout << "    TODO: Audio compilation not yet implemented\n";
+    //    }
+    //    // Simulate work for now
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //    success = true;
+    //}
+    //else if (descriptor.resourceType == "Shader") {
+    //    // TODO: Implement ShaderCompiler
+    //    if (config.verbose) {
+    //        std::cout << "    TODO: Shader compilation not yet implemented\n";
+    //    }
+    //    // Simulate work for now
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //    success = true;
+    //}
     else {
         std::cerr << "ERROR: Unknown resource type: " << descriptor.resourceType << "\n";
         return false;

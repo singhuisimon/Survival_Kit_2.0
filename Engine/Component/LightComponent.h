@@ -17,6 +17,7 @@
 
  // Types for u32
 #include "../Utility/Types.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine {
 
@@ -33,9 +34,19 @@ namespace Engine {
         // Baked = 1u, // reserved
     };
 
+    // Shadow type
+    enum class ShadowType : u32 {
+        No = 0u,
+        Hard = 1u,
+        Soft = 2u
+    };
+
     struct LightComponent
     {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Light;
+        static constexpr const char* TypeName = "LightComponent";
 
+        xresource::instance_guid ComponentGUID;
         // --------- On/Off ---------
         bool Enabled = true;
 
@@ -56,16 +67,24 @@ namespace Engine {
         // --------- Indirect / future GI scaling ---------
         float     IndirectMultiplier = 1.0f;    // Reserved for ambient/IBL/lightmaps scaling
 
-        // --------- Reserved / alignment  ---------
-        // For future implementations; CastShadows, etc
-        u32  _Reserved0 = 0u;
+        // --------- Shadows  ---------
+        ShadowType TypeShadow = ShadowType::No;
+        u32 Resolution = 1024; // Default 1024
+        float Strength = 1.0f; // 0.0 to 1.0; Default 1.0
+        float Bias = 0.005;
+        // float NormalBias = 0.05;
+        float NearPlane = 0.2; // Clamped to 0.1 or 1% of light's range, whichever is lower. Set to 0.2 by default
 
         // Default constructor
-        LightComponent() = default;
+        LightComponent()
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+        {
+        }
 
         // Construct with type; sets a sensible default intensity per type
         explicit LightComponent(LightType type)
-            : Type(type)
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Type(type)
         {
             // Unity-like default intensities:
             // - Directional: 0.5 (no distance falloff; easy to blow out otherwise)
@@ -82,7 +101,8 @@ namespace Engine {
             float indirectMult = 1.0f,
             LightMode mode = LightMode::Realtime,
             bool  enabled = true)
-            : Enabled(enabled),
+            : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
+            Enabled(enabled),
             Type(type),
             Mode(mode),
             Color(color),
@@ -98,7 +118,7 @@ namespace Engine {
         * @param t The type to set 
         * @param resetIntensityToDefault To set type-specific intensity defaults
         */
-        void SetType(LightType t, bool resetIntensityToDefault = true) {
+        void SetLightType(LightType t, bool resetIntensityToDefault = true) {
             Type = t;
             if (resetIntensityToDefault) {
                 Intensity = (t == LightType::Directional) ? 0.5f : 1.0f;
@@ -134,6 +154,10 @@ namespace Engine {
         * @param m The multiplier value to set
         */
         void SetIndirectMultiplier(float m) { IndirectMultiplier = m; }
+
+
+
+        void SetShadowType(ShadowType t) { TypeShadow = t; }
     };
 
 } // namespace Engine

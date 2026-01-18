@@ -24,7 +24,7 @@ namespace Engine
             // Use per-entity event names so receivers can subscribe cheaply.
             string eventName = "Damage:" + targetEntityId.ToString();
 
-            EventSystem.Publish(eventName, payload);
+            Event.Publish(eventName, payload);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@
 #include "../Component/MeshRendererComponent.h"
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"   
+#include "../Component/SpriteRendererComponent.h"
 #include "Asset/ResourceHelpers.h"
 
 namespace Engine {
@@ -22,17 +23,23 @@ namespace Engine {
 		m_cameralist.clear();
 		m_lightlist.clear();
 
-		// Save all visible geometry 
+		// Save all visible geometry and shadow casters
 		auto view = scene->GetRegistry().view<TransformComponent, MeshRendererComponent>();
 		for (auto entity : view) {
 			auto& renderable = view.get<MeshRendererComponent>(entity);
 			auto& transform = view.get<TransformComponent>(entity);
 
-			// Capture visible geometry information
-			if (!renderable.Visible) continue;
+			// Determine shadow cast type (and check if entity casts shadow) and if shadow is casted without entity
+			const uint32_t castType = static_cast<uint32_t>(renderable.CastType);
+			const bool isShadowCaster = (castType != 0u);
+			const bool renderMainPass = renderable.Visible && (castType != static_cast<uint32_t>(ShadowCastType::ShadowsOnly));
+
+			// Skip completely disabled objects
+			if (!renderable.Visible && !isShadowCaster) { continue; }
 			
 			m_drawitems.push_back({
 					.m_model_to_world_transform = transform.WorldTransform,
+					.m_drawitem_type = DrawItemType::MESH3D,
 					.m_entity_id = static_cast<u32>(entity),
 					.m_submesh_index = renderable.SubmeshIndex,
 					.m_default_mesh_handle = renderable.MeshType,
@@ -40,9 +47,12 @@ namespace Engine {
 					.m_default_u32texture_handle = renderable.Texture,
 					.m_mesh_guid = renderable.MeshGuid,
 					.m_material_guid = renderable.MaterialGuid,
-					.m_texture_guid = renderable.TextureGuid
+					.m_texture_guid = renderable.TextureGuid,
+					.m_render_main_pass = renderMainPass,
+					.m_receive_shadows = renderable.ShadowReceive,
+					.m_cast_shadow_type = castType
 				});
-			
+
 		}
 
 		// Save all enabled cameras
@@ -73,13 +83,17 @@ namespace Engine {
 					// Capture particle information
 					m_drawitems.push_back({
 						.m_model_to_world_transform = particle.Transform,
+						.m_drawitem_type = DrawItemType::Particle,
 						.m_entity_id = u32_max, // Particles are not associated with an entity for rendering purposes
 						.m_submesh_index = 0,
 						.m_default_mesh_handle = emitter.ParticleType,
 						.m_default_material_handle = 0,
 						.m_default_u32texture_handle = 0,
 						.m_mesh_guid = 0,
-						.m_material_guid = 0
+						.m_material_guid = 0,
+						.m_render_main_pass = true, // Particles don't cast/receive shadows
+						.m_receive_shadows = false,
+						.m_cast_shadow_type = 0
 						});
 
 				}
@@ -116,7 +130,46 @@ namespace Engine {
 
 			// Save indirect multiplier
 			L.indirectMultiplier = LgLightComp.IndirectMultiplier;
+
+			// Shadow settings (used by renderer)
+			L.shadowType = static_cast<uint32_t>(LgLightComp.TypeShadow);
+			L.shadowResolution = LgLightComp.Resolution;
+			L.shadowStrength = LgLightComp.Strength;
+			//L.shadowBias = LgLightComp.Bias; // Individual light bias, for now only support global bias
+			L.shadowBias = renderer.getGlobalBias();
+			L.shadowNearPlane = LgLightComp.NearPlane;
+
 			m_lightlist.emplace_back(L);
+		}
+
+		// Save all 2D items
+		//auto spriteView = scene->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
+
+		auto spriteView = scene->GetRegistry().group<TransformComponent, SpriteRendererComponent>();
+
+		spriteView.sort<SpriteRendererComponent>([](SpriteRendererComponent const& a, SpriteRendererComponent const& b) {return a.SpriteLayer < b.SpriteLayer; });
+
+		for (auto entity : spriteView) 
+		{
+			auto& renderable2d = spriteView.get<SpriteRendererComponent>(entity);
+			auto& r2dtransform = spriteView.get<TransformComponent>(entity);
+
+			if (!renderable2d.IsVisible) continue;
+
+			m_drawitems.push_back({
+				.m_model_to_world_transform = r2dtransform.WorldTransform,
+				.m_drawitem_type = DrawItemType::SPRITE2D,
+				.m_entity_id = static_cast<u32>(entity),
+				.m_submesh_index = 0,
+				.m_default_mesh_handle = renderable2d.Quad,
+				.m_default_material_handle = 0,
+				.m_default_u32texture_handle = 0,
+				.m_render_layer = renderable2d.SpriteLayer,
+				.m_color = renderable2d.Color,
+				.m_mesh_guid = 0,
+				.m_material_guid = 0,
+				.m_texture_guid = renderable2d.TextureGuid
+				});
 		}
 		
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());

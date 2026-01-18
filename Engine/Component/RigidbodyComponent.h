@@ -62,7 +62,8 @@ namespace Engine
 	{
 		/// Unique identifier for this component instance
 		xresource::instance_guid ComponentGUID;
-
+		static constexpr ComponentTypeID TypeID = ComponentTypeID::RigidBody;
+		static constexpr const char* TypeName = "RigidBodyComponent";
 		/// Mass of the object in kilograms
 		float Mass;
 

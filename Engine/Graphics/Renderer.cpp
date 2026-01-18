@@ -14,9 +14,11 @@
 
 #include "../Graphics/Renderer.h"
 #include "../Utility/Logger.h"
+#include "../Graphics/RenderBypassUtils.h"
 #include "../Utility/AssetPath.h"
 #include "../Asset/ResourceHelpers.h"
 #include "../Asset/ResourceManager.h"
+#include "../Physics/Collision2D.h"
 
 // TESTING
 #include "../Graphics/stb_image.h"
@@ -27,235 +29,29 @@
 
 #include "Asset/ResourceData.h"
 
-#pragma region NAMESPACE
-
 namespace {
-
 	// Testing values
 	constexpr int width = 1280, height = 720;
 	constexpr Engine::u32 NO_HIT = 0xFFFFFFFFu;
-
-	inline std::vector<Engine::ShaderProgram> loadShaderPrograms(std::vector<std::pair<std::string, std::string>> shaders) {
-
-		std::vector<Engine::ShaderProgram> shadersStorage;
-
-		for (auto const& file : shaders) {
-			// Create the shader files vector with types 
-			std::vector<std::pair<GLenum, std::string>> shader_files;
-			shader_files.emplace_back(std::make_pair(GL_VERTEX_SHADER, file.first));
-			shader_files.emplace_back(std::make_pair(GL_FRAGMENT_SHADER, file.second));
-
-			// Create new shader program
-			Engine::ShaderProgram shader_program;
-
-			// Use Graphics_Manager to compile the shader
-			if (!shader_program.compileShader(shader_files)) {
-				throw std::runtime_error("failed to compile shaders");
-			}
-
-			// Insert shader program into vector
-			shadersStorage.emplace_back(shader_program);
-		}
-
-		return shadersStorage;
-	}
-
-	inline void test_load_shaders(std::vector<Engine::ShaderProgram>& shd) {
-
-		std::string vertex_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.vert") };
-		std::string fragment_obj_path{ Engine::getAssetFilePath("Sources/Shaders/survival_kit_obj.frag") };
-
-		std::string vertex_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.vert") };
-		std::string fragment_debug_path{ Engine::getAssetFilePath("Sources/Shaders/debug.frag") };
-
-		std::string vertex_obj_picking_path{ Engine::getAssetFilePath("Sources/Shaders/object_picking.vert") };
-		std::string fragment_obj_picking_path{ Engine::getAssetFilePath("Sources/Shaders/object_picking.frag") };
-
-		std::string vertex_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.vert") };
-		std::string fragment_skybox_path{ Engine::getAssetFilePath("Sources/Shaders/skybox.frag") };
-
-		std::string vertex_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.vert") };
-		std::string fragment_hdr_path{ Engine::getAssetFilePath("Sources/Shaders/hdr.frag") };
-
-		std::string vertex_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.vert") };
-		std::string fragment_ui_path{ Engine::getAssetFilePath("Sources/Shaders/ui.frag") };
-
-		std::string fragment_bloom_downsample_path{ Engine::getAssetFilePath("Sources/Shaders/bloom_downsample.frag") };
-		std::string fragment_bloom_upsample_path{ Engine::getAssetFilePath("Sources/Shaders/bloom_upsample.frag") };
-
-
-		// Pair vertex and fragment shader files
-		std::vector<std::pair<std::string, std::string>> shader_files{
-			std::make_pair(vertex_obj_path, fragment_obj_path),
-			std::make_pair(vertex_debug_path, fragment_debug_path),
-			std::make_pair(vertex_obj_picking_path, fragment_obj_picking_path),
-			std::make_pair(vertex_skybox_path, fragment_skybox_path),
-			std::make_pair(vertex_hdr_path, fragment_hdr_path),
-			std::make_pair(vertex_ui_path, fragment_ui_path),
-			std::make_pair(vertex_hdr_path, fragment_bloom_downsample_path),
-			std::make_pair(vertex_hdr_path, fragment_bloom_upsample_path)
-		};
-
-		shd = loadShaderPrograms(shader_files);
-	}
-
-	inline void load_basic_primitives(std::vector<Engine::MeshGL>& ms, std::vector<Engine::MeshData>& md, std::vector<Engine::MeshData2D>& md2d) {
-
-		Engine::MeshData cd = Engine::make_cube();
-		Engine::MeshData pd = Engine::make_plane();
-		Engine::MeshData sd = Engine::make_sphere();
-		Engine::MeshData2D qd = Engine::make_quad();
-
-		md.push_back(cd);
-		md.push_back(pd);
-		md.push_back(sd);
-		md2d.push_back(qd);
-
-		Engine::MeshGL c = Engine::upload_mesh_data(cd);
-		Engine::MeshGL p = Engine::upload_mesh_data(pd);
-		Engine::MeshGL s = Engine::upload_mesh_data(sd);
-		Engine::MeshGL q = Engine::upload_mesh_data2D(qd);
-
-		ms.push_back(std::move(c));
-		ms.push_back(std::move(p));
-		ms.push_back(std::move(s));
-		ms.push_back(std::move(q));
-	}
-
-	unsigned int loadCubemap(std::vector<std::string> faces)
-	{
-		unsigned int textureID;
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-		int width, height, nrChannels;
-		for (unsigned int i = 0; i < faces.size(); i++)
-		{
-			unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-			if (data)
-			{
-				GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data
-				);
-				stbi_image_free(data);
-			}
-			else
-			{
-				std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
-				stbi_image_free(data);
-			}
-		}
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		return textureID;
-	}
-
-	unsigned int loadCubemapHDR(std::vector<std::string> faces)
-	{
-		unsigned int textureID;
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-		int width, height, nrChannels;
-		for (unsigned int i = 0; i < faces.size(); i++)
-		{
-			// Load as float data instead of unsigned char
-			float* data = stbi_loadf(faces[i].c_str(), &width, &height, &nrChannels, 0);
-			if (data)
-			{
-				// Use HDR internal format
-				GLenum internalFormat = (nrChannels == 4) ? GL_RGBA16F : GL_RGB16F;
-				GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					0, internalFormat, width, height, 0, format, GL_FLOAT, data
-				);
-				stbi_image_free(data);
-			}
-			else
-			{
-				std::cout << "Cubemap HDR tex failed to load at path: " << faces[i] << std::endl;
-				stbi_image_free(data);
-			}
-		}
-
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		return textureID;
-	}
-
+	bool isDebug = false;
 }
-
-namespace Engine {
-
-	namespace {
-		int  selected_texture = 0;
-		bool textureMode = false;
-		bool isDebug = false;
-	}
-
-}
-
-#pragma endregion
 
 namespace Engine {
 
 	Renderer::Renderer(Camera3D& cam) : editor_camera(cam) {}
 
-	// On first load, setup some simple stuff
 	void Renderer::setup() {
 
-		// Load OpenGL function pointers with GLAD
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			LOG_ERROR("Renderer::setup() - Failed to load OpenGL, GLAD failed to initialized");
-		}
-		else {
-			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
+		loadGLFunctionPointers();
+		loadShaders();
+		initBasicGeometry();
+		setupFramebuffers();
+		setupPasses();
+		initBloomMipChain(width, height);
+		setDefaultState();
 
-			// Load OpenGL information upon successfully load
-			LOG_INFO("OpenGL initialized");
-			LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
-			LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
-			LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
-			LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-		}
-
-		// Temporary functions, used for testing only
-		test_load_shaders(m_gl.m_shader_storage);
-
-		// Load a set of basic primitives: Cube, Plane, Sphere
-		load_basic_primitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
-
-		// Load skybox mesh
-		MeshData skybox_cube = make_cube();
-		m_skybox = upload_mesh_data(skybox_cube);
-
-		// Load skybox textures
-		std::vector<std::string> faces = {
-				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_001.png"),
-				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_002.png"),
-				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_003.png"),
-				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_004.png"),
-				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_005.png"),
-				Engine::getAssetFilePath("Sources/Textures/Skybox_Engine_v1_006.png")
-		};
-
-		m_skybox_texture = loadCubemapHDR(faces);
-
-		// Create a fullscreen quad where the final render output is drawn onto
-		MeshData2D quad = make_quad();
-		m_fullscreen_quad = upload_mesh_data2D(quad);
-
-#pragma region TESTING LOADING UBO FOR MATERIALS
+		MeshData skybox_cube = make_cube(); m_skybox = upload_mesh_data(skybox_cube); m_skybox_texture = RenderBypassUtils::loadCubemapHDR();
+		
 		// -------- Materials UBO (binding = 1)  --------
 		glCreateBuffers(1, &m_materialUBO);
 		glNamedBufferData(m_materialUBO, sizeof(MaterialUBO_Std140), nullptr, GL_DYNAMIC_DRAW);
@@ -267,13 +63,11 @@ namespace Engine {
 			if (blockIndex != GL_INVALID_INDEX) {
 				glUniformBlockBinding(programID, blockIndex, 1);
 			}
-			};
+		};
 
 		// Call for the object shader(s) that read material
-		bindMaterialBlock(m_gl.m_shader_storage[0].getShaderProgramHandle()); // adjust accessor if different
-#pragma endregion
+		bindMaterialBlock(m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::MAIN)].getShaderProgramHandle()); // adjust accessor if different
 
-#pragma region TESTING LOADING UBO FOR LIGHTINGS
 		// -------- Lights UBO (binding = 0)  --------
 		glCreateBuffers(1, &m_lightsUBO);
 		glNamedBufferData(m_lightsUBO, sizeof(LightsBlockGPU), nullptr, GL_DYNAMIC_DRAW);
@@ -287,194 +81,31 @@ namespace Engine {
 			};
 
 		// Call for the object shader(s) that read light
-		bindLightsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle());
-#pragma endregion
+		bindLightsBlock(m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::MAIN)].getShaderProgramHandle());
 
-		// Set default picked ID 
-		pickedID = NO_HIT;
+		// -------- Shadows UBO (binding = 2) --------
+		glCreateBuffers(1, &m_shadowsUBO);
+		glNamedBufferData(m_shadowsUBO, sizeof(ShadowsBlockGPU), nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_shadowsUBO);
 
-		// Set default editor camera toggle
-		isEditorCamOn = true;
+		auto bindShadowsBlock = [&](GLuint programID) {
+			GLuint blockIndex = glGetUniformBlockIndex(programID, "ShadowsBlock");
+			if (blockIndex != GL_INVALID_INDEX) {
+				glUniformBlockBinding(programID, blockIndex, 2);
+			}
+			};
 
-		// Create a framebuffer for ImGui editor and configure its settings
-		auto fp_fbo = FrameBuffer::create();
-		if (fp_fbo.has_value()) {
-			m_framebuffers.push_back(std::move(*fp_fbo));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to create framebuffer!");
-		}
+		// Object shader uses shadows
+		bindShadowsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle());
 
-		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
-		auto fp_tex = Texture::alloc_storage_on_gpu(width, height, GL_RGBA16F);
-		if (fp_tex.has_value()) {
-			m_gl.m_textures.push_back(std::move(*fp_tex));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to allocate storage on the GPU!");
-		}
+		// Allocate shadow map resources (depth-only). Will be resized per-light when rendering.
+		ensureShadowResources(1024);
+		
+		Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
+		Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
+		m_gl.t_testing_material.emplace_back(mat1);
+		m_gl.t_testing_material.emplace_back(mat2);
 
-		// Allocate extra attachments to the framebuffer
-		GLuint rboDepth;
-		glCreateRenderbuffers(1, &rboDepth);
-		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
-		temp_rbo = rboDepth;
-
-		auto& fpfbo_ = m_framebuffers[0];
-		auto& fptex_ = m_gl.m_textures[0];
-
-		// Use depth renderbuffer for attaching to editor
-		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
-		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
-
-		auto gpu_fbo = FrameBuffer::create();
-		if (gpu_fbo.has_value()) {
-			m_framebuffers.push_back(std::move(*gpu_fbo));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to create GPU ID framebuffer!");
-		}
-
-		// Create a single channel integer texture to store entity IDs
-		auto gpu_tex = Texture::alloc_storage_on_gpu(width, height, GL_R32UI);
-		if (gpu_tex.has_value()) {
-			m_gl.m_textures.push_back(std::move(*gpu_tex));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to allocate GPU ID storage on the GPU!");
-		}
-
-		// Use the same depth renderbuffer for render pass
-		auto& gpufbo_ = m_framebuffers[1];
-		auto& gputex_ = m_gl.m_textures[1];
-		gpufbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(gputex_.handle()));
-		gpufbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
-
-		// Make sure the GPU-ID FBO has correct draw/read buffers and is cleared
-		const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
-		gpufbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
-		gpufbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
-
-		// Check if fbo is successfully created
-		if (gpufbo_.complete()) {
-			LOG_INFO("Renderer::setup() - Successfully created GPU ID framebuffer.");
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to created GPU ID framebuffer!");
-		}
-
-		// Allocate a framebuffer for the final pass 
-		auto finalpass_fbo = FrameBuffer::create();
-		if (finalpass_fbo.has_value()) {
-			m_framebuffers.push_back(std::move(*finalpass_fbo));
-		}
-		else {
-			LOG_ERROR("Renderer::setup() - Failed to create final pass framebuffer!");
-		}
-
-		auto finalpass_tex = Texture::alloc_storage_on_gpu(width, height);
-		if (finalpass_tex.has_value()) {
-			m_gl.m_textures.push_back(std::move(*finalpass_tex));
-		}else {
-			LOG_ERROR("Renderer::setup() - Failed to allocate texture for final pass!");
-		}
-
-		auto& finalpass_fbo_ = m_framebuffers[2];
-		auto& finalpass_tex_ = m_gl.m_textures[2];
-
-		// Use depth renderbuffer for attaching to editor
-		finalpass_fbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(finalpass_tex_.handle()));
-
-		if (!finalpass_fbo_.complete()) {
-			LOG_ERROR("Renderer::setup() - LDR FBO is incomplete!");
-			throw std::runtime_error("");
-		}
-
-		// Create bloom mip chain based on initial HDR size
-		initBloomMipChain(width, height);
-
-		// Create a render pass for that framebuffer
-		RenderPass first_pass
-		{
-			.pass_name = "First Pass",
-			.fbo_handle = 0,
-			.shdpgm_handle = 0,
-			.auto_aspect = true,
-			.depth_test = true,
-			.depth_write = true,
-			.blending = true,
-			.culling = false
-		};
-
-		// Register the pass with the renderer
-		m_passes.push_back(first_pass);
-
-		RenderPass gpu_id_pass
-		{
-			.pass_name = "GPU ID",
-			.fbo_handle = 1,			// Render into the GPU-ID FBO
-			.shdpgm_handle = 2,         // Object_picking shader program
-			.auto_aspect = true,
-			.clear_color = false,		// Use integer clear below
-			.clear_depth = true,		
-			.depth_test = true,
-			.depth_write = true,		
-			.blending = false,
-			.culling = true,
-			.passtype = PassType::GEOMETRY
-		};
-
-		m_passes.push_back(gpu_id_pass);
-
-		RenderPass ui_pass
-		{
-			.pass_name = "UI Pass",
-			.fbo_handle = 0,
-			.shdpgm_handle = 5,
-			.auto_aspect = true,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_test = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::GEOMETRY
-		};
-
-		RenderPass debug_pass
-		{
-			.pass_name = "Debug Pass",
-			.fbo_handle = 0,
-			.shdpgm_handle = 1,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::DEBUGGING
-		};
-
-		//m_passes.push_back(debug_pass);
-
-		m_finalpass = {
-			.pass_name = "Final Pass",
-			.fbo_handle = 2,
-			.shdpgm_handle = 4,
-			.auto_aspect = true,
-			.clear_color = false,
-			.clear_depth = false,
-			.depth_test = false,
-			.depth_write = false,
-			.culling = false,
-			.passtype = PassType::FULLSCREEN
-		};
-
-#pragma region MATERIAL_LOAD_TEMP
-		{
-			Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
-			Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
-			m_gl.t_testing_material.emplace_back(mat1);
-			m_gl.t_testing_material.emplace_back(mat2);
-		}
-#pragma endregion
 
 		LOG_TRACE("Renderer::setup() - Renderer started successfully!");
 	}
@@ -552,14 +183,16 @@ namespace Engine {
 		prog.programUse();
 	}
 
-
 	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<std::pair<CameraComponent, glm::vec3>> camera_list, std::span<const LightCPU> lights) {
 
 	 	// Render through editor camera
 	 	if (isEditorCamOn) {
 
 	 		glm::mat4  cam_view = editor_camera.getLookAt(); 
+			glm::mat4  cam_perspective = editor_camera.getPerspective(static_cast<float>(renderEditorVP.size.x / renderEditorVP.size.y));
 			glm::vec3& cam_pos  = editor_camera.getCamPos();
+
+			bool shadowRenderedForThisFrame = false;
 
 	 		for (auto& pass : m_passes) {
 
@@ -582,12 +215,18 @@ namespace Engine {
 				}
 
 				// Get camera perspective transform
-				glm::mat4 cam_perspective = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+				//glm::mat4 cam_perspective = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
 
 				// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
 				if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
 					m_lastView = cam_view;
 					m_lastProj = cam_perspective;
+
+					// Render the shadow map once (use the main HDR/object pass camera matrices)
+					if (!shadowRenderedForThisFrame) {
+						renderShadowMap(draw_items, lights, cam_view, cam_perspective);
+						shadowRenderedForThisFrame = true;
+					}
 				}
 
 				// Begin drawing frame
@@ -616,7 +255,7 @@ namespace Engine {
 
 						// Read the ID
 						u32 id = 0; // (entt::null value)
-						auto& idFbo = m_framebuffers[1];
+						auto& idFbo = m_framebuffers[static_cast<size_t>(FramebufferIndex::PICKING)];
 						idFbo.set_read_buffer(GL_COLOR_ATTACHMENT0);
 						glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)idFbo.handle());
 						glReadPixels(px, py, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
@@ -631,6 +270,11 @@ namespace Engine {
 		else {
 			// For rendering all enabled camera displays
 			for (const auto& cam : camera_list) {
+
+				// Determine camera projection once, and render a shadow map for this camera.
+				glm::mat4 view = cam.first.View;
+				glm::mat4 proj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
+				renderShadowMap(draw_items, lights, view, proj);
 
 				for (auto& pass : m_passes) {
 
@@ -656,25 +300,25 @@ namespace Engine {
 
 					// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
 					if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
-						m_lastView = cam.first.View;
-						m_lastProj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
+						m_lastView = view;
+						m_lastProj = proj;
 					}
-
-					glm::mat4 proj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
 
 					// Begin drawing frame
 					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
 
 					// cam.first is the actual underlying camera object
 					// cam.second is the camera's position using the transform component
-					draw(pass, draw_items, cam.first.View, proj, cam.second, lights);
+					draw(pass, draw_items, view, proj, cam.second, lights);
 
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
 			}
 		}
 
+
 		renderFinalPass(m_finalpass);
+		renderUIPass(m_UIPass, draw_items);
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -694,7 +338,20 @@ namespace Engine {
 		prog.setUniform("CamPos", cam_pos);
 		prog.setUniform("u_ViewProjection", projection_view);
 
+		// Bind shadow map + sampler uniform only for the main lit object shader
+		if (pass.shdpgm_handle == static_cast<size_t>(ShaderIndex::MAIN)) {
+			glBindTextureUnit(10, m_shadowDepthTex);
+			prog.setUniform("u_ShadowMap", 10);
+		}
+
 		for (const auto& item : draw_items) {
+
+			// Shadow receive/cast is controlled per DrawItem (MeshRendererComponent)
+			// NOTE: requires DrawItem shadow flags 
+			if (pass.shdpgm_handle == static_cast<size_t>(ShaderIndex::MAIN)) {
+				if (!item.m_render_main_pass) continue; // e.g. CastType::ShadowsOnly
+				prog.setUniform("u_ReceiveShadows", item.m_receive_shadows ? 1 : 0);
+			}
 
 			// Specific Pass Handling Logic
 			if (pass.passtype == PassType::DEBUGGING) {
@@ -711,6 +368,8 @@ namespace Engine {
 				u32 pickId = item.m_entity_id;
 				prog.setUniform("u_ObjectID", pickId);
 			}
+
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -730,7 +389,7 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 				prog.setUniform("useNormalMap", false);
 #pragma endregion
-
+			 
 			 // Check for material resource
 			 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			 {
@@ -841,6 +500,185 @@ namespace Engine {
 		if (pass.passtype == PassType::FULLSCREEN) {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
+	}
+
+	/**
+	 * @brief Sets up the render passes used for multi-pass rendering.
+	 */
+	void Renderer::setupPasses() 
+	{
+		// Create a render pass for that framebuffer
+		RenderPass first_pass
+		{
+			.pass_name = "First Pass",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::MAIN),
+			.auto_aspect = true,
+			.depth_test = true,
+			.depth_write = true,
+			.blending = true,
+			.culling = false
+		};
+
+		m_passes.push_back(first_pass);
+
+		RenderPass gpu_id_pass
+		{
+			.pass_name = "GPU ID",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::PICKING),			// Render into the GPU-ID FBO
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::OBJECT_PICKING),         // Object_picking shader program
+			.auto_aspect = true,
+			.clear_color = false,		// Use integer clear below
+			.clear_depth = true,
+			.depth_test = true,
+			.depth_write = true,
+			.blending = false,
+			.culling = true,
+			.passtype = PassType::GEOMETRY
+		};
+
+		m_passes.push_back(gpu_id_pass);
+
+		RenderPass debug_pass
+		{
+			.pass_name = "Debug Pass",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::DEBUG_DRAW),
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::DEBUGGING
+		};
+
+		m_finalpass = {
+			.pass_name = "Final Pass",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::HDR),
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.culling = false,
+			.passtype = PassType::FULLSCREEN
+		};
+
+		m_UIPass = {
+			.pass_name = "UI Pass",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::UI),
+			.auto_aspect = true,
+			.clear_color = false,
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.blending = true,
+			.culling = false,
+			.passtype = PassType::FULLSCREEN
+		};
+	}
+
+	/**
+	 * @brief Sets up all the necessary framebuffers for rendering and compositing.
+	 */
+	void Renderer::setupFramebuffers() 
+	{
+		// Create a framebuffer for ImGui editor and configure its settings
+		auto fp_fbo = FrameBuffer::create();
+		if (fp_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*fp_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create framebuffer!");
+		}
+
+		// Allocate storage for a texture on the GPU, this texture will be attached to the framebuffer
+		auto fp_tex = Texture::alloc_storage_on_gpu(width, height, GL_RGBA16F);
+		if (fp_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*fp_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate storage on the GPU!");
+		}
+
+		// Allocate extra attachments to the framebuffer
+		GLuint rboDepth;
+		glCreateRenderbuffers(1, &rboDepth);
+		glNamedRenderbufferStorage(rboDepth, GL_DEPTH_COMPONENT24, width, height);
+		temp_rbo = rboDepth;
+
+		auto& fpfbo_ = m_framebuffers[static_cast<size_t>(FramebufferIndex::SCENE)];
+		auto& fptex_ = m_gl.m_textures[0];
+
+		// Use depth renderbuffer for attaching to editor
+		fpfbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(fptex_.handle()));
+		fpfbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
+
+		auto gpu_fbo = FrameBuffer::create();
+		if (gpu_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*gpu_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create GPU ID framebuffer!");
+		}
+
+		// Create a single channel integer texture to store entity IDs
+		auto gpu_tex = Texture::alloc_storage_on_gpu(width, height, GL_R32UI);
+		if (gpu_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*gpu_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate GPU ID storage on the GPU!");
+		}
+
+		// Use the same depth renderbuffer for render pass
+		auto& gpufbo_ = m_framebuffers[static_cast<size_t>(FramebufferIndex::PICKING)];
+		auto& gputex_ = m_gl.m_textures[1];
+		gpufbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(gputex_.handle()));
+		gpufbo_.attach_renderbuffer(GL_DEPTH_ATTACHMENT, rboDepth);
+
+		// Make sure the GPU-ID FBO has correct draw/read buffers and is cleared
+		const GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+		gpufbo_.set_draw_buffers(std::span<const GLenum>(bufs, 1));
+		gpufbo_.set_read_buffer(GL_COLOR_ATTACHMENT0);
+
+		// Check if fbo is successfully created
+		if (gpufbo_.complete()) {
+			LOG_INFO("Renderer::setup() - Successfully created GPU ID framebuffer.");
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to created GPU ID framebuffer!");
+		}
+
+		// Allocate a framebuffer for the final pass 
+		auto finalpass_fbo = FrameBuffer::create();
+		if (finalpass_fbo.has_value()) {
+			m_framebuffers.push_back(std::move(*finalpass_fbo));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to create final pass framebuffer!");
+		}
+
+		auto finalpass_tex = Texture::alloc_storage_on_gpu(width, height);
+		if (finalpass_tex.has_value()) {
+			m_gl.m_textures.push_back(std::move(*finalpass_tex));
+		}
+		else {
+			LOG_ERROR("Renderer::setup() - Failed to allocate texture for final pass!");
+		}
+
+		auto& finalpass_fbo_ = m_framebuffers[static_cast<size_t>(FramebufferIndex::COMPOSITION)];
+		auto& finalpass_tex_ = m_gl.m_textures[2];
+
+		// Use depth renderbuffer for attaching to editor
+		finalpass_fbo_.attach_color(GL_COLOR_ATTACHMENT0, static_cast<GLuint>(finalpass_tex_.handle()));
+
+		if (!finalpass_fbo_.complete()) {
+			LOG_ERROR("Renderer::setup() - LDR FBO is incomplete!");
+			throw std::runtime_error("");
+		}
+
 	}
 
 	void Renderer::resizeFBO(u32 handle, int w, int h) {
@@ -973,13 +811,16 @@ namespace Engine {
 		return (uint32_t)picked.size();
 	}
 
+	/**
+	 * @brief Renders the skybox in HDR color range.
+	 */
 	void Renderer::renderSkyboxHDR()
 	{
 		// If we don't have any bloom initialized or framebuffers, bail early
 		if (m_framebuffers.empty()) return;
 
 		// Bind the HDR scene framebuffer explicitly (FBO 0)
-		auto& hdrFbo = m_framebuffers[0];
+		auto& hdrFbo = m_framebuffers[static_cast<size_t>(FramebufferIndex::SCENE)];
 		glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(hdrFbo.handle()));
 
 		// Use the bloom source size (matches HDR resolution)
@@ -996,9 +837,7 @@ namespace Engine {
 		glm::mat4 viewNoTrans = glm::mat4(glm::mat3(m_lastView));
 		glm::mat4 skyboxVP = m_lastProj * viewNoTrans;
 
-		// Use skybox shader (index 3)
-		size_t skybox_shader_program_idx = 3;
-		auto& skybox_prog = m_gl.m_shader_storage[skybox_shader_program_idx];
+		auto& skybox_prog = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::SKYBOX)];
 		skybox_prog.programUse();
 
 		skybox_prog.setUniform("u_SkyboxViewProjection", skyboxVP);
@@ -1068,10 +907,80 @@ namespace Engine {
 		glDrawElements(m_fullscreen_quad.primitive_type, m_fullscreen_quad.draw_count, m_fullscreen_quad.index_type, nullptr);
 		glBindVertexArray(0);
 
-		
 		prog.programFree();
 		endFrame(pass);
 
+	}
+
+	void Renderer::renderUIPass(RenderPass& pass, std::span<const DrawItem> items) {
+
+		// Update pass viewport if allowed
+		if (pass.auto_aspect) {
+			int vp_w, vp_h;
+			glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
+
+			// Check if viewport needs update
+			if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+				pass.view_port.z = static_cast<float>(vp_w);
+				pass.view_port.w = static_cast<float>(vp_h);
+
+				// Resize FBO (2) for final pass
+				resizeFBO(pass.fbo_handle, vp_w, vp_h);
+
+				// Also update bloom source size (HDR scene size)
+				m_bloomSrcSize = { vp_w, vp_h };
+				resizeBloomMipChain(vp_w, vp_h);
+			}
+		}
+
+		beginFrame(pass);
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
+
+		glm::mat4 ortho = glm::ortho(pass.view_port.x, 1280.f, 720.f, pass.view_port.y, -1.f, 1.f);
+
+		double mp_x, mp_y;
+		glfwGetCursorPos(glfwGetCurrentContext(), &mp_x, &mp_y);
+		glm::vec2 mouse(static_cast<float>(mp_x), static_cast<float>(mp_y));
+		mouse.y = pass.view_port.w - mouse.y;  // Flip Y
+
+		for (const auto& item : items) {
+
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D) {
+
+				
+				AABB2D testAABB = ComputeAABB(m_gl.m_mesh_data2d_storage[0].positions, ortho, item.m_model_to_world_transform, glm::vec2(pass.view_port.z, pass.view_port.w));
+				
+				if ((item.m_render_layer >= activeLayer) && Mouse2DCollision(testAABB.min, testAABB.max, mouse)) {
+					LOG_INFO("MOUSE IS COLLIDING WITH OBJECT WITH ID: ", item.m_entity_id);
+				}
+
+				prog.setUniform("u_World2D", item.m_model_to_world_transform);
+				prog.setUniform("u_Ortho", ortho);
+				prog.setUniform("uColor", item.m_color);
+
+				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(item.m_texture_guid))) {
+					glBindTextureUnit(6, static_cast<GLuint>(texture_resource->textureID));
+					prog.setUniform("uHasTexture", true);
+				}
+				else {
+					glBindTextureUnit(6, 0);
+					prog.setUniform("uHasTexture", false);
+				}
+
+				size_t  mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+
+				GLenum  primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+				GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, nullptr);
+				glBindVertexArray(0);
+			}
+		}
+
+		prog.programFree();
+		endFrame(pass);
 	}
 
 	void Renderer::initBloomMipChain(int srcWidth, int srcHeight)
@@ -1172,7 +1081,7 @@ namespace Engine {
 
 		auto& mipChain = m_bloomMips;
 
-		auto& downProg = m_gl.m_shader_storage[6]; // bloom_downsample
+		auto& downProg = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::BLOOM_DOWNSAMPLE)]; // bloom_downsample
 		downProg.programUse();
 
 		glDisable(GL_DEPTH_TEST);
@@ -1218,7 +1127,7 @@ namespace Engine {
 		if (!m_bloomInitialized) return;
 
 		auto& mipChain = m_bloomMips;
-		auto& upProg = m_gl.m_shader_storage[7]; // bloom_upsample
+		auto& upProg = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::BLOOM_UPSAMPLE)]; // bloom_upsample
 
 		upProg.programUse();
 		upProg.setUniform("filterRadius", filterRadius);
@@ -1260,5 +1169,351 @@ namespace Engine {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	/**
+	 * @brief Loads the OpenGL function pointers.
+	 */
+	void Renderer::loadGLFunctionPointers() {
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+			LOG_ERROR("Renderer::setup() - Failed to load OpenGL, GLAD failed to initialized");
+		}
+		else {
+			LOG_TRACE("Renderer::setup() - GLAD initialized successfuly");
+			LOG_INFO("OpenGL initialized");
+			LOG_INFO("  Vendor:   ", (const char*)glGetString(GL_VENDOR));
+			LOG_INFO("  Renderer: ", (const char*)glGetString(GL_RENDERER));
+			LOG_INFO("  Version:  ", (const char*)glGetString(GL_VERSION));
+			LOG_INFO("  GLSL:     ", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+		}
+	}
 
+	/**
+	 * @brief Loads shaders from disk.
+	 */
+	void Renderer::loadShaders() {
+		RenderBypassUtils::loadAllShaderPrograms(m_gl.m_shader_storage);
+	}
+
+	/**
+	 * @brief Initializes basic geometry into memory.
+	 *		  Geometry intialized: Cube, Plane, Sphere & Quad.
+	 */
+	void Renderer::initBasicGeometry() {
+		RenderBypassUtils::loadBasicPrimitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
+	}
+
+	/**
+	 * @brief Sets the default state of the renderer on startup.
+	 */
+	void Renderer::setDefaultState() {
+		// Set default picked entity ID
+		pickedID = NO_HIT;
+		isEditorCamOn = true;
+
+		// Used for final composite
+		MeshData2D quad = make_quad(); m_fullscreen_quad = upload_mesh_data2D(quad);
+	}
+
+	// ---------------- Shadows (shadow mapping) ----------------
+	void Renderer::ensureShadowResources(uint32_t res) {
+		if (res == 0u) res = 1024u;
+		if (m_shadowDepthTex != 0 && m_shadowMapRes == res && m_shadowFBO != 0) return;
+
+		m_shadowMapRes = res;
+
+		// Destroy old
+		if (m_shadowDepthTex) {
+			glDeleteTextures(1, &m_shadowDepthTex);
+			m_shadowDepthTex = 0;
+		}
+		if (m_shadowFBO) {
+			glDeleteFramebuffers(1, &m_shadowFBO);
+			m_shadowFBO = 0;
+		}
+
+		// Create depth texture
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowDepthTex);
+		glTextureStorage2D(m_shadowDepthTex, 1, GL_DEPTH_COMPONENT24, (GLsizei)res, (GLsizei)res);
+
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		const float border[4] = { 1.f, 1.f, 1.f, 1.f };
+		glTextureParameterfv(m_shadowDepthTex, GL_TEXTURE_BORDER_COLOR, border);
+
+		// sampler2DShadow compare mode
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+		// Create FBO
+		glCreateFramebuffers(1, &m_shadowFBO);
+		glNamedFramebufferTexture(m_shadowFBO, GL_DEPTH_ATTACHMENT, m_shadowDepthTex, 0);
+		glNamedFramebufferDrawBuffer(m_shadowFBO, GL_NONE);
+		glNamedFramebufferReadBuffer(m_shadowFBO, GL_NONE);
+
+		GLenum status = glCheckNamedFramebufferStatus(m_shadowFBO, GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			LOG_ERROR("Renderer::ensureShadowResources() - Shadow FBO incomplete! status=", status);
+		}
+	}
+
+	static glm::mat4 computeLightVP_Directional(const glm::vec3& lightDirWorld,
+		std::span<const DrawItem> draw_items,
+		float extraPadding)
+	{
+		// Compute world-space AABB over draw item translations (quick and dirty)
+		glm::vec3 wmin(FLT_MAX), wmax(-FLT_MAX);
+		bool any = false;
+		for (const auto& it : draw_items) {
+			// include only shadow casters/receivers to size map roughly
+			glm::vec3 p = glm::vec3(it.m_model_to_world_transform[3]);
+			wmin = glm::min(wmin, p);
+			wmax = glm::max(wmax, p);
+			any = true;
+		}
+		if (!any) {
+			wmin = glm::vec3(-10.f);
+			wmax = glm::vec3(10.f);
+		}
+
+		glm::vec3 center = 0.5f * (wmin + wmax);
+		glm::vec3 ext = 0.5f * (wmax - wmin);
+		float radius = glm::length(ext);
+		if (radius < 1.0f) radius = 1.0f;
+
+		glm::vec3 dir = glm::normalize(lightDirWorld);
+		glm::vec3 up(0, 1, 0);
+		if (fabs(glm::dot(dir, up)) > 0.95f) up = glm::vec3(0, 0, 1);
+
+		float dist = radius * 2.0f + 10.0f;
+		glm::vec3 lightPos = center - dir * dist;
+		glm::mat4 V = glm::lookAt(lightPos, center, up);
+
+		// transform 8 corners to light space for tight ortho
+		glm::vec3 corners[8] = {
+			{wmin.x, wmin.y, wmin.z}, {wmax.x, wmin.y, wmin.z}, {wmin.x, wmax.y, wmin.z}, {wmax.x, wmax.y, wmin.z},
+			{wmin.x, wmin.y, wmax.z}, {wmax.x, wmin.y, wmax.z}, {wmin.x, wmax.y, wmax.z}, {wmax.x, wmax.y, wmax.z},
+		};
+
+		glm::vec3 lmin(FLT_MAX), lmax(-FLT_MAX);
+		for (auto& c : corners) {
+			glm::vec4 ls = V * glm::vec4(c, 1.0f);
+			glm::vec3 p = glm::vec3(ls);
+			lmin = glm::min(lmin, p);
+			lmax = glm::max(lmax, p);
+		}
+
+		lmin -= glm::vec3(extraPadding);
+		lmax += glm::vec3(extraPadding);
+
+		// Convert view-space Z (negative forward) to positive near/far for glm::ortho
+		float zNear = -lmax.z; // closest (largest z in view space)
+		float zFar = -lmin.z;  // farthest
+		if (zNear < 0.1f) zNear = 0.1f;
+		if (zFar < zNear + 0.1f) zFar = zNear + 0.1f;
+
+		glm::mat4 P = glm::ortho(lmin.x, lmax.x, lmin.y, lmax.y, zNear, zFar);
+		return P * V;
+	}
+
+	static glm::mat4 computeLightVP_Directional_FrustumFit(const glm::vec3& lightDirWorld,
+		const glm::mat4& camView,
+		const glm::mat4& camProj,
+		int shadowMapRes,
+		float extraPadding)
+	{
+		// 1) Build camera frustum corners in WORLD space
+		glm::mat4 invVP = glm::inverse(camProj * camView);
+
+		// NDC depth convention matters.
+		// - OpenGL default: z in [-1, 1]
+		// - If GLM_FORCE_DEPTH_ZERO_TO_ONE is enabled (common for Vulkan/D3D style), z in [0, 1]
+		// If these don't match your camera projection, the frustum corners (and thus lightVP)
+		// will be wrong and you'll get "no shadows".
+		float zN = -1.0f;
+		float zF = 1.0f;
+#ifdef GLM_FORCE_DEPTH_ZERO_TO_ONE
+		zN = 0.0f;
+		zF = 1.0f;
+#endif
+
+		glm::vec4 ndc[8] = {
+			{-1, -1, zN, 1}, { 1, -1, zN, 1}, {-1,  1, zN, 1}, { 1,  1, zN, 1}, // near
+			{-1, -1, zF, 1}, { 1, -1, zF, 1}, {-1,  1, zF, 1}, { 1,  1, zF, 1}, // far
+		};
+
+		glm::vec3 frustumWS[8];
+		for (int i = 0; i < 8; ++i) {
+			glm::vec4 w = invVP * ndc[i];
+			frustumWS[i] = glm::vec3(w) / w.w;
+		}
+
+		// 2) Choose a light view matrix looking at the frustum center
+		glm::vec3 dir = glm::normalize(lightDirWorld);
+		glm::vec3 up(0, 1, 0);
+		if (fabs(glm::dot(dir, up)) > 0.95f) up = glm::vec3(0, 0, 1);
+
+		glm::vec3 center(0.0f);
+		for (auto& p : frustumWS) center += p;
+		center *= (1.0f / 8.0f);
+
+		// Place the light "back" along its direction so all points are in front
+		// (distance can be generous; the ortho bounds will clamp it anyway)
+		float dist = 200.0f;
+		glm::vec3 lightPos = center - dir * dist;
+
+		glm::mat4 V = glm::lookAt(lightPos, center, up);
+
+		// 3) Compute bounds in LIGHT space (tight ortho)
+		glm::vec3 lmin(FLT_MAX), lmax(-FLT_MAX);
+		for (int i = 0; i < 8; ++i) {
+			glm::vec3 ls = glm::vec3(V * glm::vec4(frustumWS[i], 1.0f));
+			lmin = glm::min(lmin, ls);
+			lmax = glm::max(lmax, ls);
+		}
+
+		lmin -= glm::vec3(extraPadding);
+		lmax += glm::vec3(extraPadding);
+
+		// 4) Stabilize: snap to shadow texel grid in light space
+		float width = (lmax.x - lmin.x);
+		float height = (lmax.y - lmin.y);
+		// avoid division by zero if frustum is degenerate (can happen with bad proj matrices)
+		width = (fabs(width) < 1e-4f) ? 1e-4f : width;
+		height = (fabs(height) < 1e-4f) ? 1e-4f : height;
+		shadowMapRes = (shadowMapRes <= 0) ? 1024 : shadowMapRes;
+		if (width < 0.001f) width = 0.001f;
+		if (height < 0.001f) height = 0.001f;
+
+		float texelX = width / (float)shadowMapRes;
+		float texelY = height / (float)shadowMapRes;
+		if (texelX < 1e-6f) texelX = 1e-6f;
+		if (texelY < 1e-6f) texelY = 1e-6f;
+
+		// snap minimum corner
+		lmin.x = floor(lmin.x / texelX) * texelX;
+		lmin.y = floor(lmin.y / texelY) * texelY;
+
+		// preserve extents
+		lmax.x = lmin.x + width;
+		lmax.y = lmin.y + height;
+
+		// 5) Z near/far: note glm::lookAt looks down -Z in view space
+		float zNear = -lmax.z;
+		float zFar = -lmin.z;
+
+		if (zNear < 0.1f) zNear = 0.1f;
+		if (zFar < zNear + 0.1f) zFar = zNear + 0.1f;
+
+		glm::mat4 P = glm::ortho(lmin.x, lmax.x, lmin.y, lmax.y, zNear, zFar);
+		return P * V;
+	}
+
+
+	void Renderer::renderShadowMap(std::span<const DrawItem> draw_items,
+		std::span<const LightCPU> lights,
+		const glm::mat4& camView,
+		const glm::mat4& camProj)
+	{
+		// Choose first directional light that has shadows enabled
+		const LightCPU* shadowLight = nullptr;
+		for (const auto& L : lights) {
+			if (L.type == LIGHT_DIRECTIONAL && L.shadowType != 0u && L.shadowStrength > 0.0f) {
+				shadowLight = &L;
+				break;
+			}
+		}
+
+		if (!shadowLight) {
+			m_shadowsCPU.lightDirEnabled = glm::vec4(0, 0, 0, 0);
+			glNamedBufferSubData(m_shadowsUBO, 0, sizeof(ShadowsBlockGPU), &m_shadowsCPU);
+			return;
+		}
+
+		ensureShadowResources(shadowLight->shadowResolution);
+
+		// Shadow light direction 
+		glm::vec3 Ldir = glm::normalize(-shadowLight->direction);
+
+		//// Fit ortho shadow volume to the camera frustum 
+		//glm::mat4 lightVP = computeLightVP_Directional_FrustumFit(
+		//	glm::normalize(shadowLight->direction),
+		//	camView,
+		//	camProj,
+		//	(int)m_shadowMapRes,
+		//	10.0f
+		//);
+
+		glm::mat4 lightVP = computeLightVP_Directional(glm::normalize(shadowLight->direction), draw_items, 10.0f);
+
+		// Update shadows UBO
+		m_shadowsCPU.lightViewProj[0] = lightVP;
+		for (int i = 1; i < 4; ++i) m_shadowsCPU.lightViewProj[i] = glm::mat4(1.0f);
+		m_shadowsCPU.cascadeSplits = glm::vec4(0.0f);
+		m_shadowsCPU.shadowParams = glm::vec4(shadowLight->shadowStrength,
+			shadowLight->shadowBias,
+			1.0f / (float)m_shadowMapRes,
+			(float)shadowLight->shadowType);
+		m_shadowsCPU.lightDirEnabled = glm::vec4(Ldir, 1.0f);
+
+		glNamedBufferSubData(m_shadowsUBO, 0, sizeof(ShadowsBlockGPU), &m_shadowsCPU);
+
+		// Render depth
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO);
+		glViewport(0, 0, (GLsizei)m_shadowMapRes, (GLsizei)m_shadowMapRes);
+		glClearDepth(1.0);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glDisable(GL_BLEND);
+
+		// Reduce acne / peter panning
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(2.0f, 4.0f);
+
+		auto& prog = m_gl.m_shader_storage[static_cast<int>(ShaderIndex::SHADOW)];
+		prog.programUse();
+		prog.setUniform("u_LightViewProj", lightVP);
+
+		for (const auto& item : draw_items) {
+			if (item.m_cast_shadow_type == 0u) continue;
+
+			bool twoSided = (item.m_cast_shadow_type == 2u);
+			if (twoSided) glDisable(GL_CULL_FACE);
+
+			prog.setUniform("u_World", item.m_model_to_world_transform);
+
+			size_t mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+
+			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(convertToMeshGuid(item.m_mesh_guid))) {
+				glBindVertexArray(mesh_resource->VAO);
+				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
+				const void* indexOffset = reinterpret_cast<const void*>(submesh.startIndex * sizeof(unsigned int));
+				glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, indexOffset);
+				glBindVertexArray(0);
+			}
+			else {
+				GLenum primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+				GLenum index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, nullptr);
+				glBindVertexArray(0);
+			}
+
+			if (twoSided) {
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_FRONT);
+			}
+		}
+
+		prog.programFree();
+
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		glCullFace(GL_BACK);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 }

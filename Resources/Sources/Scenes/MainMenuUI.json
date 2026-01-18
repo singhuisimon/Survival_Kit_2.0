@@ -3,124 +3,12 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048581,
+            "ID": 1048582,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "GameCamera"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            -22.60203742980957
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "CameraComponent",
-                    "Properties": {
-                        "Enabled": false,
-                        "Primary": false,
-                        "Projection": false,
-                        "autoAspect": true,
-                        "Size": [
-                            0.0,
-                            20.0
-                        ],
-                        "Depth": 0,
-                        "Aspect": 1.9190404415130615,
-                        "FOV": 45.0,
-                        "NearPlane": 0.5,
-                        "FarPlane": 1000.0,
-                        "Target": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048580,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "MainMenuCamera"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            19.16200065612793
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "CameraComponent",
-                    "Properties": {
-                        "Enabled": true,
-                        "Primary": false,
-                        "Projection": true,
-                        "autoAspect": true,
-                        "Size": [
-                            0.0,
-                            21.0
-                        ],
-                        "Depth": 0,
-                        "Aspect": 1.9190404415130615,
-                        "FOV": 59.0,
-                        "NearPlane": 0.5,
-                        "FarPlane": 1000.0,
-                        "Target": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048578,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Install_Btn"
+                        "Tag": "Placeholder"
                     }
                 },
                 {
@@ -128,8 +16,41 @@
                     "Properties": {
                         "Position": [
                             4.199999809265137,
-                            -2.200000047683716,
-                            1.8992035388946533
+                            -9.300000190734863,
+                            0.800000011920929
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            33.900001525878906,
+                            36.70000076293945,
+                            23.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048579,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Shutdown_Btn"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            -15.600000381469727,
+                            -9.300000190734863,
+                            0.800000011920929
                         ],
                         "Rotation": [
                             0.0,
@@ -137,8 +58,8 @@
                             -180.0
                         ],
                         "Scale": [
-                            2.4000000953674316,
-                            0.800000011920929,
+                            2.700000047683716,
+                            1.100000023841858,
                             0.10000000149011612
                         ],
                         "Parent": 4294967295,
@@ -148,48 +69,60 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 6461645589094662301,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
                     }
-                },
+                }
+            ]
+        },
+        {
+            "ID": 1048576,
+            "Components": [
                 {
-                    "Type": "RigidbodyComponent",
+                    "Type": "TagComponent",
                     "Properties": {
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "SphereRadius": 0.5
+                        "Tag": "Background"
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "TransformComponent",
                     "Properties": {
-                        "ScriptClassName": ""
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            90.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            35.20000076293945,
+                            1.0,
+                            20.600000381469727
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
                     }
                 }
             ]
@@ -244,67 +177,21 @@
             ]
         },
         {
-            "ID": 1048576,
+            "ID": 1048578,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Background"
+                        "Tag": "Install_Btn"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            90.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            35.20000076293945,
-                            1.0,
-                            20.600000381469727
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 6461645589094662317,
-                        "TextureGuid": 0,
-                        "Visible": true,
-                        "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
-                        "SubmeshIndex": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048579,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Shutdown_Btn"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "Position": [
-                            -15.600000381469727,
-                            -9.300000190734863,
-                            0.800000011920929
+                            4.199999809265137,
+                            -2.200000047683716,
+                            1.8992035388946533
                         ],
                         "Rotation": [
                             0.0,
@@ -312,8 +199,8 @@
                             180.0
                         ],
                         "Scale": [
-                            2.700000047683716,
-                            1.100000023841858,
+                            2.4000000953674316,
+                            0.800000011920929,
                             0.10000000149011612
                         ],
                         "Parent": 4294967295,
@@ -323,34 +210,69 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 0,
-                        "MaterialGuid": 8767488598308356261,
-                        "TextureGuid": 0,
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ScriptClassName": ""
                     }
                 }
             ]
         },
         {
-            "ID": 1048582,
+            "ID": 1048580,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Placeholder"
+                        "Tag": "MainMenuCamera"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
                         "Position": [
-                            4.199999809265137,
-                            -9.300000190734863,
-                            0.800000011920929
+                            0.0,
+                            0.0,
+                            19.16200065612793
                         ],
                         "Rotation": [
                             0.0,
@@ -358,15 +280,102 @@
                             0.0
                         ],
                         "Scale": [
-                            33.900001525878906,
-                            36.70000076293945,
-                            23.0
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": false,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            21.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.7777777910232544,
+                        "FOV": 59.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    }
                 }
             ]
+        },
+        {
+            "ID": 1048581,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GameCamera"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "Position": [
+                            0.0,
+                            0.0,
+                            -22.60203742980957
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": false,
+                        "Primary": false,
+                        "Projection": false,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.9190404415130615,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0
         }
     ]
 }

@@ -234,7 +234,14 @@ namespace Engine {
 			}
 
 			if (audio->Is3D && transform) {
-				FMOD_VECTOR pos = { transform->Position.x, transform->Position.y, transform->Position.z };
+
+				//before -> use local position
+				//FMOD_VECTOR pos = { transform->Position.x, transform->Position.y, transform->Position.z };
+
+				//after -> use world position obtained from world transform matrix
+				glm::vec3 worldPos = glm::vec3(transform->WorldTransform[3]);
+				FMOD_VECTOR pos = { worldPos.x, worldPos.y,  worldPos.z };
+
 				FMOD_VECTOR vel = { 0.0f, 0.0f, 0.0f }; // Static for now
 				if (rb) {
 					vel.x = rb->Velocity.x;
@@ -280,6 +287,7 @@ namespace Engine {
 			LOG_INFO("AudioManager::PlaySound - Playing sound: ", audio->AudioFilePath);
 		}
 		
+		//I can't rem why I commented out this block of code. Leaving it here for now. - Amanda
 		//if(audio->Channel) {
 		//	LOG_INFO("AudioManager::PlaySound - Audio channel exists for sound: ", audio->AudioFilePath);
 		//	bool isPlaying = false;
@@ -434,7 +442,24 @@ namespace Engine {
 
 		//update 3d attributes
 		if (audio->Is3D && transform) {
-			FMOD_VECTOR pos = { transform->Position.x, transform->Position.y, transform->Position.z };
+			
+			//before -> local position only
+			/*FMOD_VECTOR pos = { transform->Position.x, transform->Position.y, transform->Position.z };
+			FMOD_VECTOR vel = { 0.0f, 0.0f, 0.0f };
+			if (rb) {
+				vel.x = rb->Velocity.x;
+				vel.y = rb->Velocity.y;
+				vel.z = rb->Velocity.z;
+			}
+			channel->set3DAttributes(&pos, &vel);
+			channel->set3DMinMaxDistance(audio->MinDistance, audio->MaxDistance);*/
+
+			// Doppler is automatically calculated by FMOD when velocity is set
+			// DopplerLevel controls the intensity of the effect
+
+			//after -> obtain world position from world transform.
+			glm::vec3 worldpos = glm::vec3(transform->WorldTransform[3]);
+			FMOD_VECTOR pos = { worldpos.x, worldpos.y, worldpos.z };
 			FMOD_VECTOR vel = { 0.0f, 0.0f, 0.0f };
 			if (rb) {
 				vel.x = rb->Velocity.x;

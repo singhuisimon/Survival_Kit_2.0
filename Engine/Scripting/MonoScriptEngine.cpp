@@ -1,23 +1,20 @@
-#include <windows.h>  // Add at top
+#include <windows.h>
 
 #include "MonoScriptEngine.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
 #include "../ECS/Scene.h"
-#include "../ECS/Entity.h" 
+#include "../ECS/Entity.h"
 #include "../ECS/Components.h"
 #include "../Core/input.h"
 #include "Core/Application.h"
 #include "../Audio/AudioManager.h"
 #include "../Event/EventSystem.h"
-#include "ScriptReloader.h"
-
 
 // Prefabs headers
 #include "../Serialization/PrefabSerializer.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../Prefab/PrefabRegistry.h"
-
 #include "../Physics/PhysicsAPI.h"
 
 // Mono headers
@@ -25,49 +22,263 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
+#include <mono/metadata/appdomain.h>
+#include <mono/metadata/mono-gc.h>
 
 #include <filesystem>
 #include <iostream>
 
 #define GLM_ENABLE_EXPERIMENTAL
-
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "InternalCalls.h"
+
+namespace
+{
+	enum class SnapType : uint8_t
+	{
+		Invalid = 0,
+		Bool = 1,
+		I1 = 2,
+		U1 = 3,
+		I2 = 4,
+		U2 = 5,
+		I4 = 6,
+		U4 = 7,
+		I8 = 8,
+		U8 = 9,
+		R4 = 10,
+		R8 = 11,
+		StringUtf8 = 12,
+		RawValue = 13
+	};
+
+	static inline void AppendBytes(std::vector<uint8_t> &out, const void *p, size_t n)
+	{
+		const uint8_t *b = static_cast<const uint8_t *>(p);
+		out.insert(out.end(), b, b + n);
+	}
+
+	static bool HasAttribute(MonoClassField *field, const char *ns, const char *name)
+	{
+		if (!field) return false;
+
+		MonoClass *parent = mono_field_get_parent(field);
+		if (!parent) return false;
+
+		MonoCustomAttrInfo *attrs = mono_custom_attrs_from_field(parent, field);
+		if (!attrs) return false;
+
+		// Try find the attribute class in the current domain by name
+		// (If not found, just treat as "not present".)
+		MonoClass *attrKlass = nullptr;
+
+		// First: corlib/System.* common attrs
+		MonoImage *corlib = mono_get_corlib();
+		if (corlib)
+			attrKlass = mono_class_from_name(corlib, ns, name);
+
+		bool has = (attrKlass && mono_custom_attrs_has_attr(attrs, attrKlass));
+		mono_custom_attrs_free(attrs);
+		return has;
+	}
+
+	static bool ShouldSerializeField(MonoClassField *field)
+	{
+		if (!field) return false;
+
+		const uint32_t flags = mono_field_get_flags(field);
+
+		if (flags & MONO_FIELD_ATTR_STATIC)
+			return false;
+
+		if (flags & MONO_FIELD_ATTR_NOT_SERIALIZED)
+			return false;
+
+		// [NonSerialized]
+		if (HasAttribute(field, "System", "NonSerializedAttribute"))
+			return false;
+
+		// Public => ok
+		if (flags & MONO_FIELD_ATTR_PUBLIC)
+			return true;
+
+		// Non-public => only if [SerializeField] (support either namespace)
+		if (HasAttribute(field, "UnityEngine", "SerializeField"))
+			return true;
+
+		if (HasAttribute(field, "Engine", "SerializeField"))
+			return true;
+
+		return false;
+	}
+
+	static std::vector<uint8_t> SerializeFieldValue(MonoObject *instance, MonoClassField *field)
+	{
+		std::vector<uint8_t> payload;
+		if (!instance || !field) return payload;
+
+		MonoType *mt = mono_field_get_type(field);
+		if (!mt) return payload;
+
+		const MonoTypeEnum t = static_cast<MonoTypeEnum>(mono_type_get_type(mt));
+
+#define SER_PRIM(TAG, CPP_T)                              \
+		do {                                              \
+			CPP_T v{};                                    \
+			mono_field_get_value(instance, field, &v);     \
+			payload.push_back(static_cast<uint8_t>(TAG)); \
+			AppendBytes(payload, &v, sizeof(CPP_T));       \
+			return payload;                               \
+		} while (0)
+
+		switch (t)
+		{
+		case MONO_TYPE_BOOLEAN: SER_PRIM(SnapType::Bool, uint8_t);
+		case MONO_TYPE_I1:      SER_PRIM(SnapType::I1, int8_t);
+		case MONO_TYPE_U1:      SER_PRIM(SnapType::U1, uint8_t);
+		case MONO_TYPE_I2:      SER_PRIM(SnapType::I2, int16_t);
+		case MONO_TYPE_U2:      SER_PRIM(SnapType::U2, uint16_t);
+		case MONO_TYPE_I4:      SER_PRIM(SnapType::I4, int32_t);
+		case MONO_TYPE_U4:      SER_PRIM(SnapType::U4, uint32_t);
+		case MONO_TYPE_I8:      SER_PRIM(SnapType::I8, int64_t);
+		case MONO_TYPE_U8:      SER_PRIM(SnapType::U8, uint64_t);
+		case MONO_TYPE_R4:      SER_PRIM(SnapType::R4, float);
+		case MONO_TYPE_R8:      SER_PRIM(SnapType::R8, double);
+
+		case MONO_TYPE_STRING:
+		{
+			MonoString *ms = nullptr;
+			mono_field_get_value(instance, field, &ms);
+
+			payload.push_back(static_cast<uint8_t>(SnapType::StringUtf8));
+
+			if (!ms)
+			{
+				uint32_t len = 0;
+				AppendBytes(payload, &len, sizeof(len));
+				return payload;
+			}
+
+			char *utf8 = mono_string_to_utf8(ms);
+			const uint32_t len = utf8 ? static_cast<uint32_t>(std::strlen(utf8)) : 0;
+
+			AppendBytes(payload, &len, sizeof(len));
+			if (len && utf8)
+				AppendBytes(payload, utf8, len);
+
+			if (utf8)
+				mono_free(utf8);
+
+			return payload;
+		}
+
+		case MONO_TYPE_VALUETYPE:
+		{
+			MonoClass *vc = mono_type_get_class(mt);
+			if (!vc) return {};
+
+			// Enums
+			if (mono_class_is_enum(vc))
+			{
+				int32_t v{};
+				mono_field_get_value(instance, field, &v);
+				payload.push_back(static_cast<uint8_t>(SnapType::I4));
+				AppendBytes(payload, &v, sizeof(v));
+				return payload;
+			}
+
+			uint32_t align = 0;
+			const int sz = mono_class_value_size(vc, &align);
+			if (sz <= 0) return {};
+
+			payload.push_back(static_cast<uint8_t>(SnapType::RawValue));
+			const uint32_t usz = static_cast<uint32_t>(sz);
+			AppendBytes(payload, &usz, sizeof(usz));
+
+			const size_t start = payload.size();
+			payload.resize(start + static_cast<size_t>(sz));
+			mono_field_get_value(instance, field, payload.data() + start);
+			return payload;
+		}
+
+		default:
+			break;
+		}
+
+#undef SER_PRIM
+		return {};
+	}
+} // anonymous namespace
 
 namespace Engine
 {
+	template <typename T, typename = void>
+	struct has_gchandle : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_gchandle<T, std::void_t<decltype(std::declval<T &>().GCHandle)>> : std::true_type
+	{
+	};
+
+	template <typename T, typename = void>
+	struct has_started : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_started<T, std::void_t<decltype(std::declval<T &>().Started)>> : std::true_type
+	{
+	};
+
+	template <typename T, typename = void>
+	struct has_scriptinstance : std::false_type
+	{
+	};
+	template <typename T>
+	struct has_scriptinstance<T, std::void_t<decltype(std::declval<T &>().ScriptInstance)>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	concept HasScriptInstancePtr = requires(T t)
+	{
+		{
+			t.ScriptInstance
+		};
+	};
+
+	static Scene *s_ScriptingSceneContext = nullptr;
+
 	MonoScriptEngine &MonoScriptEngine::GetInstance()
 	{
 		static MonoScriptEngine instance;
 		return instance;
 	}
 
-	bool MonoScriptEngine::IsValidMonoObject(MonoObject* instance)
+	bool MonoScriptEngine::IsValidMonoObject(MonoObject *instance)
 	{
 		if (!instance)
 			return false;
 
-		// Check if pointer looks valid (basic sanity check)
-		if ((uintptr_t)instance == 0xFFFFFFFFFFFFFFFF ||
-			(uintptr_t)instance < 0x10000)
+		if ((uintptr_t)instance == 0xFFFFFFFFFFFFFFFF || (uintptr_t)instance < 0x10000)
 		{
 			LOG_WARNING("IsValidMonoObject: Invalid pointer detected");
 			return false;
 		}
 
-		MonoDomain* currentDomain = mono_domain_get();
+		MonoDomain *currentDomain = mono_domain_get();
 		if (!currentDomain)
 		{
 			LOG_WARNING("IsValidMonoObject: No current Mono domain");
 			return false;
 		}
 
-		// Wrap in try-catch for safety (if using C++ exceptions)
 		try
 		{
-			MonoDomain* instanceDomain = mono_object_get_domain(instance);
+			MonoDomain *instanceDomain = mono_object_get_domain(instance);
 			if (!instanceDomain || instanceDomain != currentDomain)
 			{
 				LOG_WARNING("IsValidMonoObject: Instance is from a different/unloaded domain");
@@ -88,7 +299,6 @@ namespace Engine
 		if (!m_AppDomain) return;
 
 		MonoDomain *current = mono_domain_get();
-
 		if (current != m_AppDomain)
 		{
 			LOG_WARNING("EnsureCorrectDomain: Wrong domain active!");
@@ -100,14 +310,9 @@ namespace Engine
 
 			MonoDomain *after = mono_domain_get();
 			if (after == m_AppDomain)
-			{
 				LOG_INFO("  Successfully switched to correct domain");
-			}
 			else
-			{
 				LOG_ERROR("   FAILED to switch domain!");
-				LOG_ERROR("  After switch: " + std::to_string((uintptr_t)after));
-			}
 		}
 	}
 
@@ -120,13 +325,10 @@ namespace Engine
 	// Pointer to Engine.EventSystem.RaiseFromNative(string, string)
 	static MonoMethod *s_EventSystemRaiseFromNative = nullptr;
 
-	// Refresh the managed event binding whenever the C# assembly is (re)loaded
 	static void RefreshEventBindings(MonoImage *appImage)
 	{
 		s_EventSystemRaiseFromNative = nullptr;
-
-		if (!appImage)
-			return;
+		if (!appImage) return;
 
 		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "EventSystem");
 		if (!eventSystemClass)
@@ -139,14 +341,11 @@ namespace Engine
 			mono_class_get_method_from_name(eventSystemClass, "RaiseFromNative", 2);
 
 		if (!s_EventSystemRaiseFromNative)
-		{
 			LOG_WARNING("[Mono] Engine.EventSystem.RaiseFromNative(string,string) not found");
-		}
 	}
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
 	{
-		// Guard against double initialization
 		static bool s_Initialized = false;
 		if (s_Initialized)
 		{
@@ -158,7 +357,6 @@ namespace Engine
 
 		m_AssemblyPath = assemblyPath;
 
-		// Get the exe directory on Windows
 		WCHAR exePath[MAX_PATH] = { 0 };
 		GetModuleFileNameW(NULL, exePath, MAX_PATH);
 
@@ -170,14 +368,6 @@ namespace Engine
 
 		LOG_INFO("[Mono] Assembly path set to: ", monoLibPathStr);
 
-		// Verify mono/lib exists
-		if (!std::filesystem::exists(monoLibPath))
-		{
-			LOG_ERROR("[Mono] ERROR: mono/lib not found at: ", monoLibPathStr);
-			LOG_ERROR("[Mono] Make sure Mono runtime is in the build output directory");
-		}
-
-		// Initialize Mono JIT
 		m_RootDomain = mono_jit_init("EngineRuntime");
 		if (!m_RootDomain)
 		{
@@ -186,42 +376,42 @@ namespace Engine
 		}
 
 		LOG_INFO(" Mono JIT initialized");
-		LOG_INFO(" Root domain created: " + std::to_string((uintptr_t)m_RootDomain));
+
+		// RECOMMENDED: Use multi-domain mode for proper hot reload
+#if 1  // Change to 0 to use single-domain mode
+		const char *domainName = "GameScriptsDomain";
+		m_AppDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+
+		if (!m_AppDomain)
+		{
+			LOG_WARNING("Failed to create separate app domain, falling back to root domain");
+			LOG_WARNING("  Hot reload will be limited in single-domain mode");
+			m_AppDomain = m_RootDomain;
+		}
+		else
+		{
+			LOG_INFO("Using multi-domain mode for proper hot reload support");
+			LOG_INFO("  Root domain:  ", (uintptr_t)m_RootDomain);
+			LOG_INFO("  App domain:   ", (uintptr_t)m_AppDomain);
+		}
+#else
+// Single-domain mode (limited hot reload)
 		m_AppDomain = m_RootDomain;
-		// Create app domain
-		//m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
+		LOG_WARNING("Using single-domain mode (hot reload will be imperfect)");
+#endif
 
-		LOG_INFO("Using single domain mode (no separate app domain)");
-		LOG_INFO("  Root domain: " + std::to_string((uintptr_t)m_RootDomain));
-		LOG_INFO("  App domain:  " + std::to_string((uintptr_t)m_AppDomain) + " (same as root)");
-
-
-
-		/*	if (!m_AppDomain)
-			{
-				LOG_ERROR("Failed to create Mono app domain");
-				return;
-			}*/
 		mono_domain_set(m_AppDomain, false);
 
-
-
-		// Load assembly (only if it exists)
 		if (!assemblyPath.empty() && std::filesystem::exists("GameScripts.dll"))
-		{
 			LoadAssembly("GameScripts.dll");
-		}
 		else
 		{
 			LOG_WARNING("Assembly not found: ", assemblyPath);
 			LOG_WARNING("Mono initialized but no scripts will be loaded");
-			LOG_WARNING("ScriptComponents will be ignored");
 		}
 
-		// Register internal calls (C++ functions callable from C#)
 		RegisterInternalCalls();
 
-		// Hook native ScriptEvent channel into managed Engine.EventSystem
 		EventSystem::Instance().Subscribe<ScriptEvent>(
 			[](ScriptEvent const &ev)
 			{
@@ -241,30 +431,19 @@ namespace Engine
 
 		s_Initialized = true;
 		LOG_INFO("Mono Script Engine initialized");
-
 	}
-
-
 
 	void MonoScriptEngine::Shutdown()
 	{
 		LOG_INFO("Shutting down Mono Script Engine...");
 
-		// Unload assembly (clears mAppAssembly and mAppImage)
 		UnloadAssembly();
 
-		// The OS will clean up Mono memory when the process exits
-
-
-		// Just null the pointers
 		m_RootDomain = nullptr;
 		m_AppDomain = nullptr;
 
-
-
 		LOG_INFO("Mono Script Engine shut down");
 	}
-
 
 	void MonoScriptEngine::LoadAssembly(const std::string &path)
 	{
@@ -276,7 +455,6 @@ namespace Engine
 			return;
 		}
 
-		// Load assembly from file
 		m_AppAssembly = mono_domain_assembly_open(m_AppDomain, path.c_str());
 		if (!m_AppAssembly)
 		{
@@ -292,8 +470,6 @@ namespace Engine
 		}
 
 		LOG_INFO("Assembly loaded successfully");
-
-		// NEW: refresh event bindings to Engine.EventSystem
 		RefreshEventBindings(m_AppImage);
 	}
 
@@ -304,54 +480,22 @@ namespace Engine
 		m_AppAssembly = nullptr;
 	}
 
-	//void MonoScriptEngine::ReloadAssembly()
-	//{
-	//	LOG_INFO("Hot-reload: Starting...");
-	//	ClearAllInstances();
-	//	LOG_INFO("Hot-reload: Cleared instance tracking");
-	//
-	//	UnloadAssembly();
-	//	mono_domain_set(m_RootDomain, false);
-	//	mono_domain_unload(m_AppDomain);
-	//
-	//	LOG_INFO("Hot-reload: Domain unloaded");
-	//
-	//	ScriptReloader::GetInstance().FinalizeDllSwap();
-	//	LOG_INFO("Hot-reload: DLL swapped");
-	//
-	//	m_AppDomain = mono_domain_create_appdomain(const_cast<char *>("EngineAppDomain"), nullptr);
-	//	mono_domain_set(m_AppDomain, true);
-	//
-	//	LoadAssembly(m_AssemblyPath);
-	//	RegisterInternalCalls();
-	//
-	//	LOG_INFO("Hot-reload: Domain reloaded");
-	//	LOG_INFO("Hot-reload: Complete!");
-	//}
-
-
 	MonoClass *MonoScriptEngine::GetScriptClass(const std::string &className)
 	{
-		// Check if app image is loaded
 		if (!m_AppImage)
 		{
 			LOG_ERROR("Cannot get script class '", className, "': Assembly not loaded");
 			return nullptr;
 		}
 
-		// Check cache first
 		auto it = m_ClassCache.find(className);
 		if (it != m_ClassCache.end())
-		{
 			return it->second;
-		}
 
-		// Parse namespace and class name
 		size_t lastDot = className.find_last_of('.');
 		std::string namespaceName = lastDot != std::string::npos ? className.substr(0, lastDot) : "";
 		std::string classNameOnly = lastDot != std::string::npos ? className.substr(lastDot + 1) : className;
 
-		// Get class from image
 		MonoClass *klass = mono_class_from_name(
 			m_AppImage,
 			namespaceName.c_str(),
@@ -364,57 +508,24 @@ namespace Engine
 			return nullptr;
 		}
 
-		// Cache for future use
 		m_ClassCache[className] = klass;
 		return klass;
 	}
 
-
+	// ------------------------------------------------------------------------
+	// Legacy raw instance creation (caller must store a GCHandle immediately).
+	// ------------------------------------------------------------------------
 	MonoObject *MonoScriptEngine::CreateScriptInstance(const std::string &className)
 	{
 		if (!m_AppImage)
-		{
-			// Assembly not loaded - silently skip
 			return nullptr;
-		}
-		EnsureCorrectDomain();
-		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		MonoDomain *current = mono_domain_get();
-		//LOG_INFO("  Current: " + std::to_string((uintptr_t)current));
-		//LOG_INFO("  Root:    " + std::to_string((uintptr_t)m_RootDomain));
-		//LOG_INFO("  App:     " + std::to_string((uintptr_t)m_AppDomain));
 
-		if (current != m_AppDomain)
-		{
-			LOG_ERROR("   Still in wrong domain after EnsureCorrectDomain!");
-			//LOG_ERROR("  Switching to APP domain...");
-			//mono_domain_set(m_AppDomain, false);
-			//current = mono_domain_get();
-			//LOG_INFO("  Switched to: " + std::to_string((uintptr_t)current));
-		}
+		EnsureCorrectDomain();
+
 		MonoClass *klass = GetScriptClass(className);
 		if (!klass)
-		{
 			return nullptr;
-		}
 
-		MonoDomain *currentDomain = mono_domain_get();
-
-		//LOG_INFO("=== CreateScriptInstance: " + className + " ===");
-		//LOG_INFO("  Current domain: " + std::to_string((uintptr_t)currentDomain));
-		//LOG_INFO("  Root domain:    " + std::to_string((uintptr_t)m_RootDomain));
-		//LOG_INFO("  App domain:     " + std::to_string((uintptr_t)m_RootDomain));
-
-		if (currentDomain != m_RootDomain)
-		{
-			LOG_ERROR("   WRONG DOMAIN! Currently in ROOT domain!");
-			LOG_ERROR("  Switching to APP domain...");
-			mono_domain_set(m_AppDomain, false);
-			currentDomain = mono_domain_get();
-			LOG_INFO("  Switched to: " + std::to_string((uintptr_t)currentDomain));
-		}
-
-		// Allocate object
 		MonoObject *instance = mono_object_new(m_AppDomain, klass);
 		if (!instance)
 		{
@@ -422,69 +533,71 @@ namespace Engine
 			return nullptr;
 		}
 
-		// Call constructor
 		mono_runtime_object_init(instance);
-
-		uint32_t handle = mono_gchandle_new(instance, false);
-		m_ObjectToHandle[instance] = handle;
-
 		return instance;
 	}
 
+	// ------------------------------------------------------------------------
+	// Handle-first creation (what ScriptComponent should use).
+	// ------------------------------------------------------------------------
+	uint32_t MonoScriptEngine::CreateScriptInstanceHandle(const std::string &className, MonoObject **outInstance, bool pinned)
+	{
+		MonoObject *obj = CreateScriptInstance(className);
+		if (!obj)
+		{
+			if (outInstance) *outInstance = nullptr;
+			return 0;
+		}
 
-	void MonoScriptEngine::DestroyScriptInstance(MonoObject* instance)
+		uint32_t handle = mono_gchandle_new(obj, pinned ? 1 : 0);
+		if (outInstance) *outInstance = obj;
+		return handle;
+	}
+
+	MonoObject *MonoScriptEngine::GetObjectFromGCHandle(uint32_t gcHandle)
+	{
+		if (gcHandle == 0)
+			return nullptr;
+
+		EnsureCorrectDomain();
+		return mono_gchandle_get_target(gcHandle);
+	}
+
+	void MonoScriptEngine::DestroyScriptHandle(uint32_t gcHandle)
+	{
+		if (gcHandle == 0)
+			return;
+
+		EnsureCorrectDomain();
+
+		MonoObject *obj = mono_gchandle_get_target(gcHandle);
+		if (obj && IsValidMonoObject(obj))
+		{
+			// Let CallMethod do lookup + exception printing
+			CallMethod(obj, "OnDestroy");
+		}
+
+		mono_gchandle_free(gcHandle);
+	}
+
+	void MonoScriptEngine::DestroyScriptInstance(MonoObject *instance)
 	{
 		if (!instance)
 			return;
 
-		// Look up the GC handle first
-		auto it = m_ObjectToHandle.find(instance);
-		if (it == m_ObjectToHandle.end())
-		{
-			LOG_WARNING("No GC handle found for instance during destroy");
+		EnsureCorrectDomain();
+
+		if (!IsValidMonoObject(instance))
 			return;
-		}
 
-		// Get fresh instance from handle
-		MonoObject* freshInstance = mono_gchandle_get_target(it->second);
-
-		if (freshInstance)
-		{
-			// Try to call OnDestroy with the fresh instance
-			try
-			{
-				MonoClass* klass = mono_object_get_class(freshInstance);
-				if (klass)
-				{
-					MonoMethod* destroyMethod = mono_class_get_method_from_name(klass, "OnDestroy", 0);
-					if (destroyMethod)
-					{
-						EnsureCorrectDomain();
-						mono_runtime_invoke(destroyMethod, freshInstance, nullptr, nullptr);
-					}
-				}
-			}
-			catch (...)
-			{
-				LOG_WARNING("Exception during OnDestroy call");
-			}
-		}
-
-		// Free the GC handle
-		mono_gchandle_free(it->second);
-		m_ObjectToHandle.erase(it);
-		LOG_INFO("Freed GC handle for script instance");
+		// Legacy: call OnDestroy only. Handle freeing is the caller's responsibility now.
+		CallMethod(instance, "OnDestroy");
 	}
 
 	MonoMethod *MonoScriptEngine::GetMethod(MonoClass *klass, const std::string &methodName, int paramCount)
 	{
-		if (!klass)
-		{
-			return nullptr;
-		}
-
-		MonoMethod *method = mono_class_get_method_from_name(klass, methodName.c_str(), paramCount);
-		return method;
+		if (!klass) return nullptr;
+		return mono_class_get_method_from_name(klass, methodName.c_str(), paramCount);
 	}
 
 	void MonoScriptEngine::CallMethod(MonoObject *instance, const std::string &methodName)
@@ -495,9 +608,8 @@ namespace Engine
 	void MonoScriptEngine::CallMethod(MonoObject *instance, const std::string &methodName, void **params, int paramCount)
 	{
 		if (!instance)
-		{
 			return;
-		}
+
 		EnsureCorrectDomain();
 
 		if (!IsValidMonoObject(instance))
@@ -505,16 +617,12 @@ namespace Engine
 			LOG_WARNING("CallMethod: Instance is from unloaded domain, skipping ", methodName);
 			return;
 		}
+
 		MonoClass *klass = mono_object_get_class(instance);
 		MonoMethod *method = GetMethod(klass, methodName, paramCount);
-
 		if (!method)
-		{
-			// Method doesn't exist, which is fine (not all scripts need all methods)
 			return;
-		}
 
-		// Invoke method
 		MonoObject *exception = nullptr;
 		mono_runtime_invoke(method, instance, params, &exception);
 
@@ -538,7 +646,6 @@ namespace Engine
 				exceptionName
 			);
 
-			// Get full managed exception string (includes stack trace)
 			MonoString *excStr = mono_object_to_string(exception, nullptr);
 			if (excStr)
 			{
@@ -550,44 +657,25 @@ namespace Engine
 				}
 			}
 		}
-
 	}
 
-	MonoObject* MonoScriptEngine::GetObjectFromHandle(void* instancePtr)
+	MonoObject *MonoScriptEngine::GetObjectFromHandle(void *instancePtr)
 	{
+		// Best-effort legacy helper:
+		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
 		if (!instancePtr)
 			return nullptr;
 
-		MonoObject* obj = (MonoObject*)instancePtr;
-
-		auto it = m_ObjectToHandle.find(obj);
-		if (it == m_ObjectToHandle.end())
-		{
-			LOG_WARNING("No GC handle found for instance");
+		MonoObject *obj = (MonoObject *)instancePtr;
+		if (!IsValidMonoObject(obj))
 			return nullptr;
-		}
 
-		// Verify handle is valid
-		if (it->second == 0)
-		{
-			LOG_WARNING("Invalid GC handle (0)");
-			return nullptr;
-		}
-
-		EnsureCorrectDomain();
-
-		// Get the actual object from the GC handle
-		MonoObject* target = mono_gchandle_get_target(it->second);
-
-		if (!target)
-		{
-			LOG_WARNING("GC handle target is null (object was collected)");
-			return nullptr;
-		}
-
-		return target;
+		return obj;
 	}
-	// Replace the existing SetFieldValue method in MonoScriptEngine with this corrected version:
+
+	// =========================
+	// Field access (unchanged)
+	// =========================
 
 	void MonoScriptEngine::SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value)
 	{
@@ -603,7 +691,6 @@ namespace Engine
 			return;
 		}
 
-		// Walk the inheritance chain to find a field or property called `fieldName`.
 		MonoClass *klass = mono_object_get_class(instance);
 		if (!klass)
 		{
@@ -611,11 +698,9 @@ namespace Engine
 			return;
 		}
 
-		// Get class name for logging
 		const char *className = mono_class_get_name(klass);
 		const char *classNs = mono_class_get_namespace(klass);
 
-		// 1) Try to find a FIELD with this name in the type hierarchy.
 		MonoClass *currentClass = klass;
 		MonoClassField *field = nullptr;
 
@@ -623,28 +708,16 @@ namespace Engine
 		{
 			field = mono_class_get_field_from_name(currentClass, fieldName.c_str());
 			if (field)
-			{
-				//LOG_INFO("[SetFieldValue] Found FIELD '", fieldName, "' in class ",
-				//	classNs ? classNs : "", classNs ? "." : "", className);
 				break;
-			}
 			currentClass = mono_class_get_parent(currentClass);
 		}
 
 		if (field)
 		{
-			// For fields, mono_field_set_value expects a POINTER to the value
 			mono_field_set_value(instance, field, value);
-
-			// Verify it was set (for uint32)
-			uint32_t readBack = 0;
-			mono_field_get_value(instance, field, &readBack);
-			//LOG_INFO("[SetFieldValue] Set field '", fieldName, "' to ", *(uint32_t *)value,
-			//	", read back: ", readBack);
 			return;
 		}
 
-		// 2) Fall back to a PROPERTY setter (supports auto-properties).
 		currentClass = klass;
 		MonoProperty *prop = nullptr;
 
@@ -652,11 +725,7 @@ namespace Engine
 		{
 			prop = mono_class_get_property_from_name(currentClass, fieldName.c_str());
 			if (prop)
-			{
-				LOG_INFO("[SetFieldValue] Found PROPERTY '", fieldName, "' in class ",
-					classNs ? classNs : "", classNs ? "." : "", className);
 				break;
-			}
 			currentClass = mono_class_get_parent(currentClass);
 		}
 
@@ -674,12 +743,7 @@ namespace Engine
 			return;
 		}
 
-		// CRITICAL FIX: For property setters, we need to pass a POINTER TO A POINTER
-		// The value pointer itself becomes the argument
 		void *args[1] = { value };
-
-		LOG_INFO("[SetFieldValue] Calling property setter for '", fieldName,
-			"' with value ", *(uint32_t *)value);
 
 		MonoObject *exception = nullptr;
 		mono_runtime_invoke(setter, instance, args, &exception);
@@ -694,41 +758,15 @@ namespace Engine
 				mono_free(excCStr);
 			return;
 		}
-
-		// Verify it was set by reading it back
-		MonoMethod *getter = mono_property_get_get_method(prop);
-		if (getter)
-		{
-			MonoObject *result = mono_runtime_invoke(getter, instance, nullptr, nullptr);
-			if (result)
-			{
-				void *unboxed = mono_object_unbox(result);
-				if (unboxed)
-				{
-					uint32_t readBack = *(uint32_t *)unboxed;
-					LOG_INFO("[SetFieldValue] Property '", fieldName, "' set to ",
-						*(uint32_t *)value, ", read back: ", readBack);
-
-					if (readBack != *(uint32_t *)value)
-					{
-						LOG_ERROR("[SetFieldValue] VALUE MISMATCH! Expected ", *(uint32_t *)value,
-							" but got ", readBack);
-					}
-				}
-			}
-		}
 	}
 
 	void *MonoScriptEngine::GetFieldValue(MonoObject *instance, const std::string &fieldName)
 	{
 		if (!instance)
-		{
 			return nullptr;
-		}
 
 		MonoClass *klass = mono_object_get_class(instance);
 		MonoClassField *field = mono_class_get_field_from_name(klass, fieldName.c_str());
-
 		if (!field)
 		{
 			LOG_ERROR("Field not found: ", fieldName);
@@ -748,2191 +786,930 @@ namespace Engine
 			return;
 		}
 
-		// Verify instance is from current domain
 		if (!IsValidMonoObject(instance))
 		{
 			LOG_ERROR("[BindEntityID] instance is from wrong/unloaded domain!");
 			return;
 		}
 
-		MonoClass *klass = mono_object_get_class(instance);
-		if (!klass)
-		{
-			LOG_ERROR("[BindEntityID] Failed to get class from instance");
-			return;
-		}
-
-		const char *className = mono_class_get_name(klass);
-		const char *classNs = mono_class_get_namespace(klass);
-
-		//LOG_INFO("[BindEntityID] Attempting to bind EntityID=", entityID, " to instance of ",
-		//	classNs ? classNs : "", classNs ? "." : "", className);
-
-		// Make a local copy - CRITICAL: pass the ADDRESS of this copy
 		std::uint32_t idCopy = entityID;
-
-		//LOG_INFO("[BindEntityID] Calling SetFieldValue with idCopy address: ",
-		//	(void *)&idCopy, ", value: ", idCopy);
-
-		// SetFieldValue needs the ADDRESS of the value
 		SetFieldValue(instance, "EntityID", &idCopy);
+	}
 
-		// VERIFICATION: Try to read it back multiple ways
-		//LOG_INFO("[BindEntityID] === Verification Phase ===");
+	bool MonoScriptEngine::HotReloadOnPlay(bool preserveManagedState)
+	{
+		ManagedFieldSnapshot snap{};
+		if (preserveManagedState)
+			snap = CaptureManagedState();
 
-		// Method 1: Try reading as a property
-		MonoProperty *prop = nullptr;
-		MonoClass *currentClass = klass;
+		if (!BuildGameScripts())
+			return false;
 
-		while (currentClass && !prop)
+		if (!ReloadDomainAndAssembly())
+			return false;
+
+		RebindAllScriptComponents();
+
+		if (preserveManagedState)
+			RestoreManagedState(snap);
+
+		return true;
+	}
+
+
+	ManagedFieldSnapshot MonoScriptEngine::CaptureManagedState()
+	{
+		ManagedFieldSnapshot out{};
+
+		Scene *scene = InternalCalls::s_CurrentScene;
+		if (!scene)
+			return out;
+
+		auto &reg = scene->GetRegistry();
+
+		auto view = reg.view<ScriptComponent>();
+		for (auto ent : view)
 		{
-			prop = mono_class_get_property_from_name(currentClass, "EntityID");
-			currentClass = mono_class_get_parent(currentClass);
+			auto &sc = view.get<ScriptComponent>(ent);
+			if (!sc.ScriptInstance)
+				continue;
+
+			MonoObject *instance = static_cast<MonoObject *>(sc.ScriptInstance);
+			MonoClass *klass = mono_object_get_class(instance);
+			if (!klass)
+				continue;
+
+			const uint64_t eid = static_cast<uint64_t>(static_cast<uint32_t>(ent));
+			const std::string classKey = sc.ScriptClassName.empty()
+				? std::string(mono_class_get_name(klass))
+				: sc.ScriptClassName;
+
+			void *iter = nullptr;
+			MonoClassField *field = nullptr;
+
+			while ((field = mono_class_get_fields(klass, &iter)) != nullptr)
+			{
+				if (!ShouldSerializeField(field))
+					continue;
+
+				const char *fname = mono_field_get_name(field);
+				if (!fname || !fname[0])
+					continue;
+
+				std::vector<uint8_t> payload = SerializeFieldValue(instance, field);
+				if (payload.empty())
+					continue;
+
+				out.data[eid][classKey][fname] = std::move(payload);
+			}
 		}
 
-		if (prop)
-		{
-			MonoMethod *getter = mono_property_get_get_method(prop);
-			if (getter)
-			{
-				MonoObject *exception = nullptr;
-				MonoObject *result = mono_runtime_invoke(getter, instance, nullptr, &exception);
+		return out;
+	}
 
-				if (exception)
+	void MonoScriptEngine::RestoreManagedState(const ManagedFieldSnapshot &snap)
+	{
+		Scene *scene = InternalCalls::s_CurrentScene;
+		if (!scene)
+			return;
+
+		EnsureCorrectDomain();
+
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
+
+		for (auto ent : view)
+		{
+			const std::uint32_t eid = static_cast<std::uint32_t>(ent);
+
+			auto itEnt = snap.data.find(eid);
+			if (itEnt == snap.data.end())
+				continue;
+
+			auto &sc = view.get<ScriptComponent>(ent);
+
+			MonoObject *instance = nullptr;
+
+			// Prefer GCHandle if the component has it
+			if constexpr (has_gchandle<ScriptComponent>::value)
+			{
+				if (sc.GCHandle != 0)
+					instance = GetObjectFromGCHandle(sc.GCHandle);
+			}
+
+			// Fallback to raw ScriptInstance if present
+			if (!instance)
+			{
+				if constexpr (has_scriptinstance<ScriptComponent>::value)
+					instance = static_cast<MonoObject *>(sc.ScriptInstance);
+			}
+
+			if (!instance || !IsValidMonoObject(instance))
+				continue;
+
+			MonoClass *klass = mono_object_get_class(instance);
+			if (!klass)
+				continue;
+
+			// Snapshot groups by class name; we only restore the block matching this component's class
+			const std::string classKey = sc.ScriptClassName.empty()
+				? std::string(mono_class_get_name(klass))
+				: sc.ScriptClassName;
+
+			auto itClass = itEnt->second.find(classKey);
+			if (itClass == itEnt->second.end())
+				continue;
+
+			for (const auto &[fieldName, bytes] : itClass->second)
+			{
+				if (bytes.empty())
+					continue;
+
+				// Resolve field (walk parents like your SetFieldValue does)
+				MonoClass *cur = klass;
+				MonoClassField *field = nullptr;
+				while (cur && !field)
 				{
-					MonoString *excStr = mono_object_to_string(exception, nullptr);
-					char *cStr = excStr ? mono_string_to_utf8(excStr) : nullptr;
-					//LOG_ERROR("[BindEntityID] Exception reading EntityID property: ",
-					//	cStr ? cStr : "<null>");
-					if (cStr) mono_free(cStr);
+					field = mono_class_get_field_from_name(cur, fieldName.c_str());
+					if (field) break;
+					cur = mono_class_get_parent(cur);
 				}
-				else if (result)
-				{
-					void *unboxed = mono_object_unbox(result);
-					if (unboxed)
+				if (!field)
+					continue;
+
+				const uint8_t tag = bytes[0];
+				const uint8_t *p = bytes.data() + 1;
+				const size_t n = bytes.size() - 1;
+
+				auto need = [&](size_t k)
 					{
-						uint32_t verifyID = *reinterpret_cast<uint32_t *>(unboxed);
-						if (verifyID == entityID)
-						{
-							//LOG_INFO("[BindEntityID] SUCCESS! EntityID=", entityID,
-							//	" verified via property getter");
-						}
-						else
-						{
-							//LOG_ERROR("[BindEntityID] FAILED! Set ", entityID,
-							//	" but property getter returned ", verifyID);
-						}
-						return; // Exit after property check
-					}
-					else
-					{
-						LOG_ERROR("[BindEntityID] Failed to unbox property result");
-					}
-				}
-				else
+						return n >= k;
+					};
+
+				switch (static_cast<SnapType>(tag))
 				{
-					LOG_ERROR("[BindEntityID] Property getter returned null");
+				case SnapType::Bool:
+				{
+					if (!need(sizeof(uint8_t))) break;
+					uint8_t v;
+					std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
 				}
+				case SnapType::I1:
+				{
+					if (!need(sizeof(int8_t))) break;
+					int8_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U1:
+				{
+					if (!need(sizeof(uint8_t))) break;
+					uint8_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I2:
+				{
+					if (!need(sizeof(int16_t))) break;
+					int16_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U2:
+				{
+					if (!need(sizeof(uint16_t))) break;
+					uint16_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I4:
+				{
+					if (!need(sizeof(int32_t))) break;
+					int32_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U4:
+				{
+					if (!need(sizeof(uint32_t))) break;
+					uint32_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::I8:
+				{
+					if (!need(sizeof(int64_t))) break;
+					int64_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::U8:
+				{
+					if (!need(sizeof(uint64_t))) break;
+					uint64_t v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::R4:
+				{
+					if (!need(sizeof(float))) break;
+					float v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::R8:
+				{
+					if (!need(sizeof(double))) break;
+					double v; std::memcpy(&v, p, sizeof(v));
+					mono_field_set_value(instance, field, &v);
+					break;
+				}
+				case SnapType::StringUtf8:
+				{
+					if (!need(sizeof(uint32_t))) break;
+
+					uint32_t len = 0;
+					std::memcpy(&len, p, sizeof(len));
+					p += sizeof(uint32_t);
+
+					if ((bytes.data() + bytes.size()) < (p + len))
+						break;
+
+					MonoString *ms = mono_string_new_len(m_AppDomain, reinterpret_cast<const char *>(p), static_cast<uint32_t>(len));
+					mono_field_set_value(instance, field, &ms); // note: pass address for ref types
+					break;
+				}
+				case SnapType::RawValue:
+				{
+					if (!need(sizeof(uint32_t))) break;
+
+					uint32_t sz = 0;
+					std::memcpy(&sz, p, sizeof(sz));
+					p += sizeof(uint32_t);
+
+					if ((bytes.data() + bytes.size()) < (p + sz))
+						break;
+
+					// Set raw bytes for blittable valuetype
+					std::vector<uint8_t> tmp(sz);
+					std::memcpy(tmp.data(), p, sz);
+					mono_field_set_value(instance, field, tmp.data());
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	bool MonoScriptEngine::BuildGameScripts()
+	{
+#if defined(_DEBUG) || defined(DEBUG)
+		const char *cfg = "Debug";
+#else
+		const char *cfg = "Release";
+#endif
+
+		WCHAR exePathW[MAX_PATH] = { 0 };
+		GetModuleFileNameW(NULL, exePathW, MAX_PATH);
+		std::filesystem::path exeDir = std::filesystem::path(exePathW).parent_path();
+
+		std::filesystem::path projectRoot = exeDir.parent_path().parent_path().parent_path();
+		std::filesystem::path scriptProjectPath = projectRoot / "Scripts" / "GameScripts.csproj";
+		std::filesystem::path scriptsDir = scriptProjectPath.parent_path();
+
+		if (!std::filesystem::exists(scriptProjectPath))
+		{
+			LOG_ERROR("[HotReloadOnPlay] Missing csproj: ", scriptProjectPath.string());
+			return false;
+		}
+
+		// Build command
+		std::string cmd = "cmd.exe /C \"dotnet build \"" + scriptProjectPath.string() + "\" --configuration " + cfg + "\"";
+
+		STARTUPINFOA si{};
+		PROCESS_INFORMATION pi{};
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW;
+		si.wShowWindow = SW_HIDE;
+
+		std::vector<char> cmdBuf(cmd.begin(), cmd.end());
+		cmdBuf.push_back('\0');
+
+		const std::string workDir = projectRoot.string();
+
+		BOOL ok = CreateProcessA(
+			nullptr,
+			cmdBuf.data(),
+			nullptr, nullptr,
+			FALSE,
+			CREATE_NO_WINDOW,
+			nullptr,
+			workDir.c_str(),
+			&si, &pi);
+
+		if (!ok)
+		{
+			DWORD err = GetLastError();
+			LOG_ERROR("[HotReloadOnPlay] Failed to start build. GetLastError=", (int)err);
+			LOG_ERROR("[HotReloadOnPlay] Cmd: ", cmd);
+			LOG_ERROR("[HotReloadOnPlay] WorkDir: ", workDir);
+			return false;
+		}
+
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		DWORD exitCode = 1;
+		GetExitCodeProcess(pi.hProcess, &exitCode);
+
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+
+		if (exitCode != 0)
+		{
+			LOG_ERROR("[HotReloadOnPlay] dotnet build failed, exit code: ", exitCode);
+			return false;
+		}
+
+		std::vector<std::filesystem::path> candidates = {
+			scriptsDir / "obj" / cfg / "GameScripts.dll",
+			scriptsDir / "bin" / cfg / "GameScripts.dll"
+		};
+
+		std::filesystem::path builtDll;
+		for (auto &c : candidates)
+		{
+			if (std::filesystem::exists(c))
+			{
+				builtDll = c;
+				break;
+			}
+		}
+
+		if (builtDll.empty())
+		{
+			// fallback: recursive search in Scripts/bin + Scripts/obj
+			for (auto root : { scriptsDir / "bin", scriptsDir / "obj" })
+			{
+				if (!std::filesystem::exists(root)) continue;
+				for (auto &e : std::filesystem::recursive_directory_iterator(root))
+				{
+					if (e.is_regular_file() && e.path().filename() == "GameScripts.dll")
+					{
+						builtDll = e.path();
+						break;
+					}
+				}
+				if (!builtDll.empty()) break;
+			}
+		}
+
+		if (builtDll.empty())
+		{
+			LOG_ERROR("[HotReloadOnPlay] Build succeeded but GameScripts.dll not found under Scripts/bin or Scripts/obj");
+			return false;
+		}
+
+		// Copy beside exe and load that
+		std::filesystem::path outDll = exeDir / "GameScripts.dll";
+		std::filesystem::path tmpDll = exeDir / "GameScripts.dll.tmp";
+
+		try
+		{
+			std::filesystem::copy_file(builtDll, tmpDll, std::filesystem::copy_options::overwrite_existing);
+			if (std::filesystem::exists(outDll))
+				std::filesystem::remove(outDll);
+			std::filesystem::rename(tmpDll, outDll);
+		}
+		catch (const std::exception &e)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Failed to swap output DLL: ", e.what());
+			return false;
+		}
+
+		m_AssemblyPath = outDll.string();
+
+		LOG_INFO("[HotReloadOnPlay] Build OK");
+		LOG_INFO("  csproj:    ", scriptProjectPath.string());
+		LOG_INFO("  built:     ", builtDll.string());
+		LOG_INFO("  output:    ", m_AssemblyPath);
+
+		return true;
+	}
+
+	bool MonoScriptEngine::ReloadDomainAndAssembly()
+	{
+		if (!m_RootDomain)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Mono not initialized");
+			return false;
+		}
+
+		// FIXED: Handle both single-domain and multi-domain modes
+		if (m_AppDomain)
+		{
+			// Switch to root domain before unloading
+			mono_domain_set(m_RootDomain, false);
+
+			if (m_AppDomain != m_RootDomain)
+			{
+				// Multi-domain mode: unload the separate app domain
+				LOG_INFO("[HotReloadOnPlay] Unloading separate app domain...");
+				mono_domain_unload(m_AppDomain);
 			}
 			else
 			{
-				LOG_WARNING("[BindEntityID] Property has no getter");
+				// Single-domain mode: can't unload root domain
+				// Instead, we rely on assembly hot-swapping if supported by Mono
+				LOG_WARNING("[HotReloadOnPlay] Single-domain mode: cannot unload assemblies cleanly.");
+				LOG_WARNING("  Recommend switching to multi-domain mode for proper hot reload.");
+				LOG_WARNING("  Current reload will attempt to load new assembly but old one remains in memory.");
 			}
+
+			m_AppDomain = nullptr;
 		}
 
-		// Method 2: Try reading as a field
-		currentClass = klass;
-		MonoClassField *field = nullptr;
+		// Clear old assembly references
+		UnloadAssembly();
 
-		while (currentClass && !field)
+		// Create new domain for scripts
+		const char *domainName = "GameScriptsDomain";
+		MonoDomain *newDomain = mono_domain_create_appdomain(const_cast<char *>(domainName), nullptr);
+
+		if (!newDomain)
 		{
-			field = mono_class_get_field_from_name(currentClass, "EntityID");
-			currentClass = mono_class_get_parent(currentClass);
-		}
-
-		if (field)
-		{
-			uint32_t verifyID = 0;
-			mono_field_get_value(instance, field, &verifyID);
-
-			if (verifyID == entityID)
-			{
-				LOG_INFO("[BindEntityID] SUCCESS! EntityID=", entityID,
-					" verified via field access");
-			}
-			else
-			{
-				LOG_ERROR("[BindEntityID] FAILED! Set ", entityID,
-					" but field access returned ", verifyID);
-			}
+			LOG_ERROR("[HotReloadOnPlay] Failed to create new app domain");
+			LOG_WARNING("  Falling back to root domain (hot reload will be imperfect)");
+			m_AppDomain = m_RootDomain;
 		}
 		else
 		{
-			LOG_ERROR("[BindEntityID] Could not find EntityID as field or property!");
+			m_AppDomain = newDomain;
+			LOG_INFO("[HotReloadOnPlay] Created new app domain: ", (uintptr_t)newDomain);
 		}
+
+		// Switch to the app domain
+		mono_domain_set(m_AppDomain, false);
+
+		if (m_AssemblyPath.empty())
+		{
+			LOG_ERROR("[HotReloadOnPlay] m_AssemblyPath is empty; did BuildGameScripts() run?");
+			return false;
+		}
+
+		// Load the new assembly
+		LoadAssembly(m_AssemblyPath);
+
+		if (!m_AppAssembly || !m_AppImage)
+		{
+			LOG_ERROR("[HotReloadOnPlay] Assembly load failed: ", m_AssemblyPath);
+			return false;
+		}
+
+		LOG_INFO("[HotReloadOnPlay] Successfully loaded new assembly");
+		return true;
 	}
 
-	// ------------------------------------------------
-	// Helper: Initialize ScriptComponent for new entity
-	// ------------------------------------------------
-	static void InitializeScriptComponentForEntity(Entity entity)
+	void MonoScriptEngine::RebindAllScriptComponents()
 	{
-		if (!entity)
-			return;
-
-		if (!entity.HasComponent<ScriptComponent>())
-			return;
-
-		auto &sc = entity.GetComponent<ScriptComponent>();
-
-		// No script assigned on this entity
-		if (sc.ScriptClassName.empty())
-			return;
-
-		auto &se = MonoScriptEngine::GetInstance();
-
-		uint64_t eid = static_cast<uint32_t>(entity);
-
-		// If there's already a managed instance (e.g. cloned from prefab),
-		// just (re)bind EntityID to be safe.
-		if (sc.ScriptInstance)
+		Scene *scene = Engine::s_ScriptingSceneContext;
+		if (!scene)
 		{
-			LOG_INFO("[Prefab] Rebinding EntityID on existing script instance '",
-				sc.ScriptClassName, "' for entity ", eid);
-			se.BindEntityID(static_cast<MonoObject *>(sc.ScriptInstance), eid);
+			LOG_ERROR("[RebindAllScriptComponents] No scene context");
 			return;
 		}
 
-		// Otherwise create a fresh managed instance
-		MonoObject *instance = se.CreateScriptInstance(sc.ScriptClassName);
-		if (!instance)
+		if (!m_AppDomain || !m_AppImage)
 		{
-			LOG_ERROR("[Prefab] Failed to create script instance for class '",
-				sc.ScriptClassName, "' on entity ", eid);
+			LOG_ERROR("[RebindAllScriptComponents] App domain/image not ready");
 			return;
 		}
 
-		se.BindEntityID(instance, eid);
+		EnsureCorrectDomain();
 
-		sc.ScriptInstance = instance;
-		sc.Started = false; // ScriptSystem will call OnStart on next update
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
 
-		LOG_INFO("[Prefab] Initialized script '", sc.ScriptClassName,
-			"' for entity ", eid, " and bound EntityID");
+		std::uint32_t rebuilt = 0;
+		std::uint32_t failed = 0;
+
+		for (auto ent : view)
+		{
+			auto &sc = view.get<ScriptComponent>(ent);
+
+			if (sc.ScriptClassName.empty())
+				continue;
+
+			// FIXED: Safe cleanup of old handles
+			if (sc.GCHandle != 0)
+			{
+				// In multi-domain mode, the old domain is already unloaded,
+				// so we can't validate. Just free the handle number.
+				// Mono will handle the case where the domain is gone.
+				try
+				{
+					mono_gchandle_free(sc.GCHandle);
+				}
+				catch (...)
+				{
+					LOG_WARNING("[RebindAllScriptComponents] Exception freeing old GCHandle (expected if domain unloaded)");
+				}
+				sc.GCHandle = 0;
+			}
+
+			sc.ScriptInstance = nullptr;
+			sc.Started = false;
+
+			// Create new instance in the new domain
+			MonoObject *created = nullptr;
+			uint32_t handle = CreateScriptInstanceHandle(sc.ScriptClassName, &created, false);
+
+			if (handle == 0 || !created)
+			{
+				LOG_WARNING("[RebindAllScriptComponents] Failed to create: ", sc.ScriptClassName);
+				++failed;
+				continue;
+			}
+
+			// Bind entity ID to the new instance
+			BindEntityID(created, static_cast<std::uint32_t>(ent));
+
+			sc.GCHandle = handle;
+			sc.ScriptInstance = created;
+			sc.Started = false;
+
+			++rebuilt;
+		}
+
+		LOG_INFO("[RebindAllScriptComponents] Complete: rebuilt=", rebuilt, " failed=", failed);
 	}
 
-	// ============================================
-	// Internal Calls - C++ functions callable from C#
-	// ============================================
-
-	// Forward declarations for internal call functions
-	namespace InternalCalls
+	// Context setters
+	void SetScriptingInputSystem(Input *input)
 	{
-		static uint64_t Scene_CreateEntity(MonoString *nameStr);
-		static void     Scene_DestroyEntity(uint64_t entityID);
-		static void     Entity_AddScript(uint64_t entityID, MonoString *classFullNameStr);
+		InternalCalls::SetInputSystem(input);
+	}
+	void SetScriptingCurrentScene(Scene *scene)
+	{
+		Engine::s_ScriptingSceneContext = scene;
+		InternalCalls::SetCurrentScene(scene);
+	}
+	void SetScriptingAudioManager(AudioManager *audioManager)
+	{
+		InternalCalls::SetAudioManager(audioManager);
+	}
 
-		static void Log(MonoString *message);
-		static void LogError(MonoString *message);
-		static void LogWarning(MonoString *message);
+	static void BindInternalCall(const char *managedName, void *fn)
+	{
+		mono_add_internal_call(managedName, fn);
+	}
 
-		static uint64_t Entity_GetEntityID(MonoObject *entityObj);
-		static uint64_t Scene_FindEntityByName(MonoString *nameString);
-		static bool Entity_HasComponent(uint64_t entityID, MonoReflectionType *componentType);
-
-		static void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition);
-		static void Transform_SetPosition(uint64_t entityID, glm::vec3 *position);
-		static void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation);
-		static void Transform_SetRotation(uint64_t entityID, glm::quat *rotation);
-		static void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale);
-		static void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);
-
-		static bool Input_IsKeyPressed(int keyCode);
-		static bool Input_IsMouseButtonPressed(int button);
-		static void Input_GetMousePosition(glm::vec2 *outPosition);
-		static bool Input_IsKeyReleased(int keyCode);
-		//static Input* s_InputSystem = nullptr;  // Will be set later!
-
-		// Event System
-		static void Event_Publish(MonoString *nameStr, MonoString *payloadStr);
-
-		// Prefab instantiation
-		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr);
-		static uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr);
-		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::quat *rotation, glm::vec3 *scale, bool isScenePrefab);
-
-		//Physics bindings
-		static void Entity_AddRigidBody(uint64_t entityID);
-
-		// ---- Rigidbody velocity access (ECS-level) ----
-		static void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel);
-		static void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel);
-		static void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta);
-
-		// ---- Rigidbody scalar properties ----
-		static float Rigidbody_GetMass(uint64_t entityID);
-		static void  Rigidbody_SetMass(uint64_t entityID, float mass);
-		static bool  Rigidbody_GetIsKinematic(uint64_t entityID);
-		static void  Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic);
-		static bool  Rigidbody_GetUseGravity(uint64_t entityID);
-		static void  Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity);
-
-		// ---- Rigidbody helpers ----
-		static float Rigidbody_GetSpeed(uint64_t entityID);
-		static bool  Rigidbody_IsMoving(uint64_t entityID);
-		static bool  Rigidbody_IsStatic(uint64_t entityID);
-
-		// ---- Rigidbody forces ----
-		static void  Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force);
-		static void  Rigidbody_Stop(uint64_t entityID);
-
-
-		// ---- Collision events (via PhysicsAPI only) ----
-		static void Physics_EnableCollisionEvents();
-		static void Physics_BeginCollisionFrame();
-		static int  Physics_GetCollisionCount();
-		static void Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b);
-
-		// Collision events
-		static void  Physics_EnableCollisionEvents();
-		static void  Physics_BeginCollisionFrame();
-		static int   Physics_GetCollisionCount();
-		static void  Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b);
-
-		// ===== Entity / component adders =====
-		static void Entity_AddTag(uint64_t entityID);
-		static void Entity_AddCamera(uint64_t entityID);
-		static void Entity_AddAudio(uint64_t entityID);
-		static void Entity_AddMeshRenderer(uint64_t entityID);
-
-		// ===== TagComponent =====
-		static MonoString *Tag_GetTag(uint64_t entityID);
-		static void        Tag_SetTag(uint64_t entityID, MonoString *tag);
-		static MonoArray *Scene_FindEntitiesByTag(MonoString *tagString);
-
-		// ===== CameraComponent =====
-		static bool  Camera_GetEnabled(uint64_t entityID);
-		static void  Camera_SetEnabled(uint64_t entityID, bool enabled);
-		static bool  Camera_GetPrimary(uint64_t entityID);
-		static void  Camera_SetPrimary(uint64_t entityID, bool primary);
-		static float Camera_GetFOV(uint64_t entityID);
-		static void  Camera_SetFOV(uint64_t entityID, float fov);
-		static float Camera_GetNear(uint64_t entityID);
-		static void  Camera_SetNear(uint64_t entityID, float nearPlane);
-		static float Camera_GetFar(uint64_t entityID);
-		static void  Camera_SetFar(uint64_t entityID, float farPlane);
-		static void  Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget);
-		static void  Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget);
-
-		// ===== MeshRendererComponent =====
-		static bool MeshRenderer_GetVisible(uint64_t entityID);
-		static void MeshRenderer_SetVisible(uint64_t entityID, bool visible);
-		static bool MeshRenderer_GetShadowCast(uint64_t entityID);
-		static void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast);
-		static bool MeshRenderer_GetShadowReceive(uint64_t entityID);
-		static void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive);
-		static bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID);
-		static void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi);
-
-		// ===== AudioComponent =====
-		static void  Audio_Play(uint64_t entityID);
-		static void  Audio_Stop(uint64_t entityID);
-		static void  Audio_Pause(uint64_t entityID);
-
-		static float Audio_GetVolume(uint64_t entityID);
-		static void  Audio_SetVolume(uint64_t entityID, float volume);
-
-		static float Audio_GetPitch(uint64_t entityID);
-		static void  Audio_SetPitch(uint64_t entityID, float pitch);
-
-		static bool  Audio_GetLoop(uint64_t entityID);
-		static void  Audio_SetLoop(uint64_t entityID, bool loop);
-
-		static bool  Audio_GetMute(uint64_t entityID);
-		static void  Audio_SetMute(uint64_t entityID, bool mute);
-
-		static bool  Audio_GetIs3D(uint64_t entityID);
-		static void  Audio_SetIs3D(uint64_t entityID, bool is3d);
-
-		static void  Audio_SetFile(uint64_t entityID, MonoString *path);
-
-		static float Audio_GetMinDistance(uint64_t entityID);
-		static void Audio_SetMinDistance(uint64_t entityID, float minDist);
-		static float Audio_GetMaxDistance(uint64_t entityID);
-		static void Audio_SetMaxDistance(uint64_t entityID, float maxDist);
-		static int Audio_GetRolloffMode(uint64_t entityID);
-		static void Audio_SetRolloffMode(uint64_t entityID, int mode);
-		static float Audio_GetDopplerLevel(uint64_t entityID);
-		static void Audio_SetDopplerLevel(uint64_t entityID, float level);
-		static float Audio_GetPan2D(uint64_t entityID);
-		static void Audio_SetPan2D(uint64_t entityID, float pan);
-		static float Audio_GetReverbMix(uint64_t entityID);
-		static void Audio_SetReverbMix(uint64_t entityID, float mix);
-
-		// ===== AudioManager =====
-		static void AudioManager_SetGroupVolume(int groupType, float volume);
-		static float AudioManager_GetGroupVolume(int groupType);
-		static void AudioManager_SetGroupPitch(int groupType, float pitch);
-		static float AudioManager_GetGroupPitch(int groupType);
-		static void AudioManager_SetGroupMute(int groupType, bool mute);
-		static bool AudioManager_IsGroupMuted(int groupType);
-
-		static void AudioManager_PauseGroup(int groupType, bool pause);
-		static void AudioManager_PauseAll(bool pause);
-		static void AudioManager_StopByType(int groupType);
-		static void AudioManager_StopAll();
-
-		static void AudioManager_CreateDSP(int groupType, int effectType);
-		static void AudioManager_EnableDSP(int groupType, int effectType, bool enable);
-		static void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value);
-		static void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType);
-		static void AudioManager_ReleaseDSPByGroup(int groupType);
-		static void AudioManager_ReleaseAllDSPs();
-
-		static void AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
-			glm::vec3 *up, glm::vec3 *velocity);
-
-
-		static bool EntityHasCamera(uint64_t entityID);
-		static bool EntityHasRigidBody(uint64_t entityID);
-		static int  Transform_GetParent(uint64_t entityID);
-
-		// GLM Functions exposed
-		// Quaternion creation from axis-angle
-		static void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat);
-
-		// Extract forward vector from quaternion
-		static void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward);
-
-		// Extract right vector
-		static void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight);
-
-		// Extract up vector
-		static void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp);
-
-		// Rotate vector by quaternion
-		static void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec);
-
-		// Multiply quaternions (combine rotations)
-		static void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat);
-
-		// SLERP interpolation
-		static void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat);
-
-		// Inverse quaternion
-		static void Quat_Inverse(glm::quat *quat, glm::quat *outQuat);
-
-		// Convert quaternion to Euler angles
-		static void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler);
-
-		// Create quaternion from Euler angles
-		static void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat);
-
-		// Normalize quaternion
-		static void Quat_Normalize(glm::quat *quat, glm::quat *outQuat);
-
-		// Get quaternion length
-		static float Quat_Length(glm::quat *quat);
-
-		// Quaternion dot product
-		static float Quat_Dot(glm::quat *q1, glm::quat *q2);
-
-		static void Input_GetMouseDelta(float *outX, float *outY);
-
+	template <typename T>
+	static void BindInternalCall(const char *managedName, T fn)
+	{
+		mono_add_internal_call(managedName, reinterpret_cast<void *>(fn));
 	}
 
 	void MonoScriptEngine::RegisterInternalCalls()
 	{
 		LOG_INFO("Registering internal calls...");
 
-		// ECS Bindings
-		mono_add_internal_call("Engine.InternalCalls::Scene_CreateEntity", (void *)InternalCalls::Scene_CreateEntity);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddScript", (void *)InternalCalls::Entity_AddScript);
-		mono_add_internal_call("Engine.InternalCalls::Scene_DestroyEntity", (void *)InternalCalls::Scene_DestroyEntity);
+		// =====================================================================
+		// ECS / Scene
+		// =====================================================================
+		BindInternalCall("Engine.Scene::Scene_CreateEntity",
+			reinterpret_cast<void *>(InternalCalls::Scene_CreateEntity));
+		BindInternalCall("Engine.Scene::Scene_DestroyEntity",
+			reinterpret_cast<void *>(InternalCalls::Scene_DestroyEntity));
+		BindInternalCall("Engine.Scene::Scene_FindEntityByName",
+			reinterpret_cast<void *>(InternalCalls::Scene_FindEntityByName));
+		BindInternalCall("Engine.Scene::Scene_FindEntitiesByTag",
+			reinterpret_cast<void *>(InternalCalls::Scene_FindEntitiesByTag));
+		BindInternalCall("Engine.Scene::Entity_AddScript",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddScript));
+		BindInternalCall("Engine.Scene::Entity_AddRigidBody",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddRigidBody));
+		BindInternalCall("Engine.Scene::Entity_AddCamera",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddCamera));
+		BindInternalCall("Engine.Scene::Entity_AddAudio",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddAudio));
+		BindInternalCall("Engine.Scene::Entity_AddMeshRenderer",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddMeshRenderer));
+		BindInternalCall("Engine.Scene::Entity_AddTag",
+			reinterpret_cast<void *>(InternalCalls::Entity_AddTag));
 
-
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetParent", (void *)InternalCalls::Transform_GetParent);
-
-		// Logging
-		mono_add_internal_call("Engine.InternalCalls::Log", (void *)InternalCalls::Log);
-		mono_add_internal_call("Engine.InternalCalls::LogError", (void *)InternalCalls::LogError);
-		mono_add_internal_call("Engine.InternalCalls::LogWarning", (void *)InternalCalls::LogWarning);
-
-		// Entity
-		mono_add_internal_call("Engine.Entity::GetEntityID_Native", (void *)InternalCalls::Entity_GetEntityID);
-		mono_add_internal_call("Engine.Entity::HasComponent_Native", (void *)InternalCalls::Entity_HasComponent);
-
-		// Prefab
-		mono_add_internal_call("Engine.InternalCalls::Prefab_Instantiate", (void *)InternalCalls::Prefab_Instantiate);
-		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateScene", (void *)InternalCalls::Prefab_InstantiateScene);
-		mono_add_internal_call("Engine.InternalCalls::Prefab_InstantiateWithTransform", (void *)InternalCalls::Prefab_InstantiateWithTransform);
-
+		// =====================================================================
 		// Transform
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetPosition", (void *)InternalCalls::Transform_GetPosition);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetPosition", (void *)InternalCalls::Transform_SetPosition);
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetRotation", (void *)InternalCalls::Transform_GetRotation);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetRotation", (void *)InternalCalls::Transform_SetRotation);
-		mono_add_internal_call("Engine.InternalCalls::Transform_GetScale", (void *)InternalCalls::Transform_GetScale);
-		mono_add_internal_call("Engine.InternalCalls::Transform_SetScale", (void *)InternalCalls::Transform_SetScale);
+		// =====================================================================
+		BindInternalCall("Engine.Transform::Transform_GetParent",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetParent));
+		BindInternalCall("Engine.Transform::Transform_GetPosition",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetPosition));
+		BindInternalCall("Engine.Transform::Transform_SetPosition",
+			reinterpret_cast<void *>(InternalCalls::Transform_SetPosition));
+		BindInternalCall("Engine.Transform::Transform_GetRotation",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetRotation));
+		BindInternalCall("Engine.Transform::Transform_SetRotation",
+			reinterpret_cast<void *>(InternalCalls::Transform_SetRotation));
+		BindInternalCall("Engine.Transform::Transform_GetScale",
+			reinterpret_cast<void *>(InternalCalls::Transform_GetScale));
+		BindInternalCall("Engine.Transform::Transform_SetScale",
+			reinterpret_cast<void *>(InternalCalls::Transform_SetScale));
 
+		// =====================================================================
+		// Logging
+		// =====================================================================
+		BindInternalCall("Engine.Logger::LogMessage",
+			reinterpret_cast<void *>(InternalCalls::LogMessage));
+		BindInternalCall("Engine.Logger::LogError",
+			reinterpret_cast<void *>(InternalCalls::LogError));
+		BindInternalCall("Engine.Logger::LogWarning",
+			reinterpret_cast<void *>(InternalCalls::LogWarning));
+
+		// =====================================================================
+		// Entity helpers
+		// =====================================================================
+		BindInternalCall("Engine.Entity::GetEntityID_Native",
+			reinterpret_cast<void *>(InternalCalls::Entity_GetEntityID));
+		BindInternalCall("Engine.Entity::HasComponent_Native",
+			reinterpret_cast<void *>(InternalCalls::Entity_HasComponent));
+
+		// =====================================================================
+		// Prefab
+		// =====================================================================
+		BindInternalCall("Engine.Prefab::Prefab_Instantiate",
+			reinterpret_cast<void *>(InternalCalls::Prefab_Instantiate));
+		BindInternalCall("Engine.Prefab::Prefab_InstantiateScene",
+			reinterpret_cast<void *>(InternalCalls::Prefab_InstantiateScene));
+		BindInternalCall("Engine.Prefab::Prefab_InstantiateWithTransform",
+			reinterpret_cast<void *>(InternalCalls::Prefab_InstantiateWithTransform));
+
+		// =====================================================================
 		// Input
-		mono_add_internal_call("Engine.Input::IsKeyPressed_Native", (void *)InternalCalls::Input_IsKeyPressed);
-		mono_add_internal_call("Engine.Input::IsMouseButtonPressed_Native", (void *)InternalCalls::Input_IsMouseButtonPressed);
-		mono_add_internal_call("Engine.Input::GetMousePosition_Native", (void *)InternalCalls::Input_GetMousePosition);
-		mono_add_internal_call("Engine.Input::IsKeyReleased_Native", (void *)InternalCalls::Input_IsKeyReleased);
-		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntityByName", (void *)InternalCalls::Scene_FindEntityByName);
+		// =====================================================================
+		BindInternalCall("Engine.Input::IsKeyPressed_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_IsKeyPressed));
+		BindInternalCall("Engine.Input::IsKeyReleased_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_IsKeyReleased));
+		BindInternalCall("Engine.Input::IsMouseButtonPressed_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_IsMouseButtonPressed));
+		BindInternalCall("Engine.Input::GetMousePosition_Native",
+			reinterpret_cast<void *>(InternalCalls::Input_GetMousePosition));
+		BindInternalCall("Engine.Input::Input_GetMouseDelta",
+			reinterpret_cast<void *>(InternalCalls::Input_GetMouseDelta));
 
+		// =====================================================================
+		// Rigidbody
+		// =====================================================================
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetVelocity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetVelocity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddVelocity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddVelocity));
+
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetMass",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetMass));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetMass",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetMass));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetIsKinematic",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetIsKinematic));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetIsKinematic",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetIsKinematic));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetUseGravity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetUseGravity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetUseGravity",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_SetUseGravity));
+
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetSpeed",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_GetSpeed));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_IsMoving",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_IsMoving));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_IsStatic",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_IsStatic));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddForce",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_AddForce));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_Stop",
+			reinterpret_cast<void *>(InternalCalls::Rigidbody_Stop));
+
+		// =====================================================================
 		// Physics
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddRigidBody", (void *)InternalCalls::Entity_AddRigidBody);
+		// =====================================================================
+		BindInternalCall("Engine.Physics::Physics_EnableCollisionEvents",
+			reinterpret_cast<void *>(InternalCalls::Physics_EnableCollisionEvents));
+		BindInternalCall("Engine.Physics::Physics_BeginCollisionFrame",
+			reinterpret_cast<void *>(InternalCalls::Physics_BeginCollisionFrame));
+		BindInternalCall("Engine.Physics::Physics_GetCollisionCount",
+			reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionCount));
+		BindInternalCall("Engine.Physics::Physics_GetCollisionPair",
+			reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionPair));
 
-		// Entity / components
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddTag", (void *)InternalCalls::Entity_AddTag);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddCamera", (void *)InternalCalls::Entity_AddCamera);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddAudio", (void *)InternalCalls::Entity_AddAudio);
-		mono_add_internal_call("Engine.InternalCalls::Entity_AddMeshRenderer", (void *)InternalCalls::Entity_AddMeshRenderer);
-
-
-		// Rigidbody (component-level velocity)
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetVelocity", (void *)InternalCalls::Rigidbody_GetVelocity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetVelocity", (void *)InternalCalls::Rigidbody_SetVelocity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddVelocity", (void *)InternalCalls::Rigidbody_AddVelocity);
-
-		// Rigidbody scalar/flag bindings
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetMass", (void *)InternalCalls::Rigidbody_GetMass);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetMass", (void *)InternalCalls::Rigidbody_SetMass);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetIsKinematic", (void *)InternalCalls::Rigidbody_GetIsKinematic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetIsKinematic", (void *)InternalCalls::Rigidbody_SetIsKinematic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetUseGravity", (void *)InternalCalls::Rigidbody_GetUseGravity);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_SetUseGravity", (void *)InternalCalls::Rigidbody_SetUseGravity);
-
-		// Rigidbody helpers
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_GetSpeed", (void *)InternalCalls::Rigidbody_GetSpeed);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsMoving", (void *)InternalCalls::Rigidbody_IsMoving);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_IsStatic", (void *)InternalCalls::Rigidbody_IsStatic);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_AddForce", (void *)InternalCalls::Rigidbody_AddForce);
-		mono_add_internal_call("Engine.InternalCalls::Rigidbody_Stop", (void *)InternalCalls::Rigidbody_Stop);
-
-
-		// Physics collisions (keep using PhysicsAPI ONLY for this)
-		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
-		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
-
-		// Collision event access
-		mono_add_internal_call("Engine.InternalCalls::Physics_EnableCollisionEvents", (void *)InternalCalls::Physics_EnableCollisionEvents);
-		mono_add_internal_call("Engine.InternalCalls::Physics_BeginCollisionFrame", (void *)InternalCalls::Physics_BeginCollisionFrame);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionCount", (void *)InternalCalls::Physics_GetCollisionCount);
-		mono_add_internal_call("Engine.InternalCalls::Physics_GetCollisionPair", (void *)InternalCalls::Physics_GetCollisionPair);
-
+		// =====================================================================
 		// Tag
-		mono_add_internal_call("Engine.InternalCalls::Tag_GetTag", (void *)InternalCalls::Tag_GetTag);
-		mono_add_internal_call("Engine.InternalCalls::Tag_SetTag", (void *)InternalCalls::Tag_SetTag);
-		mono_add_internal_call("Engine.InternalCalls::Scene_FindEntitiesByTag", (void *)InternalCalls::Scene_FindEntitiesByTag);
+		// =====================================================================
+		BindInternalCall("Engine.Tag::Tag_GetTag",
+			reinterpret_cast<void *>(InternalCalls::Tag_GetTag));
+		BindInternalCall("Engine.Tag::Tag_SetTag",
+			reinterpret_cast<void *>(InternalCalls::Tag_SetTag));
 
+		// =====================================================================
 		// Camera
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetEnabled", (void *)InternalCalls::Camera_GetEnabled);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetEnabled", (void *)InternalCalls::Camera_SetEnabled);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetPrimary", (void *)InternalCalls::Camera_GetPrimary);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetPrimary", (void *)InternalCalls::Camera_SetPrimary);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetFOV", (void *)InternalCalls::Camera_GetFOV);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetFOV", (void *)InternalCalls::Camera_SetFOV);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetNear", (void *)InternalCalls::Camera_GetNear);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetNear", (void *)InternalCalls::Camera_SetNear);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetFar", (void *)InternalCalls::Camera_GetFar);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetFar", (void *)InternalCalls::Camera_SetFar);
-		mono_add_internal_call("Engine.InternalCalls::Camera_GetTarget", (void *)InternalCalls::Camera_GetTarget);
-		mono_add_internal_call("Engine.InternalCalls::Camera_SetTarget", (void *)InternalCalls::Camera_SetTarget);
+		// =====================================================================
+		BindInternalCall("Engine.Camera::Camera_GetEnabled",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetEnabled));
+		BindInternalCall("Engine.Camera::Camera_SetEnabled",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetEnabled));
+		BindInternalCall("Engine.Camera::Camera_GetPrimary",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetPrimary));
+		BindInternalCall("Engine.Camera::Camera_SetPrimary",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetPrimary));
+		BindInternalCall("Engine.Camera::Camera_GetFOV",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetFOV));
+		BindInternalCall("Engine.Camera::Camera_SetFOV",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetFOV));
+		BindInternalCall("Engine.Camera::Camera_GetNear",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetNear));
+		BindInternalCall("Engine.Camera::Camera_SetNear",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetNear));
+		BindInternalCall("Engine.Camera::Camera_GetFar",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetFar));
+		BindInternalCall("Engine.Camera::Camera_SetFar",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetFar));
+		BindInternalCall("Engine.Camera::Camera_GetTarget",
+			reinterpret_cast<void *>(InternalCalls::Camera_GetTarget));
+		BindInternalCall("Engine.Camera::Camera_SetTarget",
+			reinterpret_cast<void *>(InternalCalls::Camera_SetTarget));
 
-
+		// =====================================================================
 		// MeshRenderer
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetVisible", (void *)InternalCalls::MeshRenderer_GetVisible);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetVisible", (void *)InternalCalls::MeshRenderer_SetVisible);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowCast", (void *)InternalCalls::MeshRenderer_GetShadowCast);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowCast", (void *)InternalCalls::MeshRenderer_SetShadowCast);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetShadowReceive", (void *)InternalCalls::MeshRenderer_GetShadowReceive);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetShadowReceive", (void *)InternalCalls::MeshRenderer_SetShadowReceive);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_GetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_GetGlobalIlluminate);
-		mono_add_internal_call("Engine.InternalCalls::MeshRenderer_SetGlobalIlluminate", (void *)InternalCalls::MeshRenderer_SetGlobalIlluminate);
+		// =====================================================================
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetVisible",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetVisible));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetVisible",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetVisible));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowReceive",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowReceive));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowReceive",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowReceive));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetGlobalIlluminate",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetGlobalIlluminate));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetGlobalIlluminate",
+			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetGlobalIlluminate));
 
-		// Audio
-		mono_add_internal_call("Engine.InternalCalls::Audio_Play", (void *)InternalCalls::Audio_Play);
-		mono_add_internal_call("Engine.InternalCalls::Audio_Stop", (void *)InternalCalls::Audio_Stop);
-		mono_add_internal_call("Engine.InternalCalls::Audio_Pause", (void *)InternalCalls::Audio_Pause);
+		// =====================================================================
+		// AudioComponent
+		// =====================================================================
+		BindInternalCall("Engine.Audio::Audio_Play",
+			reinterpret_cast<void *>(InternalCalls::Audio_Play));
+		BindInternalCall("Engine.Audio::Audio_Stop",
+			reinterpret_cast<void *>(InternalCalls::Audio_Stop));
+		BindInternalCall("Engine.Audio::Audio_Pause",
+			reinterpret_cast<void *>(InternalCalls::Audio_Pause));
 
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetVolume", (void *)InternalCalls::Audio_GetVolume);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetVolume", (void *)InternalCalls::Audio_SetVolume);
+		BindInternalCall("Engine.Audio::Audio_GetVolume",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetVolume));
+		BindInternalCall("Engine.Audio::Audio_SetVolume",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetVolume));
 
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetPitch", (void *)InternalCalls::Audio_GetPitch);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetPitch", (void *)InternalCalls::Audio_SetPitch);
+		BindInternalCall("Engine.Audio::Audio_GetPitch",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetPitch));
+		BindInternalCall("Engine.Audio::Audio_SetPitch",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetPitch));
 
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetLoop", (void *)InternalCalls::Audio_GetLoop);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetLoop", (void *)InternalCalls::Audio_SetLoop);
+		BindInternalCall("Engine.Audio::Audio_GetLoop",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetLoop));
+		BindInternalCall("Engine.Audio::Audio_SetLoop",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetLoop));
 
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMute", (void *)InternalCalls::Audio_GetMute);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMute", (void *)InternalCalls::Audio_SetMute);
+		BindInternalCall("Engine.Audio::Audio_GetMute",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetMute));
+		BindInternalCall("Engine.Audio::Audio_SetMute",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetMute));
 
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetIs3D", (void *)InternalCalls::Audio_GetIs3D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetIs3D", (void *)InternalCalls::Audio_SetIs3D);
+		BindInternalCall("Engine.Audio::Audio_GetIs3D",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetIs3D));
+		BindInternalCall("Engine.Audio::Audio_SetIs3D",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetIs3D));
 
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetFile", (void *)InternalCalls::Audio_SetFile);
+		BindInternalCall("Engine.Audio::Audio_SetFile",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetFile));
 
-		mono_add_internal_call("Engine.InternalCalls::Event_Publish", (void *)InternalCalls::Event_Publish);
+		// AudioComponent extensions
+		BindInternalCall("Engine.Audio::Audio_GetMinDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetMinDistance));
+		BindInternalCall("Engine.Audio::Audio_SetMinDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetMinDistance));
+		BindInternalCall("Engine.Audio::Audio_GetMaxDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetMaxDistance));
+		BindInternalCall("Engine.Audio::Audio_SetMaxDistance",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetMaxDistance));
+		BindInternalCall("Engine.Audio::Audio_GetRolloffMode",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetRolloffMode));
+		BindInternalCall("Engine.Audio::Audio_SetRolloffMode",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetRolloffMode));
+		BindInternalCall("Engine.Audio::Audio_GetDopplerLevel",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetDopplerLevel));
+		BindInternalCall("Engine.Audio::Audio_SetDopplerLevel",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetDopplerLevel));
+		BindInternalCall("Engine.Audio::Audio_GetPan2D",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetPan2D));
+		BindInternalCall("Engine.Audio::Audio_SetPan2D",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetPan2D));
+		BindInternalCall("Engine.Audio::Audio_GetReverbMix",
+			reinterpret_cast<void *>(InternalCalls::Audio_GetReverbMix));
+		BindInternalCall("Engine.Audio::Audio_SetReverbMix",
+			reinterpret_cast<void *>(InternalCalls::Audio_SetReverbMix));
 
-		// ===== NEW: AudioComponent Extensions =====
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMinDistance",
-			(void *)InternalCalls::Audio_GetMinDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMinDistance",
-			(void *)InternalCalls::Audio_SetMinDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetMaxDistance",
-			(void *)InternalCalls::Audio_GetMaxDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetMaxDistance",
-			(void *)InternalCalls::Audio_SetMaxDistance);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetRolloffMode",
-			(void *)InternalCalls::Audio_GetRolloffMode);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetRolloffMode",
-			(void *)InternalCalls::Audio_SetRolloffMode);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetDopplerLevel",
-			(void *)InternalCalls::Audio_GetDopplerLevel);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetDopplerLevel",
-			(void *)InternalCalls::Audio_SetDopplerLevel);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetPan2D",
-			(void *)InternalCalls::Audio_GetPan2D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetPan2D",
-			(void *)InternalCalls::Audio_SetPan2D);
-		mono_add_internal_call("Engine.InternalCalls::Audio_GetReverbMix",
-			(void *)InternalCalls::Audio_GetReverbMix);
-		mono_add_internal_call("Engine.InternalCalls::Audio_SetReverbMix",
-			(void *)InternalCalls::Audio_SetReverbMix);
+		// =====================================================================
+		// AudioManager (global controls)
+		// =====================================================================
+		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupVolume",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupVolume",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_GetGroupVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupPitch",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupPitch));
+		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupPitch",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_GetGroupPitch));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupMute",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupMute));
+		BindInternalCall("Engine.AudioManager::AudioManager_IsGroupMuted",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_IsGroupMuted));
 
-		// ===== NEW: AudioManager Global Controls =====
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupVolume",
-			(void *)InternalCalls::AudioManager_SetGroupVolume);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupVolume",
-			(void *)InternalCalls::AudioManager_GetGroupVolume);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupPitch",
-			(void *)InternalCalls::AudioManager_SetGroupPitch);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_GetGroupPitch",
-			(void *)InternalCalls::AudioManager_GetGroupPitch);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetGroupMute",
-			(void *)InternalCalls::AudioManager_SetGroupMute);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_IsGroupMuted",
-			(void *)InternalCalls::AudioManager_IsGroupMuted);
+		BindInternalCall("Engine.AudioManager::AudioManager_PauseGroup",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_PauseGroup));
+		BindInternalCall("Engine.AudioManager::AudioManager_PauseAll",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_PauseAll));
+		BindInternalCall("Engine.AudioManager::AudioManager_StopByType",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_StopByType));
+		BindInternalCall("Engine.AudioManager::AudioManager_StopAll",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_StopAll));
 
-		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseGroup",
-			(void *)InternalCalls::AudioManager_PauseGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_PauseAll",
-			(void *)InternalCalls::AudioManager_PauseAll);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_StopByType",
-			(void *)InternalCalls::AudioManager_StopByType);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_StopAll",
-			(void *)InternalCalls::AudioManager_StopAll);
+		BindInternalCall("Engine.AudioManager::AudioManager_CreateDSP",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_CreateDSP));
+		BindInternalCall("Engine.AudioManager::AudioManager_EnableDSP",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_EnableDSP));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetDSPParameter",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetDSPParameter));
+		BindInternalCall("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_ReleaseSpecificDSPinGroup));
+		BindInternalCall("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_ReleaseDSPByGroup));
+		BindInternalCall("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_ReleaseAllDSPs));
 
-		mono_add_internal_call("Engine.AudioManager::AudioManager_CreateDSP",
-			(void *)InternalCalls::AudioManager_CreateDSP);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_EnableDSP",
-			(void *)InternalCalls::AudioManager_EnableDSP);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetDSPParameter",
-			(void *)InternalCalls::AudioManager_SetDSPParameter);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseSpecificDSPinGroup",
-			(void *)InternalCalls::AudioManager_ReleaseSpecificDSPinGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseDSPByGroup",
-			(void *)InternalCalls::AudioManager_ReleaseDSPByGroup);
-		mono_add_internal_call("Engine.AudioManager::AudioManager_ReleaseAllDSPs",
-			(void *)InternalCalls::AudioManager_ReleaseAllDSPs);
+		BindInternalCall("Engine.AudioManager::AudioManager_SetListenerAttributes",
+			reinterpret_cast<void *>(InternalCalls::AudioManager_SetListenerAttributes));
 
-		mono_add_internal_call("Engine.AudioManager::AudioManager_SetListenerAttributes",
-			(void *)InternalCalls::AudioManager_SetListenerAttributes);
+		// =====================================================================
+		// Event System
+		// =====================================================================
+		BindInternalCall("Engine.Event::Event_Publish",
+			reinterpret_cast<void *>(InternalCalls::Event_Publish));
 
-		mono_add_internal_call("Engine.InternalCalls::EntityHasCamera", (void *)InternalCalls::EntityHasCamera);
-		mono_add_internal_call("Engine.InternalCalls::EntityHasRigidBody", (void *)InternalCalls::EntityHasRigidBody);
+		// =====================================================================
+		// Quaternion
+		// =====================================================================
+		BindInternalCall("Engine.QuatNative::Quat_FromAxisAngle",
+			reinterpret_cast<void *>(InternalCalls::Quat_FromAxisAngle));
+		BindInternalCall("Engine.QuatNative::Quat_GetForward",
+			reinterpret_cast<void *>(InternalCalls::Quat_GetForward));
+		BindInternalCall("Engine.QuatNative::Quat_GetRight",
+			reinterpret_cast<void *>(InternalCalls::Quat_GetRight));
+		BindInternalCall("Engine.QuatNative::Quat_GetUp",
+			reinterpret_cast<void *>(InternalCalls::Quat_GetUp));
+		BindInternalCall("Engine.QuatNative::Quat_RotateVector",
+			reinterpret_cast<void *>(InternalCalls::Quat_RotateVector));
+		BindInternalCall("Engine.QuatNative::Quat_Multiply",
+			reinterpret_cast<void *>(InternalCalls::Quat_Multiply));
+		BindInternalCall("Engine.QuatNative::Quat_Slerp",
+			reinterpret_cast<void *>(InternalCalls::Quat_Slerp));
+		BindInternalCall("Engine.QuatNative::Quat_Inverse",
+			reinterpret_cast<void *>(InternalCalls::Quat_Inverse));
+		BindInternalCall("Engine.QuatNative::Quat_ToEuler",
+			reinterpret_cast<void *>(InternalCalls::Quat_ToEuler));
+		BindInternalCall("Engine.QuatNative::Quat_FromEuler",
+			reinterpret_cast<void *>(InternalCalls::Quat_FromEuler));
+		BindInternalCall("Engine.QuatNative::Quat_Normalize",
+			reinterpret_cast<void *>(InternalCalls::Quat_Normalize));
+		BindInternalCall("Engine.QuatNative::Quat_Length",
+			reinterpret_cast<void *>(InternalCalls::Quat_Length));
+		BindInternalCall("Engine.QuatNative::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
 
-		// Quaternion Bindings
-		mono_add_internal_call("Engine.InternalCalls::Quat_FromAxisAngle", (void *)InternalCalls::Quat_FromAxisAngle);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetForward", (void *)InternalCalls::Quat_GetForward);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetRight", (void *)InternalCalls::Quat_GetRight);
-		mono_add_internal_call("Engine.InternalCalls::Quat_GetUp", (void *)InternalCalls::Quat_GetUp);
-		mono_add_internal_call("Engine.InternalCalls::Quat_RotateVector", (void *)InternalCalls::Quat_RotateVector);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Multiply", (void *)InternalCalls::Quat_Multiply);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Slerp", (void *)InternalCalls::Quat_Slerp);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Inverse", (void *)InternalCalls::Quat_Inverse);
-		mono_add_internal_call("Engine.InternalCalls::Quat_ToEuler", (void *)InternalCalls::Quat_ToEuler);
-		mono_add_internal_call("Engine.InternalCalls::Quat_FromEuler", (void *)InternalCalls::Quat_FromEuler);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Normalize", (void *)InternalCalls::Quat_Normalize);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Length", (void *)InternalCalls::Quat_Length);
-		mono_add_internal_call("Engine.InternalCalls::Quat_Dot", (void *)InternalCalls::Quat_Dot);
-		mono_add_internal_call("Engine.InternalCalls::Input_GetMouseDelta", (void *)InternalCalls::Input_GetMouseDelta);
+		BindInternalCall("Engine.RNG::Seed",
+			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandInt));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandFloat));
+		BindInternalCall("Engine.RNG::Quat_Dot",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
+
 
 		LOG_INFO("Internal calls registered");
 	}
-
-	// ============================================
-	// Internal Call Implementations
-	// ============================================
-
-	namespace InternalCalls
-	{
-		// Global scene pointer (set by ScriptSystem)
-		static Scene *s_CurrentScene = nullptr;
-		//auto& input = GetInput();
-		static Input *s_InputSystem = nullptr;
-
-		static AudioManager *s_AudioManager = nullptr;
-
-
-
-
-		bool EntityHasCamera(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-				return false;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity)
-				return false;
-
-			return entity.HasComponent<Engine::CameraComponent>();
-		}
-
-		int Transform_GetParent(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-				return false;
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-
-			if (!registry.valid(entity) || !entity.HasComponent<Engine::TransformComponent>())
-				return 0;
-
-			auto &transform = registry.get<TransformComponent>(entity);
-			return transform.GetParentEntity();
-		}
-
-		bool EntityHasRigidBody(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-				return false;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity)
-				return false;
-
-			return entity.HasComponent<Engine::RigidbodyComponent>();
-		}
-
-		uint64_t Scene_CreateEntity(MonoString *nameStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				//LOG_ERROR("[InternalCall] Scene_CreateEntity: current scene is null");
-				return 0;
-			}
-
-			// Name (optional)
-			std::string name = "Entity";
-			if (nameStr)
-			{
-				char *c = mono_string_to_utf8(nameStr);
-				if (c)
-				{
-					name = c; mono_free(c);
-				}
-			}
-
-			// Create via your scene API
-			Entity e = InternalCalls::s_CurrentScene->CreateEntity(name.c_str());
-			const uint64_t id = static_cast<uint32_t>(e);
-			//LOG_INFO("[InternalCall] Created entity '", name, "' (ID=", id, ")");
-
-			return id;
-		}
-
-		static void Entity_AddScript(uint64_t entityID, MonoString *classFullNameStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: current scene is null");
-				return;
-			}
-			if (!classFullNameStr)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: class name is null");
-				return;
-			}
-
-			// Resolve target entity
-			Entity e = InternalCalls::s_CurrentScene->GetEntity(
-				static_cast<entt::entity>(entityID));
-			if (!e)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: entity ID=", entityID, " is invalid");
-				return;
-			}
-
-			// Managed class name (e.g., "Game.Bullet")
-			char *c = mono_string_to_utf8(classFullNameStr);
-			std::string klass = c ? c : "";
-			if (c) mono_free(c);
-			if (klass.empty())
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: empty class name");
-				return;
-			}
-
-			// Create managed instance
-			auto &se = MonoScriptEngine::GetInstance();
-			MonoObject *instance = se.CreateScriptInstance(klass);
-			if (!instance)
-			{
-				LOG_ERROR("[InternalCall] Entity_AddScript: failed to create instance of ", klass);
-				return;
-			}
-
-			// CRITICAL: Bind the native entity ID IMMEDIATELY after creation
-			se.BindEntityID(instance, static_cast<std::uint32_t>(entityID));
-			LOG_INFO("[InternalCall] Bound EntityID=", entityID, " to new script instance of ", klass);
-
-			// Store instance on the ScriptComponent
-			if (e.HasComponent<ScriptComponent>())
-			{
-				auto &sc = e.GetComponent<ScriptComponent>();
-				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
-				sc.Started = false;  // Mark as not started - ScriptSystem will call OnStart
-			}
-			else
-			{
-				auto &sc = e.AddComponent<ScriptComponent>();
-				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
-				sc.Started = false;  // Mark as not started - ScriptSystem will call OnStart
-			}
-
-			// DO NOT call OnStart here - let ScriptSystem handle it on next update
-			// This ensures EntityID is definitely set before OnStart runs
-			LOG_INFO("[InternalCall] Attached script '", klass, "' to entity ID=", entityID,
-				" (OnStart will be called on next update)");
-		}
-
-		static void Scene_DestroyEntity(uint64_t entityID)
-		{
-			if (!s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Scene_DestroyEntity: current scene is null");
-				return;
-			}
-			auto id = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			s_CurrentScene->DestroyEntity(id);
-			LOG_INFO("[InternalCall] Destroyed entity ID=", entityID);
-		}
-
-		static uint64_t Prefab_Instantiate(MonoString *prefabPathStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: current scene is null");
-				return 0;
-			}
-
-			if (!prefabPathStr)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: prefab path is null");
-				return 0;
-			}
-
-			// Convert MonoString to C++ string
-			char *c = mono_string_to_utf8(prefabPathStr);
-			std::string prefabPath = c ? c : "";
-			if (c) mono_free(c);
-
-			if (prefabPath.empty())
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: empty prefab path");
-				return 0;
-			}
-
-			LOG_INFO("[InternalCall] Instantiating prefab: ", prefabPath);
-
-			// Resolve path to actual asset file
-			std::string prefabfullpath = getAssetFilePath(prefabPath);
-
-			// Load prefab from file
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
-			if (!prefab)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to load prefab from ", prefabfullpath);
-				return 0;
-			}
-
-			// Register prefab
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			// Instantiate entity from prefab
-			Entity entity = PrefabInstantiator::InstantiateEntityPrefab(
-				InternalCalls::s_CurrentScene,
-				prefab->GetGUID()
-			);
-
-			if (!entity)
-			{
-				LOG_ERROR("[InternalCall] Prefab_Instantiate: failed to instantiate entity");
-				return 0;
-			}
-
-			// Initialize ScriptComponent on the newly spawned entity (if any)
-			InitializeScriptComponentForEntity(entity);
-
-			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Successfully instantiated prefab - Entity ID: ", entityID);
-
-			return entityID;
-		}
-
-		static uint64_t Prefab_InstantiateScene(MonoString *prefabPathStr)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: current scene is null");
-				return 0;
-			}
-
-			if (!prefabPathStr)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: prefab path is null");
-				return 0;
-			}
-
-			// Convert MonoString to C++ string
-			char *c = mono_string_to_utf8(prefabPathStr);
-			std::string prefabPath = c ? c : "";
-			if (c) mono_free(c);
-
-			if (prefabPath.empty())
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: empty prefab path");
-				return 0;
-			}
-
-			LOG_INFO("[InternalCall] Instantiating scene prefab: ", prefabPath);
-
-			// Resolve path to actual asset file
-			std::string prefabfullpath = getAssetFilePath(prefabPath);
-
-			// Load prefab from file
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabfullpath);
-			if (!prefab)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to load prefab from ", prefabfullpath);
-				return 0;
-			}
-
-			// Register prefab
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			// Instantiate root entity from scene prefab
-			Entity entity = PrefabInstantiator::InstantiateScenePrefab(
-				InternalCalls::s_CurrentScene,
-				prefab->GetGUID()
-			);
-
-			if (!entity)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateScene: failed to instantiate entity");
-				return 0;
-			}
-
-			// Initialize ScriptComponent on the root entity (if any)
-			InitializeScriptComponentForEntity(entity);
-
-			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Successfully instantiated scene prefab - root Entity ID: ", entityID);
-
-			return entityID;
-		}
-
-		static uint64_t Prefab_InstantiateWithTransform(MonoString *prefabPathStr, glm::vec3 *position, glm::quat *rotation, glm::vec3 *scale, bool isScenePrefab)
-		{
-			if (!InternalCalls::s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: current scene is null");
-				return 0;
-			}
-
-			if (!prefabPathStr)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: prefab path is null");
-				return 0;
-			}
-
-			char *c = mono_string_to_utf8(prefabPathStr);
-			std::string prefabPath = c ? c : "";
-			if (c) mono_free(c);
-
-			if (prefabPath.empty())
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: empty prefab path");
-				return 0;
-			}
-
-			std::string prefabFullPath = getAssetFilePath(prefabPath);
-
-			auto prefab = PrefabSerializer::LoadPrefabFromFile(prefabFullPath);
-			if (!prefab)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: failed to load prefab from ", prefabFullPath);
-				return 0;
-			}
-
-			PrefabRegistry::Get().RegisterPrefab(prefab);
-
-			Entity entity;
-			if (isScenePrefab)
-			{
-				entity = PrefabInstantiator::InstantiateScenePrefab(
-					InternalCalls::s_CurrentScene,
-					prefab->GetGUID());
-			}
-			else
-			{
-				entity = PrefabInstantiator::InstantiateEntityPrefab(
-					InternalCalls::s_CurrentScene,
-					prefab->GetGUID());
-			}
-
-			if (!entity)
-			{
-				LOG_ERROR("[InternalCall] Prefab_InstantiateWithTransform: failed to instantiate entity from prefab");
-				return 0;
-			}
-
-			if (entity.HasComponent<TransformComponent>())
-			{
-				auto &transform = entity.GetComponent<TransformComponent>();
-
-				// **Quats only**: assign directly
-				transform.Position = *position;
-				transform.Rotation = *rotation;
-				transform.Scale = *scale;
-				transform.IsDirty = true;
-
-				// Build matrices from quat
-				glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
-				glm::mat4 rotation_matrix = glm::mat4_cast(transform.Rotation);
-				glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), transform.Scale);
-
-				glm::mat4 transform_matrix = translation_matrix * rotation_matrix * scale_matrix;
-
-				transform.LocalTransform = transform_matrix;
-				transform.WorldTransform = transform_matrix;
-			}
-
-			// Initialize ScriptComponent on the spawned entity (if any)
-			InitializeScriptComponentForEntity(entity);
-
-			uint64_t entityID = static_cast<uint64_t>(static_cast<uint32_t>(entity));
-			LOG_INFO("[InternalCall] Prefab_InstantiateWithTransform: instantiated entity with ID ", entityID);
-			return entityID;
-		}
-
-
-		uint64_t Scene_FindEntityByName(MonoString *nameString)
-		{
-			if (!s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Scene not set!");
-				return 0; // 0 = invalid entity (entt::null)
-			}
-
-			if (!nameString)
-			{
-				LOG_ERROR("[InternalCall] Entity name string is null!");
-				return 0;
-			}
-
-			// Convert MonoString to C++ string
-			char *nameStr = mono_string_to_utf8(nameString);
-			if (!nameStr)
-			{
-				LOG_ERROR("[InternalCall] Failed to convert entity name string!");
-				return 0;
-			}
-
-			std::string name(nameStr);
-			mono_free(nameStr);
-
-			if (name.empty())
-			{
-				LOG_WARNING("[InternalCall] Empty entity name provided!");
-				return 0;
-			}
-
-			// Find entity by name
-			Entity entity = s_CurrentScene->FindEntityByName(name);
-
-			// Convert Entity to uint32_t using the conversion operator
-			// If entity is invalid (entt::null), this will return 0
-			return static_cast<uint32_t>(entity);
-		}
-
-		void SetCurrentScene(Scene *scene)
-		{
-			s_CurrentScene = scene;
-		}
-
-		void SetInputSystem(Input *input)
-		{
-			s_InputSystem = input;
-		}
-
-		// ADD THESE:
-		void SetAudioManager(AudioManager *audioManager)
-		{
-			s_AudioManager = audioManager;
-		}
-
-		AudioManager *GetAudioManager()
-		{
-			return s_AudioManager;
-		}
-
-		void Log(MonoString *message)
-		{
-			char *cStr = mono_string_to_utf8(message);
-			LOG_INFO("[C#] ", cStr);
-			mono_free(cStr);
-		}
-
-		void LogError(MonoString *message)
-		{
-			char *cStr = mono_string_to_utf8(message);
-			LOG_ERROR("[C#] ", cStr);
-			mono_free(cStr);
-		}
-
-		void LogWarning(MonoString *message)
-		{
-			char *cStr = mono_string_to_utf8(message);
-			LOG_WARNING("[C#] ", cStr);  // Fixed: was LOG_ERROR
-			mono_free(cStr);
-		}
-
-		uint64_t Entity_GetEntityID(MonoObject *entityObj)
-		{
-			// entityObj is the C# Engine.Entity instance passed from GetEntityID_Native(this)
-
-			if (!entityObj)
-			{
-				LOG_WARNING("[InternalCall] Entity_GetEntityID: entity object is null");
-				return 0;
-			}
-
-			// Get the Entity class of this object
-			MonoClass *entityClass = mono_object_get_class(entityObj);
-			if (!entityClass)
-			{
-				LOG_ERROR("[InternalCall] Entity_GetEntityID: failed to get class from object");
-				return 0;
-			}
-
-			// Look for the auto-property getter: public ulong EntityID { get; internal set; }
-			MonoMethod *getIdMethod = mono_class_get_method_from_name(entityClass, "get_EntityID", 0);
-			if (!getIdMethod)
-			{
-				LOG_ERROR("[InternalCall] Entity_GetEntityID: could not find get_EntityID on Entity");
-				return 0;
-			}
-
-			MonoObject *exception = nullptr;
-			MonoObject *result = mono_runtime_invoke(getIdMethod, entityObj, nullptr, &exception);
-
-			// If the getter threw, log and bail out
-			if (exception)
-			{
-				MonoString *excStr = mono_object_to_string(exception, nullptr);
-				char *cStr = excStr ? mono_string_to_utf8(excStr) : nullptr;
-				LOG_ERROR("[InternalCall] Entity_GetEntityID: exception while invoking get_EntityID: ",
-					cStr ? cStr : "<null>");
-				if (cStr)
-					mono_free(cStr);
-				return 0;
-			}
-
-			if (!result)
-			{
-				LOG_WARNING("[InternalCall] Entity_GetEntityID: get_EntityID returned null");
-				return 0;
-			}
-
-			// EntityID is a managed System.UInt64, so unbox to a raw uint64_t
-			void *unboxed = mono_object_unbox(result);
-			if (!unboxed)
-			{
-				LOG_WARNING("[InternalCall] Entity_GetEntityID: failed to unbox result");
-				return 0;
-			}
-
-			uint64_t id = *reinterpret_cast<uint64_t *>(unboxed);
-			return id;
-		}
-
-
-		bool Entity_HasComponent(uint64_t entityID, MonoReflectionType *componentType)
-		{
-			if (!s_CurrentScene) return false;
-			(void)componentType;
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			// Check if entity exists in registry
-			if (!registry.valid(handle)) return false;
-
-			// Check component type (you'll need to map C# component types to C++ component types)
-			// This is a simplified version
-			return false; // Implement based on your component system
-		}
-
-
-
-		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition)
-		{
-			if (!s_CurrentScene || !outPosition) return;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity || !entity.HasComponent<TransformComponent>()) return;
-
-			auto &transform = entity.GetComponent<TransformComponent>();
-			*outPosition = transform.Position;
-		}
-
-		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position)
-		{
-			if (!s_CurrentScene || !position) return;
-
-			auto entity = s_CurrentScene->GetEntity(static_cast<entt::entity>(entityID));
-			if (!entity || !entity.HasComponent<TransformComponent>()) return;
-
-			auto &transform = entity.GetComponent<TransformComponent>();
-			transform.Position = *position;
-			transform.IsDirty = true;
-		}
-
-		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation)
-		{
-			if (!s_CurrentScene || !outRotation) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			*outRotation = transform.Rotation;
-		}
-
-		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation)
-		{
-			if (!s_CurrentScene || !rotation) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			transform.Rotation = *rotation;
-			transform.IsDirty = true;
-		}
-
-		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale)
-		{
-			if (!s_CurrentScene || !outScale) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			*outScale = transform.Scale;
-		}
-
-		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale)
-		{
-			if (!s_CurrentScene || !scale) return;
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			auto handle = static_cast<entt::entity>(entityID);
-
-			if (!registry.valid(handle)) return;
-			if (!registry.all_of<TransformComponent>(handle)) return;
-
-			auto &transform = registry.get<TransformComponent>(handle);
-			transform.Scale = *scale;
-		}
-
-		bool Input_IsKeyPressed(int keyCode)
-		{
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return false;
-			}
-			return s_InputSystem->IsKeyPressed(keyCode);
-		}
-
-
-		bool Input_IsMouseButtonPressed(int button)
-		{
-
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return false;
-			}
-			return s_InputSystem->IsMouseButtonPressed(button);
-		}
-
-
-		void Input_GetMousePosition(glm::vec2 *outPosition)
-		{
-			if (!outPosition) return;
-
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				*outPosition = glm::vec2(0.0f, 0.0f);
-				return;
-			}
-
-			// Call the Input system's GetMousePosition method
-			*outPosition = s_InputSystem->GetMousePosition();
-		}
-
-		bool Input_IsKeyReleased(int keyCode)
-		{
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return false;
-			}
-			return s_InputSystem->IsKeyJustReleased(keyCode);
-		}
-
-		// Helper to fetch entity from current scene
-		static inline Entity GetEntityOrNull(uint64_t id)
-		{
-			if (!s_CurrentScene) return {};
-			return s_CurrentScene->GetEntity(static_cast<entt::entity>(id));
-		}
-
-		// =============== Physics (bodies) ===============
-
-		void Entity_AddRigidBody(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<RigidbodyComponent>();
-		}
-
-		void Rigidbody_GetVelocity(uint64_t entityID, glm::vec3 *outVel)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !outVel) return;
-			if (!e.HasComponent<RigidbodyComponent>()) return;
-			*outVel = e.GetComponent<RigidbodyComponent>().GetVelocity();
-		}
-
-		void Rigidbody_SetVelocity(uint64_t entityID, glm::vec3 *inVel)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!inVel) return;
-			e.GetComponent<RigidbodyComponent>().SetVelocity(*inVel);
-		}
-
-		void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *inVel)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!inVel) return;
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetVelocity(rb.GetVelocity() + *inVel);
-		}
-
-		float Rigidbody_GetMass(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.GetMass();
-		}
-
-		void Rigidbody_SetMass(uint64_t entityID, float mass)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetMass(mass);
-		}
-
-		bool Rigidbody_GetIsKinematic(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsKinematicBody();
-		}
-
-		void Rigidbody_SetIsKinematic(uint64_t entityID, bool isKinematic)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetKinematic(isKinematic);
-		}
-
-		bool Rigidbody_GetUseGravity(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsGravityEnabled();
-		}
-
-		void Rigidbody_SetUseGravity(uint64_t entityID, bool useGravity)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.SetGravityEnabled(useGravity);
-		}
-
-		float Rigidbody_GetSpeed(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.GetSpeed();
-		}
-
-		bool Rigidbody_IsMoving(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsMoving();
-		}
-
-		bool Rigidbody_IsStatic(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			return rb.IsStatic();
-		}
-
-		void Rigidbody_AddForce(uint64_t entityID, glm::vec3 *force)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!force) return;
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.AddForce(*force);
-		}
-
-		void Rigidbody_Stop(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &rb{ e.GetComponent<RigidbodyComponent>() };
-			rb.Stop();
-		}
-
-		// ==================================
-		// Collision events (via PhysicsAPI)
-		// ==================================
-
-		void Physics_EnableCollisionEvents()
-		{
-			Engine::PhysicsAPI::EnableCollisionEvents();
-		}
-
-		void Physics_BeginCollisionFrame()
-		{
-			Engine::PhysicsAPI::BeginCollisionFrame();
-		}
-
-		int Physics_GetCollisionCount()
-		{
-			return (int)Engine::PhysicsAPI::GetInstance().GetCollisionEvents().size();
-		}
-
-		void Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b)
-		{
-			if (!a || !b) return;
-			const auto &evs = Engine::PhysicsAPI::GetInstance().GetCollisionEvents();
-			if (index < 0 || index >= (int)evs.size()) return;
-			*a = (uint32_t)evs[index].entA;
-			*b = (uint32_t)evs[index].entB;
-		}
-
-		void Entity_AddTag(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<TagComponent>();
-		}
-
-		void Entity_AddCamera(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<CameraComponent>();
-		}
-
-		void Entity_AddAudio(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<AudioComponent>();
-		}
-
-		void Entity_AddMeshRenderer(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			e.AddComponent<MeshRendererComponent>();
-		}
-
-		MonoString *Tag_GetTag(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<TagComponent>())
-				return mono_string_new(mono_domain_get(), "");
-
-			auto &tagComp = e.GetComponent<TagComponent>();
-			const std::string &tag = tagComp.GetTag();
-			return mono_string_new(mono_domain_get(), tag.c_str());
-		}
-
-		void Tag_SetTag(uint64_t entityID, MonoString *tagStr)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<TagComponent>() || !tagStr)
-				return;
-
-			char *utf8 = mono_string_to_utf8(tagStr);
-			if (!utf8) return;
-
-			e.GetComponent<TagComponent>().SetTag(utf8);
-			mono_free(utf8);
-		}
-
-		bool Camera_GetEnabled(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<CameraComponent>()) return false;
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.Enabled;
-		}
-
-		void Camera_SetEnabled(uint64_t entityID, bool enabled)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.Enabled = enabled;
-		}
-
-		bool Camera_GetPrimary(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.Primary;
-		}
-
-		void Camera_SetPrimary(uint64_t entityID, bool primary)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.Primary = primary;
-		}
-
-		float Camera_GetFOV(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.FOV;
-		}
-
-		void Camera_SetFOV(uint64_t entityID, float fov)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.FOV = fov;
-		}
-
-		float Camera_GetNear(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.NearPlane;
-		}
-
-		void Camera_SetNear(uint64_t entityID, float nearPlane)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.NearPlane = nearPlane;
-		}
-
-		float Camera_GetFar(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			return cam.FarPlane;
-		}
-
-		void Camera_SetFar(uint64_t entityID, float farPlane)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.FarPlane = farPlane;
-		}
-
-		void Camera_GetTarget(uint64_t entityID, glm::vec3 *outTarget)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!outTarget) return;
-			auto &cam = e.GetComponent<CameraComponent>();
-			*outTarget = cam.Target;
-		}
-
-		void Camera_SetTarget(uint64_t entityID, glm::vec3 *inTarget)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!inTarget) return;
-			auto &cam = e.GetComponent<CameraComponent>();
-			cam.SetTarget(*inTarget); // marks dirty internally
-		}
-
-
-		bool MeshRenderer_GetVisible(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.Visible;
-		}
-
-		void MeshRenderer_SetVisible(uint64_t entityID, bool visible)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.Visible = visible;
-		}
-
-		bool MeshRenderer_GetShadowCast(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.ShadowCast;
-		}
-
-		void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.ShadowCast = cast;
-		}
-
-		bool MeshRenderer_GetShadowReceive(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.ShadowReceive;
-		}
-
-		void MeshRenderer_SetShadowReceive(uint64_t entityID, bool receive)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.ShadowReceive = receive;
-		}
-
-		bool MeshRenderer_GetGlobalIlluminate(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			return mr.GlobalIlluminate;
-		}
-
-		void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &mr = e.GetComponent<MeshRendererComponent>();
-			mr.GlobalIlluminate = gi;
-		}
-
-		void Audio_Play(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetState(PlayState::PLAY);
-		}
-
-		void Audio_Stop(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetState(PlayState::STOP);
-		}
-
-		void Audio_Pause(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetState(PlayState::PAUSE);
-		}
-
-		float Audio_GetVolume(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Volume;
-		}
-
-		void Audio_SetVolume(uint64_t entityID, float volume)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetVolume(volume);
-		}
-
-		float Audio_GetPitch(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Pitch;
-		}
-
-		void Audio_SetPitch(uint64_t entityID, float pitch)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetPitch(pitch);
-		}
-
-		bool Audio_GetLoop(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Loop;
-		}
-
-		void Audio_SetLoop(uint64_t entityID, bool loop)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetLoop(loop);
-		}
-
-		bool Audio_GetMute(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Mute;
-		}
-
-		void Audio_SetMute(uint64_t entityID, bool mute)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetMute(mute);
-		}
-
-		bool Audio_GetIs3D(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Is3D;
-		}
-
-		void Audio_SetIs3D(uint64_t entityID, bool is3d)
-		{
-			auto e = GetEntityOrNull(entityID);
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.Set3D(is3d);
-		}
-
-		void Audio_SetFile(uint64_t entityID, MonoString *path)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!path) return;
-
-			auto &audio = e.GetComponent<AudioComponent>();
-
-			char *utf8 = mono_string_to_utf8(path);
-			if (!utf8) return;
-
-			audio.SetAudioFile(utf8);
-			mono_free(utf8);
-		}
-
-		// ===== NEW AudioComponent Extensions =====
-
-		float Audio_GetMinDistance(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 1.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.MinDistance;
-		}
-
-		void Audio_SetMinDistance(uint64_t entityID, float minDist)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetMinDistance(minDist);
-		}
-
-		float Audio_GetMaxDistance(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 10000.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.MaxDistance;
-		}
-
-		void Audio_SetMaxDistance(uint64_t entityID, float maxDist)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetMaxDistance(maxDist);
-		}
-
-		int Audio_GetRolloffMode(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 0;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return static_cast<int>(audio.RolloffMode);
-		}
-
-		void Audio_SetRolloffMode(uint64_t entityID, int mode)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetRolloffMode(static_cast<AudioRolloffMode>(mode));
-		}
-
-		float Audio_GetDopplerLevel(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 1.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.DopplerLevel;
-		}
-
-		void Audio_SetDopplerLevel(uint64_t entityID, float level)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetDopplerLevel(level);
-		}
-
-		float Audio_GetPan2D(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 0.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.Pan2D;
-		}
-
-		void Audio_SetPan2D(uint64_t entityID, float pan)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetPan(pan);
-		}
-
-		float Audio_GetReverbMix(uint64_t entityID)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return 0.0f;
-			auto &audio = e.GetComponent<AudioComponent>();
-			return audio.ReverbProperties;
-		}
-
-		void Audio_SetReverbMix(uint64_t entityID, float mix)
-		{
-			auto e = GetEntityOrNull(entityID);
-			if (!e) return;
-			auto &audio = e.GetComponent<AudioComponent>();
-			audio.SetReverbProperties(mix);
-		}
-
-		// ===== NEW AudioManager Global Controls =====
-
-		void AudioManager_SetGroupVolume(int groupType, float volume)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->SetGroupVolume(static_cast<AudioType>(groupType), volume);
-		}
-
-		float AudioManager_GetGroupVolume(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return 0.0f;
-			float vol = 0.0f;
-			am->GetGroupVolume(static_cast<AudioType>(groupType), vol);
-			return vol;
-		}
-
-		void AudioManager_SetGroupPitch(int groupType, float pitch)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->SetGroupPitch(static_cast<AudioType>(groupType), pitch);
-		}
-
-		float AudioManager_GetGroupPitch(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return 1.0f;
-			float pitch = 1.0f;
-			am->GetGroupPitch(static_cast<AudioType>(groupType), pitch);
-			return pitch;
-		}
-
-		void AudioManager_SetGroupMute(int groupType, bool mute)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->MuteGroup(static_cast<AudioType>(groupType), mute);
-		}
-
-		bool AudioManager_IsGroupMuted(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return false;
-			return am->IsGroupMuted(static_cast<AudioType>(groupType));
-		}
-
-		void Event_Publish(MonoString *nameStr, MonoString *payloadStr)
-		{
-			ScriptEvent ev;
-
-			if (nameStr)
-			{
-				char *cName = mono_string_to_utf8(nameStr);
-				if (cName)
-				{
-					ev.name = cName;
-					mono_free(cName);
-				}
-			}
-
-			if (payloadStr)
-			{
-				char *cPayload = mono_string_to_utf8(payloadStr);
-				if (cPayload)
-				{
-					ev.payload = cPayload;
-					mono_free(cPayload);
-				}
-			}
-
-			EventSystem::Instance().Queue(ev);
-		}
-
-		/*void AudioManager_SetMasterVolume(float volume) {
-			auto* am = GetAudioManager();
-			if (!am) return;
-			am->SetMasterVolume(volume);
-		}
-
-		float AudioManager_GetMasterVolume() {
-			auto* am = GetAudioManager();
-			if (!am) return 0.0f;
-			float vol = 0.0f;
-			am->GetMasterVolume(vol);
-			return vol;
-		}
-
-		void AudioManager_SetMasterPitch(float pitch) {
-			auto* am = GetAudioManager();
-			if (!am) return;
-			am->SetMasterPitch(pitch);
-		}
-
-		float AudioManager_GetMasterPitch() {
-			auto* am = GetAudioManager();
-			if (!am) return 1.0f;
-			float pitch = 1.0f;
-			am->GetMasterPitch(pitch);
-			return pitch;
-		}
-
-		void AudioManager_MuteMaster(bool mute) {
-			auto* am = GetAudioManager();
-			if (!am) return;
-			am->MuteMaster(mute);
-		}
-
-		bool AudioManager_IsMasterMuted() {
-			auto* am = GetAudioManager();
-			if (!am) return false;
-			return am->IsMasterMuted();
-		}*/
-
-		void AudioManager_PauseGroup(int groupType, bool pause)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->PauseGroup(static_cast<AudioType>(groupType), pause);
-		}
-
-		void AudioManager_PauseAll(bool pause)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->PauseAll(pause);
-		}
-
-		void AudioManager_StopByType(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->StopByType(static_cast<AudioType>(groupType));
-		}
-
-		void AudioManager_StopAll()
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->StopAll();
-		}
-
-		void AudioManager_CreateDSP(int groupType, int effectType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->CreateDSP(static_cast<DSPEffectType>(effectType),
-				static_cast<AudioType>(groupType));
-		}
-
-		void AudioManager_EnableDSP(int groupType, int effectType, bool enable)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->EnableDSP(static_cast<AudioType>(groupType),
-				static_cast<DSPEffectType>(effectType), enable);
-		}
-
-		void AudioManager_SetDSPParameter(int groupType, int effectType, int paramIndex, float value)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->SetDSPParameter(static_cast<AudioType>(groupType),
-				static_cast<DSPEffectType>(effectType),
-				paramIndex, value);
-		}
-
-		void AudioManager_ReleaseSpecificDSPinGroup(int groupType, int effectType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->ReleaseSpecificDSPinGroup(static_cast<AudioType>(groupType),
-				static_cast<DSPEffectType>(effectType));
-		}
-
-		void AudioManager_ReleaseDSPByGroup(int groupType)
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->ReleaseDSPByGroup(static_cast<AudioType>(groupType));
-		}
-
-		void AudioManager_ReleaseAllDSPs()
-		{
-			auto *am = GetAudioManager();
-			if (!am) return;
-			am->ReleaseAllDSPs();
-		}
-
-		void AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
-			glm::vec3 *up, glm::vec3 *velocity)
-		{
-			auto *am = GetAudioManager();
-			if (!am || !position || !forward || !up || !velocity) return;
-			am->SetListenerAttributes(*position, *forward, *up, *velocity);
-		}
-
-		// NEW: return managed uint[] of all entities with a given tag
-		MonoArray *Scene_FindEntitiesByTag(MonoString *tagString)
-		{
-			MonoDomain *domain = mono_domain_get();
-			if (!domain)
-				return nullptr;
-
-			MonoClass *uintClass = mono_get_uint32_class();
-			if (!uintClass)
-				return nullptr;
-
-			auto make_empty = [&]() -> MonoArray *
-				{
-					return mono_array_new(domain, uintClass, 0);
-				};
-
-			if (!s_CurrentScene)
-			{
-				LOG_ERROR("[InternalCall] Scene_FindEntitiesByTag: current scene is null");
-				return make_empty();
-			}
-
-			if (!tagString)
-			{
-				LOG_WARNING("[InternalCall] Scene_FindEntitiesByTag: tag string is null");
-				return make_empty();
-			}
-
-			char *tagCStr = mono_string_to_utf8(tagString);
-			if (!tagCStr)
-			{
-				LOG_ERROR("[InternalCall] Scene_FindEntitiesByTag: failed to convert tag string");
-				return make_empty();
-			}
-
-			std::string tag(tagCStr);
-			mono_free(tagCStr);
-
-			auto &registry = s_CurrentScene->GetRegistry();
-			std::vector<uint32_t> results;
-
-			auto view = registry.view<TagComponent>();
-			for (auto entity : view)
-			{
-				const auto &tagComp = view.get<TagComponent>(entity);
-				if (tagComp.GetTag() == tag)
-				{
-					results.push_back(static_cast<uint32_t>(entity));
-				}
-			}
-
-			MonoArray *resultArray = mono_array_new(domain, uintClass, (uintptr_t)results.size());
-			for (uintptr_t i = 0; i < results.size(); ++i)
-			{
-				uint32_t id = results[i];
-				mono_array_set(resultArray, uint32_t, i, id);
-			}
-
-			return resultArray;
-		}
-
-		// Quaternion creation from axis-angle
-		void Quat_FromAxisAngle(glm::vec3 *axis, float angleRadians, glm::quat *outQuat)
-		{
-			*outQuat = glm::angleAxis(angleRadians, *axis);
-		}
-
-		// Extract forward vector from quaternion
-		void Quat_GetForward(glm::quat *quat, glm::vec3 *outForward)
-		{
-			*outForward = glm::rotate(*quat, glm::vec3(0.0f, 0.0f, -1.0f));
-		}
-
-		// Extract right vector
-		void Quat_GetRight(glm::quat *quat, glm::vec3 *outRight)
-		{
-			*outRight = glm::rotate(*quat, glm::vec3(1.0f, 0.0f, 0.0f));
-		}
-
-		// Extract up vector
-		void Quat_GetUp(glm::quat *quat, glm::vec3 *outUp)
-		{
-			*outUp = glm::rotate(*quat, glm::vec3(0.0f, 1.0f, 0.0f));
-		}
-
-		// Rotate vector by quaternion
-		void Quat_RotateVector(glm::quat *quat, glm::vec3 *vec, glm::vec3 *outVec)
-		{
-			*outVec = glm::rotate(*quat, *vec);
-		}
-
-		// Multiply quaternions (combine rotations)
-		void Quat_Multiply(glm::quat *q1, glm::quat *q2, glm::quat *outQuat)
-		{
-			*outQuat = (*q1) * (*q2);
-		}
-
-		// SLERP interpolation
-		void Quat_Slerp(glm::quat *q1, glm::quat *q2, float t, glm::quat *outQuat)
-		{
-			*outQuat = glm::slerp(*q1, *q2, t);
-		}
-
-		// Inverse quaternion
-		void Quat_Inverse(glm::quat *quat, glm::quat *outQuat)
-		{
-			*outQuat = glm::inverse(*quat);
-		}
-
-		// Convert quaternion to Euler angles
-		void Quat_ToEuler(glm::quat *quat, glm::vec3 *outEuler)
-		{
-			*outEuler = glm::eulerAngles(*quat);
-		}
-
-		// Create quaternion from Euler angles
-		void Quat_FromEuler(glm::vec3 *euler, glm::quat *outQuat)
-		{
-			*outQuat = glm::quat(*euler);
-		}
-
-		// Normalize quaternion
-		void Quat_Normalize(glm::quat *quat, glm::quat *outQuat)
-		{
-			*outQuat = glm::normalize(*quat);
-		}
-
-		// Get quaternion length
-		float Quat_Length(glm::quat *quat)
-		{
-			return glm::length(*quat);
-		}
-
-		// Quaternion dot product
-		float Quat_Dot(glm::quat *q1, glm::quat *q2)
-		{
-			return glm::dot(*q1, *q2);
-		}
-
-		static void Input_GetMouseDelta(float *outX, float *outY)
-		{
-			if (outX) *outX = 0.0f;
-			if (outY) *outY = 0.0f;
-			if (!s_InputSystem)
-			{
-				LOG_WARNING("[InternalCall] Input system not initialized");
-				return;
-			}
-			glm::vec2 in_out;
-			in_out = s_InputSystem->GetMouseDelta();
-			*outX = in_out.x;
-			*outY = in_out.y;
-		}
-	} // namespace internalcalls
-
-	// Expose these functions for external use
-	void SetScriptingInputSystem(Input *input)
-	{
-		InternalCalls::SetInputSystem(input);
-	}
-
-	void SetScriptingCurrentScene(Scene *scene)
-	{
-		InternalCalls::SetCurrentScene(scene);
-	}
-
-	// ADD THIS:
-	void SetScriptingAudioManager(AudioManager *audioManager)
-	{
-		InternalCalls::SetAudioManager(audioManager);
-	}
-
 } // namespace Engine

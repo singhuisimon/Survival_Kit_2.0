@@ -1,6 +1,9 @@
 using Engine;
 using System;
-
+using static Engine.Scene;
+using static Engine.Event;
+using static Engine.Logger;
+using static Engine.Camera;
 namespace Game
 {
     // As of right now, using keys W and L to test for Win and Lose screen
@@ -9,7 +12,7 @@ namespace Game
     public class UIStateManager : ScriptBehaviour
     {
         // serialize the camera entities
-         [SerializeField]
+        [SerializeField]
         private string mainMenuCameraName = "MainMenuCamera";
 
         [SerializeField]
@@ -46,19 +49,19 @@ namespace Game
         public override void OnStart()
         {
             // find all the cameras in the scene
-            mainMenuCameraID = InternalCalls.Scene_FindEntityByName(mainMenuCameraName);
-            gameCameraID = InternalCalls.Scene_FindEntityByName(gameCameraName);
-            winCameraID = InternalCalls.Scene_FindEntityByName(winCameraName);
-            loseCameraID = InternalCalls.Scene_FindEntityByName(loseCameraName);
+            mainMenuCameraID = SceneFindEntityByName(mainMenuCameraName);
+            gameCameraID = SceneFindEntityByName(gameCameraName);
+            winCameraID = SceneFindEntityByName(winCameraName);
+            loseCameraID = SceneFindEntityByName(loseCameraName);
 
             // initialize state
-             currentState = ScreenState.MainMenu;
+            currentState = ScreenState.MainMenu;
 
-             // put here for events (once implemented)
-             // added the PlayerHasDied event
-             EventSystem.Subscribe("PlayerHasDied", OnPlayerDied);
-             // added the player has won event
-             EventSystem.Subscribe("PlayerWin", OnPlayerWin);
+            // put here for events (once implemented)
+            // added the PlayerHasDied event
+            Subscribe("PlayerHasDied", OnPlayerDied);
+            // added the player has won event
+            Subscribe("PlayerWin", OnPlayerWin);
 
 
         }
@@ -99,13 +102,13 @@ namespace Game
             // testing shortcut (remember to remove during submission
             // if (pJustPressed)
             // {
-            //     Log("Testing Win screen...");
+            //     LogMessage("Testing Win screen...");
             //     ShowWinScreen();
             // }
 
             // if (lJustPressed)
             // {
-            //     Log("Testing Lose screen...");
+            //     LogMessage("Testing Lose screen...");
             //     ShowLoseScreen();
             // }
         }
@@ -114,26 +117,26 @@ namespace Game
 
         private void OnPlayerDied(string eventName, string payload)
         {
-            Log("Player died event received!");
-            EventSystem.Publish("ChangeToLost", loseCameraName);
+            LogMessage("Player died event received!");
+            Publish("ChangeToLost", loseCameraName);
             ShowLoseScreen();
         }
 
-        private void OnPlayerWin(string eventName, string payload) 
+        private void OnPlayerWin(string eventName, string payload)
         {
-            Log("Game win event received! Botnets killed: " + payload);
+            LogMessage("Game win event received! Botnets killed: " + payload);
             ShowWinScreen();
         }
-    
+
 
         // Screen Transistions
 
         private void ShowWinScreen()
         {
             if (currentState == ScreenState.Won)
-            return; // player is already on win screen
+                return; // player is already on win screen
 
-            Log("PLAYER WINS!!");
+            LogMessage("PLAYER WINS!!");
 
             // update the win state
             currentState = ScreenState.Won;
@@ -144,8 +147,8 @@ namespace Game
             // enable the win camera
             if (winCameraID != 0)
             {
-                InternalCalls.Camera_SetEnabled(winCameraID, true);
-                Log("Enabled WinCamera");
+                CameraSetEnabled(winCameraID, true);
+                LogMessage("Enabled WinCamera");
             }
             else
             {
@@ -156,9 +159,9 @@ namespace Game
         private void ShowLoseScreen()
         {
             if (currentState == ScreenState.Lost)
-            return; // player already on lose screen
+                return; // player already on lose screen
 
-            Log("PLAYER LOST!!");
+            LogMessage("PLAYER LOST!!");
 
             // update the lose state
             currentState = ScreenState.Lost;
@@ -169,8 +172,8 @@ namespace Game
             // enable the lose camera
             if (loseCameraID != 0)
             {
-                InternalCalls.Camera_SetEnabled(loseCameraID, true);
-                Log("Enabled LoseCamera");
+                CameraSetEnabled(loseCameraID, true);
+                LogMessage("Enabled LoseCamera");
             }
             else
             {
@@ -180,7 +183,7 @@ namespace Game
 
         private void ReturnToMainMenu()
         {
-            Log("Returning to main menu");
+            LogMessage("Returning to main menu");
 
             currentState = ScreenState.MainMenu;
 
@@ -190,8 +193,8 @@ namespace Game
             // enable the main menu camera
             if (mainMenuCameraID != 0)
             {
-                InternalCalls.Camera_SetEnabled(mainMenuCameraID, true);
-                Log("Enabled MainMenuCamera");
+                CameraSetEnabled(mainMenuCameraID, true);
+                LogMessage("Enabled MainMenuCamera");
             }
             else
             {
@@ -202,31 +205,31 @@ namespace Game
             // add code whenever needed here
 
             // letting it know it should restart the game
-            EventSystem.Publish("GameRestart", ""); 
+            Publish("GameRestart", "");
         }
 
         // HELPER FUNCTIONS
         private void DisableAllCameras()
         {
             if (mainMenuCameraID != 0)
-                InternalCalls.Camera_SetEnabled(mainMenuCameraID, false);
+                CameraSetEnabled(mainMenuCameraID, false);
 
             if (gameCameraID != 0)
-                InternalCalls.Camera_SetEnabled(gameCameraID, false);
+                CameraSetEnabled(gameCameraID, false);
 
             if (winCameraID != 0)
-                InternalCalls.Camera_SetEnabled(winCameraID, false);
+                CameraSetEnabled(winCameraID, false);
 
             if (loseCameraID != 0)
-                InternalCalls.Camera_SetEnabled(loseCameraID, false);
+                CameraSetEnabled(loseCameraID, false);
         }
 
         // clean up event subscriptions
         public override void OnDestroy()
         {
-            EventSystem.Unsubscribe("PlayerHasDied", OnPlayerDied);
-            EventSystem.Unsubscribe("PlayerWin", OnPlayerWin); 
-            Log("UIStateManager destroyed");
+            Unsubscribe("PlayerHasDied", OnPlayerDied);
+            Unsubscribe("PlayerWin", OnPlayerWin);
+            LogMessage("UIStateManager destroyed");
         }
 
     }
