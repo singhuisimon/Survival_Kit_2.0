@@ -19,6 +19,14 @@
 
 namespace Engine {
 
+    // Shadow cast types
+    enum class ShadowCastType : u32 {
+        Off = 0u,
+        On = 1u,
+        TwoSided = 2u,
+        ShadowsOnly = 3u
+    };
+
     /**
      * @brief Mesh renderer component (for future rendering system)
      */
@@ -32,11 +40,10 @@ namespace Engine {
 		xresource::instance_guid MaterialGuid;
 		xresource::instance_guid TextureGuid;
 
-		// Lighting, shadows and visibility
+        // Visibility settings
         bool Visible;               // Determine if sent to draw call
-        bool ShadowReceive;         // For future expansion (WIP)
-        bool ShadowCast;            // For future expansion (WIP)
         bool GlobalIlluminate;      // Require further expansion; for now true means it receives light from a light object
+        bool ShadowReceive;         // Allow object to receive shadows if true
 
         // Defaults
         u32 MeshType;          // Fallback to default mesh if custom mesh not found
@@ -47,16 +54,19 @@ namespace Engine {
 		u32 SubmeshIndex;           // Submesh index for multi mesh objects, assumes all custom meshes imported as a group of submeshes, even if its 1 mesh.
 									// If a single mesh is imported, it's treated as a group of 1 submesh.
 
+        // Lighting & Shadows options
+        ShadowCastType CastType;            // (Off, On, Two-sided, Shadows Only)
+
         // Default constructor
         MeshRendererComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
             MeshGuid(0),
 			MaterialGuid(0),
 			TextureGuid(0),
-    		Visible(true),
-            ShadowReceive(false),
-            ShadowCast(false),
+            Visible(true),
             GlobalIlluminate(true),
+            ShadowReceive(false),
+            CastType(ShadowCastType::Off),
             MeshType(0),
             Material(0),
             Texture(0),

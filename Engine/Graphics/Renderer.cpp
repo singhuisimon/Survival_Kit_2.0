@@ -82,6 +82,24 @@ namespace Engine {
 
 		// Call for the object shader(s) that read light
 		bindLightsBlock(m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::MAIN)].getShaderProgramHandle());
+
+		// -------- Shadows UBO (binding = 2) --------
+		glCreateBuffers(1, &m_shadowsUBO);
+		glNamedBufferData(m_shadowsUBO, sizeof(ShadowsBlockGPU), nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_shadowsUBO);
+
+		auto bindShadowsBlock = [&](GLuint programID) {
+			GLuint blockIndex = glGetUniformBlockIndex(programID, "ShadowsBlock");
+			if (blockIndex != GL_INVALID_INDEX) {
+				glUniformBlockBinding(programID, blockIndex, 2);
+			}
+			};
+
+		// Object shader uses shadows
+		bindShadowsBlock(m_gl.m_shader_storage[0].getShaderProgramHandle());
+
+		// Allocate shadow map resources (depth-only). Will be resized per-light when rendering.
+		ensureShadowResources(1024);
 		
 		Material mat1 = Material(glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.3f, 0.5f, 0.9f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
 		Material mat2 = Material(glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.9f, 0.5f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), 100.0f);
@@ -171,7 +189,10 @@ namespace Engine {
 	 	if (isEditorCamOn) {
 
 	 		glm::mat4  cam_view = editor_camera.getLookAt(); 
+			glm::mat4  cam_perspective = editor_camera.getPerspective(static_cast<float>(renderEditorVP.size.x / renderEditorVP.size.y));
 			glm::vec3& cam_pos  = editor_camera.getCamPos();
+
+			bool shadowRenderedForThisFrame = false;
 
 	 		for (auto& pass : m_passes) {
 
@@ -194,12 +215,18 @@ namespace Engine {
 				}
 
 				// Get camera perspective transform
-				glm::mat4 cam_perspective = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
+				//glm::mat4 cam_perspective = editor_camera.getPerspective(pass.view_port.z / pass.view_port.w);
 
 				// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
 				if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
 					m_lastView = cam_view;
 					m_lastProj = cam_perspective;
+
+					// Render the shadow map once (use the main HDR/object pass camera matrices)
+					if (!shadowRenderedForThisFrame) {
+						renderShadowMap(draw_items, lights, cam_view, cam_perspective);
+						shadowRenderedForThisFrame = true;
+					}
 				}
 
 				// Begin drawing frame
@@ -244,6 +271,11 @@ namespace Engine {
 			// For rendering all enabled camera displays
 			for (const auto& cam : camera_list) {
 
+				// Determine camera projection once, and render a shadow map for this camera.
+				glm::mat4 view = cam.first.View;
+				glm::mat4 proj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
+				renderShadowMap(draw_items, lights, view, proj);
+
 				for (auto& pass : m_passes) {
 
 					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
@@ -268,18 +300,16 @@ namespace Engine {
 
 					// If this is the main HDR pass (FBO 0, object shader 0), remember camera matrices
 					if (pass.fbo_handle == 0 && pass.shdpgm_handle == 0) {
-						m_lastView = cam.first.View;
-						m_lastProj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
+						m_lastView = view;
+						m_lastProj = proj;
 					}
-
-					glm::mat4 proj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
 
 					// Begin drawing frame
 					beginFrame(pass); // (Future): if cam.TargetTexture != -1, pass it into begin frame for binding to fbo
 
 					// cam.first is the actual underlying camera object
 					// cam.second is the camera's position using the transform component
-					draw(pass, draw_items, cam.first.View, proj, cam.second, lights);
+					draw(pass, draw_items, view, proj, cam.second, lights);
 
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 				}
@@ -308,7 +338,20 @@ namespace Engine {
 		prog.setUniform("CamPos", cam_pos);
 		prog.setUniform("u_ViewProjection", projection_view);
 
+		// Bind shadow map + sampler uniform only for the main lit object shader
+		if (pass.shdpgm_handle == static_cast<size_t>(ShaderIndex::MAIN)) {
+			glBindTextureUnit(10, m_shadowDepthTex);
+			prog.setUniform("u_ShadowMap", 10);
+		}
+
 		for (const auto& item : draw_items) {
+
+			// Shadow receive/cast is controlled per DrawItem (MeshRendererComponent)
+			// NOTE: requires DrawItem shadow flags 
+			if (pass.shdpgm_handle == static_cast<size_t>(ShaderIndex::MAIN)) {
+				if (!item.m_render_main_pass) continue; // e.g. CastType::ShadowsOnly
+				prog.setUniform("u_ReceiveShadows", item.m_receive_shadows ? 1 : 0);
+			}
 
 			// Specific Pass Handling Logic
 			if (pass.passtype == PassType::DEBUGGING) {
@@ -325,6 +368,8 @@ namespace Engine {
 				u32 pickId = item.m_entity_id;
 				prog.setUniform("u_ObjectID", pickId);
 			}
+
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -1166,5 +1211,309 @@ namespace Engine {
 
 		// Used for final composite
 		MeshData2D quad = make_quad(); m_fullscreen_quad = upload_mesh_data2D(quad);
+	}
+
+	// ---------------- Shadows (shadow mapping) ----------------
+	void Renderer::ensureShadowResources(uint32_t res) {
+		if (res == 0u) res = 1024u;
+		if (m_shadowDepthTex != 0 && m_shadowMapRes == res && m_shadowFBO != 0) return;
+
+		m_shadowMapRes = res;
+
+		// Destroy old
+		if (m_shadowDepthTex) {
+			glDeleteTextures(1, &m_shadowDepthTex);
+			m_shadowDepthTex = 0;
+		}
+		if (m_shadowFBO) {
+			glDeleteFramebuffers(1, &m_shadowFBO);
+			m_shadowFBO = 0;
+		}
+
+		// Create depth texture
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowDepthTex);
+		glTextureStorage2D(m_shadowDepthTex, 1, GL_DEPTH_COMPONENT24, (GLsizei)res, (GLsizei)res);
+
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		const float border[4] = { 1.f, 1.f, 1.f, 1.f };
+		glTextureParameterfv(m_shadowDepthTex, GL_TEXTURE_BORDER_COLOR, border);
+
+		// sampler2DShadow compare mode
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+		// Create FBO
+		glCreateFramebuffers(1, &m_shadowFBO);
+		glNamedFramebufferTexture(m_shadowFBO, GL_DEPTH_ATTACHMENT, m_shadowDepthTex, 0);
+		glNamedFramebufferDrawBuffer(m_shadowFBO, GL_NONE);
+		glNamedFramebufferReadBuffer(m_shadowFBO, GL_NONE);
+
+		GLenum status = glCheckNamedFramebufferStatus(m_shadowFBO, GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			LOG_ERROR("Renderer::ensureShadowResources() - Shadow FBO incomplete! status=", status);
+		}
+	}
+
+	static glm::mat4 computeLightVP_Directional(const glm::vec3& lightDirWorld,
+		std::span<const DrawItem> draw_items,
+		float extraPadding)
+	{
+		// Compute world-space AABB over draw item translations (quick and dirty)
+		glm::vec3 wmin(FLT_MAX), wmax(-FLT_MAX);
+		bool any = false;
+		for (const auto& it : draw_items) {
+			// include only shadow casters/receivers to size map roughly
+			glm::vec3 p = glm::vec3(it.m_model_to_world_transform[3]);
+			wmin = glm::min(wmin, p);
+			wmax = glm::max(wmax, p);
+			any = true;
+		}
+		if (!any) {
+			wmin = glm::vec3(-10.f);
+			wmax = glm::vec3(10.f);
+		}
+
+		glm::vec3 center = 0.5f * (wmin + wmax);
+		glm::vec3 ext = 0.5f * (wmax - wmin);
+		float radius = glm::length(ext);
+		if (radius < 1.0f) radius = 1.0f;
+
+		glm::vec3 dir = glm::normalize(lightDirWorld);
+		glm::vec3 up(0, 1, 0);
+		if (fabs(glm::dot(dir, up)) > 0.95f) up = glm::vec3(0, 0, 1);
+
+		float dist = radius * 2.0f + 10.0f;
+		glm::vec3 lightPos = center - dir * dist;
+		glm::mat4 V = glm::lookAt(lightPos, center, up);
+
+		// transform 8 corners to light space for tight ortho
+		glm::vec3 corners[8] = {
+			{wmin.x, wmin.y, wmin.z}, {wmax.x, wmin.y, wmin.z}, {wmin.x, wmax.y, wmin.z}, {wmax.x, wmax.y, wmin.z},
+			{wmin.x, wmin.y, wmax.z}, {wmax.x, wmin.y, wmax.z}, {wmin.x, wmax.y, wmax.z}, {wmax.x, wmax.y, wmax.z},
+		};
+
+		glm::vec3 lmin(FLT_MAX), lmax(-FLT_MAX);
+		for (auto& c : corners) {
+			glm::vec4 ls = V * glm::vec4(c, 1.0f);
+			glm::vec3 p = glm::vec3(ls);
+			lmin = glm::min(lmin, p);
+			lmax = glm::max(lmax, p);
+		}
+
+		lmin -= glm::vec3(extraPadding);
+		lmax += glm::vec3(extraPadding);
+
+		// Convert view-space Z (negative forward) to positive near/far for glm::ortho
+		float zNear = -lmax.z; // closest (largest z in view space)
+		float zFar = -lmin.z;  // farthest
+		if (zNear < 0.1f) zNear = 0.1f;
+		if (zFar < zNear + 0.1f) zFar = zNear + 0.1f;
+
+		glm::mat4 P = glm::ortho(lmin.x, lmax.x, lmin.y, lmax.y, zNear, zFar);
+		return P * V;
+	}
+
+	static glm::mat4 computeLightVP_Directional_FrustumFit(const glm::vec3& lightDirWorld,
+		const glm::mat4& camView,
+		const glm::mat4& camProj,
+		int shadowMapRes,
+		float extraPadding)
+	{
+		// 1) Build camera frustum corners in WORLD space
+		glm::mat4 invVP = glm::inverse(camProj * camView);
+
+		// NDC depth convention matters.
+		// - OpenGL default: z in [-1, 1]
+		// - If GLM_FORCE_DEPTH_ZERO_TO_ONE is enabled (common for Vulkan/D3D style), z in [0, 1]
+		// If these don't match your camera projection, the frustum corners (and thus lightVP)
+		// will be wrong and you'll get "no shadows".
+		float zN = -1.0f;
+		float zF = 1.0f;
+#ifdef GLM_FORCE_DEPTH_ZERO_TO_ONE
+		zN = 0.0f;
+		zF = 1.0f;
+#endif
+
+		glm::vec4 ndc[8] = {
+			{-1, -1, zN, 1}, { 1, -1, zN, 1}, {-1,  1, zN, 1}, { 1,  1, zN, 1}, // near
+			{-1, -1, zF, 1}, { 1, -1, zF, 1}, {-1,  1, zF, 1}, { 1,  1, zF, 1}, // far
+		};
+
+		glm::vec3 frustumWS[8];
+		for (int i = 0; i < 8; ++i) {
+			glm::vec4 w = invVP * ndc[i];
+			frustumWS[i] = glm::vec3(w) / w.w;
+		}
+
+		// 2) Choose a light view matrix looking at the frustum center
+		glm::vec3 dir = glm::normalize(lightDirWorld);
+		glm::vec3 up(0, 1, 0);
+		if (fabs(glm::dot(dir, up)) > 0.95f) up = glm::vec3(0, 0, 1);
+
+		glm::vec3 center(0.0f);
+		for (auto& p : frustumWS) center += p;
+		center *= (1.0f / 8.0f);
+
+		// Place the light "back" along its direction so all points are in front
+		// (distance can be generous; the ortho bounds will clamp it anyway)
+		float dist = 200.0f;
+		glm::vec3 lightPos = center - dir * dist;
+
+		glm::mat4 V = glm::lookAt(lightPos, center, up);
+
+		// 3) Compute bounds in LIGHT space (tight ortho)
+		glm::vec3 lmin(FLT_MAX), lmax(-FLT_MAX);
+		for (int i = 0; i < 8; ++i) {
+			glm::vec3 ls = glm::vec3(V * glm::vec4(frustumWS[i], 1.0f));
+			lmin = glm::min(lmin, ls);
+			lmax = glm::max(lmax, ls);
+		}
+
+		lmin -= glm::vec3(extraPadding);
+		lmax += glm::vec3(extraPadding);
+
+		// 4) Stabilize: snap to shadow texel grid in light space
+		float width = (lmax.x - lmin.x);
+		float height = (lmax.y - lmin.y);
+		// avoid division by zero if frustum is degenerate (can happen with bad proj matrices)
+		width = (fabs(width) < 1e-4f) ? 1e-4f : width;
+		height = (fabs(height) < 1e-4f) ? 1e-4f : height;
+		shadowMapRes = (shadowMapRes <= 0) ? 1024 : shadowMapRes;
+		if (width < 0.001f) width = 0.001f;
+		if (height < 0.001f) height = 0.001f;
+
+		float texelX = width / (float)shadowMapRes;
+		float texelY = height / (float)shadowMapRes;
+		if (texelX < 1e-6f) texelX = 1e-6f;
+		if (texelY < 1e-6f) texelY = 1e-6f;
+
+		// snap minimum corner
+		lmin.x = floor(lmin.x / texelX) * texelX;
+		lmin.y = floor(lmin.y / texelY) * texelY;
+
+		// preserve extents
+		lmax.x = lmin.x + width;
+		lmax.y = lmin.y + height;
+
+		// 5) Z near/far: note glm::lookAt looks down -Z in view space
+		float zNear = -lmax.z;
+		float zFar = -lmin.z;
+
+		if (zNear < 0.1f) zNear = 0.1f;
+		if (zFar < zNear + 0.1f) zFar = zNear + 0.1f;
+
+		glm::mat4 P = glm::ortho(lmin.x, lmax.x, lmin.y, lmax.y, zNear, zFar);
+		return P * V;
+	}
+
+
+	void Renderer::renderShadowMap(std::span<const DrawItem> draw_items,
+		std::span<const LightCPU> lights,
+		const glm::mat4& camView,
+		const glm::mat4& camProj)
+	{
+		// Choose first directional light that has shadows enabled
+		const LightCPU* shadowLight = nullptr;
+		for (const auto& L : lights) {
+			if (L.type == LIGHT_DIRECTIONAL && L.shadowType != 0u && L.shadowStrength > 0.0f) {
+				shadowLight = &L;
+				break;
+			}
+		}
+
+		if (!shadowLight) {
+			m_shadowsCPU.lightDirEnabled = glm::vec4(0, 0, 0, 0);
+			glNamedBufferSubData(m_shadowsUBO, 0, sizeof(ShadowsBlockGPU), &m_shadowsCPU);
+			return;
+		}
+
+		ensureShadowResources(shadowLight->shadowResolution);
+
+		// Shadow light direction 
+		glm::vec3 Ldir = glm::normalize(-shadowLight->direction);
+
+		//// Fit ortho shadow volume to the camera frustum 
+		//glm::mat4 lightVP = computeLightVP_Directional_FrustumFit(
+		//	glm::normalize(shadowLight->direction),
+		//	camView,
+		//	camProj,
+		//	(int)m_shadowMapRes,
+		//	10.0f
+		//);
+
+		glm::mat4 lightVP = computeLightVP_Directional(glm::normalize(shadowLight->direction), draw_items, 10.0f);
+
+		// Update shadows UBO
+		m_shadowsCPU.lightViewProj[0] = lightVP;
+		for (int i = 1; i < 4; ++i) m_shadowsCPU.lightViewProj[i] = glm::mat4(1.0f);
+		m_shadowsCPU.cascadeSplits = glm::vec4(0.0f);
+		m_shadowsCPU.shadowParams = glm::vec4(shadowLight->shadowStrength,
+			shadowLight->shadowBias,
+			1.0f / (float)m_shadowMapRes,
+			(float)shadowLight->shadowType);
+		m_shadowsCPU.lightDirEnabled = glm::vec4(Ldir, 1.0f);
+
+		glNamedBufferSubData(m_shadowsUBO, 0, sizeof(ShadowsBlockGPU), &m_shadowsCPU);
+
+		// Render depth
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO);
+		glViewport(0, 0, (GLsizei)m_shadowMapRes, (GLsizei)m_shadowMapRes);
+		glClearDepth(1.0);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glDisable(GL_BLEND);
+
+		// Reduce acne / peter panning
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(2.0f, 4.0f);
+
+		auto& prog = m_gl.m_shader_storage[static_cast<int>(ShaderIndex::SHADOW)];
+		prog.programUse();
+		prog.setUniform("u_LightViewProj", lightVP);
+
+		for (const auto& item : draw_items) {
+			if (item.m_cast_shadow_type == 0u) continue;
+
+			bool twoSided = (item.m_cast_shadow_type == 2u);
+			if (twoSided) glDisable(GL_CULL_FACE);
+
+			prog.setUniform("u_World", item.m_model_to_world_transform);
+
+			size_t mesh_handle = static_cast<size_t>(item.m_default_mesh_handle);
+
+			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(convertToMeshGuid(item.m_mesh_guid))) {
+				glBindVertexArray(mesh_resource->VAO);
+				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
+				const void* indexOffset = reinterpret_cast<const void*>(submesh.startIndex * sizeof(unsigned int));
+				glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, indexOffset);
+				glBindVertexArray(0);
+			}
+			else {
+				GLenum primitive = m_gl.m_mesh_storage[mesh_handle].primitive_type;
+				GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
+				GLenum index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
+				m_gl.m_mesh_storage[mesh_handle].vao.bind();
+				glDrawElements(primitive, draw_count, index_type, nullptr);
+				glBindVertexArray(0);
+			}
+
+			if (twoSided) {
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_FRONT);
+			}
+		}
+
+		prog.programFree();
+
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		glCullFace(GL_BACK);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }

@@ -175,8 +175,6 @@ namespace Game
                 moveDir.X += forward.X;
                 moveDir.Y += forward.Y;
                 moveDir.Z += forward.Z;
-
-                LogMessage("Send help pls");
             }
             if (Input.IsKeyPressed(KeyCode.S))  // S = Move toward camera (backward)
             {

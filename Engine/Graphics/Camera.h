@@ -97,6 +97,7 @@ namespace Engine {
         // Compute the perspective projection matrix (P) based on the field of view and aspect ratio (Default aspect ratio is 1)
         glm::mat4 getPerspective(float aspect = 1.0f) const
         {
+            if (aspect <= 0.0f) aspect = 1.0f;
             return glm::perspective(glm::radians(FOV), aspect, nearPlane, farPlane);
         }
 

@@ -24,7 +24,7 @@ source_group("Utils" REGULAR_EXPRESSION "${COMPILER_ROOT}/Utility/.*")
 add_executable(AssetCompiler
     ${COMPILER_SOURCES}
     ${COMPILER_HEADERS}
-)
+ "CompilerCore/FontCompiler.cpp")
 
 # Include directories
 target_include_directories(AssetCompiler PRIVATE
@@ -32,6 +32,7 @@ target_include_directories(AssetCompiler PRIVATE
     ${CMAKE_SOURCE_DIR}/External/rapidjson/include  
     ${CMAKE_SOURCE_DIR}/External/glm   
     ${CMAKE_SOURCE_DIR}/External/openFBX/openFBX/src       
+    ${CMAKE_SOURCE_DIR}/External/freetype
 )
 
 # link against OPENFBX library
@@ -39,6 +40,12 @@ target_link_libraries(AssetCompiler PRIVATE
     openfbx
 )
 add_dependencies(AssetCompiler openfbx)
+
+# link against Freetype library 
+target_link_libraries(AssetCompiler PRIVATE 
+    freetype
+)
+add_dependencies(AssetCompiler freetype)
 
 # Link only what we need (NO game engine dependencies!)
 # We'll link specific libraries as needed for asset processing

@@ -63,7 +63,7 @@
         {
           "Type": "SpriteRendererComponent",
           "Properties": {
-            "Texture": "Screen_EpilepsyWarning.png",
+            "Texture": "EpilepsyWarning.png",
             "Color": [1.0, 1.0, 1.0, 1.0],
             "Quad": 3,
             "Sprite Layer": 0,

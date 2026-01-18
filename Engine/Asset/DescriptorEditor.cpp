@@ -48,6 +48,8 @@ namespace Engine
 		//build path 
 		 // Build descriptor path
 		m_descriptorPath = AM.descriptorGenerator().GetDescriptorFolderPath(*rec) + "Descriptor.txt";
+		//debug
+		std::cout << "DEBUG: m_descriptorPath = " << m_descriptorPath << std::endl;
 		m_infoPath = AM.descriptorGenerator().GetDescriptorFolderPath(*rec) + "Info.txt";
 
 		// Check if files exist

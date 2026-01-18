@@ -119,7 +119,7 @@ namespace Engine {
 		//detect the resource type from file extension
 		rec->type = detectResourceTypeFromPath(src);
 		if (rec->type == ResourceType::UNKNOWN) {
-			LOG_WARNING("Unknown resource type: ", src);
+			//LOG_WARNING("Unknown resource type: ", src);
 			rec->valid = false;
 			return;
 		}
