@@ -600,6 +600,13 @@ namespace Engine
 				componentObj.AddMember("Type", "ScriptComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(script.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+
+				);
 				propertiesObj.AddMember("ScriptClassName",
 					Value(script.ScriptClassName.c_str(), allocator), allocator);
 
@@ -1447,6 +1454,12 @@ namespace Engine
 						LOG_TRACE("  - Deserializing ScriptComponent");
 
 						auto &script = entity.AddComponent<ScriptComponent>();
+						if (properties.HasMember("ComponentGUID"))
+						{
+							script.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 
 						if (properties.HasMember("ScriptClassName"))
 						{
