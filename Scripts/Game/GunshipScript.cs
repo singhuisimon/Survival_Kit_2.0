@@ -18,7 +18,7 @@ namespace Game
     {
 
         // === NAME OF ENTITY ===
-        [SerializeField] private string gunshipEntity = "GUNSHIP";
+        [SerializeField] private string gunshipEntity = "ALLIES";
         private uint gunshipEntityID = 0;
 
         // === HEALTH INFORMATION ===
@@ -84,6 +84,15 @@ namespace Game
             
             // Set initial turret rotation
             turretRotation = GetRotation((uint)EntityID);
+
+            LogMessage("Initial rotation: X=" + turretRotation.X + ", Y=" + turretRotation.Y + 
+           ", Z=" + turretRotation.Z + ", W=" + turretRotation.W);
+            Vector3 testForward = turretRotation.Forward;
+            LogMessage("Model's Forward direction: " + testForward.X + ", " + testForward.Y + ", " + testForward.Z);
+            Vector3 testRight = turretRotation.Right;
+            LogMessage("Model's Right direction: " + testRight.X + ", " + testRight.Y + ", " + testRight.Z);
+            Vector3 testUp = turretRotation.Up;
+            LogMessage("Model's Up direction: " + testUp.X + ", " + testUp.Y + ", " + testUp.Z);
             
             // Subscribe to damage events
             Subscribe("GunshipDamage:" + EntityID, OnTakeDamage);
@@ -231,7 +240,7 @@ namespace Game
             toTarget.Z *= invLen;
             
             // Calculate rotation needed to face target
-            Vector3 forward = new Vector3(0f, 0f, 1f);  // Forward Direction
+            Vector3 forward = new Vector3(0f, 0f, -1f);  // Forward Direction
             Quat targetRotation = QuaternionFromTo(forward, toTarget);
             
             // Rotate towards Enemy Target
@@ -246,45 +255,52 @@ namespace Game
 
         private void TryShoot()
         {
+            // To test the bullet shooting immediately
+            // FireBullet();
 
-             FireBullet();
+            //On Cooldown
+            if (fireCooldown > 0f)
+                return;
+            
+            // Cannot shoot without Target (Enemy)
+            if (currentTarget == INVALID_ENTITY)
+                return;
+            
+            // Check if it is aimed at Target
+            Vector3 myPos = GetPosition((uint)EntityID);
+            Vector3 targetPos = GetPosition(currentTarget);
+            Vector3 forward = turretRotation.Forward;
 
-            // On Cooldown
-            // if (fireCooldown > 0f)
-            //     return;
+            // Debug Msg
+            LogMessage("Turret forward: " + forward.X + ", " + forward.Y + ", " + forward.Z);
             
-            // // Cannot shoot without Target (Enemy)
-            // if (currentTarget == INVALID_ENTITY)
-            //     return;
+            Vector3 toTarget = new Vector3(
+                targetPos.X - myPos.X,
+                targetPos.Y - myPos.Y,
+                targetPos.Z - myPos.Z
+            );
             
-            // // Check if it is aimed at Target
-            // Vector3 myPos = GetPosition((uint)EntityID);
-            // Vector3 targetPos = GetPosition(currentTarget);
-            // Vector3 forward = turretRotation.Forward;
-            
-            // Vector3 toTarget = new Vector3(
-            //     targetPos.X - myPos.X,
-            //     targetPos.Y - myPos.Y,
-            //     targetPos.Z - myPos.Z
-            // );
-            
-            // float lenSq = toTarget.X * toTarget.X + toTarget.Y * toTarget.Y + toTarget.Z * toTarget.Z;
-            // if (lenSq > 0.0001f)
-            // {
-            //     float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-            //     toTarget.X *= invLen;
-            //     toTarget.Y *= invLen;
-            //     toTarget.Z *= invLen;
+            float lenSq = toTarget.X * toTarget.X + toTarget.Y * toTarget.Y + toTarget.Z * toTarget.Z;
+            if (lenSq > 0.0001f)
+            {
+                float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+                toTarget.X *= invLen;
+                toTarget.Y *= invLen;
+                toTarget.Z *= invLen;
                 
-            //     // Check if aimed (dot product > 0.95 = ~18 degrees)
-            //     float dot = forward.X * toTarget.X + forward.Y * toTarget.Y + forward.Z * toTarget.Z;
-                
-            //     if (dot > 0.95f)
-            //     {
-            //         // Shoot
-            //         FireBullet();
-            //     }
-            // }
+                // Check if aimed (dot product > 0.95 = ~18 degrees)
+                float dot = forward.X * toTarget.X + forward.Y * toTarget.Y + forward.Z * toTarget.Z;
+                LogMessage("Dot product: " + dot + " (need > 0.95 to shoot)");
+
+                if (dot > -0.3f)
+                {
+                    // Shoot
+                    LogMessage("SHOOTING NOW!");
+                    FireBullet();
+                } else {
+                    LogMessage("Not aimed yet, rotating...");
+                }
+            }
         }
         
         private void FireBullet()

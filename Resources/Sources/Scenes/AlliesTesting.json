@@ -8,7 +8,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "GUNSHIP"
+                        "Tag": "ALLIES"
                     }
                 },
                 {
@@ -42,10 +42,13 @@
                         "Material": "",
                         "Texture": "",
                         "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
                         "MeshType": 0,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
-                        "SubmeshIndex": 0
+                        "SubmeshIndex": 0,
+                        "CastType": 0
                     }
                 },
                 {
@@ -83,7 +86,7 @@
                     "Properties": {
                         "ScriptClassName": "Game.GunshipScript",
                         "Fields": {
-                            "gunshipEntity": "GUNSHIP",
+                            "gunshipEntity": "GUNSHIP1",
                             "maxHealth": 75.0,
                             "fireRate": 0.10000000149011612,
                             "turretRange": 600.0,
@@ -135,10 +138,13 @@
                         "Material": "",
                         "Texture": "",
                         "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
                         "MeshType": 2,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
-                        "SubmeshIndex": 0
+                        "SubmeshIndex": 0,
+                        "CastType": 0
                     }
                 },
                 {
@@ -266,7 +272,10 @@
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10401046214794616929\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.006000000052154064,0.006000000052154064,0.006000000052154064],\"Parent\":4294967295,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10401046214794616929\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.006000000052154064,0.006000000052154064,0.006000000052154064],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 101,
@@ -299,9 +308,9 @@
                             53.599998474121094
                         ],
                         "Rotation": [
-                            -20.0,
-                            -0.0,
-                            0.0
+                            -179.0004425048828,
+                            10.047999382019043,
+                            179.99993896484375
                         ],
                         "Scale": [
                             0.006000000052154064,
@@ -320,10 +329,13 @@
                         "Material": "",
                         "Texture": "",
                         "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
                         "MeshType": 0,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
-                        "SubmeshIndex": 0
+                        "SubmeshIndex": 0,
+                        "CastType": 0
                     }
                 },
                 {
@@ -398,7 +410,8 @@
             "BloomToggle": false,
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
-            "Exposure": 1.0
+            "Exposure": 1.0,
+            "GlobalBias": 0.004999999888241291
         }
     ]
 }
