@@ -17,6 +17,8 @@
 
 #include "../ECS/Scene.h"
 
+#include "../Utility/Logger.h"
+
 namespace Engine 
 {
 	
@@ -33,9 +35,9 @@ namespace Engine
 	 * param[in]  ortho_proj_ref
 	 *			  Provides a reference to the orthographic projection data
 	 */
-	CollisionSystem2D::CollisionSystem2D( std::vector<MeshData2D>& meshdata2d_ref, 
-										  glm::vec2& viewport_ref, 
-										  glm::mat4& ortho_proj_ref) : 
+	CollisionSystem2D::CollisionSystem2D( std::vector<MeshData2D> const& meshdata2d_ref,
+										  glm::vec4 const& viewport_ref,
+										  glm::mat4 const& ortho_proj_ref) :
 		meshdata2d_(meshdata2d_ref), viewport_(viewport_ref), ortho_proj_(ortho_proj_ref), active_scene_(nullptr) { }
 
 	/**
@@ -50,6 +52,8 @@ namespace Engine
 	void CollisionSystem2D::OnUpdate(Scene* scene, Timestep ts) {
 		(void)ts;
 		active_scene_ = scene; 
+
+		LOG_INFO(GetName(), " IS RUNNING AT PRIORITY: ", GetPriority());
 	}
 
 	/**
@@ -87,7 +91,7 @@ namespace Engine
 		AABB2D aabb = ComputeAABB(meshdata2d_[sprite.GetMeshIndex()].positions,
 								  ortho_proj_,
 								  transform.WorldTransform,
-								  viewport_);
+								  glm::vec2(viewport_.z, viewport_.w));
 
 		return Mouse2DCollision(aabb.min, aabb.max, point);
 	}

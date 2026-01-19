@@ -39,7 +39,7 @@ namespace Engine
 		 * param[in]  ortho_proj_ref
 		 *			  Provides a reference to the orthographic projection data
 		 */
-		CollisionSystem2D(std::vector<MeshData2D>& meshdata2d_ref, glm::vec2& viewport_ref, glm::mat4& ortho_proj_ref);
+		CollisionSystem2D(std::vector<MeshData2D>const& meshdata2d_ref, glm::vec4 const& viewport_ref, glm::mat4 const& ortho_proj_ref);
 		
 		/**
 		 * @brief     Continuously updates the active scene to point to the
@@ -80,9 +80,9 @@ namespace Engine
 	private:
 		
 		// Collision system only uses these data it doesn't own them.
-		std::vector<MeshData2D>& meshdata2d_;
-		glm::vec2&			     viewport_;
-		glm::mat4&				 ortho_proj_;
-		Scene*			         active_scene_;
+		std::vector<MeshData2D> const& meshdata2d_;
+		glm::vec4 const&			   viewport_;
+		glm::mat4 const&			   ortho_proj_;
+		Scene*			               active_scene_;
 	};
 }
