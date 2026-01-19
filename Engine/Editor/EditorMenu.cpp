@@ -401,7 +401,9 @@ namespace Engine
 		if(!m_Editor || !m_Editor->GetRenderer())
 			return;
 
-		ImGui::Begin("HDR Settings", &m_ShowHDRSettings);
+		ImGui::Begin("Render Settings", &m_ShowHDRSettings);
+
+		ImGui::SeparatorText("Quality");
 
 		float& exposure = m_Editor->GetRenderer()->getExposure();
 
@@ -423,8 +425,44 @@ namespace Engine
 			ImGui::SetTooltip("Reset exposure to default value (1.0)");
 		}
 
+		ImGui::SeparatorText("Lighting");
 
-		ImGui::Separator();
+		/* 
+		- Main Light
+		- Additional Lights
+		For both: 
+		bool Cast Shadows
+		float Shadows resolution
+		int Per object limit
+		*/
+
+		ImGui::SeparatorText("Shadows");
+		
+		// ======================
+		// Global bias
+		// ======================
+		// Slider
+		auto& globalBias = m_Editor->GetRenderer()->getGlobalBias();
+		if (ImGui::SliderFloat("Global Bias",
+			&globalBias,
+			0.0f, 2.0f, "%.3f"))
+		{
+			// Global bias changed
+		}
+
+		// Reset button for shadow settings
+		if (ImGui::Button("Reset to Default##Shadow"))
+		{
+			globalBias = 0.005f;
+		}
+
+		// Tooltip for bloom settings
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset global bias (0.005) to default values");
+		}
+
+		ImGui::SeparatorText("Post-Processing");
 
 		// ======================
 		// Bloom toggle

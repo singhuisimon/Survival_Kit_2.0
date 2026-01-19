@@ -1550,10 +1550,6 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetVisible));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetVisible",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetVisible));
-		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowCast",
-			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowCast));
-		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowCast",
-			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowCast));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowReceive",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowReceive));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowReceive",

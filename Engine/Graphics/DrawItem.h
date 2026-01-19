@@ -67,6 +67,11 @@ namespace Engine{
 		xresource::instance_guid m_mesh_guid = 0;
 		xresource::instance_guid m_material_guid = 0;
 		xresource::instance_guid m_texture_guid = 0;
+
+		// Shadow settings
+		bool     m_render_main_pass = true;		// false for CastType::ShadowsOnly
+		bool     m_receive_shadows = false;		// MeshRendererComponent::ShadowReceive
+		u32		 m_cast_shadow_type = 0u;		// MeshRendererComponent::CastType: 0 = Off,1 = On,2 = TwoSided,3 = ShadowsOnly
 	};
 
 }

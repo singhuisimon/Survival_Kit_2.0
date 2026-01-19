@@ -1607,36 +1607,6 @@ namespace Engine
 		 * @return
 		 * True if the condition is met; otherwise false.
 		***************************************************************************/
-		bool MeshRenderer_GetShadowCast(uint64_t entityID)
-		{
-			Entity e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<MeshRendererComponent>()) return false;
-			return e.GetComponent<MeshRendererComponent>().ShadowCast;
-		}
-
-		/**************************************************************************
-		 * @brief
-		 * Sets a mesh renderer property on the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param cast
-		 * Input parameter.
-		***************************************************************************/
-		void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast)
-		{
-			Entity e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
-			e.GetComponent<MeshRendererComponent>().ShadowCast = cast;
-		}
-
-		/**************************************************************************
-		 * @brief
-		 * Gets a mesh renderer property from the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @return
-		 * True if the condition is met; otherwise false.
-		***************************************************************************/
 		bool MeshRenderer_GetShadowReceive(uint64_t entityID)
 		{
 			Entity e = GetEntityOrNull(entityID);

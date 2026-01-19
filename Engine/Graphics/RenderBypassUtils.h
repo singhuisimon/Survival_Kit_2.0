@@ -15,6 +15,7 @@
 #include "../Graphics/ShaderProgram.h"
 #include "../Graphics/MeshData.h"
 #include <vector>
+#include <cfloat> // FLT_MAX, etc
 
 namespace Engine {
 
