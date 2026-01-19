@@ -1714,6 +1714,11 @@ namespace Engine
 		BindInternalCall("Engine.RNG::RandBool",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
 
+		// =====================================================================
+		// UI
+		// =====================================================================
+		BindInternalCall("Engine.Collision2D::IsPointInEntity", 
+			reinterpret_cast<void*>(InternalCalls::CollisionSystem2D_IsPointInEntity));
 
 		LOG_INFO("Internal calls registered");
 	}

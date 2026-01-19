@@ -936,7 +936,7 @@ namespace Engine {
 		beginFrame(pass);
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
-		glm::mat4 ortho = glm::ortho(pass.view_port.x, 1280.f, 720.f, pass.view_port.y, -1.f, 1.f);
+		m_ui_projection = glm::ortho(pass.view_port.x, 1280.f, 720.f, pass.view_port.y, -1.f, 1.f);
 
 		double mp_x, mp_y;
 		glfwGetCursorPos(glfwGetCurrentContext(), &mp_x, &mp_y);
@@ -948,14 +948,14 @@ namespace Engine {
 			if (item.m_drawitem_type == DrawItemType::SPRITE2D) {
 
 				
-				AABB2D testAABB = ComputeAABB(m_gl.m_mesh_data2d_storage[0].positions, ortho, item.m_model_to_world_transform, glm::vec2(pass.view_port.z, pass.view_port.w));
-				
-				if ((item.m_render_layer >= activeLayer) && Mouse2DCollision(testAABB.min, testAABB.max, mouse)) {
-					LOG_INFO("MOUSE IS COLLIDING WITH OBJECT WITH ID: ", item.m_entity_id);
-				}
+				//AABB2D testAABB = ComputeAABB(m_gl.m_mesh_data2d_storage[0].positions, ortho, item.m_model_to_world_transform, glm::vec2(pass.view_port.z, pass.view_port.w));
+				//
+				//if ((item.m_render_layer >= activeLayer) && Mouse2DCollision(testAABB.min, testAABB.max, mouse)) {
+				//	LOG_INFO("MOUSE IS COLLIDING WITH OBJECT WITH ID: ", item.m_entity_id);
+				//}
 
 				prog.setUniform("u_World2D", item.m_model_to_world_transform);
-				prog.setUniform("u_Ortho", ortho);
+				prog.setUniform("u_Ortho", m_ui_projection);
 				prog.setUniform("uColor", item.m_color);
 
 				if (TextureResource* texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(item.m_texture_guid))) {
@@ -1208,6 +1208,10 @@ namespace Engine {
 		// Set default picked entity ID
 		pickedID = NO_HIT;
 		isEditorCamOn = true;
+
+		// This is needed for mouse collision to work properly
+		auto pass = m_UIPass;
+		m_ui_projection = glm::ortho(pass.view_port.x, 1280.f, 720.f, pass.view_port.y, -1.f, 1.f);
 
 		// Used for final composite
 		MeshData2D quad = make_quad(); m_fullscreen_quad = upload_mesh_data2D(quad);
