@@ -86,7 +86,7 @@ namespace Engine
 		auto& transform = view.get<TransformComponent>(entityId);
 		auto& sprite = view.get<SpriteRendererComponent>(entityId);
 
-		AABB2D aabb = ComputeAABB(meshdata2d_[sprite.GetMeshIndex()].positions,
+		AABB2D aabb = ComputeAABB(meshdata2d_[0].positions,
 								  ortho_proj_,
 								  transform.WorldTransform,
 								  glm::vec2(viewport_.z, viewport_.w));

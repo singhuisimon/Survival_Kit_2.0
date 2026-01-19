@@ -6,12 +6,12 @@ namespace Engine
     public static class Collision2D
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool CollisionSystem2D_IsPointInEntity(ulong entityId, ref Vector2 point);
+        private static extern bool IsPointInEntity(uint entityId, ref Vector2 point);
 
-        public static bool IsMouseCollidingWithEntity(Entity e)
+        public static bool IsMouseCollidingWithEntity(uint entityId)
         {
             Vector2 mousePos = Input.GetMousePosition();
-            return CollisionSystem2D_IsPointInEntity(e.EntityID, ref mousePos);
+            return IsPointInEntity(entityId, ref mousePos);
         }
     }
 }
