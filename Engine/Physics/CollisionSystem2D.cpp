@@ -52,8 +52,6 @@ namespace Engine
 	void CollisionSystem2D::OnUpdate(Scene* scene, Timestep ts) {
 		(void)ts;
 		active_scene_ = scene; 
-
-		LOG_INFO(GetName(), " IS RUNNING AT PRIORITY: ", GetPriority());
 	}
 
 	/**
