@@ -47,7 +47,7 @@ namespace Game
         // ===== Player Rotation =====
         [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 5.0f;
         [SerializeField("Model Y Rotation Offset")] private float modelYRotationOffset = -90.0f;
-        [SerializeField("Model Rotation Offset")] private float modelRotationOffset = -90.0f;
+        [SerializeField("Model Rotation Offset")] private float modelRotationOffset = 180.0f;
 
         // ===== Cursor Control =====
         [SerializeField("Toggle Cursor Key")] private KeyCode toggleCursorKey = KeyCode.F3;
@@ -69,11 +69,11 @@ namespace Game
         // Movement state
         private float currentStrafeVelocity = 0.0f;
         private float targetStrafeVelocity = 0.0f;
-        private Vector3 targetMovementVelocity = Vector3.Zero;
+        // private Vector3 targetMovementVelocity = Vector3.Zero;
 
         // Camera state
         private Vector3 smoothCameraPosition = Vector3.Zero;
-        private Quat smoothCameraRotation = Quat.Identity;
+        //private Quat smoothCameraRotation = Quat.Identity;
         
         // Player rotation
         private float targetPlayerYaw = 0.0f;
@@ -302,20 +302,20 @@ namespace Game
             //still side view
             Vector3 camForward = CalculateCameraForward();
             // Project camera forward onto horizontal plane (ignore Y component)
-            Vector3 horizontalForward = new Vector3(camForward.X, 0.0, camForward.Z);
+            Vector3 horizontalForward = new Vector3(camForward.X, 0.0f, camForward.Z);
 
             if (horizontalForward.SqrMagnitude > 0.001f)
             {
                 horizontalForward = horizontalForward.Normalized;
 
                 // Calculate yaw from horizontal direction
-                float target = SimpleMath.Atan2(horizontalForward.X, horizontalForward.Z);
+                float targetYaw = SimpleMath.Atan2(horizontalForward.X, horizontalForward.Z);
 
                 currentPlayerYaw = SimpleMath.Lerp(currentPlayerYaw, targetYaw, playerRotationSpeed * deltaTime);
 
                 // ===== BUILD PLAYER ROTATION =====
                 // Start with yaw rotation (around world up)
-                Quat yawRotation = Quat.FromAxisAngle(Vector3.Up, playerYaw);
+                Quat yawRotation = Quat.FromAxisAngle(Vector3.Up, currentPlayerYaw);
 
                 // Apply model rotation offset
                 Quat modelOffset = Quat.FromAxisAngle(Vector3.Up, modelRotationOffset * SimpleMath.DEG_TO_RAD);
