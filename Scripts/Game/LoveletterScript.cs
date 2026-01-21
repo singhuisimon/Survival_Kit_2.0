@@ -11,7 +11,7 @@ namespace Game
     public class LoveLetterScript : ScriptBehaviour
     {
         // ===== NAME OF ENTITY =====
-        [SerializeField] private string loveletterEntity = "loveletter";
+        [SerializeField] private string loveletterEntity = "lovelettertest";
         private uint loveletterEntityID = 0;
 
         // ===== MULTIPLE CORES =====
@@ -52,9 +52,8 @@ namespace Game
         private Engine.Vector3 targetSurfaceCenter;
         private bool targetCalculated = false;
 
-        // ===== SMOOTH MOVEMENT SETTINGS =====
-        [SerializeField] private float slowDownRadius = 10.0f;
-        [SerializeField] private float minSpeedFactor = 0.1f;
+        // ===== DEBUG =====
+        private int debugFrameCount = 0;
 
         private static bool rngSeeded = false;
 
@@ -147,7 +146,6 @@ namespace Game
             if (isMoving && targetCalculated)
             {
                 MoveTowardsTarget(deltaTime);
-                CheckIfReachedTarget();
             }
         }
 
@@ -344,6 +342,7 @@ namespace Game
             LogMessage("Starting distance to target: " + initialDistance);
         }
 
+        // COMPLETELY REWRITTEN: Constant speed movement with instant stop
         private void MoveTowardsTarget(float deltaTime)
         {
             if (loveletterEntityID == 0) return;
@@ -358,15 +357,26 @@ namespace Game
             // Calculate distance
             float distance = SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
             
-            // If already very close, just snap to target
-            if (distance < 0.5f)
+            // Calculate movement this frame at CONSTANT speed - NO VARIATION
+            float movementThisFrame = moveSpeed * deltaTime;
+            
+            // DEBUG: Log speed every 60 frames to verify it's constant
+            debugFrameCount++;
+            if (debugFrameCount % 60 == 0)
             {
+                LogMessage("[SPEED] Moving at " + moveSpeed + " units/sec, distance remaining: " + distance.ToString("F1"));
+            }
+            
+            // Check if we'll reach or pass the target this frame
+            if (distance <= movementThisFrame)
+            {
+                // Snap directly to target and stop
                 SetPosition(loveletterEntityID, ref targetSurfaceCenter);
                 OnReachedTarget();
                 return;
             }
             
-            // Normalize direction
+            // Normalize direction (only if distance is meaningful)
             if (distance > 0.001f)
             {
                 dx /= distance;
@@ -375,24 +385,14 @@ namespace Game
             }
             else
             {
-                return;
-            }
-            
-            // Calculate effective speed with smooth slowdown
-            float effectiveSpeed = CalculateEffectiveSpeed(distance);
-            
-            // Calculate movement this frame
-            float movementThisFrame = effectiveSpeed * deltaTime;
-            
-            // Don't overshoot - if we would move past the target, just go to target
-            if (distance <= movementThisFrame)
-            {
+                // Already at target
                 SetPosition(loveletterEntityID, ref targetSurfaceCenter);
                 OnReachedTarget();
                 return;
             }
             
-            // Calculate new position
+            // Calculate new position - ALWAYS using full moveSpeed (1200 units/sec)
+            // This should be EXACTLY the same for ALL loveletters regardless of distance
             Engine.Vector3 newPos = new Engine.Vector3(
                 currentPos.X + dx * movementThisFrame,
                 currentPos.Y + dy * movementThisFrame,
@@ -400,42 +400,6 @@ namespace Game
             );
             
             SetPosition(loveletterEntityID, ref newPos);
-        }
-
-        private float CalculateEffectiveSpeed(float distanceToTarget)
-        {
-            // Base speed
-            float speed = moveSpeed;
-            
-            // Apply smooth slowdown when approaching target
-            if (distanceToTarget < slowDownRadius)
-            {
-                // Quadratic ease-out: speed reduces as we get closer
-                float t = distanceToTarget / slowDownRadius; // 1.0 at radius, 0.0 at target
-                speed *= t * t; // Quadratic slowdown (smoother)
-                
-                // Ensure minimum speed
-                if (speed < moveSpeed * minSpeedFactor)
-                {
-                    speed = moveSpeed * minSpeedFactor;
-                }
-            }
-            
-            return speed;
-        }
-
-        private void CheckIfReachedTarget()
-        {
-            if (isWaitingAtSurface) return;
-            
-            Engine.Vector3 currentPos = GetPosition(loveletterEntityID);
-            float distance = CalculateDistance(currentPos, targetSurfaceCenter);
-            
-            if (distance <= 1.0f)
-            {
-                LogMessage("=== REACHED TARGET SURFACE CENTER ===");
-                OnReachedTarget();
-            }
         }
 
         private void OnReachedTarget()
@@ -448,7 +412,8 @@ namespace Game
             isWaitingAtSurface = true;
             waitTimer = waitTimeAtSurface;
             
-            LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface center before self-destruct...");
+            LogMessage("=== REACHED TARGET SURFACE ===");
+            LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface before self-destruct...");
         }
 
         private void OnReachedCore()
@@ -459,6 +424,7 @@ namespace Game
             LogMessage("=== SELF DESTRUCTING AT CORE ===");
         
             // Publish event
+            Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
             Publish("LoveLetterReachedCore", loveletterEntityID.ToString());
             
             // Self-destruct
