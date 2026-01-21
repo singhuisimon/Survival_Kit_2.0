@@ -111,11 +111,12 @@ namespace Game
             hasSplit = true;
 
             // Disappear for now
-            Vector3 newScale = new Vector3(0,0,0);
-            SetScale(EntityID, ref newScale);
+            // Vector3 newScale = new Vector3(0,0,0);
+            // SetScale(EntityID, ref newScale);
             
-            Event.Publish("WormHostSplit", VectorToString(GetPosition((uint)EntityID)));
-            LogMessage("======= WormHostSplit EntityID " + EntityID + "; Position: " + VectorToString(GetPosition((uint)EntityID)) + " =======");
+            Publish("WormHostSplit", VectorToString(GetPosition((uint)EntityID)));
+            LogMessage("======= WormHostSplit EntityID " + EntityID + "; Position: " 
+                       + VectorToString(GetPosition((uint)EntityID)) + " =======");
         }
 
         public string VectorToString(Vector3 vec){
