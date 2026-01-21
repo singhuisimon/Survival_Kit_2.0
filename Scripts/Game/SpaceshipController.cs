@@ -33,7 +33,7 @@ namespace Game
         [SerializeField("Backward Speed")] private float backwardSpeed = 200.0f;
         [SerializeField("Strafe Speed")] private float strafeSpeed = 250.0f;
         [SerializeField("Vertical Speed")] private float verticalSpeed = 200.0f;
-        
+
         // ===== Strafe Dynamics =====
         [SerializeField("Strafe Acceleration")] private float strafeAcceleration = 15.0f;
         [SerializeField("Strafe Deceleration")] private float strafeDeceleration = 12.0f;
@@ -61,11 +61,11 @@ namespace Game
         // Camera rotation angles
         private float pitch = 0.0f;  // Up/down (clamped)
         private float yaw = 0.0f;    // Left/right (unlimited 360)
-        
+
         // Smoothed input
         private float smoothYaw = 0.0f;
         private float smoothPitch = 0.0f;
-        
+
         // Movement state
         private float currentStrafeVelocity = 0.0f;
         private float targetStrafeVelocity = 0.0f;
@@ -74,7 +74,7 @@ namespace Game
         // Camera state
         private Vector3 smoothCameraPosition = Vector3.Zero;
         //private Quat smoothCameraRotation = Quat.Identity;
-        
+
         // Player rotation
         private float targetPlayerYaw = 0.0f;
         private float currentPlayerYaw = 0.0f;
@@ -120,11 +120,9 @@ namespace Game
         {
             Vector3 playerPos = GetPosition(playerEntityID);
             Vector3 camPos = GetPosition(cameraEntityID);
-            
-            // Initialize camera position
+
             smoothCameraPosition = camPos;
-            
-            // Calculate initial angles from camera offset
+
             Vector3 offset = camPos - playerPos;
             if (offset.Magnitude > 0.001f)
             {
@@ -138,12 +136,11 @@ namespace Game
                 yaw = 0.0f;
             }
 
-            // Initialize player rotation
-            Quat playerRot = GetRotation(playerEntityID);
-            Vector3 playerEuler = playerRot.ToEuler();
-            currentPlayerYaw = playerEuler.Y;
+            // Use camera yaw as the authoritative facing direction
             targetPlayerYaw = yaw;
+            currentPlayerYaw = yaw;
         }
+
 
         public override void OnUpdate(float deltaTime)
         {
@@ -191,7 +188,7 @@ namespace Game
             {
                 bool currentVisible = IsCursorVisible();
                 SetCursorVisible(!currentVisible);
-                
+
                 if (!currentVisible)
                 {
                     LogMessage("[SpaceshipController] Cursor unlocked");
@@ -253,8 +250,8 @@ namespace Game
             Vector3 camUp = Vector3.Cross(camRight, camForward).Normalized;
 
             // Calculate desired camera position (behind and above player)
-            Vector3 desiredCameraPos = playerPos 
-                - camForward * cameraDistanceBack 
+            Vector3 desiredCameraPos = playerPos
+                - camForward * cameraDistanceBack
                 + Vector3.Up * cameraHeightOffset;
 
             // Smooth camera position
@@ -285,10 +282,10 @@ namespace Game
 
         //     // Build rotation: Y-axis only (no pitch, no roll/banking)
         //     Quat yawRotation = Quat.FromAxisAngle(Vector3.Up, currentPlayerYaw);
-            
+
         //     // Apply model offset
         //     Quat modelOffset = Quat.FromAxisAngle(Vector3.Up, modelYRotationOffset * SimpleMath.DEG_TO_RAD);
-            
+
         //     Quat finalRotation = (yawRotation * modelOffset).Normalized();
 
         //     SetRotation(playerEntityID, ref finalRotation);
@@ -296,90 +293,71 @@ namespace Game
 
         private void UpdatePlayerRotation(float deltaTime)
         {
-            // ===== EXTRACT ONLY HORIZONTAL DIRECTION (YAW) =====
+            // Smoothly follow the camera yaw
+            currentPlayerYaw = SimpleMath.Lerp(
+                currentPlayerYaw,
+                targetPlayerYaw,
+                playerRotationSpeed * deltaTime
+            );
 
-            //somewhat working best as in player rotates in a sense but wrong direction
-            //still side view
-            Vector3 camForward = CalculateCameraForward();
-            // Project camera forward onto horizontal plane (ignore Y component)
-            Vector3 horizontalForward = new Vector3(camForward.X, 0.0f, camForward.Z);
+            // Build yaw rotation (world up)
+            Quat yawRotation = Quat.FromAxisAngle(Vector3.Up, currentPlayerYaw);
 
-            if (horizontalForward.SqrMagnitude > 0.001f)
-            {
-                horizontalForward = horizontalForward.Normalized;
+            // Apply ONLY the model's visual yaw offset (e.g. -90 if the mesh faces +X by default)
+            Quat modelOffset = Quat.FromAxisAngle(Vector3.Up, modelYRotationOffset * SimpleMath.DEG_TO_RAD);
 
-                // Calculate yaw from horizontal direction
-                float targetYaw = SimpleMath.Atan2(horizontalForward.X, horizontalForward.Z);
-
-                currentPlayerYaw = SimpleMath.Lerp(currentPlayerYaw, targetYaw, playerRotationSpeed * deltaTime);
-
-                // ===== BUILD PLAYER ROTATION =====
-                // Start with yaw rotation (around world up)
-                Quat yawRotation = Quat.FromAxisAngle(Vector3.Up, currentPlayerYaw);
-
-                // Apply model rotation offset
-                Quat modelOffset = Quat.FromAxisAngle(Vector3.Up, modelRotationOffset * SimpleMath.DEG_TO_RAD);
-
-                // Combine: model offset -> yaw -> banking
-                Quat finalRotation = (yawRotation * modelOffset).Normalized();
-
-                SetRotation(playerEntityID, ref finalRotation);
-            }
-
-
-
-            // // Get camera's forward direction and project to horizontal plane
-            // Vector3 camForward = CalculateCameraForward();
-            // Vector3 horizontalForward = new Vector3(camForward.X, 0.0f, camForward.Z);
-            
-            // // Handle edge case of looking straight up/down
-            // if (horizontalForward.Magnitude < 0.001f)
-            // {
-            //     return; // Keep current rotation
-            // }
-            
-            // horizontalForward = horizontalForward.Normalized;
-            
-            // // Calculate yaw from the horizontal forward vector
-            // // Note: Engine forward is -Z, so we need to account for that
-            // // atan2(x, -z) converts from camera space to engine space
-            // float calculatedYaw = SimpleMath.Atan2(horizontalForward.X, -horizontalForward.Z);
-            
-            // // Smoothly interpolate to target yaw
-            // currentPlayerYaw = SimpleMath.Lerp(
-            //     currentPlayerYaw,
-            //     calculatedYaw,
-            //     playerRotationSpeed * deltaTime
-            // );
-            
-            // // Build rotation from calculated yaw (no need for model offset with this approach)
-            // Quat playerRotation = Quat.FromAxisAngle(Vector3.Up, currentPlayerYaw);
-            
-            // // Apply model offset if your spaceship model still needs it
-            // Quat modelOffset = Quat.FromAxisAngle(Vector3.Up, modelYRotationOffset * SimpleMath.DEG_TO_RAD);
-            // Quat finalRotation = (playerRotation * modelOffset).Normalized();
-            
-            // SetRotation(playerEntityID, ref finalRotation);
+            Quat finalRotation = (yawRotation * modelOffset).Normalized();
+            SetRotation(playerEntityID, ref finalRotation);
         }
+
+
+        // // Get camera's forward direction and project to horizontal plane
+        // Vector3 camForward = CalculateCameraForward();
+        // Vector3 horizontalForward = new Vector3(camForward.X, 0.0f, camForward.Z);
+
+        // // Handle edge case of looking straight up/down
+        // if (horizontalForward.Magnitude < 0.001f)
+        // {
+        //     return; // Keep current rotation
+        // }
+
+        // horizontalForward = horizontalForward.Normalized;
+
+        // // Calculate yaw from the horizontal forward vector
+        // // Note: Engine forward is -Z, so we need to account for that
+        // // atan2(x, -z) converts from camera space to engine space
+        // float calculatedYaw = SimpleMath.Atan2(horizontalForward.X, -horizontalForward.Z);
+
+        // // Smoothly interpolate to target yaw
+        // currentPlayerYaw = SimpleMath.Lerp(
+        //     currentPlayerYaw,
+        //     calculatedYaw,
+        //     playerRotationSpeed * deltaTime
+        // );
+
+        // // Build rotation from calculated yaw (no need for model offset with this approach)
+        // Quat playerRotation = Quat.FromAxisAngle(Vector3.Up, currentPlayerYaw);
+
+        // // Apply model offset if your spaceship model still needs it
+        // Quat modelOffset = Quat.FromAxisAngle(Vector3.Up, modelYRotationOffset * SimpleMath.DEG_TO_RAD);
+        // Quat finalRotation = (playerRotation * modelOffset).Normalized();
+
+        // SetRotation(playerEntityID, ref finalRotation);
+
 
         // ========================================
         // FIXED UPDATE: Movement physics
         // ========================================
         private void HandleMovementPhysics(float deltaTime)
         {
-            // Calculate camera direction vectors
-            Vector3 camForward = CalculateCameraForward();
-            Vector3 camRight = Vector3.Cross(camForward, Vector3.Up).Normalized;
-            Vector3 camUp = Vector3.Cross(camRight, camForward).Normalized;
+            GetPlayerMoveAxes(out Vector3 moveForward, out Vector3 moveRight);
 
-            // ===== FORWARD/BACKWARD (W/S) =====
             Vector3 forwardVelocity = Vector3.Zero;
             if (IsKeyPressed(KeyCode.W))
-                forwardVelocity = camForward * forwardSpeed;
+                forwardVelocity = moveForward * forwardSpeed;
             else if (IsKeyPressed(KeyCode.S))
-                forwardVelocity = -camForward * backwardSpeed;
+                forwardVelocity = -moveForward * backwardSpeed;
 
-            // ===== STRAFE (A/D) with acceleration =====
             if (IsKeyPressed(KeyCode.A))
                 targetStrafeVelocity = -strafeSpeed;
             else if (IsKeyPressed(KeyCode.D))
@@ -387,34 +365,19 @@ namespace Game
             else
                 targetStrafeVelocity = 0.0f;
 
-            // Smooth strafe acceleration
             if (targetStrafeVelocity != 0.0f)
-            {
-                currentStrafeVelocity = SimpleMath.Lerp(
-                    currentStrafeVelocity,
-                    targetStrafeVelocity,
-                    strafeAcceleration * deltaTime
-                );
-            }
+                currentStrafeVelocity = SimpleMath.Lerp(currentStrafeVelocity, targetStrafeVelocity, strafeAcceleration * deltaTime);
             else
-            {
-                currentStrafeVelocity = SimpleMath.Lerp(
-                    currentStrafeVelocity,
-                    0.0f,
-                    strafeDeceleration * deltaTime
-                );
-            }
+                currentStrafeVelocity = SimpleMath.Lerp(currentStrafeVelocity, 0.0f, strafeDeceleration * deltaTime);
 
-            Vector3 strafeVelocity = camRight * currentStrafeVelocity;
+            Vector3 strafeVelocity = moveRight * currentStrafeVelocity;
 
-            // ===== VERTICAL (Space/Ctrl) =====
             Vector3 verticalVelocity = Vector3.Zero;
             if (IsKeyPressed(KeyCode.Space))
                 verticalVelocity = Vector3.Up * verticalSpeed;
             else if (IsKeyPressed(KeyCode.LeftControl))
                 verticalVelocity = -Vector3.Up * verticalSpeed;
 
-            // ===== COMBINE AND APPLY =====
             Vector3 finalVelocity = forwardVelocity + strafeVelocity + verticalVelocity;
             RigidbodySetVelocity(playerEntityID, ref finalVelocity);
         }
@@ -429,6 +392,17 @@ namespace Game
             forward.Y = SimpleMath.Sin(pitch);
             forward.Z = SimpleMath.Cos(pitch) * SimpleMath.Cos(yaw);
             return forward.Normalized;
+        }
+
+        // Movement axes based on the player's *visual facing* (includes modelRotationOffset)
+        // Assumes engine "forward" is -Z (so yaw=0 => forward = (0,0,-1))
+        private void GetPlayerMoveAxes(out Vector3 forward, out Vector3 right)
+        {
+            forward = CalculateCameraForward(); // includes pitch (Y)
+
+            right = Vector3.Cross(forward, Vector3.Up);
+            if (right.SqrMagnitude < 0.0001f) right = Vector3.Right;
+            else right = right.Normalized;
         }
     }
 }
