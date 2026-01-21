@@ -34,6 +34,7 @@
 #include "BehaviourTree/BehaviourTreeSystem.h"
 #include "ParticleSystem/ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
+#include "Physics/CollisionSystem2D.h"
 
 #include "Event/EventSystem.h"
 
@@ -264,6 +265,7 @@ void Game::OnInit()
 			m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
 			m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 			m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
+			m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
 		}
 		else
 		{
@@ -384,6 +386,7 @@ void Game::AddAllSystems()
 	m_ActiveScene->AddSystem<Engine::BehaviourTreeSystem>();
 	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
 	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
+	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 }
 
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
@@ -400,6 +403,7 @@ void Game::AddAllSystemsToScene(Engine::Scene* scene)
 	scene->AddSystem<Engine::BehaviourTreeSystem>();
 	scene->AddSystem<Engine::ParticleSystem>();
 	scene->AddSystem<Engine::AnimationSystem>();
+	scene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 }
 
 void Game::CreateDefaultScene()
@@ -480,6 +484,7 @@ void Game::CreateDefaultScene()
 
 	auto &mesh = player.AddComponent<Engine::MeshRendererComponent>();
 	mesh.Material = 1;
+	//mesh.CastType = Engine::ShadowCastType::On;
 
 	std::string meshName = "E004_botnet_v001.fbx";
 	xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
@@ -587,6 +592,7 @@ void Game::CreateDefaultScene()
 
 	auto &g_mesh = ground.AddComponent<Engine::MeshRendererComponent>();
 	g_mesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
+	//g_mesh.ShadowReceive = true;  
 	LOG_TRACE("  -> Ground created");
 
 	LOG_TRACE("  Creating Sphere entity...");
@@ -606,6 +612,7 @@ void Game::CreateDefaultScene()
 
 	auto &spheremesh = sphere.AddComponent<Engine::MeshRendererComponent>();
 	spheremesh.MeshType = 0; // Sphere
+	//spheremesh.CastType = Engine::ShadowCastType::On;
 
 	auto &sphereAnimation = sphere.AddComponent<Engine::AnimatorComponent>();
 	sphereAnimation.playing = true;
@@ -692,6 +699,13 @@ void Game::CreateDefaultScene()
 	sunlightLight.SpotAngleDeg = 0.0f;  // ignored for directional
 	sunlightLight.IndirectMultiplier = 1.0f;
 	sunlightLight.Mode = Engine::LightMode::Realtime;
+
+	//// Shadows setting for sunlight
+	//sunlightLight.TypeShadow = Engine::ShadowType::Hard;
+	//sunlightLight.Resolution = 1024;
+	//sunlightLight.Strength = 1.0;
+	//sunlightLight.Bias = 0.005;
+
 	LOG_TRACE("  -> Sunlight created");
 
 	LOG_TRACE("  Creating Lamp entity...");

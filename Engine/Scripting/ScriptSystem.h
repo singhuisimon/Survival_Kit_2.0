@@ -26,6 +26,9 @@ namespace Engine
 	private:
 		Scene *m_Scene = nullptr;
 		bool m_IsShuttingDown = false;
+		float m_FixedAccumulator = 0.0f;
+		float m_FixedDeltaSeconds = 1.0f / 60.0f;
+		int   m_MaxFixedSubsteps = 8;
 	};
 
 } // namespace Engine

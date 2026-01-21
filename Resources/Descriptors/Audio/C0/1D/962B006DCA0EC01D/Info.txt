@@ -1,7 +1,0 @@
-{
-  "name": "Player_Primary_Alt_Bullet_Fly.wav",
-  "guid": "962B006DCA0EC01D",
-  "tags": [],
-  "lastImported": "000000006966F34B",
-  "resourceLinks": []
-}

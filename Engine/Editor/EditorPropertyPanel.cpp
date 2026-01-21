@@ -636,17 +636,19 @@ namespace Engine
 					ImGui::EndPopup();
 				}
 
+				bool visible = mesh.Visible;
+				if (ImGui::Checkbox("Visible", &visible)) {
+					mesh.Visible = visible;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+				}
+
 				ImGui::Spacing();
+
+				ImGui::SeparatorText("Lighting Properties");
 
 				bool globalIlluminate = mesh.GlobalIlluminate;
 				if (ImGui::Checkbox("Global Illuminate", &globalIlluminate)) {
 					mesh.GlobalIlluminate = globalIlluminate;
-					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
-				}
-
-				bool shadowCast = mesh.ShadowCast;
-				if (ImGui::Checkbox("Shadow Cast", &shadowCast)) {
-					mesh.ShadowCast = shadowCast;
 					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
@@ -656,10 +658,15 @@ namespace Engine
 					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
-				bool visible = mesh.Visible;
-				if (ImGui::Checkbox("Visible", &visible)) {
-					mesh.Visible = visible;
-					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
+				//ShadowCastType castType = mesh.CastType;
+				// --- Shadow Cast Type Dropdown ---
+				const char* shadowCastTypes[] = { "Off", "On", "Two-Sided", "Shadows Only"};
+				int currentCastType = static_cast<int>(mesh.CastType);
+
+				if (ImGui::Combo("Cast Type", &currentCastType, shadowCastTypes, IM_ARRAYSIZE(shadowCastTypes)))
+				{
+					mesh.CastType = static_cast<ShadowCastType>(currentCastType);
+					MarkComponentOverridden(ComponentTypeID::Light);
 				}
 
 				// Material Editor Section
@@ -1890,11 +1897,19 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Script);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
 			bool openScriptComp = ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeScriptComp = false;
 			auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
 			std::string scriptPath = getRepository() + "\\Scripts\\Game";
 			auto scriptFiles = m_Editor->getAssetsInFolder(scriptPath);
+
 			ImGui::NextColumn();
 			if (ImGui::Button("...##ScriptBtn", buttonSize))
 				ImGui::OpenPopup("ScriptPopUp");
@@ -1903,7 +1918,17 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeScriptComp = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Script);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Script, originalJSON);
+						LOG_INFO("Marked ScriptComponent as REMOVED override");
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1926,6 +1951,9 @@ namespace Engine
 							bool isSelected = scriptComp.ScriptClassName == selectedClassName;
 							if (ImGui::Selectable(className.c_str(), isSelected))
 							{
+								if (scriptComp.ScriptClassName != selectedClassName) {
+									MarkComponentOverridden(ComponentTypeID::Script);
+								}
 								// Destroy previous script instance if exists
 								if (scriptComp.ScriptInstance)
 								{
@@ -2045,6 +2073,8 @@ namespace Engine
 
 			if (openLightComp)
 			{
+				ImGui::SeparatorText("General");
+
 				auto& lightComp = m_SelectedEntity.GetComponent<LightComponent>();
 				if (ImGui::Checkbox("Enabled###LightEnabled", &lightComp.Enabled))
 				{
@@ -2053,13 +2083,15 @@ namespace Engine
 
 				// --- Light Type Dropdown ---
 				const char* lightTypeNames[] = { "Directional", "Point", "Spot" };
-				int currentType = static_cast<int>(lightComp.Type);
+				int currentLightType = static_cast<int>(lightComp.Type);
 
-				if (ImGui::Combo("Type", &currentType, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
+				if (ImGui::Combo("Light Type", &currentLightType, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
 				{
-					lightComp.SetType(static_cast<LightType>(currentType));
+					lightComp.SetLightType(static_cast<LightType>(currentLightType));
 					MarkComponentOverridden(ComponentTypeID::Light);
 				}
+
+				ImGui::SeparatorText("Emission");
 
 				// --- Color ---
 				glm::vec3 color = lightComp.Color;
@@ -2104,6 +2136,64 @@ namespace Engine
 				if (ImGui::DragFloat("Indirect Multiplier", &indirectMult, 0.01f, 0.0f, 10.0f, "%.2f"))
 				{
 					lightComp.SetIndirectMultiplier(indirectMult); // uses setter
+					MarkComponentOverridden(ComponentTypeID::Light);
+				}
+
+				ImGui::SeparatorText("Shadow");
+
+				// --- Shadow Type Dropdown ---
+				const char* shadowTypeNames[] = { "No", "Hard", "Soft" };
+				int currentShadowType = static_cast<int>(lightComp.TypeShadow);
+
+				if (ImGui::Combo("Shadow Type", &currentShadowType, shadowTypeNames, IM_ARRAYSIZE(shadowTypeNames)))
+				{
+					lightComp.SetShadowType(static_cast<ShadowType>(currentShadowType));
+					MarkComponentOverridden(ComponentTypeID::Light);
+				}
+
+				// --- Resolution Dropdown ---
+				const char* resolutionTypeNames[] = { "Low (256)", "Med (512)", "High (1024)" };
+
+				int currentResolutionType = 0;
+				switch (lightComp.Resolution)
+				{
+				case 256:  currentResolutionType = 0; break;
+				case 512:  currentResolutionType = 1; break;
+				case 1024: currentResolutionType = 2; break;
+				default:   currentResolutionType = 2; break; // default to High
+				}
+
+				if (ImGui::Combo("Resolution", &currentResolutionType, resolutionTypeNames, IM_ARRAYSIZE(resolutionTypeNames)))
+				{
+					switch (currentResolutionType)
+					{
+					case 0: lightComp.Resolution = 256;  break; // Low
+					case 1: lightComp.Resolution = 512;  break; // Med
+					case 2: lightComp.Resolution = 1024; break; // High
+					default: lightComp.Resolution = 1024; break;
+					}
+
+					MarkComponentOverridden(ComponentTypeID::Light);
+				}
+
+				// --- Strength Value ---
+				float strength = lightComp.Strength;
+				if (ImGui::DragFloat("Strength", &strength, 0.01f, 0.0f, 1.0f, "%.2f"))
+				{
+					lightComp.Strength = strength; 
+					MarkComponentOverridden(ComponentTypeID::Light);
+				}
+
+				// --- Near Plane Value ---
+				float rangeMin = std::min(0.1f, std::max(lightComp.Range, 0.0f) * 0.01f);
+				rangeMin = std::max(rangeMin, 0.0f);	// Prevent neg min
+				float nearPlaneLight = lightComp.NearPlane;
+				if (ImGui::DragFloat("Near Plane", &nearPlaneLight, 0.01f, rangeMin, 10.0f, "%.2f"))
+				{
+					// Clamp to rule (in case user types a value)
+					nearPlaneLight = std::clamp(nearPlaneLight, rangeMin, 10.0f);
+
+					lightComp.NearPlane = nearPlaneLight;
 					MarkComponentOverridden(ComponentTypeID::Light);
 				}
 

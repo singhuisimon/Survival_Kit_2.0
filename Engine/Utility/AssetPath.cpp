@@ -65,7 +65,7 @@ namespace Engine {
             fs::path sourcesPath = resourcesPath / "Sources";
 
             if (fs::exists(sourcesPath)) {
-                std::string result = resourcesPath.generic_string();
+                std::string result = resourcesPath.lexically_normal().generic_string();
                 if (!result.empty() && result.back() != '/') {
                     result += '/';
                 }
@@ -80,7 +80,7 @@ namespace Engine {
         }
 
         // Fallback
-        std::string fallback = resourcesPath.generic_string();
+        std::string fallback = resourcesPath.lexically_normal().generic_string();
         if (!fallback.empty() && fallback.back() != '/') {
             fallback += '/';
         }
@@ -97,6 +97,7 @@ namespace Engine {
         std::string formattedPath = relativePath;
         std::string currentPath = getAssetsPath();
 
+        //normalize to forward slashes
         for (char& c : formattedPath) {
             if (c == '\\') c = '/';
         }
@@ -216,7 +217,7 @@ namespace Engine {
         fs::path currentPath = fs::current_path();
 
         while (!currentPath.empty()) {
-            if (fs::exists(currentPath / "build")) {
+            if (fs::exists(currentPath / "CMakeLists.txt")) {
               //  std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
                 return currentPath.string();
             }
@@ -279,30 +280,28 @@ namespace Engine {
 
     std::string getRelativeAssetPath(const std::string& absolutePath)
     {
-        std::filesystem::path full(absolutePath);
-        std::string norm = full.lexically_normal().string();
+        fs::path full(absolutePath);
+        std::string norm = full.lexically_normal().generic_string();
 
-        // normalize slashes
-        std::replace(norm.begin(), norm.end(), '/', '\\');
-
-        // look for "\Resources\" to strip everything before it
-        size_t pos = norm.find("\\Resources\\");
+        // look for "/Resources/" to strip everything before it
+        size_t pos = norm.find("/Resources/");
         if (pos != std::string::npos)
         {
-            // keep everything from "\Resources" onwards
+            // keep everything from "/Resources" onwards
             return norm.substr(pos);
         }
 
         // fallback: just filename
-        return "\\Resources\\" + full.filename().string();
+        return "/Resources/" + full.filename().string();
     }
 
     // Does the same thing as getAssetFilePath, but for the root assets at the root Resources file
     // Get the absolute filepath for files in root assets directory
     std::string getRootAssetFilePath(const std::string& inputRelativePath) {
-        std::filesystem::path resourcesRoot = getRootResourcesPath();
 
-        std::filesystem::path relative = std::filesystem::path(inputRelativePath);
+        fs::path resourcesRoot = getRootResourcesPath();
+        fs::path relative = fs::path(inputRelativePath);
+
         // Prevent absolute paths
         if (relative.is_absolute()) {
             LOG_ERROR("Asset path must be relative, got absolute: ", inputRelativePath);
@@ -312,9 +311,9 @@ namespace Engine {
         // Remove ".", "..", and duplicate slashes
         relative = relative.lexically_normal();
 
-        std::filesystem::path finalPath = resourcesRoot / relative;
+        fs::path finalPath = resourcesRoot / relative;
 
-        if (!std::filesystem::exists(finalPath)) {
+        if (!fs::exists(finalPath)) {
             LOG_ERROR("Asset at root directory not found: ", finalPath);
             return {};
         }
@@ -324,9 +323,9 @@ namespace Engine {
     }
 
     std::string convertAssetPathToRootResources(const std::string& absoluteNonRootPath) {
-        std::filesystem::path resourcesRoot = getRootResourcesPath();
+        fs::path resourcesRoot = getRootResourcesPath();
+        fs::path absoluteNonRoot = fs::absolute(absoluteNonRootPath);
 
-        std::filesystem::path absoluteNonRoot = std::filesystem::absolute(absoluteNonRootPath);
         if (!absoluteNonRoot.is_absolute()) {
             LOG_ERROR("Asset path must be absolute, got relative: ", absoluteNonRootPath);
             return {};

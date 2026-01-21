@@ -1,0 +1,7 @@
+{
+  "name": "hdr.frag",
+  "guid": "647C507D63D9C035",
+  "tags": [],
+  "lastImported": "00000000696C73D1",
+  "resourceLinks": []
+}
