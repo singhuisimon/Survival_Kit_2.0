@@ -43,7 +43,7 @@
 /Resources/Sources/Scenes/ExampleScene.json|1768961343|12823
 /Resources/Sources/Textures/WindowsBG.png|1768961343|147225
 /Resources/Sources/Meshes/A9003_dreadnought_v002.fbx|1768961343|45040
-/Resources/Sources/Scenes/SpriteRendererTest.json|1768961361|1931
+/Resources/Sources/Scenes/SpriteRendererTest.json|1768984661|2071
 /Resources/Sources/Scenes/GameLevel.json|1768961343|26321
 /Resources/Sources/Scenes/M3_Submission.json|1768961343|237673
 /Resources/Sources/Meshes/level_design_v003.fbx|1768961343|45472
@@ -102,6 +102,7 @@
 /Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_Emissive.png|1768961343|88472
 /Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_Metallic.png|1768961343|44784
 /Resources/Sources/Textures/Firewall_active.png|1768961343|2339110
+/Resources/Sources/Scenes/LoveLetterLevel1.json|1768984661|145824
 /Resources/Sources/Textures/Firewall_Inactive.png|1768961343|406532
 /Resources/Sources/Textures/front.jpg|1768961343|473329
 /Resources/Sources/Textures/PlayerHPBarRed.png|1768961343|2511
@@ -154,4 +155,5 @@
 /Resources/Sources/Textures/PlayerHPWindow.png|1768961343|60240
 /Resources/Sources/Shaders/shadow_depth.frag|1768961343|36
 /Resources/Sources/Shaders/shadow_depth.vert|1768961343|196
-/Resources/Sources/Scenes/TestingWorms.json|1768979789|33026
+/Resources/Sources/Scenes/TestingWorms.json|1768984605|33026
+/Resources/Sources/Scenes/Level1LoveLetter.json|1768984661|70658

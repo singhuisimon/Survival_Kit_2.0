@@ -159,3 +159,5 @@ e52707d64d34017|0|/Resources/Sources/Textures/PlayerHPWindow.png|.png||176896134
 c2dda07db50d4001|4|/Resources/Sources/Shaders/shadow_depth.frag|.frag||1768961343|1|0|0|0
 b2dda07db50d4003|4|/Resources/Sources/Shaders/shadow_depth.vert|.vert||1768961343|1|0|0|0
 d87efdaf4001|7|/Resources/Sources/Scenes/TestingWorms.json|.json||0|0|0|0|0
+6f44f87f04178001|7|/Resources/Sources/Scenes/Level1LoveLetter.json|.json||0|0|0|0|0
+9744f87f04178003|7|/Resources/Sources/Scenes/LoveLetterLevel1.json|.json||0|0|0|0|0

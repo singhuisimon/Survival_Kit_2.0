@@ -1,4 +1,4 @@
-// Botnet.cs
+// WormChild.cs
 using Engine;
 using System;
 using static Engine.Event;
@@ -71,9 +71,22 @@ namespace Game
 
         private void OnHostSplit(string eventName, string payload)
         {
-            LogMessage("----------------- Triggered by WormHostSplit -----------------");
-            LogMessage("----------------- Parent Position: " + payload + " -----------------");
+            Vector3 target = VectorToString(payload);
+            LogMessage("======= target.X: " + target.X + " =======");
+            LogMessage("======= target.Y: " + target.Y + " =======");
+            LogMessage("======= target.Z: " + target.Z + " =======");
             hasSplit = true;
+        }
+
+        public Vector3 VectorToString(string payload){
+            
+            string[] parts = payload.Split(',');
+
+            float x = float.Parse(parts[0]);
+            float y = float.Parse(parts[1]);
+            float z = float.Parse(parts[2]);
+
+            return new Vector3(x, y, z);
         }
     }
     
