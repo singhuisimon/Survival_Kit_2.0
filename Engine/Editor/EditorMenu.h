@@ -40,6 +40,8 @@ namespace Engine
 		bool m_ShowHDRSettings = false;
 		bool m_SavePrefabPanel = false;
 		bool m_CloseSavePrefabPanel = false;
+		bool m_SceneModified = false;
+		bool m_SceneIsNew = false;
 
 		std::string m_CurrScenePath = "";
 		std::string m_CurrPrefabPath = "";

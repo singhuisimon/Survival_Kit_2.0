@@ -182,9 +182,12 @@ namespace Engine {
 		inline bool& getEditorModeToggle() { return isEditorMode; }
 
 		/**
+		 * THIS FUNCTION IS DEPRECATED 
+		 * 
 		 * @brief  Provides an orthographic projection for the UI.
 		 * @return Matrix 4x4 that represents the orthographic projection 
 		 *		   for the user interface.
+		 * 
 		 */
 		inline const glm::mat4 getUIProjection() const { return glm::ortho(m_UIPass.view_port.x, m_UIPass.view_port.z, m_UIPass.view_port.w, m_UIPass.view_port.y, -1.f, 1.f); }
 
@@ -194,6 +197,18 @@ namespace Engine {
 		inline float& getExposure() { return m_exposure; }
 
 		inline float& getGlobalBias() { return m_globalBias; }
+
+		/**
+		 * @brief  Gets the viewport dimensions of the UI pass.
+		 * @return Reference to the UI pass viewport.
+		 */
+		inline glm::vec4 const& GetUIViewport() { return m_UIPass.view_port; }
+
+		/**
+		 * @brief  Gets the projection (orthographic) information of the UI pass.
+		 * @return Reference to projection.
+		 */
+		inline glm::mat4 const& GetUIProjection() { return m_ui_projection; }
 
 	private:
 
@@ -396,6 +411,8 @@ namespace Engine {
 		RenderPass m_UIPass;
 
 		u32 activeLayer = 1;
+
+		glm::mat4 m_ui_projection;
 	};
 
 }
