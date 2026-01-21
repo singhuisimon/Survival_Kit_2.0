@@ -12,7 +12,7 @@
         "positionY": 0.0,
         "positionZ": 0.0,
         "rotationX": -90.0,
-        "rotationY": 0.0,
+        "rotationY": 270.0,
         "rotationZ": 0.0,
         "optimizeVertices": true,
         "generateNormals": false

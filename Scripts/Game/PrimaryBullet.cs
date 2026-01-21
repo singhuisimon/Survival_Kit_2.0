@@ -16,10 +16,6 @@ namespace Game
         [SerializeField]
         public float Damage = 10.0f;
 
-        // Name of the shooter whose rotation we copy (e.g., "Player")
-        [SerializeField]
-        public string ShooterName = "Player";
-
         // Tags this bullet can damage
         [SerializeField]
         private string[] TargetTags = { "botnet", "loveletter", "adware" };
