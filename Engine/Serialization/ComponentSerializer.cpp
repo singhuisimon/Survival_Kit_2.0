@@ -390,6 +390,27 @@ namespace Engine
             propertiesObj.AddMember("Active", emitter.Active, allocator);
             break;
         }
+        case ComponentTypeID::Script: {
+            if (!entity.HasComponent<ScriptComponent>()) {
+                return "{}";
+            }
+            auto& script = entity.GetComponent<ScriptComponent>();
+
+            propertiesObj.AddMember(
+                "ComponentGUID",
+                Value(std::to_string(script.ComponentGUID.m_Value).c_str(), allocator),
+                allocator
+            );
+
+            propertiesObj.AddMember("ScriptClassName",
+                Value(script.ScriptClassName.c_str(), allocator),
+                allocator);
+
+            propertiesObj.AddMember("Started", script.Started, allocator);
+            propertiesObj.AddMember("GCHandle", script.GCHandle, allocator);
+
+            break;
+        }
         case ComponentTypeID::SpriteRenderer : {
             if (!entity.HasComponent<SpriteRendererComponent>()) {
 				return "{}";
@@ -986,7 +1007,30 @@ namespace Engine
         }
 
         case ComponentTypeID::Script: {
-            LOG_WARNING("Script deserialization not fully implemented - skipping");
+            if (!entity.HasComponent<ScriptComponent>()) {
+                entity.AddComponent<ScriptComponent>();
+            }
+
+            auto& script = entity.GetComponent<ScriptComponent>();
+
+            if (properties.HasMember("ComponentGUID")) {
+                script.ComponentGUID = xresource::instance_guid(
+                    std::stoull(properties["ComponentGUID"].GetString())
+                );
+            }
+
+            if (properties.HasMember("ScriptClassName")) {
+                script.ScriptClassName = properties["ScriptClassName"].GetString();
+            }
+
+            if (properties.HasMember("Started")) {
+                script.Started = properties["Started"].GetBool();
+            }
+
+            if (properties.HasMember("GCHandle")) {
+                script.GCHandle = properties["GCHandle"].GetUint();
+            }
+
             return true;
         }
         case ComponentTypeID::SpriteRenderer : {

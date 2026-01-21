@@ -1897,11 +1897,19 @@ namespace Engine
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Script);
+			if (isComponentOverridden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
 			bool openScriptComp = ImGui::CollapsingHeader("Script Component", ImGuiTreeNodeFlags_DefaultOpen);
+			if (isComponentOverridden)
+				ImGui::PopStyleColor();
 			bool removeScriptComp = false;
 			auto& scriptComp = m_SelectedEntity.GetComponent<ScriptComponent>();
 			std::string scriptPath = getRepository() + "\\Scripts\\Game";
 			auto scriptFiles = m_Editor->getAssetsInFolder(scriptPath);
+
 			ImGui::NextColumn();
 			if (ImGui::Button("...##ScriptBtn", buttonSize))
 				ImGui::OpenPopup("ScriptPopUp");
@@ -1910,7 +1918,17 @@ namespace Engine
 				if (ImGui::MenuItem("Remove Component"))
 				{
 					removeScriptComp = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Script);
+
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Script, originalJSON);
+						LOG_INFO("Marked ScriptComponent as REMOVED override");
+					}
 				}
 				ImGui::EndPopup();
 			}
@@ -1933,6 +1951,9 @@ namespace Engine
 							bool isSelected = scriptComp.ScriptClassName == selectedClassName;
 							if (ImGui::Selectable(className.c_str(), isSelected))
 							{
+								if (scriptComp.ScriptClassName != selectedClassName) {
+									MarkComponentOverridden(ComponentTypeID::Script);
+								}
 								// Destroy previous script instance if exists
 								if (scriptComp.ScriptInstance)
 								{

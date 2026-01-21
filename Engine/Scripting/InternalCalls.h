@@ -1270,6 +1270,18 @@ namespace Engine
 		***************************************************************************/
 		float Quat_Dot(glm::quat *q1, glm::quat *q2);
 
+		/**************************************************************************
+		 * @brief
+		 * Checks if a point lies within a game object entity.
+		 * @param entityId
+		 * The entity id of the game object to check.
+		 * @param point
+		 * The point of interest.
+		 * @return
+		 * True if point lies within game object, else false.
+		***************************************************************************/
+		bool CollisionSystem2D_IsPointInEntity(uint64_t entityId, glm::vec2* point);
+
 		void  RNG_Seed(std::uint32_t seed);
 		int   RNG_RandInt(int min, int max);
 		float RNG_RandFloat(float min, float max);

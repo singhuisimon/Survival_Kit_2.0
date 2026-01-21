@@ -36,6 +36,8 @@
 
 #include "../Physics/PhysicsAPI.h"
 
+#include "../Physics/CollisionSystem2D.h"
+
 // Mono
 #include <mono/jit/jit.h>
 #include <mono/metadata/class.h>
@@ -2627,6 +2629,14 @@ namespace Engine
 		bool RNG_RandBool()
 		{
 			return (NextU32() & 1u) != 0u;
+		}
+
+		bool CollisionSystem2D_IsPointInEntity(uint64_t entityId, glm::vec2* point) 
+		{
+			if (!s_CurrentScene) return false;
+
+			auto sys = s_CurrentScene->GetSystem<CollisionSystem2D>();
+			return sys->IsPointInEntity(static_cast<entt::entity>(entityId), *point);
 		}
 	} // namespace InternalCalls
 } // namespace Engine

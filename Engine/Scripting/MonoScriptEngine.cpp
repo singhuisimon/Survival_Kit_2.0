@@ -330,10 +330,10 @@ namespace Engine
 		s_EventSystemRaiseFromNative = nullptr;
 		if (!appImage) return;
 
-		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "EventSystem");
+		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "Event");
 		if (!eventSystemClass)
 		{
-			LOG_WARNING("[Mono] Engine.EventSystem class not found - script events will not be delivered to C#");
+			LOG_WARNING("[Mono] Engine.Event class not found - script events will not be delivered to C#");
 			return;
 		}
 
@@ -341,11 +341,12 @@ namespace Engine
 			mono_class_get_method_from_name(eventSystemClass, "RaiseFromNative", 2);
 
 		if (!s_EventSystemRaiseFromNative)
-			LOG_WARNING("[Mono] Engine.EventSystem.RaiseFromNative(string,string) not found");
+			LOG_WARNING("[Mono] Engine.Event.RaiseFromNative(string,string) not found");
 	}
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
 	{
+
 		static bool s_Initialized = false;
 		if (s_Initialized)
 		{
@@ -411,7 +412,11 @@ namespace Engine
 		}
 
 		RegisterInternalCalls();
+		uint32_t timeSeed = static_cast<uint32_t>(
+			std::chrono::system_clock::now().time_since_epoch().count() & 0xFFFFFFFF
+			);
 
+		InternalCalls::RNG_Seed(timeSeed);
 		EventSystem::Instance().Subscribe<ScriptEvent>(
 			[](ScriptEvent const &ev)
 			{
@@ -1706,13 +1711,18 @@ namespace Engine
 
 		BindInternalCall("Engine.RNG::Seed",
 			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
-		BindInternalCall("Engine.RNG::Quat_Dot",
+		BindInternalCall("Engine.RNG::RandInt",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandInt));
-		BindInternalCall("Engine.RNG::Quat_Dot",
+		BindInternalCall("Engine.RNG::RandFloat",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandFloat));
-		BindInternalCall("Engine.RNG::Quat_Dot",
+		BindInternalCall("Engine.RNG::RandBool",
 			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
 
+		// =====================================================================
+		// UI
+		// =====================================================================
+		BindInternalCall("Engine.Collision2D::IsPointInEntity", 
+			reinterpret_cast<void*>(InternalCalls::CollisionSystem2D_IsPointInEntity));
 
 		LOG_INFO("Internal calls registered");
 	}
