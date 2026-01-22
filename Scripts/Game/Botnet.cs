@@ -22,7 +22,7 @@ namespace Game
         // ===== Serialized Fields (Editable in Inspector) =====
 
         // Movement
-        [SerializeField] private float acceleration = 50.0f;
+        [SerializeField] private float acceleration = 100.0f;
         [SerializeField] private float topSpeed = 30.0f;
 
         // Rotation speed (how fast bot turns towards target)
@@ -47,6 +47,9 @@ namespace Game
 
         // Death explosion prefab path
         [SerializeField] private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
+
+        // Botnet Health
+        [SerializeField] private float HP = 3.0f;
 
         // ===== Private Runtime State =====
 
@@ -101,7 +104,7 @@ namespace Game
             hasChosenInitialTarget = false;
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
-            PhysicsEnableCollisionEvents();
+            //PhysicsEnableCollisionEvents();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
@@ -168,8 +171,15 @@ namespace Game
             if (hitId != (uint)EntityID)
                 return;
 
-            Publish("BotnetDeath", 1.ToString());
-            Explode();
+            HP -= 1.0f;
+            LogMessage("CurrentBotnetHP is: " + HP.ToString());
+
+            if(HP <= 1.0f){
+                Publish("BotnetDeath", 1.ToString());
+                Explode();
+            }
+
+            //add in bullet hit audio here i guess - Amanda
         }
 
         private void OnSpawnDisable(string eventName, string payload)
