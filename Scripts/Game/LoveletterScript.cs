@@ -32,7 +32,7 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 1200.0f;
+        [SerializeField] private float moveSpeed = 800.0f;
         [SerializeField] private float startDelay = 2.0f;
         [SerializeField] private float waitTimeAtSurface = 3.0f;
 
@@ -46,14 +46,18 @@ namespace Game
         private bool isWaitingAtSurface = false;
         private float delayTimer = 0.0f;
         private float waitTimer = 0.0f;
+        
+        // Manual position tracking to bypass physics
+        private Engine.Vector3 currentPosition;
+        private float totalDistanceTraveled = 0.0f;
 
         // ===== TARGET POSITIONS =====
         private Engine.Vector3 corePosition;
+        private Engine.Vector3 startPosition;
         private Engine.Vector3 targetSurfaceCenter;
+        private Engine.Vector3 directionNormalized;
+        private float totalDistance = 0.0f;
         private bool targetCalculated = false;
-
-        // ===== DEBUG =====
-        private int debugFrameCount = 0;
 
         private static bool rngSeeded = false;
 
@@ -83,7 +87,6 @@ namespace Game
             // Initialize core IDs array
             coreEntityIDs = new uint[coreEntities.Length];
             
-            
             if (!rngSeeded)
             {
                 uint timeSeed = (uint)(System.DateTime.Now.Ticks & 0xFFFFFFFF);
@@ -101,7 +104,6 @@ namespace Game
                 delayTimer = startDelay;
                 LogMessage("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
                 LogMessage("Selected core: " + coreEntities[selectedCoreIndex] + " (ID: " + selectedCoreEntityID + ")");
-                
             }
             else
             {
@@ -111,7 +113,6 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            
             // Don't update if dead or no core selected
             if (isDead || selectedCoreIndex < 0) return;
 
@@ -142,10 +143,10 @@ namespace Game
                 return;
             }
 
-            // Movement logic
+            // Movement logic using linear interpolation
             if (isMoving && targetCalculated)
             {
-                MoveTowardsTarget(deltaTime);
+                MoveTowardsTargetLinear(deltaTime);
             }
         }
 
@@ -227,9 +228,6 @@ namespace Game
             isMoving = false;
             isWaitingAtSurface = false;
 
-            // TODO: Add destruction VFX/SFX here
-            // TODO: Spawn upgrade module or rewards
-
             // Publish event for game systems
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
 
@@ -245,6 +243,30 @@ namespace Game
                 corePosition = GetPosition(selectedCoreEntityID);
                 CalculateTargetSurfaceCenter();
                 targetCalculated = true;
+                
+                // Store start position and calculate direction
+                startPosition = GetPosition(loveletterEntityID);
+                currentPosition = startPosition;
+                totalDistanceTraveled = 0.0f;
+                
+                // Calculate total distance
+                float dx = targetSurfaceCenter.X - startPosition.X;
+                float dy = targetSurfaceCenter.Y - startPosition.Y;
+                float dz = targetSurfaceCenter.Z - startPosition.Z;
+                totalDistance = SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
+                
+                // Normalize direction
+                if (totalDistance > 0.001f)
+                {
+                    directionNormalized = new Engine.Vector3(
+                        dx / totalDistance,
+                        dy / totalDistance,
+                        dz / totalDistance
+                    );
+                }
+                
+                LogMessage("Total travel distance: " + totalDistance.ToString("F1") + " units");
+                LogMessage("Movement will take: " + (totalDistance / moveSpeed).ToString("F1") + " seconds at " + moveSpeed + " units/sec");
             }
             else
             {
@@ -336,70 +358,35 @@ namespace Game
                     LogMessage("Targeting BACK face center");
                 }
             }
-            
-            Engine.Vector3 startPos = GetPosition(loveletterEntityID);
-            float initialDistance = CalculateDistance(startPos, targetSurfaceCenter);
-            LogMessage("Starting distance to target: " + initialDistance);
         }
 
-        // COMPLETELY REWRITTEN: Constant speed movement with instant stop
-        private void MoveTowardsTarget(float deltaTime)
+        // NEW APPROACH: Linear interpolation based on total distance traveled
+        private void MoveTowardsTargetLinear(float deltaTime)
         {
             if (loveletterEntityID == 0) return;
 
-            Engine.Vector3 currentPos = GetPosition(loveletterEntityID);
+            // Calculate how far we should move this frame (constant speed)
+            float distanceThisFrame = moveSpeed * deltaTime;
+            totalDistanceTraveled += distanceThisFrame;
             
-            // Calculate direction to target
-            float dx = targetSurfaceCenter.X - currentPos.X;
-            float dy = targetSurfaceCenter.Y - currentPos.Y;
-            float dz = targetSurfaceCenter.Z - currentPos.Z;
-            
-            // Calculate distance
-            float distance = SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
-            
-            // Calculate movement this frame at CONSTANT speed - NO VARIATION
-            float movementThisFrame = moveSpeed * deltaTime;
-            
-            // DEBUG: Log speed every 60 frames to verify it's constant
-            debugFrameCount++;
-            if (debugFrameCount % 60 == 0)
+            // Check if we've reached the target
+            if (totalDistanceTraveled >= totalDistance)
             {
-                LogMessage("[SPEED] Moving at " + moveSpeed + " units/sec, distance remaining: " + distance.ToString("F1"));
-            }
-            
-            // Check if we'll reach or pass the target this frame
-            if (distance <= movementThisFrame)
-            {
-                // Snap directly to target and stop
+                // Snap to exact target
                 SetPosition(loveletterEntityID, ref targetSurfaceCenter);
                 OnReachedTarget();
                 return;
             }
             
-            // Normalize direction (only if distance is meaningful)
-            if (distance > 0.001f)
-            {
-                dx /= distance;
-                dy /= distance;
-                dz /= distance;
-            }
-            else
-            {
-                // Already at target
-                SetPosition(loveletterEntityID, ref targetSurfaceCenter);
-                OnReachedTarget();
-                return;
-            }
-            
-            // Calculate new position - ALWAYS using full moveSpeed (1200 units/sec)
-            // This should be EXACTLY the same for ALL loveletters regardless of distance
-            Engine.Vector3 newPos = new Engine.Vector3(
-                currentPos.X + dx * movementThisFrame,
-                currentPos.Y + dy * movementThisFrame,
-                currentPos.Z + dz * movementThisFrame
+            // Calculate new position based on total distance traveled (not physics position)
+            currentPosition = new Engine.Vector3(
+                startPosition.X + directionNormalized.X * totalDistanceTraveled,
+                startPosition.Y + directionNormalized.Y * totalDistanceTraveled,
+                startPosition.Z + directionNormalized.Z * totalDistanceTraveled
             );
             
-            SetPosition(loveletterEntityID, ref newPos);
+            // Apply the calculated position
+            SetPosition(loveletterEntityID, ref currentPosition);
         }
 
         private void OnReachedTarget()
@@ -413,6 +400,7 @@ namespace Game
             waitTimer = waitTimeAtSurface;
             
             LogMessage("=== REACHED TARGET SURFACE ===");
+            LogMessage("Traveled " + totalDistanceTraveled.ToString("F1") + " units in total");
             LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface before self-destruct...");
         }
 
