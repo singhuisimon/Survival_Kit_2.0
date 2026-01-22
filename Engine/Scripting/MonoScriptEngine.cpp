@@ -330,10 +330,10 @@ namespace Engine
 		s_EventSystemRaiseFromNative = nullptr;
 		if (!appImage) return;
 
-		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "EventSystem");
+		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "Event");
 		if (!eventSystemClass)
 		{
-			LOG_WARNING("[Mono] Engine.EventSystem class not found - script events will not be delivered to C#");
+			LOG_WARNING("[Mono] Engine.Event class not found - script events will not be delivered to C#");
 			return;
 		}
 
@@ -341,7 +341,7 @@ namespace Engine
 			mono_class_get_method_from_name(eventSystemClass, "RaiseFromNative", 2);
 
 		if (!s_EventSystemRaiseFromNative)
-			LOG_WARNING("[Mono] Engine.EventSystem.RaiseFromNative(string,string) not found");
+			LOG_WARNING("[Mono] Engine.Event.RaiseFromNative(string,string) not found");
 	}
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
