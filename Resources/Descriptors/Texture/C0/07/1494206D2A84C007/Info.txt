@@ -1,7 +1,0 @@
-{
-  "name": "level_Design_Grid_Texture.png",
-  "guid": "1494206D2A84C007",
-  "tags": [],
-  "lastImported": "00000000692A7D34",
-  "resourceLinks": []
-}

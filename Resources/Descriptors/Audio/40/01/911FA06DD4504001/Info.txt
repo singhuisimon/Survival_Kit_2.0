@@ -1,7 +1,0 @@
-{
-  "name": "office_ambience.wav",
-  "guid": "911FA06DD4504001",
-  "tags": [],
-  "lastImported": "000000006966F34B",
-  "resourceLinks": []
-}

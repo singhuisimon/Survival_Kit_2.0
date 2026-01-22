@@ -1,7 +1,0 @@
-{
-  "name": "WindowsBG.mat",
-  "guid": "E3D1886DAA5EC00D",
-  "tags": [],
-  "lastImported": "000000006966F34B",
-  "resourceLinks": []
-}

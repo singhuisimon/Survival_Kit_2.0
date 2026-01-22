@@ -1,7 +1,0 @@
-{
-  "name": "Bounds2.png",
-  "guid": "DE9B106C33EDC005",
-  "tags": [],
-  "lastImported": "000000006966F34B",
-  "resourceLinks": []
-}

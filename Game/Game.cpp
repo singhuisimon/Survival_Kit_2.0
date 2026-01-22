@@ -31,10 +31,10 @@
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/ScriptSystem.h"        // ADD THIS
 #include "Scripting/MonoScriptEngine.h"    // ADD THIS
-#include "Scripting/ScriptReloader.h" 
 #include "BehaviourTree/BehaviourTreeSystem.h"
 #include "ParticleSystem/ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
+#include "Physics/CollisionSystem2D.h"
 
 #include "Event/EventSystem.h"
 
@@ -265,6 +265,7 @@ void Game::OnInit()
 			m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
 			m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 			m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
+			m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
 		}
 		else
 		{
@@ -344,21 +345,6 @@ void Game::OnInit()
 			Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
 			LOG_INFO("  -> Mono Scripting Engine initialized successfully");
 		}
-
-		WCHAR exePath[MAX_PATH] = { 0 };
-		GetModuleFileNameW(NULL, exePath, MAX_PATH);
-		std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
-
-		std::filesystem::path projectRoot = exeDir.parent_path().parent_path().parent_path();
-		std::filesystem::path scriptSourcePath = projectRoot / "Scripts" / "Game";
-		std::filesystem::path scriptProjectPath = projectRoot / "Scripts" / "GameScripts.csproj";
-		std::string outputDllPath = (exeDir / "GameScripts.dll").string();
-
-		Engine::ScriptReloader::GetInstance().Initialize(
-			scriptSourcePath.string(),
-			scriptProjectPath.string(),
-			outputDllPath
-		);
 	}
 	catch (const std::exception &e)
 	{
@@ -410,6 +396,7 @@ void Game::AddAllSystems()
 	m_ActiveScene->AddSystem<Engine::BehaviourTreeSystem>();
 	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
 	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
+	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 }
 
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
@@ -426,6 +413,7 @@ void Game::AddAllSystemsToScene(Engine::Scene* scene)
 	scene->AddSystem<Engine::BehaviourTreeSystem>();
 	scene->AddSystem<Engine::ParticleSystem>();
 	scene->AddSystem<Engine::AnimationSystem>();
+	scene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 }
 
 void Game::CreateDefaultScene()
@@ -506,6 +494,7 @@ void Game::CreateDefaultScene()
 
 	auto &mesh = player.AddComponent<Engine::MeshRendererComponent>();
 	mesh.Material = 1;
+	//mesh.CastType = Engine::ShadowCastType::On;
 
 	std::string meshName = "E004_botnet_v001.fbx";
 	xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
@@ -613,6 +602,7 @@ void Game::CreateDefaultScene()
 
 	auto &g_mesh = ground.AddComponent<Engine::MeshRendererComponent>();
 	g_mesh.MaterialGuid = Engine::AM.getAssetIdByFilename("test.mat");
+	//g_mesh.ShadowReceive = true;  
 	LOG_TRACE("  -> Ground created");
 
 	LOG_TRACE("  Creating Sphere entity...");
@@ -632,6 +622,7 @@ void Game::CreateDefaultScene()
 
 	auto &spheremesh = sphere.AddComponent<Engine::MeshRendererComponent>();
 	spheremesh.MeshType = 0; // Sphere
+	//spheremesh.CastType = Engine::ShadowCastType::On;
 
 	auto &sphereAnimation = sphere.AddComponent<Engine::AnimatorComponent>();
 	sphereAnimation.playing = true;
@@ -718,6 +709,13 @@ void Game::CreateDefaultScene()
 	sunlightLight.SpotAngleDeg = 0.0f;  // ignored for directional
 	sunlightLight.IndirectMultiplier = 1.0f;
 	sunlightLight.Mode = Engine::LightMode::Realtime;
+
+	//// Shadows setting for sunlight
+	//sunlightLight.TypeShadow = Engine::ShadowType::Hard;
+	//sunlightLight.Resolution = 1024;
+	//sunlightLight.Strength = 1.0;
+	//sunlightLight.Bias = 0.005;
+
 	LOG_TRACE("  -> Sunlight created");
 
 	LOG_TRACE("  Creating Lamp entity...");
@@ -814,9 +812,6 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 		LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
-
-
-	Engine::ScriptReloader::GetInstance().Update();
 
 	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
 	//{

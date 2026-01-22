@@ -22,7 +22,7 @@
 #include <mutex>
 #include <queue>
 #include <atomic>
-
+#include <filesystem>
 
 //Asset Files
 #include "AssetDatabase.h"
@@ -99,10 +99,14 @@ namespace Engine {
 			Config cfg{};
 
 			//resource path (get from the /Resources not from the build folder)
-			std::string sourcesPath = Engine::getAssetsPath();
+			//std::string sourcesPath = Engine::getAssetsPath();
+
+			std::string sourcesPath = Engine::getRootResourcesPath();
+			std::cout << "AssetManager: SourcesPath = " << sourcesPath << std::endl;
 
 			//get the build/Resources path for compiled path
 			std::string assetsPath = Engine::getAssetsPath();
+
 			// Normalize BOTH paths: convert to forward slashes and remove trailing slash
       std::replace(sourcesPath.begin(), sourcesPath.end(), '\\', '/');
       if (!sourcesPath.empty() && sourcesPath.back() == '/') {

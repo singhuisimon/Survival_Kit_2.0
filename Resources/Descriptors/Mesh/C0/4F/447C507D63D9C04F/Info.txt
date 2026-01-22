@@ -1,0 +1,7 @@
+{
+  "name": "core pad.fbx",
+  "guid": "447C507D63D9C04F",
+  "tags": [],
+  "lastImported": "00000000696DFA32",
+  "resourceLinks": []
+}

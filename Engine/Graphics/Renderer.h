@@ -48,7 +48,25 @@ namespace Engine {
 		float cosOuter{ std::cos(glm::radians(30.f)) };
 		float indirectMultiplier{ 1 };
 		uint32_t type{ LIGHT_POINT };
-		uint32_t _pad{ 0 };
+
+		// Shadow info
+		// Only directional shadows are implemented for now, but the fields
+		// exist for point/spot expansion later.
+		uint32_t shadowType{ 0u };      // 0 = No, 1 = Hard, 2 = Soft (matches LightComponent::ShadowType)
+		uint32_t shadowResolution{ 1024u };
+		float    shadowStrength{ 1.0f };
+		float    shadowBias{ 0.005f };   // receiver bias baseline
+		float    shadowNearPlane{ 0.2f };
+		float    shadowFarPlane{ 50.0f }; // used for (future) cascade splits; currently auto-fit for directional
+	};
+
+	// ---------------- Shadows UBO (room for cascades) ----------------
+	constexpr uint32_t MAX_SHADOW_CASCADES = 4;
+	struct ShadowsBlockGPU {
+		glm::mat4 lightViewProj[MAX_SHADOW_CASCADES];
+		glm::vec4 cascadeSplits; // view-space split depths (positive). Only x is used for single cascade.
+		glm::vec4 shadowParams;  // x=strength, y=bias, z=texelSize (1/res), w=shadowType (0/1/2)
+		glm::vec4 lightDirEnabled; // xyz = light dir (world, normalized), w = 1 if enabled
 	};
 
 	// std140-tight 64B/light packing (4x vec4)
@@ -164,9 +182,12 @@ namespace Engine {
 		inline bool& getEditorModeToggle() { return isEditorMode; }
 
 		/**
+		 * THIS FUNCTION IS DEPRECATED 
+		 * 
 		 * @brief  Provides an orthographic projection for the UI.
 		 * @return Matrix 4x4 that represents the orthographic projection 
 		 *		   for the user interface.
+		 * 
 		 */
 		inline const glm::mat4 getUIProjection() const { return glm::ortho(m_UIPass.view_port.x, m_UIPass.view_port.z, m_UIPass.view_port.w, m_UIPass.view_port.y, -1.f, 1.f); }
 
@@ -174,6 +195,20 @@ namespace Engine {
 		inline float& getBloomStrength() { return m_bloomStrength; }
 		inline float& getBloomFilterRadius() { return m_bloomFilterRadius; }
 		inline float& getExposure() { return m_exposure; }
+
+		inline float& getGlobalBias() { return m_globalBias; }
+
+		/**
+		 * @brief  Gets the viewport dimensions of the UI pass.
+		 * @return Reference to the UI pass viewport.
+		 */
+		inline glm::vec4 const& GetUIViewport() { return m_UIPass.view_port; }
+
+		/**
+		 * @brief  Gets the projection (orthographic) information of the UI pass.
+		 * @return Reference to projection.
+		 */
+		inline glm::mat4 const& GetUIProjection() { return m_ui_projection; }
 
 	private:
 
@@ -188,7 +223,8 @@ namespace Engine {
 		  HDR			   = 4, 
 		  UI			   = 5, 
 		  BLOOM_DOWNSAMPLE = 6, 
-		  BLOOM_UPSAMPLE   = 7 
+		  BLOOM_UPSAMPLE   = 7,
+		  SHADOW		   = 8
 		};
 
 		/**
@@ -295,6 +331,23 @@ namespace Engine {
 		GLuint m_lightsUBO = 0;
 		LightsBlockGPU m_lightsCPU{}; // scratch buffer
 
+		// ---------------- Shadows Mapping ----------------
+		GLuint m_shadowsUBO = 0;
+		ShadowsBlockGPU m_shadowsCPU{};
+		GLuint m_shadowFBO = 0;
+		GLuint m_shadowDepthTex = 0;
+		uint32_t m_shadowMapRes = 1024u;
+		//uint32_t m_shadowShaderIndex = 0u;
+
+		float m_globalBias = 0.005;
+
+		void ensureShadowResources(uint32_t res);
+		//void renderShadowMap(std::span<const DrawItem> draw_items, std::span<const LightCPU> lights);
+		void renderShadowMap(std::span<const DrawItem> draw_items,
+			std::span<const LightCPU> lights,
+			const glm::mat4& camView,
+			const glm::mat4& camProj);
+
 		std::vector<RenderPass>  m_passes;
 		std::vector<FrameBuffer> m_framebuffers;
 
@@ -358,6 +411,8 @@ namespace Engine {
 		RenderPass m_UIPass;
 
 		u32 activeLayer = 1;
+
+		glm::mat4 m_ui_projection;
 	};
 
 }
