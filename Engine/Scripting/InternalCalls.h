@@ -1294,5 +1294,33 @@ namespace Engine
 		static Input *s_InputSystem = nullptr;
 		static AudioManager *s_AudioManager = nullptr;
 
+
+		// ========================================
+// File I/O
+// ========================================
+
+/**
+ * @brief Checks if a file exists at the given path.
+ * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+ * @return True if the file exists, otherwise false.
+ */
+		bool FileExists(MonoString* pathStr);
+
+		/**
+		 * @brief Reads the entire content of a text file.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return Managed string containing file content, or empty string on failure.
+		 */
+		MonoString* FileReadAllText(MonoString* pathStr);
+
+		/**
+		 * @brief Writes text content to a file, creating directories if needed.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @param contentStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return True if write succeeded, otherwise false.
+		 */
+		bool FileWriteAllText(MonoString* pathStr, MonoString* contentStr);
+
+
 	} // namespace InternalCalls
 } // namespace Engine

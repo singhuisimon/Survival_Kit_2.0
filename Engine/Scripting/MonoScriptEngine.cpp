@@ -1709,6 +1709,12 @@ namespace Engine
 		BindInternalCall("Engine.QuatNative::Quat_Dot",
 			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
 
+		// File I/O
+		BindInternalCall("Engine.FileIO::FileExists", reinterpret_cast<void*>(InternalCalls::FileExists));
+		BindInternalCall("Engine.FileIO::ReadAllText", reinterpret_cast<void*>(InternalCalls::FileReadAllText));
+		BindInternalCall("Engine.FileIO::WriteAllText", reinterpret_cast<void*>(InternalCalls::FileWriteAllText));
+
+		
 		BindInternalCall("Engine.RNG::Seed",
 			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
 		BindInternalCall("Engine.RNG::RandInt",
