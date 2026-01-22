@@ -15,18 +15,22 @@ namespace Game
 {
     public class WormChild : ScriptBehaviour
     {
-        [SerializeField] private float positionX;
-        [SerializeField] private float positionY;
-        [SerializeField] private float positionZ;
+        // [SerializeField] private float positionX;
+        // [SerializeField] private float positionY;
+        // [SerializeField] private float positionZ;
 
-        [SerializeField] private float parentX;
-        [SerializeField] private float parentY;
-        [SerializeField] private float parentZ;
+        [SerializeField] private float targetX;
+        [SerializeField] private float targetY;
+        [SerializeField] private float targetZ;
+
+        [SerializeField] private float OGscaleX;
+        [SerializeField] private float OGscaleY;
+        [SerializeField] private float OGscaleZ;
 
         private const uint INVALID_ENTITY = 0xffffffffu;
         
-        private uint parentID = INVALID_ENTITY;
-        private uint targetID = INVALID_ENTITY;
+        // private uint targetID = INVALID_ENTITY;
+        // private uint targetID = INVALID_ENTITY;
         
         private const string EVENT_HOST_SPLIT = "WormHostSplit";
 
@@ -38,17 +42,21 @@ namespace Game
             LogMessage("======= WormChild started (EntityID = " + EntityID + ") =======");
 
             Vector3 ownPosition = GetPosition((uint)EntityID);
-            positionX = ownPosition.X;
-            positionY = ownPosition.Y;
-            positionZ = ownPosition.Z;
+            // positionX = ownPosition.X;
+            // positionY = ownPosition.Y;
+            // positionZ = ownPosition.Z;
 
-            parentID = TransformGetParent((uint)EntityID);
-            LogMessage("======= WormChild's parent (parentID = " + parentID + ") =======");
+            targetX = ownPosition.X;
+            targetY = ownPosition.Y;
+            targetZ = ownPosition.Z;
 
-            Vector3 parentPosition = GetPosition((uint)parentID);
-            parentX = parentPosition.X;
-            parentY = parentPosition.Y;
-            parentZ = parentPosition.Z;
+            Vector3 ownScale = GetScale((uint)EntityID);
+            OGscaleX = ownScale.X;
+            OGscaleY = ownScale.Y;
+            OGscaleZ = ownScale.Z;
+
+            Vector3 disappearScale = new Vector3(0,0,0);
+            SetScale(EntityID, ref disappearScale);
 
             hasSplit = false;
 
@@ -60,7 +68,8 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {   
             if(hasSplit){
-                LogMessage("Supposed to split");
+
+                LogMessage("Aiming at: " + targetX + ", " + targetY + ", " + targetZ);
             }
         }
 
@@ -71,10 +80,14 @@ namespace Game
 
         private void OnHostSplit(string eventName, string payload)
         {
-            Vector3 target = VectorToString(payload);
-            LogMessage("======= target.X: " + target.X + " =======");
-            LogMessage("======= target.Y: " + target.Y + " =======");
-            LogMessage("======= target.Z: " + target.Z + " =======");
+            Vector3 appearScale = new Vector3(OGscaleX,OGscaleY,OGscaleZ);
+            SetScale(EntityID, ref appearScale);
+
+            Vector3 aim = VectorToString(payload);
+            targetX = aim.X;
+            targetY = aim.Y;
+            targetZ = aim.Z;
+            
             hasSplit = true;
         }
 
