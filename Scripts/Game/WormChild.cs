@@ -79,9 +79,7 @@ namespace Game
             targetY = aim.Y;
             targetZ = aim.Z;
 
-            Engine.Vector3 ownPosition = GetPosition((uint)EntityID);
-            Engine.Vector3 parentPosition = GetPosition(TransformGetParent((uint)EntityID));
-            Engine.Vector3 globalPosition = parentPosition + ownPosition;
+            Engine.Vector3 globalPosition = SimpleMath.LocalChildtoWorld((uint)EntityID);
             Engine.Vector3 distanceVec = aim - globalPosition;
 
             float yaw = SimpleMath.Atan2(distanceVec.X, distanceVec.Z);

@@ -63,8 +63,8 @@ dc7c507d63d9c06d|1|/Resources/Sources/Meshes/Temp_PrimarySecondaryBullet.fbx|.fb
 447c507d63d9c075|0|/Resources/Sources/Textures/Bounds2.png|.png||1768961343|1|0|0|0
 dc7c507d63d9c02d|4|/Resources/Sources/Shaders/bloom_downsample.frag|.frag||1768961343|1|0|0|0
 f47c507d63d9c065|1|/Resources/Sources/Meshes/lvl1_level_design_v001.fbx|.fbx||1768961343|1|0|0|0
-347c507d63d9c0df|3|/Resources/Sources/Audio/Player_Kill.wav|.wav||1768961342|1|0|0|0
 9c7c507d63d9c067|1|/Resources/Sources/Meshes/lvl2_level_design_v001.fbx|.fbx||1768961343|1|0|0|0
+347c507d63d9c0df|3|/Resources/Sources/Audio/Player_Kill.wav|.wav||1768961342|1|0|0|0
 447c507d63d9c04f|1|/Resources/Sources/Meshes/core pad.fbx|.fbx||1768961343|1|0|0|0
 247c507d63d9c02f|4|/Resources/Sources/Shaders/bloom_upsample.frag|.frag||1768961343|1|0|0|0
 7c7c507d63d9c033|4|/Resources/Sources/Shaders/debug.vert|.vert||1768961343|1|0|0|0
@@ -161,3 +161,4 @@ b2dda07db50d4003|4|/Resources/Sources/Shaders/shadow_depth.vert|.vert||176896134
 d87efdaf4001|7|/Resources/Sources/Scenes/TestingWorms.json|.json||0|0|0|0|0
 6f44f87f04178001|7|/Resources/Sources/Scenes/Level1LoveLetter.json|.json||0|0|0|0|0
 9744f87f04178003|7|/Resources/Sources/Scenes/LoveLetterLevel1.json|.json||0|0|0|0|0
+76b4107f7f6ec001|7|/Resources/Sources/Scenes/Level1_Worm.json|.json||0|0|0|0|0

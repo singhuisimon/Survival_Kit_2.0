@@ -45,7 +45,7 @@ namespace Game
             hasSplit = false;
 
             // Set Speed and Timers (Serialize Field Value)
-            speed = 1.5f;
+            speed = 100f;
             stationaryTimer = 4.0f;
             timer = 0.0f;
 

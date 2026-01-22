@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static Engine.Transform;
 
 namespace Engine
 {
@@ -274,6 +275,12 @@ namespace Engine
             float x9 = x7 * x2;
 
             return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
+        }
+
+        public static Vector3 LocalChildtoWorld (uint childID){
+            Vector3 childPosition = GetPosition((uint)childID);
+            Vector3 parentPosition = GetPosition(TransformGetParent((uint)childID));
+            return parentPosition + childPosition;
         }
     }
 
