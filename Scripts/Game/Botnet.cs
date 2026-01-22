@@ -104,7 +104,7 @@ namespace Game
             hasChosenInitialTarget = false;
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
-            PhysicsEnableCollisionEvents();
+            //PhysicsEnableCollisionEvents();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
