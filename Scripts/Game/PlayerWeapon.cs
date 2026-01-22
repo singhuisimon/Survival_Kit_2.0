@@ -6,6 +6,7 @@ using static Engine.Prefab;
 using static Engine.Logger;
 using static Engine.Input;
 using static Engine.Rigidbody;
+using static Engine.Camera;
 
 namespace Game{
 
@@ -24,7 +25,7 @@ namespace Game{
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
         [SerializeField] private float primaryShootRate = 0.05f; 
         [SerializeField] private float primaryShootNext = 0.0f;
-        [SerializeField] private float bulletOffset = 10.0f;
+        [SerializeField] private float bulletSpeed = 100.0f;
 
         [SerializeField] private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
         //audio
@@ -74,8 +75,14 @@ namespace Game{
 
         #region entity
 
-        [SerializeField] private string firingPointName = "FiringPoint";
+        [SerializeField] private string firingPointName = "PlayerCam";
         [SerializeField] private string playerName = "Player";
+
+        #endregion
+
+        #region others
+        
+        [SerializeField] private float muzzleDistance = 5.0f;
 
         #endregion
 
@@ -85,6 +92,7 @@ namespace Game{
         private float elapsedTime = 0.0f;
 
         private float reloadFinishTime = 0.0f;
+        private Vector3 bulletDirection;
 
         // [SerializeField] private bool primaryWeapon = true;
         // [SerializeField] private bool primaryAltWeapon = true;
@@ -262,14 +270,42 @@ namespace Game{
 
                 //Instantiate at the firing position & rotation);
                 Vector3 firingPoint = GetPosition(firingPointEntityID);
+                Vector3 firingTarget = GetTarget(firingPointEntityID);
+                Vector3 bulletDirection = (firingTarget - firingPoint).Normalized;
+
+                Vector3 playerPos = GetPosition(playerEntityID);
                 Quat playerRot = GetRotation(playerEntityID);
+
+                Vector3 playerForward = playerRot.Forward;
+                //Vector3 bulletSpawnPos = playerPos + (playerForward * muzzleDistance);
+
+                //NEW
+                Vector3 offset = playerRot.Right * 5.0f;
+                Vector3 bulletSpawnPos = playerPos + offset;
+
+
+                //DEBUGGING
+                Vector3 forward = playerRot.Forward;
+                Vector3 right = playerRot.Right;
+                Vector3 up = playerRot.Up;
+
+                LogMessage("PlayerForward: X:" + forward.X + ", Y: " + forward.Y + ", Z: " + forward.Z);
+                LogMessage("PlayerRight: X:" + right.X + ", Y: " + right.Y + ", Z: " + right.Z);
+                LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
+
+
+                Quat bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
+
                 Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
 
                 uint bulletID = 0;
-                bulletID = PrefabInstantiateWithTransform(PrimaryBulletPrefab, ref firingPoint, ref playerRot, ref scale, false);
+                bulletID = PrefabInstantiateWithTransform(PrimaryBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
                 if(bulletID == 0){
                     LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
+                    //return; //comment this for debugging temp
                 }
+                Vector3 bulletVel = bulletDirection * bulletSpeed;
+                RigidbodySetVelocity(bulletID, ref bulletVel);
 
                 //TODO NEED DO PRIMARY BULLET SCRIPT
                 //EntityAddScript(bulletID, "Game.PrimaryBullet");

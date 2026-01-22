@@ -22,7 +22,7 @@ namespace Game
 
         // Tags that represent bullets (fill this in Inspector with your bullet tag, e.g. "primarybullet")
         [SerializeField]
-        private string[] BulletTags = { "primarybullet" };
+        private string[] BulletTags = { "Primarybullet" };
 
         private float elapsedTime = 0.0f;
 
@@ -103,7 +103,7 @@ namespace Game
                 }
             }
 
-            LogMessage("Failed to tag target: " + tag);
+            LogMessage("Tag: " + tag + "is not the target");
             return false;
         }
 

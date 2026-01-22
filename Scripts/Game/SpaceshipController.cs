@@ -43,6 +43,7 @@ namespace Game
         [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 3.0f;
         [SerializeField("Camera Follow Speed")] private float cameraFollowSpeed = 10.0f;
         [SerializeField("Camera Rotation Speed")] private float cameraRotationSpeed = 8.0f;
+        [SerializeField("Camera Rotation Speed")] private float cameraLookHeight = 8.0f;
 
         // ===== Player Rotation =====
         [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 5.0f;
@@ -264,7 +265,8 @@ namespace Game
             SetPosition(cameraEntityID, ref smoothCameraPosition);
 
             // Calculate camera look-at target (ahead of player)
-            Vector3 lookAtTarget = playerPos + camForward * 10.0f;
+            //Vector3 lookAtTarget = playerPos + camForward * 10.0f;
+            Vector3 lookAtTarget = playerPos + Vector3.Up * cameraLookHeight;
             SetTarget(cameraEntityID, ref lookAtTarget);
         }
 

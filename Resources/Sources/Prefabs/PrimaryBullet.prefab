@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryBullet.prefab",
-    "Prefab GUID": 9729895599192899783,
+    "Prefab GUID": 16559085465389809879,
     "version": 1,
     "entities": [
         {
@@ -123,7 +123,14 @@
                 {
                     "type": 8,
                     "typeName": "ScriptComponent",
-                    "data": {}
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14829703208479391955",
+                            "ScriptClassName": "Game.PrimaryBullet",
+                            "Started": false,
+                            "GCHandle": 0
+                        }
+                    }
                 }
             ]
         }

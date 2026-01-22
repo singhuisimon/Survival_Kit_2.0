@@ -339,7 +339,7 @@
                         "Depth": 0,
                         "Aspect": 1.9190404415130615,
                         "FOV": 90.0,
-                        "NearPlane": 0.4099999964237213,
+                        "NearPlane": 0.5,
                         "FarPlane": 5000.0,
                         "Target": [
                             1000.0,
@@ -351,6 +351,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
+                        "ComponentGUID": "9026023440309814373",
                         "ScriptClassName": "Game.SpaceshipController",
                         "Fields": {
                             "cameraName": "PlayerCam",
@@ -365,8 +366,8 @@
                             "verticalSpeed": 200.0,
                             "strafeAcceleration": 15.0,
                             "strafeDeceleration": 12.0,
-                            "cameraDistanceBack": 30.0,
-                            "cameraHeightOffset": 3.0,
+                            "cameraDistanceBack": 15.0,
+                            "cameraHeightOffset": 8.0,
                             "cameraFollowSpeed": 10.0,
                             "cameraRotationSpeed": 8.0,
                             "playerRotationSpeed": 5.0,
@@ -1200,6 +1201,14 @@
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ],
                         "childEntityIDs": [
@@ -1293,6 +1302,41 @@
                             0.5
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9026023440310174993",
+                        "ScriptClassName": "Game.PlayerWeapon",
+                        "Fields": {
+                            "shootAllowed": false,
+                            "primaryShooting": false,
+                            "reloadingPrimary": false,
+                            "primaryAmmo": 0,
+                            "primaryAmmoMax": 100,
+                            "primaryReloadDelay": 1.5,
+                            "primaryShootRate": 0.05000000074505806,
+                            "primaryShootNext": 0.0,
+                            "bulletSpeed": 100.0,
+                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
+                            "chargeDelayRate": 0.5,
+                            "chargeDelayNext": 0.0,
+                            "primaryAltCharging": false,
+                            "primaryChargeRate": 0.10000000149011612,
+                            "primaryChargeNext": 0.0,
+                            "primaryAltCharge": 0,
+                            "primaryAltChargeMax": 30,
+                            "primaryAltReady": false,
+                            "primaryAltFireAOERange": 30.0,
+                            "CAMSHAKE_primaryFire": 0.05000000074505806,
+                            "CAMSHAKE_primaryFireDuration": 0.5,
+                            "CAMSHAKE_primaryAltFire": 0.1599999964237213,
+                            "CAMSHAKE_primaryAltFireDuration": 0.5,
+                            "firingPointName": "PlayerCam",
+                            "playerName": "Player",
+                            "muzzleDistance": 5.0
+                        }
                     }
                 }
             ]
@@ -1420,7 +1464,7 @@
                         "Rotation": [
                             -116.99600219726563,
                             -32.97199249267578,
-                            5.995079517364502
+                            5.995083332061768
                         ],
                         "Scale": [
                             1.0,
