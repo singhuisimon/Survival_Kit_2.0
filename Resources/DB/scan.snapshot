@@ -1,5 +1,5 @@
 /Resources/Sources/Scenes/AlliesTesting.json|1767947709|7691
-/Resources/Sources/Scenes/SpriteRendererTest.json|1768765351|1931
+/Resources/Sources/Scenes/SpriteRendererTest.json|1768833869|2071
 /Resources/Sources/Audio/Player_primary_alt_fire.wav|1767553280|768172
 /Resources/Sources/Material/WindowsBG.mat|1767553280|774
 /Resources/Sources/Audio/Player_Secondary_Fire.wav|1767553280|1152044
@@ -55,6 +55,7 @@
 /Resources/Sources/Material/testma2.mat|1767553280|748
 /Resources/Sources/Scenes/TestPrefab2.json|1768550485|36896
 /Resources/Sources/Meshes/A9004_cruiser_v001.fbx|1767553280|52480
+/Resources/Sources/Textures/E005_loveletter_v003_Opacity.png|1769080187|7583
 /Resources/Sources/Meshes/level_design_v003.fbx|1767553280|45472
 /Resources/Sources/Material/TestUVAnimationMat.mat|1767553280|767
 /Resources/Sources/Shaders/skybox.frag|1767553280|184
@@ -90,6 +91,7 @@
 /Resources/Sources/Textures/2k_mercury.jpg|1767553280|872555
 /Resources/Sources/Meshes/E005_loveletter_v001.fbx|1767553280|81008
 /Resources/Sources/Textures/GAM3_VFX_PlayerHeal.png|1767553280|878179
+/Resources/Sources/Textures/E005_loveletter_v003_Emissive.png|1769080173|159498
 /Resources/Sources/Meshes/E007_adware_popup_v001.fbx|1767553280|32656
 /Resources/Sources/Audio/Loveletter_Ambient.wav|1767553279|256808
 /Resources/Sources/Meshes/E005_loveletter_v002.fbx|1768765351|84016
@@ -110,6 +112,7 @@
 /Resources/Sources/Textures/level_Design_Grid_Texture.png|1767553280|771958
 /Resources/Sources/Textures/mouse_kenny.png|1767553280|247
 /Resources/Sources/Textures/rabbit_kenny.png|1767553280|235
+/Resources/Sources/Scenes/LoveletterRotation.json|1769079409|145815
 /Resources/Sources/Textures/Screen_EpilepsyWarning.png|1768765351|49054
 /Resources/Sources/Textures/SettingsButton.png|1768765351|11660
 /Resources/Sources/Textures/Skybox_Engine_v1_001.png|1767553280|438249
@@ -154,5 +157,9 @@
 /Resources/Sources/Textures/PlayerHPWindow.png|1768765351|60240
 /Resources/Sources/Shaders/shadow_depth.frag|1768765351|36
 /Resources/Sources/Shaders/shadow_depth.vert|1768765351|196
-/Resources/Sources/Scenes/Level1LoveLetter.json|1768765364|70658
-/Resources/Sources/Scenes/LoveLetterLevel1.json|1768765364|145824
+/Resources/Sources/Scenes/Level1LoveLetter.json|1768834692|70658
+/Resources/Sources/Scenes/LoveLetterLevel1.json|1769062286|82876
+/Resources/Sources/Meshes/E005_loveletter_v003.fbx|1769080119|105584
+/Resources/Sources/Textures/E005_loveletter_v003_BaseColor.png|1769080164|160385
+/Resources/Sources/Textures/E005_loveletter_v003_Metallic.png|1769080180|47152
+/Resources/Sources/Textures/E005_loveletter_v003_Roughness.png|1769080194|113988

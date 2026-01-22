@@ -22,16 +22,32 @@ namespace Game
         
         // ===== SPAWN TIMING =====
         [SerializeField] private float initialDelay = 5.0f;        // Wait before first spawn
-        [SerializeField] private float minSpawnInterval = 8.0f;    // Min time between spawns
-        [SerializeField] private float maxSpawnInterval = 15.0f;   // Max time between spawns
+        [SerializeField] private float minSpawnInterval = 2.0f;    // Min time between spawns
+        [SerializeField] private float maxSpawnInterval = 4.0f;    // Max time between spawns
         
         // ===== SPAWN LIMITS =====
-        [SerializeField] private int maxActiveLetters = 3;         // Max letters alive at once
-        // CHANGED: Set to -1 for infinite spawning until game ends
+        // IMPORTANT: Increase this number to have more loveletters active at once!
+        // Set to 10 for more constant pressure
+        [SerializeField] private int maxActiveLetters = 10;        // Max letters alive at once
         [SerializeField] private int maxTotalSpawns = -1;          // -1 = infinite spawns
         
         // ===== SPAWN OFFSET =====
         [SerializeField] private float spawnOffsetFromWall = 50.0f; // Distance in front of wall
+        
+        // ===== WALL SPAWN AREA =====
+        [SerializeField] private bool useWallScale = true;          // Use wall's actual scale for spawn area
+        [SerializeField] private float wallScaleMultiplierX = 1.0f; // Multiply wall's X scale by this (if too big/small)
+        [SerializeField] private float wallScaleMultiplierY = 1.0f; // Multiply wall's Y scale by this (if too big/small)
+        
+        // Manual override (only used if useWallScale = false)
+        [SerializeField] private float manualWallWidth = 500.0f;
+        [SerializeField] private float manualWallHeight = 300.0f;
+        [SerializeField] private bool randomizeSpawnPosition = true; // Toggle random spawn within wall bounds
+        
+        // ===== ROTATION ADJUSTMENT =====
+        [SerializeField] private float rotationOffsetX = 0.0f;  // Additional rotation around X axis (pitch)
+        [SerializeField] private float rotationOffsetY = 0.0f;  // Additional rotation around Y axis (yaw)
+        [SerializeField] private float rotationOffsetZ = 0.0f;  // Additional rotation around Z axis (roll)
         
         // ===== STATE =====
         private uint[] wallEntityIDs;
@@ -40,7 +56,6 @@ namespace Game
         private int activeLetterCount = 0;
         private int totalSpawned = 0;
         private bool isInitialized = false;
-        // CHANGED: Removed hasStarted flag that was preventing spawning
         
         private static bool rngSeeded = false;
 
@@ -85,14 +100,7 @@ namespace Game
             LogMessage("Initial delay: " + initialDelay + "s");
             LogMessage("Spawn interval: " + minSpawnInterval + "-" + maxSpawnInterval + "s");
             LogMessage("Max active letters: " + maxActiveLetters);
-            if (maxTotalSpawns < 0)
-            {
-                LogMessage("Infinite spawning enabled - will spawn until game ends");
-            }
-            else
-            {
-                LogMessage("Max total spawns: " + maxTotalSpawns);
-            }
+            LogMessage("Infinite spawning enabled - will spawn continuously until game ends");
             
             // Subscribe to LoveLetter destruction events
             Subscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
@@ -103,18 +111,13 @@ namespace Game
             nextSpawnTime = GetRandomSpawnInterval();
             
             isInitialized = true;
+            
+            LogMessage("*** SPAWNER READY - Will maintain " + maxActiveLetters + " active loveletters ***");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             if (!isInitialized) return;
-            
-            // Check if we've reached max total spawns (only if limit is set)
-            if (maxTotalSpawns >= 0 && totalSpawned >= maxTotalSpawns)
-            {
-                // Don't spawn anymore
-                return;
-            }
             
             // Update spawn timer
             spawnTimer -= deltaTime;
@@ -130,14 +133,12 @@ namespace Game
                     spawnTimer = nextSpawnTime;
                     nextSpawnTime = GetRandomSpawnInterval();
                     
-                    LogMessage("Next spawn in " + spawnTimer + " seconds (Active: " + activeLetterCount + "/" + maxActiveLetters + ")");
+                    LogMessage(">>> Next spawn in " + spawnTimer.ToString("F1") + " seconds (Active: " + activeLetterCount + "/" + maxActiveLetters + ")");
                 }
                 else
                 {
-                    // CHANGED: Reduced wait time when at max capacity for more responsive spawning
-                    spawnTimer = 0.5f;
-                    // Optional: Log less frequently to reduce spam
-                    // LogMessage("At max active letters (" + maxActiveLetters + "), waiting for destruction...");
+                    // At max capacity - check again quickly
+                    spawnTimer = 0.2f;
                 }
             }
         }
@@ -155,18 +156,64 @@ namespace Game
             uint selectedWallID = wallEntityIDs[randomWallIndex];
             string wallName = spawnWallNames[randomWallIndex];
             
-            // Get wall position and rotation
+            // Get wall position, rotation, and scale
             Engine.Vector3 wallPos = GetPosition(selectedWallID);
             Engine.Quat wallRot = GetRotation(selectedWallID);
+            Engine.Vector3 wallScale = GetScale(selectedWallID);
             
-            // Calculate spawn position (offset from wall based on wall's forward direction)
+            // Calculate wall dimensions based on scale
+            float wallWidth, wallHeight;
+            
+            if (useWallScale)
+            {
+                // Use actual wall scale (typically X and Y, but depends on wall orientation)
+                // Assuming walls are oriented with width on X and height on Y
+                wallWidth = wallScale.X * wallScaleMultiplierX;
+                wallHeight = wallScale.Y * wallScaleMultiplierY;
+                
+                LogMessage("Using wall scale: Width=" + wallWidth.ToString("F1") + ", Height=" + wallHeight.ToString("F1"));
+            }
+            else
+            {
+                // Use manual values
+                wallWidth = manualWallWidth;
+                wallHeight = manualWallHeight;
+            }
+            
+            // Get wall's forward, right, and up vectors
             Engine.Vector3 wallForward = wallRot.Forward;
+            Engine.Vector3 wallRight = wallRot.Right;
+            Engine.Vector3 wallUp = wallRot.Up;
             
+            // Calculate random offset within wall bounds
+            float randomX = 0.0f;
+            float randomY = 0.0f;
+            
+            if (randomizeSpawnPosition)
+            {
+                // Random position within wall area
+                // X offset: -wallWidth/2 to +wallWidth/2
+                randomX = RNG.RandFloat(-wallWidth * 0.5f, wallWidth * 0.5f);
+                // Y offset: -wallHeight/2 to +wallHeight/2
+                randomY = RNG.RandFloat(-wallHeight * 0.5f, wallHeight * 0.5f);
+            }
+            
+            // Calculate spawn position
+            // Start at wall center, add offset in wall's forward direction, then add random position
             Engine.Vector3 spawnPos = new Engine.Vector3(
-                wallPos.X + wallForward.X * spawnOffsetFromWall,
-                wallPos.Y + wallForward.Y * spawnOffsetFromWall,
-                wallPos.Z + wallForward.Z * spawnOffsetFromWall
+                wallPos.X + wallForward.X * spawnOffsetFromWall + wallRight.X * randomX + wallUp.X * randomY,
+                wallPos.Y + wallForward.Y * spawnOffsetFromWall + wallRight.Y * randomX + wallUp.Y * randomY,
+                wallPos.Z + wallForward.Z * spawnOffsetFromWall + wallRight.Z * randomX + wallUp.Z * randomY
             );
+            
+            // // Apply rotation offsets (in degrees)
+            // Engine.Quat rotationOffset = QuatFromEuler(
+            //     rotationOffsetX * 0.0174533f,  // Convert degrees to radians
+            //     rotationOffsetY * 0.0174533f,
+            //     rotationOffsetZ * 0.0174533f
+            // );
+            
+            // Engine.Quat finalRotation = wallRot * rotationOffset;
             
             // Spawn the LoveLetter prefab
             uint letterID = PrefabInstantiate(loveletterPrefabPath);
@@ -179,17 +226,22 @@ namespace Game
             
             // Set position and rotation
             SetPosition(letterID, ref spawnPos);
-            SetRotation(letterID, ref wallRot);
+            //SetRotation(letterID, ref finalRotation);
             
             // Increment counters
             activeLetterCount++;
             totalSpawned++;
             
-            LogMessage("=== LoveLetter Spawned ===");
-            LogMessage("Spawn #" + totalSpawned);
-            LogMessage("From wall: " + wallName);
-            LogMessage("Position: (" + spawnPos.X + ", " + spawnPos.Y + ", " + spawnPos.Z + ")");
-            LogMessage("Active letters: " + activeLetterCount + "/" + maxActiveLetters);
+         
+            // LogMessage("LOVELETTER SPAWNED #" + totalSpawned);
+            // LogMessage("Wall: " + wallName);
+            // if (randomizeSpawnPosition)
+            // {
+            //     LogMessage("Random Offset: X=" + randomX.ToString("F1") + ", Y=" + randomY.ToString("F1"));
+            // }
+            // LogMessage("Position: (" + spawnPos.X.ToString("F1") + ", " + spawnPos.Y.ToString("F1") + ", " + spawnPos.Z.ToString("F1") + ")");
+            // LogMessage("Active: " + activeLetterCount + "/" + maxActiveLetters);
+      
         }
 
         private int GetRandomValidWallIndex()
@@ -234,20 +286,20 @@ namespace Game
             activeLetterCount--;
             if (activeLetterCount < 0) activeLetterCount = 0;
             
-            LogMessage("LoveLetter destroyed. Active count: " + activeLetterCount + "/" + maxActiveLetters);
+            LogMessage(">>> LoveLetter destroyed. Active count now: " + activeLetterCount + "/" + maxActiveLetters + " (Total spawned: " + totalSpawned + ")");
         }
 
         private void OnLoveLetterReachedCore(string eventName, string payload)
         {
             // Additional handling if needed when letter reaches core
-            LogWarning("A LoveLetter reached the core!");
+            LogWarning("!!! A LoveLetter reached the core! !!!");
         }
 
         public override void OnDestroy()
         {
             Unsubscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
             Unsubscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
-            LogMessage("=== LoveLetterSpawner Destroyed ===");
+            LogMessage("=== LoveLetterSpawner Destroyed (Total spawned: " + totalSpawned + ") ===");
         }
     }
 }

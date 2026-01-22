@@ -27,6 +27,7 @@ cc7c507d63d9c0fd|2|/Resources/Sources/Material/Firewall_Void.mat|.mat||176755328
 fc7c507d63d9c0ef|3|/Resources/Sources/Audio/RoomAmbience.wav|.wav||1767553280|1|0|0|0
 647c507d63d9c007|7|/Resources/Sources/Scenes/GameLevel.json|.json||0|0|0|0|0
 d47c507d63d9c037|4|/Resources/Sources/Shaders/hdr.vert|.vert||1767553280|1|0|0|0
+153db07f6022c009|0|/Resources/Sources/Textures/E005_loveletter_v003_Metallic.png|.png||1769080180|1|0|0|0
 947c507d63d9c0f7|2|/Resources/Sources/Material/Firewall_Active.mat|.mat||1767553280|1|0|0|0
 a47c507d63d9c047|4|/Resources/Sources/Shaders/ui.vert|.vert||1768765351|1|0|0|0
 8c7c507d63d9c07f|0|/Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_Emissive.png|.png||1768765351|1|0|0|0
@@ -63,9 +64,9 @@ f47c507d63d9c065|1|/Resources/Sources/Meshes/lvl1_level_design_v001.fbx|.fbx||17
 dc7c507d63d9c06d|1|/Resources/Sources/Meshes/Temp_PrimarySecondaryBullet.fbx|.fbx||1767553280|1|0|0|0
 447c507d63d9c075|0|/Resources/Sources/Textures/Bounds2.png|.png||1767553280|1|0|0|0
 2c7c507d63d9c07d|0|/Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_BaseColor.png|.png||1768765351|1|0|0|0
-447c507d63d9c04f|1|/Resources/Sources/Meshes/core pad.fbx|.fbx||1768765351|1|0|0|0
 347c507d63d9c0df|3|/Resources/Sources/Audio/Player_Kill.wav|.wav||1767553280|1|0|0|0
 9c7c507d63d9c067|1|/Resources/Sources/Meshes/lvl2_level_design_v001.fbx|.fbx||1768765351|1|0|0|0
+447c507d63d9c04f|1|/Resources/Sources/Meshes/core pad.fbx|.fbx||1768765351|1|0|0|0
 247c507d63d9c02f|4|/Resources/Sources/Shaders/bloom_upsample.frag|.frag||1767553280|1|0|0|0
 7c7c507d63d9c033|4|/Resources/Sources/Shaders/debug.vert|.vert||1767553280|1|0|0|0
 b47c507d63d9c061|1|/Resources/Sources/Meshes/E007_adware_v001.fbx|.fbx||1767553280|1|0|0|0
@@ -77,6 +78,7 @@ c7c507d63d9c0c5|3|/Resources/Sources/Audio/COMBAT_Vestigal_Strings+Perc-Action_B
 3c7c507d63d9c0d5|3|/Resources/Sources/Audio/Loveletter_Warp_Warning.wav|.wav||1767553279|1|0|0|0
 fc7c507d63d9c043|4|/Resources/Sources/Shaders/survival_kit_obj.vert|.vert||1767553280|1|0|0|0
 2c7c507d63d9c045|4|/Resources/Sources/Shaders/ui.frag|.frag||1768765351|1|0|0|0
+e53db07f6022c003|1|/Resources/Sources/Meshes/E005_loveletter_v003.fbx|.fbx||1769080119|1|0|0|0
 d47c507d63d9c049|1|/Resources/Sources/Meshes/A9003_dreadnought_v002.fbx|.fbx||1768765351|1|0|0|0
 4c7c507d63d9c0c1|3|/Resources/Sources/Audio/Botnet_Explosion.wav|.wav||1767553279|1|0|0|0
 347c507d63d9c063|1|/Resources/Sources/Meshes/level_design_v003.fbx|.fbx||1767553280|1|0|0|0
@@ -95,6 +97,7 @@ dc7c507d63d9c0d9|3|/Resources/Sources/Audio/PlayerShoot.wav|.wav||1767553279|1|0
 b47c507d63d9c093|0|/Resources/Sources/Textures/InstallButton.png|.png||1767553280|1|0|0|0
 247c507d63d9c095|0|/Resources/Sources/Textures/left.jpg|.jpg||1767553280|1|0|0|0
 1c7c507d63d9c0ad|0|/Resources/Sources/Textures/Skybox_Engine_v1_005.png|.png||1767553280|1|0|0|0
+f53db07f6022c00b|0|/Resources/Sources/Textures/E005_loveletter_v003_Opacity.png|.png||1769080187|1|0|0|0
 f47c507d63d9c099|0|/Resources/Sources/Textures/mouse_kenny.png|.png||1767553280|1|0|0|0
 c47c507d63d9c09d|0|/Resources/Sources/Textures/right.jpg|.jpg||1767553280|1|0|0|0
 6c7c507d63d9c09f|0|/Resources/Sources/Textures/Screen_EpilepsyWarning.png|.png||1768765351|1|0|0|0
@@ -130,6 +133,7 @@ f47c507d63d9c0e7|3|/Resources/Sources/Audio/Player_Primary_Fire.wav|.wav||176755
 e47c507d63d9c0f1|2|/Resources/Sources/Material/Core.mat|.mat||1767553280|1|0|0|0
 bc7c507d63d9c0f3|2|/Resources/Sources/Material/DefenceFailed.mat|.mat||1767553280|1|0|0|0
 cc7c507d63d9c0ff|2|/Resources/Sources/Material/Gunship_Allies.mat|.mat||1767553280|1|0|0|0
+4d3db07f6022c001|7|/Resources/Sources/Scenes/LoveletterRotation.json|.json||0|0|0|0|0
 447c507d63d9c101|2|/Resources/Sources/Material/InstallButton.mat|.mat||1767553280|1|0|0|0
 747c507d63d9c103|2|/Resources/Sources/Material/LevelDesign_GroundBelow.mat|.mat||1767553280|1|0|0|0
 447c507d63d9c105|2|/Resources/Sources/Material/LevelDesign_GroundTexture.mat|.mat||1767553280|1|0|0|0
@@ -160,3 +164,6 @@ e52707d64d34017|0|/Resources/Sources/Textures/PlayerHPWindow.png|.png||176876535
 c2dda07db50d4001|4|/Resources/Sources/Shaders/shadow_depth.frag|.frag||1768765351|1|0|0|0
 b2dda07db50d4003|4|/Resources/Sources/Shaders/shadow_depth.vert|.vert||1768765351|1|0|0|0
 577a207dff6f4001|7|/Resources/Sources/Scenes/LoveLetterLevel1.json|.json||0|0|0|0|0
+dd3db07f6022c005|0|/Resources/Sources/Textures/E005_loveletter_v003_BaseColor.png|.png||1769080164|1|0|0|0
+6d3db07f6022c007|0|/Resources/Sources/Textures/E005_loveletter_v003_Emissive.png|.png||1769080173|1|0|0|0
+153db07f6022c00d|0|/Resources/Sources/Textures/E005_loveletter_v003_Roughness.png|.png||1769080194|1|0|0|0

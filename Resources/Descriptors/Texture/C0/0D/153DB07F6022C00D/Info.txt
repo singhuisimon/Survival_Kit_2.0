@@ -1,0 +1,7 @@
+{
+  "name": "E005_loveletter_v003_Roughness.png",
+  "guid": "153DB07F6022C00D",
+  "tags": [],
+  "lastImported": "000000006972060B",
+  "resourceLinks": []
+}
