@@ -54,6 +54,9 @@ namespace Game
         // Botnet Damage
         [SerializeField] private float blastDamage = 10.0f;
 
+        //DEBUG
+        [SerializeField] private string TARGET = "";
+
         // ===== Private Runtime State =====
 
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -115,34 +118,34 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            if (isDead)
-                return;
+            // if (isDead)
+            //     return;
 
-            // Update stun
-            if (isStunned)
-            {
-                UpdateStun(deltaTime);
-                return;
-            }
+            // // Update stun
+            // if (isStunned)
+            // {
+            //     UpdateStun(deltaTime);
+            //     return;
+            // }
 
-            // Target selection
-            UpdateTargetSelectionTimer(deltaTime);
+            // // Target selection
+            // UpdateTargetSelectionTimer(deltaTime);
 
-            // Movement and rotation
-            if (isMoving && targetID != INVALID_ENTITY)
-            {
-                if (enableLookAt)
-                    RotateTowardsTarget(deltaTime);
+            // // Movement and rotation
+            // if (isMoving && targetID != INVALID_ENTITY)
+            // {
+            //     if (enableLookAt)
+            //         RotateTowardsTarget(deltaTime);
 
-                MoveTowardsTarget(deltaTime);
-                ClampSpeed();
-            }
+            //     MoveTowardsTarget(deltaTime);
+            //     ClampSpeed();
+            // }
 
-            // Handle collision-triggered explosion
-            HandleCollisionTriggers();
+            // // Handle collision-triggered explosion
+            // HandleCollisionTriggers();
 
-            if (isExploding)
-                Explode();
+            // if (isExploding)
+            //     Explode();
         }
 
         public override void OnDestroy()
@@ -286,15 +289,19 @@ namespace Game
             switch(choice){
                 case 0:
                     chosen = FindFirstEntityWithTag(TAG_PLAYER);
+                    TARGET = TAG_PLAYER;
                     break;
                 case 1:
                     chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+                    TARGET = TAG_SEMICONDUCTOR;
                     break;
                 case 2:
                     chosen = FindRandomEntityWithTag(TAG_EMPLACEMENT);
+                    TARGET = TAG_EMPLACEMENT;
                     break;
                 case 3:
                     chosen = FindRandomEntityWithTag(TAG_ALLIES);
+                    TARGET = TAG_ALLIES;
                     break;
             }
 
