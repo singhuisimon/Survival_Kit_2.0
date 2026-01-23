@@ -78,7 +78,7 @@ namespace Engine
 	 *			  else false.
 	 */
 	bool CollisionSystem2D::IsPointInEntity(entt::entity const entityId, glm::vec2 const& point) {
-		 
+
 		if (!active_scene_) return false;
 
 		auto view = active_scene_->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
@@ -91,6 +91,9 @@ namespace Engine
 								  transform.WorldTransform,
 								  glm::vec2(viewport_.z, viewport_.w));
 
-		return Mouse2DCollision(aabb.min, aabb.max, point);
+		// Flip Y coordinate from window space (0,0 top-left) to screen space (0,0 bottom-left)
+		glm::vec2 flippedPoint(point.x, viewport_.w - point.y);
+
+		return Mouse2DCollision(aabb.min, aabb.max, flippedPoint);
 	}
 }
