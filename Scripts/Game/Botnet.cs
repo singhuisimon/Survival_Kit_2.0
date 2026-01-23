@@ -22,8 +22,8 @@ namespace Game
         // ===== Serialized Fields (Editable in Inspector) =====
 
         // Movement
-        [SerializeField] private float acceleration = 50.0f;
-        [SerializeField] private float topSpeed = 30.0f;
+        [SerializeField] private float acceleration = 300.0f;
+        [SerializeField] private float topSpeed = 400.0f;
 
         // Rotation speed (how fast bot turns towards target)
         [SerializeField] private float rotateSpeed = 5.0f;
@@ -47,6 +47,15 @@ namespace Game
 
         // Death explosion prefab path
         [SerializeField] private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
+
+        // Botnet Health
+        [SerializeField] private float HP = 3.0f;
+
+        // Botnet Damage
+        [SerializeField] private float blastDamage = 10.0f;
+
+        //DEBUG
+        [SerializeField] private string TARGET = "";
 
         // ===== Private Runtime State =====
 
@@ -101,7 +110,7 @@ namespace Game
             hasChosenInitialTarget = false;
             chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
-            PhysicsEnableCollisionEvents();
+            //PhysicsEnableCollisionEvents();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
@@ -165,11 +174,21 @@ namespace Game
             if (!uint.TryParse(payload, out uint hitId))
                 return;
 
-            if (hitId != (uint)EntityID)
+            if (hitId != (uint)EntityID){
+                LogMessage("ID DOESN'T MATCH HIT!");
                 return;
+            }
 
-            Publish("BotnetDeath", 1.ToString());
-            Explode();
+            HP -= 1.0f;
+            LogMessage("CurrentBotnetHP is: " + HP.ToString());
+            LogMessage("SUCCESS MATCH! REDUCING HEALTH!");
+
+            if(HP <= 1.0f){
+                Publish("BotnetDeath", 1.ToString());
+                Explode();
+            }
+
+            //add in bullet hit audio here i guess - Amanda
         }
 
         private void OnSpawnDisable(string eventName, string payload)
@@ -258,9 +277,33 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
+            LogMessage("CHOICE IS: " + choice.ToString());
 
-            // currently forced to Player (as per your commented switch)
-            uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
+            // currently forced to Player (as per your commented switch) M3
+            //uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
+
+            uint chosen = INVALID_ENTITY;
+
+            // TODO: ADD IN RANDOM TARGET (EMPLACEMENT BARRIER ALLIES?)
+            // TEMP FOR NOW - AMANDA
+            switch(choice){
+                case 0:
+                    chosen = FindFirstEntityWithTag(TAG_PLAYER);
+                    TARGET = TAG_PLAYER;
+                    break;
+                case 1:
+                    chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+                    TARGET = TAG_SEMICONDUCTOR;
+                    break;
+                case 2:
+                    chosen = FindRandomEntityWithTag(TAG_EMPLACEMENT);
+                    TARGET = TAG_EMPLACEMENT;
+                    break;
+                case 3:
+                    chosen = FindRandomEntityWithTag(TAG_ALLIES);
+                    TARGET = TAG_ALLIES;
+                    break;
+            }
 
             if (chosen != INVALID_ENTITY)
             {
@@ -272,6 +315,7 @@ namespace Game
             {
                 targetID = INVALID_ENTITY;
                 isMoving = false;
+                LogMessage("Could not find a target");
             }
         }
 
@@ -452,6 +496,7 @@ namespace Game
 
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
+                //instantiate the explode sound
                 uint explosionID = PrefabInstantiate(deathExplosionPrefab);
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
@@ -486,7 +531,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
-                    // DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }

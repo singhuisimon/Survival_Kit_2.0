@@ -14,7 +14,6 @@ namespace Engine
         public const float PI = 3.14159265359f;
         public const float TWO_PI = 6.28318530718f;
         public const float HALF_PI = 1.57079632679f;
-
         public const float DEG_TO_RAD = 0.0174532924f;
         public const float RAD_TO_DEG = 57.2957795131f;
 
@@ -302,6 +301,137 @@ namespace Engine
 
             return new Engine.Vector3(rotatedX, rotatedY, rotatedZ);
         }
+        public static Quat QuatFromBasis(Vector3 right, Vector3 up, Vector3 forward)
+        {
+            float m00 = right.X, m01 = up.X, m02 = forward.X;
+            float m10 = right.Y, m11 = up.Y, m12 = forward.Y;
+            float m20 = right.Z, m21 = up.Z, m22 = forward.Z;
+
+            float trace = m00 + m11 + m22;
+
+            if (trace > 0.0f)
+            {
+                float s = SimpleMath.Sqrt(trace + 1.0f) * 2f;
+                return new Quat(
+                    (m21 - m12) / s,
+                    (m02 - m20) / s,
+                    (m10 - m01) / s,
+                    0.25f * s
+                );
+            }
+            else if (m00 > m11 && m00 > m22)
+            {
+                float s = SimpleMath.Sqrt(1.0f + m00 - m11 - m22) * 2f;
+                return new Quat(
+                    0.25f * s,
+                    (m01 + m10) / s,
+                    (m02 + m20) / s,
+                    (m21 - m12) / s
+                );
+            }
+            else if (m11 > m22)
+            {
+                float s = SimpleMath.Sqrt(1.0f + m11 - m00 - m22) * 2f;
+                return new Quat(
+                    (m01 + m10) / s,
+                    0.25f * s,
+                    (m12 + m21) / s,
+                    (m02 - m20) / s
+                );
+            }
+            else
+            {
+                float s = SimpleMath.Sqrt(1.0f + m22 - m00 - m11) * 2f;
+                return new Quat(
+                    (m02 + m20) / s,
+                    (m12 + m21) / s,
+                    0.25f * s,
+                    (m10 - m01) / s
+                );
+            }
+        }
+
+        /// <summary>
+        /// Creates a rotation quaternion that looks in the specified direction
+        /// </summary>
+        public static Quat LookRotation(Vector3 forward, Vector3 up)
+        {
+            forward = forward.Normalized;
+            
+            // Calculate right vector
+            Vector3 right = Vector3.Cross(up, forward).Normalized;
+            
+            // Recalculate up to ensure orthogonality
+            up = Vector3.Cross(forward, right).Normalized;
+            
+            // Build quaternion from rotation matrix
+            return FromMatrix(right, up, forward);
+        }
+
+        /// <summary>
+        /// Creates a quaternion from three orthonormal basis vectors
+        /// </summary>
+        private static Quat FromMatrix(Vector3 right, Vector3 up, Vector3 forward)
+        {
+            // This is the standard matrix-to-quaternion conversion
+            // Matrix layout:
+            // [ right.x   up.x   forward.x ]
+            // [ right.y   up.y   forward.y ]
+            // [ right.z   up.z   forward.z ]
+            
+            float trace = right.X + up.Y + forward.Z;
+            
+            if (trace > 0.0f)
+            {
+                float s = Sqrt(trace + 1.0f) * 2.0f;
+                float invS = 1.0f / s;
+                
+                return new Quat(
+                    (up.Z - forward.Y) * invS,      // x
+                    (forward.X - right.Z) * invS,   // y
+                    (right.Y - up.X) * invS,        // z
+                    s * 0.25f                       // w
+                );
+            }
+            else if (right.X > up.Y && right.X > forward.Z)
+            {
+                float s = Sqrt(1.0f + right.X - up.Y - forward.Z) * 2.0f;
+                float invS = 1.0f / s;
+                
+                return new Quat(
+                    s * 0.25f,                      // x
+                    (right.Y + up.X) * invS,        // y
+                    (forward.X + right.Z) * invS,   // z
+                    (up.Z - forward.Y) * invS       // w
+                );
+            }
+            else if (up.Y > forward.Z)
+            {
+                float s = Sqrt(1.0f + up.Y - right.X - forward.Z) * 2.0f;
+                float invS = 1.0f / s;
+                
+                return new Quat(
+                    (right.Y + up.X) * invS,        // x
+                    s * 0.25f,                      // y
+                    (up.Z + forward.Y) * invS,      // z
+                    (forward.X - right.Z) * invS    // w
+                );
+            }
+            else
+            {
+                float s = Sqrt(1.0f + forward.Z - right.X - up.Y) * 2.0f;
+                float invS = 1.0f / s;
+                
+                return new Quat(
+                    (forward.X + right.Z) * invS,   // x
+                    (up.Z + forward.Y) * invS,      // y
+                    s * 0.25f,                      // z
+                    (right.Y - up.X) * invS         // w
+                );
+            }
+        }
+
+
     }
 
     // =====================================================================
