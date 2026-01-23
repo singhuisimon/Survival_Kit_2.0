@@ -1,5 +1,5 @@
 {
-  "sourcePath": "/Resources/Sources/Meshes/E004_botnet_v001.fbx",
+  "sourcePath": "/Resources/Sources/Material/OOB.mat",
   "meshSettings": {
     "outputFormat": "CUSTOM",
     "includePos": true,

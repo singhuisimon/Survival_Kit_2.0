@@ -1,5 +1,5 @@
 {
-  "sourcePath": "/Resources/Sources/Meshes/lvl1_level_design_v001.fbx",
+  "sourcePath": "/Resources/Sources/Meshes/lvl1_OOB_walls_v002.fbx",
   "meshSettings": {
     "outputFormat": "CUSTOM",
     "includePos": true,
