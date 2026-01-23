@@ -2,6 +2,10 @@
   "name": "A9003_dreadnought_v002.fbx",
   "guid": "D47C507D63D9C049",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "0000000069730D31",
+=======
+  "lastImported": "00000000696D2F30",
+>>>>>>> main
   "resourceLinks": []
 }

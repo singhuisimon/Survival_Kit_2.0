@@ -2,6 +2,10 @@
   "name": "EpilepsyWarning.png",
   "guid": "BE52707D64D34009",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "0000000069730F12",
+=======
+  "lastImported": "00000000696D2F30",
+>>>>>>> main
   "resourceLinks": []
 }

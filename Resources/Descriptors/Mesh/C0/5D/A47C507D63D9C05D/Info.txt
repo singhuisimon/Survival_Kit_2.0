@@ -2,6 +2,10 @@
   "name": "E005_loveletter_v002.fbx",
   "guid": "A47C507D63D9C05D",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "0000000069730D31",
+=======
+  "lastImported": "00000000696D2F30",
+>>>>>>> main
   "resourceLinks": []
 }
