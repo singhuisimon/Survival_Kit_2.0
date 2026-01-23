@@ -51,6 +51,9 @@ namespace Game
         // Botnet Health
         [SerializeField] private float HP = 3.0f;
 
+        // Botnet Damage
+        [SerializeField] private float blastDamage = 10.0f;
+
         // ===== Private Runtime State =====
 
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -271,9 +274,29 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
+            LogMessage("CHOICE IS: " + choice.ToString());
 
-            // currently forced to Player (as per your commented switch)
-            uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
+            // currently forced to Player (as per your commented switch) M3
+            //uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
+
+            uint chosen = INVALID_ENTITY;
+
+            // TODO: ADD IN RANDOM TARGET (EMPLACEMENT BARRIER ALLIES?)
+            // TEMP FOR NOW - AMANDA
+            switch(choice){
+                case 0:
+                    chosen = FindFirstEntityWithTag(TAG_PLAYER);
+                    break;
+                case 1:
+                    chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+                    break;
+                case 2:
+                    chosen = FindRandomEntityWithTag(TAG_EMPLACEMENT);
+                    break;
+                case 3:
+                    chosen = FindRandomEntityWithTag(TAG_ALLIES);
+                    break;
+            }
 
             if (chosen != INVALID_ENTITY)
             {
@@ -285,6 +308,7 @@ namespace Game
             {
                 targetID = INVALID_ENTITY;
                 isMoving = false;
+                LogMessage("Could not find a target");
             }
         }
 
@@ -465,6 +489,7 @@ namespace Game
 
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
+                //instantiate the explode sound
                 uint explosionID = PrefabInstantiate(deathExplosionPrefab);
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
@@ -499,7 +524,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
-                    // DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }

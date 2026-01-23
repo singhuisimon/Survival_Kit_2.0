@@ -39,8 +39,10 @@ namespace Game
         [SerializeField("Strafe Deceleration")] private float strafeDeceleration = 12.0f;
 
         // ===== Camera Positioning =====
-        [SerializeField("Camera Distance Back")] private float cameraDistanceBack = 30.0f;
-        [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 3.0f;
+        [SerializeField("Camera Distance Back")] private float cameraDistanceBack = 15.0f;
+        //[SerializeField("Camera Distance Back")] private float cameraDistanceBack = 30.0f;
+        //[SerializeField("Camera Height Offset")] private float cameraHeightOffset = 3.0f;
+        [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 0.0f;
         [SerializeField("Camera Follow Speed")] private float cameraFollowSpeed = 10.0f;
         [SerializeField("Camera Rotation Speed")] private float cameraRotationSpeed = 8.0f;
         [SerializeField("Camera Rotation Speed")] private float cameraLookHeight = 8.0f;
