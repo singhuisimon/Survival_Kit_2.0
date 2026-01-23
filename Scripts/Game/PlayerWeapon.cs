@@ -25,7 +25,7 @@ namespace Game{
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
         [SerializeField] private float primaryShootRate = 0.05f; 
         [SerializeField] private float primaryShootNext = 0.0f;
-        [SerializeField] private float bulletSpeed = 100.0f;
+        [SerializeField] private float bulletSpeed = 1000.0f;
 
         [SerializeField] private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
         //audio
