@@ -1400,6 +1400,68 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
+	// UNCOMMENT IF YOU NEED TO SPAWN A FIRST TIME INSTANCE OF A ENTITY THAT HAS SUBMESH HERE - AMANDA
+	// ADJUST THE SUBMESH COUNT ACCORDINGLY ARIGATO
+	// SAME FOR THE NAME!
+	//if (input.IsKeyJustPressed(GLFW_KEY_H)) {
+	//	glm::vec3 position = glm::vec3(0.0f, 1.0f, 0.0f);
+	//	glm::quat rotation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	//	auto enemy = m_ActiveScene->CreateEntity("loveletter");
+
+	//	//enemy.AddComponent<RigidbodyComponent>();
+	//	if (enemy.HasComponent<Engine::TransformComponent>()) {
+	//		auto& transform = enemy.GetComponent<Engine::TransformComponent>();
+	//		transform.Position = position;
+	//		transform.Rotation = rotation;
+	//		//transform.Scale = glm::vec3(0.002f);
+
+	//		transform.IsDirty = true;
+
+	//		// CRITICAL: Manually calculate WorldTransform immediately!
+	//		glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
+	//		glm::mat4 rotation_matrix = glm::mat4_cast(transform.Rotation);
+	//		glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), transform.Scale);
+	//		glm::mat4 transformation_matrix = translation_matrix * rotation_matrix * scale_matrix;
+
+	//		transform.WorldTransform = transformation_matrix;
+	//		transform.LocalTransform = transformation_matrix;
+	//	}
+
+	//	auto& parentMesh = enemy.AddComponent<Engine::MeshRendererComponent>();
+	//	std::string meshName = "E005_loveletter_v003.fbx";
+	//	xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
+	//	parentMesh.MeshGuid = inst_guid;
+	//	parentMesh.SubmeshIndex = 0;
+
+	//	const int submeshCount = 9;
+	//	for (int sub = 0; sub < submeshCount; ++sub) {
+	//		auto child = m_ActiveScene->CreateEntity("loveletter_" + std::to_string(sub));
+	//		auto& childTransform = child.GetComponent<Engine::TransformComponent>();
+	//		childTransform.Position = glm::vec3(0.0f);
+	//		childTransform.Scale = glm::vec3(1.0f);
+	//		childTransform.Parent = enemy;
+	//		childTransform.IsDirty = true;
+
+	//		// Calculate child's LocalTransform
+	//		glm::mat4 child_translation = glm::translate(glm::mat4(1.0f), childTransform.Position);
+	//		glm::mat4 child_rotation = glm::mat4_cast(childTransform.Rotation);
+	//		glm::mat4 child_scale = glm::scale(glm::mat4(1.0f), childTransform.Scale);
+	//		childTransform.LocalTransform = child_translation * child_rotation * child_scale;
+
+	//		if (enemy.HasComponent<Engine::TransformComponent>()) {
+	//			auto& parentTransform = enemy.GetComponent<Engine::TransformComponent>();
+	//			childTransform.WorldTransform = parentTransform.WorldTransform * childTransform.LocalTransform;
+	//			parentTransform.Children.push_back(child);
+	//		}
+
+	//		auto& childMesh = child.AddComponent<Engine::MeshRendererComponent>();
+	//		childMesh.MeshGuid = inst_guid;
+	//		childMesh.SubmeshIndex = sub;
+	//	}
+	//}
+
+
 	//m_Editor->StartImguiFrame();
 
 	// Update Editor To Do

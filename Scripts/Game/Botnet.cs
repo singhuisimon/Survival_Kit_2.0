@@ -22,8 +22,8 @@ namespace Game
         // ===== Serialized Fields (Editable in Inspector) =====
 
         // Movement
-        [SerializeField] private float acceleration = 100.0f;
-        [SerializeField] private float topSpeed = 30.0f;
+        [SerializeField] private float acceleration = 300.0f;
+        [SerializeField] private float topSpeed = 400.0f;
 
         // Rotation speed (how fast bot turns towards target)
         [SerializeField] private float rotateSpeed = 5.0f;
@@ -168,11 +168,14 @@ namespace Game
             if (!uint.TryParse(payload, out uint hitId))
                 return;
 
-            if (hitId != (uint)EntityID)
+            if (hitId != (uint)EntityID){
+                LogMessage("ID DOESN'T MATCH HIT!");
                 return;
+            }
 
             HP -= 1.0f;
             LogMessage("CurrentBotnetHP is: " + HP.ToString());
+            LogMessage("SUCCESS MATCH! REDUCING HEALTH!");
 
             if(HP <= 1.0f){
                 Publish("BotnetDeath", 1.ToString());
