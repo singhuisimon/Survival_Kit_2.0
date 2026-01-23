@@ -34,6 +34,7 @@
 #include "BehaviourTree/BehaviourTreeSystem.h"
 #include "ParticleSystem/ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
+#include "Physics/CollisionSystem2D.h"
 
 #include "Event/EventSystem.h"
 
@@ -385,6 +386,7 @@ void Game::AddAllSystems()
 	m_ActiveScene->AddSystem<Engine::BehaviourTreeSystem>();
 	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
 	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
+	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 }
 
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
@@ -401,6 +403,7 @@ void Game::AddAllSystemsToScene(Engine::Scene* scene)
 	scene->AddSystem<Engine::BehaviourTreeSystem>();
 	scene->AddSystem<Engine::ParticleSystem>();
 	scene->AddSystem<Engine::AnimationSystem>();
+	scene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 }
 
 void Game::CreateDefaultScene()
@@ -1006,198 +1009,198 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//	}
 	//}
 
-	//if (found && foundEntity.HasComponent<Engine::TransformComponent>())
-	//{
+	if (found && foundEntity.HasComponent<Engine::TransformComponent>())
+	{
 
-	//	// Get player transform to control its movement
-	//	auto &transform = foundEntity.GetComponent<Engine::TransformComponent>();
+		// Get player transform to control its movement
+		auto &transform = foundEntity.GetComponent<Engine::TransformComponent>();
 
-	//	// Update main game camera on player if it exists
-	//	if (GameCamFound && GameCam.HasComponent<Engine::CameraComponent>()
-	//		&& GameCam.HasComponent<Engine::TransformComponent>()
-	//		&& !editorCamToggle)
-	//	{
+		// Update main game camera on player if it exists
+		if (GameCamFound && GameCam.HasComponent<Engine::CameraComponent>()
+			&& GameCam.HasComponent<Engine::TransformComponent>()
+			&& !editorCamToggle)
+		{
 
-	//		// Get MainCamera transform and camera component
-	//		auto &camTransform = GameCam.GetComponent<Engine::TransformComponent>();
-	//		auto &camComp = GameCam.GetComponent<Engine::CameraComponent>();
+			// Get MainCamera transform and camera component
+			auto &camTransform = GameCam.GetComponent<Engine::TransformComponent>();
+			auto &camComp = GameCam.GetComponent<Engine::CameraComponent>();
 
-	//		// Player head/aim point (slightly above)
-	//		const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
+			// Player head/aim point (slightly above)
+			const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
 
-	//		// Persistent orbit state
-	//		static bool  initialized = false;
-	//		static float pitch = 0.25f; // alpha
-	//		static float yaw = 0.0f;    // betta
-	//		static float radius = 7.5f;
+			// Persistent orbit state
+			static bool  initialized = false;
+			static float pitch = 0.25f; // alpha
+			static float yaw = 0.0f;    // betta
+			static float radius = 7.5f;
 
-	//		// Initialize yaw/pitch from current camera placement once
-	//		if (!initialized)
-	//		{
-	//			const glm::vec3 rel = camTransform.Position - aimTarget;
-	//			const float r = glm::length(rel);
-	//			if (r > 1e-6f)
-	//			{
-	//				pitch = glm::asin(glm::clamp(rel.y / r, -1.0f, 1.0f));
-	//				yaw = std::atan2(rel.x, rel.z);
-	//				/* Radius is constant thru out the gameplay */
-	//			}
-	//			else
-	//			{
-	//				// fallback if camera starts at target: put it behind player
-	//				pitch = 0.25f;
-	//				yaw = 0.0f;
-	//				radius = 7.5f;
-	//			}
-	//			initialized = true;
-	//		}
+			// Initialize yaw/pitch from current camera placement once
+			if (!initialized)
+			{
+				const glm::vec3 rel = camTransform.Position - aimTarget;
+				const float r = glm::length(rel);
+				if (r > 1e-6f)
+				{
+					pitch = glm::asin(glm::clamp(rel.y / r, -1.0f, 1.0f));
+					yaw = std::atan2(rel.x, rel.z);
+					/* Radius is constant thru out the gameplay */
+				}
+				else
+				{
+					// fallback if camera starts at target: put it behind player
+					pitch = 0.25f;
+					yaw = 0.0f;
+					radius = 7.5f;
+				}
+				initialized = true;
+			}
 
-	//		// Mouse deltas
-	//		const float xOffset = input.GetMouseDelta().x;
-	//		const float yOffset = input.GetMouseDelta().y;
+			// Mouse deltas
+			const float xOffset = input.GetMouseDelta().x;
+			const float yOffset = input.GetMouseDelta().y;
 
-	//		// Update orbit angles only when mouse moves
-	//		if (xOffset != 0.0f || yOffset != 0.0f)
-	//		{
+			// Update orbit angles only when mouse moves
+			if (xOffset != 0.0f || yOffset != 0.0f)
+			{
 
-	//			// Adjust angles based on cursor offset
-	//			yaw += (xOffset < 0.0f) ? 0.05f : (xOffset > 0.0f ? -0.05f : 0.0f);
-	//			pitch += (yOffset > 0.0f) ? 0.02f : (yOffset < 0.0f ? -0.02f : 0.0f);
+				// Adjust angles based on cursor offset
+				yaw += (xOffset < 0.0f) ? 0.05f : (xOffset > 0.0f ? -0.05f : 0.0f);
+				pitch += (yOffset > 0.0f) ? 0.02f : (yOffset < 0.0f ? -0.02f : 0.0f);
 
-	//			// Clamp pitch to avoid flipping
-	//			pitch = glm::clamp(pitch, -Engine::MathUtils::HALF_PI + 0.01f, Engine::MathUtils::HALF_PI - 0.01f);
-	//		}
+				// Clamp pitch to avoid flipping
+				pitch = glm::clamp(pitch, -Engine::MathUtils::HALF_PI + 0.01f, Engine::MathUtils::HALF_PI - 0.01f);
+			}
 
-	//		// Rebuild direction from yaw/pitch EVERY FRAME
-	//		glm::vec3 dir;
-	//		dir.x = glm::cos(pitch) * glm::sin(yaw);
-	//		dir.y = glm::sin(pitch);
-	//		dir.z = glm::cos(pitch) * glm::cos(yaw);
-	//		dir = glm::normalize(dir);
+			// Rebuild direction from yaw/pitch EVERY FRAME
+			glm::vec3 dir;
+			dir.x = glm::cos(pitch) * glm::sin(yaw);
+			dir.y = glm::sin(pitch);
+			dir.z = glm::cos(pitch) * glm::cos(yaw);
+			dir = glm::normalize(dir);
 
-	//		// Keep constant distance from the player (orbit)
-	//		const glm::vec3 camPos = aimTarget + dir * radius;
-	//		camTransform.SetPosition(camPos);
+			// Keep constant distance from the player (orbit)
+			const glm::vec3 camPos = aimTarget + dir * radius;
+			camTransform.SetPosition(camPos);
 
-	//		// Always update camera target to the player's head/aim point
-	//		camComp.SetTarget(aimTarget);
+			// Always update camera target to the player's head/aim point
+			camComp.SetTarget(aimTarget);
 
-	//		///* Camera and Player rotations if all meshes face Z- as forward */
-	//		//// Player face same horizontal direction as the camera (camera behind player)
-	//		//glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
+			///* Camera and Player rotations if all meshes face Z- as forward */
+			//// Player face same horizontal direction as the camera (camera behind player)
+			//glm::vec3 camFwd = glm::normalize(aimTarget - camPos);          // camera forward (cam -> target)
 
-	//		//// Calculate yaw (rotation around Y axis)
-	//		//const float yawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+			//// Calculate yaw (rotation around Y axis)
+			//const float yawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
 
-	//		//// Calculate pitch (rotation around X axis)
-	//		//// Pitch = angle between horizontal plane and forward vector
-	//		//float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+			//// Calculate pitch (rotation around X axis)
+			//// Pitch = angle between horizontal plane and forward vector
+			//float pitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
 
-	//		//transform.SetRotation(glm::vec3(pitchDeg, yawDeg/* - 90.0f*/, 0.0f));
-	//		///* Camera and Player rotations if all meshes face Z- as forward */
+			//transform.SetRotation(glm::vec3(pitchDeg, yawDeg/* - 90.0f*/, 0.0f));
+			///* Camera and Player rotations if all meshes face Z- as forward */
 
-	//		/* Temporary adjustments to Camera and Player rotations */
-	//		glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
-	//		glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camFwd));
-	//		glm::vec3 camUp = glm::normalize(glm::cross(camFwd, camRight));
+			/* Temporary adjustments to Camera and Player rotations */
+			glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
+			glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camFwd));
+			glm::vec3 camUp = glm::normalize(glm::cross(camFwd, camRight));
 
-	//		// Build rotation from camera basis to match player orientation
-	//		glm::mat3 camBasis(camRight, camUp, camFwd);
+			// Build rotation from camera basis to match player orientation
+			glm::mat3 camBasis(camRight, camUp, camFwd);
 
-	//		// Your model’s forward = X+, so rotate 90° around Y to map +Z → +X
-	//		glm::quat modelOffset = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0, 1, 0));
+			// Your model’s forward = X+, so rotate 90° around Y to map +Z → +X
+			glm::quat modelOffset = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0, 1, 0));
 
-	//		// Convert basis to quaternion and apply offset
-	//		glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
+			// Convert basis to quaternion and apply offset
+			glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
 
-	//		transform.Rotation = q;
-	//		transform.IsDirty = true;
+			transform.Rotation = q;
+			transform.IsDirty = true;
 
-	//		/* Temporary adjustments to Camera and Player rotations */
+			/* Temporary adjustments to Camera and Player rotations */
 
-	//		/* Player controls begin here */
-	//		// Movement speed 
-	//		const float moveSpeed = 0.1f;
+			/* Player controls begin here */
+			// Movement speed 
+			const float moveSpeed = 0.1f;
 
-	//		// Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
-	//		//glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
-	//		glm::vec3 forward = glm::normalize(transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f)); // forward in local space (For botnet)
+			// Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
+			//glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
+			glm::vec3 forward = glm::normalize(transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f)); // forward in local space (For botnet)
 
-	//		// Compute right vector of player from forward and world up
-	//		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+			// Compute right vector of player from forward and world up
+			glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-	//		// TimerBar entity exists and has a TransformComponent
-	//		if (timerBarUIFound && timerBarUI.HasComponent<Engine::TransformComponent>())
-	//		{
+			// TimerBar entity exists and has a TransformComponent
+			if (timerBarUIFound && timerBarUI.HasComponent<Engine::TransformComponent>())
+			{
 
-	//			// Timerbar UI transform
-	//			auto &timerBarTrans = timerBarUI.GetComponent<Engine::TransformComponent>();
+				// Timerbar UI transform
+				auto &timerBarTrans = timerBarUI.GetComponent<Engine::TransformComponent>();
 
-	//			// Place timer bar above the player's local up
-	//			const float timerBarDist = 3.0f; // How high above the player
-	//			const float angleRad = glm::radians(20.0f);	// Diagonal angle to "fit" into the camera screen
-	//			glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
-	//				camUp * std::sin(angleRad));
-	//			timerBarTrans.Position = camPos + angledDir * timerBarDist;
+				// Place timer bar above the player's local up
+				const float timerBarDist = 3.0f; // How high above the player
+				const float angleRad = glm::radians(20.0f);	// Diagonal angle to "fit" into the camera screen
+				glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
+					camUp * std::sin(angleRad));
+				timerBarTrans.Position = camPos + angledDir * timerBarDist;
 
-	//			// Make timer bar "follow" camera rotation
-	//			// Use only pitch and yaw so the timer bar stays upright 
-	//			const float timerBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
-	//			const float timerBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
-	//			timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
-	//		}
+				// Make timer bar "follow" camera rotation
+				// Use only pitch and yaw so the timer bar stays upright 
+				const float timerBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+				const float timerBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+				timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
+			}
 
-	//		if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>())
-	//		{
+			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>())
+			{
 
-	//			// Healthbar UI transform
-	//			auto &healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
+				// Healthbar UI transform
+				auto &healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
 
-	//			// Place timer bar above the player's local up
-	//			const float healthBarDist = 3.0f;      // How far from camera/player
-	//			const float angleRad = glm::radians(20.0f);
-	//			glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
-	//				camUp * std::sin(angleRad));
+				// Place timer bar above the player's local up
+				const float healthBarDist = 3.0f;      // How far from camera/player
+				const float angleRad = glm::radians(20.0f);
+				glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
+					camUp * std::sin(angleRad));
 
-	//			// Offset downward in camera's local up direction
-	//			const float yOffset = -3.5f; // negative = lower
-	//			glm::vec3 offset = camUp * yOffset;
+				// Offset downward in camera's local up direction
+				const float yOffset = -3.5f; // negative = lower
+				glm::vec3 offset = camUp * yOffset;
 
-	//			// Final position
-	//			healthBarTrans.Position = camPos + angledDir * healthBarDist + offset;
+				// Final position
+				healthBarTrans.Position = camPos + angledDir * healthBarDist + offset;
 
-	//			// Make timer bar "follow" camera rotation
-	//			const float healthBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
-	//			const float healthBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
-	//			healthBarTrans.SetRotation(glm::vec3(healthBarPitchDeg, healthBarYawDeg, 0.0f));
-	//		}
+				// Make timer bar "follow" camera rotation
+				const float healthBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+				const float healthBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+				healthBarTrans.SetRotation(glm::vec3(healthBarPitchDeg, healthBarYawDeg, 0.0f));
+			}
 
 
-	//		// Movement accumulator
-	//		glm::vec3 moveDir(0.0f);
+			// Movement accumulator
+			glm::vec3 moveDir(0.0f);
 
-	//		if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
-	//		if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
-	//		if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
-	//		if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+			if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+			if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+			if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+			if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
 
-	//		// Normalize to prevent faster diagonal movement
-	//		if (glm::dot(moveDir, moveDir) > 0.0f)
-	//			moveDir = glm::normalize(moveDir);
+			// Normalize to prevent faster diagonal movement
+			if (glm::dot(moveDir, moveDir) > 0.0f)
+				moveDir = glm::normalize(moveDir);
 
-	//		// Apply movement to player
-	//		transform.Position += moveDir * moveSpeed;
+			// Apply movement to player
+			transform.Position += moveDir * moveSpeed;
 
-	//	}
-	//	else
-	//	{
-	//		// Default player movement w/o MainCamera
-	//		//if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
-	//		//if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
-	//		//if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
-	//		//if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
-	//	}
-	//}
+		}
+		else
+		{
+			// Default player movement w/o MainCamera
+			//if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+			//if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+			//if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+			//if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+		}
+	}
 
 
 	////sphereTrans.Position = glm::vec3(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
@@ -1396,6 +1399,68 @@ void Game::OnUpdate(Engine::Timestep ts)
 			LOG_ERROR("Load failed!");
 		}
 	}
+
+	// UNCOMMENT IF YOU NEED TO SPAWN A FIRST TIME INSTANCE OF A ENTITY THAT HAS SUBMESH HERE - AMANDA
+	// ADJUST THE SUBMESH COUNT ACCORDINGLY ARIGATO
+	// SAME FOR THE NAME!
+	//if (input.IsKeyJustPressed(GLFW_KEY_H)) {
+	//	glm::vec3 position = glm::vec3(0.0f, 1.0f, 0.0f);
+	//	glm::quat rotation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	//	auto enemy = m_ActiveScene->CreateEntity("loveletter");
+
+	//	//enemy.AddComponent<RigidbodyComponent>();
+	//	if (enemy.HasComponent<Engine::TransformComponent>()) {
+	//		auto& transform = enemy.GetComponent<Engine::TransformComponent>();
+	//		transform.Position = position;
+	//		transform.Rotation = rotation;
+	//		//transform.Scale = glm::vec3(0.002f);
+
+	//		transform.IsDirty = true;
+
+	//		// CRITICAL: Manually calculate WorldTransform immediately!
+	//		glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
+	//		glm::mat4 rotation_matrix = glm::mat4_cast(transform.Rotation);
+	//		glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), transform.Scale);
+	//		glm::mat4 transformation_matrix = translation_matrix * rotation_matrix * scale_matrix;
+
+	//		transform.WorldTransform = transformation_matrix;
+	//		transform.LocalTransform = transformation_matrix;
+	//	}
+
+	//	auto& parentMesh = enemy.AddComponent<Engine::MeshRendererComponent>();
+	//	std::string meshName = "E005_loveletter_v003.fbx";
+	//	xresource::instance_guid inst_guid = Engine::AM.getAssetIdByFilename(meshName);
+	//	parentMesh.MeshGuid = inst_guid;
+	//	parentMesh.SubmeshIndex = 0;
+
+	//	const int submeshCount = 9;
+	//	for (int sub = 0; sub < submeshCount; ++sub) {
+	//		auto child = m_ActiveScene->CreateEntity("loveletter_" + std::to_string(sub));
+	//		auto& childTransform = child.GetComponent<Engine::TransformComponent>();
+	//		childTransform.Position = glm::vec3(0.0f);
+	//		childTransform.Scale = glm::vec3(1.0f);
+	//		childTransform.Parent = enemy;
+	//		childTransform.IsDirty = true;
+
+	//		// Calculate child's LocalTransform
+	//		glm::mat4 child_translation = glm::translate(glm::mat4(1.0f), childTransform.Position);
+	//		glm::mat4 child_rotation = glm::mat4_cast(childTransform.Rotation);
+	//		glm::mat4 child_scale = glm::scale(glm::mat4(1.0f), childTransform.Scale);
+	//		childTransform.LocalTransform = child_translation * child_rotation * child_scale;
+
+	//		if (enemy.HasComponent<Engine::TransformComponent>()) {
+	//			auto& parentTransform = enemy.GetComponent<Engine::TransformComponent>();
+	//			childTransform.WorldTransform = parentTransform.WorldTransform * childTransform.LocalTransform;
+	//			parentTransform.Children.push_back(child);
+	//		}
+
+	//		auto& childMesh = child.AddComponent<Engine::MeshRendererComponent>();
+	//		childMesh.MeshGuid = inst_guid;
+	//		childMesh.SubmeshIndex = sub;
+	//	}
+	//}
+
 
 	//m_Editor->StartImguiFrame();
 

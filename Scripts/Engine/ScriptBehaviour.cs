@@ -14,6 +14,7 @@ namespace Engine
 
         public virtual void OnStart() { }
         public virtual void OnUpdate(float deltaTime) { }
+        public virtual void OnFixedUpdate(float deltaTime) { }
         public virtual void OnDestroy() { }
 
         // Helper properties
