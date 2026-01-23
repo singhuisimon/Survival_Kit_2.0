@@ -2,10 +2,6 @@
   "name": "test.mat",
   "guid": "B47C507D63D9C113",
   "tags": [],
-<<<<<<< HEAD
-  "lastImported": "0000000069730D31",
-=======
-  "lastImported": "00000000696D2F31",
->>>>>>> main
+  "lastImported": "000000006973126D",
   "resourceLinks": []
 }

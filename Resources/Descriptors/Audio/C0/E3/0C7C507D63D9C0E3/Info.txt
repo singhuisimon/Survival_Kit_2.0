@@ -2,10 +2,6 @@
   "name": "Player_Primary_Alt_Bullet_Fly.wav",
   "guid": "0C7C507D63D9C0E3",
   "tags": [],
-<<<<<<< HEAD
-  "lastImported": "0000000069730D31",
-=======
-  "lastImported": "00000000696D2F31",
->>>>>>> main
+  "lastImported": "000000006973126D",
   "resourceLinks": []
 }

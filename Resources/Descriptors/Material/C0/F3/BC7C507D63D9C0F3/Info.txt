@@ -2,10 +2,6 @@
   "name": "DefenceFailed.mat",
   "guid": "BC7C507D63D9C0F3",
   "tags": [],
-<<<<<<< HEAD
-  "lastImported": "0000000069730D31",
-=======
-  "lastImported": "00000000696D2F31",
->>>>>>> main
+  "lastImported": "000000006973126D",
   "resourceLinks": []
 }

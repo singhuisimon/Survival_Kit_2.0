@@ -276,6 +276,137 @@
           }
         }
       ]
+    },
+    {
+      "ID": 8,
+      "Name": "Quit Confirmation Popup",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Quit Confirmation Popup",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.5],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [256.0, 144.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_QuitConfirmation.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 10,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 9,
+      "Name": "Quit Yes Button",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Quit Yes Button",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [580.0, -560.0, -0.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [50.0, 25.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_YesButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 10,
+      "Name": "Quit No Button",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Quit No Button",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [700.0, -560.0, -0.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [50.0, 25.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_NoButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 11,
+      "Name": "Quit Popup Controller",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Quit Popup Controller",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [0.0, 0.0, 0.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "ScriptComponent",
+          "Properties": {
+            "ScriptClassName": "Game.QuitConfirmationPopup"
+          }
+        }
+      ]
     }
   ],
   "Settings": [

@@ -2,10 +2,6 @@
   "name": "hdr.vert",
   "guid": "D47C507D63D9C037",
   "tags": [],
-<<<<<<< HEAD
-  "lastImported": "0000000069730D31",
-=======
-  "lastImported": "00000000696D2F30",
->>>>>>> main
+  "lastImported": "000000006973126D",
   "resourceLinks": []
 }
