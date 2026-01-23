@@ -6,6 +6,7 @@ using static Engine.Scene;
 using static Engine.Camera;
 using static Engine.Input;
 using static Engine.Rigidbody;
+using static Engine.Event;
 
 namespace Game
 {
@@ -39,9 +40,11 @@ namespace Game
         [SerializeField("Strafe Deceleration")] private float strafeDeceleration = 12.0f;
 
         // ===== Camera Positioning =====
-        [SerializeField("Camera Distance Back")] private float cameraDistanceBack = 30.0f;
-        [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 3.0f;
-        [SerializeField("Camera Follow Speed")] private float cameraFollowSpeed = 10.0f;
+        [SerializeField("Camera Distance Back")] private float cameraDistanceBack = 15.0f;
+        //[SerializeField("Camera Distance Back")] private float cameraDistanceBack = 30.0f;
+        //[SerializeField("Camera Height Offset")] private float cameraHeightOffset = 3.0f;
+        [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 0.0f;
+        [SerializeField("Camera Follow Speed")] private float cameraFollowSpeed = 15.0f;
         [SerializeField("Camera Rotation Speed")] private float cameraRotationSpeed = 8.0f;
         [SerializeField("Camera Rotation Speed")] private float cameraLookHeight = 8.0f;
 
@@ -54,6 +57,11 @@ namespace Game
         [SerializeField("Toggle Cursor Key")] private KeyCode toggleCursorKey = KeyCode.F3;
         [SerializeField("Start With Cursor Locked")] private bool startWithCursorLocked = true;
 
+        [SerializeField] private float playerHP = 100.0f;
+        [SerializeField] private const float playerOriginalHP = 100.0f;
+
+        [SerializeField] private string EVENT_PLAYER_DAMAGE = "Damage:";
+        [SerializeField] private string EVENT_PLAYER_HEALTHCHANGE = "Damage:";
 
         // ===== Internal State =====
         private uint cameraEntityID = 0;
@@ -85,6 +93,9 @@ namespace Game
 
         public override void OnStart()
         {
+
+            playerHP = playerOriginalHP;
+
             // Find entities
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
@@ -112,6 +123,10 @@ namespace Game
             {
                 SetCursorVisible(false);
             }
+
+            EVENT_PLAYER_DAMAGE += playerEntityID.ToString();
+
+            Subscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
 
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - physics in FixedUpdate, visuals in Update");
@@ -178,6 +193,7 @@ namespace Game
         {
             // Restore cursor state
             SetCursorVisible(cursorWasVisible);
+            Unsubscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
         }
 
         // ========================================
@@ -185,7 +201,7 @@ namespace Game
         // ========================================
         private void HandleCursorToggle()
         {
-            if (IsKeyPressed(toggleCursorKey) || IsKeyPressed(KeyCode.Tab))
+            if (IsKeyReleased(toggleCursorKey) || IsKeyReleased(KeyCode.Tab))
             {
                 bool currentVisible = IsCursorVisible();
                 SetCursorVisible(!currentVisible);
@@ -382,6 +398,24 @@ namespace Game
 
             Vector3 finalVelocity = forwardVelocity + strafeVelocity + verticalVelocity;
             RigidbodySetVelocity(playerEntityID, ref finalVelocity);
+        }
+
+        private void OnDamageReceived(string eventName, string payload){
+            float damage = DamageSystem.ParseAmount(payload);
+
+            playerHP -= damage;
+
+            LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player " + playerEntityID.ToString() + " gets damage! Health: " + playerHP.ToString() + "/" + playerOriginalHP.ToString());
+
+            //Send event here to ui 
+            //take note playerHP is a float!
+            Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+
+            //Check if player is <= 0 if so send signal that you are ded
+            if(playerHP <= 0){
+                //publish event here
+                //do what you need to do here
+            }
         }
 
         // ========================================
