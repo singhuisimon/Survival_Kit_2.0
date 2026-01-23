@@ -118,34 +118,34 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // if (isDead)
-            //     return;
+            if (isDead)
+                return;
 
-            // // Update stun
-            // if (isStunned)
-            // {
-            //     UpdateStun(deltaTime);
-            //     return;
-            // }
+            // Update stun
+            if (isStunned)
+            {
+                UpdateStun(deltaTime);
+                return;
+            }
 
-            // // Target selection
-            // UpdateTargetSelectionTimer(deltaTime);
+            // Target selection
+            UpdateTargetSelectionTimer(deltaTime);
 
-            // // Movement and rotation
-            // if (isMoving && targetID != INVALID_ENTITY)
-            // {
-            //     if (enableLookAt)
-            //         RotateTowardsTarget(deltaTime);
+            // Movement and rotation
+            if (isMoving && targetID != INVALID_ENTITY)
+            {
+                if (enableLookAt)
+                    RotateTowardsTarget(deltaTime);
 
-            //     MoveTowardsTarget(deltaTime);
-            //     ClampSpeed();
-            // }
+                MoveTowardsTarget(deltaTime);
+                ClampSpeed();
+            }
 
-            // // Handle collision-triggered explosion
-            // HandleCollisionTriggers();
+            // Handle collision-triggered explosion
+            HandleCollisionTriggers();
 
-            // if (isExploding)
-            //     Explode();
+            if (isExploding)
+                Explode();
         }
 
         public override void OnDestroy()
