@@ -1,7 +1,0 @@
-{
-  "name": "WindowsBG.png",
-  "guid": "6C7C507D63D9C0B9",
-  "tags": [],
-  "lastImported": "000000006973152A",
-  "resourceLinks": []
-}

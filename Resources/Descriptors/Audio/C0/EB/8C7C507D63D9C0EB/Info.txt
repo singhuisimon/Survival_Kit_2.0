@@ -1,7 +1,0 @@
-{
-  "name": "Player_Secondary_Fire_Impact_Explosion.wav",
-  "guid": "8C7C507D63D9C0EB",
-  "tags": [],
-  "lastImported": "000000006973152A",
-  "resourceLinks": []
-}

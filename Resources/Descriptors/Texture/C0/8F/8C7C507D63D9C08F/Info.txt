@@ -1,7 +1,0 @@
-{
-  "name": "GAM3_VFX_PlayerHeal.png",
-  "guid": "8C7C507D63D9C08F",
-  "tags": [],
-  "lastImported": "0000000069731529",
-  "resourceLinks": []
-}

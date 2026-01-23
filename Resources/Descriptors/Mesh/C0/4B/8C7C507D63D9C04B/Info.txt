@@ -1,7 +1,0 @@
-{
-  "name": "A9004_cruiser_v001.fbx",
-  "guid": "8C7C507D63D9C04B",
-  "tags": [],
-  "lastImported": "0000000069731529",
-  "resourceLinks": []
-}

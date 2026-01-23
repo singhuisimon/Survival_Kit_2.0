@@ -1,7 +1,0 @@
-{
-  "name": "wood_normal.jpg",
-  "guid": "0C7C507D63D9C0BD",
-  "tags": [],
-  "lastImported": "000000006973152A",
-  "resourceLinks": []
-}
