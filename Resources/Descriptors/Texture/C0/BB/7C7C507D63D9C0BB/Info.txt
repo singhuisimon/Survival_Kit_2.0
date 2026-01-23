@@ -2,6 +2,6 @@
   "name": "wood_color.jpg",
   "guid": "7C7C507D63D9C0BB",
   "tags": [],
-  "lastImported": "000000006970371B",
+  "lastImported": "0000000069732708",
   "resourceLinks": []
 }
