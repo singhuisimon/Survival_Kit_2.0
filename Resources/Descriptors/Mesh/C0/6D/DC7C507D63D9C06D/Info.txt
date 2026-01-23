@@ -2,6 +2,10 @@
   "name": "Temp_PrimarySecondaryBullet.fbx",
   "guid": "DC7C507D63D9C06D",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "000000006973126D",
+=======
+  "lastImported": "000000006970371B",
+>>>>>>> main
   "resourceLinks": []
 }

@@ -2,6 +2,10 @@
   "name": "bloom_downsample.frag",
   "guid": "DC7C507D63D9C02D",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "000000006973126D",
+=======
+  "lastImported": "000000006970371B",
+>>>>>>> main
   "resourceLinks": []
 }

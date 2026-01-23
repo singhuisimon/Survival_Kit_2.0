@@ -2,6 +2,10 @@
   "name": "right.jpg",
   "guid": "C47C507D63D9C09D",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "000000006973126D",
+=======
+  "lastImported": "000000006970371B",
+>>>>>>> main
   "resourceLinks": []
 }

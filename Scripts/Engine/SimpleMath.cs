@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static Engine.Transform;
 
 namespace Engine
 {
@@ -275,6 +276,31 @@ namespace Engine
             return x - (x3 / 3.0f) + (x5 / 5.0f) - (x7 / 7.0f) + (x9 / 9.0f);
         }
 
+        public static Vector3 LocalChildtoWorld (uint childID){
+            Vector3 childPosition = GetPosition((uint)childID);
+            Vector3 parentPosition = GetPosition(TransformGetParent((uint)childID));
+            return parentPosition + childPosition;
+        }
+
+        public static Vector3 QuatMultiplyVec3 (Quat q, Vector3 v)
+        {
+            float x = q.X;
+            float y = q.Y;
+            float z = q.Z;
+            float w = q.W;
+
+            // Cross product:
+            float crossX = 2.0f * (y * v.Z - z * v.Y);
+            float crossY = 2.0f * (z * v.X - x * v.Z);
+            float crossZ = 2.0f * (x * v.Y - y * v.X);
+
+            // Final rotated vector: v + w*t + cross(q.xyz, t)
+            float rotatedX = v.X + w * crossX + (y * crossZ - z * crossY);
+            float rotatedY = v.Y + w * crossY + (z * crossX - x * crossZ);
+            float rotatedZ = v.Z + w * crossZ + (x * crossY - y * crossX);
+
+            return new Engine.Vector3(rotatedX, rotatedY, rotatedZ);
+        }
         public static Quat QuatFromBasis(Vector3 right, Vector3 up, Vector3 forward)
         {
             float m00 = right.X, m01 = up.X, m02 = forward.X;

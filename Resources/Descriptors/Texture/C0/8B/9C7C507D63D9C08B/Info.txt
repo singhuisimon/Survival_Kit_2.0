@@ -2,6 +2,10 @@
   "name": "Firewall_Inactive.png",
   "guid": "9C7C507D63D9C08B",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "000000006973126D",
+=======
+  "lastImported": "000000006970371B",
+>>>>>>> main
   "resourceLinks": []
 }

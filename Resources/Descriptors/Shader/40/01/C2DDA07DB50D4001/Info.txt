@@ -2,6 +2,10 @@
   "name": "shadow_depth.frag",
   "guid": "C2DDA07DB50D4001",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "000000006973126D",
+=======
+  "lastImported": "000000006970371B",
+>>>>>>> main
   "resourceLinks": []
 }

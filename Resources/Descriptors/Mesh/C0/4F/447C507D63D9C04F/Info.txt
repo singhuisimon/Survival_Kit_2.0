@@ -2,6 +2,10 @@
   "name": "core pad.fbx",
   "guid": "447C507D63D9C04F",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "000000006973126D",
+=======
+  "lastImported": "000000006970371B",
+>>>>>>> main
   "resourceLinks": []
 }
