@@ -72,6 +72,20 @@ namespace Game
 
             Vector3 direction = targetPosition - ownPosition;
 
+            float yaw = SimpleMath.Atan2(direction.X, direction.Z) + SimpleMath.PI;
+            Engine.Vector3 upAxis = new Engine.Vector3(0.0f, 1.0f, 0.0f);
+            Quat yawQ = Quat.FromAxisAngle(upAxis, yaw);
+
+            float horizLen = SimpleMath.Sqrt(direction.X*direction.X + direction.Z*direction.Z);
+            float pitch = SimpleMath.Atan2(direction.Y, horizLen);
+
+            Engine.Vector3 localRight = new Engine.Vector3(1.0f, 0.0f, 0.0f);
+            Engine.Vector3 rightAxis = SimpleMath.QuatMultiplyVec3(yawQ,  localRight);
+            Quat pitchQ = Engine.Quat.FromAxisAngle(rightAxis, -pitch);
+
+            Quat finalRotation = pitchQ * yawQ;
+            SetRotation((uint)EntityID, ref finalRotation);
+
             // Get magnitude of distance
             float magnitude = SimpleMath.Sqrt(direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z);
     

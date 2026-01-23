@@ -126,25 +126,6 @@ namespace Game
             return new Engine.Vector3(x, y, z);
         }
 
-        public Engine.Vector3 QuatMultiplyVec3 (Quat q, Engine.Vector3 v)
-        {
-            float x = q.X;
-            float y = q.Y;
-            float z = q.Z;
-            float w = q.W;
-
-            // Cross product:
-            float crossX = 2.0f * (y * v.Z - z * v.Y);
-            float crossY = 2.0f * (z * v.X - x * v.Z);
-            float crossZ = 2.0f * (x * v.Y - y * v.X);
-
-            // Final rotated vector: v + w*t + cross(q.xyz, t)
-            float rotatedX = v.X + w * crossX + (y * crossZ - z * crossY);
-            float rotatedY = v.Y + w * crossY + (z * crossX - x * crossZ);
-            float rotatedZ = v.Z + w * crossZ + (x * crossY - y * crossX);
-
-            return new Engine.Vector3(rotatedX, rotatedY, rotatedZ);
-        }
 
         public void ShootAtTarget()
         {
@@ -152,7 +133,7 @@ namespace Game
             Engine.Vector3 globalPosition = SimpleMath.LocalChildtoWorld((uint)EntityID);
             Quat wormchildRot = Transform.GetRotation(TransformGetParent((uint)EntityID));
 
-            Engine.Vector3 forwardDir = wormchildRot.Right;
+            Engine.Vector3 forwardDir = wormchildRot.Forward;
 
             float spawnDist = 1.5f;
             float bulletForce = 100.0f;

@@ -5,7 +5,7 @@
 c47c507d63d9c009|7|/Resources/Sources/Scenes/GameScene.json|.json||0|0|0|0|0
 ac7c507d63d9c071|0|/Resources/Sources/Textures/back.jpg|.jpg||1768961343|1|0|0|0
 7c7c507d63d9c001|7|/Resources/Sources/Scenes/AlliesTesting.json|.json||0|0|0|0|0
-c7c507d63d9c051|1|/Resources/Sources/Meshes/E001_worm_host_v001.fbx|.fbx||1768961343|1|0|0|0
+c7c507d63d9c051|1|/Resources/Sources/Meshes/E001_worm_host_v001.fbx|.fbx||1768961343|1|1769147080|134136206805785610|0
 ec7c507d63d9c031|4|/Resources/Sources/Shaders/debug.frag|.frag||1768961343|1|0|0|0
 cc7c507d63d9c01b|7|/Resources/Sources/Scenes/NewDefault.json|.json||0|0|0|0|0
 9c7c507d63d9c08b|0|/Resources/Sources/Textures/Firewall_Inactive.png|.png||1768961343|1|0|0|0
@@ -81,7 +81,7 @@ fc7c507d63d9c043|4|/Resources/Sources/Shaders/survival_kit_obj.vert|.vert||17689
 d47c507d63d9c049|1|/Resources/Sources/Meshes/A9003_dreadnought_v002.fbx|.fbx||1768961343|1|0|0|0
 347c507d63d9c063|1|/Resources/Sources/Meshes/level_design_v003.fbx|.fbx||1768961343|1|0|0|0
 5c7c507d63d9c05b|1|/Resources/Sources/Meshes/E005_loveletter_v001.fbx|.fbx||1768961343|1|0|0|0
-e47c507d63d9c053|1|/Resources/Sources/Meshes/E002_worm_child_v001.fbx|.fbx||1768961343|1|0|0|0
+e47c507d63d9c053|1|/Resources/Sources/Meshes/E002_worm_child_v001.fbx|.fbx||1768961343|1|1769147122|134136207224436281|0
 bc7c507d63d9c0fb|2|/Resources/Sources/Material/Firewall_Logo.mat|.mat||1768961343|1|0|0|0
 8c7c507d63d9c04b|1|/Resources/Sources/Meshes/A9004_cruiser_v001.fbx|.fbx||1768961343|1|0|0|0
 5c7c507d63d9c069|1|/Resources/Sources/Meshes/PlayerModel_v002.fbx|.fbx||1768961343|1|0|0|0
