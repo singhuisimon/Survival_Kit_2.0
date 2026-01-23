@@ -1769,11 +1769,6 @@ namespace Engine
 						ImGui::EndCombo();
 					}
 
-					if (ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f"))
-					{
-						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
-					}
-
 					ImGui::Spacing();
 					ImGui::Text("Color Range");
 					if (ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x))
@@ -1791,6 +1786,34 @@ namespace Engine
 				// Particle Behavior
 				if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
 				{
+					ImGui::Text("Size");
+
+					if (ImGui::DragFloat3("Initial Size", &particleComp.StartSize.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat3("Default Size", &particleComp.DefaultSize.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat3("End Size", &particleComp.EndSize.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat("Growth Phase End", &particleComp.GrowPhaseEnd, 0.1f, 0.f, 1.f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat("Shrink Phase Start", &particleComp.ShrinkPhaseStart, 0.1f, 0.f, 1.f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					ImGui::Spacing();
 					ImGui::Text("Velocity");
 					if (ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f))
 					{

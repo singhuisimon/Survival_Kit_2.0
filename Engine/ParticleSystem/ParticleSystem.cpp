@@ -53,6 +53,7 @@ namespace Engine {
 					// Initialize the particles
 					particleToUse->Position = transform.Position;
 					particleToUse->PreviousPosition = transform.Position;
+					particleToUse->Size = emitter.StartSize;
 
 					// Random velocity in a cone around InitialVelocity
 					float speed = Random(std::max(0.1f, emitter.MinSpeed), emitter.MaxSpeed); // Random speed multiplier
@@ -106,16 +107,39 @@ namespace Engine {
 
 					particle.PreviousPosition = particle.Position;
 					particle.Position += particle.Velocity * ts.GetSeconds();
-					particle.Lifetime -= ts.GetSeconds();
+					particle.Age += ts.GetSeconds();
 
+					float normalizedLife = particle.Age / particle.Lifetime;
+
+					 
+
+					if (normalizedLife < emitter.GrowPhaseEnd) {
+						// Growing phase: start -> default
+						float t = normalizedLife / emitter.GrowPhaseEnd; // 0 to 1 within grow phase
+						particle.Size = glm::mix(emitter.StartSize, emitter.DefaultSize, t);
+					}
+					else if (normalizedLife < emitter.ShrinkPhaseStart) {
+						// Stable phase: stay at default
+						particle.Size = emitter.DefaultSize;
+					}
+					else {
+						// Shrinking phase: default -> end
+						float t = (normalizedLife - emitter.ShrinkPhaseStart) / (1.0f - emitter.ShrinkPhaseStart);
+						particle.Size = glm::mix(emitter.DefaultSize, emitter.EndSize, t);
+					}
+ 
 					// Calculate particle transform matrix
-					glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(emitter.ParticleSize)); // Uniform scale for particles
+					glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(particle.Size)); 
 					glm::mat4 rot = glm::toMat4(particle.Rotation); // No rotation for
 					glm::mat4 trans = glm::translate(glm::mat4(1.0f), particle.Position);
 
 					particle.Transform = trans * rot * scale;
 
-					if (particle.Lifetime <= 0.0f) {
+					if ((particle.Lifetime - particle.Age) <= 0.00001f) {
+
+						// Reset particle lifetime
+						particle.Lifetime = 0.f;
+						particle.Age = 0.f;
 						particle.Alive = false;
 					}
 				}

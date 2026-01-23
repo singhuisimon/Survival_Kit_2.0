@@ -543,6 +543,27 @@ namespace Engine
 				velArray.PushBack(emitter.InitialVelocity.z, allocator);
 				propertiesObj.AddMember("Initial Velocity", velArray, allocator);
 
+				// Start Size
+				rapidjson::Value startSizeArray(kArrayType);
+				startSizeArray.PushBack(emitter.StartSize.x, allocator);
+				startSizeArray.PushBack(emitter.StartSize.y, allocator);
+				startSizeArray.PushBack(emitter.StartSize.z, allocator);
+				propertiesObj.AddMember("Start Size", startSizeArray, allocator);
+
+				// Default Size
+				rapidjson::Value defaultSizeArray(kArrayType);
+				defaultSizeArray.PushBack(emitter.DefaultSize.x, allocator);
+				defaultSizeArray.PushBack(emitter.DefaultSize.y, allocator);
+				defaultSizeArray.PushBack(emitter.DefaultSize.z, allocator);
+				propertiesObj.AddMember("Default Size", defaultSizeArray, allocator);
+
+				// End Size
+				rapidjson::Value endSizeArray(kArrayType);
+				endSizeArray.PushBack(emitter.EndSize.x, allocator);
+				endSizeArray.PushBack(emitter.EndSize.y, allocator);
+				endSizeArray.PushBack(emitter.EndSize.z, allocator);
+				propertiesObj.AddMember("End Size", endSizeArray, allocator);
+
 				// Min Color
 				rapidjson::Value minColorArray(kArrayType);
 				minColorArray.PushBack(emitter.ColorMin.x, allocator);
@@ -574,6 +595,12 @@ namespace Engine
 
 				// Particle Size
 				propertiesObj.AddMember("Particle Size", emitter.ParticleSize, allocator);
+
+				// Grow Phase End
+				propertiesObj.AddMember("Grow Phase End", emitter.GrowPhaseEnd, allocator);
+
+				// Shrink Phase Start
+				propertiesObj.AddMember("Shrink Phase Start", emitter.ShrinkPhaseStart, allocator);
 
 				// Randomization parameters
 				propertiesObj.AddMember("Velocity Randomness", emitter.VelocityRandomness, allocator);
@@ -1372,6 +1399,40 @@ namespace Engine
 							}
 						}
 
+						// Start Size
+						if (properties.HasMember("Start Size") && properties["Start Size"].IsArray())
+						{
+							const auto& startSizeArray = properties["Start Size"].GetArray();
+							if (startSizeArray.Size() >= 3)
+							{
+								emitter.StartSize.x = startSizeArray[0].GetFloat();
+								emitter.StartSize.y = startSizeArray[1].GetFloat();
+								emitter.StartSize.z = startSizeArray[2].GetFloat();
+							}
+						}
+						// Default Size
+						if (properties.HasMember("Default Size") && properties["Default Size"].IsArray())
+						{
+							const auto& defaultSizeArray = properties["Default Size"].GetArray();
+							if (defaultSizeArray.Size() >= 3)
+							{
+								emitter.DefaultSize.x = defaultSizeArray[0].GetFloat();
+								emitter.DefaultSize.y = defaultSizeArray[1].GetFloat();
+								emitter.DefaultSize.z = defaultSizeArray[2].GetFloat();
+							}
+						}
+						// End Size
+						if (properties.HasMember("End Size") && properties["End Size"].IsArray())
+						{
+							const auto& endSizeArray = properties["End Size"].GetArray();
+							if (endSizeArray.Size() >= 3)
+							{
+								emitter.EndSize.x = endSizeArray[0].GetFloat();
+								emitter.EndSize.y = endSizeArray[1].GetFloat();
+								emitter.EndSize.z = endSizeArray[2].GetFloat();
+							}
+						}
+
 						// Color Min
 						if (properties.HasMember("Color Min") && properties["Color Min"].IsArray())
 						{
@@ -1419,6 +1480,14 @@ namespace Engine
 						// Particle Size
 						if (properties.HasMember("Particle Size"))
 							emitter.ParticleSize = properties["Particle Size"].GetFloat();
+
+						// Grow Phase End
+						if (properties.HasMember("Grow Phase End"))
+							emitter.GrowPhaseEnd = properties["Grow Phase End"].GetFloat();
+
+						// Shrink Phase Start
+						if (properties.HasMember("Shrink Phase Start"))
+							emitter.ShrinkPhaseStart = properties["Shrink Phase Start"].GetFloat();
 
 						// Randomization parameters
 						if (properties.HasMember("Velocity Randomness"))

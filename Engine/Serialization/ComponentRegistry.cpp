@@ -519,6 +519,27 @@ namespace Engine {
                 [](ParticleComponent& c, const glm::vec3& v) { c.InitialVelocity = v; }
             );
 
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "StartSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.StartSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.StartSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "DefaultSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.DefaultSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.DefaultSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "EndSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.EndSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.EndSize = v; }
+            );
+
             meta.AddProperty<ParticleComponent, glm::vec4>(
             "ColorMin",
                 PropertyType::Vec4,
@@ -573,6 +594,20 @@ namespace Engine {
                 PropertyType::Float,
                 [](const ParticleComponent& c) { return c.ParticleSize; },
                 [](ParticleComponent& c, const float& v) { c.ParticleSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "GrowPhaseEnd",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.GrowPhaseEnd; },
+                [](ParticleComponent& c, const float& v) { c.GrowPhaseEnd = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "ShrinkPhaseStart",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.ShrinkPhaseStart; },
+                [](ParticleComponent& c, const float& v) { c.ShrinkPhaseStart = v; }
             );
 
             meta.AddProperty<ParticleComponent, float>(

@@ -12,8 +12,10 @@ namespace Engine {
 		glm::vec3 Position;
 		glm::vec3 Velocity;
 		glm::vec3 PreviousPosition;
+		glm::vec3 Size;
 		glm::vec4 Color;
 		float	  Lifetime;
+		float     Age;
 		glm::quat Rotation;
 		bool	  Alive;
 	};
@@ -26,6 +28,11 @@ namespace Engine {
 		std::vector<ParticleData> Particles;
 
 		glm::vec3 InitialVelocity = glm::vec3(0.f, 1.f, 0.f);
+
+		glm::vec3 StartSize = glm::vec3(0.f, 0.f, 0.f);
+		glm::vec3 DefaultSize = glm::vec3(0.5f, 0.5f, 0.5f);
+		glm::vec3 EndSize = glm::vec3(0.f, 0.f, 0.f);
+
 		glm::vec4 ColorMin = glm::vec4(0.f, 0.f, 0.7f, 1.f);
 		glm::vec4 ColorMax = glm::vec4(0.3f, 0.3f, 1.f, 1.f);
 
@@ -36,6 +43,8 @@ namespace Engine {
 		float     ParticleLifetime    = 2.0f; // Lifetime of each particle in seconds
 		float     EmissionAccumulator = 0.0f; // Accumulator for emission timing
 		float     ParticleSize		  = 0.2f; // Size of each particle
+		float	  GrowPhaseEnd		  = 0.3f;
+		float	  ShrinkPhaseStart	  = 0.7f;
 
 		// Randomization parameters
 		float     VelocityRandomness = 0.5f;  // 0-1, how much velocity varies
@@ -46,7 +55,7 @@ namespace Engine {
 		float     RotationSpeed = 0.0f;   // Angular velocity (degrees/sec), 0 = no spin
 
 		bool      RandomizeRotation = true;   // Enable/disable random rotation
-		bool      Loop = false;
+		bool      Loop = false; // Non loop is basically "Burst Mode" -> Will just set it in editor.
 		bool      Active = true;
 	};
 
