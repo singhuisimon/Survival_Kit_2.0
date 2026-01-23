@@ -128,7 +128,7 @@ if(ENGINE_SOURCES)
     add_library(EngineLib STATIC
         ${ENGINE_SOURCES}
         ${ENGINE_HEADERS}
-        )
+         "Component/TextComponent.h")
     message(STATUS "Engine sources found: ${ENGINE_SOURCES}")
 else()
     # Create dummy source file if no sources exist yet

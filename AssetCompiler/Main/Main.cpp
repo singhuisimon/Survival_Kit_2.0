@@ -22,7 +22,7 @@
 #include "../Utility/DescriptorParser.h"
 #include "../CompilerCore/MeshCompiler.h"
 #include "../CompilerCore/TextureCompiler.h"
-
+#include "../CompilerCore/FontCompiler.h"
 
 
 namespace fs = std::filesystem;
@@ -400,7 +400,11 @@ int main(int argc, char* argv[]) {
     if (!fs::exists(config.outputPath)) {
         fs::create_directories(config.outputPath);
     }
-    
+
+    AssetCompiler::FontCompiler compiler;
+    if (compiler.compile("Resources/Sources/Fonts/Quantico-Bold.ttf")) {
+        std::cout << "Success! << std::endl";
+    }
     // Compile each asset
     int successCount = 0;
     int failCount = 0;
