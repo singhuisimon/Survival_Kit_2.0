@@ -1868,6 +1868,160 @@ namespace Engine
 					ImGui::TreePop();
 				}
 
+				if (ImGui::TreeNode("Advanced"))
+				{
+					static bool showWrongTypeParticle = false;
+
+					// Display asset reference fields
+					DisplayAssetField("Mesh", particleComp.ParticleTypeAdvanced, ResourceType::MESH, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+					DisplayAssetField("Material", particleComp.MaterialType, ResourceType::MATERIAL, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+
+					if (showWrongTypeParticle) {
+						ImGui::OpenPopup("Incompatible Asset Type");
+						showWrongTypeParticle = false;
+					}
+
+					if (ImGui::BeginPopup("Incompatible Asset Type")) {
+						ImGui::Text("The dropped asset type does not match the expected type.");
+						if (ImGui::Button("Close")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// Material Editor Section
+					ImGui::SeparatorText("Material Properties");
+
+					// Save Material Button
+					static char materialSaveName[256] = "";
+					ImGui::InputText("Material Name", materialSaveName, sizeof(materialSaveName));
+					ImGui::SameLine();
+					if (ImGui::Button("Save Material")) {
+						if (strlen(materialSaveName) > 0) {
+							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+							if (material) {
+								std::string filename = std::string(materialSaveName);
+								serializeMaterial(material, filename);
+
+								AM.scanAndProcess();
+								memset(materialSaveName, 0, sizeof(materialSaveName));
+								ImGui::OpenPopup("Material Saved");
+							}
+						}
+						else {
+							ImGui::OpenPopup("Invalid Name");
+						}
+					}
+
+					if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Material saved successfully!");
+						if (ImGui::Button("OK")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Please enter a valid material name.");
+						if (ImGui::Button("OK")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// Get material reference
+					MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+
+					if (material) {
+						ImGui::Text("Shader: %s", material->shaderName.c_str());
+
+						if (ImGui::CollapsingHeader("Texture Maps")) {
+							DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+						}
+
+						if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
+							if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
+								ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::ColorEdit3("Emission Color", material->emissionColor.data(),
+								ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+						}
+
+						if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
+							if (ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0f, "%.2f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f, "%.2f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f")) {
+								material->emissionStrength = std::max(0.0f, material->emissionStrength);
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f")) {
+								material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f")) {
+								material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+						}
+
+						if (ImGui::CollapsingHeader("UV Transform")) {
+							if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f")) {
+								material->tiling[0] = std::max(0.1f, material->tiling[0]);
+								material->tiling[1] = std::max(0.1f, material->tiling[1]);
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+						}
+
+						if (ImGui::CollapsingHeader("Render Flags")) {
+							if (ImGui::Checkbox("Enable Emission", &material->enableEmission)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Alpha Test", &material->alphaTest)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Double Sided", &material->doubleSided)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Receive Shadows", &material->receiveShadows)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Cast Shadows", &material->castShadows)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+						}
+					}
+
+					ImGui::SeparatorText("Values for Debugging:");
+					ImGui::Text("Material: %u", particleComp.MaterialType);
+
+					ImGui::TreePop();
+				}
+
 				// Statistics
 				if (ImGui::TreeNode("Statistics"))
 				{

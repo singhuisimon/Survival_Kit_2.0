@@ -24,7 +24,12 @@ namespace Engine {
 		static constexpr ComponentTypeID TypeID = ComponentTypeID::ParticleSystem;
 		static constexpr const char* TypeName = "ParticleComponent";
 
-		xresource::instance_guid ComponentGUID;
+		xresource::instance_guid	  ComponentGUID;
+
+		// Advanced features
+		xresource::instance_guid	  ParticleTypeAdvanced = 0;
+		xresource::instance_guid	  MaterialType = 0;
+
 		std::vector<ParticleData> Particles;
 
 		glm::vec3 InitialVelocity = glm::vec3(0.f, 1.f, 0.f);

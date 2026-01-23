@@ -1,0 +1,10 @@
+{
+    "sourcePath": "/Resources/Sources/Textures/Particle_Circle29.png",
+    "textureSettings": {
+        "usageType": "COLOR",
+        "compression": "BC7",
+        "quality": 0.8090000152587891,
+        "generateMipmaps": true,
+        "srgb": true
+    }
+}

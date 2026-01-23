@@ -89,8 +89,8 @@ namespace Engine {
 						.m_default_mesh_handle = emitter.ParticleType,
 						.m_default_material_handle = 0,
 						.m_default_u32texture_handle = 0,
-						.m_mesh_guid = 0,
-						.m_material_guid = 0,
+						.m_mesh_guid = emitter.ParticleTypeAdvanced,
+						.m_material_guid = emitter.MaterialType,
 						.m_render_main_pass = true, // Particles don't cast/receive shadows
 						.m_receive_shadows = false,
 						.m_cast_shadow_type = 0
