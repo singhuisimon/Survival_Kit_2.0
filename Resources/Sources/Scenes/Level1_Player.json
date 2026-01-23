@@ -3,32 +3,32 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048598,
+            "ID": 2097183,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Dreadnought"
+                        "Tag": "OOB"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11865138375820280161",
+                        "ComponentGUID": "5011592139811090341",
                         "Position": [
-                            -798.2805786132813,
-                            -415.9496765136719,
-                            -416.16143798828125
+                            0.0,
+                            -115.0,
+                            -583.9447021484375
                         ],
                         "Rotation": [
-                            0.000005008954758523032,
-                            -86.0199966430664,
-                            0.000005008954758523032
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
+                            2373.89697265625,
+                            1000.0,
+                            1723.749267578125
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -37,9 +37,9 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "10135756118911435113",
-                        "Mesh": "A9003_dreadnought_v002.fbx",
-                        "Material": "Gunship_Allies.mat",
+                        "ComponentGUID": "11352660415149010855",
+                        "Mesh": "",
+                        "Material": "OOB.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -49,6 +49,48 @@
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "2705749130598494121",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 1,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -705,9 +747,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -116.99600219726563,
-                            -32.97199249267578,
-                            5.995083332061768
+                            -31.99199867248535,
+                            29.000993728637695,
+                            98.0
                         ],
                         "Scale": [
                             1.0,
@@ -928,9 +970,9 @@
                     "Properties": {
                         "ComponentGUID": "16100272381120889775",
                         "Position": [
-                            1000.0,
-                            400.0,
-                            -125.0
+                            767.7905883789063,
+                            190.38815307617188,
+                            -82.42496490478516
                         ],
                         "Rotation": [
                             0.0,
@@ -1887,7 +1929,10 @@
                             "playerRotationSpeed": 5.0,
                             "modelYRotationOffset": -90.0,
                             "modelRotationOffset": 180.0,
-                            "startWithCursorLocked": true
+                            "startWithCursorLocked": true,
+                            "playerHP": 100.0,
+                            "EVENT_PLAYER_DAMAGE": "Damage:",
+                            "EVENT_PLAYER_HEALTHCHANGE": "Damage:"
                         }
                     }
                 }
@@ -2173,6 +2218,57 @@
                         "Material": "",
                         "Texture": "",
                         "Visible": false,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048598,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Dreadnought"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11865138375820280161",
+                        "Position": [
+                            -798.2805786132813,
+                            -415.9496765136719,
+                            -416.16143798828125
+                        ],
+                        "Rotation": [
+                            0.000005008954758523032,
+                            -86.0199966430664,
+                            0.000005008954758523032
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "10135756118911435113",
+                        "Mesh": "A9003_dreadnought_v002.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
                         "MeshType": 0,

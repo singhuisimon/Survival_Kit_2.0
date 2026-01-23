@@ -27,7 +27,7 @@ namespace Game
         [SerializeField("Mouse Sensitivity")] private float mouseSensitivity = 15f;
         [SerializeField("Mouse Smoothing")] private float mouseSmoothing = 0.15f;
         [SerializeField("Max Turn Speed")] private float maxTurnSpeed = 3.0f;
-        [SerializeField("Pitch Limit (Degrees)")] private float pitchLimitDegrees = 85.0f;
+        [SerializeField("Pitch Limit (Degrees)")] private float pitchLimitDegrees = 65.0f;
 
         // ===== Movement Settings =====
         [SerializeField("Forward Speed")] private float forwardSpeed = 333.0f;
@@ -61,7 +61,13 @@ namespace Game
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
         [SerializeField] private string EVENT_PLAYER_DAMAGE = "Damage:";
-        [SerializeField] private string EVENT_PLAYER_HEALTHCHANGE = "Damage:";
+        [SerializeField] private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
+        [SerializeField] private string EVENT_PLAYER_OOB = "Damage:";
+
+        // ======= STATE OF COLLISION / IN ENVIRONMENT
+        [SerializeField] private bool inEnvironment = true;
+        [SerializeField] private float countdownOOB = 5.0f;
+        [SerializeField] private float originalCountdownOOB = 5.0f;
 
         // ===== Internal State =====
         private uint cameraEntityID = 0;
@@ -95,6 +101,8 @@ namespace Game
         {
 
             playerHP = playerOriginalHP;
+            countdownOOB = originalCountdownOOB;
+            inEnvironment = true;
 
             // Find entities
             cameraEntityID = SceneFindEntityByName(cameraName);
@@ -125,8 +133,10 @@ namespace Game
             }
 
             EVENT_PLAYER_DAMAGE += playerEntityID.ToString();
+            EVENT_PLAYER_OOB += playerEntityID.ToString();
 
             Subscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
+            Subscribe(EVENT_PLAYER_OOB, OnDamageReceived);
 
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - physics in FixedUpdate, visuals in Update");
@@ -194,6 +204,7 @@ namespace Game
             // Restore cursor state
             SetCursorVisible(cursorWasVisible);
             Unsubscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
+            Unsubscribe(EVENT_PLAYER_OOB, OnDamageReceived);
         }
 
         // ========================================
