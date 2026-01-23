@@ -126,8 +126,6 @@ namespace Game
             hasSplit = true;
             
             Publish("WormHostSplit", VectorToString(GetPosition((uint)playerID)));
-            // LogMessage("======= WormHostSplit EntityID " + EntityID + "; Position: " 
-            //            + VectorToString(GetPosition((uint)EntityID)) + " =======");
         }
 
         public string VectorToString(Vector3 vec){
