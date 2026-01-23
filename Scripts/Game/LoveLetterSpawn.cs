@@ -11,7 +11,7 @@ namespace Game
     {
         // ===== SPAWNER SETTINGS =====
        
-        private string loveletterPrefabPath = "Sources/Prefabs/" + "lovelettertest.prefab";
+        private string loveletterPrefabPath = "Sources/Prefabs/" + "loveletterV3.prefab";
         
         [SerializeField] private string[] spawnWallNames = new string[]
         {
@@ -28,11 +28,11 @@ namespace Game
         // ===== SPAWN LIMITS =====
         // IMPORTANT: Increase this number to have more loveletters active at once!
         // Set to 10 for more constant pressure
-        [SerializeField] private int maxActiveLetters = 10;        // Max letters alive at once
+        [SerializeField] private int maxActiveLetters = 1;        // Max letters alive at once
         [SerializeField] private int maxTotalSpawns = -1;          // -1 = infinite spawns
         
         // ===== SPAWN OFFSET =====
-        [SerializeField] private float spawnOffsetFromWall = 50.0f; // Distance in front of wall
+        [SerializeField] private float spawnOffsetFromWall = 200.0f; // Distance in front of wall
         
         // ===== WALL SPAWN AREA =====
         [SerializeField] private bool useWallScale = true;          // Use wall's actual scale for spawn area
@@ -43,11 +43,6 @@ namespace Game
         [SerializeField] private float manualWallWidth = 500.0f;
         [SerializeField] private float manualWallHeight = 300.0f;
         [SerializeField] private bool randomizeSpawnPosition = true; // Toggle random spawn within wall bounds
-        
-        // ===== ROTATION ADJUSTMENT =====
-        [SerializeField] private float rotationOffsetX = 0.0f;  // Additional rotation around X axis (pitch)
-        [SerializeField] private float rotationOffsetY = 0.0f;  // Additional rotation around Y axis (yaw)
-        [SerializeField] private float rotationOffsetZ = 0.0f;  // Additional rotation around Z axis (roll)
         
         // ===== STATE =====
         private uint[] wallEntityIDs;
@@ -206,15 +201,6 @@ namespace Game
                 wallPos.Z + wallForward.Z * spawnOffsetFromWall + wallRight.Z * randomX + wallUp.Z * randomY
             );
             
-            // // Apply rotation offsets (in degrees)
-            // Engine.Quat rotationOffset = QuatFromEuler(
-            //     rotationOffsetX * 0.0174533f,  // Convert degrees to radians
-            //     rotationOffsetY * 0.0174533f,
-            //     rotationOffsetZ * 0.0174533f
-            // );
-            
-            // Engine.Quat finalRotation = wallRot * rotationOffset;
-            
             // Spawn the LoveLetter prefab
             uint letterID = PrefabInstantiate(loveletterPrefabPath);
             
@@ -224,24 +210,23 @@ namespace Game
                 return;
             }
             
-            // Set position and rotation
+            // Set position and rotation (use wall's rotation)
             SetPosition(letterID, ref spawnPos);
-            //SetRotation(letterID, ref finalRotation);
+            SetRotation(letterID, ref wallRot);
             
             // Increment counters
             activeLetterCount++;
             totalSpawned++;
             
-         
-            // LogMessage("LOVELETTER SPAWNED #" + totalSpawned);
-            // LogMessage("Wall: " + wallName);
-            // if (randomizeSpawnPosition)
-            // {
-            //     LogMessage("Random Offset: X=" + randomX.ToString("F1") + ", Y=" + randomY.ToString("F1"));
-            // }
-            // LogMessage("Position: (" + spawnPos.X.ToString("F1") + ", " + spawnPos.Y.ToString("F1") + ", " + spawnPos.Z.ToString("F1") + ")");
-            // LogMessage("Active: " + activeLetterCount + "/" + maxActiveLetters);
-      
+            LogMessage("LOVELETTER SPAWNED #" + totalSpawned);
+            LogMessage(" Wall: " + wallName + " (Index: " + randomWallIndex + ")");
+            if (randomizeSpawnPosition)
+            {
+                LogMessage(" Random Offset: X=" + randomX.ToString("F1") + ", Y=" + randomY.ToString("F1"));
+            }
+            LogMessage(" Position: (" + spawnPos.X.ToString("F1") + ", " + spawnPos.Y.ToString("F1") + ", " + spawnPos.Z.ToString("F1") + ")");
+            LogMessage(" Active: " + activeLetterCount + "/" + maxActiveLetters);
+   
         }
 
         private int GetRandomValidWallIndex()

@@ -5,23 +5,18 @@ using static Engine.Event;
 using static Engine.Transform;
 using static Engine.Quat;
 using static Engine.SimpleMath;
+using static Engine.Tag;
 
 namespace Game
 {
     public class LoveLetterScript : ScriptBehaviour
     {
         // ===== NAME OF ENTITY =====
-        [SerializeField] private string loveletterEntity = "lovelettertest";
+        [SerializeField] private string loveletterEntity = "loveletterV3";
         private uint loveletterEntityID = 0;
 
-        // ===== MULTIPLE CORES =====
-        [SerializeField] private string[] coreEntities = new string[]
-        {
-            "Core_1", "Core_2", "Core_3"
-        };
-        
-        private uint[] coreEntityIDs;
-        private int selectedCoreIndex = -1;
+        // ===== CORE TAG =====
+        [SerializeField] private string coreTag = "SEMICONDUCTOR";
         private uint selectedCoreEntityID = 0;
 
         // ===== CORE DIMENSIONS =====
@@ -32,9 +27,9 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 800.0f;
+        [SerializeField] private float moveSpeed = 500.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 3.0f;
+        [SerializeField] private float waitTimeAtSurface = 0.0f;
 
         // ===== HEALTH SYSTEM =====
         [SerializeField] private int totalLogicBombs = 9;
@@ -59,6 +54,8 @@ namespace Game
         private float totalDistance = 0.0f;
         private bool targetCalculated = false;
 
+        // ===== RNG =====
+        private static uint s_RngState = 0x12345678u;
         private static bool rngSeeded = false;
 
         public override void OnStart()
@@ -69,7 +66,7 @@ namespace Game
             LogMessage("=== LoveLetter Started ===");
             LogMessage("LoveLetterEntity: " + loveletterEntityID);
             LogMessage("Total LogicBombs: " + totalLogicBombs);
-            LogMessage("Available Cores: " + coreEntities.Length);
+            LogMessage("Core Tag: " + coreTag);
             
             if (loveletterEntityID == 0)
             {
@@ -84,37 +81,35 @@ namespace Game
             // Subscribe to LogicBomb destruction events
             Subscribe("LogicBombDestroyed", OnLogicBombDestroyed);
             
-            // Initialize core IDs array
-            coreEntityIDs = new uint[coreEntities.Length];
-            
+            // Seed RNG if not already done
             if (!rngSeeded)
             {
                 uint timeSeed = (uint)(System.DateTime.Now.Ticks & 0xFFFFFFFF);
-                RNG.Seed(timeSeed);
+                s_RngState = timeSeed;
                 rngSeeded = true;
                 LogMessage("RNG seeded with: " + timeSeed);
             }
             
-            // Select a random core
-            SelectRandomCore();
+            // Select a random core by tag
+            SelectRandomCoreByTag();
             
-            if (selectedCoreIndex >= 0)
+            if (selectedCoreEntityID != 0)
             {
                 // Start movement after delay
                 delayTimer = startDelay;
                 LogMessage("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
-                LogMessage("Selected core: " + coreEntities[selectedCoreIndex] + " (ID: " + selectedCoreEntityID + ")");
+                LogMessage("Selected core ID: " + selectedCoreEntityID);
             }
             else
             {
-                LogError("No valid core found! LoveLetter cannot move.");
+                LogError("No valid core found with tag '" + coreTag + "'! LoveLetter cannot move.");
             }
         }
 
         public override void OnUpdate(float deltaTime)
         {
             // Don't update if dead or no core selected
-            if (isDead || selectedCoreIndex < 0) return;
+            if (isDead || selectedCoreEntityID == 0) return;
 
             // Handle spawn delay
             if (delayTimer > 0.0f)
@@ -123,7 +118,7 @@ namespace Game
                 
                 if (delayTimer <= 0.0f)
                 {
-                    LogMessage("Starting movement to " + coreEntities[selectedCoreIndex] + "!");
+                    LogMessage("Starting movement to SEMICONDUCTOR core!");
                     FindCoreAndCalculateTarget();
                     isMoving = true;
                 }
@@ -150,50 +145,32 @@ namespace Game
             }
         }
 
-        private void SelectRandomCore()
+        private void SelectRandomCoreByTag()
         {
-            int validCores = 0;
-            for (int i = 0; i < coreEntities.Length; i++)
-            {
-                coreEntityIDs[i] = SceneFindEntityByName(coreEntities[i]);
-                if (coreEntityIDs[i] != 0)
-                {
-                    validCores++;
-                    LogMessage("Found core: " + coreEntities[i] + " (ID: " + coreEntityIDs[i] + ")");
-                }
-                else
-                {
-                    LogMessage("Core not found: " + coreEntities[i]);
-                }
-            }
+            // Find all entities with the SEMICONDUCTOR tag
+            uint[] coreEntities = SceneFindEntitiesByTag(coreTag);
             
-            if (validCores == 0)
+            if (coreEntities == null || coreEntities.Length == 0)
             {
-                selectedCoreIndex = -1;
+                LogError("No cores found with tag: " + coreTag);
                 selectedCoreEntityID = 0;
                 return;
             }
             
-            // Create list of available core indices
-            int[] availableIndices = new int[validCores];
-            int index = 0;
-            for (int i = 0; i < coreEntities.Length; i++)
+            LogMessage("Found " + coreEntities.Length + " cores with tag '" + coreTag + "'");
+            
+            // Select a random core from the available ones
+            if (coreEntities.Length == 1)
             {
-                if (coreEntityIDs[i] != 0)
-                {
-                    availableIndices[index] = i;
-                    index++;
-                }
+                selectedCoreEntityID = coreEntities[0];
+                LogMessage("Only one core available, selected ID: " + selectedCoreEntityID);
             }
-            
-            // Use engine's RNG.RandInt (inclusive: [min, max])
-            int randomIndex = RNG.RandInt(0, validCores - 1);
-            
-            selectedCoreIndex = availableIndices[randomIndex];
-            selectedCoreEntityID = coreEntityIDs[selectedCoreIndex];
-
-            LogMessage("Randomly selected core: " + coreEntities[selectedCoreIndex] + 
-                    " (index: " + randomIndex + " out of " + validCores + ")");
+            else
+            {
+                int randomIndex = RandomRangeInt(0, coreEntities.Length);
+                selectedCoreEntityID = coreEntities[randomIndex];
+                LogMessage("Randomly selected core at index " + randomIndex + ", ID: " + selectedCoreEntityID);
+            }
         }
 
         // ===== HEALTH SYSTEM =====
@@ -406,7 +383,9 @@ namespace Game
 
         private void OnReachedCore()
         {
+            LogMessage("///////////////////////////Start of Onreached.");
             if (isDead) return;
+            LogMessage("Destroying LoveLetter | EntityID: " + loveletterEntityID);
 
             isDead = true;
             LogMessage("=== SELF DESTRUCTING AT CORE ===");
@@ -417,7 +396,7 @@ namespace Game
             
             // Self-destruct
             SceneDestroyEntity(loveletterEntityID);
-            LogMessage("///////////////////////////End of the Loveletter movement.");
+            LogMessage("///////////////////////////End of Onreached.");
         }
 
         // ===== HELPER FUNCTIONS =====
@@ -427,6 +406,30 @@ namespace Game
             float dy = b.Y - a.Y;
             float dz = b.Z - a.Z;
             return SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
+        // ===== RNG FUNCTIONS (copied from Botnet) =====
+        private static uint Nextuint()
+        {
+            uint x = s_RngState;
+            if (x == 0)
+                x = 0x12345678u;
+
+            x ^= x << 13;
+            x ^= x >> 17;
+            x ^= x << 5;
+            s_RngState = x;
+            return x;
+        }
+
+        private static int RandomRangeInt(int minInclusive, int maxExclusive)
+        {
+            if (maxExclusive <= minInclusive)
+                return minInclusive;
+
+            uint range = (uint)(maxExclusive - minInclusive);
+            uint r = Nextuint();
+            return minInclusive + (int)(r % range);
         }
 
         public override void OnDestroy()

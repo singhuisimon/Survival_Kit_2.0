@@ -303,7 +303,7 @@ namespace Engine
 
 			if (headerOpen) {
 				auto& transform = m_SelectedEntity.GetComponent<TransformComponent>();
-
+				ImGui::Text("Entity ID: %zu", static_cast<u32>(m_SelectedEntity.GetHandle()));
 				// Position
 				glm::vec3 position = transform.Position;
 				if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
