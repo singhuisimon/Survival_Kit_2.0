@@ -9,16 +9,16 @@ namespace Game
 {
     public class HealthCore : ScriptBehaviour
     {
-        private const float MaxHealth = 100.0f;
-        private float CurrentHealth = 100.0f;
-        private const float DamagePerHit = 50.0f;
-        private bool isDead = false;
+        [SerializeField] private const float MaxHealth = 100.0f;
+        [SerializeField] private float CurrentHealth = 100.0f;
+        [SerializeField] private const float DamagePerHit = 50.0f;
+        [SerializeField] private bool isDead = false;
 
         private const float SPAWN_GRACE_TIME = 0.5f;
         private float spawnTimer = 0.0f;
         private bool isInvulnerable = true;
 
-        private const string EVENT_CORE_HIT = "CoreHit";
+        private string EVENT_CORE_HIT = "Damage:";
 
         public override void OnStart()
         {
@@ -26,9 +26,10 @@ namespace Game
             isDead = false;
             isInvulnerable = true;
             spawnTimer = SPAWN_GRACE_TIME;
+            EVENT_CORE_HIT += EntityID.ToString();
 
             // Subscribe to bullet hits
-            Subscribe(EVENT_CORE_HIT, OnEnemyBulletHit);
+            Subscribe(EVENT_CORE_HIT, OnDamageReceived);
 
             LogMessage("CoreMotherboard " + EntityID + " Health initialized");
         }
@@ -49,26 +50,14 @@ namespace Game
             }
         }
 
-        private void OnEnemyBulletHit(string eventName, string coreMotherboard)
+        private void OnDamageReceived(string eventName, string payload)
         {
-            if (!uint.TryParse(coreMotherboard, out uint hitEntity))
-                return;
+            float damage = DamageSystem.ParseAmount(payload);
 
-            // If this core was hit
-            if (hitEntity == EntityID && !isInvulnerable)
-            {
-                LogMessage("CoreMotherboard " + EntityID + " hit by bullet!");
-                TakeDamage();
-            }
-        }
-
-        private void TakeDamage()
-        {
-            CurrentHealth -= DamagePerHit;
+            CurrentHealth -= damage;
             LogMessage("CoreMotherboard " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
-            if (CurrentHealth <= 0.0f)
-            {
+            if(CurrentHealth <= 0.0f){
                 Die();
             }
         }
@@ -90,7 +79,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Unsubscribe(EVENT_CORE_HIT, OnEnemyBulletHit);
+            Unsubscribe(EVENT_CORE_HIT, OnDamageReceived);
             LogMessage("CoreMotherboard " + EntityID + " destroyed");
         }
     }

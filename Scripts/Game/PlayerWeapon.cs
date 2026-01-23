@@ -153,6 +153,12 @@ namespace Game{
             //there is only primary and primary alt no secondary
             Primary_ReloadAndCharging();
             PrimaryShoot();
+
+            //Spawn botnet
+            if(Input.IsKeyReleased(KeyCode.J)){
+                uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
+                LogMessage("Spawning botnet");
+            }
         }
 
         private void PrimaryShoot(){

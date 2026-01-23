@@ -351,6 +351,20 @@ void Game::OnInit()
 		LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
 	}
 
+
+	// Step 9: Register scene transition event handler
+	Engine::EventSystem::Instance().Subscribe<Engine::ScriptEvent>(
+		[this](const Engine::ScriptEvent& event) {
+			if (event.name == "LoadScene") {
+				LoadSceneFromEvent(event.payload);
+			}
+			else if (event.name == "QuitGame") {
+				LOG_INFO("QuitGame event received - closing application");
+				glfwSetWindowShouldClose(GetWindow(), GLFW_TRUE);
+			}
+		});
+	LOG_INFO("Scene transition event handler registered");
+
 	LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
 	LOG_INFO("Scene status: VALID at ", (void *)m_ActiveScene);
 	LOG_INFO("");
@@ -1546,4 +1560,86 @@ void Game::RequestNewSceneFromEditor(const std::string& name)
 	Engine::Scene* newScene = CreateScene(name);
 	m_Editor->SetActiveScene(newScene);
 	LOG_INFO("New scene created and set as active: ", name);
+}
+
+void Game::LoadSceneFromEvent(const std::string& scenePath)
+{
+	LOG_INFO("===========================================");
+	LOG_INFO("LOADING SCENE FROM EVENT");
+	LOG_INFO("Scene path: ", scenePath);
+	LOG_INFO("===========================================");
+
+	if (!m_ActiveScene)  // CHANGED: Was m_Scene, now m_ActiveScene
+	{
+		LOG_ERROR("Cannot load scene - m_ActiveScene is null!");
+		return;
+	}
+
+	try
+	{
+		// Step 1: Shutdown current scene systems
+		LOG_INFO("Step 1: Shutting down current scene systems...");
+		m_ActiveScene->ShutdownSystems();  // CHANGED: Was m_Scene
+		LOG_INFO("  -> Systems shut down successfully");
+
+		// Step 2: Clear current scene
+		LOG_INFO("Step 2: Clearing current scene...");
+		m_ActiveScene->GetRegistry().clear();  // CHANGED: Was m_Scene
+		LOG_INFO("  -> Scene cleared");
+
+		// Step 3: Load new scene from file
+		LOG_INFO("Step 3: Loading scene from file: ", scenePath);
+		bool success = m_ActiveScene->LoadFromFile(scenePath);  // CHANGED: Was m_Scene
+
+		if (!success)
+		{
+			LOG_ERROR("  -> Failed to load scene from file!");
+			LOG_WARNING("  -> Attempting to create default scene as fallback...");
+			CreateDefaultScene();
+			AddAllSystems();
+			m_ActiveScene->InitializeSystems();  // CHANGED: Was m_Scene
+			return;
+		}
+
+		LOG_INFO("  -> Scene loaded successfully");
+
+		// Step 4: Update renderer settings from loaded scene
+		LOG_INFO("Step 4: Updating renderer settings...");
+		m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;  // CHANGED: Was m_Scene
+		m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;  // CHANGED: Was m_Scene
+		m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;  // CHANGED: Was m_Scene
+		m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;  // CHANGED: Was m_Scene
+		LOG_INFO("  -> Renderer settings updated");
+
+		// Step 5: Re-add all systems
+		LOG_INFO("Step 5: Re-adding systems to new scene...");
+		AddAllSystems();
+		LOG_INFO("  -> Systems added");
+
+		// Step 6: Initialize systems
+		LOG_INFO("Step 6: Initializing systems...");
+		m_ActiveScene->InitializeSystems();  // CHANGED: Was m_Scene
+		LOG_INFO("  -> Systems initialized");
+
+		LOG_INFO("===========================================");
+		LOG_INFO("SCENE TRANSITION COMPLETE");
+		LOG_INFO("===========================================");
+	}
+	catch (const std::exception& e)
+	{
+		LOG_CRITICAL("Exception during scene transition: ", e.what());
+		LOG_WARNING("Attempting recovery with default scene...");
+
+		try
+		{
+			CreateDefaultScene();
+			AddAllSystems();
+			m_ActiveScene->InitializeSystems();  // CHANGED: Was m_Scene
+			LOG_INFO("Recovery successful - default scene loaded");
+		}
+		catch (const std::exception& recoveryError)
+		{
+			LOG_CRITICAL("Recovery failed: ", recoveryError.what());
+		}
+	}
 }
