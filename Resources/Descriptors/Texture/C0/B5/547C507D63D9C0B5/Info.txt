@@ -2,10 +2,6 @@
   "name": "stone_normal.jpg",
   "guid": "547C507D63D9C0B5",
   "tags": [],
-<<<<<<< HEAD
-  "lastImported": "000000006973126D",
-=======
-  "lastImported": "000000006970371B",
->>>>>>> main
+  "lastImported": "0000000069732708",
   "resourceLinks": []
 }
