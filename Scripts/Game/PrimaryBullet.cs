@@ -16,17 +16,13 @@ namespace Game
         [SerializeField]
         public float Damage = 10.0f;
 
-        // Name of the shooter whose rotation we copy (e.g., "Player")
-        [SerializeField]
-        public string ShooterName = "Player";
-
         // Tags this bullet can damage
         [SerializeField]
         private string[] TargetTags = { "botnet", "loveletter", "adware" };
 
         // Tags that represent bullets (fill this in Inspector with your bullet tag, e.g. "primarybullet")
         [SerializeField]
-        private string[] BulletTags = { "primarybullet" };
+        private string[] BulletTags = { "Primarybullet" };
 
         private float elapsedTime = 0.0f;
 
@@ -107,7 +103,7 @@ namespace Game
                 }
             }
 
-            LogMessage("Failed to tag target: " + tag);
+            LogMessage("Tag: " + tag + "is not the target");
             return false;
         }
 

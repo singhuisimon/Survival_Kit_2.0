@@ -14,6 +14,8 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool IsKeyReleased_Native(int button);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void GetMousePosition_Native(out Vector2 position);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Input_GetMouseDelta(out float deltaX, out float deltaY);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Input_SetCursorVisible(bool visible);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Input_GetCursorVisible();
 
         public static void GetMouseDelta(out float deltaX, out float deltaY) => Input_GetMouseDelta(out deltaX, out deltaY);
 
@@ -37,6 +39,11 @@ namespace Engine
         public static bool IsKeyReleased(KeyCode key)
         {
             return IsKeyReleased_Native((int)key);
+        }
+
+        public static void SetCursorVisible(bool visible) => Input_SetCursorVisible(visible);
+        public static bool IsCursorVisible(){
+            return Input_GetCursorVisible();
         }
     }
 

@@ -330,10 +330,10 @@ namespace Engine
 		s_EventSystemRaiseFromNative = nullptr;
 		if (!appImage) return;
 
-		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "EventSystem");
+		MonoClass *eventSystemClass = mono_class_from_name(appImage, "Engine", "Event");
 		if (!eventSystemClass)
 		{
-			LOG_WARNING("[Mono] Engine.EventSystem class not found - script events will not be delivered to C#");
+			LOG_WARNING("[Mono] Engine.Event class not found - script events will not be delivered to C#");
 			return;
 		}
 
@@ -341,11 +341,12 @@ namespace Engine
 			mono_class_get_method_from_name(eventSystemClass, "RaiseFromNative", 2);
 
 		if (!s_EventSystemRaiseFromNative)
-			LOG_WARNING("[Mono] Engine.EventSystem.RaiseFromNative(string,string) not found");
+			LOG_WARNING("[Mono] Engine.Event.RaiseFromNative(string,string) not found");
 	}
 
 	void MonoScriptEngine::Initialize(const std::string &assemblyPath)
 	{
+
 		static bool s_Initialized = false;
 		if (s_Initialized)
 		{
@@ -411,7 +412,11 @@ namespace Engine
 		}
 
 		RegisterInternalCalls();
+		uint32_t timeSeed = static_cast<uint32_t>(
+			std::chrono::system_clock::now().time_since_epoch().count() & 0xFFFFFFFF
+			);
 
+		InternalCalls::RNG_Seed(timeSeed);
 		EventSystem::Instance().Subscribe<ScriptEvent>(
 			[](ScriptEvent const &ev)
 			{
@@ -1460,6 +1465,10 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::Input_GetMousePosition));
 		BindInternalCall("Engine.Input::Input_GetMouseDelta",
 			reinterpret_cast<void *>(InternalCalls::Input_GetMouseDelta));
+		BindInternalCall("Engine.Input::Input_SetCursorVisible",
+			reinterpret_cast<void*>(InternalCalls::Input_SetCursorVisible));
+		BindInternalCall("Engine.Input::Input_GetCursorVisible",
+			reinterpret_cast<void*>(InternalCalls::Input_GetCursorVisible));
 
 		// =====================================================================
 		// Rigidbody
@@ -1550,10 +1559,6 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetVisible));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetVisible",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetVisible));
-		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowCast",
-			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowCast));
-		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowCast",
-			reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetShadowCast));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_GetShadowReceive",
 			reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetShadowReceive));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetShadowReceive",
@@ -1703,6 +1708,27 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::Quat_Length));
 		BindInternalCall("Engine.QuatNative::Quat_Dot",
 			reinterpret_cast<void *>(InternalCalls::Quat_Dot));
+
+		// File I/O
+		BindInternalCall("Engine.FileIO::FileExists", reinterpret_cast<void*>(InternalCalls::FileExists));
+		BindInternalCall("Engine.FileIO::ReadAllText", reinterpret_cast<void*>(InternalCalls::FileReadAllText));
+		BindInternalCall("Engine.FileIO::WriteAllText", reinterpret_cast<void*>(InternalCalls::FileWriteAllText));
+
+		
+		BindInternalCall("Engine.RNG::Seed",
+			reinterpret_cast<void *>(InternalCalls::RNG_Seed));
+		BindInternalCall("Engine.RNG::RandInt",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandInt));
+		BindInternalCall("Engine.RNG::RandFloat",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandFloat));
+		BindInternalCall("Engine.RNG::RandBool",
+			reinterpret_cast<void *>(InternalCalls::RNG_RandBool));
+
+		// =====================================================================
+		// UI
+		// =====================================================================
+		BindInternalCall("Engine.Collision2D::IsPointInEntity", 
+			reinterpret_cast<void*>(InternalCalls::CollisionSystem2D_IsPointInEntity));
 
 		LOG_INFO("Internal calls registered");
 	}

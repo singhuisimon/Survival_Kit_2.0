@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "PrimaryBullet",
-    "Prefab GUID": 6492704592064227665,
+    "Prefab Name": "Prefab: PrimaryBullet.prefab",
+    "Prefab GUID": 16559085465389809879,
     "version": 1,
     "entities": [
         {
@@ -17,17 +17,17 @@
                             "Position": [
                                 0.0,
                                 0.0,
-                                5.960464477539063e-8
+                                5.960464477539064e-8
                             ],
                             "Rotation": [
                                 0.0,
-                                0.0,
+                                -0.0,
                                 0.0
                             ],
                             "Scale": [
                                 0.15000000596046448,
                                 0.15000000596046448,
-                                0.05000000074505806
+                                0.15000000596046448
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -54,13 +54,13 @@
                             "Material": "PrimaryBullet.mat",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 0
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 },
@@ -113,7 +113,7 @@
                             "ReverbProperties": 1.0,
                             "Is3D": true,
                             "MinDistance": 4.165999889373779,
-                            "MaxDistance": 104.14900207519531,
+                            "MaxDistance": 104.14900207519533,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
@@ -125,7 +125,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.PrimaryBullet"
+                            "ComponentGUID": "14829703208479391955",
+                            "ScriptClassName": "Game.PrimaryBullet",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }

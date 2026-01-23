@@ -1,267 +1,408 @@
-// using System;
-// using Engine;
-// using static Engine.Scene;
-// using static Engine.Transform;
-// using static Engine.Prefab;
+using System;
+using Engine;
+using static Engine.Scene;
+using static Engine.Transform;
+using static Engine.Prefab;
+using static Engine.Logger;
+using static Engine.Input;
+using static Engine.Rigidbody;
+using static Engine.Camera;
 
-// namespace Game{
+namespace Game{
 
-//     /// <Summary>
-//     /// This script manages the weapon player uses
-//     /// </Summary>
-//     public class PlayerWeapon : ScriptBehaviour{
+    /// <Summary>
+    /// This script manages the weapon player uses
+    /// </Summary>
+    public class PlayerWeapon : ScriptBehaviour{
 
-//         [SerializeField] private bool shootAllowed;
+        [SerializeField] private bool shootAllowed;
 
-//         #region primary
-//         [SerializeField] private bool primaryShooting = false;  //player is currently shooting
-//         [SerializeField] private bool reloadingPrimary = false; //player is currently reloading
-//         [SerializeField] private int primaryAmmo = 0;
-//         [SerializeField] private int primaryAmmoMax = 100;
-//         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
-//         [SerializeField] private float primaryShootRate = 0.05; 
-//         [SerializeField] private float primaryShootNext = 0.0f;
-//         [SerializeField] private string primaryProjectilePrefab = "";
+        #region primary
+        [SerializeField] private bool primaryShooting = false;  //player is currently shooting
+        [SerializeField] private bool reloadingPrimary = false; //player is currently reloading
+        [SerializeField] private int primaryAmmo = 0;
+        [SerializeField] private int primaryAmmoMax = 100;
+        [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
+        [SerializeField] private float primaryShootRate = 0.05f; 
+        [SerializeField] private float primaryShootNext = 0.0f;
+        [SerializeField] private float bulletSpeed = 100.0f;
 
-//         #endregion
+        [SerializeField] private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
+        //audio
+        //vfx -> trail
+
+        #endregion
         
-//         #region alt charge
-//         [SerializeFiled] private float chargeDelayRate;
-//         [SerializeField] private float chargeDelayNext = 0.0f;
-//         [SerializeField] private bool primaryAltCharging = false;
-//         [SerializeField] private float primaryChargeRate;
-//         [SerializeField] private float primaryChargeNext = 0.0f;
-//         [SerializeField] private int primaryAltCharge = 0;
-//         [SerializeField] private int primaryAltChargeMax = 30;
+        #region alt charge
+        [SerializeField] private float chargeDelayRate = 0.5f;
+        [SerializeField] private float chargeDelayNext = 0.0f;
+        [SerializeField] private bool primaryAltCharging = false;
+        [SerializeField] private float primaryChargeRate = 0.1f;
+        [SerializeField] private float primaryChargeNext = 0.0f;
+        [SerializeField] private int primaryAltCharge = 0;
+        [SerializeField] private int primaryAltChargeMax = 30;
 
-//         [SerializeField] private bool primaryAltReady = false;
-//         [SerializeField] private float primaryAltFireAOERange = 30f;
+        [SerializeField] private bool primaryAltReady = false;
+        [SerializeField] private float primaryAltFireAOERange = 30f;
 
-//         [SerializeField] private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
-//         [SerializeField] private string lookAtName = "LookAt";
+        //2 audio for primary alt fire
+        //not sure what is layermask
+        //left and right player alt vortex
+        //particle system
 
-//         #endregion
-//         private uint lookAtEntityID = 0;
-//         private bool isKeyRPressedPreviously = false;
-//         private float elapsedTime = 0.0f;
+        #endregion
 
-//         // [SerializeField] private bool primaryWeapon = true;
-//         // [SerializeField] private bool primaryAltWeapon = true;
-//         // [SerializeField] private int primaryWeaponAmmo = 100;
-//         // [SerializeField] private float primaryCooldown = 0.05f;
-//         // [SerializeField] private float primaryReloadSpeed = 1.5f;
-//         // [SerializeField] private float primaryAltCooldown = -1.0f;
-//         // [SerializeField] private float primaryAltReloadSpeed = -1.0f;
-//         // [SerializeField] private float primaryAltCharge = 30.0f;
+        #region Vfx
 
-//         // private bool weaponReload = false;
-//         // private bool primaryAltReload = false;
-//         // private float primaryElapsedTime = 0.0f;
-//         // private float primaryElapsedReload = 0.0f;
+        //particle -> VFX when shooting primary
 
-//         public void OnStart(){
-//             //Initialize Values
-//             shootAllowed = true;
-//             primaryAmmo = primaryAmmoMax;
-//             primaryAltCharge = primaryAltChargeMax;
+        #endregion
 
-//             if(lookAtEntityID == 0){
-//                 LogMessage("[CamControl] look at entity cannot be found");
-//             }
-//         }
+        #region sfx
+        //player hit something sfx
+        //sfx alt charge
+        //sfx alt ready
+        //sfx swap weapon
 
-//         public void OnUpdate(float deltaTime){
+        #endregion
 
-//             elapsedTime += deltaTime;
+        #region camera shake
+        [SerializeField] private float CAMSHAKE_primaryFire = 0.05f;
+        [SerializeField] private float CAMSHAKE_primaryFireDuration = 0.5f;
+        [SerializeField] private float CAMSHAKE_primaryAltFire = 0.16f;
+        [SerializeField] private float CAMSHAKE_primaryAltFireDuration = 0.5f;
+        #endregion
 
-//             //Cheatcode
-//             if(Input.GetKey(KeyCode.O)){
-//                 PrimaryAltCharge_Reward();
-//             }
+        #region entity
+
+        [SerializeField] private string firingPointName = "PlayerCam";
+        [SerializeField] private string playerName = "Player";
+
+        #endregion
+
+        #region others
+        
+        [SerializeField] private float muzzleDistance = 5.0f;
+
+        #endregion
+
+        private uint firingPointEntityID = 0;
+        private uint playerEntityID = 0;
+        private bool isKeyRPressedPreviously = false;
+        private float elapsedTime = 0.0f;
+
+        private float reloadFinishTime = 0.0f;
+        private Vector3 bulletDirection;
+
+        // [SerializeField] private bool primaryWeapon = true;
+        // [SerializeField] private bool primaryAltWeapon = true;
+        // [SerializeField] private int primaryWeaponAmmo = 100;
+        // [SerializeField] private float primaryCooldown = 0.05f;
+        // [SerializeField] private float primaryReloadSpeed = 1.5f;
+        // [SerializeField] private float primaryAltCooldown = -1.0f;
+        // [SerializeField] private float primaryAltReloadSpeed = -1.0f;
+        // [SerializeField] private float primaryAltCharge = 30.0f;
+
+        // private bool weaponReload = false;
+        // private bool primaryAltReload = false;
+        // private float primaryElapsedTime = 0.0f;
+        // private float primaryElapsedReload = 0.0f;
+
+        public override void OnStart(){
+            //Initialize Values
+            shootAllowed = true;
+            primaryAmmo = primaryAmmoMax;
+            primaryAltCharge = primaryAltChargeMax;
+
+            firingPointEntityID = SceneFindEntityByName(firingPointName);
+            playerEntityID = SceneFindEntityByName(playerName);
+
+            if(firingPointEntityID == 0){
+                LogMessage("[CamControl] firing point entity cannot be found");
+            }
+            if(playerEntityID == 0){
+                LogMessage("[CamControl] player entity cannot be found");
+            }
+        }
+
+        public override void OnUpdate(float deltaTime){
+
+            elapsedTime += deltaTime;
+
+            // Check if reload finished
+            if (reloadingPrimary && elapsedTime >= reloadFinishTime)
+            {
+                primaryAmmo = primaryAmmoMax;
+                //stop ui reticle spinning reload
+                //show reload ui banner
+                reloadingPrimary = false;
+                shootAllowed = true;
+                LogMessage("[PlayerWeapon] Reload complete!");
+            }
+
+            //Cheatcode
+            if(Input.IsKeyPressed(KeyCode.O)){
+                PrimaryAltCharge_Reward();
+            }
             
-//             if(!shootAllowed){
-//                 return;
-//             }
+            if(!shootAllowed){
+                LogMessage("[CamControl] player isnt allow to shoot!");
+                return;
+            }
 
-//             //there is only primary and primary alt no secondary
-//             Primary_ReloadAndCharging();
-//             PrimaryShoot();
+            //there is only primary and primary alt no secondary
+            Primary_ReloadAndCharging();
+            PrimaryShoot();
 
+            //Spawn botnet
+            if(Input.IsKeyReleased(KeyCode.J)){
+                uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
+                LogMessage("Spawning botnet");
+            }
+        }
 
-//             // if(Input.IsMouseButtonPressed(Mouse.Left)){
-//             //     primaryWeapon = true;
-//             //     primaryAltWeapon = false;
-//             //     ShootPrimaryBullet(deltaTime);
-//             // } else if (Input.IsMouseButtonPressed(Mouse.Right)){
-//             //     primaryWeapon = false;
-//             //     primaryAltWeapon = true;
-//             //     ShootPrimaryAltBullet(deltaTime);
-//             // }
+        private void PrimaryShoot(){
+            if(Input.IsMouseButtonPressed(MouseButton.Left) && primaryAmmo > 0)
+            {
+                primaryShooting = true;
+            } 
+            else 
+            {
+                primaryShooting = false;
+            }
 
-//             // if(Input.IsKeyPressed(KeyCode.R)){
-//             //     weaponReload = true;
-//             // }
-            
-//             // //Update the reload timing should it be true
-//             // if(weaponReload == true){
-//             //     primaryElapsedReload += deltaTime;
-//             // }
+            if(primaryShooting)
+            {
+                PrimaryFire();
+            }
 
+            if(Input.IsMouseButtonPressed(MouseButton.Right) && primaryAltReady)
+            {
+                PrimaryAltFire();
+            }
+        }
 
-//             // //Check if reload time has passed if so reload
-//             // if(primaryElapsedRelaod >= primaryReloadSpeed){
-//             //     primaryWeaponAmmo = 100;
-//             //     primaryElapsedReload = 0;
-//             //     primaryReload = false;
-//             // }
-            
-//         }
+        private void Primary_ReloadAndCharging()
+        {
+            //Primary - Reload and Charging Alt when holding 'R' key
+            Primary_ReloadingAndCharging();
 
-//         private void PrimaryShoot(){
-//             if(Input.IsMouseButtonPressed(Mouse.Left) && primaryAmmo > 0){
-//                 primaryShooting = true;
-//             } else {
-//                 primaryShooting = false;
-//             }
+            //Primary Auto reloads when ammo reaches 0
+            Primary_AutoReload();
 
-//             if(primaryShooting){
-//                 PrimaryFire();
-//             }
+            //Alt Charging - Primary
+            Primary_AltCharging();
+        }
 
-//             if(Input.IsMouseButtonPressed(Mouse.Right) && primaryAltReady){
-//                 PrimaryAltFire();
-//             }
-//         }
+        #region PRIMARY
+        private void Primary_ReloadingAndCharging()
+        {
+            if((Input.IsKeyPressed(KeyCode.R) && !primaryShooting) && !isKeyRPressedPreviously)
+            {
+                isKeyRPressedPreviously = true;
+                chargeDelayNext = elapsedTime + chargeDelayRate;
+            } 
+            else if(Input.IsKeyPressed(KeyCode.R) && isKeyRPressedPreviously)
+            {
+                //this is the charge delay function in unity
+                if(elapsedTime > chargeDelayNext){
+                    primaryAltCharging = true;
+                }
+            } 
+            else if(Input.IsKeyReleased(KeyCode.R)){
+                isKeyRPressedPreviously = false;
+                if(!primaryAltCharging && !reloadingPrimary && primaryAmmo < primaryAmmoMax)
+                {
+                    //update UI here
 
-//         private void Primary_ReloadAndCharging(){
-//             //Primary - Reload and Charging Alt when holding 'R' key
-//             Primary_ReloadingAndCharging();
-
-//             //Primary Auto reloads when ammo reaches 0
-//             Primary_AutoReload();
-
-//             //Alt Charging - Primary
-//             Primary_AltCharging();
-//         }
-
-//         #region PRIMARY
-//         private void Primary_ReloadingAndCharging(){
-//             if((Input.IsKeyPressed(KeyCode.R) && !primaryShooting) && !isKeyRPressedPreviously){
-//                 isKeyRPressedPreviously = true;
-//                 chargeDelayNext = elapsedTime + chargeDelayRate;
-//             } else if(Input.IsKeyPressed(KeyCode.R) && isKeyRPressedPreviously){
-//                 if(elapsedTime > chargeDelayNext){
-//                     primaryAltCharging = true;
-//                 }
-//             } else if(Input.IsKeyReleased(KeyCode.R)){
-//                 if(!primaryAltCharging && !reloadingPrimary && primaryAmmo < primaryAmmoMax){
-//                     //update UI here
-
-//                     //reload
-//                     PrimaryReload(primaryReloadDelay);
+                    //reload
+                    PrimaryReload(primaryReloadDelay);
                     
 
-//                     //play sound effects here
-//                 }
-//             } else {
-//                 primaryAltCharging = false;
-//             }
-//         }
+                    //play sound effects here
+                }
+            } 
+            else 
+            {
+                primaryAltCharging = false;
+            }
+        }
 
-//         #endregion
+        #endregion
 
-//         #region reloading
+        private void Primary_AutoReload()
+        {
+            if(!primaryAltCharging && !reloadingPrimary && primaryAmmo <= 0)
+            {
+                //update UI
 
-//         private void Primary_AutoReload(){
-//             if(!primaryAltCharging && !reloadingPrimary && primaryAmmo <= 0){
-//                 //update UI
+                //reload
+                PrimaryReload(primaryReloadDelay);
 
-//                 //reload
-//                 PrimaryReload(primaryReloadDelay);
+                //SFX
+            }
+        }
 
-//                 //SFX
-//             }
-//         }
+        private void Primary_AltCharging()
+        {
+            if(primaryAltCharging && !primaryShooting)
+            {
+                if(primaryAltCharge < primaryAltChargeMax)
+                {
+                    PrimaryCharge();
+                }
+                else {
+                    LogMessage("[PlayerWeapon] Alt Charge Full");
+                    primaryAltReady = true;
 
-//         private void PrimaryAltCharging(){
-//             if(primaryAltCharging && !primaryShooting){
-//                 if(primaryAltCharge < primaryAltChargMax){
-//                     PrimaryCharge();
-//                 }
-//                 else {
-//                     LogMessage("[PlayerWeapon] Alt Charge Full");
-//                     primaryAltReady = true;
+                    //play SFX
+                }
+            } 
+            else if(primaryAltCharge >= primaryAltChargeMax)
+            {
+                primaryAltReady = true;
+            }
+        }
 
-//                     //play SFX
-//                 }
-//             } else if(primaryAltCharge >= primaryAltChargeMax){
-//                 primaryAltReady = true;
-//             }
-//         }
+        private void PrimaryFire(){
+           
+            if(elapsedTime > primaryShootNext)
+            {
 
-//         private void PrimaryReload(float delay){
-//             reloadingPrimary = true;
-//             shootAllowed = false;
+                 if(firingPointEntityID == 0 || playerEntityID == 0){
+                    LogMessage("[PlayerWeapon] returning at PrimaryFire");
+                    return;
+                }
 
-//             //yield return new Delay primaryReloadDelay - TODO
+                //Instantiate at the firing position & rotation);
+                Vector3 firingPoint = GetPosition(firingPointEntityID);
+                Vector3 firingTarget = GetTarget(firingPointEntityID);
+                Vector3 bulletDirection = (firingTarget - firingPoint).Normalized;
 
-//             primaryAmmo = primaryAmmoMax;
+                Vector3 playerPos = GetPosition(playerEntityID);
+                Quat playerRot = GetRotation(playerEntityID);
 
-//             //delay for 0.5f - TODO
+                Vector3 playerForward = playerRot.Forward;
+                //Vector3 bulletSpawnPos = playerPos + (playerForward * muzzleDistance);
 
-//             reloadingPrimary = false;
-//             primaryAltCharging = false;
-//             shootAllowed = true;
-//         }
+                //NEW
+                Vector3 offset = playerRot.Right * 5.0f;
+                Vector3 bulletSpawnPos = playerPos + offset;
 
-//         private void PrimaryFire(){
-//             if(elapsedTime > primaryShootNext){
 
-//                 if(lookAtEntityID == 0){
-//                     LogMessage("[PlayerWeapon]");
-//                     return;
-//                 }
+                //DEBUGGING
+                Vector3 forward = playerRot.Forward;
+                Vector3 right = playerRot.Right;
+                Vector3 up = playerRot.Up;
 
-//                 Quat rotation = GetRotation(lookAtEntityID);
+                LogMessage("PlayerForward: X:" + forward.X + ", Y: " + forward.Y + ", Z: " + forward.Z);
+                LogMessage("PlayerRight: X:" + right.X + ", Y: " + right.Y + ", Z: " + right.Z);
+                LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
 
-//                 //Instantiate at the firing position & rotation);
-//                 //PrefabInstantiateWithTransform(PrimaryBulletPrefab, );
-//                 primaryAmmo -= 1;
 
-//                 //vfx
+                Quat bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
 
-//                 primaryShootNext = elapsedTime + primaryShootRate;
+                Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
 
-//                 //cameraShake
-//                 //add function to adjust the target of the camera or the position whichever looks more real
+                uint bulletID = 0;
+                bulletID = PrefabInstantiateWithTransform(PrimaryBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
+                if(bulletID == 0){
+                    LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
+                    //return; //comment this for debugging temp
+                }
+                Vector3 bulletVel = bulletDirection * bulletSpeed;
+                RigidbodySetVelocity(bulletID, ref bulletVel);
 
-//                 if(primaryAmmo <= 0){
-//                     //change the ui to run out of ammo here
-//                 }
-//             }
-//         }
+                //TODO NEED DO PRIMARY BULLET SCRIPT
+                //EntityAddScript(bulletID, "Game.PrimaryBullet");
 
-//         private void PrimaryAltFire(){
-//             //TODO:
-//             // SPAWN PREFAB -> IN SCRIPT FOR IT ENSURE IF COLLIDED DEAL DAMAGE.
-//             primaryAltCharge = 0;
-//             primaryAltReady = false;
-//         }
+                primaryAmmo -= 1;
 
-//         private void PrimaryCharge(){
-//             if(elapsedTime > primaryChargeNext){
-//                 if(primaryAmmo > 0){
-//                     primaryAmmo -= 1;
-//                     primaryAltCharge += 1;
+                //vfx
 
-//                     //SFX for altcharge
+                primaryShootNext = elapsedTime + primaryShootRate;
 
-//                     primaryChargeNext = elapsedTime + primaryChargeRate;
-//                 }
-//             }
-//         }
+                //cameraShake
+                //add function to adjust the target of the camera or the position whichever looks more real
 
-//         #endregion
+                if(primaryAmmo <= 0){
+                    //change the ui to run out of ammo here
+                }
 
-//     }
-// }
+                // Quat rotation = GetRotation(playerEntityID);
+                // Vector3 playerPos = GetPosition(playerEntityID);
+                // Vector3 velocity = RigidbodyGetVelocity(firingPointEntityID);
+                // Vector3 targetOffset = Vector3.Zero;
+
+                // if(velocity.SqrMagnitude > 0.1f){
+                //     Vector3 moveDir = velocity.Normalized;
+                //     Vector3 perpendicular = Vector3.Cross(moveDir, Vector3.Up);
+                //     targetOffset = perpendicular * bulletOffset;
+                // }
+
+                
+                // Vector3 forward = rotation.Forward;
+                // Vector3 bulletPos = playerPos + (forward * bulletOffset);
+                // Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+                
+                
+            }
+        }
+
+        //this by right not void but rather IEnumerator
+        //return things like how long till this script resume.
+        private void PrimaryReload(float delay){
+            reloadingPrimary = true;
+            shootAllowed = false;
+
+            //yield return new Delay primaryReloadDelay - TODO
+            reloadFinishTime = elapsedTime + delay;
+
+            primaryAmmo = primaryAmmoMax;
+
+            //delay for 0.5f - TODO
+
+            // remove temporary
+            reloadingPrimary = false;
+            primaryAltCharging = false;
+            shootAllowed = true;
+        }
+
+        private void PrimaryAltFire(){
+            //TODO:
+            //Check with LiXiang on how does this work by tonight 21/1/26
+            primaryAltCharge = 0;
+            primaryAltReady = false;
+        }
+
+        private void PrimaryCharge()
+        {
+            if(elapsedTime > primaryChargeNext)
+            {
+                if(primaryAmmo > 0)
+                {
+                    primaryAmmo -= 1;
+                    primaryAltCharge += 1;
+
+                    //SFX for altcharge
+
+                    primaryChargeNext = elapsedTime + primaryChargeRate;
+                }
+            }
+        }
+
+        private void PrimaryAltCharge_Reward()
+        {
+            if(primaryAltCharge < primaryAltChargeMax)
+            {
+                ++primaryAltCharge;
+            } 
+            else 
+            {
+                primaryAltReady = true;
+                LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
+            }
+        }
+
+    }
+}

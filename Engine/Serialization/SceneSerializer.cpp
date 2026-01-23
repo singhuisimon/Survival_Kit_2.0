@@ -360,10 +360,13 @@ namespace Engine
 					allocator);
 				//LOG_DEBUG("TextureGuid in serializer SerializeToString(): ", mesh.TextureGuid.m_Value);
 				propertiesObj.AddMember("Visible", mesh.Visible, allocator);
+				propertiesObj.AddMember("GlobalIlluminate", mesh.GlobalIlluminate, allocator);
+				propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
 				propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
 				propertiesObj.AddMember("MaterialIdx", mesh.Material, allocator);
 				propertiesObj.AddMember("TextureIdx", mesh.Texture, allocator);
 				propertiesObj.AddMember("SubmeshIndex", mesh.SubmeshIndex, allocator);
+				propertiesObj.AddMember("CastType", static_cast<int>(mesh.CastType), allocator);
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
 			}
@@ -597,6 +600,13 @@ namespace Engine
 				componentObj.AddMember("Type", "ScriptComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(script.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+
+				);
 				propertiesObj.AddMember("ScriptClassName",
 					Value(script.ScriptClassName.c_str(), allocator), allocator);
 
@@ -643,6 +653,11 @@ namespace Engine
 				propertiesObj.AddMember("Range", light.Range, allocator);
 				propertiesObj.AddMember("SpotAngleDeg", light.SpotAngleDeg, allocator);
 				propertiesObj.AddMember("IndirectMultiplier", light.IndirectMultiplier, allocator);
+				propertiesObj.AddMember("TypeShadow", static_cast<int>(light.TypeShadow), allocator);
+				propertiesObj.AddMember("Resolution", light.Resolution, allocator);
+				propertiesObj.AddMember("Strength", light.Strength, allocator);
+				propertiesObj.AddMember("Bias", light.Bias, allocator);
+				propertiesObj.AddMember("NearPlane", light.NearPlane, allocator);
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
@@ -720,6 +735,7 @@ namespace Engine
 		settingsObj.AddMember("BloomStrength", sceneSettings.s_BloomStrength, allocator);
 		settingsObj.AddMember("BloomFilterRadius", sceneSettings.s_BloomFilterRadius, allocator);
 		settingsObj.AddMember("Exposure", sceneSettings.s_Exposure, allocator);
+		settingsObj.AddMember("GlobalBias", sceneSettings.s_GlobalBias, allocator);
 
 		settingsArray.PushBack(settingsObj, allocator);
 		doc.AddMember("Settings", settingsArray, allocator);
@@ -1153,6 +1169,8 @@ namespace Engine
 
 						// Handle other properties
 						if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
+						if (properties.HasMember("ShadowReceive")) mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
+						if (properties.HasMember("GlobalIlluminate")) mesh.GlobalIlluminate = properties["GlobalIlluminate"].GetBool();
 						if (properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
 
 						// FIXED: Check if "Material" is a NUMBER before reading as integer
@@ -1178,6 +1196,10 @@ namespace Engine
 						}
 
 						if (properties.HasMember("SubmeshIndex")) mesh.SubmeshIndex = properties["SubmeshIndex"].GetUint();
+
+						if (properties.HasMember("CastType")) {
+							mesh.CastType = static_cast<ShadowCastType>(properties["CastType"].GetUint());
+						}
 					}
 			
 					else if (componentType == "RigidbodyComponent")
@@ -1432,6 +1454,12 @@ namespace Engine
 						LOG_TRACE("  - Deserializing ScriptComponent");
 
 						auto &script = entity.AddComponent<ScriptComponent>();
+						if (properties.HasMember("ComponentGUID"))
+						{
+							script.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
 
 						if (properties.HasMember("ScriptClassName"))
 						{
@@ -1497,6 +1525,17 @@ namespace Engine
 							light.SpotAngleDeg = properties["SpotAngleDeg"].GetFloat();
 						if (properties.HasMember("IndirectMultiplier"))
 							light.IndirectMultiplier = properties["IndirectMultiplier"].GetFloat();
+						if (properties.HasMember("TypeShadow"))
+							light.TypeShadow = static_cast<ShadowType>(properties["TypeShadow"].GetInt()); // 0 = No,1 = Hard ,2 = Soft
+						if (properties.HasMember("Resolution"))
+							light.Resolution = properties["Resolution"].GetUint();
+						if (properties.HasMember("Strength"))
+							light.Strength = properties["Strength"].GetFloat();
+						if (properties.HasMember("Bias"))
+							light.Bias = properties["Bias"].GetFloat();
+						if (properties.HasMember("NearPlane"))
+							light.NearPlane = properties["NearPlane"].GetFloat();
+
 					}
 					else if (componentType == "AnimatorComponent")
 					{
