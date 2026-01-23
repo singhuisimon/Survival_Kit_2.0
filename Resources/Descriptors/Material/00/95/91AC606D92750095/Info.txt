@@ -1,7 +1,0 @@
-{
-  "name": "Firewall_Inactive.mat",
-  "guid": "91AC606D92750095",
-  "tags": [],
-  "lastImported": "00000000692ACF54",
-  "resourceLinks": []
-}

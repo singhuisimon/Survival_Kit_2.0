@@ -1,7 +1,0 @@
-{
-  "name": "CreditsButton.png",
-  "guid": "847C507D63D9C077",
-  "tags": [],
-  "lastImported": "00000000696D128C",
-  "resourceLinks": []
-}

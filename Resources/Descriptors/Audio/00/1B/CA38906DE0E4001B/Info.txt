@@ -1,7 +1,0 @@
-{
-  "name": "Player_Ambience.wav",
-  "guid": "CA38906DE0E4001B",
-  "tags": [],
-  "lastImported": "00000000692C0910",
-  "resourceLinks": []
-}

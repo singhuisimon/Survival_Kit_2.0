@@ -1,7 +1,0 @@
-{
-  "name": "RoomAmbience.wav",
-  "guid": "8A38906DE0E4002F",
-  "tags": [],
-  "lastImported": "00000000692C0910",
-  "resourceLinks": []
-}

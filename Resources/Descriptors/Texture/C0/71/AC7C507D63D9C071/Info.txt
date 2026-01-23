@@ -1,7 +1,0 @@
-{
-  "name": "back.jpg",
-  "guid": "AC7C507D63D9C071",
-  "tags": [],
-  "lastImported": "00000000696D128C",
-  "resourceLinks": []
-}

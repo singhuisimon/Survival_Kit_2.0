@@ -1,7 +1,0 @@
-{
-  "name": "DefenceSuccess.mat",
-  "guid": "EC7C507D63D9C0F5",
-  "tags": [],
-  "lastImported": "00000000696D128D",
-  "resourceLinks": []
-}

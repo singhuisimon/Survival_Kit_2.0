@@ -1,7 +1,0 @@
-{
-  "name": "PlayerHPBarGreen.png",
-  "guid": "1E52707D64D34011",
-  "tags": [],
-  "lastImported": "00000000696D128C",
-  "resourceLinks": []
-}

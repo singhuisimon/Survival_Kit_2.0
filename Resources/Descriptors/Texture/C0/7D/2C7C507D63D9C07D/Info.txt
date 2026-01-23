@@ -1,7 +1,0 @@
-{
-  "name": "E004_botnet_v003_Botnet_v001_BaseColor.png",
-  "guid": "2C7C507D63D9C07D",
-  "tags": [],
-  "lastImported": "00000000696D128C",
-  "resourceLinks": []
-}

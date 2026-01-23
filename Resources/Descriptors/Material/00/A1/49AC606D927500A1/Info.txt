@@ -1,7 +1,0 @@
-{
-  "name": "LevelDesign_GroundTexture.mat",
-  "guid": "49AC606D927500A1",
-  "tags": [],
-  "lastImported": "00000000692ACF54",
-  "resourceLinks": []
-}

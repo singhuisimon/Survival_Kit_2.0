@@ -1,7 +1,0 @@
-{
-  "name": "Player_Hitmarker.wav",
-  "guid": "DA38906DE0E4001D",
-  "tags": [],
-  "lastImported": "00000000692C0910",
-  "resourceLinks": []
-}

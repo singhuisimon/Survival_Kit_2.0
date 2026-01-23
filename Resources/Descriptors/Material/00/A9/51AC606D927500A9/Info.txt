@@ -1,7 +1,0 @@
-{
-  "name": "testma2.mat",
-  "guid": "51AC606D927500A9",
-  "tags": [],
-  "lastImported": "00000000692ACF54",
-  "resourceLinks": []
-}

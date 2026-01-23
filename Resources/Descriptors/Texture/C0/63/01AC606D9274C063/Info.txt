@@ -1,7 +1,0 @@
-{
-  "name": "InstallButton.png",
-  "guid": "01AC606D9274C063",
-  "tags": [],
-  "lastImported": "00000000692B068B",
-  "resourceLinks": []
-}

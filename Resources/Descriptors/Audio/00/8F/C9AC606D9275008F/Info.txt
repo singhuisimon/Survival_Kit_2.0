@@ -1,7 +1,0 @@
-{
-  "name": "PlayerShoot.wav",
-  "guid": "C9AC606D9275008F",
-  "tags": [],
-  "lastImported": "00000000692ACF54",
-  "resourceLinks": []
-}

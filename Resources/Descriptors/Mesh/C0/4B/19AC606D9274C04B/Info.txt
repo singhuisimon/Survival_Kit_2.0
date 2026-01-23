@@ -1,7 +1,0 @@
-{
-  "name": "PlayerModel_v002.fbx",
-  "guid": "19AC606D9274C04B",
-  "tags": [],
-  "lastImported": "00000000692ACF53",
-  "resourceLinks": []
-}
