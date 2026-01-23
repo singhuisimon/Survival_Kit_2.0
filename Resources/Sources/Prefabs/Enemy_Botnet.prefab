@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Enemy_Botnet",
-    "Prefab GUID": 7518742453276462767,
+    "Prefab Name": "Prefab: Enemy_Botnet.prefab",
+    "Prefab GUID": 7548587675929231667,
     "version": 1,
     "entities": [
         {
-            "Name": "Enemy_Botnet",
+            "Name": "botnet",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -16,18 +16,18 @@
                             "ComponentGUID": "16742114490130125945",
                             "Position": [
                                 0.0,
-                                0.0,
+                                -2.9802322387695313e-8,
                                 0.0
                             ],
                             "Rotation": [
                                 0.0,
-                                0.0,
+                                -0.0,
                                 0.0
                             ],
                             "Scale": [
-                                0.006000000052154064,
-                                0.006000000052154064,
-                                0.006000000052154064
+                                0.009999999776482582,
+                                0.009999999776482582,
+                                0.009999999776482582
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -54,13 +54,13 @@
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 0
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 },
@@ -112,8 +112,8 @@
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 50.88399887084961,
-                            "MaxDistance": 337.77301025390625,
+                            "MinDistance": 31.780000686645508,
+                            "MaxDistance": 276.7699890136719,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.003999948501587,
                             "Pan2D": 0.0
@@ -125,7 +125,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.Botnet"
+                            "ComponentGUID": "11007352189747626285",
+                            "ScriptClassName": "Game.Botnet",
+                            "Started": true,
+                            "GCHandle": 19
                         }
                     }
                 }

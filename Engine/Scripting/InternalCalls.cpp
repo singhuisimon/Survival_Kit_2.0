@@ -791,6 +791,28 @@ namespace Engine
 			if (outY) *outY = d.y;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets the visibility of the system cursor.
+		 * @param visible
+		 * Input parameter.
+		 **************************************************************************/
+		void Input_SetCursorVisible(bool visible) {
+			if (!s_InputSystem) return;
+			s_InputSystem->SetCursorVisible(visible);
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Gets the visibility of the system cursor.
+		 * @return
+		 * True if the cursor is visible; otherwise false.
+		 **************************************************************************/
+		bool Input_GetCursorVisible() {
+			if (!s_InputSystem) return true;
+			return s_InputSystem->IsCursorVisible();
+		}
+
 		// =====================================================================
 		// Prefabs
 		// =====================================================================

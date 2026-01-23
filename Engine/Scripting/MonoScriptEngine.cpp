@@ -1465,6 +1465,10 @@ namespace Engine
 			reinterpret_cast<void *>(InternalCalls::Input_GetMousePosition));
 		BindInternalCall("Engine.Input::Input_GetMouseDelta",
 			reinterpret_cast<void *>(InternalCalls::Input_GetMouseDelta));
+		BindInternalCall("Engine.Input::Input_SetCursorVisible",
+			reinterpret_cast<void*>(InternalCalls::Input_SetCursorVisible));
+		BindInternalCall("Engine.Input::Input_GetCursorVisible",
+			reinterpret_cast<void*>(InternalCalls::Input_GetCursorVisible));
 
 		// =====================================================================
 		// Rigidbody
