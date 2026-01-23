@@ -45,7 +45,7 @@ namespace Game
             hasSplit = false;
 
             // Set Speed and Timers (Serialize Field Value)
-            speed = 100f;
+            speed = 200f;
             stationaryTimer = 4.0f;
             timer = 0.0f;
 
@@ -76,7 +76,7 @@ namespace Game
             float magnitude = SimpleMath.Sqrt(direction.X * direction.X + direction.Y * direction.Y + direction.Z * direction.Z);
     
             // If WormHost is near/at target
-            if(magnitude < 5.0f){
+            if(magnitude < 50.0f){
                 isStationary = true;
             }
 
