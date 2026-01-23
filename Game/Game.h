@@ -65,5 +65,8 @@ private:
      */
     void CreateDefaultScene();
 
-    
+    /**
+	* @brief Load a scene from the given file path
+    */
+    void LoadSceneFromEvent(const std::string& scenePath);
 };
