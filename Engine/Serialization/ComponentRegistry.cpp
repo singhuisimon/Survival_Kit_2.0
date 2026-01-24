@@ -512,6 +512,20 @@ namespace Engine {
         {
 	        auto& meta = REGISTER_COMPONENT(ParticleComponent);
 
+            meta.AddProperty<ParticleComponent, u64>(
+                "ParticleTypeAdvanced",
+                PropertyType::U64,
+                [](const ParticleComponent& c) { return static_cast<u64>(c.ParticleTypeAdvanced.m_Value); },
+                [](ParticleComponent& c, const xresource::instance_guid& v) { c.ParticleTypeAdvanced = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, u64>(
+                "MaterialType",
+                PropertyType::U64,
+                [](const ParticleComponent& c) { return static_cast<u64>(c.MaterialType.m_Value); },
+                [](ParticleComponent& c, const xresource::instance_guid& v) { c.MaterialType = v; }
+            );
+
             meta.AddProperty<ParticleComponent, glm::vec3>(
                 "InitialVelocity",
                 PropertyType::Vec3,

@@ -337,6 +337,19 @@ namespace Engine
                 Value(std::to_string(emitter.ComponentGUID.m_Value).c_str(), allocator),
                 allocator
             );
+
+            // Particle Type Advanced
+            std::string particleTypeAdvancedName = AM.getNameFromGuid(emitter.ParticleTypeAdvanced);
+            propertiesObj.AddMember("Particle Type Advanced",
+                Value(particleTypeAdvancedName.empty() ? "" : particleTypeAdvancedName.c_str(), allocator),
+                allocator);
+
+            // Material Type
+            std::string materialTypeName = AM.getNameFromGuid(emitter.MaterialType);
+            propertiesObj.AddMember("Material Type",
+                Value(materialTypeName.empty() ? "" : materialTypeName.c_str(), allocator),
+                allocator);
+
             // Initial Velocity
             rapidjson::Value velArray(kArrayType);
             velArray.PushBack(emitter.InitialVelocity.x, allocator);
@@ -942,6 +955,21 @@ namespace Engine
                     std::stoull(properties["ComponentGUID"].GetString())
                 );
             }
+
+            // Particle Type Advanced
+            if (properties.HasMember("Particle Type Advanced") && properties["Particle Type Advanced"].IsString())
+            {
+                std::string particleTypeAdvancedName = properties["Particle Type Advanced"].GetString();
+                emitter.ParticleTypeAdvanced = AM.getGuidFromName(particleTypeAdvancedName);
+            }
+
+            // Material Type
+            if (properties.HasMember("Material Type") && properties["Material Type"].IsString())
+            {
+                std::string materialTypeName = properties["Material Type"].GetString();
+                emitter.MaterialType = AM.getGuidFromName(materialTypeName);
+            }
+
             // Initial Velocity
             if (properties.HasMember("Initial Velocity") && properties["Initial Velocity"].IsArray())
             {
