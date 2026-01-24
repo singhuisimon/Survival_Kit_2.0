@@ -389,10 +389,22 @@ namespace Engine {
 				prog.setUniform("isTexture", false);
 				prog.setUniform("useNormalMap", false);
 #pragma endregion
+
+				if (item.m_drawitem_type == DrawItemType::Particle) {
+					prog.setUniform("uParticle", true);
+					prog.setUniform("uColor", item.m_color);
+			    }
+				else {
+					prog.setUniform("uParticle", false);
+				}
 			 
 			 // Check for material resource
 			 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			 {
+
+			    prog.setUniform("uEmissive", material_resource->enableEmission);
+				
+
 				// New workflow has no ambient lighting
 				prog.setUniform("material_.albedo", glm::vec3(material_resource->baseColor[0], 
 				 												       material_resource->baseColor[1], 

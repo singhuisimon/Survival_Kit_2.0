@@ -674,7 +674,7 @@ namespace Engine
 
 				// Save Material Section
 
-// Overwrite Current Material Button
+				// Overwrite Current Material Button
 				if (ImGui::Button("Overwrite Current Material")) {
 					MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
 					if (material) {

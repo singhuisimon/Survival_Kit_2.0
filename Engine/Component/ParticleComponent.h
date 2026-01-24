@@ -20,6 +20,7 @@ namespace Engine {
 		glm::vec3 PreviousPosition;
 		glm::vec3 Size;
 		glm::vec4 Color;
+		glm::vec4 TransitionColor;
 		float	  Lifetime;
 		float     Age;
 		glm::quat Rotation;

@@ -61,7 +61,7 @@ namespace Engine{
 		u32						 m_render_layer			     = 0;
 
 		// Color if the rendered object has self defined colors
-		glm::vec4				 m_color = { 0.f, 0.f, 0.f, 1.f };
+		glm::vec4				 m_color = { 0.5f, 0.5f, 0.5f, 1.f };
 
 		// Resource GUIDs
 		xresource::instance_guid m_mesh_guid = 0;

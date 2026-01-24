@@ -59,12 +59,7 @@ namespace Engine {
 					particle.Velocity = randomDir * glm::length(emitter.InitialVelocity) * speed;
 
 					particle.Lifetime = emitter.ParticleLifetime * Random(0.8f, 1.2f);
-					particle.Color = glm::vec4(
-						Random(emitter.ColorMin.r, emitter.ColorMax.r),
-						Random(emitter.ColorMin.g, emitter.ColorMax.g),
-						Random(emitter.ColorMin.b, emitter.ColorMax.b),
-						Random(emitter.ColorMin.a, emitter.ColorMax.a)
-					);
+					particle.Color = emitter.ColorMin;
 
 					if (emitter.RandomizeRotation) {
 						switch (emitter.ParticleType) {
@@ -140,14 +135,7 @@ namespace Engine {
 
 					// Random lifetime variation
 					particleToUse->Lifetime = emitter.ParticleLifetime * Random(0.8f, 1.2f);
-
-					// Random color variation (blue-ish particles)
-					particleToUse->Color = glm::vec4(
-						Random(emitter.ColorMin.r, emitter.ColorMax.r),
-						Random(emitter.ColorMin.g, emitter.ColorMax.g),
-						Random(emitter.ColorMin.b, emitter.ColorMax.b),
-						Random(emitter.ColorMin.a, emitter.ColorMax.a)
-					);
+					particleToUse->Color = emitter.ColorMin;
 
 					// In particle initialization:
 					if (emitter.RandomizeRotation) {
@@ -194,15 +182,18 @@ namespace Engine {
 					// Growing phase: start -> default
 					float t = normalizedLife / emitter.GrowPhaseEnd; // 0 to 1 within grow phase
 					particle.Size = glm::mix(emitter.StartSize, emitter.DefaultSize, t);
+					particle.Color = glm::mix(emitter.ColorMin, emitter.ColorMax, t);
 				}
 				else if (normalizedLife < emitter.ShrinkPhaseStart) {
 					// Stable phase: stay at default
-					particle.Size = emitter.DefaultSize;
+					particle.Size  = emitter.DefaultSize;
+					particle.TransitionColor = particle.Color;
 				}
 				else {
 					// Shrinking phase: default -> end
 					float t = (normalizedLife - emitter.ShrinkPhaseStart) / (1.0f - emitter.ShrinkPhaseStart);
 					particle.Size = glm::mix(emitter.DefaultSize, emitter.EndSize, t);
+					particle.Color = glm::mix(particle.TransitionColor, emitter.ColorMax, t);
 				}
 
 
