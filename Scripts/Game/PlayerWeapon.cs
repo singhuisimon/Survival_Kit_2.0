@@ -25,7 +25,7 @@ namespace Game{
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
         [SerializeField] private float primaryShootRate = 0.05f; 
         [SerializeField] private float primaryShootNext = 0.0f;
-        [SerializeField] private float bulletSpeed = 1000.0f;
+        [SerializeField] private float primarybulletSpeed = 1000.0f;
 
         [SerializeField] private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
         //audio
@@ -44,6 +44,7 @@ namespace Game{
 
         [SerializeField] private bool primaryAltReady = false;
         [SerializeField] private float primaryAltFireAOERange = 30f;
+        [SerializeField] private float primaryUltSpeed = 500.0f;
 
         //2 audio for primary alt fire
         //not sure what is layermask
@@ -310,7 +311,7 @@ namespace Game{
                     LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
                     //return; //comment this for debugging temp
                 }
-                Vector3 bulletVel = bulletDirection * bulletSpeed;
+                Vector3 bulletVel = bulletDirection * primarybulletSpeed;
                 RigidbodySetVelocity(bulletID, ref bulletVel);
 
                 //TODO NEED DO PRIMARY BULLET SCRIPT
