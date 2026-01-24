@@ -16,8 +16,8 @@
                     "Properties": {
                         "ComponentGUID": "6938341132032101499",
                         "Position": [
-                            40.0,
-                            0.0,
+                            -8.0,
+                            -8.0,
                             0.0
                         ],
                         "Rotation": [
@@ -44,7 +44,7 @@
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
@@ -89,8 +89,8 @@
                     "Properties": {
                         "ComponentGUID": "7514801884335475831",
                         "Position": [
-                            -20.0,
-                            0.0,
+                            8.0,
+                            -8.0,
                             0.0
                         ],
                         "Rotation": [
@@ -117,7 +117,7 @@
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
@@ -162,8 +162,8 @@
                     "Properties": {
                         "ComponentGUID": "1106135633417667175",
                         "Position": [
-                            20.0,
                             0.0,
+                            8.0,
                             0.0
                         ],
                         "Rotation": [
@@ -190,7 +190,7 @@
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
-                        "MeshType": 0,
+                        "MeshType": 2,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
