@@ -554,8 +554,15 @@ namespace Engine {
                 [](ParticleComponent& c, const glm::vec3& v) { c.EndSize = v; }
             );
 
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "EmissionBoxSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.EmissionBoxSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.EmissionBoxSize = v; }
+            );
+
             meta.AddProperty<ParticleComponent, glm::vec4>(
-            "ColorMin",
+                "ColorMin",
                 PropertyType::Vec4,
                 [](const ParticleComponent& c) { return c.ColorMin; },
                 [](ParticleComponent& c, const glm::vec4& v) { c.ColorMin = v; }
@@ -566,6 +573,13 @@ namespace Engine {
                 PropertyType::Vec4,
                 [](const ParticleComponent& c) { return c.ColorMax; },
                 [](ParticleComponent& c, const glm::vec4& v) { c.ColorMax = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, u32>(
+                "EmitterShape",
+                PropertyType::U32,
+                [](const ParticleComponent& c) { return static_cast<u32>(c.Shape); },
+                [](ParticleComponent& c, const u32& v) { c.Shape = static_cast<EmitterShape>(v); }
             );
 
             meta.AddProperty<ParticleComponent, u32>(
@@ -625,6 +639,13 @@ namespace Engine {
             );
 
             meta.AddProperty<ParticleComponent, float>(
+                "EmissionSphereRadius",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.EmissionSphereRadius; },
+                [](ParticleComponent& c, const float& v) { c.EmissionSphereRadius = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
                 "VelocityRandomness",
                 PropertyType::Float,
                 [](const ParticleComponent& c) { return c.VelocityRandomness; },
@@ -636,6 +657,20 @@ namespace Engine {
                 PropertyType::Float,
                 [](const ParticleComponent& c) { return c.LifetimeRandomness; },
                 [](ParticleComponent& c, const float& v) { c.LifetimeRandomness = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "PlayDelay",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.PlayDelay; },
+                [](ParticleComponent& c, const float& v) { c.PlayDelay = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "DelayAccumualator",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.DelayAccumualator; },
+                [](ParticleComponent& c, const float& v) { c.DelayAccumualator = v; }
             );
 
             meta.AddProperty<ParticleComponent, float>(
@@ -686,6 +721,21 @@ namespace Engine {
                 [](const ParticleComponent& c) { return c.Active; },
                 [](ParticleComponent& c, const bool& v) { c.Active = v; }
             );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "WorldSpace",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.WorldSpace; },
+                [](ParticleComponent& c, const bool& v) { c.WorldSpace = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "BurstMode",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.BurstMode; },
+                [](ParticleComponent& c, const bool& v) { c.BurstMode = v; }
+            );
+
         }
 
         // Register LightComponent

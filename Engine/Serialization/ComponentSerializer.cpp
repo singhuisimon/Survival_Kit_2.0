@@ -378,6 +378,13 @@ namespace Engine
             endSizeArray.PushBack(emitter.EndSize.z, allocator);
             propertiesObj.AddMember("End Size", endSizeArray, allocator);
 
+            // Emission Box Size
+            rapidjson::Value EmissionBoxSizeArray(kArrayType);
+            EmissionBoxSizeArray.PushBack(emitter.EmissionBoxSize.x, allocator);
+            EmissionBoxSizeArray.PushBack(emitter.EmissionBoxSize.y, allocator);
+            EmissionBoxSizeArray.PushBack(emitter.EmissionBoxSize.z, allocator);
+            propertiesObj.AddMember("Emission Box Size", EmissionBoxSizeArray, allocator);
+
             // Min Color
             rapidjson::Value minColorArray(kArrayType);
             minColorArray.PushBack(emitter.ColorMin.x, allocator);
@@ -391,6 +398,9 @@ namespace Engine
             maxColorArray.PushBack(emitter.ColorMax.y, allocator);
             maxColorArray.PushBack(emitter.ColorMax.z, allocator);
             propertiesObj.AddMember("Color Max", maxColorArray, allocator);
+
+            // Emitter Shape
+            propertiesObj.AddMember("Emitter Shape", static_cast<u32>(emitter.Shape), allocator);
 
             // Max Particles
             propertiesObj.AddMember("Max Particles", emitter.MaxParticles, allocator);
@@ -416,6 +426,9 @@ namespace Engine
             // Shrink Phase Start
             propertiesObj.AddMember("Shrink Phase Start", emitter.ShrinkPhaseStart, allocator);
 
+            // Emission Sphere Radius
+            propertiesObj.AddMember("Emission Sphere Radius", emitter.EmissionSphereRadius, allocator);
+
             // Randomization parameters
             propertiesObj.AddMember("Velocity Randomness", emitter.VelocityRandomness, allocator);
             propertiesObj.AddMember("Lifetime Randomness", emitter.LifetimeRandomness, allocator);
@@ -424,10 +437,17 @@ namespace Engine
             propertiesObj.AddMember("Max Speed", emitter.MaxSpeed, allocator);
             propertiesObj.AddMember("Rotation Speed", emitter.RotationSpeed, allocator);
 
+            // Play Delay Parameters
+            propertiesObj.AddMember("Play Delay", emitter.PlayDelay, allocator);
+            propertiesObj.AddMember("Delay Accumulator", emitter.DelayAccumualator, allocator);
+
             // Boolean parameters
             propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
             propertiesObj.AddMember("Loop", emitter.Loop, allocator);
             propertiesObj.AddMember("Active", emitter.Active, allocator);
+            propertiesObj.AddMember("World Space", emitter.WorldSpace, allocator);
+            propertiesObj.AddMember("Burst Mode", emitter.BurstMode, allocator);
+
             break;
         }
         case ComponentTypeID::Script: {
@@ -1016,6 +1036,15 @@ namespace Engine
                 }
             }
 
+            // Emission Box Size
+            if (properties.HasMember("Emission Box Size") && properties["Emission Box Size"].IsArray())
+            {
+                const auto& emissionBoxSizeArray = properties["Emission Box Size"].GetArray();
+                emitter.EmissionBoxSize.x = emissionBoxSizeArray[0].GetFloat();
+                emitter.EmissionBoxSize.y = emissionBoxSizeArray[1].GetFloat();
+                emitter.EmissionBoxSize.z = emissionBoxSizeArray[2].GetFloat();
+            }
+
             // Color Min
             if (properties.HasMember("Color Min") && properties["Color Min"].IsArray())
             {
@@ -1039,6 +1068,10 @@ namespace Engine
                     emitter.ColorMax.z = maxColorArray[2].GetFloat();
                 }
             }
+
+            // Emitter Shape
+            if (properties.HasMember("Emitter Shape"))
+                emitter.Shape = static_cast<EmitterShape>(properties["Emitter Shape"].GetUint());
 
             // Max Particles
             if (properties.HasMember("Max Particles"))
@@ -1072,6 +1105,10 @@ namespace Engine
             if (properties.HasMember("Shrink Phase Start"))
                 emitter.ShrinkPhaseStart = properties["Shrink Phase Start"].GetFloat();
 
+            // Emission Sphere Radius
+            if (properties.HasMember("Emission Sphere Radius"))
+                emitter.EmissionSphereRadius = properties["Emission Sphere Radius"].GetFloat();
+
             // Randomization parameters
             if (properties.HasMember("Velocity Randomness"))
                 emitter.VelocityRandomness = properties["Velocity Randomness"].GetFloat();
@@ -1091,6 +1128,12 @@ namespace Engine
             if (properties.HasMember("Rotation Speed"))
                 emitter.RotationSpeed = properties["Rotation Speed"].GetFloat();
 
+            if (properties.HasMember("Play Delay"))
+                emitter.PlayDelay = properties["Play Delay"].GetFloat();
+
+            if (properties.HasMember("Delay Accumualator"))
+                emitter.DelayAccumualator = properties["Delay Accumualator"].GetFloat();
+
             // Boolean parameters
             if (properties.HasMember("Randomize Rotation"))
                 emitter.RandomizeRotation = properties["Randomize Rotation"].GetBool();
@@ -1100,6 +1143,12 @@ namespace Engine
 
             if (properties.HasMember("Active"))
                 emitter.Active = properties["Active"].GetBool();
+
+            if (properties.HasMember("World Space"))
+                emitter.WorldSpace = properties["World Space"].GetBool();
+
+            if (properties.HasMember("Burst Mode"))
+                emitter.BurstMode = properties["Burst Mode"].GetBool();
             return true;
         }
 

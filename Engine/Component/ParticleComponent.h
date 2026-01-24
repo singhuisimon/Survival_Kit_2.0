@@ -6,6 +6,12 @@
 
 namespace Engine {
 
+	enum class EmitterShape : u32 {
+		POINT = 0,
+		BOX,
+		SPHERE
+	};
+
 	struct ParticleData {
 
 		glm::mat4 Transform;
@@ -38,8 +44,12 @@ namespace Engine {
 		glm::vec3 DefaultSize = glm::vec3(0.5f, 0.5f, 0.5f);
 		glm::vec3 EndSize = glm::vec3(0.f, 0.f, 0.f);
 
+		glm::vec3 EmissionBoxSize = glm::vec3(1.f, 1.f, 1.f);
+
 		glm::vec4 ColorMin = glm::vec4(0.f, 0.f, 0.7f, 1.f);
 		glm::vec4 ColorMax = glm::vec4(0.3f, 0.3f, 1.f, 1.f);
+
+		EmitterShape Shape = EmitterShape::POINT;
 
 		u32       MaxParticles        = 1000;
 		u32       ParticleType        = 0; // Cube, Plane or Sphere
@@ -51,6 +61,8 @@ namespace Engine {
 		float	  GrowPhaseEnd		  = 0.3f;
 		float	  ShrinkPhaseStart	  = 0.7f;
 
+		float	  EmissionSphereRadius = 1.f;
+
 		// Randomization parameters
 		float     VelocityRandomness = 0.5f;  // 0-1, how much velocity varies
 		float     LifetimeRandomness = 0.2f;  // 0-1, how much lifetime varies
@@ -59,9 +71,15 @@ namespace Engine {
 		float     MaxSpeed    = 1.5f; // Speed multiplier
 		float     RotationSpeed = 0.0f;   // Angular velocity (degrees/sec), 0 = no spin
 
+		float     PlayDelay = 0.0f;
+		float     DelayAccumualator = 0.0f; // In Seconds
+
 		bool      RandomizeRotation = true;   // Enable/disable random rotation
 		bool      Loop = false; // Non loop is basically "Burst Mode" -> Will just set it in editor.
 		bool      Active = true;
+
+		bool      WorldSpace = true; // Boolean to check whether it's set to world space or local space
+		bool      BurstMode  = false;
 	};
 
 }

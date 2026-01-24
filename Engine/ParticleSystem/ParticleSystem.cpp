@@ -16,17 +16,93 @@ namespace Engine {
 			// Get the particle component -> the particle component is actually the particle emitter
 			auto& emitter = view.get<ParticleComponent>(entity);
 
+			emitter.DelayAccumualator += ts.GetSeconds();
+
 			// If this emitter is not currently set to active skip it
-			if (!emitter.Active)
+			if (!emitter.Active || emitter.DelayAccumualator < emitter.PlayDelay)
 				continue;
 
 			// Get the emitter position, NOT the particle position
 			auto& transform = view.get<TransformComponent>(entity);
+			
+			if (emitter.BurstMode) {
 
+				// BURST MODE: Emit ALL particles in one frame
+				size_t particlesToEmit = emitter.MaxParticles - emitter.Particles.size();
+
+				for (size_t i = 0; i < particlesToEmit; ++i) {
+					emitter.Particles.emplace_back();
+					ParticleData& particle = emitter.Particles.back();
+
+					// Recalculate random offset for EACH particle
+					glm::vec3 particleOffset = glm::vec3(0.f);
+					if (emitter.Shape == EmitterShape::BOX) {
+						particleOffset = glm::vec3(
+							Random(-emitter.EmissionBoxSize.x * 0.5f, emitter.EmissionBoxSize.x * 0.5f),
+							Random(-emitter.EmissionBoxSize.y * 0.5f, emitter.EmissionBoxSize.y * 0.5f),
+							Random(-emitter.EmissionBoxSize.z * 0.5f, emitter.EmissionBoxSize.z * 0.5f)
+						);
+					}
+					else if (emitter.Shape == EmitterShape::SPHERE) {
+						glm::vec3 RandomDirection = glm::normalize(glm::vec3(Random(-1.f, 1.f), Random(-1.f, 1.f), Random(-1.f, 1.f)));
+						float RandomRadius = Random(0.f, emitter.EmissionSphereRadius);
+						particleOffset = RandomDirection * RandomRadius;
+					}
+
+					// Initialize particle (same logic as before)
+					particle.Position = emitter.WorldSpace ? transform.Position + particleOffset : particleOffset;
+					particle.PreviousPosition = transform.Position;
+					particle.Size = emitter.StartSize;
+
+					float speed = Random(std::max(0.1f, emitter.MinSpeed), emitter.MaxSpeed);
+					glm::vec3 randomDir = RandomInCone(glm::normalize(emitter.InitialVelocity), emitter.SpreadAngle);
+					particle.Velocity = randomDir * glm::length(emitter.InitialVelocity) * speed;
+
+					particle.Lifetime = emitter.ParticleLifetime * Random(0.8f, 1.2f);
+					particle.Color = glm::vec4(
+						Random(emitter.ColorMin.r, emitter.ColorMax.r),
+						Random(emitter.ColorMin.g, emitter.ColorMax.g),
+						Random(emitter.ColorMin.b, emitter.ColorMax.b),
+						Random(emitter.ColorMin.a, emitter.ColorMax.a)
+					);
+
+					if (emitter.RandomizeRotation) {
+						switch (emitter.ParticleType) {
+						case 0: particle.Rotation = RandomRotation(); break;
+						case 1: particle.Rotation = RandomRotationAxis(glm::vec3(0, 0, 1), 0.0f, 360.0f); break;
+						case 2: particle.Rotation = RandomRotation(); break;
+						default: particle.Rotation = RandomRotation(); break;
+						}
+					}
+					else {
+						particle.Rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+					}
+
+					particle.Alive = true;
+				}
+
+			}
 			// Emit new particles based on the emission rate
-			if (emitter.Loop || emitter.Particles.size() < emitter.MaxParticles) {
+			else if (emitter.Loop || emitter.Particles.size() < emitter.MaxParticles) {
 
 				emitter.EmissionAccumulator += emitter.EmissionRate * ts.GetSeconds();
+
+				glm::vec3 RandomOffset = glm::vec3(0.f);
+				if (emitter.Shape == EmitterShape::POINT) {
+					RandomOffset = glm::vec3(0.f);
+				}
+				else if (emitter.Shape == EmitterShape::BOX) {
+					RandomOffset = glm::vec3(
+						Random(-emitter.EmissionBoxSize.x * 0.5f, emitter.EmissionBoxSize.x * 0.5f),
+						Random(-emitter.EmissionBoxSize.y * 0.5f, emitter.EmissionBoxSize.y * 0.5f),
+						Random(-emitter.EmissionBoxSize.z * 0.5f, emitter.EmissionBoxSize.z * 0.5f)
+					);
+				}
+				else if (emitter.Shape == EmitterShape::SPHERE) {
+					glm::vec3 RandomDirection = glm::normalize(glm::vec3(Random(-1.f, 1.f), Random(-1.f, 1.f), Random(-1.f, 1.f)));
+					glm::vec3 RandomRadius = glm::vec3(Random(0.f, emitter.EmissionSphereRadius * 1.f));
+					RandomOffset = RandomDirection * RandomRadius;
+				}
 
 				while (emitter.EmissionAccumulator >= 1.0f && 
 					emitter.Particles.size() < emitter.MaxParticles) {
@@ -42,16 +118,18 @@ namespace Engine {
 
 					// If no dead particle found, create a new one
 					if (particleToUse == nullptr) {
+						// Create new particles if we have not hit the cap yet
 						if (emitter.Particles.size() < emitter.MaxParticles) {
 							emitter.Particles.emplace_back();
 							particleToUse = &emitter.Particles.back();
 						}else {
+							// End the entire loop
 							break;
 						}
 					}
 
 					// Initialize the particles
-					particleToUse->Position = transform.Position;
+					particleToUse->Position = emitter.WorldSpace ? transform.Position + RandomOffset : RandomOffset;
 					particleToUse->PreviousPosition = transform.Position;
 					particleToUse->Size = emitter.StartSize;
 
@@ -98,50 +176,54 @@ namespace Engine {
 					particleToUse->Alive = true;
 					emitter.EmissionAccumulator -= 1.0f;
 				}
+			}
 
-				// Update existing particles
-				for (auto& particle : emitter.Particles) {
+			// Update existing particles
+			for (auto& particle : emitter.Particles) {
 
-					if (!particle.Alive) 
-						continue;
+				if (!particle.Alive)
+					continue;
 
-					particle.PreviousPosition = particle.Position;
-					particle.Position += particle.Velocity * ts.GetSeconds();
-					particle.Age += ts.GetSeconds();
+				particle.PreviousPosition = particle.Position;
+				particle.Position += particle.Velocity * ts.GetSeconds();
+				particle.Age += ts.GetSeconds();
 
-					float normalizedLife = particle.Age / particle.Lifetime;
+				float normalizedLife = particle.Age / particle.Lifetime;
 
-					 
+				if (normalizedLife < emitter.GrowPhaseEnd) {
+					// Growing phase: start -> default
+					float t = normalizedLife / emitter.GrowPhaseEnd; // 0 to 1 within grow phase
+					particle.Size = glm::mix(emitter.StartSize, emitter.DefaultSize, t);
+				}
+				else if (normalizedLife < emitter.ShrinkPhaseStart) {
+					// Stable phase: stay at default
+					particle.Size = emitter.DefaultSize;
+				}
+				else {
+					// Shrinking phase: default -> end
+					float t = (normalizedLife - emitter.ShrinkPhaseStart) / (1.0f - emitter.ShrinkPhaseStart);
+					particle.Size = glm::mix(emitter.DefaultSize, emitter.EndSize, t);
+				}
 
-					if (normalizedLife < emitter.GrowPhaseEnd) {
-						// Growing phase: start -> default
-						float t = normalizedLife / emitter.GrowPhaseEnd; // 0 to 1 within grow phase
-						particle.Size = glm::mix(emitter.StartSize, emitter.DefaultSize, t);
-					}
-					else if (normalizedLife < emitter.ShrinkPhaseStart) {
-						// Stable phase: stay at default
-						particle.Size = emitter.DefaultSize;
-					}
-					else {
-						// Shrinking phase: default -> end
-						float t = (normalizedLife - emitter.ShrinkPhaseStart) / (1.0f - emitter.ShrinkPhaseStart);
-						particle.Size = glm::mix(emitter.DefaultSize, emitter.EndSize, t);
-					}
- 
-					// Calculate particle transform matrix
-					glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(particle.Size)); 
-					glm::mat4 rot = glm::toMat4(particle.Rotation); // No rotation for
-					glm::mat4 trans = glm::translate(glm::mat4(1.0f), particle.Position);
 
+				// Calculate particle transform matrix
+				glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(particle.Size));
+				glm::mat4 rot = glm::toMat4(particle.Rotation); // No rotation for
+				glm::mat4 trans = glm::translate(glm::mat4(1.0f), particle.Position);
+
+				if (emitter.WorldSpace) {
 					particle.Transform = trans * rot * scale;
+				}
+				else {
+					particle.Transform = transform.WorldTransform * trans * rot * scale;
+				}
 
-					if ((particle.Lifetime - particle.Age) <= 0.00001f) {
+				if ((particle.Lifetime - particle.Age) <= 0.00001f) {
 
-						// Reset particle lifetime
-						particle.Lifetime = 0.f;
-						particle.Age = 0.f;
-						particle.Alive = false;
-					}
+					// Reset particle lifetime
+					particle.Lifetime = 0.f;
+					particle.Age = 0.f;
+					particle.Alive = false;
 				}
 			}
 		}

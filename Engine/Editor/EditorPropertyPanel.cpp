@@ -1771,7 +1771,7 @@ namespace Engine
 
 						// Mark as removed
 						prefabComp.MarkComponentRemoved(ComponentTypeID::ParticleSystem, originalJSON);
-						LOG_INFO("Marked RigidBody as REMOVED override");
+						LOG_INFO("Marked Particle Component as REMOVED override");
 					}
 					//return;
 				}
@@ -1783,16 +1783,45 @@ namespace Engine
 
 			if (openParticleComp)
 			{
+				auto clearpc = [](ParticleComponent& pc) { pc.Particles.clear(), pc.EmissionAccumulator = 0.f; pc.DelayAccumualator = 0.f; };
+
 				// Playback Controls
 				ImGui::Text("Playback");
-				if (ImGui::Checkbox("Active###activeParticle", &particleComp.Active))
-				{
-					MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+				if (ImGui::Button("Play###PlayParticle")) {
+					if (particleComp.BurstMode)
+						clearpc(particleComp);
+
+					particleComp.Active = true;
+
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 				}
 				ImGui::SameLine();
-				if (ImGui::Checkbox("Loop", &particleComp.Loop))
+				if (ImGui::Button("Pause###PauseParticle")) {
+					particleComp.Active = false;
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Restart Animation##RestartPlaybackParticle")) {
+					clearpc(particleComp);
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+				ImGui::Spacing();
+
+				if(ImGui::DragFloat("Play Delay", &particleComp.PlayDelay, 0.1f, 0.f, 60.f)) {
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+
+				ImGui::Spacing();
+
+				// Burst Mode Checkbox
+				if (ImGui::Checkbox("Burst Mode", &particleComp.BurstMode))
 				{
-					MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Checkbox("Loop", &particleComp.Loop)) {
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 				}
 
 				ImGui::Spacing();
@@ -1801,6 +1830,44 @@ namespace Engine
 				// Emission Settings
 				if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
 				{
+					// Particle Type Dropdown
+					const char* emissionShape[] = { "Point", "Box", "Sphere" };
+					const char* currentShape = emissionShape[static_cast<uint32_t>(particleComp.Shape)];
+
+					if (ImGui::BeginCombo("Emission Shape", currentShape))
+					{
+						for (int i = 0; i < 3; i++)
+						{
+							bool isSelected = (static_cast<uint32_t>(particleComp.Shape) == static_cast<uint32_t>(i));
+							if (ImGui::Selectable(emissionShape[i], isSelected))
+							{
+								particleComp.Shape = static_cast<EmitterShape>(i);
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (isSelected)
+							{
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					// Conditional widgets based on selected shape
+					if (particleComp.Shape == EmitterShape::BOX)
+					{
+						if (ImGui::DragFloat3("Box Size", &particleComp.EmissionBoxSize.x, 0.1f, 0.0f, 100000.0f))
+						{
+							MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+						}
+					}
+					else if (particleComp.Shape == EmitterShape::SPHERE)
+					{
+						if (ImGui::DragFloat("Sphere Radius", &particleComp.EmissionSphereRadius, 0.1f, 0.0f, 100000.0f))
+						{
+							MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+						}
+					}
+
 					if (ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000))
 					{
 						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
@@ -1813,6 +1880,7 @@ namespace Engine
 					{
 						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
 					}
+
 					ImGui::TreePop();
 				}
 
@@ -1858,6 +1926,11 @@ namespace Engine
 				// Particle Behavior
 				if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
 				{
+					if(ImGui::Checkbox("World Space##ParticleWorldSpace", &particleComp.WorldSpace)) 
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
+
 					ImGui::Text("Size");
 
 					if (ImGui::DragFloat3("Initial Size", &particleComp.StartSize.x, 0.1f))
@@ -2201,6 +2274,7 @@ namespace Engine
 				{
 					particleComp.Particles.clear();
 					particleComp.EmissionAccumulator = 0.0f;
+					particleComp.DelayAccumualator = 0.f;
 				}
 			}
 			// ----------------------------------------- Remove Particle Component -------------------------------
