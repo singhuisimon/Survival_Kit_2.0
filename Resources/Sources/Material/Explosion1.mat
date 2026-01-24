@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Particle_Circle2.png",
+    "baseMap": "",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
@@ -8,11 +8,11 @@
     "occlusionMap": "",
     "baseColor": [
         1.0,
-        1.0,
-        1.0
+        0.4803921580314636,
+        0.4803921580314636
     ],
     "emissionColor": [
-        0.0,
+        1.0,
         0.0,
         0.0
     ],
