@@ -19,6 +19,11 @@ namespace Engine {
 
 	void serializeMaterial(MaterialResource* mat, std::string filename) {
 
+        // Remove .mat extension if user added it by accident
+        if (filename.size() >= 4 && filename.substr(filename.size() - 4) == ".mat") {
+            filename = filename.substr(0, filename.size() - 4);
+        }
+
 		using namespace rapidjson;
 
 		Document doc;

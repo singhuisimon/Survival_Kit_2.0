@@ -672,27 +672,89 @@ namespace Engine
 				// Material Editor Section
 				ImGui::SeparatorText("Material Properties");
 
-				// Save Material Button
-				static char materialSaveName[256] = "";
-				ImGui::InputText("Material Name", materialSaveName, sizeof(materialSaveName));
-				ImGui::SameLine();
-				if (ImGui::Button("Save Material")) {
-					if (strlen(materialSaveName) > 0) {
-						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
-						if (material) {
-							std::string filename = std::string(materialSaveName);
-							serializeMaterial(material, filename);
+				// Save Material Section
 
-							AM.scanAndProcess();
-							memset(materialSaveName, 0, sizeof(materialSaveName));
-							ImGui::OpenPopup("Material Saved");
+// Overwrite Current Material Button
+				if (ImGui::Button("Overwrite Current Material")) {
+					MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+					if (material) {
+						std::string currentMaterialName = AM.getNameFromGuid(mesh.MaterialGuid);
+						if (!currentMaterialName.empty()) {
+							ImGui::OpenPopup("Confirm Overwrite");
 						}
-					}
-					else {
-						ImGui::OpenPopup("Invalid Name");
+						else {
+							ImGui::OpenPopup("No Material Selected");
+						}
 					}
 				}
 
+				// Save As New Material Button (on new row)
+				if (ImGui::Button("Save As New Material")) {
+					ImGui::OpenPopup("Save As New Material");
+				}
+
+				// --- Popups ---
+
+				// Confirm Overwrite Popup
+				if (ImGui::BeginPopupModal("Confirm Overwrite", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+					ImGui::Text("Are you sure you want to overwrite the current material?");
+					ImGui::Separator();
+
+					if (ImGui::Button("Yes", ImVec2(120, 0))) {
+						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+						if (material) {
+							std::string currentMaterialName = AM.getNameFromGuid(mesh.MaterialGuid);
+							serializeMaterial(material, currentMaterialName);
+							AM.scanAndProcess();
+							ImGui::CloseCurrentPopup();
+							ImGui::OpenPopup("Material Saved");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("No", ImVec2(120, 0))) {
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				// Save As New Material Popup
+				static char saveAsName[256] = "";
+				if (ImGui::BeginPopupModal("Save As New Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+					ImGui::Text("Enter a name for the new material:");
+					ImGui::InputText("##SaveAsName", saveAsName, sizeof(saveAsName));
+					ImGui::Separator();
+
+					if (ImGui::Button("Save", ImVec2(120, 0))) {
+						if (strlen(saveAsName) > 0) {
+							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+							if (material) {
+								std::string filename = std::string(saveAsName);
+								serializeMaterial(material, filename);
+								AM.scanAndProcess();
+								memset(saveAsName, 0, sizeof(saveAsName));
+								ImGui::CloseCurrentPopup();
+								ImGui::OpenPopup("Material Saved");
+							}
+						}
+						else {
+							ImGui::OpenPopup("Invalid Name");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+						memset(saveAsName, 0, sizeof(saveAsName));
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				// Material Saved Popup
 				if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("Material saved successfully!");
 					if (ImGui::Button("OK")) {
@@ -701,8 +763,18 @@ namespace Engine
 					ImGui::EndPopup();
 				}
 
+				// Invalid Name Popup
 				if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("Please enter a valid material name.");
+					if (ImGui::Button("OK")) {
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				// No Material Selected Popup
+				if (ImGui::BeginPopupModal("No Material Selected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+					ImGui::Text("No material currently selected to overwrite.");
 					if (ImGui::Button("OK")) {
 						ImGui::CloseCurrentPopup();
 					}
@@ -1892,27 +1964,89 @@ namespace Engine
 					// Material Editor Section
 					ImGui::SeparatorText("Material Properties");
 
-					// Save Material Button
-					static char materialSaveName[256] = "";
-					ImGui::InputText("Material Name", materialSaveName, sizeof(materialSaveName));
-					ImGui::SameLine();
-					if (ImGui::Button("Save Material")) {
-						if (strlen(materialSaveName) > 0) {
-							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
-							if (material) {
-								std::string filename = std::string(materialSaveName);
-								serializeMaterial(material, filename);
+					// Save Material Section
 
-								AM.scanAndProcess();
-								memset(materialSaveName, 0, sizeof(materialSaveName));
-								ImGui::OpenPopup("Material Saved");
+					// Overwrite Current Material Button
+					if (ImGui::Button("Overwrite Current Material")) {
+						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+						if (material) {
+							std::string currentMaterialName = AM.getNameFromGuid(particleComp.MaterialType);
+							if (!currentMaterialName.empty()) {
+								ImGui::OpenPopup("Confirm Overwrite");
 							}
-						}
-						else {
-							ImGui::OpenPopup("Invalid Name");
+							else {
+								ImGui::OpenPopup("No Material Selected");
+							}
 						}
 					}
 
+					// Save As New Material Button (on new row)
+					if (ImGui::Button("Save As New Material")) {
+						ImGui::OpenPopup("Save As New Material");
+					}
+
+					// --- Popups ---
+
+					// Confirm Overwrite Popup
+					if (ImGui::BeginPopupModal("Confirm Overwrite", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Are you sure you want to overwrite the current material?");
+						ImGui::Separator();
+
+						if (ImGui::Button("Yes", ImVec2(120, 0))) {
+							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+							if (material) {
+								std::string currentMaterialName = AM.getNameFromGuid(particleComp.MaterialType);
+								serializeMaterial(material, currentMaterialName);
+								AM.scanAndProcess();
+								ImGui::CloseCurrentPopup();
+								ImGui::OpenPopup("Material Saved");
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("No", ImVec2(120, 0))) {
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+
+					// Save As New Material Popup
+					static char saveAsName[256] = "";
+					if (ImGui::BeginPopupModal("Save As New Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Enter a name for the new material:");
+						ImGui::InputText("##SaveAsName", saveAsName, sizeof(saveAsName));
+						ImGui::Separator();
+
+						if (ImGui::Button("Save", ImVec2(120, 0))) {
+							if (strlen(saveAsName) > 0) {
+								MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+								if (material) {
+									std::string filename = std::string(saveAsName);
+									serializeMaterial(material, filename);
+									AM.scanAndProcess();
+									memset(saveAsName, 0, sizeof(saveAsName));
+									ImGui::CloseCurrentPopup();
+									ImGui::OpenPopup("Material Saved");
+								}
+							}
+							else {
+								ImGui::OpenPopup("Invalid Name");
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+							memset(saveAsName, 0, sizeof(saveAsName));
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+
+					// Material Saved Popup
 					if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 						ImGui::Text("Material saved successfully!");
 						if (ImGui::Button("OK")) {
@@ -1921,8 +2055,18 @@ namespace Engine
 						ImGui::EndPopup();
 					}
 
+					// Invalid Name Popup
 					if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 						ImGui::Text("Please enter a valid material name.");
+						if (ImGui::Button("OK")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// No Material Selected Popup
+					if (ImGui::BeginPopupModal("No Material Selected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("No material currently selected to overwrite.");
 						if (ImGui::Button("OK")) {
 							ImGui::CloseCurrentPopup();
 						}
