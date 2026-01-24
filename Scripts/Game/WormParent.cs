@@ -130,7 +130,8 @@ namespace Game
 
         public string VectorToString(Vector3 vec){
             
-            string concat = vec.X.ToString() + "," + vec.Y.ToString() + "," + vec.Z.ToString();
+            string parentID = EntityID.ToString();
+            string concat = parentID + ", " + vec.X.ToString() + "," + vec.Y.ToString() + "," + vec.Z.ToString();
             return concat;
         }
     }
