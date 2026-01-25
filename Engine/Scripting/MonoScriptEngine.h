@@ -114,6 +114,7 @@ namespace Engine {
 		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
 		MonoObject *GetObjectFromHandle(void *instancePtr);
 		bool HotReloadOnPlay(bool preserveManagedState);
+		bool InstanceMatchesClass(MonoObject *instance, const std::string &expectedFullName);
 
 	private:
 		MonoScriptEngine() = default;

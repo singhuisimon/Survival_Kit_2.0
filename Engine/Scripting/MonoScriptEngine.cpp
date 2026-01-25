@@ -1422,6 +1422,32 @@ namespace Engine {
 		return true;
 	}
 
+	bool Engine::MonoScriptEngine::InstanceMatchesClass(MonoObject *instance, const std::string &expectedFullName) {
+		if(!instance) return false;
+
+		EnsureCorrectDomain();
+		if(!IsValidMonoObject(instance)) return false;
+
+		MonoClass *klass = mono_object_get_class(instance);
+		if(!klass) return false;
+
+		const char *name = mono_class_get_name(klass);
+		const char *ns = mono_class_get_namespace(klass);
+
+		std::string full;
+		if(ns && ns[0]) {
+			full.reserve(std::strlen(ns) + 1 + (name ? std::strlen(name) : 0));
+			full += ns;
+			full += ".";
+			if(name) full += name;
+		}
+		else {
+			if(name) full = name;
+		}
+
+		return full == expectedFullName;
+	}
+
 	bool MonoScriptEngine::ReloadDomainAndAssembly() {
 		if(!m_RootDomain) {
 			LOG_ERROR("[HotReloadOnPlay] Mono not initialized");
