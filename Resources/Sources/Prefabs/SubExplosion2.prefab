@@ -1,0 +1,108 @@
+{
+    "Prefab Name": "SubExplosion2",
+    "Prefab GUID": 9139449062764052703,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "SubExplosion2",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16355535078436733131",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14904056585798025401",
+                            "Tag": "SubExplosion2"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "Explosion2.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.10000000149011612,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.800000011920929,
+                                0.0,
+                                0.0
+                            ],
+                            "End Size": [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Max Particles": 1000,
+                            "Particle Type": 1,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.30000001192092896,
+                            "Emission Accumulator": 0.4126617908477783,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.0,
+                            "Shrink Phase Start": 0.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.0,
+                            "Max Speed": 0.0,
+                            "Rotation Speed": 90.0,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

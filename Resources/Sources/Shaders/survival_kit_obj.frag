@@ -81,6 +81,9 @@ struct Material_
 
 uniform Material_ material_;
 
+uniform vec4 uColor;
+uniform bool uParticle;
+uniform bool uEmissive;
 
 // ===== Engine uniforms kept =====      
 uniform vec3 CamPos;       
@@ -231,6 +234,11 @@ void main()
         albedo *= texSample.rgb;
         texAlpha = texSample.a;
     }
+
+    if (uParticle) {
+        albedo *= uColor.rgb;        // Tint the albedo
+        texAlpha *= uColor.a;        // Modulate texture alpha
+    }
     
     float roughness = material_.roughness;
     float metallic = material_.metallic;
@@ -328,7 +336,13 @@ void main()
 
     // ===== Ambient lighting =====
     vec3 ambient = ambient_indirect.rgb * albedo * ao * ambient_indirect.a;
-    vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
+
+    vec3 color = ambient + Lo;
+    if(uEmissive){
+        color += (material_.emissionColor * material_.emissionStrength);
+    }
+
+    //vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
 
     float finalAlpha = material_.opacity * texAlpha;
 

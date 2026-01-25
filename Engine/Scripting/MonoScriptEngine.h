@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <unordered_set>
+#include <vector>
 #include <cstdint>
 
 // Forward declarations for Mono types
@@ -14,16 +15,14 @@ typedef struct _MonoObject MonoObject;
 typedef struct _MonoMethod MonoMethod;
 typedef struct _MonoClassField MonoClassField;
 
-namespace Engine
-{
+namespace Engine {
 
 	class Scene;
 	class Entity;
 	class Input;
 	class AudioManager;
 
-	struct ManagedFieldSnapshot
-	{
+	struct ManagedFieldSnapshot {
 		// entity id -> (class name -> (field name -> serialized bytes/string))
 		// Keep this aligned with what your engine already supports (int/float/bool/string/vec3/quat/etc).
 		std::unordered_map<std::uint32_t,
@@ -36,8 +35,7 @@ namespace Engine
 	void SetScriptingInputSystem(Input *input);
 	void SetScriptingAudioManager(AudioManager *audiomManager);
 
-	class MonoScriptEngine
-	{
+	class MonoScriptEngine {
 	public:
 		static MonoScriptEngine &GetInstance();
 
@@ -69,12 +67,12 @@ namespace Engine
 		// Script method invocation
 		void CallMethod(MonoObject *instance, const std::string &methodName);
 		void CallMethod(MonoObject *instance, const std::string &methodName,
-			void **params, int paramCount);
+						void **params, int paramCount);
 
 		// Class and method lookup
 		MonoClass *GetScriptClass(const std::string &className);
 		MonoMethod *GetMethod(MonoClass *klass, const std::string &methodName,
-			int paramCount = 0);
+							  int paramCount = 0);
 
 		// Field access
 		void SetFieldValue(MonoObject *instance, const std::string &fieldName, void *value);
@@ -83,25 +81,32 @@ namespace Engine
 		// Bind native EntityID to managed script
 		void BindEntityID(MonoObject *instance, std::uint32_t entityID);
 
+		// ============================================================
+		// ScriptComponent-backed serialized field storage (editor source of truth)
+		// ============================================================
+		// Store a single field's current value (read from 'instance') into the owning ScriptComponent.
+		// This is intended to be called by the editor when a user changes a serialized field.
+		void StoreSerializedFieldToComponent(MonoObject *instance, MonoClassField *field);
+
+		// Apply ScriptComponent::SerializedFields (if any) onto the given instance.
+		// Safe to call on newly created instances (before OnStart).
+		void ApplySerializedFieldsFromComponent(std::uint32_t entityID, MonoObject *instance);
+
 		// Hot reload support
 		void EnsureCorrectDomain();
 		bool IsInCorrectDomain();
 
 		// Getters
-		MonoDomain *GetRootDomain() const
-		{
+		MonoDomain *GetRootDomain() const {
 			return m_RootDomain;
 		}
-		MonoDomain *GetDomain() const
-		{
+		MonoDomain *GetDomain() const {
 			return m_AppDomain ? m_AppDomain : m_RootDomain;
 		}
-		MonoAssembly *GetAssembly() const
-		{
+		MonoAssembly *GetAssembly() const {
 			return m_AppAssembly;
 		}
-		MonoImage *GetImage() const
-		{
+		MonoImage *GetImage() const {
 			return m_AppImage;
 		}
 
