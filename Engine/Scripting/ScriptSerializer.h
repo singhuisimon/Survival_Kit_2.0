@@ -13,15 +13,13 @@
 // SerializedFieldInfo Structure
 // ========================================
 namespace Engine {
-    struct SerializedFieldInfo
-    {
+    struct SerializedFieldInfo {
         std::string name;
         std::string displayName;
-        MonoClassField* field;
-        MonoType* type;
+        MonoClassField *field;
+        MonoType *type;
 
-        enum class FieldType
-        {
+        enum class FieldType {
             Int, Float, Bool, String, Unknown
         };
         FieldType fieldType;
@@ -31,8 +29,7 @@ namespace Engine {
     // FieldValue Structure for ImGui
     // ========================================
 
-    struct FieldValue
-    {
+    struct FieldValue {
         SerializedFieldInfo::FieldType type;
         union {
             int32_t intValue;
@@ -49,26 +46,26 @@ namespace Engine {
     /**
      * Get all fields marked with [SerializeField] from a MonoObject
      */
-    std::vector<SerializedFieldInfo> GetSerializedFields(MonoObject* instance);
+    std::vector<SerializedFieldInfo> GetSerializedFields(MonoObject *instance);
 
     /**
      * Get field value from Mono instance
      */
-    FieldValue GetFieldValue(MonoObject* instance, const SerializedFieldInfo& fieldInfo);
+    FieldValue GetFieldValue(MonoObject *instance, const SerializedFieldInfo &fieldInfo);
 
     /**
      * Set field value on Mono instance
      */
-    void SetFieldValue(MonoObject* instance, const SerializedFieldInfo& fieldInfo, const FieldValue& value);
+    void SetFieldValue(MonoObject *instance, const SerializedFieldInfo &fieldInfo, const FieldValue &value);
 
     /**
      * Render serialized fields in ImGui editor
      */
-    void RenderSerializedFieldsInImGui(MonoObject* scriptInstance);
+    void RenderSerializedFieldsInImGui(MonoObject *scriptInstance);
 
-    void SerializeScriptFieldsToRapidJSON(MonoObject* instance, rapidjson::Value& obj, rapidjson::Document::AllocatorType& allocator);
-    void SerializeScriptToDiskRapidJSON(MonoObject* instance, const std::string& filePath);
+    void SerializeScriptFieldsToRapidJSON(MonoObject *instance, rapidjson::Value &obj, rapidjson::Document::AllocatorType &allocator);
+    void SerializeScriptToDiskRapidJSON(MonoObject *instance, const std::string &filePath);
 
-    void DeserializeScriptFieldsFromRapidJSON(MonoObject* instance, const rapidjson::Value& obj);
-    void DeserializeScriptFromDiskRapidJSON(MonoObject* instance, const std::string& filePath);
+    void DeserializeScriptFieldsFromRapidJSON(MonoObject *instance, const rapidjson::Value &obj);
+    void DeserializeScriptFromDiskRapidJSON(MonoObject *instance, const std::string &filePath);
 }
