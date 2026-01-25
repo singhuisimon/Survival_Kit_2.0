@@ -186,7 +186,10 @@ namespace Game
             Transform.SetRotation(wormBulletID, ref wormchildRot);
             
             EntityAddRigidBody(wormBulletID);
+            RigidbodySetIsKinematic(wormBulletID, false);
+            RigidbodySetUseGravity(wormBulletID, false);
 
+            TagSetTag(wormBulletID, "WormBullet");
             Engine.Vector3 force = new Engine.Vector3(
                 forwardDir.X * bulletForce,
                 forwardDir.Y * bulletForce,
@@ -195,8 +198,11 @@ namespace Game
             RigidbodyAddForce(wormBulletID, ref force);
 
             EntityAddMeshRenderer(wormBulletID);
-            EntityAddScript(wormBulletID, "Game.PrimaryBullet");
+            EntityAddScript(wormBulletID, "Game.WormBullet");
             LogMessage("Creating worm bullet with ID: " + wormBulletID);
+            LogMessage("Bullet spawn position: X=" + spawnPosition.X + " Y=" + spawnPosition.Y + " Z=" + spawnPosition.Z);
+            LogMessage("Bullet force applied: X=" + force.X + " Y=" + force.Y + " Z=" + force.Z);
+
         }
     }
     
