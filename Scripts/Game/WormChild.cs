@@ -124,6 +124,14 @@ namespace Game
             // Quat finalRotation = pitchQ * yawQ;
             // SetRotation((uint)EntityID, ref finalRotation);
             
+            // uint wormChildColliderID = SceneCreateEntity("WormCollider" + EntityID);
+            // if (wormChildColliderID == 0)
+            //     return;
+
+            // EntityAddMeshRenderer(wormChildColliderID);
+            // EntityAddRigidBody(wormChildColliderID);
+            // SetPosition(wormChildColliderID, ref globalPosition);
+            
             hasSplit = true;
         }
 
