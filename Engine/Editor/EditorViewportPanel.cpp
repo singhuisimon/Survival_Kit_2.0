@@ -236,6 +236,7 @@ namespace Engine
         if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
         {
             auto &se = Engine::MonoScriptEngine::GetInstance();
+            if (m_PlayState == PlayState::STOP)
             se.HotReloadOnPlay(true);
 
             // Store the original scene state before playing
