@@ -13,79 +13,69 @@
 // ========================================
 
 
-namespace Engine
-{
-    std::vector<SerializedFieldInfo> GetSerializedFields(MonoObject* instance)
-    {
+namespace Engine {
+    std::vector<SerializedFieldInfo> GetSerializedFields(MonoObject *instance) {
         std::vector<SerializedFieldInfo> serializedFields;
 
-        if (!instance)
+        if(!instance)
             return serializedFields;
+
         MonoScriptEngine::GetInstance().EnsureCorrectDomain();
 
-        MonoClass* klass = mono_object_get_class(instance);
-        if (!klass)
+        MonoClass *klass = mono_object_get_class(instance);
+        if(!klass)
             return serializedFields;
 
-        // Iterate through all fields in the class
-        void* iter = nullptr;
-        MonoClassField* field;
+        void *iter = nullptr;
+        MonoClassField *field;
 
-        while ((field = mono_class_get_fields(klass, &iter)))
-        {
-            // Skip static and private fields (only get public and serialized)
+        while((field = mono_class_get_fields(klass, &iter))) {
             int flags = mono_field_get_flags(field);
 
-            // Skip if it's static
-            if (flags & MONO_FIELD_ATTR_STATIC)
+            if(flags & MONO_FIELD_ATTR_STATIC)
                 continue;
 
-            // Get field attributes
-            MonoCustomAttrInfo* attrInfo = mono_custom_attrs_from_field(klass, field);
+            const bool isPublic = (flags & MONO_FIELD_ATTR_PUBLIC) != 0;
 
             bool hasSerializeField = false;
+            MonoCustomAttrInfo *attrInfo = mono_custom_attrs_from_field(klass, field);
+            if(attrInfo) {
+                for(int i = 0; i < attrInfo->num_attrs; i++) {
+                    MonoMethod *ctor = attrInfo->attrs[i].ctor;
+                    if(!ctor) continue;
 
-            if (attrInfo)
-            {
-                // Check if field has SerializeField attribute
-                for (int i = 0; i < attrInfo->num_attrs; i++)
-                {
-                    MonoMethod* ctor = attrInfo->attrs[i].ctor;
-                    if (!ctor) continue;  // Safety check
+                    MonoClass *attrClass = mono_method_get_class(ctor);
+                    if(!attrClass) continue;
 
-                    MonoClass* attrClass = mono_method_get_class(ctor);
-                    if (!attrClass) continue;  // Safety check
+                    const char *attrName = mono_class_get_name(attrClass);
+                    if(!attrName) continue;
 
-                    const char* attrName = mono_class_get_name(attrClass);
-                    if (!attrName) continue;  // Safety check
-
-                    // Check if this is our SerializeField attribute
-                    if (strcmp(attrName, "SerializeFieldAttribute") == 0)
-                    {
+                    if(strcmp(attrName, "SerializeFieldAttribute") == 0 ||
+                       strcmp(attrName, "SerializedFieldAttribute") == 0 ||
+                       strcmp(attrName, "SerializeField") == 0 ||
+                       strcmp(attrName, "SerializedField") == 0) {
                         hasSerializeField = true;
                         break;
                     }
                 }
-
                 mono_custom_attrs_free(attrInfo);
             }
 
-            // Only add if it has SerializeField attribute
-            if (hasSerializeField)
-            {
-                SerializedFieldInfo info;
-                info.name = mono_field_get_name(field);
-                info.field = field;
-                info.type = mono_field_get_type(field);
+            // Public fields are serialized by default; non-public only if it has the attribute.
+            if(!(isPublic || hasSerializeField))
+                continue;
 
-                // Determine field type for easier ImGui rendering
-                int typeEnum = mono_type_get_type(info.type);
-                switch (typeEnum)
-                {
-                case MONO_TYPE_I4:  // int32
+            SerializedFieldInfo info;
+            info.name = mono_field_get_name(field);
+            info.field = field;
+            info.type = mono_field_get_type(field);
+
+            int typeEnum = mono_type_get_type(info.type);
+            switch(typeEnum) {
+                case MONO_TYPE_I4:
                     info.fieldType = SerializedFieldInfo::FieldType::Int;
                     break;
-                case MONO_TYPE_R4:  // float
+                case MONO_TYPE_R4:
                     info.fieldType = SerializedFieldInfo::FieldType::Float;
                     break;
                 case MONO_TYPE_BOOLEAN:
@@ -97,13 +87,10 @@ namespace Engine
                 default:
                     info.fieldType = SerializedFieldInfo::FieldType::Unknown;
                     break;
-                }
-
-                // Get DisplayName property from attribute if set
-                info.displayName = info.name; // Default to field name
-
-                serializedFields.push_back(info);
             }
+
+            info.displayName = info.name;
+            serializedFields.push_back(info);
         }
 
         return serializedFields;
@@ -114,8 +101,7 @@ namespace Engine
     // Get field value from Mono instance
     // ========================================
 
-    FieldValue GetFieldValue(MonoObject* instance, const SerializedFieldInfo& fieldInfo)
-    {
+    FieldValue GetFieldValue(MonoObject *instance, const SerializedFieldInfo &fieldInfo) {
         FieldValue result;
         result.type = fieldInfo.fieldType;
         result.intValue = 0;
@@ -123,39 +109,37 @@ namespace Engine
         result.boolValue = false;
         result.stringValue = "";
 
-        if (!instance)
+        if(!instance)
             return result;
 
-        switch (fieldInfo.fieldType)
-        {
-        case SerializedFieldInfo::FieldType::Int:
-            mono_field_get_value(instance, fieldInfo.field, &result.intValue);
-            break;
+        switch(fieldInfo.fieldType) {
+            case SerializedFieldInfo::FieldType::Int:
+                mono_field_get_value(instance, fieldInfo.field, &result.intValue);
+                break;
 
-        case SerializedFieldInfo::FieldType::Float:
-            mono_field_get_value(instance, fieldInfo.field, &result.floatValue);
-            break;
+            case SerializedFieldInfo::FieldType::Float:
+                mono_field_get_value(instance, fieldInfo.field, &result.floatValue);
+                break;
 
-        case SerializedFieldInfo::FieldType::Bool:
-            mono_field_get_value(instance, fieldInfo.field, &result.boolValue);
-            break;
+            case SerializedFieldInfo::FieldType::Bool:
+                mono_field_get_value(instance, fieldInfo.field, &result.boolValue);
+                break;
 
-        case SerializedFieldInfo::FieldType::String:
-        {
-            MonoString* monoStr = nullptr;
-            mono_field_get_value(instance, fieldInfo.field, &monoStr);
-            if (monoStr)
+            case SerializedFieldInfo::FieldType::String:
             {
-                char* cstr = mono_string_to_utf8(monoStr);
-                result.stringValue = cstr ? cstr : "";
-                if (cstr)
-                    mono_free(cstr);
+                MonoString *monoStr = nullptr;
+                mono_field_get_value(instance, fieldInfo.field, &monoStr);
+                if(monoStr) {
+                    char *cstr = mono_string_to_utf8(monoStr);
+                    result.stringValue = cstr ? cstr : "";
+                    if(cstr)
+                        mono_free(cstr);
+                }
+                break;
             }
-            break;
-        }
 
-        default:
-            break;
+            default:
+                break;
         }
 
         return result;
@@ -165,58 +149,60 @@ namespace Engine
     // Set field value on Mono instance
     // ========================================
 
-    void SetFieldValue(MonoObject* instance, const SerializedFieldInfo& fieldInfo, const FieldValue& value)
-    {
-        if (!instance)
+    void SetFieldValue(MonoObject *instance, const SerializedFieldInfo &fieldInfo, const FieldValue &value) {
+        if(!instance)
             return;
 
-        switch (value.type)
-        {
-        case SerializedFieldInfo::FieldType::Int:
-        {
-            int32_t temp = value.intValue;
-            mono_field_set_value(instance, fieldInfo.field, &temp);
-            break;
+        switch(value.type) {
+            case SerializedFieldInfo::FieldType::Int:
+            {
+                int32_t temp = value.intValue;
+                mono_field_set_value(instance, fieldInfo.field, &temp);
+                break;
+            }
+
+            case SerializedFieldInfo::FieldType::Float:
+            {
+                float temp = value.floatValue;
+                mono_field_set_value(instance, fieldInfo.field, &temp);
+                break;
+            }
+
+            case SerializedFieldInfo::FieldType::Bool:
+            {
+                bool temp = value.boolValue;
+                mono_field_set_value(instance, fieldInfo.field, &temp);
+                break;
+            }
+
+            case SerializedFieldInfo::FieldType::String:
+            {
+                MonoDomain *domain = mono_object_get_domain(instance);
+                MonoString *monoStr = mono_string_new(domain, value.stringValue.c_str());
+
+                // NOTE: mono_field_set_value expects a pointer to the value to assign.
+                mono_field_set_value(instance, fieldInfo.field, &monoStr);
+                break;
+            }
+            default:
+                break;
         }
 
-        case SerializedFieldInfo::FieldType::Float:
-        {
-            float temp = value.floatValue;
-            mono_field_set_value(instance, fieldInfo.field, &temp);
-            break;
-        }
-
-        case SerializedFieldInfo::FieldType::Bool:
-        {
-            bool temp = value.boolValue;
-            mono_field_set_value(instance, fieldInfo.field, &temp);
-            break;
-        }
-
-        case SerializedFieldInfo::FieldType::String:
-        {
-            // Get the domain from the instance object itself
-            MonoDomain* domain = mono_object_get_domain(instance);
-            MonoString* monoStr = mono_string_new(domain, value.stringValue.c_str());
-            mono_field_set_value(instance, fieldInfo.field, monoStr);
-            break;
-        }
-        }
+        // Persist editor-authored value into ScriptComponent storage so it survives hot reload/build.
+        MonoScriptEngine::GetInstance().StoreSerializedFieldToComponent(instance, fieldInfo.field);
     }
 
     // ========================================
     // Render serialized fields in ImGui
     // ========================================
 
-    void RenderSerializedFieldsInImGui(MonoObject* scriptInstance)
-    {
-        if (!scriptInstance)
+    void RenderSerializedFieldsInImGui(MonoObject *scriptInstance) {
+        if(!scriptInstance)
             return;
 
         auto fields = GetSerializedFields(scriptInstance);
 
-        if (fields.empty())
-        {
+        if(fields.empty()) {
             ImGui::TextDisabled("No serialized fields");
             return;
         }
@@ -224,107 +210,96 @@ namespace Engine
         ImGui::Text("Script Properties:");
         ImGui::Separator();
 
-        for (const auto& fieldInfo : fields)
-        {
+        for(const auto &fieldInfo : fields) {
             FieldValue value = GetFieldValue(scriptInstance, fieldInfo);
             bool changed = false;
 
-            switch (value.type)
-            {
-            case SerializedFieldInfo::FieldType::Int:
-            {
-                int temp = value.intValue;
-                if (ImGui::InputInt(fieldInfo.displayName.c_str(), &temp))
+            switch(value.type) {
+                case SerializedFieldInfo::FieldType::Int:
                 {
-                    value.intValue = temp;
-                    changed = true;
+                    int temp = value.intValue;
+                    if(ImGui::InputInt(fieldInfo.displayName.c_str(), &temp)) {
+                        value.intValue = temp;
+                        changed = true;
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case SerializedFieldInfo::FieldType::Float:
-            {
-                float temp = value.floatValue;
-                if (ImGui::InputFloat(fieldInfo.displayName.c_str(), &temp))
+                case SerializedFieldInfo::FieldType::Float:
                 {
-                    value.floatValue = temp;
-                    changed = true;
+                    float temp = value.floatValue;
+                    if(ImGui::InputFloat(fieldInfo.displayName.c_str(), &temp)) {
+                        value.floatValue = temp;
+                        changed = true;
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case SerializedFieldInfo::FieldType::Bool:
-            {
-                bool temp = value.boolValue;
-                if (ImGui::Checkbox(fieldInfo.displayName.c_str(), &temp))
+                case SerializedFieldInfo::FieldType::Bool:
                 {
-                    value.boolValue = temp;
-                    changed = true;
+                    bool temp = value.boolValue;
+                    if(ImGui::Checkbox(fieldInfo.displayName.c_str(), &temp)) {
+                        value.boolValue = temp;
+                        changed = true;
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case SerializedFieldInfo::FieldType::String:
-            {
-                char buffer[256];
-                strncpy_s(buffer, sizeof(buffer), value.stringValue.c_str(), _TRUNCATE);
-                if (ImGui::InputText(fieldInfo.displayName.c_str(), buffer, sizeof(buffer)))
+                case SerializedFieldInfo::FieldType::String:
                 {
-                    value.stringValue = buffer;
-                    changed = true;
+                    char buffer[256];
+                    strncpy_s(buffer, sizeof(buffer), value.stringValue.c_str(), _TRUNCATE);
+                    if(ImGui::InputText(fieldInfo.displayName.c_str(), buffer, sizeof(buffer))) {
+                        value.stringValue = buffer;
+                        changed = true;
+                    }
+                    break;
                 }
-                break;
-            }
 
-            default:
-                ImGui::TextDisabled("%s: <unsupported type>", fieldInfo.displayName.c_str());
-                break;
+                default:
+                    ImGui::TextDisabled("%s: <unsupported type>", fieldInfo.displayName.c_str());
+                    break;
             }
 
             // Write back to Mono if changed
-            if (changed)
-            {
+            if(changed) {
                 SetFieldValue(scriptInstance, fieldInfo, value);
             }
         }
     }
 
 
-    void SerializeScriptFieldsToRapidJSON(MonoObject* instance, rapidjson::Value& obj, rapidjson::Document::AllocatorType& allocator)
-    {
+    void SerializeScriptFieldsToRapidJSON(MonoObject *instance, rapidjson::Value &obj, rapidjson::Document::AllocatorType &allocator) {
         auto fields = GetSerializedFields(instance);
-        for (const auto& fieldInfo : fields)
-        {
+        for(const auto &fieldInfo : fields) {
             FieldValue value = GetFieldValue(instance, fieldInfo);
-            const std::string& name = fieldInfo.name;
-            switch (value.type)
-            {
-            case SerializedFieldInfo::FieldType::Int:
-                obj.AddMember(
-                    rapidjson::Value(name.c_str(), allocator),              // Key
-                    rapidjson::Value(value.intValue),                       // **Value converted to RapidJSON Value**
-                    allocator);
-                break;
-            case SerializedFieldInfo::FieldType::Float:
-                obj.AddMember(rapidjson::Value(name.c_str(), allocator), rapidjson::Value(value.floatValue), allocator);
-                break;
-            case SerializedFieldInfo::FieldType::Bool:
-                obj.AddMember(rapidjson::Value(name.c_str(), allocator), rapidjson::Value(value.boolValue), allocator);
-                break;
-            case SerializedFieldInfo::FieldType::String:
-                obj.AddMember(
-                    rapidjson::Value(name.c_str(), allocator),                            // key
-                    rapidjson::Value(value.stringValue.c_str(), allocator),               // value as rapidjson::Value
-                    allocator);
-                break;
-            default:
-                break;
+            const std::string &name = fieldInfo.name;
+            switch(value.type) {
+                case SerializedFieldInfo::FieldType::Int:
+                    obj.AddMember(
+                        rapidjson::Value(name.c_str(), allocator),              // Key
+                        rapidjson::Value(value.intValue),                       // **Value converted to RapidJSON Value**
+                        allocator);
+                    break;
+                case SerializedFieldInfo::FieldType::Float:
+                    obj.AddMember(rapidjson::Value(name.c_str(), allocator), rapidjson::Value(value.floatValue), allocator);
+                    break;
+                case SerializedFieldInfo::FieldType::Bool:
+                    obj.AddMember(rapidjson::Value(name.c_str(), allocator), rapidjson::Value(value.boolValue), allocator);
+                    break;
+                case SerializedFieldInfo::FieldType::String:
+                    obj.AddMember(
+                        rapidjson::Value(name.c_str(), allocator),                            // key
+                        rapidjson::Value(value.stringValue.c_str(), allocator),               // value as rapidjson::Value
+                        allocator);
+                    break;
+                default:
+                    break;
             }
         }
     }
 
-    void SerializeScriptToDiskRapidJSON(MonoObject* instance, const std::string& filePath)
-    {
+    void SerializeScriptToDiskRapidJSON(MonoObject *instance, const std::string &filePath) {
         rapidjson::Document doc;
         doc.SetObject();
         SerializeScriptFieldsToRapidJSON(instance, doc, doc.GetAllocator());
@@ -339,47 +314,43 @@ namespace Engine
     }
 
     // ----------- DESERIALIZE FROM RAPIDJSON -----------
-    void DeserializeScriptFieldsFromRapidJSON(MonoObject* instance, const rapidjson::Value& obj)
-    {
+    void DeserializeScriptFieldsFromRapidJSON(MonoObject *instance, const rapidjson::Value &obj) {
         auto fields = GetSerializedFields(instance);
-        for (const auto& fieldInfo : fields)
-        {
-            if (!obj.HasMember(fieldInfo.name.c_str()))
+        for(const auto &fieldInfo : fields) {
+            if(!obj.HasMember(fieldInfo.name.c_str()))
                 continue;
 
             FieldValue value = GetFieldValue(instance, fieldInfo);
 
-            const rapidjson::Value& fieldValue = obj[fieldInfo.name.c_str()];
+            const rapidjson::Value &fieldValue = obj[fieldInfo.name.c_str()];
 
-            switch (value.type)
-            {
-            case SerializedFieldInfo::FieldType::Int:
-                if (fieldValue.IsInt())
-                    value.intValue = fieldValue.GetInt();
-                break;
-            case SerializedFieldInfo::FieldType::Float:
-                if (fieldValue.IsNumber())
-                    value.floatValue = static_cast<float>(fieldValue.GetDouble());
-                break;
-            case SerializedFieldInfo::FieldType::Bool:
-                if (fieldValue.IsBool())
-                    value.boolValue = fieldValue.GetBool();
-                break;
-            case SerializedFieldInfo::FieldType::String:
-                if (fieldValue.IsString())
-                    value.stringValue = fieldValue.GetString();
-                break;
-            default:
-                break;
+            switch(value.type) {
+                case SerializedFieldInfo::FieldType::Int:
+                    if(fieldValue.IsInt())
+                        value.intValue = fieldValue.GetInt();
+                    break;
+                case SerializedFieldInfo::FieldType::Float:
+                    if(fieldValue.IsNumber())
+                        value.floatValue = static_cast<float>(fieldValue.GetDouble());
+                    break;
+                case SerializedFieldInfo::FieldType::Bool:
+                    if(fieldValue.IsBool())
+                        value.boolValue = fieldValue.GetBool();
+                    break;
+                case SerializedFieldInfo::FieldType::String:
+                    if(fieldValue.IsString())
+                        value.stringValue = fieldValue.GetString();
+                    break;
+                default:
+                    break;
             }
             SetFieldValue(instance, fieldInfo, value);
         }
     }
 
-    void DeserializeScriptFromDiskRapidJSON(MonoObject* instance, const std::string& filePath)
-    {
+    void DeserializeScriptFromDiskRapidJSON(MonoObject *instance, const std::string &filePath) {
         std::ifstream inFile(filePath);
-        if (!inFile.is_open())
+        if(!inFile.is_open())
             return;
         std::stringstream buffer;
         buffer << inFile.rdbuf();
@@ -387,7 +358,7 @@ namespace Engine
         rapidjson::Document doc;
         doc.Parse(buffer.str().c_str());
 
-        if (!doc.IsObject())
+        if(!doc.IsObject())
             return;
 
         DeserializeScriptFieldsFromRapidJSON(instance, doc);
