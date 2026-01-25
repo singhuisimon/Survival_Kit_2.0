@@ -196,7 +196,7 @@ namespace Game
                 forwardDir.Z * bulletForce
             );
             RigidbodyAddForce(wormBulletID, ref force);
-            Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(0.5f, 0.5f, 0.5f);
+            Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(2.0f, 2.0f, 2.0f);
           
             RigidbodySetBoxHalfExtents(wormBulletID,ref newBoxHalfExtents);
 
