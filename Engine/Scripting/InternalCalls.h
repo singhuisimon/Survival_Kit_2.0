@@ -465,6 +465,10 @@ namespace Engine
 		***************************************************************************/
 		void  Rigidbody_Stop(uint64_t entityID);
 
+		void Rigidbody_SetBoxHalfExtent(uint64_t entityID, glm::vec3 *newBoxHalfExtents);
+
+		glm::vec3  Rigidbody_GetBoxHalfExtent(uint64_t entityID);
+
 		// ---- Collision events (via PhysicsAPI only) ----
 		/**************************************************************************
 		 * @brief

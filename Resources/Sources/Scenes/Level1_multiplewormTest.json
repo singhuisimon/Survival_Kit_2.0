@@ -897,7 +897,7 @@
                         "ComponentGUID": "16732350830320074971",
                         "Mass": 1.0,
                         "IsKinematic": false,
-                        "IsTrigger": false,
+                        "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -914,9 +914,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            25.0,
-                            25.0,
-                            25.0
+                            0.009999999776482582,
+                            0.009999999776482582,
+                            0.009999999776482582
                         ],
                         "SphereRadius": 0.5
                     }
@@ -2004,7 +2004,7 @@
                         ],
                         "Rotation": [
                             65.79816436767578,
-                            -2.5401105880737305,
+                            -2.5401103496551514,
                             -180.0
                         ],
                         "Scale": [

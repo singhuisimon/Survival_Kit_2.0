@@ -1202,6 +1202,21 @@ namespace Engine
 			e.GetComponent<RigidbodyComponent>().Stop();
 		}
 
+		void Rigidbody_SetBoxHalfExtent(uint64_t entityID, glm::vec3 *newBoxHalfExtents)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<RigidbodyComponent>()) return;
+
+			e.GetComponent<RigidbodyComponent>().BoxHalfExtents = *newBoxHalfExtents;
+		}
+
+		glm::vec3 Rigidbody_GetBoxHalfExtent(uint64_t entityID)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<RigidbodyComponent>()) return glm::vec3{};
+			return e.GetComponent<RigidbodyComponent>().BoxHalfExtents;
+		}
+
 		// =====================================================================
 		// Physics collisions (PhysicsAPI only)
 		// =====================================================================
