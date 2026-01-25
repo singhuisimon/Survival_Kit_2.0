@@ -2,6 +2,6 @@
   "name": "Crosshair_Base.png",
   "guid": "1E52707D64D34005",
   "tags": [],
-  "lastImported": "000000006970371B",
+  "lastImported": "0000000069732708",
   "resourceLinks": []
 }

@@ -150,7 +150,7 @@ namespace Engine {
 		}
 	}
 
-	int TransformSystem::GetPriority() const { return 1; }
+	int TransformSystem::GetPriority() const { return 51; }
 
 	const char* TransformSystem::GetName() const { return "TransformSystem"; }
 }

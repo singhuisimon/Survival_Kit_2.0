@@ -1,0 +1,108 @@
+{
+    "Prefab Name": "MainExplosion1",
+    "Prefab GUID": 5104223796640039127,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "MainExplosion1",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16355535078436733131",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6833606053550096591",
+                            "Tag": "MainExplosion1"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "Explosion1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.0010000000474974513,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.800000011920929,
+                                0.0,
+                                0.0
+                            ],
+                            "End Size": [
+                                2.0999999046325684,
+                                2.0999999046325684,
+                                2.0999999046325684
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Max Particles": 1000,
+                            "Particle Type": 0,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.15000000596046448,
+                            "Emission Accumulator": 0.061357736587524414,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 10.0,
+                            "Max Speed": 10.0,
+                            "Rotation Speed": 276.0,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

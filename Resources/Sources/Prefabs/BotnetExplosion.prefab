@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "BotnetExplosion",
-    "Prefab GUID": 16406499575065068197,
+    "Prefab Name": "Prefab: BotnetExplosion.prefab",
+    "Prefab GUID": 6357684644238807469,
     "version": 1,
     "entities": [
         {
@@ -14,9 +14,21 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16406499575063790243",
-                            "Position": [0.0, 0.0, 0.0],
-                            "Rotation": [0.0, 0.0, 0.0],
-                            "Scale": [1.0, 1.0, 1.0],
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
                             "Parent": 4294967295,
                             "Children": []
                         }
@@ -41,7 +53,7 @@
                             "FilePath": "Botnet_Explosion.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.3089999854564667,
+                            "Volume": 0.5090000033378601,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -60,7 +72,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.GameSoundPrefabLifetime"
+                            "ComponentGUID": "10392909910362608039",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
