@@ -6,6 +6,71 @@
 
 namespace Engine
 {
+    namespace {
+        struct ScriptFieldBackup {
+            std::string ScriptClassName;
+            std::unordered_map<std::string, std::vector<std::uint8_t>> Fields;
+        };
+
+        // Backed-up edit-mode serialized field data captured at the moment Play is pressed.
+        // Stop() reloads the scene from disk, so without this, inspector-authored
+        // [SerializeField] edits revert to whatever is stored in the scene file.
+        static std::unordered_map<std::uint32_t, ScriptFieldBackup> s_EditModeScriptFieldBackup;
+
+        static void CacheEditModeScriptFieldOverrides(Scene *scene) {
+            s_EditModeScriptFieldBackup.clear();
+            if(!scene) return;
+
+            auto &registry = scene->GetRegistry();
+            auto view = registry.view<ScriptComponent>();
+
+            for(auto entity : view) {
+                auto &sc = view.get<ScriptComponent>(entity);
+                if(sc.ScriptClassName.empty())
+                    continue;
+
+                ScriptFieldBackup backup;
+                backup.ScriptClassName = sc.ScriptClassName;
+                backup.Fields = sc.SerializedFields; // copy
+                s_EditModeScriptFieldBackup[static_cast<std::uint32_t>(entity)] = std::move(backup);
+            }
+        }
+
+        static void RestoreEditModeScriptFieldOverrides(Scene *scene) {
+            if(!scene || s_EditModeScriptFieldBackup.empty())
+                return;
+
+            auto &registry = scene->GetRegistry();
+            auto view = registry.view<ScriptComponent>();
+            auto &se = MonoScriptEngine::GetInstance();
+
+            for(auto entity : view) {
+                const std::uint32_t eid = static_cast<std::uint32_t>(entity);
+                auto it = s_EditModeScriptFieldBackup.find(eid);
+                if(it == s_EditModeScriptFieldBackup.end())
+                    continue;
+
+                auto &sc = view.get<ScriptComponent>(entity);
+
+                // If the scene file didn't persist the script binding, keep the edit-time one.
+                if(sc.ScriptClassName.empty() && !it->second.ScriptClassName.empty())
+                    sc.ScriptClassName = it->second.ScriptClassName;
+
+                sc.SerializedFields = it->second.Fields;
+
+                // Best-effort: if an instance already exists, push restored values into it.
+                MonoObject *inst = nullptr;
+                if(sc.GCHandle != 0)
+                    inst = se.GetObjectFromGCHandle(sc.GCHandle);
+                if(!inst)
+                    inst = reinterpret_cast<MonoObject *>(sc.ScriptInstance);
+
+                if(inst)
+                    se.ApplySerializedFieldsFromComponent(eid, inst);
+            }
+        }
+    }
+
     void EditorViewportPanel::ManipulateEntityTransform(Entity& entity, EditorViewport m_ImGuizmoViewportData)
     {
         //if (m_PlayState != PlayState::STOP) return;
@@ -230,32 +295,37 @@ namespace Engine
         LOG_DEBUG("Camera focused on entity front at {", newCamPos.x, ", ", newCamPos.y, ", ", newCamPos.z, "}");
     }
     
-    void EditorViewportPanel::Play()
-    {
-        // ONLY allow Play from STOP state
-        if (m_PlayState == PlayState::PAUSE || m_PlayState == PlayState::STOP)
-        {
-            auto &se = Engine::MonoScriptEngine::GetInstance();
-            if (m_PlayState == PlayState::STOP)
-            se.HotReloadOnPlay(true);
-
-            // Store the original scene state before playing
-            Scene* activeScene = m_Editor->GetActiveScene();
-            if (activeScene && m_Editor->HasScenePath())
-            {
-                m_OriginalScenePath = m_Editor->GetScenePath();
-                m_OriginalSceneName = m_Editor->GetSceneName();
-                std::cout << "[VIEWPORT] Saved scene state: " << m_OriginalSceneName << std::endl;
-            }
-
+    void EditorViewportPanel::Play() {
+        // Allow entering play mode from STOP. When PAUSE, Play acts as Resume.
+        if(m_PlayState == PlayState::PAUSE) {
             m_PlayState = PlayState::PLAY;
-            //m_Editor->SetCurrSelectedEntity(Entity{});
-            std::cout << "[VIEWPORT] State changed: STOP to PLAY" << std::endl;
+            std::cout << "[VIEWPORT] State changed: PAUSE to PLAY (Resume)" << std::endl;
+            return;
         }
-        else
-        {
+
+        // ONLY allow Play from STOP state
+        if(m_PlayState != PlayState::STOP) {
             std::cout << "[VIEWPORT] Play() ignored - not in STOP state" << std::endl;
+            return;
         }
+
+        Scene *activeScene = m_Editor->GetActiveScene();
+
+        // Capture edit-mode script field overrides BEFORE any hot-reload or scene changes.
+        CacheEditModeScriptFieldOverrides(activeScene);
+
+        auto &se = Engine::MonoScriptEngine::GetInstance();
+        se.HotReloadOnPlay(true);
+
+        // Store the original scene state before playing
+        if(activeScene && m_Editor->HasScenePath()) {
+            m_OriginalScenePath = m_Editor->GetScenePath();
+            m_OriginalSceneName = m_Editor->GetSceneName();
+            std::cout << "[VIEWPORT] Saved scene state: " << m_OriginalSceneName << std::endl;
+        }
+
+        m_PlayState = PlayState::PLAY;
+        std::cout << "[VIEWPORT] State changed: STOP to PLAY" << std::endl;
     }
 
     void EditorViewportPanel::Pause()
@@ -290,6 +360,7 @@ namespace Engine
 
                 // Load the original scene
                 activeScene->LoadFromFile(m_OriginalScenePath);
+                RestoreEditModeScriptFieldOverrides(activeScene);
 
                 // Reset scene name and path in Editor
                 m_Editor->SetScenePath(m_OriginalScenePath);
