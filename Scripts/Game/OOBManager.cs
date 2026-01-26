@@ -5,6 +5,7 @@ using static Engine.Transform;
 using static Engine.Physics;
 using static Engine.Event;
 using static Engine.Scene;
+using static Engine.Rigidbody;
 
 namespace Game{
     public class OOBManager : ScriptBehaviour{
@@ -27,8 +28,15 @@ namespace Game{
                 LogMessage("[OOBManager] player entity cannot be found");
             }
 
+            LogMessage("[OOBManager] OOB EntityID is: " + EntityID.ToString());
+            LogMessage("[OOBManager] Player EntityID is: " + playerEntityID.ToString());
+
             countdownOOB = originalCountdownOOB;
             inEnvironment = true;
+
+            RigidbodySetMass((uint)EntityID, 1.0f);
+
+            //PhysicsEnableCollisionEvents();
 
             //subscribe to event here
         }
@@ -87,16 +95,16 @@ namespace Game{
                 uint other = (a == self) ? b : a;
 
                 if(other == playerEntityID){
-                    LogMessage("Player is in Environment");
+                    LogMessage("[OOBManager] Player is in Environment");
                     playerdetected = true;
                 } 
             }
 
             if(!playerdetected){
-                LogMessage("Player is not in environment");
+                LogMessage("[OOBManager] Player is not in environment");
                 inEnvironment = false;
             } else {
-                LogMessage("Player is in Environment");
+                LogMessage("[OOBManager] Player is in Environment");
                 inEnvironment = true;
             }
         }

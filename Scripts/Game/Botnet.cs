@@ -87,7 +87,7 @@ namespace Game
 
         public override void OnStart()
         {
-            LogMessage("=== Botnet started (EntityID = " + EntityID + ") ===");
+            LogMessage("=== Botnet started (EntityID = " + EntityID.ToString() + ") ===");
 
             // Seed RNG
             s_RngState ^= (uint)EntityID * 747796405u + 2891336453u;
@@ -175,13 +175,13 @@ namespace Game
                 return;
 
             if (hitId != (uint)EntityID){
-                LogMessage("ID DOESN'T MATCH HIT!");
+                LogMessage("[Botnet] ID DOESN'T MATCH HIT!");
                 return;
             }
 
             HP -= 1.0f;
-            LogMessage("CurrentBotnetHP is: " + HP.ToString());
-            LogMessage("SUCCESS MATCH! REDUCING HEALTH!");
+            LogMessage("[Botnet] CurrentBotnetHP is: " + HP.ToString());
+            LogMessage("[Botnet] SUCCESS MATCH! REDUCING HEALTH!");
 
             if(HP <= 1.0f){
                 Publish("BotnetDeath", 1.ToString());
@@ -245,8 +245,10 @@ namespace Game
             {
                 EnsureTargetStillValid();
 
-                if (targetID != INVALID_ENTITY)
+                if (targetID != INVALID_ENTITY){
+                    LogMessage("[Botnet] UpdateTargetSelectionTimer: targetid is invalid");
                     return;
+                }
 
                 chooseTargetTimer = 0.0f;
             }
@@ -277,7 +279,7 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
-            LogMessage("CHOICE IS: " + choice.ToString());
+            LogMessage("[Botnet] CHOICE IS: " + choice.ToString() + "for entity: " + EntityID.ToString());
 
             // currently forced to Player (as per your commented switch) M3
             //uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
@@ -309,25 +311,27 @@ namespace Game
             {
                 targetID = chosen;
                 isMoving = true;
-                LogMessage("Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
+                LogMessage("[Botnet] ChooseTarget: Botnet (EntityID = " + EntityID + ") chose target " + targetID + " (choice " + choice + ")");
             }
             else
             {
                 targetID = INVALID_ENTITY;
                 isMoving = false;
-                LogMessage("Could not find a target");
+                LogMessage("[Botnet] ChooseTarget: Could not find a target");
             }
         }
 
         private void EnsureTargetStillValid()
         {
-            if (targetID == INVALID_ENTITY)
+            if (targetID == INVALID_ENTITY){
+                LogMessage("[Botnet] Ensure target still valid: target is invalid entity");
                 return;
+            }
 
             string tag = TagGetTag(targetID);
             if (string.IsNullOrEmpty(tag))
             {
-                LogMessage("Botnet (EntityID = " + EntityID + ") target " + targetID + " destroyed");
+                LogMessage("[Botnet] EnsureTargetStillValid Botnet (EntityID = " + EntityID + ") target " + targetID + " destroyed");
                 targetID = INVALID_ENTITY;
                 isMoving = false;
                 chooseTargetTimer = 0.0f;
@@ -412,6 +416,8 @@ namespace Game
             );
 
             RigidbodyAddForce((uint)EntityID, ref force);
+            LogMessage("[Botnet] UpdateMovement: AddingForce to botnet: " + EntityID.ToString() + "." );
+            LogMessage("[Botnet] UpdateMovement: Force Added: X: " + force.X.ToString(), ",Y: " + force.Y.ToString() + ", Z: " + force.Z.ToString());
         }
 
         private void ClampSpeed()
@@ -466,13 +472,13 @@ namespace Game
 
                 if (other == playerID)
                 {
-                    LogMessage("Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
+                    LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
                     Publish("BotnetAttackedPlayer", EntityID.ToString());
                 }
 
                 if (other == targetID)
                 {
-                    LogMessage("Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
+                    LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     isExploding = true;
                     break;
                 }
@@ -487,7 +493,7 @@ namespace Game
             isDead = true;
             isExploding = false;
 
-            LogMessage("Botnet (EntityID = " + EntityID + ") exploding!");
+            LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") exploding!");
 
             ApplyBlastToTag(TAG_PLAYER);
             ApplyBlastToTag(TAG_SEMICONDUCTOR);
