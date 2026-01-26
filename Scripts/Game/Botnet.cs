@@ -417,7 +417,7 @@ namespace Game
 
             RigidbodyAddForce((uint)EntityID, ref force);
             LogMessage("[Botnet] UpdateMovement: AddingForce to botnet: " + EntityID.ToString() + "." );
-            LogMessage("[Botnet] UpdateMovement: Force Added: X: " + force.X.ToString(), ",Y: " + force.Y.ToString() + ", Z: " + force.Z.ToString());
+            LogMessage("[Botnet] UpdateMovement: Force Added: X: " + force.X.ToString() + ",Y: " + force.Y.ToString() + ", Z: " + force.Z.ToString());
         }
 
         private void ClampSpeed()

@@ -46,6 +46,8 @@ namespace Game{
         [SerializeField] private float primaryAltFireAOERange = 30f;
         [SerializeField] private float primaryUltSpeed = 500.0f;
 
+        [SerializeField] private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
+
         //2 audio for primary alt fire
         //not sure what is layermask
         //left and right player alt vortex
@@ -95,25 +97,11 @@ namespace Game{
         private float reloadFinishTime = 0.0f;
         private Vector3 bulletDirection;
 
-        // [SerializeField] private bool primaryWeapon = true;
-        // [SerializeField] private bool primaryAltWeapon = true;
-        // [SerializeField] private int primaryWeaponAmmo = 100;
-        // [SerializeField] private float primaryCooldown = 0.05f;
-        // [SerializeField] private float primaryReloadSpeed = 1.5f;
-        // [SerializeField] private float primaryAltCooldown = -1.0f;
-        // [SerializeField] private float primaryAltReloadSpeed = -1.0f;
-        // [SerializeField] private float primaryAltCharge = 30.0f;
-
-        // private bool weaponReload = false;
-        // private bool primaryAltReload = false;
-        // private float primaryElapsedTime = 0.0f;
-        // private float primaryElapsedReload = 0.0f;
-
         public override void OnStart(){
             //Initialize Values
             shootAllowed = true;
             primaryAmmo = primaryAmmoMax;
-            primaryAltCharge = primaryAltChargeMax;
+            primaryAltCharge = 0;
 
             firingPointEntityID = SceneFindEntityByName(firingPointName);
             playerEntityID = SceneFindEntityByName(playerName);
@@ -256,7 +244,7 @@ namespace Game{
                     LogMessage("[PlayerWeapon] Alt Charge Full");
                     primaryAltReady = true;
 
-                    //play SFX
+                    //play SFX ->notify player ult is ready?
                 }
             } 
             else if(primaryAltCharge >= primaryAltChargeMax)
@@ -269,40 +257,50 @@ namespace Game{
            
             if(elapsedTime > primaryShootNext)
             {
+                
+                //testing claude theory for now so commenting - Amanda 26/1 4.37pm
+                //put the below under the calculate function (TODO for claude)
+                //  if(firingPointEntityID == 0 || playerEntityID == 0){
+                //     LogMessage("[PlayerWeapon] returning at PrimaryFire");
+                //     return;
+                // }
 
-                 if(firingPointEntityID == 0 || playerEntityID == 0){
-                    LogMessage("[PlayerWeapon] returning at PrimaryFire");
+                // //Instantiate at the firing position & rotation);
+                // Vector3 firingPoint = GetPosition(firingPointEntityID);
+                // Vector3 firingTarget = GetTarget(firingPointEntityID);
+                // Vector3 bulletDirection = (firingTarget - firingPoint).Normalized;
+
+                // Vector3 playerPos = GetPosition(playerEntityID);
+                // Quat playerRot = GetRotation(playerEntityID);
+
+                // Vector3 playerForward = playerRot.Forward;
+                // //Vector3 bulletSpawnPos = playerPos + (playerForward * muzzleDistance);
+
+                // //NEW
+                // Vector3 offset = playerRot.Right * 5.0f;
+                // Vector3 bulletSpawnPos = playerPos + offset;
+
+                // //DEBUGGING
+                // Vector3 forward = playerRot.Forward;
+                // Vector3 right = playerRot.Right;
+                // Vector3 up = playerRot.Up;
+
+                // LogMessage("PlayerForward: X:" + forward.X + ", Y: " + forward.Y + ", Z: " + forward.Z);
+                // LogMessage("PlayerRight: X:" + right.X + ", Y: " + right.Y + ", Z: " + right.Z);
+                // LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
+
+
+                // Quat bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
+
+                // FIX #1: Use the separated calculation function
+                if(!CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot))
+                {
+                    LogMessage("[PlayerWeapon] Failed to calculate firing position");
                     return;
                 }
 
-                //Instantiate at the firing position & rotation);
-                Vector3 firingPoint = GetPosition(firingPointEntityID);
-                Vector3 firingTarget = GetTarget(firingPointEntityID);
-                Vector3 bulletDirection = (firingTarget - firingPoint).Normalized;
-
-                Vector3 playerPos = GetPosition(playerEntityID);
-                Quat playerRot = GetRotation(playerEntityID);
-
-                Vector3 playerForward = playerRot.Forward;
-                //Vector3 bulletSpawnPos = playerPos + (playerForward * muzzleDistance);
-
-                //NEW
-                Vector3 offset = playerRot.Right * 5.0f;
-                Vector3 bulletSpawnPos = playerPos + offset;
-
-
-                //DEBUGGING
-                Vector3 forward = playerRot.Forward;
-                Vector3 right = playerRot.Right;
-                Vector3 up = playerRot.Up;
-
-                LogMessage("PlayerForward: X:" + forward.X + ", Y: " + forward.Y + ", Z: " + forward.Z);
-                LogMessage("PlayerRight: X:" + right.X + ", Y: " + right.Y + ", Z: " + right.Z);
-                LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
-
-
-                Quat bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
-
+                //End of where the calculate firing pos 
+                
                 Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
 
                 uint bulletID = 0;
@@ -311,11 +309,10 @@ namespace Game{
                     LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
                     //return; //comment this for debugging temp
                 }
+
+
                 Vector3 bulletVel = bulletDirection * primarybulletSpeed;
                 RigidbodySetVelocity(bulletID, ref bulletVel);
-
-                //TODO NEED DO PRIMARY BULLET SCRIPT
-                //EntityAddScript(bulletID, "Game.PrimaryBullet");
 
                 primaryAmmo -= 1;
 
@@ -329,23 +326,6 @@ namespace Game{
                 if(primaryAmmo <= 0){
                     //change the ui to run out of ammo here
                 }
-
-                // Quat rotation = GetRotation(playerEntityID);
-                // Vector3 playerPos = GetPosition(playerEntityID);
-                // Vector3 velocity = RigidbodyGetVelocity(firingPointEntityID);
-                // Vector3 targetOffset = Vector3.Zero;
-
-                // if(velocity.SqrMagnitude > 0.1f){
-                //     Vector3 moveDir = velocity.Normalized;
-                //     Vector3 perpendicular = Vector3.Cross(moveDir, Vector3.Up);
-                //     targetOffset = perpendicular * bulletOffset;
-                // }
-
-                
-                // Vector3 forward = rotation.Forward;
-                // Vector3 bulletPos = playerPos + (forward * bulletOffset);
-                // Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
-                
                 
             }
         }
@@ -359,19 +339,50 @@ namespace Game{
             //yield return new Delay primaryReloadDelay - TODO
             reloadFinishTime = elapsedTime + delay;
 
-            primaryAmmo = primaryAmmoMax;
+            LogMessage("[PlayerWeapon] Reloading... will finish in " + delay + " seconds");
+
+            primaryAltCharging = false;
 
             //delay for 0.5f - TODO
 
-            // remove temporary
-            reloadingPrimary = false;
-            primaryAltCharging = false;
-            shootAllowed = true;
+            // testing claude theory so commenting these out for now
+            //primaryAmmo = primaryAmmoMax;
+            //reloadingPrimary = false;
+            //primaryAltCharging = false;
+            //shootAllowed = true;
         }
 
         private void PrimaryAltFire(){
             //TODO:
             //Check with LiXiang on how does this work by tonight 21/1/26
+            // Calculate firing position
+            if(!CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot))
+            {
+                LogMessage("[PlayerWeapon] Failed to calculate firing position for Primary Alt Fire");
+                return;
+            }
+            
+            // Scale for ult bullet (might want to make it bigger than regular bullets)
+            Vector3 scale = new Vector3(1.0f, 1.0f, 1.0f);
+
+            // Spawn the ult bullet
+            uint ultBulletID = PrefabInstantiateWithTransform(PrimaryUltBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
+            if(ultBulletID == 0){
+                LogMessage("[PlayerWeapon] Primary Alt Fire bulletID fail to instantiate");
+                return;
+            }
+
+            // Set velocity for the ult bullet
+            Vector3 bulletVel = bulletDirection * primaryUltSpeed;
+            RigidbodySetVelocity(ultBulletID, ref bulletVel);
+
+            LogMessage("[PlayerWeapon] Primary Alt Fire launched!");
+
+            // TODO: Camera shake for ult fire (use CAMSHAKE_primaryAltFire)
+            // TODO: SFX for ult fire
+            // TODO: VFX for ult fire
+            
+            //reset the values here
             primaryAltCharge = 0;
             primaryAltReady = false;
         }
@@ -388,6 +399,8 @@ namespace Game{
                     //SFX for altcharge
 
                     primaryChargeNext = elapsedTime + primaryChargeRate;
+
+                    LogMessage("[PlayerWeapon] Charging... " + primaryAltCharge + "/" + primaryAltChargeMax);
                 }
             }
         }
@@ -403,6 +416,43 @@ namespace Game{
                 primaryAltReady = true;
                 LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
             }
+        }
+
+        private bool CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot){
+            if(firingPointEntityID == 0 || playerEntityID == 0){
+                LogMessage("[PlayerWeapon] CalculateFiringPos - entities not found");
+                bulletSpawnPos = Vector3.Zero;
+                bulletDirection = Vector3.Zero;
+                bulletRot = Quat.Identity;
+                return false;
+            }
+
+            // Get firing point (camera) position and target
+            Vector3 firingPoint = GetPosition(firingPointEntityID);
+            Vector3 firingTarget = GetTarget(firingPointEntityID);
+            bulletDirection = (firingTarget - firingPoint).Normalized;
+
+            // Get player position and rotation
+            Vector3 playerPos = GetPosition(playerEntityID);
+            Quat playerRot = GetRotation(playerEntityID);
+
+            // Calculate spawn position (offset to the right of the player)
+            Vector3 offset = playerRot.Right * 5.0f;
+            bulletSpawnPos = playerPos + offset;
+
+            // Calculate bullet rotation (pointing in firing direction)
+            bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
+
+            // Debug logging
+            Vector3 forward = playerRot.Forward;
+            Vector3 right = playerRot.Right;
+            Vector3 up = playerRot.Up;
+
+            LogMessage("PlayerForward: X:" + forward.X + ", Y: " + forward.Y + ", Z: " + forward.Z);
+            LogMessage("PlayerRight: X:" + right.X + ", Y: " + right.Y + ", Z: " + right.Z);
+            LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
+
+            return true;
         }
 
     }
