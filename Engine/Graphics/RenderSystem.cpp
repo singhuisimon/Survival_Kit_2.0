@@ -171,6 +171,37 @@ namespace Engine {
 				.m_texture_guid = renderable2d.TextureGuid
 				});
 		}
+
+		//collect all text entities
+		auto textView = scene->GetRegistry().view<TransformComponent, TextComponent>();
+		for (auto entity : textView) {
+			auto& textComp = textView.get<TextComponent>(entity);
+			auto& transform = textView.get<TransformComponent>(entity);
+
+			//skip empty text
+			if (textComp.text.empty()) continue; 
+
+			m_drawitems.push_back({
+				.m_model_to_world_transform = transform.WorldTransform,
+				.m_drawitem_type = DrawItemType::TEXT,
+				.m_entity_id = static_cast<u32>(entity),
+				.m_submesh_index = 0,
+				.m_default_mesh_handle = 0,
+				.m_default_material_handle = 0,
+				.m_default_u32texture_handle = 0,
+				.m_render_layer = 0,
+				.m_color = glm::vec4(textComp.color[0], textComp.color[1],
+									textComp.color[2], textComp.color[3]),
+				.m_mesh_guid = 0,
+				.m_material_guid = 0,
+				.m_texture_guid = 0,
+
+				.m_text = textComp.text,
+				.m_fontSize = textComp.fontSize,
+				.m_textAlignment = textComp.align
+
+				});
+		}
 		
 		std::span<DrawItem> drawitem_span(m_drawitems.data(), m_drawitems.size());
 		std::span<std::pair<CameraComponent, glm::vec3>> cameralist_span(m_cameralist.data(), m_cameralist.size());

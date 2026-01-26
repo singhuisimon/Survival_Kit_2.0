@@ -28,6 +28,9 @@
 // For Camera component
 #include "Component/CameraComponent.h"
 
+// For Font
+#include "Font.h"
+
 namespace Engine {
 
 	// Material UBO layout mirrored from GLSL std140
@@ -224,7 +227,8 @@ namespace Engine {
 		  UI			   = 5, 
 		  BLOOM_DOWNSAMPLE = 6, 
 		  BLOOM_UPSAMPLE   = 7,
-		  SHADOW		   = 8
+		  SHADOW		   = 8,
+		  FONT			   = 9
 		};
 
 		/**
@@ -413,6 +417,32 @@ namespace Engine {
 		u32 activeLayer = 1;
 
 		glm::mat4 m_ui_projection;
+
+		// ------------- Font ------------------
+		Font m_defaultFont; 
+		GLuint m_fontVAO = 0; 
+		GLuint m_fontVBO = 0; 
+		RenderPass m_textPass; 
+
+		/*
+		* @brief Loads a font from compiled .font file 
+		* @param filepath path to .font file
+		* @return true if loaded successfully
+		*/
+		
+		bool loadFont(const std::string& filepath);
+
+		/**
+		 * @brief Renders the text pass
+		 * @param pass The render pass containing render data
+		 * @param items A view of all available draw items
+		 */
+		void renderTextPass(RenderPass& pass, std::span<const DrawItem> items);
+
+		/**
+		 * @brief Initializes font rendering resources (VAO/VBO)
+		 */
+		void initFontResources();
 	};
 
 }

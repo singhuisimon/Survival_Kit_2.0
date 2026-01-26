@@ -16,6 +16,7 @@
 #include "../Utility/Types.h"
 #include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
+#include "../Component/TextComponent.h"
 
 #include "Asset/ResourceData.h"
 
@@ -29,7 +30,8 @@ namespace Engine{
 	{
 		MESH3D,
 		SPRITE2D,
-		Particle
+		Particle,
+		TEXT
 	};
 
 	/**
@@ -72,6 +74,11 @@ namespace Engine{
 		bool     m_render_main_pass = true;		// false for CastType::ShadowsOnly
 		bool     m_receive_shadows = false;		// MeshRendererComponent::ShadowReceive
 		u32		 m_cast_shadow_type = 0u;		// MeshRendererComponent::CastType: 0 = Off,1 = On,2 = TwoSided,3 = ShadowsOnly
+
+		// text data
+		std::string m_text = ""; 
+		float m_fontSize = 24.0f; 
+		TextAlignment m_textAlignment; // 0=left, 1=Center, 2=Right, 3=Justified
 	};
 
 }
