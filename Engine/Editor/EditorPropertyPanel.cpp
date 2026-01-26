@@ -2661,7 +2661,8 @@ namespace Engine
 			ImGui::SetColumnWidth(0, 200.0f);
 
 			bool  isComponentOverridden = IsComponentOverridden(ComponentTypeID::Text);
-			if (isComponentOverridden) {
+
+			if (isComponentOverridden) 
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 
 				bool openTextComp = ImGui::CollapsingHeader("Text Component", ImGuiTreeNodeFlags_DefaultOpen);
@@ -2781,7 +2782,7 @@ namespace Engine
 					}
 				}
 			}
-		}
+		
 	}
 	
 
@@ -5274,67 +5275,69 @@ namespace Engine
 				}
 			}
 			ImGui::EndDisabled();
-			ImGui::EndPopup(); // end pop up for Add Component  
-		}
-
-		// ------------------------ Add Text Component ----------------------------
-
-		{
-			bool hasTextComponent = m_SelectedEntity.HasComponent<TextComponent>();
-			ImGui::BeginDisabled(hasTextComponent);
-
-			if (ImGui::MenuItem("Text Component"))
+			// ------------------------ Add Text Component ----------------------------
 			{
-				if (!hasTextComponent)
-				{
-					m_SelectedEntity.AddComponent<TextComponent>();
-					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
-						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+				bool hasTextComponent = m_SelectedEntity.HasComponent<TextComponent>();
+				ImGui::BeginDisabled(hasTextComponent);
 
-						// Check if this component exists in the prefab blueprint
-						bool existsInPrefab = false;
-						if (prefabComp.isPrefabRoot) {
-							// For root, check prefab registry
-							Prefab prefab;
-							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
-								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
-									for (const auto& comp : entityData->components) {
-										if (comp.type == ComponentTypeID::Text) {
-											existsInPrefab = true;
-											break;
+				if (ImGui::MenuItem("Text Component"))
+				{
+					if (!hasTextComponent)
+					{
+						m_SelectedEntity.AddComponent<TextComponent>();
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+							// Check if this component exists in the prefab blueprint
+							bool existsInPrefab = false;
+							if (prefabComp.isPrefabRoot) {
+								// For root, check prefab registry
+								Prefab prefab;
+								if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+									if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+										for (const auto& comp : entityData->components) {
+											if (comp.type == ComponentTypeID::Text) {
+												existsInPrefab = true;
+												break;
+											}
 										}
 									}
 								}
 							}
-						}
 
-						// Mark appropriately
-						if (!existsInPrefab) {
-							// New component not in prefab = added override
-							std::string componentJSON = ComponentSerializer::SerializeComponent(
-								m_SelectedEntity, ComponentTypeID::Text);
-							prefabComp.MarkComponentAdded(ComponentTypeID::Text, componentJSON);
-							LOG_INFO("Marked Text as ADDED component (not in prefab)");
-						}
-						else {
-							// Component exists in prefab but was removed, now re-added
-							// Clear the removal flag
-							prefabComp.ClearComponentRemoval(ComponentTypeID::Text);
-							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Text);
-							LOG_INFO("Marked Text as RESTORED (was removed, now re-added)");
+							// Mark appropriately
+							if (!existsInPrefab) {
+								// New component not in prefab = added override
+								std::string componentJSON = ComponentSerializer::SerializeComponent(
+									m_SelectedEntity, ComponentTypeID::Text);
+								prefabComp.MarkComponentAdded(ComponentTypeID::Text, componentJSON);
+								LOG_INFO("Marked Text as ADDED component (not in prefab)");
+							}
+							else {
+								// Component exists in prefab but was removed, now re-added
+								// Clear the removal flag
+								prefabComp.ClearComponentRemoval(ComponentTypeID::Text);
+								prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Text);
+								LOG_INFO("Marked Text as RESTORED (was removed, now re-added)");
+							}
 						}
 					}
 				}
-			}
-			if (ImGui::IsItemHovered())
-			{
-				if (!hasTextComponent)
+				if (ImGui::IsItemHovered())
 				{
-					ImGui::SetTooltip("Renders 2D text on screen.");
+					if (!hasTextComponent)
+					{
+						ImGui::SetTooltip("Renders 2D text on screen.");
+					}
 				}
+				ImGui::EndDisabled();
 			}
-			ImGui::EndDisabled();
+			ImGui::EndPopup(); // end pop up for Add Component  
 		}
+
+		
+
+		
 	}
 
 	// Helper Functions
