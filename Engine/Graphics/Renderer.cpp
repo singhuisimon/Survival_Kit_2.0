@@ -378,6 +378,7 @@ namespace Engine {
 			}
 
 			if (item.m_drawitem_type == DrawItemType::SPRITE2D) continue;
+			if (item.m_drawitem_type == DrawItemType::TEXT) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -1591,23 +1592,21 @@ namespace Engine {
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle]; 
 
 		//enable blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 		//set uniforms
-		glm::mat4 ortho = glm::ortho(0.0f, static_cast<float>(pass.view_port.z), 
-									0.0f, static_cast<float>(pass.view_port.w), 
-									-1.0f, 1.0f);
-		prog.setUniform("u_Projection", ortho);
+		prog.setUniform("u_Projection", m_ui_projection);
 		
-
 		//bind font atlas 
-		glActiveTexture(GL_TEXTURE); 
-		glBindTexture(GL_TEXTURE_2D, m_defaultFont.getAtlasTexture()); 
+		//glActiveTexture(GL_TEXTURE); 
+		//glBindTexture(GL_TEXTURE_2D, m_defaultFont.getAtlasTexture()); 
+		//glBindTextureUnit(11, m_defaultFont.getAtlasTexture());
+
 		if (!m_defaultFont.getAtlasTexture()) {
 			std::cout << "Atlas Textures are empty" << std::endl;
 		}
-		prog.setUniform("u_FontAtlas", 0); 
+		//prog.setUniform("u_FontAtlas", 0); 
 
 		glBindVertexArray(m_fontVAO); 
 
@@ -1684,7 +1683,7 @@ namespace Engine {
 		}
 
 		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0); 
+		//glBindTexture(GL_TEXTURE_2D, 0); 
 		prog.programFree(); 
 		endFrame(pass); 
 

@@ -15,10 +15,10 @@
 in vec2 TexCoords;
 out vec4 color;
 
-uniform sampler2D text;
+layout (binding = 11) uniform sampler2D text;
 uniform vec3 textColor;
 
-uniform float uThickness;
+const float uThickness = 0.5;
 const float edge  = 0.01;
 
 const float borderWidth = 0.5;
@@ -28,8 +28,8 @@ const vec3 outlineColor = vec3(1.0, 0.0, 0.0);
 
 void main()
 {   
-    float distance = 1.0 - texture(text, TexCoords).r;
-    float alpha    = 1.0 - smoothstep(uThickness, uThickness + edge, distance);
+    // float distance = 1.0 - texture(text, TexCoords).r;
+    // float alpha    = 1.0 - smoothstep(uThickness, uThickness + edge, distance);
 
-    color = vec4(textColor, alpha);
+    color = vec4(1.0, 0.0, 0.0, 1.0);   //vec4(textColor, alpha);
 }
