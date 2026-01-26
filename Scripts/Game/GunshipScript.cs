@@ -17,10 +17,6 @@ namespace Game
     public class GunshipScript : ScriptBehaviour 
     {
 
-        // === NAME OF ENTITY ===
-        [SerializeField] private string gunshipEntity = "ALLIES";
-        private uint gunshipEntityID = 0;
-
         // === HEALTH INFORMATION ===
         [SerializeField] private float maxHealth = 75f;
         private float currentHealth = 75f;
@@ -31,7 +27,7 @@ namespace Game
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
         [SerializeField] private float bulletSpeed = 3000f;
-        [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
+        [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/PrimaryBullet.prefab";
 
         // === PRIVATE STATES ===
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -39,77 +35,55 @@ namespace Game
         private float fireCooldown = 0f;               
         private Quat turretRotation;  
 
-        // Tags of enemies to shoot
-        private readonly string[] enemyTags = { "botnet", "loveletter", "adware" };
+        private uint gunshipID = INVALID_ENTITY; // getting the ID of the read gunship entity
+        private bool initialized = false;
+
+        // Tags of enemies to shoot (right now, currently testing with botnet in Level1_Player)
+        private readonly string[] enemyTags = { "botnet"};
 
         // Start up
         public override void OnStart() 
         {
-            // Message to indicate Gunship starting (there are multiple Gunships)
-            // LogMessage("=== Gunship Started (ID: " + EntityID + ") ===");
-            
-            // // Initialize health
-            // currentHealth = maxHealth;
-            // isDead = false;
-            
-            // // Set initial turret rotation to match gunship
-            // turretRotation = GetRotation((uint)EntityID);
-            
-            // // Subscribe to damage events
-            // Subscribe("GunshipDamage:" + EntityID, OnTakeDamage);
-            
-            // LogMessage("Gunship ready! Health: " + currentHealth + "/" + maxHealth);
+            LogMessage("====Gunship Helper Started====");
+            LogMessage("Helper EntityID: " + EntityID);
 
-            //new code to try and see if it can detect Gunship
-            LogMessage("==== Gunship Started ====");
-            gunshipEntityID = SceneFindEntityByName(gunshipEntity);
-            EntityID = gunshipEntityID; 
-
-            LogMessage("Gunship ID: " + gunshipEntityID);
-
-            if (EntityID == 0 || EntityID == INVALID_ENTITY)
-            {
-                LogError("FAILED to find gunship: " + gunshipEntity);
-                isDead = true;
-                return;
-            }
-
-            // Verify position works
-            Vector3 pos = GetPosition((uint)EntityID);
-            LogMessage("Gunship position: " + pos.X + ", " + pos.Y + ", " + pos.Z);
-            
-            // Initialize health
-            currentHealth = maxHealth;
+            // not detecting Gunship here (might not be ready on frame 0)
+            initialized = false;
             isDead = false;
-            
-            // Set initial turret rotation
-            turretRotation = GetRotation((uint)EntityID);
-
-            LogMessage("Initial rotation: X=" + turretRotation.X + ", Y=" + turretRotation.Y + 
-           ", Z=" + turretRotation.Z + ", W=" + turretRotation.W);
-            Vector3 testForward = turretRotation.Forward;
-            LogMessage("Model's Forward direction: " + testForward.X + ", " + testForward.Y + ", " + testForward.Z);
-            Vector3 testRight = turretRotation.Right;
-            LogMessage("Model's Right direction: " + testRight.X + ", " + testRight.Y + ", " + testRight.Z);
-            Vector3 testUp = turretRotation.Up;
-            LogMessage("Model's Up direction: " + testUp.X + ", " + testUp.Y + ", " + testUp.Z);
-            
-            // Subscribe to damage events
-            Subscribe("GunshipDamage:" + EntityID, OnTakeDamage);
-            
-            LogMessage("Gunship ready! Health: " + currentHealth + "/" + maxHealth);
         }
 
         // update loop
         public override void OnUpdate(float deltaTime) 
         {
+            if (!initialized) {
+                uint self = (uint)EntityID;
+                gunshipID = TransformGetParent(self);
+
+                // Parent is not ready yet
+                if (gunshipID == 0 || gunshipID == INVALID_ENTITY)
+                    return;
+
+                LogMessage("Gunship Helper is bound to parent gunshipID (gunship identity) " + gunshipID);
+
+                currentHealth = maxHealth;
+                isDead = false;
+
+                turretRotation = GetRotation(gunshipID);
+
+                Subscribe("GunshipDamage: " + gunshipID, OnTakeDamage);
+                
+                initialized = true;
+            }
             // does not do anything is Gunship is dead
             if (isDead)
                 return;
             
             // Update fire cooldown
-            if (fireCooldown > 0f)
+            if (fireCooldown > 0f) 
+            {
                 fireCooldown -= deltaTime;
+                if (fireCooldown < 0f) fireCooldown = 0f;
+            }
             
             // find Enemy targets
             UpdateTargeting();
@@ -117,7 +91,6 @@ namespace Game
             // if there is a target, rotate towards it to shoot
             if (currentTarget != INVALID_ENTITY)
             {
-                RotateTowardsTarget(deltaTime);
                 TryShoot();
             }
         }
@@ -125,8 +98,9 @@ namespace Game
         // Gunship dies lol
         public override void OnDestroy()
         {
-            Unsubscribe("GunshipDamage:" + EntityID, OnTakeDamage);
-            LogMessage("Gunship destroyed");
+            if (gunshipID != INVALID_ENTITY) 
+                Unsubscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
+
         }
 
         // Targeting System
@@ -145,7 +119,7 @@ namespace Game
                 else
                 {
                     // check if target is within range
-                    Vector3 myPos = GetPosition((uint)EntityID);
+                    Vector3 myPos = GetPosition(gunshipID);
                     Vector3 targetPos = GetPosition(currentTarget);
                     float distSq = DistanceSquared(myPos, targetPos);
                     
@@ -172,7 +146,7 @@ namespace Game
 
         private uint FindNearestEnemy()
         {
-            Vector3 myPos = GetPosition((uint)EntityID);
+            Vector3 myPos = GetPosition(gunshipID);
             float rangeSq = turretRange * turretRange;
             
             uint nearestEnemy = INVALID_ENTITY;
@@ -212,7 +186,7 @@ namespace Game
 
         // Turret Rotation
 
-        // Move the turret towards the enemy
+        // ===== THIS FUNCTION IS CURRENTLY NOT BEING USED AS OF RIGHT NOW ======
         private void RotateTowardsTarget(float deltaTime)
         {
             if (currentTarget == INVALID_ENTITY)
@@ -255,110 +229,82 @@ namespace Game
 
         private void TryShoot()
         {
-            // To test the bullet shooting immediately
-            // FireBullet();
-
-            //On Cooldown
-            if (fireCooldown > 0f)
+            // Cooldown Check
+            if (fireCooldown > 0f) 
                 return;
-            
-            // Cannot shoot without Target (Enemy)
+
+            // Must have a target
             if (currentTarget == INVALID_ENTITY)
                 return;
-            
-            // Check if it is aimed at Target
-            Vector3 myPos = GetPosition((uint)EntityID);
-            Vector3 targetPos = GetPosition(currentTarget);
-            Vector3 forward = turretRotation.Forward;
 
-            // Debug Msg
-            LogMessage("Turret forward: " + forward.X + ", " + forward.Y + ", " + forward.Z);
-            
-            Vector3 toTarget = new Vector3(
-                targetPos.X - myPos.X,
-                targetPos.Y - myPos.Y,
-                targetPos.Z - myPos.Z
-            );
-            
-            float lenSq = toTarget.X * toTarget.X + toTarget.Y * toTarget.Y + toTarget.Z * toTarget.Z;
-            if (lenSq > 0.0001f)
-            {
-                float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-                toTarget.X *= invLen;
-                toTarget.Y *= invLen;
-                toTarget.Z *= invLen;
-                
-                // Check if aimed (dot product > 0.95 = ~18 degrees)
-                float dot = forward.X * toTarget.X + forward.Y * toTarget.Y + forward.Z * toTarget.Z;
-                LogMessage("Dot product: " + dot + " (need > 0.95 to shoot)");
-
-                if (dot > -0.3f)
-                {
-                    // Shoot
-                    LogMessage("SHOOTING NOW!");
-                    FireBullet();
-                } else {
-                    LogMessage("Not aimed yet, rotating...");
-                }
-            }
+            // Fire Immediately (No need for aiming checks as there are no rotation)
+            FireBullet();
         }
         
         private void FireBullet()
         {
-            // Reset cooldown
-            fireCooldown = fireRate;
+           fireCooldown = fireRate;
 
-            // calculate spawn position (in front of turret)
-            Vector3 myPos = GetPosition((uint)EntityID);
-            //debug msg
-            LogMessage("Gunship position: " + myPos.X + ", " + myPos.Y + ", " + myPos.Z);
-            Vector3 forward = turretRotation.Forward;
-            //debug msg
-            LogMessage("Forward direction: " + forward.X + ", " + forward.Y + ", " + forward.Z);
+           // Shoot from helper position (hidden inside the Gunship)
+           uint self = (uint)EntityID;
+           Vector3 myPos = GetPosition(self);
 
-            // Spawn bullet infront of Gunship
-            Vector3 spawnPos = new Vector3(
-                myPos.X + forward.X * 1.5f,
-                myPos.Y + forward.Y * 1.5f,
-                myPos.Z + forward.Z * 1.5f
+           // Enemy Position
+           Vector3 targetPos = GetPosition(currentTarget);
+
+           // Direction to enemy
+           Vector3 dir = new Vector3(
+                targetPos.X - myPos.X,
+                targetPos.Y - myPos.Y,
+                targetPos.Z - myPos.Z
+           );
+
+           float lenSq = dir.X * dir.X + dir.Y * dir.Y + dir.Z * dir.Z;
+           if (lenSq <= 0.0001f)
+                return;
+
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            dir.X *= invLen;
+            dir.Y *= invLen;
+            dir.Z *= invLen;
+
+            //Spawn infront of helper so it dosen't collide instantly
+            float muzzleDist = 5.0f;
+            Vector3 spawnPos = new Vector3 (
+                myPos.X + dir.X * muzzleDist,
+                myPos.Y + dir.Y * muzzleDist,
+                myPos.Z + dir.Z * muzzleDist
             );
 
-            //debug msg
-            LogMessage("Bullet spawn position: " + spawnPos.X + ", " + spawnPos.Y + ", " + spawnPos.Z);
+            // Rotate bullet to face direction
+            Quat bulletRot = SimpleMath.LookRotation(dir, Vector3.Up);
 
-            Vector3 bulletScale = new Vector3(0.3f, 0.2f, 0.15f);
 
-            // Spawn the bullet prefab
+            Vector3 bulletScale = new Vector3 (0.1f, 0.1f, 0.1f);
+
             uint bulletID = PrefabInstantiateWithTransform(
                 bulletPrefabPath,
                 ref spawnPos,
-                ref turretRotation,
+                ref bulletRot,
                 ref bulletScale,
                 false
             );
 
-            if (bulletID != 0) 
+            if (bulletID == 0 || bulletID == INVALID_ENTITY)
             {
-                Vector3 verifyPos = GetPosition(bulletID);
-                LogMessage("Bullet actual position after spawn: " + verifyPos.X + ", " + verifyPos.Y + ", " + verifyPos.Z);
-
-                SetPosition(bulletID, ref spawnPos);
-
-                // Give bullet velocity
-                Vector3 velocity = new Vector3(
-                    forward.X * bulletSpeed,
-                    forward.Y * bulletSpeed,
-                    forward.Z * bulletSpeed
-                );
-
-                RigidbodySetVelocity(bulletID, ref velocity);
-
-                LogMessage("Gunship fired at target " + currentTarget);
-            } 
-            else 
-            {
-                LogError("Failed to spawn bullet!");
+                LogError("Failed to spawn PrimaryBullet!");
+                return;
             }
+
+            Vector3 velocity = new Vector3(
+                dir.X * bulletSpeed,
+                dir.Y * bulletSpeed,
+                dir.Z * bulletSpeed
+            );
+
+            RigidbodySetVelocity(bulletID, ref velocity);
+
+            LogMessage("Gunship fired PrimaryBullet at target " + currentTarget);
         }
 
         // Damage System (This is for when the Gunship takes Damage)
@@ -399,7 +345,7 @@ namespace Game
             
             
             // Destroy the gunship
-            SceneDestroyEntity((uint)EntityID);
+            SceneDestroyEntity(gunshipID);
         }
 
         // Math Helpers
