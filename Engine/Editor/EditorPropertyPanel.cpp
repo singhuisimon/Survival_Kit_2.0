@@ -97,6 +97,9 @@ namespace Engine
 				// Sprite Renderer Component
 				DisplaySpriteRendererComponent(dotButtonSize);
 
+				// Text Component 
+				DisplayTextComponent(dotButtonSize); 
+
 				// Add Component Button
 				AddComponent();
 
@@ -2650,6 +2653,138 @@ namespace Engine
 		}
 	}
 
+	void EditorPropertyPanel::DisplayTextComponent(ImVec2& buttonSize) {
+
+		if (m_SelectedEntity.HasComponent<TextComponent>()) {
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool  isComponentOverridden = IsComponentOverridden(ComponentTypeID::Text);
+			if (isComponentOverridden) {
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
+				bool openTextComp = ImGui::CollapsingHeader("Text Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+				if (isComponentOverridden)
+					ImGui::PopStyleColor();
+
+				bool removeTextComp = false;
+				ImGui::NextColumn();
+
+				if (ImGui::Button("...###TextBtn", buttonSize)) {
+					ImGui::OpenPopup("TextPopUp");
+				}
+				if (ImGui::BeginPopup("TextPopUp")) {
+					if (ImGui::MenuItem("Remove Component")) {
+						removeTextComp = true;
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Columns(1);
+
+				if (openTextComp) {
+					auto& textComp = m_SelectedEntity.GetComponent<TextComponent>();
+
+					// Text content input (multi-line)
+					ImGui::Text("Text Content:");
+					char textBuffer[1024];
+					strncpy_s(textBuffer, sizeof(textBuffer), textComp.text.c_str(), _TRUNCATE);
+
+					if (ImGui::InputTextMultiline("##TextContent", textBuffer, sizeof(textBuffer),
+						ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 4),
+						ImGuiInputTextFlags_AllowTabInput))
+					{
+						textComp.setText(textBuffer);
+						MarkComponentOverridden(ComponentTypeID::Text, "text");
+					}
+
+					ImGui::Spacing();
+
+					// Font Size
+					float fontSize = textComp.fontSize;
+					if (ImGui::DragFloat("Font Size", &fontSize, 0.5f, 1.0f, 200.0f, "%.1f")) {
+						textComp.setFontSize(fontSize);
+						MarkComponentOverridden(ComponentTypeID::Text, "fontSize");
+					}
+
+					// Color Picker
+					float color[4] = {
+						textComp.color[0],
+						textComp.color[1],
+						textComp.color[2],
+						textComp.color[3]
+					};
+
+					if (ImGui::ColorEdit4("Text Color", color)) {
+						textComp.setColor(color[0], color[1], color[2], color[3]);
+						MarkComponentOverridden(ComponentTypeID::Text, "color");
+					}
+
+					ImGui::Spacing();
+					ImGui::SeparatorText("Layout");
+
+					// Alignment
+					const char* alignmentItems[] = { "Left", "Right", "Center", "Justified" };
+					int currentAlignment = static_cast<int>(textComp.align);
+					if (ImGui::Combo("Alignment", &currentAlignment, alignmentItems, IM_ARRAYSIZE(alignmentItems))) {
+						textComp.setAlignment(static_cast<TextAlignment>(currentAlignment));
+						MarkComponentOverridden(ComponentTypeID::Text, "align");
+					}
+
+					// Line Spacing
+					float lineSpacing = textComp.lineSpacing;
+					if (ImGui::DragFloat("Line Spacing", &lineSpacing, 0.01f, 0.5f, 3.0f, "%.2f")) {
+						textComp.lineSpacing = glm::clamp(lineSpacing, 0.5f, 3.0f);
+						textComp.isDirty = true;
+						MarkComponentOverridden(ComponentTypeID::Text, "lineSpacing");
+					}
+
+					// Letter Spacing
+					float letterSpacing = textComp.letterSpacing;
+					if (ImGui::DragFloat("Letter Spacing", &letterSpacing, 0.1f, -10.0f, 10.0f, "%.2f")) {
+						textComp.setLetterSpacing(letterSpacing);
+						MarkComponentOverridden(ComponentTypeID::Text, "letterSpacing");
+					}
+
+					// Max Width (0 = no limit)
+					float maxWidth = textComp.maxWidth;
+					if (ImGui::DragFloat("Max Width", &maxWidth, 1.0f, 0.0f, 2000.0f, "%.1f")) {
+						textComp.maxWidth = glm::max(maxWidth, 0.0f);
+						textComp.isDirty = true;
+						MarkComponentOverridden(ComponentTypeID::Text, "maxWidth");
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("0 = No width limit");
+					}
+
+					ImGui::Spacing();
+					ImGui::SeparatorText("Info");
+
+					// Display bounds (read-only)
+					ImGui::Text("Calculated Width: %.1f", textComp.bounds.z);
+					ImGui::Text("Calculated Height: %.1f", textComp.bounds.w);
+
+					// Dirty flag indicator
+					if (textComp.isDirty) {
+						ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "* Layout needs update");
+					}
+				}
+
+				// Handle component removal
+				if (removeTextComp) {
+					m_SelectedEntity.RemoveComponent<TextComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Text);
+					}
+				}
+			}
+		}
+	}
+	
+
 	// Animator Window
 	void EditorPropertyPanel::AnimatorWindow(){
 		
@@ -5129,6 +5264,8 @@ namespace Engine
 					}
 				}
 			}
+
+
 			if (ImGui::IsItemHovered())
 			{
 				if (!hasSpriteRenderer)
@@ -5138,6 +5275,65 @@ namespace Engine
 			}
 			ImGui::EndDisabled();
 			ImGui::EndPopup(); // end pop up for Add Component  
+		}
+
+		// ------------------------ Add Text Component ----------------------------
+
+		{
+			bool hasTextComponent = m_SelectedEntity.HasComponent<TextComponent>();
+			ImGui::BeginDisabled(hasTextComponent);
+
+			if (ImGui::MenuItem("Text Component"))
+			{
+				if (!hasTextComponent)
+				{
+					m_SelectedEntity.AddComponent<TextComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot) {
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+									for (const auto& comp : entityData->components) {
+										if (comp.type == ComponentTypeID::Text) {
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab) {
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Text);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Text, componentJSON);
+							LOG_INFO("Marked Text as ADDED component (not in prefab)");
+						}
+						else {
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Text);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Text);
+							LOG_INFO("Marked Text as RESTORED (was removed, now re-added)");
+						}
+					}
+				}
+			}
+			if (ImGui::IsItemHovered())
+			{
+				if (!hasTextComponent)
+				{
+					ImGui::SetTooltip("Renders 2D text on screen.");
+				}
+			}
+			ImGui::EndDisabled();
 		}
 	}
 
