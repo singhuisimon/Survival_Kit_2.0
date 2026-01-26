@@ -51,8 +51,12 @@ namespace Engine {
 		setDefaultState();
 
 		initFontResources(); 
-		loadFont("");
-
+		if (loadFont(getAssetFilePath("Sources/Fonts/Quantico-Bold.ttf.font"))) {
+			std::cout << "Font loaded successfully!" << std::endl;
+		}
+		else {
+			std::cerr << "Failed to load font!" << std::endl;
+		}
 		MeshData skybox_cube = make_cube(); m_skybox = upload_mesh_data(skybox_cube); m_skybox_texture = RenderBypassUtils::loadCubemapHDR();
 		
 		// -------- Materials UBO (binding = 1)  --------
@@ -1600,6 +1604,10 @@ namespace Engine {
 		//bind font atlas 
 		glActiveTexture(GL_TEXTURE); 
 		glBindTexture(GL_TEXTURE_2D, m_defaultFont.getAtlasTexture()); 
+		if (!m_defaultFont.getAtlasTexture()) {
+			std::cout << "Atlas Textures are empty" << std::endl;
+		}
+		prog.setUniform("u_FontAtlas", 0); 
 
 		glBindVertexArray(m_fontVAO); 
 
@@ -1612,8 +1620,20 @@ namespace Engine {
 			std::string text = item->m_text; 
 			float fontSize = item->m_fontSize; 
 			glm::vec4 color = item->m_color; 
-			glm::vec3 position(item->m_model_to_world_transform[3]); 
+			glm::vec3 position(item->m_model_to_world_transform[3]);
 
+			//Convert world space to screen space
+			glm::vec4 clipSpace = m_lastProj * m_lastView * glm::vec4(position, 1.0f);
+			clipSpace /= clipSpace.w; // Perspective divide
+
+			// Convert from NDC (-1 to 1) to screen space (0 to viewport size)
+			float screenX = (clipSpace.x + 1.0f) * 0.5f * pass.view_port.z;
+			float screenY = (clipSpace.y + 1.0f) * 0.5f * pass.view_port.w;
+
+			// Use screen space position instead
+			position.x = screenX;
+			position.y = screenY;
+			std::cout << "Rendering text '" << text << "' at: " << position.x << ", " << position.y << ", " << position.z << std::endl;
 			float scale = fontSize / m_defaultFont.getBaseSize(); 
 
 			//compute total width 
@@ -1671,9 +1691,9 @@ namespace Engine {
 	}
 
 	bool Renderer::loadFont(const std::string& filepath) {
-		std::ifstream file(filepath, std::ios::binary); 
+		std::ifstream file(filepath, std::ios::binary);
 		if (!file) {
-			std::cerr << "Failed to open font file: " << filepath << std::endl; 
+			std::cerr << "Failed to open font file: " << filepath << std::endl;
 			return false;
 		}
 
@@ -1687,35 +1707,50 @@ namespace Engine {
 		file.read(reinterpret_cast<char*>(&m_defaultFont.atlasWidth), sizeof(int));
 		file.read(reinterpret_cast<char*>(&m_defaultFont.atlasHeight), sizeof(int));
 
+		// ===== FIX: Read pixel data BEFORE glyphs (matches FontCompiler order) =====
+		uint32_t pixelDataSize;
+		file.read(reinterpret_cast<char*>(&pixelDataSize), sizeof(uint32_t));
+
+		std::vector<uint8_t> atlasPixels(pixelDataSize);
+		file.read(reinterpret_cast<char*>(atlasPixels.data()), pixelDataSize);
+
 		// Read glyph count
 		uint32_t glyphCount;
 		file.read(reinterpret_cast<char*>(&glyphCount), sizeof(uint32_t));
 
-		// Read all glyphs
-		for (uint32_t i = 0; i < glyphCount; ++i) {
+		// ===== FIX: Read glyphs as GlyphMetrics struct (matches FontCompiler) =====
+		struct GlyphMetrics {
 			uint32_t charCode;
-			file.read(reinterpret_cast<char*>(&charCode), sizeof(uint32_t));
+			float uv_x, uv_y;
+			float uv_width, uv_height;
+			float p_width, p_height;
+			float bearing_x, bearing_y;
+			float advance;
+		};
+
+		for (uint32_t i = 0; i < glyphCount; ++i) {
+			GlyphMetrics metrics;
+			file.read(reinterpret_cast<char*>(&metrics), sizeof(GlyphMetrics));
 
 			Glyph glyph;
-			file.read(reinterpret_cast<char*>(&glyph.uvMin.x), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.uvMin.y), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.uvMax.x), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.uvMax.y), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.size.x), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.size.y), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.bearing.x), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.bearing.y), sizeof(float));
-			file.read(reinterpret_cast<char*>(&glyph.advance), sizeof(float));
+			glyph.uvMin.x = metrics.uv_x;
+			glyph.uvMin.y = metrics.uv_y;
+			glyph.uvMax.x = metrics.uv_x + metrics.uv_width;
+			glyph.uvMax.y = metrics.uv_y + metrics.uv_height;
+			glyph.size.x = metrics.p_width;
+			glyph.size.y = metrics.p_height;
+			glyph.bearing.x = metrics.bearing_x;
+			glyph.bearing.y = metrics.bearing_y;
+			glyph.advance = metrics.advance;
 
-			m_defaultFont.glyphs[charCode] = glyph;
+			m_defaultFont.glyphs[metrics.charCode] = glyph;
 		}
 
-		// Read atlas pixels
-		size_t atlasSize = static_cast<size_t>(m_defaultFont.atlasWidth) *
-			m_defaultFont.atlasHeight * 4;
-		std::vector<uint8_t> atlasPixels(atlasSize);
-		file.read(reinterpret_cast<char*>(atlasPixels.data()), atlasSize);
 		file.close();
+
+		// Debug output
+		std::cout << "Font loaded: " << glyphCount << " glyphs, atlas "
+			<< m_defaultFont.atlasWidth << "x" << m_defaultFont.atlasHeight << std::endl;
 
 		// Create OpenGL texture
 		glGenTextures(1, &m_defaultFont.atlasTexture);

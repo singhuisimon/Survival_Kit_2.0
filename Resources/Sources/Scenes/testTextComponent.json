@@ -16,9 +16,9 @@
                     "Properties": {
                         "ComponentGUID": "2134750756489298115",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            -0.46024614572525024,
+                            0.7152738571166992,
+                            -0.10693178325891495
                         ],
                         "Rotation": [
                             0.0,
@@ -35,15 +35,32 @@
                     }
                 },
                 {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "7779590676959805647",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "6169976022613295301",
-                        "text": "Hello",
-                        "fontSize": 24.0,
+                        "text": "Hello This is the test for text rendering :_ ",
+                        "fontSize": 200.0,
                         "color": [
-                            0.0049019455909729,
-                            0.0,
-                            0.0,
+                            0.9509803652763367,
+                            0.16315840184688568,
+                            0.16315840184688568,
                             1.0
                         ],
                         "align": 2,
