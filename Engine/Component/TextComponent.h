@@ -4,6 +4,8 @@
 #include <string>
 #include <array>
 #include <glm/glm.hpp>
+#include "../include/xresource_guid.h"
+#include "../Serialization/ComponentRegistry.h"
 namespace Engine {
 
 	enum class TextAlignment {
@@ -14,6 +16,12 @@ namespace Engine {
 	};
 
 	struct TextComponent {
+
+		static constexpr ComponentTypeID TypeID = ComponentTypeID::Text; 
+		static constexpr const char* TypeName = "TextComponent";
+
+		xresource::instance_guid ComponentGUID = 0;
+
 		std::string text = "Text";
 		float fontSize = 24.0f; 
 		std::array<float, 4> color = {1.0f,1.0f,1.0f,1.0f};
@@ -29,6 +37,10 @@ namespace Engine {
 		glm::vec4 bounds = { 0.0f,0.0f,0.0f,0.0f };
 		
 
+		//constructor 
+		TextComponent() {
+			ComponentGUID.GenerateGUID(); 
+		}
 
 		void setText(const std::string& txt) {
 			text = txt;
