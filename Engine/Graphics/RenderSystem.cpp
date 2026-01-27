@@ -198,7 +198,10 @@ namespace Engine {
 
 				.m_text = textComp.text,
 				.m_fontSize = textComp.fontSize,
-				.m_textAlignment = textComp.align
+				.m_textAlignment = textComp.align,
+				.m_lineSpacing = textComp.lineSpacing,
+				.m_letterSpacing = textComp.letterSpacing,
+				.m_maxWidth = textComp.maxWidth
 
 				});
 		}

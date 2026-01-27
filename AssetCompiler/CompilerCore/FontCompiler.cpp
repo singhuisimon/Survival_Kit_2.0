@@ -145,7 +145,7 @@ namespace AssetCompiler {
 		for (uint32_t charCode : characters) {
 			GlyphRasterData rasterData = rasterizeGlyph(face, charCode);
 
-			if (!rasterData.data.empty()) {
+			if (!rasterData.data.empty() || rasterData.advance > 0.0f) {
 				//convert grayscale bitmap to SDF 
 				if (rasterData.width > 0 && rasterData.height > 0) {
 					std::vector<uint8_t> sdfData = generateSDF(

@@ -1600,6 +1600,8 @@ namespace Engine {
 									-1.0f, 1.0f);
 		prog.setUniform("u_Projection", ortho);
 		
+	/*	prog.setUniform("u_Projection", m_lastProj);
+		prog.setUniform("u_View", m_lastView);*/
 
 		//bind font atlas 
 		glActiveTexture(GL_TEXTURE); 
@@ -1621,26 +1623,17 @@ namespace Engine {
 			float fontSize = item->m_fontSize; 
 			glm::vec4 color = item->m_color; 
 			glm::vec3 position(item->m_model_to_world_transform[3]);
+			float lineSpacing = item->m_lineSpacing;
+			float letterSpacing = item->m_letterSpacing; 
+			float maxWidth = item->m_maxWidth;
 
-			////Convert world space to screen space
-			//glm::vec4 clipSpace = m_lastProj * m_lastView * glm::vec4(position, 1.0f);
-			//clipSpace /= clipSpace.w; // Perspective divide
-
-			//// Convert from NDC (-1 to 1) to screen space (0 to viewport size)
-			//float screenX = (clipSpace.x + 1.0f) * 0.5f * pass.view_port.z;
-			//float screenY = (clipSpace.y + 1.0f) * 0.5f * pass.view_port.w;
-
-			//// Use screen space position instead
-			//position.x = screenX;
-			//position.y = screenY;
-			std::cout << "Rendering text '" << text << "' at: " << position.x << ", " << position.y << ", " << position.z << std::endl;
 			float scale = fontSize / m_defaultFont.getBaseSize(); 
 
 			//compute total width 
 			float totalWidth = 0.0f; 
 			for (char c : text) {
 				const Glyph* glyph = m_defaultFont.getGlyph(static_cast<uint32_t>(c));
-				if (glyph) totalWidth += glyph->advance * scale; 
+				if (glyph) totalWidth += (glyph->advance + letterSpacing) * scale; 
 			}
 			
 			//apply alignment 
@@ -1659,6 +1652,12 @@ namespace Engine {
 			for (char c : text) {
 				const Glyph* glyph = m_defaultFont.getGlyph(static_cast<uint32_t>(c));
 				if (!glyph) continue;
+
+				//handle new line characters for multi line
+				if (c == '\n') {
+					currentX = startX;
+					currentY -= fontSize * lineSpacing;
+				}
 
 				float xpos = currentX + glyph->bearing.x * scale;
 				float ypos = currentY - (glyph->size.y - glyph->bearing.y) * scale;
@@ -1679,7 +1678,7 @@ namespace Engine {
 				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 
-				currentX += glyph->advance * scale;
+				currentX += (glyph->advance + letterSpacing) * scale;
 			}
 		}
 

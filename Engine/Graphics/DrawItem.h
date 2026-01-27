@@ -79,6 +79,9 @@ namespace Engine{
 		std::string m_text = ""; 
 		float m_fontSize = 24.0f; 
 		TextAlignment m_textAlignment; // 0=left, 1=Center, 2=Right, 3=Justified
+		float m_lineSpacing = 1.0f; 
+		float m_letterSpacing = 0.0f; 
+		float m_maxWidth = 0.0f;
 	};
 
 }

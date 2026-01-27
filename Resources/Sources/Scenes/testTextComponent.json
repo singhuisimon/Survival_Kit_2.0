@@ -16,9 +16,9 @@
                     "Properties": {
                         "ComponentGUID": "2134750756489298115",
                         "Position": [
-                            -0.46024614572525024,
-                            0.7152738571166992,
-                            -0.10693178325891495
+                            700.0,
+                            300.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -39,16 +39,16 @@
                     "Properties": {
                         "ComponentGUID": "6169976022613295301",
                         "text": "Hello This is the test for text rendering :_ ",
-                        "fontSize": 200.0,
+                        "fontSize": 56.0,
                         "color": [
-                            0.9509803652763367,
-                            0.16315840184688568,
-                            0.16315840184688568,
+                            1.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "align": 2,
                         "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
+                        "letterSpacing": 5.0,
                         "maxWidth": 0.0
                     }
                 }
