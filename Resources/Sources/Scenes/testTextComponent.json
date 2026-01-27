@@ -35,23 +35,6 @@
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "7779590676959805647",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "6169976022613295301",

@@ -1,24 +1,17 @@
 #version 450 core
 
-///////////////////////////////////////////////////////////////////////////////////////
-///
-/// \file     font.vert
-///
-/// \brief    Vertex shader for font rendering.
-///
-/// \authors  Tan Jun Rui [100%]
-///
-/// Copyright 2024, Digipen Institute of Technology
-///
-///////////////////////////////////////////////////////////////////////////////////////
+// Match the C++ vertex attributes
+layout (location = 0) in vec2 position;    // 2 floats
+layout (location = 1) in vec2 texCoords;   // 2 floats  
+layout (location = 2) in vec4 color;       // 4 floats
 
-layout (location = 0) in vec4 vertex; 
 out vec2 TexCoords;
+out vec4 VertexColor;  // Pass color to fragment shader
 
-uniform mat3 uCameraMatrix;
+uniform mat4 u_Projection;  // Changed from mat3 to mat4
 
-void main(){
-    
-    gl_Position = vec4(vec2(uCameraMatrix * vec3(vertex.xy, 1.f)), 0.0, 1.0);
-    TexCoords = vertex.zw;
+void main() {
+    gl_Position = u_Projection * vec4(position, 0.0, 1.0);
+    TexCoords = texCoords;
+    VertexColor = color;
 }

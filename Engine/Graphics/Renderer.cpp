@@ -377,7 +377,7 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
-			if (item.m_drawitem_type == DrawItemType::SPRITE2D) continue;
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D || item.m_drawitem_type == DrawItemType::TEXT) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -1622,17 +1622,17 @@ namespace Engine {
 			glm::vec4 color = item->m_color; 
 			glm::vec3 position(item->m_model_to_world_transform[3]);
 
-			//Convert world space to screen space
-			glm::vec4 clipSpace = m_lastProj * m_lastView * glm::vec4(position, 1.0f);
-			clipSpace /= clipSpace.w; // Perspective divide
+			////Convert world space to screen space
+			//glm::vec4 clipSpace = m_lastProj * m_lastView * glm::vec4(position, 1.0f);
+			//clipSpace /= clipSpace.w; // Perspective divide
 
-			// Convert from NDC (-1 to 1) to screen space (0 to viewport size)
-			float screenX = (clipSpace.x + 1.0f) * 0.5f * pass.view_port.z;
-			float screenY = (clipSpace.y + 1.0f) * 0.5f * pass.view_port.w;
+			//// Convert from NDC (-1 to 1) to screen space (0 to viewport size)
+			//float screenX = (clipSpace.x + 1.0f) * 0.5f * pass.view_port.z;
+			//float screenY = (clipSpace.y + 1.0f) * 0.5f * pass.view_port.w;
 
-			// Use screen space position instead
-			position.x = screenX;
-			position.y = screenY;
+			//// Use screen space position instead
+			//position.x = screenX;
+			//position.y = screenY;
 			std::cout << "Rendering text '" << text << "' at: " << position.x << ", " << position.y << ", " << position.z << std::endl;
 			float scale = fontSize / m_defaultFont.getBaseSize(); 
 
