@@ -293,7 +293,7 @@
           "Properties": {
             "Position": [640.0, -500.0, -0.5],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [256.0, 144.0, 1.0],
+            "Scale": [650.0, 360.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -325,9 +325,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [580.0, -560.0, -0.6],
+            "Position": [568.0, -560.0, -0.6],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [50.0, 25.0, 1.0],
+            "Scale": [65.0, 20.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -359,9 +359,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [700.0, -560.0, -0.6],
+            "Position": [712.0, -560.0, -0.6],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [50.0, 25.0, 1.0],
+            "Scale": [65.0, 20.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -433,6 +433,137 @@
           "Type": "ScriptComponent",
           "Properties": {
             "ScriptClassName": "Game.InstallButtonHandler"
+          }
+        }
+      ]
+    },
+    {
+      "ID": 13,
+      "Name": "Credits Popup",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Popup",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.5],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [650.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_CreditsAlternative.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 10,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 14,
+      "Name": "Credits Close Button",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Close Button",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [725.0, -500.0, -0.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [13.0, 13.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "XButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 16,
+      "Name": "Credits Close Button 2",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Close Button 2",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [555.0, -500.0, -0.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [13.0, 13.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "XButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 15,
+      "Name": "Credits Popup Controller",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Popup Controller",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [0.0, 0.0, 0.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "ScriptComponent",
+          "Properties": {
+            "ScriptClassName": "Game.CreditsPopup"
           }
         }
       ]

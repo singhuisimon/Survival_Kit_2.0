@@ -28,10 +28,11 @@ namespace Game
         private const float VISIBLE_Y = 360.0f;
         private const float CENTER_X = 640.0f;
 
-        // Button offsets from popup center when visible
-        private const float YES_BUTTON_OFFSET_X = -60.0f;
-        private const float NO_BUTTON_OFFSET_X = 60.0f;
-        private const float BUTTON_OFFSET_Y = -60.0f;
+        // Absolute button positions when visible
+        private const float YES_BUTTON_X = 568.0f;
+        private const float YES_BUTTON_Y = 437.0f;
+        private const float NO_BUTTON_X = 712.0f;
+        private const float NO_BUTTON_Y = 437.0f;
 
         // Entity IDs
         private uint shutdownButtonId;
@@ -154,12 +155,12 @@ namespace Game
             Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
             SetPosition(popupId, ref popupPos);
 
-            // Move Yes button (left of center)
-            Vector3 yesPos = new Vector3(CENTER_X + YES_BUTTON_OFFSET_X, VISIBLE_Y + BUTTON_OFFSET_Y, -0.6f);
+            // Move Yes button to visible position
+            Vector3 yesPos = new Vector3(YES_BUTTON_X, YES_BUTTON_Y, -0.6f);
             SetPosition(yesButtonId, ref yesPos);
 
-            // Move No button (right of center)
-            Vector3 noPos = new Vector3(CENTER_X + NO_BUTTON_OFFSET_X, VISIBLE_Y + BUTTON_OFFSET_Y, -0.6f);
+            // Move No button to visible position
+            Vector3 noPos = new Vector3(NO_BUTTON_X, NO_BUTTON_Y, -0.6f);
             SetPosition(noButtonId, ref noPos);
 
             LogMessage("QuitConfirmationPopup: Popup shown at center");
@@ -174,11 +175,11 @@ namespace Game
             SetPosition(popupId, ref popupPos);
 
             // Move Yes button off screen
-            Vector3 yesPos = new Vector3(CENTER_X + YES_BUTTON_OFFSET_X, HIDDEN_Y + BUTTON_OFFSET_Y, -0.6f);
+            Vector3 yesPos = new Vector3(YES_BUTTON_X, HIDDEN_Y, -0.6f);
             SetPosition(yesButtonId, ref yesPos);
 
             // Move No button off screen
-            Vector3 noPos = new Vector3(CENTER_X + NO_BUTTON_OFFSET_X, HIDDEN_Y + BUTTON_OFFSET_Y, -0.6f);
+            Vector3 noPos = new Vector3(NO_BUTTON_X, HIDDEN_Y, -0.6f);
             SetPosition(noButtonId, ref noPos);
 
             LogMessage("QuitConfirmationPopup: Popup hidden");
