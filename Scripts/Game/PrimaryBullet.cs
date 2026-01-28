@@ -16,6 +16,9 @@ namespace Game
         [SerializeField]
         public float Damage = 10.0f;
 
+        [SerializeField]
+        public int UltRecharged = 1;
+
         // Tags this bullet can damage
         [SerializeField]
         private string[] TargetTags = { "botnet", "loveletter", "adware" };
@@ -41,6 +44,10 @@ namespace Game
             }
 
             // Collisions (for ALL bullets, decided by tag)
+            //CheckCollisions();
+        }
+
+        public override void OnFixedUpdate(float deltaTime){
             CheckCollisions();
         }
 
@@ -116,6 +123,7 @@ namespace Game
             // Publish event
             Publish("BulletHit", targetEntityID.ToString());
             Publish("BulletHitEnemy", true.ToString());
+            Publish("GainUlt", UltRecharged.ToString());
             LogMessage("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
 
             // Destroy the bullet that actually hit

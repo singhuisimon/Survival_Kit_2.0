@@ -5,6 +5,7 @@ using static Engine.Logger;
 using static Engine.Physics;
 using static Engine.Scene;
 using static Engine.Tag;
+using static Engine.Rigidbody;
 
 namespace Game {
 
@@ -14,9 +15,11 @@ namespace Game {
         [SerializeField] private float projectileLifetime = 2.0f;
         
         private string[] targets = { "botnet", "wormhost", "wormchild", "adware"};
-        private string ultTag = "primaryUltAOE";
+        private string ultTag = "PrimaryUltExplosion";
 
         private float elapsedTime = 0.0f;
+
+        public float test = 0.0f;
 
         public override void OnStart(){
 
@@ -25,12 +28,18 @@ namespace Game {
         public override void OnUpdate(float deltaTime){
             elapsedTime += deltaTime;
 
+            
+
+            //CheckCollisions();
+        }
+
+        public override void OnFixedUpdate(float deltaTime){
+            CheckCollisions();
+
             if(elapsedTime >= projectileLifetime){
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
-
-            CheckCollisions();
         }
 
         public override void OnDestroy(){
@@ -109,7 +118,7 @@ namespace Game {
             LogMessage("AOE SPAWN! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
 
             // Destroy the bullet that actually hit
-            SceneDestroyEntity(bulletEntityID);
+            //SceneDestroyEntity(bulletEntityID);
         }
 
 

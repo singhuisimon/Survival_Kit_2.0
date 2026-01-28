@@ -7,6 +7,7 @@ using static Engine.Logger;
 using static Engine.Input;
 using static Engine.Rigidbody;
 using static Engine.Camera;
+using static Engine.Event;
 
 namespace Game{
 
@@ -47,6 +48,8 @@ namespace Game{
         [SerializeField] private float primaryUltSpeed = 500.0f;
 
         [SerializeField] private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
+
+        private string ULTGAINEVENT = "GainUlt";
 
         //2 audio for primary alt fire
         //not sure what is layermask
@@ -98,6 +101,7 @@ namespace Game{
         private Vector3 bulletDirection;
 
         public override void OnStart(){
+
             //Initialize Values
             shootAllowed = true;
             primaryAmmo = primaryAmmoMax;
@@ -112,6 +116,8 @@ namespace Game{
             if(playerEntityID == 0){
                 LogMessage("[CamControl] player entity cannot be found");
             }
+
+            Subscribe(ULTGAINEVENT, UltCharging);
         }
 
         public override void OnUpdate(float deltaTime){
@@ -150,6 +156,10 @@ namespace Game{
             }
         }
 
+        public override void OnDestroy(){
+            Unsubscribe(ULTGAINEVENT, UltCharging);
+        }
+
         private void PrimaryShoot(){
             if(Input.IsMouseButtonPressed(MouseButton.Left) && primaryAmmo > 0)
             {
@@ -180,7 +190,8 @@ namespace Game{
             Primary_AutoReload();
 
             //Alt Charging - Primary
-            Primary_AltCharging();
+            //Change to events
+            //Primary_AltCharging();
         }
 
         #region PRIMARY
@@ -232,25 +243,49 @@ namespace Game{
             }
         }
 
-        private void Primary_AltCharging()
-        {
-            if(primaryAltCharging && !primaryShooting)
-            {
-                if(primaryAltCharge < primaryAltChargeMax)
-                {
-                    PrimaryCharge();
-                }
-                else {
-                    LogMessage("[PlayerWeapon] Alt Charge Full");
-                    primaryAltReady = true;
+        // private void Primary_AltCharging()
+        // {
+        //     if(primaryAltCharging && !primaryShooting)
+        //     {
+        //         if(primaryAltCharge < primaryAltChargeMax)
+        //         {
+        //             PrimaryCharge();
+        //         }
+        //         else {
+        //             LogMessage("[PlayerWeapon] Alt Charge Full");
+        //             primaryAltReady = true;
 
-                    //play SFX ->notify player ult is ready?
-                }
-            } 
-            else if(primaryAltCharge >= primaryAltChargeMax)
-            {
-                primaryAltReady = true;
+        //             //play SFX ->notify player ult is ready?
+        //         }
+        //     } 
+        //     else if(primaryAltCharge >= primaryAltChargeMax)
+        //     {
+        //         primaryAltReady = true;
+        //     }
+        // }
+
+        private void UltCharging(string eventName, string payload)
+        {
+            if (primaryAltReady || eventName != ULTGAINEVENT)
+                return;
+
+            if (!int.TryParse(payload, out int gainAmount))
+                return;
+
+            if(primaryAltCharge < primaryAltChargeMax){
+                primaryAltCharge += gainAmount;
             }
+
+            if(primaryAltCharge >= primaryAltChargeMax){
+                //play sfx -> notify player ult is ready
+                //publish event here
+
+                primaryAltReady = true;
+
+                LogMessage("[PlayerWeapon] AltCharge is full");
+            }
+
+            //add in bullet hit audio here i guess - Amanda
         }
 
         private void PrimaryFire(){
@@ -363,7 +398,7 @@ namespace Game{
             }
             
             // Scale for ult bullet (might want to make it bigger than regular bullets)
-            Vector3 scale = new Vector3(1.0f, 1.0f, 1.0f);
+            Vector3 scale = new Vector3(5.0f, 5.0f, 5.0f);
 
             // Spawn the ult bullet
             uint ultBulletID = PrefabInstantiateWithTransform(PrimaryUltBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
@@ -387,23 +422,23 @@ namespace Game{
             primaryAltReady = false;
         }
 
-        private void PrimaryCharge()
-        {
-            if(elapsedTime > primaryChargeNext)
-            {
-                if(primaryAmmo > 0)
-                {
-                    primaryAmmo -= 1;
-                    primaryAltCharge += 1;
+        // private void PrimaryCharge()
+        // {
+        //     if(elapsedTime > primaryChargeNext)
+        //     {
+        //         if(primaryAmmo > 0)
+        //         {
+        //             primaryAmmo -= 1;
+        //             primaryAltCharge += 1;
 
-                    //SFX for altcharge
+        //             //SFX for altcharge
 
-                    primaryChargeNext = elapsedTime + primaryChargeRate;
+        //             primaryChargeNext = elapsedTime + primaryChargeRate;
 
-                    LogMessage("[PlayerWeapon] Charging... " + primaryAltCharge + "/" + primaryAltChargeMax);
-                }
-            }
-        }
+        //             LogMessage("[PlayerWeapon] Charging... " + primaryAltCharge + "/" + primaryAltChargeMax);
+        //         }
+        //     }
+        // }
 
         private void PrimaryAltCharge_Reward()
         {

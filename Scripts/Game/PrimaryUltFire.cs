@@ -15,10 +15,10 @@ namespace Game{
 
         [SerializeField] private float aoeRadius = 10.0f;
         [SerializeField] private float projectileLifetime = 2.0f;
-        [SerializeField] private string ultExplosionPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
+        [SerializeField] private string ultExplosionPrefab = "Sources/Prefabs/PrimaryUltExplosion.prefab";
 
         private string[] targets = { "botnet", "wormhost", "wormchild", "adware"};
-        private string ultTag = "primaryUlt";
+        private string ultTag = "PrimaryUltBullet";
 
         private float elapsedTime = 0.0f;
 
@@ -35,11 +35,11 @@ namespace Game{
             }
 
             // Collisions (for ALL bullets, decided by tag)
-            CheckCollisions();
+            //CheckCollisions();
         }
 
         public override void OnFixedUpdate(float deltaTime){
-
+            CheckCollisions();
         }
 
         public override void OnDestroy(){
