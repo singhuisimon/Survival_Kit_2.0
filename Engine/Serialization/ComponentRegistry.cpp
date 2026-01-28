@@ -26,6 +26,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TextComponent.h"
 
  // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -877,8 +878,68 @@ namespace Engine {
                 [](SpriteRendererComponent& c, const bool& v) {c.IsVisible = v; });
         }
 
+        // Register Text Component
+        {
+            auto& meta = REGISTER_COMPONENT(TextComponent);
+
+            meta.AddProperty<TextComponent, std::string>(
+                "Text",
+                PropertyType::String,
+                [](const TextComponent& c) { return c.text; },
+                [](TextComponent& c, const std::string& v) { c.setText(v); }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "FontSize",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.fontSize;  },
+                [](TextComponent& c, const float& v) { return c.setFontSize(v);  }
+            );
+
+            meta.AddProperty<TextComponent, glm::vec4>(
+                "Color",
+                PropertyType::Vec4,
+                [](const TextComponent& c) {
+                    return glm::vec4(c.color[0], c.color[1], c.color[2], c.color[3]);
+                },
+                [](TextComponent& c, const glm::vec4& v) {
+                    c.setColor(v);
+                }
+            );
+
+            meta.AddProperty<TextComponent, u32>(
+                "Alignment",
+                PropertyType::U32,
+                [](const TextComponent& c) { return static_cast<u32>(c.align); },
+                [](TextComponent& c, const u32& v) {
+                    c.setAlignment(static_cast<TextAlignment>(v));
+                }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "LineSpacing",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.lineSpacing; },
+                [](TextComponent& c, const float& v) { c.lineSpacing = v; }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "LetterSpacing",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.letterSpacing; },
+                [](TextComponent& c, const float& v) { c.setLetterSpacing(v); }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "MaxWidth",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.maxWidth; },
+                [](TextComponent& c, const float& v) { c.maxWidth = v; }
+            );
+        }
+
         LOG_INFO("Component reflection registration complete");
-        LOG_INFO("  - Registered 10 component types");
+        LOG_INFO("  - Registered 11 component types");
     }
 
 } // namespace Engine
