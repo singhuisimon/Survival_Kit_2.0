@@ -5,6 +5,8 @@ out vec4 FragColor;
 
 layout (binding = 6) uniform sampler2D Texture2D;
 
+const float gamma = 2.2;
+
 uniform vec4 uColor;
 uniform bool uHasTexture;
 
@@ -18,6 +20,9 @@ void main()
     else{
         baseColor = uColor;
     }
+
+    // gamma correction 
+    baseColor = pow(baseColor, vec4(1.0 / gamma));
 
     FragColor = baseColor;
 }

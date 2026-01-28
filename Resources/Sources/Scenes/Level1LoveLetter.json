@@ -38,7 +38,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "17542814111464145181",
-                        "Mesh": "lvl1_level_design_v001.fbx",
+                        "Mesh": "lvl1_level_design_v002.fbx",
                         "Material": "LevelDesign_GroundBelow.mat",
                         "Texture": "",
                         "Visible": true,

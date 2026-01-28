@@ -108,9 +108,22 @@ namespace Game
             stunTimer = 0.0f;
 
             hasChosenInitialTarget = false;
-            chooseTargetTimer = RandomRangeFloat(minInitialTargetDelay, maxInitialTargetDelay);
 
-            //PhysicsEnableCollisionEvents();
+            // Immediate attempt (no busy-wait loops)
+            chooseTargetTimer = 0.0f;
+            ChooseTarget();
+            hasChosenInitialTarget = true;
+
+            if (targetID != INVALID_ENTITY)
+            {
+                isMoving = true;
+                chooseTargetTimer = RandomRangeFloat(minRetargetDelay, maxRetargetDelay);
+            }
+            else
+            {
+                isMoving = false;
+                // keep chooseTargetTimer at 0 so OnUpdate retries next frame
+            }
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
@@ -121,17 +134,14 @@ namespace Game
             if (isDead)
                 return;
 
-            // Update stun
             if (isStunned)
             {
                 UpdateStun(deltaTime);
                 return;
             }
 
-            // Target selection
             UpdateTargetSelectionTimer(deltaTime);
 
-            // Movement and rotation
             if (isMoving && targetID != INVALID_ENTITY)
             {
                 if (enableLookAt)
@@ -141,7 +151,6 @@ namespace Game
                 ClampSpeed();
             }
 
-            // Handle collision-triggered explosion
             HandleCollisionTriggers();
 
             if (isExploding)
@@ -174,7 +183,8 @@ namespace Game
             if (!uint.TryParse(payload, out uint hitId))
                 return;
 
-            if (hitId != (uint)EntityID){
+            if (hitId != (uint)EntityID)
+            {
                 LogMessage("ID DOESN'T MATCH HIT!");
                 return;
             }
@@ -183,12 +193,11 @@ namespace Game
             LogMessage("CurrentBotnetHP is: " + HP.ToString());
             LogMessage("SUCCESS MATCH! REDUCING HEALTH!");
 
-            if(HP <= 1.0f){
+            if (HP <= 1.0f)
+            {
                 Publish("BotnetDeath", 1.ToString());
                 Explode();
             }
-
-            //add in bullet hit audio here i guess - Amanda
         }
 
         private void OnSpawnDisable(string eventName, string payload)
@@ -255,10 +264,10 @@ namespace Game
             if (chooseTargetTimer > 0.0f)
                 return;
 
-            ChooseTarget();
-
             if (!hasChosenInitialTarget)
                 hasChosenInitialTarget = true;
+
+            ChooseTarget();
 
             if (targetID != INVALID_ENTITY)
             {
@@ -267,6 +276,7 @@ namespace Game
             }
             else
             {
+                isMoving = false;
                 chooseTargetTimer = RandomRangeFloat(0.5f, 1.0f);
             }
         }
@@ -279,14 +289,10 @@ namespace Game
             int choice = RandomRangeInt(0, 4);
             LogMessage("CHOICE IS: " + choice.ToString());
 
-            // currently forced to Player (as per your commented switch) M3
-            //uint chosen = FindFirstEntityWithTag(TAG_PLAYER);
-
             uint chosen = INVALID_ENTITY;
 
-            // TODO: ADD IN RANDOM TARGET (EMPLACEMENT BARRIER ALLIES?)
-            // TEMP FOR NOW - AMANDA
-            switch(choice){
+            switch (choice)
+            {
                 case 0:
                     chosen = FindFirstEntityWithTag(TAG_PLAYER);
                     TARGET = TAG_PLAYER;
@@ -341,18 +347,15 @@ namespace Game
 
             uint self = (uint)EntityID;
 
-            // Positions
             Vector3 myPos = Transform.GetPosition(self);
             Vector3 targetPos = Transform.GetPosition(targetID);
 
-            // Direction to target
             Vector3 toTarget = new Vector3(
                 targetPos.X - myPos.X,
                 targetPos.Y - myPos.Y,
                 targetPos.Z - myPos.Z
             );
 
-            // Normalize direction
             float lenSq = toTarget.X * toTarget.X +
                           toTarget.Y * toTarget.Y +
                           toTarget.Z * toTarget.Z;
@@ -364,19 +367,13 @@ namespace Game
             toTarget.Y *= invLen;
             toTarget.Z *= invLen;
 
-            // Engine convention: forward is +Z for identity rotation
-            Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
+            // FIX: use engine's forward basis (Vector3.Forward is (0,0,-1) in your SimpleMath.cs)
+            Vector3 forward = Vector3.Forward;
 
-            // Current orientation (quat)
             Quat currentRot = Transform.GetRotation(self);
-
-            // Desired orientation: rotate +Z to face toTarget (world-space)
             Quat targetRot = QuaternionFromTo(forward, toTarget);
 
-            // Interpolation factor based on rotateSpeed
             float t = SimpleMath.Clamp(rotateSpeed * deltaTime, 0.0f, 1.0f);
-
-            // Smoothly rotate towards target using nlerp (shortest path)
             Quat newRot = Nlerp(currentRot, targetRot, t);
 
             Transform.SetRotation(self, ref newRot);
@@ -447,7 +444,6 @@ namespace Game
             if (count <= 0)
                 return;
 
-            // Only explode if we have a target
             if (targetID == INVALID_ENTITY)
                 return;
 
@@ -496,7 +492,6 @@ namespace Game
 
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
-                //instantiate the explode sound
                 uint explosionID = PrefabInstantiate(deathExplosionPrefab);
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
@@ -550,7 +545,6 @@ namespace Game
                 return q180;
             }
 
-            // General case: use cross product
             Vector3 cross = new Vector3(
                 from.Y * to.Z - from.Z * to.Y,
                 from.Z * to.X - from.X * to.Z,
@@ -641,8 +635,6 @@ namespace Game
             float t = r / 16777215.0f;
             return minInclusive + (maxInclusive - minInclusive) * t;
         }
-
-        // ===== Search Helpers =====
 
         private static uint FindFirstEntityWithTag(string tag)
         {

@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Bullet",
-    "Prefab GUID": 100000000000001,
+    "Prefab Name": "Prefab: Bullet.prefab",
+    "Prefab GUID": 17310438938004099517,
     "version": 1,
     "entities": [
         {
@@ -21,9 +21,8 @@
                             ],
                             "Rotation": [
                                 0.0,
-                                0.0,
-                                0.0,
-                                1.0
+                                -0.0,
+                                0.0
                             ],
                             "Scale": [
                                 0.20000000298023224,
@@ -55,13 +54,13 @@
                             "Material": "PrimaryBullet.mat",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
                             "MeshType": 1,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 0
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 },
@@ -103,7 +102,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": ""
+                            "ComponentGUID": "17886899690307441079",
+                            "ScriptClassName": "",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }

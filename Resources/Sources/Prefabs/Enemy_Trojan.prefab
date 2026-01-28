@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Enemy_Trojan",
-    "Prefab GUID": 8095203205580822471,
+    "Prefab Name": "Prefab: Enemy_Trojan.prefab",
+    "Prefab GUID": 12698752919577662041,
     "version": 1,
     "entities": [
         {
@@ -21,14 +21,13 @@
                             ],
                             "Rotation": [
                                 0.0,
-                                0.0,
-                                0.0,
-                                1.0
+                                -0.0,
+                                0.0
                             ],
                             "Scale": [
-                                0.006000000052154064,
-                                0.006000000052154064,
-                                0.006000000052154064
+                                0.009999999776482582,
+                                0.009999999776482582,
+                                0.009999999776482582
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -51,17 +50,17 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "0",
-                            "MeshGuid": 3212263247895052315,
-                            "MaterialGuid": 0,
-                            "TextureGuid": 0,
+                            "Mesh": "E003_trojan_v001.fbx",
+                            "Material": "",
+                            "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
                             "MeshType": 0,
-                            "Material": 0,
-                            "Texture": 0,
-                            "SubmeshIndex": 0
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 },
@@ -103,7 +102,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": ""
+                            "ComponentGUID": "7510606148846375507",
+                            "ScriptClassName": "",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
