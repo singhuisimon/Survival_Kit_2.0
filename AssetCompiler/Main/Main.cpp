@@ -402,7 +402,8 @@ int main(int argc, char* argv[]) {
     }
 
     AssetCompiler::FontCompiler compiler;
-    if (compiler.compile("Resources/Sources/Fonts/Quantico-Bold.ttf")) {
+    if (compiler.compile("Resources/Sources/Fonts/Quantico-Bold.ttf",
+        "Resources/Compiled/Font/Quantico-Bold.font")) {
         std::cout << "Success! << std::endl";
     }
     // Compile each asset

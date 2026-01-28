@@ -41,7 +41,7 @@ namespace AssetCompiler {
 
 	class FontCompiler {
 	public:
-		bool compile(const fs::path& ttfPath);
+		bool compile(const fs::path& ttfPath, const fs::path& outputPath);
 
 
 	private:

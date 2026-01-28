@@ -16,7 +16,7 @@ namespace AssetCompiler {
 	FT_Library FontCompiler::ftLibrary;
 	bool FontCompiler::ftInitialized = false;
 
-	bool FontCompiler::compile(const fs::path& ttfPath) {
+	bool FontCompiler::compile(const fs::path& ttfPath, const fs::path& outputPath) {
 		// Initialize FreeType if needed
 		if (!ftInitialized) {
 			if (FT_Init_FreeType(&ftLibrary)) {
@@ -76,8 +76,10 @@ namespace AssetCompiler {
 		std::vector<uint8_t> compiledData = serializeFontData(metrics, atlas);
 
 		// 7. Write output file
-		fs::path outputPath = ttfPath;
-		outputPath += ".font";  // e.g., arial.ttf ? arial.ttf.font
+		fs::path outputDir = outputPath.parent_path(); 
+		if (!outputDir.empty() && !fs::exists(outputDir)) {
+			fs::create_directories(outputDir);
+		}
 
 		if (!writeFontFile(outputPath, compiledData)) {
 			FT_Done_Face(face);
