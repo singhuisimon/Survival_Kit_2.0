@@ -51,7 +51,7 @@ namespace Engine {
 		setDefaultState();
 
 		initFontResources(); 
-		if (loadFont(getAssetFilePath("Sources/Fonts/Quantico-Bold.ttf.font"))) {
+		if (loadFont(getAssetFilePath("Compiled/Font/Quantico-Bold.font"))) {
 			std::cout << "Font loaded successfully!" << std::endl;
 		}
 		else {
