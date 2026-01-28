@@ -177,7 +177,7 @@ namespace Game
             LogMessage("Damage dealt: " + Damage);
 
             //Publish(EVENT_PLAYER_HEALTHCHAGE, playerHP.ToString());
-
+            DamageSystem.DealDamage(targetEntityID, Damage, bulletEntityID);
             // Destroy the bullet after hitting
             SceneDestroyEntity(bulletEntityID);
             
