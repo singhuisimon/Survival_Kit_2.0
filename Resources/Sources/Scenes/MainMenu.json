@@ -285,21 +285,21 @@
     },
     {
       "ID": 8,
-      "Name": "QuitConfirmation Popup",
+      "Name": "Quit Confirmation Popup",
       "Components": [
         {
           "Type": "TagComponent",
           "Properties": {
-            "Tag": "QuitConfirmation Popup",
+            "Tag": "Quit Confirmation Popup",
             "Active": true
           }
         },
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [640.0, -500.0, -0.2],
+            "Position": [640.0, -500.0, -0.5],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 100.0, 1.0],
+            "Scale": [650.0, 360.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -310,7 +310,7 @@
             "Texture": "MainMenu_QuitConfirmation.png",
             "Color": [1.0, 1.0, 1.0, 1.0],
             "Quad": 3,
-            "Sprite Layer": 2,
+            "Sprite Layer": 10,
             "IsActive": true,
             "IsVisible": true
           }
@@ -319,21 +319,21 @@
     },
     {
       "ID": 9,
-      "Name": "QuitConfirmation YesButton",
+      "Name": "Quit Yes Button",
       "Components": [
         {
           "Type": "TagComponent",
           "Properties": {
-            "Tag": "QuitConfirmation YesButton",
+            "Tag": "Quit Yes Button",
             "Active": true
           }
         },
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [580.0, -500.0, -0.3],
+            "Position": [568.0, -560.0, -0.6],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [50.0, 20.0, 1.0],
+            "Scale": [65.0, 20.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -344,7 +344,7 @@
             "Texture": "MainMenu_YesButton.png",
             "Color": [1.0, 1.0, 1.0, 1.0],
             "Quad": 3,
-            "Sprite Layer": 3,
+            "Sprite Layer": 11,
             "IsActive": true,
             "IsVisible": true
           }
@@ -353,21 +353,21 @@
     },
     {
       "ID": 10,
-      "Name": "QuitConfirmation NoButton",
+      "Name": "Quit No Button",
       "Components": [
         {
           "Type": "TagComponent",
           "Properties": {
-            "Tag": "QuitConfirmation NoButton",
+            "Tag": "Quit No Button",
             "Active": true
           }
         },
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [700.0, -500.0, -0.3],
+            "Position": [712.0, -560.0, -0.6],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [50.0, 20.0, 1.0],
+            "Scale": [65.0, 20.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -378,7 +378,468 @@
             "Texture": "MainMenu_NoButton.png",
             "Color": [1.0, 1.0, 1.0, 1.0],
             "Quad": 3,
-            "Sprite Layer": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 11,
+      "Name": "Quit Popup Controller",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Quit Popup Controller",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [0.0, 0.0, 0.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "ScriptComponent",
+          "Properties": {
+            "ScriptClassName": "Game.QuitConfirmationPopup"
+          }
+        }
+      ]
+    },
+    {
+      "ID": 12,
+      "Name": "Install Button Controller",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Install Button Controller",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [0.0, 0.0, 0.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "ScriptComponent",
+          "Properties": {
+            "ScriptClassName": "Game.InstallButtonHandler"
+          }
+        }
+      ]
+    },
+    {
+      "ID": 13,
+      "Name": "Credits Popup",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Popup",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.5],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [650.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_CreditsAlternative.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 10,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 14,
+      "Name": "Credits Close Button",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Close Button",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [725.0, -500.0, -0.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [13.0, 13.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "XButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 16,
+      "Name": "Credits Close Button 2",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Close Button 2",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [555.0, -500.0, -0.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [13.0, 13.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "XButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 11,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 15,
+      "Name": "Credits Popup Controller",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Credits Popup Controller",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [0.0, 0.0, 0.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "ScriptComponent",
+          "Properties": {
+            "ScriptClassName": "Game.CreditsPopup"
+          }
+        }
+      ]
+    },
+    {
+      "ID": 17,
+      "Name": "Error Popup 1",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 1",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [200.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 18,
+      "Name": "Error Popup 2",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 2",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [250.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 19,
+      "Name": "Error Popup 3",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 3",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [300.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 20,
+      "Name": "Error Popup 4",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 4",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [350.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 21,
+      "Name": "Error Popup 5",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 5",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [400.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 22,
+      "Name": "Error Popup 6",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 6",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [450.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 23,
+      "Name": "Error Popup 7",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 7",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [500.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 24,
+      "Name": "Error Popup 8",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Error Popup 8",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [550.0, -500.0, -0.7],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [150.0, 80.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "ErrorPopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 12,
             "IsActive": true,
             "IsVisible": true
           }

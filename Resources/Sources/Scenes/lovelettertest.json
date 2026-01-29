@@ -14,6 +14,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "12345730512721805587",
                         "Position": [
                             0.0,
                             0.0,
@@ -36,25 +37,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 3149221636613570589,
-                      "TextureGuid": 11796132921164922911,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 0
+                        "ComponentGUID": "2545897723563606293",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -71,6 +74,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "11192809008114958617",
                         "Position": [
                             0.0,
                             0.0,
@@ -93,28 +97,29 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 18137201196503105573,
-                      "TextureGuid": 13525515178075717671,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 1
+                        "ComponentGUID": "17533877283452616987",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 1
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
-            
             ]
         },
         {
@@ -129,6 +134,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "8886965998901264671",
                         "Position": [
                             0.0,
                             0.0,
@@ -151,25 +157,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 12949054425772425261,
-                      "TextureGuid": 11796132921165578287,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 2
+                        "ComponentGUID": "5428201485080723745",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 2
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -186,6 +194,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "4851740732777300261",
                         "Position": [
                             0.0,
                             0.0,
@@ -208,25 +217,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 16984279691896635445,
-                      "TextureGuid": 7184446902738436151,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 3
+                        "ComponentGUID": "5428201485080723751",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 3
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -243,63 +254,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 6,
-                        "Children": []
-                    }
-                },
-              {
-                  "Type": "MeshRendererComponent",
-                  "Properties": {
-                    "MeshGuid": 1561377315146448923,
-                    "MaterialGuid": 16984279691896897597,
-                    "TextureGuid": 8913829159648968767,
-                    "Visible": true,
-                    "MeshType": 0,
-                    "Material": 0,
-                    "Texture": 0,
-                    "SubmeshIndex": 4
-                  }
-              },
-              {
-                  "Type": "AnimatorComponent",
-                  "Properties": {
-                    "playing": true,
-                    "respectClipLoop": true,
-                    "controller": 0,
-                    "currentClipIndex": 0,
-                    "currentTime": 0.0,
-                    "playbackSpeed": 1.0
-                  }
-              }
-            ]
-        },
-        {
-            "ID": 5,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "E006_logicbomb6"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
+                        "ComponentGUID": "13498652017328652587",
                         "Position": [
                             0.0,
                             0.0,
@@ -322,25 +277,87 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 4302143141221777477,
-                      "TextureGuid": 14101975930379976775,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 5
+                        "ComponentGUID": "11769269760418382125",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 4
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "E006_logicbomb6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3698819228170453297",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 6,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "5428201485080723763",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 5
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -357,6 +374,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "15804495026542346551",
                         "Position": [
                             0.0,
                             0.0,
@@ -390,25 +408,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 1561377315146448923,
-                        "MaterialGuid": 10066750664256176205,
-                        "TextureGuid": 8913829159649329231,
+                        "ComponentGUID": "240054714349912377",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 6
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": false,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 1,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": false,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 1,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -425,6 +445,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "4275279980473876797",
                         "Position": [
                             0.0,
                             0.0,
@@ -447,25 +468,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 16984279691897356373,
-                      "TextureGuid": 11219672168863121495,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 7
+                        "ComponentGUID": "7157583741990994239",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 7
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -482,6 +505,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "15804495026542346563",
                         "Position": [
                             0.0,
                             0.0,
@@ -504,13 +528,14 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "MeshGuid": 1561377315146448923,
-                        "MaterialGuid": 15254897434987364445,
-                        "TextureGuid": 3149221636615471199,
+                        "ComponentGUID": "3122358475867029829",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
                         "Visible": true,
                         "MeshType": 0,
-                        "Material": 0,
-                        "Texture": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
                         "SubmeshIndex": 8
                     }
                 }
@@ -528,6 +553,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "13498652017328652617",
                         "Position": [
                             0.0,
                             0.0,
@@ -550,25 +576,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 14101975930380648549,
-                      "TextureGuid": 4878603893525872743,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 9
+                        "ComponentGUID": "11192809008114958667",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 9
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -585,13 +613,14 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "1392976218956759375",
                         "Position": [
                             0.0,
                             0.0,
                             0.0
                         ],
                         "Rotation": [
-                            -2.831725835800171,
+                            -2.8317253589630127,
                             0.0,
                             0.0
                         ],
@@ -607,25 +636,27 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                      "MeshGuid": 1561377315146448923,
-                      "MaterialGuid": 7760907655043285101,
-                      "TextureGuid": 10066750664256979055,
-                      "Visible": true,
-                      "MeshType": 0,
-                      "Material": 0,
-                      "Texture": 0,
-                      "SubmeshIndex": 10
+                        "ComponentGUID": "11769269760418382161",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 10
                     }
                 },
                 {
                     "Type": "AnimatorComponent",
                     "Properties": {
-                      "playing": true,
-                      "respectClipLoop": true,
-                      "controller": 0,
-                      "currentClipIndex": 0,
-                      "currentTime": 0.0,
-                      "playbackSpeed": 1.0
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
@@ -642,6 +673,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
+                        "ComponentGUID": "16957416531149193557",
                         "Position": [
                             0.0,
                             10.0,
@@ -664,6 +696,7 @@
                 {
                     "Type": "LightComponent",
                     "Properties": {
+                        "ComponentGUID": "816515466653335895",
                         "Enabled": true,
                         "Type": 0,
                         "Color": [
@@ -678,6 +711,15 @@
                     }
                 }
             ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": true,
+            "BloomStrength": 0.04699999839067459,
+            "BloomFilterRadius": 0.0031999999191612005,
+            "Exposure": 1.2699999809265137,
+            "GlobalBias": 0.004999999888241291
         }
     ]
 }

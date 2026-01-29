@@ -36,6 +36,8 @@
 
 #include "../Physics/PhysicsAPI.h"
 
+#include "../Physics/CollisionSystem2D.h"
+
 // Mono
 #include <mono/jit/jit.h>
 #include <mono/metadata/class.h>
@@ -48,6 +50,14 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#ifdef _WIN32
+#include <direct.h>   // For _mkdir on Windows
+#else
+#include <sys/stat.h> // For mkdir on Unix/Linux
+#endif
+
 
 namespace Engine
 {
@@ -108,13 +118,6 @@ namespace Engine
 
 	namespace InternalCalls
 	{
-		// =====================================================================
-		// Global context (set from ScriptSystem via MonoScriptEngine helpers)
-		// =====================================================================
-		static Scene *s_CurrentScene = nullptr;
-		static Input *s_InputSystem = nullptr;
-		static AudioManager *s_AudioManager = nullptr;
-
 		/**************************************************************************
 		 * @brief
 		 * Sets the scene context used by InternalCalls.
@@ -190,26 +193,63 @@ namespace Engine
 				return;
 
 			auto &se = MonoScriptEngine::GetInstance();
-
 			uint64_t eid = static_cast<uint32_t>(entity);
 
-			// If prefab clone already contains a managed instance, just rebind.
-			if (sc.ScriptInstance)
+			// If prefab clone already contains a handle, just rebind to the resolved object.
+			if (sc.GCHandle != 0)
 			{
-				se.BindEntityID(static_cast<MonoObject *>(sc.ScriptInstance), static_cast<std::uint32_t>(eid));
-				sc.Started = false;
-				return;
+				MonoObject *obj = se.GetObjectFromGCHandle(sc.GCHandle);
+				sc.ScriptInstance = obj; // keep cache synced
+
+				if (!obj)
+				{
+					// handle is stale/invalid -> clear and recreate next
+					se.DestroyScriptHandle(sc.GCHandle);
+					sc.GCHandle = 0;
+					sc.ScriptInstance = nullptr;
+				}
+				else
+				{
+					se.BindEntityID(obj, static_cast<std::uint32_t>(eid));
+					sc.Started = false;
+					return;
+				}
 			}
 
-			MonoObject *instance = se.CreateScriptInstance(sc.ScriptClassName);
-			if (!instance)
+			// Transitional: if old data has ScriptInstance but no handle, adopt it.
+			// (Optional, but helps when cloning prefabs that copied ScriptInstance pointer.)
+			if (sc.ScriptInstance && sc.GCHandle == 0)
+			{
+				MonoObject *legacy = static_cast<MonoObject *>(sc.ScriptInstance);
+				sc.GCHandle = mono_gchandle_new(legacy, /*pinned*/ false);
+				MonoObject *obj = se.GetObjectFromGCHandle(sc.GCHandle);
+				sc.ScriptInstance = obj;
+
+				if (obj)
+				{
+					se.BindEntityID(obj, static_cast<std::uint32_t>(eid));
+					sc.Started = false;
+					return;
+				}
+
+				// If legacy pointer was bad, clean it up and fall through to recreate
+				se.DestroyScriptHandle(sc.GCHandle);
+				sc.GCHandle = 0;
+				sc.ScriptInstance = nullptr;
+			}
+
+			// Create a NEW managed instance and store handle (handle-first)
+			MonoObject *instance = nullptr;
+			uint32_t handle = se.CreateScriptInstanceHandle(sc.ScriptClassName, &instance, /*pinned*/ false);
+			if (handle == 0 || !instance)
 			{
 				LOG_ERROR("[InternalCall] Prefab script init failed for class '", sc.ScriptClassName, "' on entity ", eid);
 				return;
 			}
 
 			se.BindEntityID(instance, static_cast<std::uint32_t>(eid));
-			sc.ScriptInstance = instance;
+			sc.GCHandle = handle;
+			sc.ScriptInstance = instance; // cache only
 			sc.Started = false;
 		}
 
@@ -335,8 +375,23 @@ namespace Engine
 			}
 
 			auto &se = MonoScriptEngine::GetInstance();
-			MonoObject *instance = se.CreateScriptInstance(klass);
-			if (!instance)
+
+			// If entity already has a script, destroy the old handle cleanly
+			if (e.HasComponent<ScriptComponent>())
+			{
+				auto &scOld = e.GetComponent<ScriptComponent>();
+				if (scOld.GCHandle != 0)
+				{
+					se.DestroyScriptHandle(scOld.GCHandle);
+					scOld.GCHandle = 0;
+				}
+				scOld.ScriptInstance = nullptr;
+				scOld.Started = false;
+			}
+
+			MonoObject *instance = nullptr;
+			uint32_t handle = se.CreateScriptInstanceHandle(klass, &instance, false);
+			if (handle == 0 || !instance)
 			{
 				LOG_ERROR("[InternalCall] Entity_AddScript: failed to create instance of ", klass);
 				return;
@@ -344,18 +399,21 @@ namespace Engine
 
 			se.BindEntityID(instance, static_cast<std::uint32_t>(entityID));
 
+			// Attach/update component with handle as source of truth
 			if (e.HasComponent<ScriptComponent>())
 			{
 				auto &sc = e.GetComponent<ScriptComponent>();
 				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
+				sc.GCHandle = handle;
+				sc.ScriptInstance = instance; // cache
 				sc.Started = false;
 			}
 			else
 			{
 				auto &sc = e.AddComponent<ScriptComponent>();
 				sc.ScriptClassName = klass;
-				sc.ScriptInstance = instance;
+				sc.GCHandle = handle;
+				sc.ScriptInstance = instance; // cache
 				sc.Started = false;
 			}
 		}
@@ -731,6 +789,28 @@ namespace Engine
 			glm::vec2 d = s_InputSystem->GetMouseDelta();
 			if (outX) *outX = d.x;
 			if (outY) *outY = d.y;
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Sets the visibility of the system cursor.
+		 * @param visible
+		 * Input parameter.
+		 **************************************************************************/
+		void Input_SetCursorVisible(bool visible) {
+			if (!s_InputSystem) return;
+			s_InputSystem->SetCursorVisible(visible);
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Gets the visibility of the system cursor.
+		 * @return
+		 * True if the cursor is visible; otherwise false.
+		 **************************************************************************/
+		bool Input_GetCursorVisible() {
+			if (!s_InputSystem) return true;
+			return s_InputSystem->IsCursorVisible();
 		}
 
 		// =====================================================================
@@ -1549,36 +1629,6 @@ namespace Engine
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
 			e.GetComponent<MeshRendererComponent>().Visible = visible;
-		}
-
-		/**************************************************************************
-		 * @brief
-		 * Gets a mesh renderer property from the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @return
-		 * True if the condition is met; otherwise false.
-		***************************************************************************/
-		bool MeshRenderer_GetShadowCast(uint64_t entityID)
-		{
-			Entity e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<MeshRendererComponent>()) return false;
-			return e.GetComponent<MeshRendererComponent>().ShadowCast;
-		}
-
-		/**************************************************************************
-		 * @brief
-		 * Sets a mesh renderer property on the entity.
-		 * @param entityID
-		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
-		 * @param cast
-		 * Input parameter.
-		***************************************************************************/
-		void MeshRenderer_SetShadowCast(uint64_t entityID, bool cast)
-		{
-			Entity e = GetEntityOrNull(entityID);
-			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
-			e.GetComponent<MeshRendererComponent>().ShadowCast = cast;
 		}
 
 		/**************************************************************************
@@ -2527,6 +2577,222 @@ namespace Engine
 		{
 			if (!q1 || !q2) return 0.0f;
 			return glm::dot(*q1, *q2);
+		}
+
+		// ========================================
+// File I/O
+// ========================================
+
+/**
+ * @brief Checks if a file exists at the given path.
+ * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+ * @return True if the file exists, otherwise false.
+ */
+		bool FileExists(MonoString* pathStr)
+		{
+			if (!pathStr)
+				return false;
+
+			char* pathCStr = mono_string_to_utf8(pathStr);
+			if (!pathCStr)
+				return false;
+
+			std::string path(pathCStr);
+			mono_free(pathCStr);
+
+			// Use fopen for reliable cross-platform existence check
+			FILE* file = fopen(path.c_str(), "r");
+			if (file)
+			{
+				fclose(file);
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * @brief Reads the entire content of a text file.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return Managed string containing file content, or empty string on failure.
+		 */
+		MonoString* FileReadAllText(MonoString* pathStr)
+		{
+			MonoDomain* domain = mono_domain_get();
+			if (!domain)
+				return nullptr;
+
+			if (!pathStr)
+				return mono_string_new(domain, "");
+
+			char* pathCStr = mono_string_to_utf8(pathStr);
+			if (!pathCStr)
+				return mono_string_new(domain, "");
+
+			std::string path(pathCStr);
+			mono_free(pathCStr);
+
+			// Open file for reading
+			std::ifstream file(path);
+			if (!file.is_open())
+			{
+				LOG_ERROR("[FileIO] Failed to open file for reading: {0}", path);
+				return mono_string_new(domain, "");
+			}
+
+			// Read entire file into string
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			file.close();
+
+			std::string content = buffer.str();
+			return mono_string_new(domain, content.c_str());
+		}
+
+		/**
+		 * @brief Helper function to create directory recursively (cross-platform).
+		 * @param path Directory path to create.
+		 */
+		static void CreateDirectoriesRecursive(const std::string& path)
+		{
+			if (path.empty())
+				return;
+
+			// Find parent directory
+			size_t pos = path.find_last_of("/\\");
+			if (pos != std::string::npos)
+			{
+				std::string parent = path.substr(0, pos);
+				CreateDirectoriesRecursive(parent);
+			}
+
+			// Try to create this directory (ignore errors if it already exists)
+#ifdef _WIN32
+			_mkdir(path.c_str());
+#else
+			mkdir(path.c_str(), 0755);
+#endif
+		}
+
+		/**
+		 * @brief Writes text content to a file, creating parent directories if needed.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @param contentStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return True if write succeeded, otherwise false.
+		 */
+		bool FileWriteAllText(MonoString* pathStr, MonoString* contentStr)
+		{
+			if (!pathStr || !contentStr)
+				return false;
+
+			// Convert path
+			char* pathCStr = mono_string_to_utf8(pathStr);
+			if (!pathCStr)
+				return false;
+
+			std::string path(pathCStr);
+			mono_free(pathCStr);
+
+			// Convert content
+			char* contentCStr = mono_string_to_utf8(contentStr);
+			if (!contentCStr)
+				return false;
+
+			std::string content(contentCStr);
+			mono_free(contentCStr);
+
+			// Create parent directories if needed
+			size_t lastSlash = path.find_last_of("/\\");
+			if (lastSlash != std::string::npos)
+			{
+				std::string parentDir = path.substr(0, lastSlash);
+				CreateDirectoriesRecursive(parentDir);
+			}
+
+			// Write file
+			std::ofstream file(path);
+			if (!file.is_open())
+			{
+				LOG_ERROR("[FileIO] Failed to open file for writing: {0}", path);
+				return false;
+			}
+
+			file << content;
+			file.close();
+
+			LOG_INFO("[FileIO] File written successfully: {0}", path);
+			return true;
+		}
+
+
+
+
+
+		static std::uint32_t g_rngState = 0x6D2B79F5u; // non-zero default
+
+		static inline std::uint32_t NextU32()
+		{
+			// xorshift32
+			std::uint32_t x = g_rngState;
+			if (x == 0u) x = 0x6D2B79F5u; // never allow 0 state
+
+			x ^= (x << 13);
+			x ^= (x >> 17);
+			x ^= (x << 5);
+
+			g_rngState = x;
+			return x;
+		}
+
+		void RNG_Seed(std::uint32_t seed)
+		{
+			g_rngState = (seed == 0u) ? 0x6D2B79F5u : seed;
+			(void)NextU32(); // diffuse a bit
+		}
+
+		int RNG_RandInt(int min, int max)
+		{
+			if (min == max) return min;
+			if (min > max)
+			{
+				int tmp = min; min = max; max = tmp;
+			}
+
+			// Inclusive range [min, max]
+			std::uint32_t span = static_cast<std::uint32_t>(max - min) + 1u;
+
+			// Simple modulo (tiny bias, fine for games)
+			std::uint32_t r = NextU32();
+			int val = min + static_cast<int>(r % span);
+			return val;
+		}
+
+		float RNG_RandFloat(float min, float max)
+		{
+			if (min == max) return min;
+			if (min > max)
+			{
+				float tmp = min; min = max; max = tmp;
+			}
+
+			// Convert to [0,1) using 24 bits
+			std::uint32_t r = NextU32();
+			r >>= 8; // 24 bits
+			float t = static_cast<float>(r) * (1.0f / 16777216.0f); // 2^24
+
+			return min + (max - min) * t; // [min, max)
+		}
+
+		bool RNG_RandBool()
+		{
+			return (NextU32() & 1u) != 0u;
+		}
+
+		bool CollisionSystem2D_IsPointInEntity(uint64_t entityId, glm::vec2* point) 
+		{
+			if (!s_CurrentScene) return false;
+
+			auto sys = s_CurrentScene->GetSystem<CollisionSystem2D>();
+			return sys->IsPointInEntity(static_cast<entt::entity>(entityId), *point);
 		}
 	} // namespace InternalCalls
 } // namespace Engine

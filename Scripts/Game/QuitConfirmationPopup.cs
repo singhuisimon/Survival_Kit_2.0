@@ -3,6 +3,7 @@
 // written consent of DigiPen Institute of Technology is prohibited.
 
 using Engine;
+using System;
 using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Logger;
@@ -11,21 +12,27 @@ using static Engine.Transform;
 namespace Game
 {
     /// <summary>
-    /// Handles the quit confirmation popup.
-    /// Attach this script to the Shutdown Button.
-    /// When clicked, shows a popup with Yes/No options.
+    /// Handles the quit confirmation popup in the main menu.
+    /// Shows popup when shutdown button is clicked, handles Yes/No responses.
     /// </summary>
     public class QuitConfirmationPopup : ScriptBehaviour
     {
         // Entity names to find
-        [SerializeField]
-        private string shutdownButtonEntityName = "Shutdown Button";
+        private const string SHUTDOWN_BUTTON_NAME = "Shutdown Button";
+        private const string POPUP_NAME = "Quit Confirmation Popup";
+        private const string YES_BUTTON_NAME = "Quit Yes Button";
+        private const string NO_BUTTON_NAME = "Quit No Button";
 
-        [SerializeField]
-        private string popupEntityName = "QuitConfirmation Popup";
+        // Positions
+        private const float HIDDEN_Y = -500.0f;
+        private const float VISIBLE_Y = 360.0f;
+        private const float CENTER_X = 640.0f;
 
-        [SerializeField]
-        private string yesButtonEntityName = "QuitConfirmation YesButton";
+        // Absolute button positions when visible
+        private const float YES_BUTTON_X = 568.0f;
+        private const float YES_BUTTON_Y = 437.0f;
+        private const float NO_BUTTON_X = 712.0f;
+        private const float NO_BUTTON_Y = 437.0f;
 
         [SerializeField]
         private string noButtonEntityName = "QuitConfirmation NoButton";
@@ -60,15 +67,15 @@ namespace Game
         private Vector3 visibleNoPosition;
 
         // Entity IDs
-        private uint shutdownButtonEntityID;
-        private uint popupEntityID;
-        private uint yesButtonEntityID;
-        private uint noButtonEntityID;
+        private uint shutdownButtonId;
+        private uint popupId;
+        private uint yesButtonId;
+        private uint noButtonId;
 
         // State
         private bool isPopupVisible = false;
-        private bool isAnimating = false;
-        private float animationTimer = 0.0f;
+        private bool entitiesFound = false;
+        private bool wasMousePressed = false;  // For edge detection
 
         // Input state for edge detection
         private bool wasMousePressed = false;
@@ -76,124 +83,94 @@ namespace Game
 
         public override void OnStart()
         {
-            LogMessage("QuitConfirmationPopup: OnStart called!");
-            LogMessage("QuitConfirmationPopup: Script EntityID (may be wrong): " + EntityID);
+            LogMessage("QuitConfirmationPopup: Initializing...");
 
-            // Initialize positions
-            hiddenPosition = new Vector3(640.0f, -500.0f, -0.2f);
-            visiblePopupPosition = new Vector3(640.0f, 360.0f, -0.2f);
-            visibleYesPosition = new Vector3(580.0f, 320.0f, -0.3f);
-            visibleNoPosition = new Vector3(700.0f, 320.0f, -0.3f);
+            // Find all required entities
+            shutdownButtonId = SceneFindEntityByName(SHUTDOWN_BUTTON_NAME);
+            popupId = SceneFindEntityByName(POPUP_NAME);
+            yesButtonId = SceneFindEntityByName(YES_BUTTON_NAME);
+            noButtonId = SceneFindEntityByName(NO_BUTTON_NAME);
 
-            // Find shutdown button by name (workaround for EntityID bug)
-            shutdownButtonEntityID = SceneFindEntityByName(shutdownButtonEntityName);
-            LogMessage("QuitConfirmationPopup: Shutdown Button EntityID (by name): " + shutdownButtonEntityID);
+            // Verify all entities were found
+            if (shutdownButtonId == 0)
+            {
+                LogError("QuitConfirmationPopup: Could not find entity: " + SHUTDOWN_BUTTON_NAME);
+                return;
+            }
+            if (popupId == 0)
+            {
+                LogError("QuitConfirmationPopup: Could not find entity: " + POPUP_NAME);
+                return;
+            }
+            if (yesButtonId == 0)
+            {
+                LogError("QuitConfirmationPopup: Could not find entity: " + YES_BUTTON_NAME);
+                return;
+            }
+            if (noButtonId == 0)
+            {
+                LogError("QuitConfirmationPopup: Could not find entity: " + NO_BUTTON_NAME);
+                return;
+            }
 
-            // Find popup entities
-            popupEntityID = SceneFindEntityByName(popupEntityName);
-            yesButtonEntityID = SceneFindEntityByName(yesButtonEntityName);
-            noButtonEntityID = SceneFindEntityByName(noButtonEntityName);
+            entitiesFound = true;
+            isPopupVisible = false;
+            wasMousePressed = false;
 
-            LogMessage("QuitConfirmationPopup: Popup EntityID: " + popupEntityID);
-            LogMessage("QuitConfirmationPopup: YesButton EntityID: " + yesButtonEntityID);
-            LogMessage("QuitConfirmationPopup: NoButton EntityID: " + noButtonEntityID);
-
-            if (shutdownButtonEntityID == 0)
-                LogError("QuitConfirmationPopup: Could not find shutdown button entity: " + shutdownButtonEntityName);
-            if (popupEntityID == 0)
-                LogError("QuitConfirmationPopup: Could not find popup entity: " + popupEntityName);
-            if (yesButtonEntityID == 0)
-                LogError("QuitConfirmationPopup: Could not find yes button entity: " + yesButtonEntityName);
-            if (noButtonEntityID == 0)
-                LogError("QuitConfirmationPopup: Could not find no button entity: " + noButtonEntityName);
-
-            // Log the ACTUAL shutdown button position (found by name)
-            Vector3 shutdownPos = GetPosition(shutdownButtonEntityID);
-            LogMessage("QuitConfirmationPopup: Shutdown button position: (" + shutdownPos.X + ", " + shutdownPos.Y + ", " + shutdownPos.Z + ")");
-
-            // Ensure popup starts hidden
-            HidePopup();
-
-            LogMessage("QuitConfirmationPopup: Ready!");
+            LogMessage("QuitConfirmationPopup: All entities found, ready!");
+            LogMessage("QuitConfirmationPopup: Shutdown Button ID: " + shutdownButtonId);
+            LogMessage("QuitConfirmationPopup: Popup ID: " + popupId);
+            LogMessage("QuitConfirmationPopup: Yes Button ID: " + yesButtonId);
+            LogMessage("QuitConfirmationPopup: No Button ID: " + noButtonId);
+            LogMessage("QuitConfirmationPopup: entitiesFound = " + entitiesFound);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // Handle animation
-            if (isAnimating)
-            {
-                animationTimer += deltaTime;
-                float t = animationTimer / fadeInDuration;
-                if (t > 1.0f) t = 1.0f;
+            if (!entitiesFound)
+                return;
 
-                // Scale animation (start small, grow to full size)
-                float scale = t;
-                Vector3 popupScale = new Vector3(popupWidth * scale, popupHeight * scale, 1.0f);
-                Vector3 buttonScale = new Vector3(yesNoButtonWidth * scale, yesNoButtonHeight * scale, 1.0f);
-
-                SetScale(popupEntityID, ref popupScale);
-                SetScale(yesButtonEntityID, ref buttonScale);
-                SetScale(noButtonEntityID, ref buttonScale);
-
-                if (t >= 1.0f)
-                {
-                    isAnimating = false;
-                    LogMessage("QuitConfirmationPopup: Animation complete");
-                }
-            }
-
-            // Detect mouse click (edge detection)
+            // Edge detection for mouse click (just pressed)
             bool isMousePressed = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
 
-            // Get mouse position and convert to world coordinates
-            // Engine uses: mouse.y = viewport_height - mouse.y (flip Y)
-            Vector2 rawMouse = Input.GetMousePosition();
-            float screenHeight = 720.0f;
-
-            // Flip Y to match engine's world coordinate system
-            Vector2 mousePos = new Vector2(rawMouse.X, screenHeight - rawMouse.Y);
-
-            Vector3 shutdownPos = GetPosition(shutdownButtonEntityID);
-
-            // Check hover state (log only when state changes to avoid spam)
-            bool isHovering = IsMouseOverButton(mousePos, shutdownPos, shutdownButtonWidth, shutdownButtonHeight);
-            if (isHovering && !wasHovering)
+            // Check for left mouse button click
+            if (mouseJustPressed)
             {
-                LogMessage("QuitConfirmationPopup: HOVER START on Shutdown Button!");
-                LogMessage("  Raw: (" + rawMouse.X + ", " + rawMouse.Y + ") | Converted: (" + mousePos.X + ", " + mousePos.Y + ") | Button: (" + shutdownPos.X + ", " + shutdownPos.Y + ")");
+                LogMessage("QuitConfirmationPopup: Mouse button just pressed detected!");
+                HandleMouseClick();
             }
             else if (!isHovering && wasHovering)
             {
                 LogMessage("QuitConfirmationPopup: HOVER END");
-            }
+        }
             wasHovering = isHovering;
 
             if (!mouseJustPressed)
                 return;
 
-            // Debug: Log on click - help map coordinates
-            LogMessage("=== CLICK DEBUG ===");
-            LogMessage("Raw mouse: (" + rawMouse.X + ", " + rawMouse.Y + ")");
-            LogMessage("Converted mouse (Y flipped): (" + mousePos.X + ", " + mousePos.Y + ")");
-            LogMessage("Button world pos: (" + shutdownPos.X + ", " + shutdownPos.Y + ")");
-            LogMessage("Button bounds: X[" + (shutdownPos.X - shutdownButtonWidth/2) + "-" + (shutdownPos.X + shutdownButtonWidth/2) + "] Y[" + (shutdownPos.Y - shutdownButtonHeight/2) + "-" + (shutdownPos.Y + shutdownButtonHeight/2) + "]");
-            LogMessage("Is over button: " + isHovering);
-            LogMessage("===================");
+        private void HandleMouseClick()
+        {
+            Vector2 mousePos = Input.GetMousePosition();
+            LogMessage("QuitConfirmationPopup: Mouse clicked at (" + mousePos.X + ", " + mousePos.Y + ")");
+            LogMessage("QuitConfirmationPopup: isPopupVisible = " + isPopupVisible);
 
             if (isPopupVisible)
             {
-                // Check Yes button click
-                if (IsMouseOverButton(mousePos, visibleYesPosition, yesNoButtonWidth, yesNoButtonHeight))
+                // Popup is visible - check Yes/No buttons
+                bool yesHit = Collision2D.IsMouseCollidingWithEntity(yesButtonId);
+                bool noHit = Collision2D.IsMouseCollidingWithEntity(noButtonId);
+                LogMessage("QuitConfirmationPopup: Yes button collision = " + yesHit);
+                LogMessage("QuitConfirmationPopup: No button collision = " + noHit);
+
+                if (yesHit)
                 {
                     LogMessage("QuitConfirmationPopup: Yes clicked - quitting game");
                     OnYesClicked();
                     return;
                 }
-
-                // Check No button click
-                if (IsMouseOverButton(mousePos, visibleNoPosition, yesNoButtonWidth, yesNoButtonHeight))
+                else if (noHit)
                 {
                     LogMessage("QuitConfirmationPopup: No clicked - hiding popup");
                     OnNoClicked();
@@ -209,8 +186,12 @@ namespace Game
             }
             else
             {
-                // Check Shutdown button click (this entity) - shutdownPos already fetched above for debug
-                if (IsMouseOverButton(mousePos, shutdownPos, shutdownButtonWidth, shutdownButtonHeight))
+                // Popup is hidden - check shutdown button
+                bool shutdownHit = Collision2D.IsMouseCollidingWithEntity(shutdownButtonId);
+                LogMessage("QuitConfirmationPopup: Shutdown button ID = " + shutdownButtonId);
+                LogMessage("QuitConfirmationPopup: Shutdown collision = " + shutdownHit);
+
+                if (shutdownHit)
                 {
                     LogMessage("QuitConfirmationPopup: Shutdown button clicked - showing popup");
                     ShowPopup();
@@ -241,22 +222,19 @@ namespace Game
             isAnimating = true;
             animationTimer = 0.0f;
 
-            // Move entities to visible positions
-            Vector3 popupPos = visiblePopupPosition;
-            Vector3 yesPos = visibleYesPosition;
-            Vector3 noPos = visibleNoPosition;
+            // Move popup to center of screen
+            Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
+            SetPosition(popupId, ref popupPos);
 
-            SetPosition(popupEntityID, ref popupPos);
-            SetPosition(yesButtonEntityID, ref yesPos);
-            SetPosition(noButtonEntityID, ref noPos);
+            // Move Yes button to visible position
+            Vector3 yesPos = new Vector3(YES_BUTTON_X, YES_BUTTON_Y, -0.6f);
+            SetPosition(yesButtonId, ref yesPos);
 
-            // Start with small scale for animation
-            Vector3 smallScale = new Vector3(0.1f, 0.1f, 1.0f);
-            SetScale(popupEntityID, ref smallScale);
-            SetScale(yesButtonEntityID, ref smallScale);
-            SetScale(noButtonEntityID, ref smallScale);
+            // Move No button to visible position
+            Vector3 noPos = new Vector3(NO_BUTTON_X, NO_BUTTON_Y, -0.6f);
+            SetPosition(noButtonId, ref noPos);
 
-            LogMessage("QuitConfirmationPopup: Popup shown");
+            LogMessage("QuitConfirmationPopup: Popup shown at center");
         }
 
         private void HidePopup()
@@ -269,24 +247,24 @@ namespace Game
             Vector3 yesHidePos = new Vector3(580.0f, -500.0f, -0.3f);
             Vector3 noHidePos = new Vector3(700.0f, -500.0f, -0.3f);
 
-            SetPosition(popupEntityID, ref hidePos);
-            SetPosition(yesButtonEntityID, ref yesHidePos);
-            SetPosition(noButtonEntityID, ref noHidePos);
+            // Move popup off screen
+            Vector3 popupPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
+            SetPosition(popupId, ref popupPos);
 
-            // Reset scale
-            Vector3 popupScale = new Vector3(popupWidth, popupHeight, 1.0f);
-            Vector3 buttonScale = new Vector3(yesNoButtonWidth, yesNoButtonHeight, 1.0f);
+            // Move Yes button off screen
+            Vector3 yesPos = new Vector3(YES_BUTTON_X, HIDDEN_Y, -0.6f);
+            SetPosition(yesButtonId, ref yesPos);
 
-            SetScale(popupEntityID, ref popupScale);
-            SetScale(yesButtonEntityID, ref buttonScale);
-            SetScale(noButtonEntityID, ref buttonScale);
+            // Move No button off screen
+            Vector3 noPos = new Vector3(NO_BUTTON_X, HIDDEN_Y, -0.6f);
+            SetPosition(noButtonId, ref noPos);
 
             LogMessage("QuitConfirmationPopup: Popup hidden");
         }
 
         private void OnYesClicked()
         {
-            // Publish event to quit the game
+            // Publish quit event - Game.cpp will handle closing the window
             Publish("QuitGame", "");
             LogMessage("QuitConfirmationPopup: QuitGame event published");
         }

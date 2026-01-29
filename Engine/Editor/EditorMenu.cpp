@@ -26,8 +26,12 @@ namespace Engine
 						m_Editor->CreateNewScene("New Scene");
 						m_CurrScenePath = "";
 						m_Editor->SetScenePath(m_CurrScenePath);
+						m_SceneIsNew = true;
+						m_Editor->SetPrefabPath("");
+						
 					}
 				}
+				
 				if (ImGui::IsItemHovered())
 				{
 					ImGui::SetTooltip("Create new scene.");
@@ -38,14 +42,19 @@ namespace Engine
 					m_OpenScenePanel = true;
 					m_CurrPrefabPath = "";
 					m_Editor->SetPrefabPath(m_CurrPrefabPath);
+					m_SceneIsNew = false;
 				}
 				if (ImGui::IsItemHovered())
 				{
 					ImGui::SetTooltip("Open scene from file.");
 				}
+
 				bool hasScenePath = !m_Editor->GetScenePath().empty();
+				bool hasPrefabPath = !m_Editor->GetPrefabPath().empty();
+				bool isInSceneMode = !hasPrefabPath && (hasScenePath || m_SceneIsNew);
+
 				// ----------------- Save Scene ------------------------
-				if (ImGui::MenuItem("Save Scene")/*, nullptr, false, hasScenePath)*/)
+				if (ImGui::MenuItem("Save Scene", nullptr, false, isInSceneMode))
 				{
 					m_CurrScenePath = m_Editor->GetScenePath();
 					Scene*m_Scene = m_Editor->GetActiveScene();
@@ -55,6 +64,7 @@ namespace Engine
 					if (!m_CurrScenePath.empty())
 					{
 						m_Editor->SaveActiveSceneToPath(m_CurrScenePath);
+						m_SceneIsNew = false;
 					}
 					else
 					{
@@ -66,7 +76,7 @@ namespace Engine
 					ImGui::SetTooltip("Save current scene.");
 				}
 				// --------------- Save Scene As -------------------
-				if (ImGui::MenuItem("Save Scene As...")/*,  nullptr, false, hasScenePath)*/)
+				if (ImGui::MenuItem("Save Scene As...", nullptr, false, isInSceneMode))
 				{
 					m_SaveScenePanel = true;
 				}
@@ -80,19 +90,22 @@ namespace Engine
 					m_OpenPrefabPanel = true;
 					m_CurrScenePath = "";
 					m_Editor->SetScenePath(m_CurrScenePath);
+					m_SceneIsNew = false;
 				}
-				bool hasPrefabPath = !m_Editor->GetPrefabPath().empty();
+				
 				if (ImGui::MenuItem("Save Prefab", nullptr, false, hasPrefabPath))
 				{
 					if (m_Editor->HasPrefabPath() && !m_Editor->GetPrefabPath().empty()) {
 						SaveCurrentPrefab();
+
 					}
 					else {
 						// If no current prefab path, open "Save As" dialog
 						m_SavePrefabPanel = true;
 					}
 				}
-				if (ImGui::MenuItem("Save Prefab As...",  nullptr, false, hasPrefabPath))
+				bool isInPrefabMode = hasPrefabPath;
+				if (ImGui::MenuItem("Save Prefab As...",  nullptr, false, isInPrefabMode))
 				{
 					m_SavePrefabPanel = true;
 				}
@@ -401,7 +414,9 @@ namespace Engine
 		if(!m_Editor || !m_Editor->GetRenderer())
 			return;
 
-		ImGui::Begin("HDR Settings", &m_ShowHDRSettings);
+		ImGui::Begin("Render Settings", &m_ShowHDRSettings);
+
+		ImGui::SeparatorText("Quality");
 
 		float& exposure = m_Editor->GetRenderer()->getExposure();
 
@@ -423,8 +438,44 @@ namespace Engine
 			ImGui::SetTooltip("Reset exposure to default value (1.0)");
 		}
 
+		ImGui::SeparatorText("Lighting");
 
-		ImGui::Separator();
+		/* 
+		- Main Light
+		- Additional Lights
+		For both: 
+		bool Cast Shadows
+		float Shadows resolution
+		int Per object limit
+		*/
+
+		ImGui::SeparatorText("Shadows");
+		
+		// ======================
+		// Global bias
+		// ======================
+		// Slider
+		auto& globalBias = m_Editor->GetRenderer()->getGlobalBias();
+		if (ImGui::SliderFloat("Global Bias",
+			&globalBias,
+			0.0f, 2.0f, "%.3f"))
+		{
+			// Global bias changed
+		}
+
+		// Reset button for shadow settings
+		if (ImGui::Button("Reset to Default##Shadow"))
+		{
+			globalBias = 0.005f;
+		}
+
+		// Tooltip for bloom settings
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset global bias (0.005) to default values");
+		}
+
+		ImGui::SeparatorText("Post-Processing");
 
 		// ======================
 		// Bloom toggle

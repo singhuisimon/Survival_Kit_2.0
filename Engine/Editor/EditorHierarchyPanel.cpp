@@ -1080,6 +1080,17 @@ namespace Engine
 			componentsArray.PushBack(compObj, allocator);
 		}
 
+		// SpriteRenderer Component
+		if (entity.HasComponent<SpriteRendererComponent>())
+		{
+			std::string spriteRendererJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::SpriteRenderer);
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::SpriteRenderer), allocator);
+			compObj.AddMember("typeName", "SpriteRendererComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(spriteRendererJSON.c_str(), allocator), allocator);
+			componentsArray.PushBack(compObj, allocator);
+		}
+
 		doc.AddMember("components", componentsArray, allocator);
 
 		rapidjson::StringBuffer buffer;

@@ -1,7 +1,0 @@
-{
-  "name": "Brute_Force_Attack_Siren.wav",
-  "guid": "C95B286DF70DC013",
-  "tags": [],
-  "lastImported": "00000000692C61B7",
-  "resourceLinks": []
-}

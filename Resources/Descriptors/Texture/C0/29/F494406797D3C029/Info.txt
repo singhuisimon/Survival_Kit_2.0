@@ -1,7 +1,0 @@
-{
-  "name": "rabbit_kenny.png",
-  "guid": "F494406797D3C029",
-  "tags": [],
-  "lastImported": "000000006966F34B",
-  "resourceLinks": []
-}

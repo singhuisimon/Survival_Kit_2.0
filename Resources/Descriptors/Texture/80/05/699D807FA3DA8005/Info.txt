@@ -1,0 +1,7 @@
+{
+  "name": "MainMenu_YesButton.png",
+  "guid": "699D807FA3DA8005",
+  "tags": [],
+  "lastImported": "0000000069732F84",
+  "resourceLinks": []
+}
