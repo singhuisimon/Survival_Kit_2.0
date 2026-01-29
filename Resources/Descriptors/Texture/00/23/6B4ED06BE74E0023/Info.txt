@@ -1,0 +1,7 @@
+{
+  "name": "front.jpg",
+  "guid": "6B4ED06BE74E0023",
+  "tags": [],
+  "lastImported": "0000000069247762",
+  "resourceLinks": []
+}

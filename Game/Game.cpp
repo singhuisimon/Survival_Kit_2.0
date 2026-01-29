@@ -372,6 +372,10 @@ void Game::OnInit()
 			if (event.name == "LoadScene") {
 				LoadSceneFromEvent(event.payload);
 			}
+			else if (event.name == "QuitGame") {
+				LOG_INFO("QuitGame event received - closing application");
+				Close();
+			}
 		});
 	LOG_INFO("Scene transition event handler registered");
 
