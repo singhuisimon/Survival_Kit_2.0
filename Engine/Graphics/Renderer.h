@@ -228,7 +228,8 @@ namespace Engine {
 		  BLOOM_DOWNSAMPLE = 6, 
 		  BLOOM_UPSAMPLE   = 7,
 		  SHADOW		   = 8,
-		  FONT			   = 9
+		  FONT			   = 9,
+		  TRAIL			   = 10
 		};
 
 		/**
@@ -443,6 +444,22 @@ namespace Engine {
 		 * @brief Initializes font rendering resources (VAO/VBO)
 		 */
 		void initFontResources();
+
+		struct TrailVertex {
+			glm::vec3 Position;
+			glm::vec3 Tangent;   // Direction along trail
+			glm::vec2 UV;
+			float Width;
+			float Age;           // Normalized age [0, 1]
+		};
+
+		GLuint m_TrailVAO;
+		GLuint m_TrailVBO;
+		GLuint m_TrailEBO;
+
+		void InitTrailResources();
+		void RenderTrails(std::span<const DrawItem> trailItems, const Camera3D& camera, const glm::vec3& camPos);
+		void BuildTrailGeometry(const TrailComponent& trail, std::vector<TrailVertex>& vertices, std::vector<u32>& indices);
 	};
 
 }
