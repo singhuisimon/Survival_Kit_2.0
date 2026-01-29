@@ -75,11 +75,11 @@ namespace Game
         // State
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
-        private bool wasMousePressed = false;  // For edge detection
+        private bool isAnimating = false;
+        private float animationTimer = 0.0f;
 
         // Input state for edge detection
         private bool wasMousePressed = false;
-        private bool wasHovering = false;
 
         public override void OnStart()
         {
@@ -141,14 +141,7 @@ namespace Game
                 LogMessage("QuitConfirmationPopup: Mouse button just pressed detected!");
                 HandleMouseClick();
             }
-            else if (!isHovering && wasHovering)
-            {
-                LogMessage("QuitConfirmationPopup: HOVER END");
         }
-            wasHovering = isHovering;
-
-            if (!mouseJustPressed)
-                return;
 
         private void HandleMouseClick()
         {

@@ -2,6 +2,6 @@
   "name": "GlitchTextureRedTransparent.png",
   "guid": "74EFA880FB4BC003",
   "tags": [],
-  "lastImported": "00000000697872AF",
+  "lastImported": "00000000697B22C1",
   "resourceLinks": []
 }

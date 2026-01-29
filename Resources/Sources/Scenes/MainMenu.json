@@ -588,9 +588,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [200.0, -500.0, -0.7],
+            "Position": [750.0, 450.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -622,9 +622,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [250.0, -500.0, -0.7],
+            "Position": [850.0, 250.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -656,9 +656,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [300.0, -500.0, -0.7],
+            "Position": [600.0, 500.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -690,9 +690,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [350.0, -500.0, -0.7],
+            "Position": [450.0, 400.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -724,9 +724,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [400.0, -500.0, -0.7],
+            "Position": [400.0, 300.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -758,9 +758,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [450.0, -500.0, -0.7],
+            "Position": [350.0, 250.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -792,9 +792,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [500.0, -500.0, -0.7],
+            "Position": [300.0, 200.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -826,9 +826,9 @@
         {
           "Type": "TransformComponent",
           "Properties": {
-            "Position": [550.0, -500.0, -0.7],
+            "Position": [250.0, 150.0, -0.7],
             "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [150.0, 80.0, 1.0],
+            "Scale": [200.0, 100.0, 1.0],
             "Parent": 4294967295,
             "Children": []
           }
@@ -840,6 +840,108 @@
             "Color": [1.0, 1.0, 1.0, 1.0],
             "Quad": 3,
             "Sprite Layer": 12,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 25,
+      "Name": "Glitch Overlay",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Glitch Overlay",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, 360.0, -0.9],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [640.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "GlitchTextureRedTransparent.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 15,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 26,
+      "Name": "Start Game Popup",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Start Game Popup",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, 360.0, -1.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [650.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_StartGamePopUp.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 16,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 27,
+      "Name": "Start Game Yes Button",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Start Game Yes Button",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [568.0, 437.0, -0.2],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [65.0, 21.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_YesButton.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 17,
             "IsActive": true,
             "IsVisible": true
           }
