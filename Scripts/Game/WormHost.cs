@@ -38,6 +38,8 @@ namespace Game
             
             Vector3 newScale = new Vector3(0,0,0);
             SetScale(EntityID, ref newScale);
+            Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(0.0f, 0.0f, 0.0f);
+            RigidbodySetBoxHalfExtents(EntityID, ref newBoxHalfExtents);
         }
     }
     

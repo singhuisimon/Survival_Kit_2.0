@@ -128,7 +128,7 @@ namespace Game
             // SetRotation((uint)EntityID, ref finalRotation);
             
             EntityAddRigidBody(EntityID);
-            Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(200.0f, 200.0f, 200.0f);
+            Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(30.0f, 30.0f, 30.0f);
             RigidbodySetBoxHalfExtents(EntityID, ref newBoxHalfExtents);
 
             hasSplit = true;
