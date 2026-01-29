@@ -40,6 +40,7 @@ namespace Game
         
         private const uint INVALID_ENTITY = 0xffffffffu;
         private const string EVENT_HOST_SPLIT = "WormHostSplit";
+        private const string EVENT_BULLET_HIT = "BulletHit";
         private float shootingTimer = 0.0f;
         private bool hasSplit;
 
@@ -55,9 +56,9 @@ namespace Game
             targetZ = ownPosition.Z;
 
             Engine.Vector3 ownScale = GetScale((uint)EntityID);
-            OGscaleX = 0.001f;
-            OGscaleY = 0.001f;
-            OGscaleZ = 0.001f;
+            OGscaleX = 0.01f;
+            OGscaleY = 0.01f;
+            OGscaleZ = 0.01f;
 
             Engine.Vector3 disappearScale = new Engine.Vector3(0,0,0);
             SetScale(EntityID, ref disappearScale);
@@ -65,6 +66,7 @@ namespace Game
             hasSplit = false;
 
             Subscribe("WormHostSplit", OnHostSplit);
+            Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             LogMessage("----------------- Subscribing to WormHostSplit ----------------- ");
             
         }
@@ -86,6 +88,7 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_HOST_SPLIT, OnHostSplit);
+            Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
         }
 
         private void OnHostSplit(string eventName, string payload)
@@ -124,7 +127,15 @@ namespace Game
             // Quat finalRotation = pitchQ * yawQ;
             // SetRotation((uint)EntityID, ref finalRotation);
             
+            EntityAddRigidBody(EntityID);
+            Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(200.0f, 200.0f, 200.0f);
+            RigidbodySetBoxHalfExtents(EntityID, ref newBoxHalfExtents);
+
             hasSplit = true;
+        }
+
+        private void OnBulletHit(string eventName, string payload){
+            LogMessage("WormChild OnBulletHit: " + eventName + ", " + payload);
         }
 
         public bool isParentCall (string payload){

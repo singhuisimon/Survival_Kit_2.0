@@ -18,7 +18,7 @@ namespace Game
 
         // Tags this bullet can damage
         [SerializeField]
-        private string[] TargetTags = { "botnet", "loveletter", "adware" };
+        private string[] TargetTags = { "botnet", "loveletter", "adware", "wormchild" };
 
         // Tags that represent bullets (fill this in Inspector with your bullet tag, e.g. "primarybullet")
         [SerializeField]
@@ -57,14 +57,18 @@ namespace Game
                 string tagA = TagGetTag(entityA);
                 string tagB = TagGetTag(entityB);
 
+                //LogMessage("FIND - Collision pair " + i + ": " + tagA + ", " + tagB + ": EntityA=" + entityA + " vs EntityB=" + entityB);
+
                 // Case 1: A is bullet, B is valid target
                 if (IsBulletTag(tagA) && IsTargetTag(tagB))
                 {
+                    //LogMessage("Both are valid 1");
                     OnBulletHit(entityA, entityB);
                 }
                 // Case 2: B is bullet, A is valid target
                 else if (IsBulletTag(tagB) && IsTargetTag(tagA))
                 {
+                    //LogMessage("Both are valid 2");
                     OnBulletHit(entityB, entityA);
                 }
             }
@@ -99,11 +103,13 @@ namespace Game
                 if (!string.IsNullOrEmpty(target) &&
                     string.Equals(tag, target, StringComparison.OrdinalIgnoreCase))
                 {
+                    //LogMessage(tag + " is part of listed target: " + TargetTags[i]);
                     return true;
                 }
             }
 
             LogMessage("Tag: " + tag + "is not the target");
+            //LogMessage(tag + " is not part of listed target");
             return false;
         }
 
@@ -116,6 +122,7 @@ namespace Game
             // Publish event
             Publish("BulletHit", targetEntityID.ToString());
             Publish("BulletHitEnemy", true.ToString());
+            //LogMessage("BulletHit: " + targetEntityID.ToString() + "; BulletHitEnemy: " + true.ToString());
             LogMessage("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
 
             // Destroy the bullet that actually hit
