@@ -403,7 +403,32 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "9026023440309814373",
-                        "ScriptClassName": "Game.SpaceshipController"
+                        "ScriptClassName": "Game.SpaceshipController",
+                        "Fields": {
+                            "mouseSensitivity": 15.0,
+                            "mouseSmoothing": 0.15000000596046448,
+                            "maxTurnSpeed": 3.0,
+                            "pitchLimitDegrees": 65.0,
+                            "forwardSpeed": 333.0,
+                            "backwardSpeed": 200.0,
+                            "strafeSpeed": 250.0,
+                            "verticalSpeed": 200.0,
+                            "strafeAcceleration": 15.0,
+                            "strafeDeceleration": 12.0,
+                            "cameraDistanceBack": 15.0,
+                            "cameraHeightOffset": 0.0,
+                            "cameraFollowSpeed": 15.0,
+                            "cameraRotationSpeed": 8.0,
+                            "cameraLookHeight": 8.0,
+                            "playerRotationSpeed": 5.0,
+                            "modelYRotationOffset": -90.0,
+                            "modelRotationOffset": 180.0,
+                            "startWithCursorLocked": true,
+                            "playerHP": 100.0,
+                            "inEnvironment": true,
+                            "countdownOOB": 5.0,
+                            "originalCountdownOOB": 5.0
+                        }
                     }
                 }
             ]
@@ -1337,7 +1362,33 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "9026023440310174993",
-                        "ScriptClassName": "Game.PlayerWeapon"
+                        "ScriptClassName": "Game.PlayerWeapon",
+                        "Fields": {
+                            "shootAllowed": false,
+                            "primaryShooting": false,
+                            "reloadingPrimary": false,
+                            "primaryAmmo": 0,
+                            "primaryAmmoMax": 100,
+                            "primaryReloadDelay": 1.5,
+                            "primaryShootRate": 0.05000000074505806,
+                            "primaryShootNext": 0.0,
+                            "primarybulletSpeed": 1000.0,
+                            "chargeDelayRate": 0.5,
+                            "chargeDelayNext": 0.0,
+                            "primaryAltCharging": false,
+                            "primaryChargeRate": 0.10000000149011612,
+                            "primaryChargeNext": 0.0,
+                            "primaryAltCharge": 0,
+                            "primaryAltChargeMax": 30,
+                            "primaryAltReady": false,
+                            "primaryAltFireAOERange": 30.0,
+                            "primaryUltSpeed": 500.0,
+                            "CAMSHAKE_primaryFire": 0.05000000074505806,
+                            "CAMSHAKE_primaryFireDuration": 0.5,
+                            "CAMSHAKE_primaryAltFire": 0.1599999964237213,
+                            "CAMSHAKE_primaryAltFireDuration": 0.5,
+                            "muzzleDistance": 5.0
+                        }
                     }
                 }
             ]
@@ -1464,7 +1515,7 @@
                         ],
                         "Rotation": [
                             -31.992002487182617,
-                            29.000993728637695,
+                            29.00098991394043,
                             98.0
                         ],
                         "Scale": [
@@ -1572,9 +1623,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            75.0,
+                            75.0,
+                            75.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1583,7 +1634,11 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "11863986098428055233",
-                        "ScriptClassName": "Game.HealthCore"
+                        "ScriptClassName": "Game.HealthCore",
+                        "Fields": {
+                            "CurrentHealth": 100.0,
+                            "isDead": false
+                        }
                     }
                 }
             ]
@@ -1660,9 +1715,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            75.0,
+                            75.0,
+                            75.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1671,7 +1726,11 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "7252300080000929477",
-                        "ScriptClassName": "Game.HealthCore"
+                        "ScriptClassName": "Game.HealthCore",
+                        "Fields": {
+                            "CurrentHealth": 100.0,
+                            "isDead": false
+                        }
                     }
                 }
             ]
@@ -1748,9 +1807,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            75.0,
+                            75.0,
+                            75.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1759,7 +1818,11 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "14169829107642257097",
-                        "ScriptClassName": "Game.HealthCore"
+                        "ScriptClassName": "Game.HealthCore",
+                        "Fields": {
+                            "CurrentHealth": 100.0,
+                            "isDead": false
+                        }
                     }
                 }
             ]
@@ -2193,11 +2256,26 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            1200.0,
+                            500.0,
+                            900.0
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "13615895159748381479",
+                        "ScriptClassName": "Game.OOBManager",
+                        "Fields": {
+                            "originalCountdownOOB": 5.0,
+                            "countdownOOB": 5.0,
+                            "inEnvironment": true,
+                            "nextDamageTime": 0.0,
+                            "elapsedTime": 0.0,
+                            "damageCooldown": 1.0
+                        }
                     }
                 },
                 {
@@ -2210,6 +2288,48 @@
                         "currentClipIndex": 0,
                         "currentTime": 0.0,
                         "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3145780,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CollisoinManager"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3816062370590296875",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "16498198921265728301",
+                        "ScriptClassName": "Game.CollisionManager",
+                        "Fields": {}
                     }
                 }
             ]
