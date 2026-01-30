@@ -2,10 +2,6 @@
   "name": "HighscoreButton.png",
   "guid": "9FE7F87FA1EC4001",
   "tags": [],
-<<<<<<< HEAD
-  "lastImported": "00000000697B22C1",
-=======
-  "lastImported": "0000000069732E73",
->>>>>>> main
+  "lastImported": "00000000697C257D",
   "resourceLinks": []
 }

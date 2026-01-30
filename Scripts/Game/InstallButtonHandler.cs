@@ -23,7 +23,7 @@ namespace Game
         private const string BSOD_SCREEN_3_NAME = "BSOD Screen 3";
         private const string BLACK_SCREEN_NAME = "Black Screen";
 
-        private const string MAIN_GAME_SCENE_PATH = "Resources/Sources/Scenes/MainGameScene.json";
+        private const string MAIN_GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_Player.json";
         private const int NUM_ERROR_POPUPS = 8;
 
         private const float HIDDEN_Y = -500.0f;
