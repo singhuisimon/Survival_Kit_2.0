@@ -51,12 +51,23 @@ namespace Engine {
 		setDefaultState();
 
 		initFontResources(); 
-		if (loadFont(getAssetFilePath("Compiled/Font/Quantico-Bold.font"))) {
-			std::cout << "Font loaded successfully!" << std::endl;
+		std::vector<std::pair<std::string, std::string>> fontsToLoad = {
+			 {"Quantico-Bold", "Compiled/Font/Quantico-Bold.font"},
+			{"Quantico-BoldItalic", "Compiled/Font/Quantico-BoldItalic.font"},
+			{"Quantico-Regular", "Compiled/Font/Quantico-Regular.font"},
+			{"Quantico-Italic", "Compiled/Font/Quantico-Italic.font"},
+			{"DigitalNumbers-Regular", "Compiled/Font/DigitalNumbers-Regular.font"}
+		};
+
+		for (const auto& [fontName, fontPath] : fontsToLoad) {
+			if (loadFont(getAssetFilePath(fontPath), fontName)) {
+				std::cout << fontName << " loaded successfully!" << std::endl;
+			}
+			else {
+				std::cerr << "Failed to load " << fontName << std::endl;
+			}
 		}
-		else {
-			std::cerr << "Failed to load font!" << std::endl;
-		}
+
 		MeshData skybox_cube = make_cube(); m_skybox = upload_mesh_data(skybox_cube); m_skybox_texture = RenderBypassUtils::loadCubemapHDR();
 		
 		// -------- Materials UBO (binding = 1)  --------
@@ -1599,6 +1610,13 @@ namespace Engine {
 		//if empty, return
 		if (textItems.empty()) return; 
 
+
+		//group texts by font 
+		std::unordered_map<std::string, std::vector<const DrawItem*>> itemsByFont;
+		for (const auto* item : textItems) {
+			itemsByFont[item->m_fontName].push_back(item);
+		}
+
 		beginFrame(pass); 
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle]; 
 
@@ -1611,22 +1629,26 @@ namespace Engine {
 									0.0f, static_cast<float>(pass.view_port.w), 
 									-1.0f, 1.0f);
 		prog.setUniform("u_Projection", ortho);
-		
-	/*	prog.setUniform("u_Projection", m_lastProj);
-		prog.setUniform("u_View", m_lastView);*/
 
 		//bind font atlas 
-		glActiveTexture(GL_TEXTURE); 
-		glBindTexture(GL_TEXTURE_2D, m_defaultFont.getAtlasTexture()); 
-		if (!m_defaultFont.getAtlasTexture()) {
-			std::cout << "Atlas Textures are empty" << std::endl;
-		}
-		prog.setUniform("u_FontAtlas", 0); 
+		//glActiveTexture(GL_TEXTURE); 
+		//glBindTexture(GL_TEXTURE_2D, m_defaultFont.getAtlasTexture()); 
+		//if (!m_defaultFont.getAtlasTexture()) {
+		//	std::cout << "Atlas Textures are empty" << std::endl;
+		//}
+		//prog.setUniform("u_FontAtlas", 0); 
 
 		glBindVertexArray(m_fontVAO); 
 
+		for (const auto& [fontName, items] : itemsByFont) {
+
+		Font* currentFont = getFont(fontName);
+
+		glActiveTexture(GL_TEXTURE);
+		glBindTexture(GL_TEXTURE_2D, currentFont->getAtlasTexture());
+		prog.setUniform("u_FontAtlas", 0);
 		//render each text item 
-		for (const auto* item : textItems) {
+		for (const auto* item : items) {
 			
 			if (item->m_drawitem_type != DrawItemType::TEXT) continue; 
 
@@ -1639,12 +1661,12 @@ namespace Engine {
 			float letterSpacing = item->m_letterSpacing; 
 			float maxWidth = item->m_maxWidth;
 
-			float scale = fontSize / m_defaultFont.getBaseSize(); 
+			float scale = fontSize / currentFont->getBaseSize(); 
 
 			//compute total width 
 			float totalWidth = 0.0f; 
 			for (char c : text) {
-				const Glyph* glyph = m_defaultFont.getGlyph(static_cast<uint32_t>(c));
+				const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
 				if (glyph) totalWidth += (glyph->advance + letterSpacing) * scale; 
 			}
 			
@@ -1662,13 +1684,14 @@ namespace Engine {
 
 			//render characters
 			for (char c : text) {
-				const Glyph* glyph = m_defaultFont.getGlyph(static_cast<uint32_t>(c));
+				const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
 				if (!glyph) continue;
 
 				//handle new line characters for multi line
 				if (c == '\n') {
 					currentX = startX;
 					currentY -= fontSize * lineSpacing;
+					continue;
 				}
 
 				float xpos = currentX + glyph->bearing.x * scale;
@@ -1693,6 +1716,7 @@ namespace Engine {
 				currentX += (glyph->advance + letterSpacing) * scale;
 			}
 		}
+		}
 
 		glBindVertexArray(0);
 		glBindTexture(GL_TEXTURE_2D, 0); 
@@ -1701,22 +1725,24 @@ namespace Engine {
 
 	}
 
-	bool Renderer::loadFont(const std::string& filepath) {
+	bool Renderer::loadFont(const std::string& filepath, const std::string& fontName) {
 		std::ifstream file(filepath, std::ios::binary);
 		if (!file) {
 			std::cerr << "Failed to open font file: " << filepath << std::endl;
 			return false;
 		}
 
+		Font newFont;
+
 		// Read font metrics
-		file.read(reinterpret_cast<char*>(&m_defaultFont.lineHeight), sizeof(float));
-		file.read(reinterpret_cast<char*>(&m_defaultFont.ascent), sizeof(float));
-		file.read(reinterpret_cast<char*>(&m_defaultFont.descent), sizeof(float));
-		file.read(reinterpret_cast<char*>(&m_defaultFont.baseSize), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.lineHeight), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.ascent), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.descent), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.baseSize), sizeof(float));
 
 		// Read atlas dimensions
-		file.read(reinterpret_cast<char*>(&m_defaultFont.atlasWidth), sizeof(int));
-		file.read(reinterpret_cast<char*>(&m_defaultFont.atlasHeight), sizeof(int));
+		file.read(reinterpret_cast<char*>(&newFont.atlasWidth), sizeof(int));
+		file.read(reinterpret_cast<char*>(&newFont.atlasHeight), sizeof(int));
 
 		// ===== FIX: Read pixel data BEFORE glyphs (matches FontCompiler order) =====
 		uint32_t pixelDataSize;
@@ -1754,21 +1780,21 @@ namespace Engine {
 			glyph.bearing.y = metrics.bearing_y;
 			glyph.advance = metrics.advance;
 
-			m_defaultFont.glyphs[metrics.charCode] = glyph;
+			newFont.glyphs[metrics.charCode] = glyph;
 		}
 
 		file.close();
 
 		// Debug output
 		std::cout << "Font loaded: " << glyphCount << " glyphs, atlas "
-			<< m_defaultFont.atlasWidth << "x" << m_defaultFont.atlasHeight << std::endl;
+			<< newFont.atlasWidth << "x" << newFont.atlasHeight << std::endl;
 
 		// Create OpenGL texture
-		glGenTextures(1, &m_defaultFont.atlasTexture);
-		glBindTexture(GL_TEXTURE_2D, m_defaultFont.atlasTexture);
+		glGenTextures(1, &newFont.atlasTexture);
+		glBindTexture(GL_TEXTURE_2D, newFont.atlasTexture);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
-			m_defaultFont.atlasWidth, m_defaultFont.atlasHeight,
+			newFont.atlasWidth, newFont.atlasHeight,
 			0, GL_RGBA, GL_UNSIGNED_BYTE, atlasPixels.data());
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1778,7 +1804,17 @@ namespace Engine {
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+		m_fonts[fontName] = std::move(newFont);
+
 		return true;
+	}
+
+	Font* Renderer::getFont(const std::string& fontName) {
+		auto it = m_fonts.find(fontName);
+		if (it != m_fonts.end()) {
+			return &it->second; //return ptr to font obj
+		}
+		return &m_defaultFont;
 	}
 
 

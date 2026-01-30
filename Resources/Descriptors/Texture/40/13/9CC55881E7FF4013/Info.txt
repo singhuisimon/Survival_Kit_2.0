@@ -1,0 +1,7 @@
+{
+  "name": "DigitalTriangle.png",
+  "guid": "9CC55881E7FF4013",
+  "tags": [],
+  "lastImported": "00000000697C257D",
+  "resourceLinks": []
+}

@@ -1,0 +1,10 @@
+{
+  "name": "E001_worm_host_v001.fbx",
+  "guid": {
+    "instance": "612DC063B4770011",
+    "type": "0D54B0820387912F"
+  },
+  "tags": [],
+  "lastImported": 6903575C,
+  "resourceLinks": []
+}

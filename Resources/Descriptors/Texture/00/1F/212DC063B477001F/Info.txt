@@ -1,0 +1,10 @@
+{
+  "name": "mouse_kenny.png",
+  "guid": {
+    "instance": "212DC063B477001F",
+    "type": "3380EA40A8C5EC19"
+  },
+  "tags": [],
+  "lastImported": 6903575C,
+  "resourceLinks": []
+}
