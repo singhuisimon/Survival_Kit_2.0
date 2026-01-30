@@ -53,6 +53,8 @@ namespace Engine {
 		uint32_t   CreateScriptInstanceHandle(const std::string &className, MonoObject **outInstance = nullptr, bool pinned = false);
 		MonoObject *GetObjectFromGCHandle(uint32_t gcHandle);
 		void       DestroyScriptHandle(uint32_t gcHandle);
+		uint32_t   CreateGCHandleForObject(MonoObject *obj, bool pinned = false);
+		void       FreeGCHandle(uint32_t gcHandle);
 
 		// Legacy API (NO LONGER ROOTS/OWNS LIFETIME):
 		// Returns a raw MonoObject*; caller must immediately create/store a GCHandle,
@@ -141,6 +143,7 @@ namespace Engine {
 		MonoImage *m_AppImage = nullptr;
 		std::string   m_AssemblyPath;
 		std::unordered_map<std::string, MonoClass *> m_ClassCache;
+		std::unordered_set<std::uint32_t> m_LiveGCHandles;
 	};
 
 } // namespace Engine

@@ -479,6 +479,7 @@ namespace Engine {
 
 	void MonoScriptEngine::UnloadAssembly() {
 		m_ClassCache.clear();
+		m_LiveGCHandles.clear();
 		m_AppImage = nullptr;
 		m_AppAssembly = nullptr;
 	}
@@ -546,20 +547,67 @@ namespace Engine {
 		}
 
 		uint32_t handle = mono_gchandle_new(obj, pinned ? 1 : 0);
+		if(handle != 0)
+			m_LiveGCHandles.insert(handle);
 		if(outInstance) *outInstance = obj;
 		return handle;
+	}
+
+	uint32_t MonoScriptEngine::CreateGCHandleForObject(MonoObject *obj, bool pinned) {
+		if(!obj)
+			return 0;
+
+		EnsureCorrectDomain();
+		if(!IsValidMonoObject(obj))
+			return 0;
+
+		uint32_t handle = mono_gchandle_new(obj, pinned ? 1 : 0);
+		if(handle != 0)
+			m_LiveGCHandles.insert(handle);
+		return handle;
+	}
+
+	void MonoScriptEngine::FreeGCHandle(uint32_t gcHandle) {
+		if(gcHandle == 0)
+			return;
+
+		auto it = m_LiveGCHandles.find(gcHandle);
+		if(it == m_LiveGCHandles.end())
+			return;
+
+		EnsureCorrectDomain();
+		mono_gchandle_free(gcHandle);
+		m_LiveGCHandles.erase(it);
 	}
 
 	MonoObject *MonoScriptEngine::GetObjectFromGCHandle(uint32_t gcHandle) {
 		if(gcHandle == 0)
 			return nullptr;
 
+		// If this handle wasn't created by this runtime, treat it as invalid.
+		// This prevents crashes when GCHandle values get accidentally serialized into scene/prefab files.
+		if(m_LiveGCHandles.find(gcHandle) == m_LiveGCHandles.end())
+			return nullptr;
+
 		EnsureCorrectDomain();
-		return mono_gchandle_get_target(gcHandle);
+		MonoObject *obj = mono_gchandle_get_target(gcHandle);
+		if(!obj)
+			return nullptr;
+
+		// obj came from Mono; domain validation here is safe and prevents stale-pointer crashes after unload.
+		if(!IsValidMonoObject(obj))
+			return nullptr;
+
+		return obj;
 	}
 
 	void MonoScriptEngine::DestroyScriptHandle(uint32_t gcHandle) {
 		if(gcHandle == 0)
+			return;
+
+		// Don't call into Mono with unknown/garbage handles.
+		auto it = m_LiveGCHandles.find(gcHandle);
+		if(it == m_LiveGCHandles.end())
 			return;
 
 		EnsureCorrectDomain();
@@ -571,6 +619,7 @@ namespace Engine {
 		}
 
 		mono_gchandle_free(gcHandle);
+		m_LiveGCHandles.erase(it);
 	}
 
 	void MonoScriptEngine::DestroyScriptInstance(MonoObject *instance) {
@@ -800,50 +849,62 @@ namespace Engine {
 
 		auto &reg = scene->GetRegistry();
 
-		// Resolve owning entity ID.
-		std::uint32_t eid = 0;
-		bool haveID = TryGetEntityIDFromInstance(instance, eid);
-
 		ScriptComponent *sc = nullptr;
+		std::uint32_t eid = 0;
 
-		if(haveID) {
-			entt::entity ent = static_cast<entt::entity>(eid);
-			if(reg.valid(ent))
-				sc = reg.try_get<ScriptComponent>(ent);
+		// IMPORTANT:
+		// Do NOT read EntityID from the provided 'instance' (it might be stale during stop/hotreload).
+		// Instead, find the owning ScriptComponent by matching the resolved GCHandle target.
+		MonoObject *safeInstance = nullptr;
+
+		auto view = reg.view<ScriptComponent>();
+
+		// First pass: match via GCHandle resolution (safe path)
+		for(auto ent : view) {
+			auto &c = view.get<ScriptComponent>(ent);
+			if(c.GCHandle == 0)
+				continue;
+
+			MonoObject *resolved = GetObjectFromGCHandle(c.GCHandle);
+			if(!resolved)
+				continue;
+
+			if(resolved == instance) {
+				sc = &c;
+				eid = static_cast<std::uint32_t>(ent);
+				safeInstance = resolved;
+				break;
+			}
 		}
 
-		// Fallback: find the component whose handle currently resolves to this instance.
+		// Fallback: legacy pointer match, but still serialize using the GCHandle target only.
 		if(!sc) {
-			auto view = reg.view<ScriptComponent>();
 			for(auto ent : view) {
 				auto &c = view.get<ScriptComponent>(ent);
-				MonoObject *resolved = nullptr;
-
-				if(c.GCHandle != 0)
-					resolved = GetObjectFromGCHandle(c.GCHandle);
-				else if(c.ScriptInstance)
-					resolved = static_cast<MonoObject *>(c.ScriptInstance);
-
-				if(resolved == instance) {
+				if(c.ScriptInstance == instance) {
 					sc = &c;
 					eid = static_cast<std::uint32_t>(ent);
+
+					if(c.GCHandle != 0)
+						safeInstance = GetObjectFromGCHandle(c.GCHandle);
+
 					break;
 				}
 			}
 		}
 
-		if(!sc)
+		// If we can't resolve a safe instance via handle, bail (prevents dead-string reads).
+		if(!sc || !safeInstance)
 			return;
 
 		const char *fname = mono_field_get_name(field);
 		if(!fname || !fname[0])
 			return;
 
-		// Never store EntityID
 		if(std::strcmp(fname, "EntityID") == 0)
 			return;
 
-		std::vector<std::uint8_t> payload = SerializeFieldValue(instance, field);
+		std::vector<std::uint8_t> payload = SerializeFieldValue(safeInstance, field);
 		if(payload.empty())
 			return;
 
@@ -992,10 +1053,15 @@ namespace Engine {
 					if((bytes.data() + bytes.size()) < (p + len))
 						break;
 
-					MonoString *ms = mono_string_new_len(m_AppDomain,
+					MonoDomain *dom = mono_object_get_domain(instance);
+					if(!dom)
+						dom = mono_domain_get();
+
+					MonoString *ms = mono_string_new_len(dom,
 														 reinterpret_cast<const char *>(p),
 														 static_cast<uint32_t>(len));
 
+					// ref type => pass address of pointer
 					mono_field_set_value(instance, f, &ms);
 					break;
 				}
@@ -1042,8 +1108,6 @@ namespace Engine {
 		return true;
 	}
 
-
-
 	ManagedFieldSnapshot MonoScriptEngine::CaptureManagedState() {
 		ManagedFieldSnapshot out{};
 
@@ -1074,12 +1138,12 @@ namespace Engine {
 			}
 
 			// Fallback: live managed instance (best-effort)
-			if(!sc.ScriptInstance)
+			MonoObject *instance = nullptr;
+			if(sc.GCHandle != 0)
+				instance = GetObjectFromGCHandle(sc.GCHandle);
+			if(!instance)
 				continue;
-
-			MonoObject *instance = static_cast<MonoObject *>(sc.ScriptInstance);
-			if(!IsValidMonoObject(instance))
-				continue;
+			sc.ScriptInstance = instance; // keep cache in sync
 
 			MonoClass *klass = mono_object_get_class(instance);
 			if(!klass)
@@ -1137,14 +1201,9 @@ namespace Engine {
 					instance = GetObjectFromGCHandle(sc.GCHandle);
 			}
 
-			// Fallback to raw ScriptInstance if present
-			if(!instance) {
-				if constexpr(has_scriptinstance<ScriptComponent>::value)
-					instance = static_cast<MonoObject *>(sc.ScriptInstance);
-			}
-
-			if(!instance || !IsValidMonoObject(instance))
+			if(!instance)
 				continue;
+			sc.ScriptInstance = instance; // keep cache in sync
 
 			MonoClass *klass = mono_object_get_class(instance);
 			if(!klass)
@@ -1178,16 +1237,13 @@ namespace Engine {
 				const uint8_t *p = bytes.data() + 1;
 				const size_t n = bytes.size() - 1;
 
-				auto need = [&](size_t k) {
-					return n >= k;
-					};
+				auto need = [&](size_t k) { return n >= k; };
 
 				switch(static_cast<SnapType>(tag)) {
 					case SnapType::Bool:
 					{
 						if(!need(sizeof(uint8_t))) break;
-						uint8_t v;
-						std::memcpy(&v, p, sizeof(v));
+						uint8_t v; std::memcpy(&v, p, sizeof(v));
 						mono_field_set_value(instance, field, &v);
 						break;
 					}
@@ -1272,8 +1328,15 @@ namespace Engine {
 						if((bytes.data() + bytes.size()) < (p + len))
 							break;
 
-						MonoString *ms = mono_string_new_len(m_AppDomain, reinterpret_cast<const char *>(p), static_cast<uint32_t>(len));
-						mono_field_set_value(instance, field, &ms); // note: pass address for ref types
+						MonoDomain *dom = mono_object_get_domain(instance);
+						if(!dom)
+							dom = mono_domain_get();
+
+						MonoString *ms = mono_string_new_len(dom,
+															 reinterpret_cast<const char *>(p),
+															 static_cast<uint32_t>(len));
+
+						mono_field_set_value(instance, field, &ms);
 						break;
 					}
 					case SnapType::RawValue:
@@ -1287,7 +1350,6 @@ namespace Engine {
 						if((bytes.data() + bytes.size()) < (p + sz))
 							break;
 
-						// Set raw bytes for blittable valuetype
 						std::vector<uint8_t> tmp(sz);
 						std::memcpy(tmp.data(), p, sz);
 						mono_field_set_value(instance, field, tmp.data());
@@ -1538,17 +1600,9 @@ namespace Engine {
 			if(sc.ScriptClassName.empty())
 				continue;
 
-			// FIXED: Safe cleanup of old handles
+			// Safe cleanup of old handles (also protects against garbage handles from serialization)
 			if(sc.GCHandle != 0) {
-				// In multi-domain mode, the old domain is already unloaded,
-				// so we can't validate. Just free the handle number.
-				// Mono will handle the case where the domain is gone.
-				try {
-					mono_gchandle_free(sc.GCHandle);
-				}
-				catch(...) {
-					LOG_WARNING("[RebindAllScriptComponents] Exception freeing old GCHandle (expected if domain unloaded)");
-				}
+				DestroyScriptHandle(sc.GCHandle);
 				sc.GCHandle = 0;
 			}
 
@@ -1568,9 +1622,9 @@ namespace Engine {
 			// Bind entity ID to the new instance
 			BindEntityID(created, static_cast<std::uint32_t>(ent));
 
-
 			// Apply editor-authored ScriptComponent serialized fields (if any)
 			ApplySerializedFieldsFromComponent(static_cast<std::uint32_t>(ent), created);
+
 			sc.GCHandle = handle;
 			sc.ScriptInstance = created;
 			sc.Started = false;
