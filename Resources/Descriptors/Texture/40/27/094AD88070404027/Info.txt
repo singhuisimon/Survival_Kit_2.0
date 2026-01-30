@@ -1,0 +1,7 @@
+{
+  "name": "Particle_Explosion.png",
+  "guid": "094AD88070404027",
+  "tags": [],
+  "lastImported": "0000000069764681",
+  "resourceLinks": []
+}
