@@ -132,6 +132,13 @@ namespace Game
         }
 
         private void OnBulletHit(string eventName, string payload){
+
+            uint hitEntityID = uint.Parse(payload.Split(',')[0]);
+
+            if(hitEntityID != EntityID){
+                return; 
+            }
+            
             LogMessage("WormChild OnBulletHit: " + eventName + ", " + payload);
             health -= 1.0f;
             Transform.SetPosition(EntityID, ref stillPos);
