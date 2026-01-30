@@ -126,7 +126,7 @@ namespace Game{
 
         public override void OnUpdate(float deltaTime){
 
-            elapsedTime += deltaTime;primaryAltReady = true;
+            elapsedTime += deltaTime;//primaryAltReady = true;
 
             // Check if reload finished
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)

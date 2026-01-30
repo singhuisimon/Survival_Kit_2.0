@@ -169,7 +169,7 @@ namespace Game{
 
             if(elapsedTime >= nextDamageTime){
                 //RECEIVER IS AT SPACESHIP CONTROLLER
-                DamageSystem.DealDamage(playerEntityID, 20.0f, (uint)EntityID);
+                DamageSystem.DealDamage(playerEntityID, 15.0f, (uint)EntityID);
                 nextDamageTime += damageCooldown; //its 20 per second
             }
         }

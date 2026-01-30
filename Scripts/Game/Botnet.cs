@@ -24,7 +24,7 @@ namespace Game
 
         // Movement
         [SerializeField] private float acceleration = 300.0f;
-        [SerializeField] private float topSpeed = 40.0f;
+        [SerializeField] private float topSpeed = 400.0f;
 
         // Rotation speed (how fast bot turns towards target)
         [SerializeField] private float rotateSpeed = 5.0f;
@@ -509,6 +509,7 @@ namespace Game
 
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
+                LogMessage("Prefab is not null");
                 uint explosionID = PrefabInstantiate(deathExplosionPrefab);
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
