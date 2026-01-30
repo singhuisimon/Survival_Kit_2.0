@@ -24,7 +24,7 @@ namespace Engine
 		u32 MaxSegments = 50;
 		float SegmentLifetime = 1.f;
 		float MinDistance = 0.1f;
-		float SampleInterval = 0.05f;
+		float SampleInterval = 0.016f;
 
 		float SampleAccumulator = 0.0f;
 
@@ -43,6 +43,8 @@ namespace Engine
 		// Last known position
 		glm::vec3 LastPosition = glm::vec3(0.f);
 		bool HasLastPosition = false;
+
+		glm::vec3 LocalOffset = glm::vec3(0.f);
 	};
 
 }

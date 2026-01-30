@@ -9,10 +9,20 @@ namespace Engine
 		auto view = scene->GetRegistry().view<TrailComponent, TransformComponent>();
 		float dt = ts.GetSeconds();
 
+		static glm::vec3 lastPrintedPos(0);
+
 		for (auto e : view)
 		{
 			auto& trail = view.get<TrailComponent>(e);
 			auto& transform = view.get<TransformComponent>(e);
+
+			//glm::vec3 currentPos = transform.Position;
+			//glm::vec3 delta = currentPos - lastPrintedPos;
+
+			//std::cout << "Frame delta: (" << delta.x << ", " << delta.y << ", " << delta.z << ")\n";
+			//std::cout << "Delta magnitude: " << glm::length(delta) << "\n";
+
+			//lastPrintedPos = currentPos;
 
 			if (!trail.Active)
 				continue;
@@ -31,37 +41,53 @@ namespace Engine
 				}
 			}
 
+			// === STEP 2: Time-based sampling with distance check ===
 			if (trail.EmitTrail) {
+				trail.SampleAccumulator += dt;
+
 				glm::vec3 currentPosition = transform.Position;
 
+				// **CRITICAL: Check if we've moved enough distance**
 				bool shouldSample = false;
 
-				if (!trail.HasLastPosition) {
-					// Progenitor segment
+				if (trail.Segments.empty()) {
+					// First segment ever
 					shouldSample = true;
-					trail.LastPosition = currentPosition;
-					trail.HasLastPosition = true;
 				}
-				else {
-					// Check distance threshold
-					float distance = glm::distance(currentPosition, trail.LastPosition);
-					if (distance >= trail.MinDistance) {
+				else if (trail.SampleAccumulator >= trail.SampleInterval) {
+					// Time threshold met, now check distance
+					glm::vec3 lastSegmentPos = trail.Segments.back().Position;
+					float distanceMoved = glm::distance(currentPosition, lastSegmentPos);
+
+					// **Only sample if moved at least MinDistance**
+					if (distanceMoved >= trail.MinDistance) {
 						shouldSample = true;
 					}
 				}
 
 				if (shouldSample) {
-					if (trail.Segments.size() >= trail.MaxSegments)
+					// Enforce max segments limit
+					if (trail.Segments.size() >= trail.MaxSegments) {
 						trail.Segments.erase(trail.Segments.begin());
+					}
 
+					// Add new segment
 					TrailSegment newSegment;
 					newSegment.Position = currentPosition;
-					newSegment.TimeStamp = 0.f;
+					newSegment.TimeStamp = 0.0f;
 					newSegment.Width = trail.StartWidth;
-					newSegment.Normal = glm::vec3(0.f, 1.f, 0.f); // Placeholder val
+					newSegment.Normal = glm::vec3(0.0f, 1.0f, 0.0f);
+
 					trail.Segments.push_back(newSegment);
-					trail.LastPosition = currentPosition;
+
+					// Reset accumulator
+					trail.SampleAccumulator = 0.0f;
 				}
+			}
+
+			// === STEP 3: Skip rendering if not enough segments ===
+			if (trail.Segments.size() < 2) {
+				continue;  // Need at least 2 segments to render
 			}
 
 			for (size_t i = 0; i < trail.Segments.size(); ++i)

@@ -1014,6 +1014,13 @@ namespace Engine {
                 [](TrailComponent& c, const bool& v) {c.Active = v; }
             );
 
+
+            meta.AddProperty<TrailComponent, glm::vec3>(
+                "Trail Offset",
+                PropertyType::Vec3,
+                [](const TrailComponent& c) { return c.LocalOffset; },
+                [](TrailComponent& c, const glm::vec3& v) { c.LocalOffset = v; }
+            );
         }
 
         LOG_INFO("Component reflection registration complete");

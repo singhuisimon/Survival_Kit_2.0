@@ -324,7 +324,6 @@ namespace Engine {
 			}
 		}
 
-
 		renderFinalPass(m_finalpass, draw_items, editor_camera);
 		renderUIPass(m_UIPass, draw_items);
 		renderTextPass(m_textPass, draw_items);

@@ -3302,6 +3302,9 @@ namespace Engine
 				if (ImGui::Checkbox("Emit Trail", &trail.EmitTrail))
 					MarkComponentOverridden(ComponentTypeID::Trail);
 
+				if (ImGui::DragFloat3("Trail Offset", &trail.LocalOffset.x, 0.01f, -10.0f, 10.0f))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
 				// ======================= Debug Info Section =======================
 				ImGui::Spacing();
 				ImGui::SeparatorText("Debug Info");
