@@ -43,20 +43,6 @@ target_include_directories(rapidjson INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/rapidjson
 )
 
-# Tracy - Profiler
-message(STATUS "Configuring Tracy...")
-add_library(tracy STATIC
-    tracy/tracy/public/TracyClient.cpp
-)
-target_include_directories(tracy PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/tracy/tracy/public
-)
-target_compile_definitions(tracy PUBLIC 
-    TRACY_ENABLE
-    TRACY_ON_DEMAND
-)
-set_target_properties(tracy PROPERTIES FOLDER "External")
-
 # ImGuizmo - 3D Gizmos for ImGui
 message(STATUS "Configuring ImGuizmo...")
 add_library(imguizmo STATIC
@@ -219,7 +205,6 @@ target_link_libraries(External INTERFACE
     glm
     entt
     rapidjson
-    tracy
     imguizmo
     openfbx
     Jolt

@@ -6,7 +6,7 @@
 
 #include "../Utility/Logger.h"
 #include "../Utility/Timestep.h"
-#include "../Profiler/Profiler.h"
+//#include "../Profiler/Profiler.h"
 
 namespace Engine
 {

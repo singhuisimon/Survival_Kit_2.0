@@ -3,7 +3,7 @@
 #include "Utility/Logger.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <tracy/Tracy.hpp>
+//#include <tracy/Tracy.hpp>
 #include <sstream>
 #include <iomanip>
 #include"../Scripting/MonoScriptEngine.h"
@@ -135,8 +135,8 @@ namespace Engine
 
 		while (m_Running && !glfwWindowShouldClose(m_Window))
 		{
-			ZoneScoped;
-			FrameMark;
+			//ZoneScoped;
+			//FrameMark;
 
 			// Calculate delta time
 			float time = (float)glfwGetTime();
@@ -158,13 +158,13 @@ namespace Engine
 
 			// Poll events first to get latest input
 			{
-				ZoneScopedN("Events");
+				//ZoneScopedN("Events");
 				//glfwPollEvents();
 			}
 
 			// Update
 			{
-				ZoneScopedN("Update");
+				//ZoneScopedN("Update");
 
 				// Update input system (after events are polled)
 				m_Input->Update();
@@ -175,7 +175,7 @@ namespace Engine
 
 			// Swap buffers
 			{
-				ZoneScopedN("Render");
+				//ZoneScopedN("Render");
 				glfwSwapBuffers(m_Window);
 			}
 

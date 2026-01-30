@@ -308,29 +308,29 @@ void Game::OnInit()
 	}
 
 	// Step 8: Initialize Tracy Profiler
-	LOG_INFO("Step 8: Initializing Tracy Profiler...");
-	try
-	{
-		m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
+	//LOG_INFO("Step 8: Initializing Tracy Profiler...");
+	//try
+	//{
+	//	m_TracyProfiler = std::make_shared<Engine::TracyProfiler>();
 
-		// Get the directory where the executable is running from
-		std::filesystem::path exeDir = Engine::getAssetsPath();
+	//	// Get the directory where the executable is running from
+	//	std::filesystem::path exeDir = Engine::getAssetsPath();
 
-		// Move up one level (from 'resources/' to project root)
-		std::filesystem::path projectRoot = exeDir.parent_path().parent_path();
+	//	// Move up one level (from 'resources/' to project root)
+	//	std::filesystem::path projectRoot = exeDir.parent_path().parent_path();
 
-		std::filesystem::path tracyExe = projectRoot / "tracy-profiler.exe";
-		std::string result = tracyExe.generic_string();
-		LOG_INFO("tracy-profiler path: %s", result.c_str());
+	//	std::filesystem::path tracyExe = projectRoot / "tracy-profiler.exe";
+	//	std::string result = tracyExe.generic_string();
+	//	LOG_INFO("tracy-profiler path: %s", result.c_str());
 
-		m_TracyProfiler->SetTracyPath(result);
+	//	m_TracyProfiler->SetTracyPath(result);
 
-		m_Editor->SetTracy(m_TracyProfiler);
-	}
-	catch (const std::exception &e)
-	{
-		LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
-	}
+	//	m_Editor->SetTracy(m_TracyProfiler);
+	//}
+	//catch (const std::exception &e)
+	//{
+	//	LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
+	//}
 
   // ====================================
   // Step 8: Initialize Mono Scripting Engine
@@ -1488,7 +1488,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	}
 
 	m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
-	m_TracyProfiler->OnUpdate();
+	//m_TracyProfiler->OnUpdate();
 
 	Engine::EventSystem::Instance().DispatchQueued();
 }
@@ -1532,7 +1532,7 @@ void Game::OnShutdown()
 
 	m_AudioManager.reset();
 	m_Editor.reset();
-	m_TracyProfiler.reset();
+	//m_TracyProfiler.reset();
 
 	LOG_INFO("Game shutdown complete");
 }
