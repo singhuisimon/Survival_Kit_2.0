@@ -1732,6 +1732,10 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::Rigidbody_AddForce));
 		BindInternalCall("Engine.Rigidbody::Rigidbody_Stop",
 						 reinterpret_cast<void *>(InternalCalls::Rigidbody_Stop));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetBoxHalfExtent",
+			reinterpret_cast<void*>(InternalCalls::Rigidbody_SetBoxHalfExtent));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetBoxHalfExtent",
+			reinterpret_cast<void*>(InternalCalls::Rigidbody_GetBoxHalfExtent));
 
 		// =====================================================================
 		// Physics
