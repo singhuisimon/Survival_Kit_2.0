@@ -1,4 +1,6 @@
 {
+  "Scene": "MainMenu",
+  "Version": "1.0",
   "Entities": [
     {
       "ID": 0,
@@ -942,6 +944,142 @@
             "Color": [1.0, 1.0, 1.0, 1.0],
             "Quad": 3,
             "Sprite Layer": 17,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 28,
+      "Name": "BSOD Screen 1",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "BSOD Screen 1",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.2],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [640.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_BSOD_001.jpg",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 18,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 29,
+      "Name": "BSOD Screen 2",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "BSOD Screen 2",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.25],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [640.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_BSOD_002.jpg",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 19,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 30,
+      "Name": "BSOD Screen 3",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "BSOD Screen 3",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.3],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [640.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "MainMenu_BSOD_003.jpg",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 20,
+            "IsActive": true,
+            "IsVisible": true
+          }
+        }
+      ]
+    },
+    {
+      "ID": 31,
+      "Name": "Black Screen",
+      "Components": [
+        {
+          "Type": "TagComponent",
+          "Properties": {
+            "Tag": "Black Screen",
+            "Active": true
+          }
+        },
+        {
+          "Type": "TransformComponent",
+          "Properties": {
+            "Position": [640.0, -500.0, -0.35],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [640.0, 360.0, 1.0],
+            "Parent": 4294967295,
+            "Children": []
+          }
+        },
+        {
+          "Type": "SpriteRendererComponent",
+          "Properties": {
+            "Texture": "Blackscreen.png",
+            "Color": [1.0, 1.0, 1.0, 1.0],
+            "Quad": 3,
+            "Sprite Layer": 21,
             "IsActive": true,
             "IsVisible": true
           }

@@ -13,13 +13,22 @@ namespace Game
 {
     public class InstallButtonHandler : ScriptBehaviour
     {
+        // Entity names
         private const string INSTALL_BUTTON_NAME = "Install Button";
         private const string GLITCH_OVERLAY_NAME = "Glitch Overlay";
         private const string START_GAME_POPUP_NAME = "Start Game Popup";
         private const string START_GAME_YES_BUTTON_NAME = "Start Game Yes Button";
+        private const string BSOD_SCREEN_1_NAME = "BSOD Screen 1";
+        private const string BSOD_SCREEN_2_NAME = "BSOD Screen 2";
+        private const string BSOD_SCREEN_3_NAME = "BSOD Screen 3";
+        private const string BLACK_SCREEN_NAME = "Black Screen";
+
+        private const string MAIN_GAME_SCENE_PATH = "Resources/Sources/Scenes/MainGameScene.json";
         private const int NUM_ERROR_POPUPS = 8;
 
         private const float HIDDEN_Y = -500.0f;
+        private const float SCREEN_CENTER_X = 640.0f;
+        private const float SCREEN_CENTER_Y = 360.0f;
 
         // Visible positions for each error popup (index 0 = popup 1, index 7 = popup 8)
         private static readonly float[] POPUP_VISIBLE_X = { 750.0f, 850.0f, 600.0f, 450.0f, 400.0f, 350.0f, 300.0f, 250.0f };
@@ -43,24 +52,42 @@ namespace Game
         private const float GLITCH_TIMESTAMP = 0.39f;
         private const float START_GAME_TIMESTAMP = 1.03f;
 
+        // BSOD sequence timestamps
+        private const float BSOD_1_TIMESTAMP = 0.0f;    // Immediately
+        private const float BSOD_2_TIMESTAMP = 0.54f;
+        private const float BSOD_3_TIMESTAMP = 1.17f;
+        private const float BLACK_SCREEN_TIMESTAMP = 2.05f;
+        private const float LOAD_SCENE_TIMESTAMP = 2.56f;
+
         // Entity IDs
         private uint installButtonId;
         private uint[] errorPopupIds = new uint[NUM_ERROR_POPUPS];
         private uint glitchOverlayId;
         private uint startGamePopupId;
         private uint startGameYesButtonId;
+        private uint bsodScreen1Id;
+        private uint bsodScreen2Id;
+        private uint bsodScreen3Id;
+        private uint blackScreenId;
 
         // State
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
         private bool sequenceStarted = false;
         private bool sequenceComplete = false;
+        private bool bsodSequenceStarted = false;
+        private bool sceneLoadTriggered = false;
         private float elapsedTime = 0.0f;
+        private float bsodElapsedTime = 0.0f;
 
         // Track which elements have been shown
         private bool[] popupShown = new bool[NUM_ERROR_POPUPS];
         private bool glitchShown = false;
         private bool startGameShown = false;
+        private bool bsod1Shown = false;
+        private bool bsod2Shown = false;
+        private bool bsod3Shown = false;
+        private bool blackScreenShown = false;
 
         // Glitch overlay position
         private const float GLITCH_X = 640.0f;
@@ -76,6 +103,12 @@ namespace Game
         private const float START_BUTTON_X = 568.0f;
         private const float START_BUTTON_Y = 437.0f;
         private const float START_BUTTON_Z = -0.2f;
+
+        // BSOD Z positions (layered on top of each other, using working range)
+        private const float BSOD_1_Z = -0.2f;
+        private const float BSOD_2_Z = -0.25f;
+        private const float BSOD_3_Z = -0.3f;
+        private const float BLACK_SCREEN_Z = -0.35f;
 
         public override void OnStart()
         {
@@ -127,6 +160,35 @@ namespace Game
                 return;
             }
 
+            // Find BSOD screens
+            bsodScreen1Id = SceneFindEntityByName(BSOD_SCREEN_1_NAME);
+            if (bsodScreen1Id == 0)
+            {
+                LogError("InstallButtonHandler: Could not find entity: " + BSOD_SCREEN_1_NAME);
+                return;
+            }
+
+            bsodScreen2Id = SceneFindEntityByName(BSOD_SCREEN_2_NAME);
+            if (bsodScreen2Id == 0)
+            {
+                LogError("InstallButtonHandler: Could not find entity: " + BSOD_SCREEN_2_NAME);
+                return;
+            }
+
+            bsodScreen3Id = SceneFindEntityByName(BSOD_SCREEN_3_NAME);
+            if (bsodScreen3Id == 0)
+            {
+                LogError("InstallButtonHandler: Could not find entity: " + BSOD_SCREEN_3_NAME);
+                return;
+            }
+
+            blackScreenId = SceneFindEntityByName(BLACK_SCREEN_NAME);
+            if (blackScreenId == 0)
+            {
+                LogError("InstallButtonHandler: Could not find entity: " + BLACK_SCREEN_NAME);
+                return;
+            }
+
             entitiesFound = true;
             wasMousePressed = false;
 
@@ -156,6 +218,19 @@ namespace Game
             // Hide start game yes button
             Vector3 startButtonHidePos = new Vector3(START_BUTTON_X, HIDDEN_Y, START_BUTTON_Z);
             SetPosition(startGameYesButtonId, ref startButtonHidePos);
+
+            // Hide BSOD screens
+            Vector3 bsod1HidePos = new Vector3(SCREEN_CENTER_X, HIDDEN_Y, BSOD_1_Z);
+            SetPosition(bsodScreen1Id, ref bsod1HidePos);
+
+            Vector3 bsod2HidePos = new Vector3(SCREEN_CENTER_X, HIDDEN_Y, BSOD_2_Z);
+            SetPosition(bsodScreen2Id, ref bsod2HidePos);
+
+            Vector3 bsod3HidePos = new Vector3(SCREEN_CENTER_X, HIDDEN_Y, BSOD_3_Z);
+            SetPosition(bsodScreen3Id, ref bsod3HidePos);
+
+            Vector3 blackScreenHidePos = new Vector3(SCREEN_CENTER_X, HIDDEN_Y, BLACK_SCREEN_Z);
+            SetPosition(blackScreenId, ref blackScreenHidePos);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -179,22 +254,29 @@ namespace Game
                 }
             }
 
-            // Update sequence if started
+            // Update error popup sequence if started
             if (sequenceStarted && !sequenceComplete)
             {
                 elapsedTime += deltaTime;
                 UpdateSequence();
             }
 
-            // Handle start game yes button click after sequence is complete
-            if (sequenceComplete && mouseJustPressed)
+            // Handle start game yes button click after sequence is complete (before BSOD)
+            if (sequenceComplete && !bsodSequenceStarted && mouseJustPressed)
             {
                 if (Collision2D.IsMouseCollidingWithEntity(startGameYesButtonId))
                 {
-                    LogMessage("InstallButtonHandler: Start Game Yes button clicked - loading gameplay");
-                    // TODO: Load gameplay scene
-                    Publish("StartGame", "");
+                    LogMessage("InstallButtonHandler: Start Game Yes button clicked - starting BSOD sequence");
+                    bsodSequenceStarted = true;
+                    bsodElapsedTime = 0.0f;
                 }
+            }
+
+            // Update BSOD sequence if started
+            if (bsodSequenceStarted && !sceneLoadTriggered)
+            {
+                bsodElapsedTime += deltaTime;
+                UpdateBSODSequence();
             }
         }
 
@@ -229,6 +311,50 @@ namespace Game
             }
         }
 
+        private void UpdateBSODSequence()
+        {
+            // Show BSOD Screen 1 immediately
+            if (!bsod1Shown && bsodElapsedTime >= BSOD_1_TIMESTAMP)
+            {
+                ShowBSODScreen1();
+                bsod1Shown = true;
+                LogMessage("InstallButtonHandler: BSOD Screen 1 shown at " + bsodElapsedTime + "s");
+            }
+
+            // Show BSOD Screen 2 at 0.54s
+            if (!bsod2Shown && bsodElapsedTime >= BSOD_2_TIMESTAMP)
+            {
+                ShowBSODScreen2();
+                bsod2Shown = true;
+                LogMessage("InstallButtonHandler: BSOD Screen 2 shown at " + bsodElapsedTime + "s");
+            }
+
+            // Show BSOD Screen 3 at 1.17s
+            if (!bsod3Shown && bsodElapsedTime >= BSOD_3_TIMESTAMP)
+            {
+                ShowBSODScreen3();
+                bsod3Shown = true;
+                LogMessage("InstallButtonHandler: BSOD Screen 3 shown at " + bsodElapsedTime + "s");
+            }
+
+            // Show Black Screen at 2.05s
+            if (!blackScreenShown && bsodElapsedTime >= BLACK_SCREEN_TIMESTAMP)
+            {
+                ShowBlackScreen();
+                blackScreenShown = true;
+                LogMessage("InstallButtonHandler: Black Screen shown at " + bsodElapsedTime + "s");
+            }
+
+            // Load scene at 2.56s
+            if (!sceneLoadTriggered && bsodElapsedTime >= LOAD_SCENE_TIMESTAMP)
+            {
+                sceneLoadTriggered = true;
+                LogMessage("InstallButtonHandler: Loading main game scene at " + bsodElapsedTime + "s");
+                LogMessage("Scene path: " + MAIN_GAME_SCENE_PATH);
+                Publish("LoadScene", MAIN_GAME_SCENE_PATH);
+            }
+        }
+
         private void ShowErrorPopup(int index)
         {
             Vector3 pos = new Vector3(POPUP_VISIBLE_X[index], POPUP_VISIBLE_Y[index], -0.7f - index * 0.01f);
@@ -250,6 +376,30 @@ namespace Game
             // Show yes button
             Vector3 buttonPos = new Vector3(START_BUTTON_X, START_BUTTON_Y, START_BUTTON_Z);
             SetPosition(startGameYesButtonId, ref buttonPos);
+        }
+
+        private void ShowBSODScreen1()
+        {
+            Vector3 pos = new Vector3(SCREEN_CENTER_X, SCREEN_CENTER_Y, BSOD_1_Z);
+            SetPosition(bsodScreen1Id, ref pos);
+        }
+
+        private void ShowBSODScreen2()
+        {
+            Vector3 pos = new Vector3(SCREEN_CENTER_X, SCREEN_CENTER_Y, BSOD_2_Z);
+            SetPosition(bsodScreen2Id, ref pos);
+        }
+
+        private void ShowBSODScreen3()
+        {
+            Vector3 pos = new Vector3(SCREEN_CENTER_X, SCREEN_CENTER_Y, BSOD_3_Z);
+            SetPosition(bsodScreen3Id, ref pos);
+        }
+
+        private void ShowBlackScreen()
+        {
+            Vector3 pos = new Vector3(SCREEN_CENTER_X, SCREEN_CENTER_Y, BLACK_SCREEN_Z);
+            SetPosition(blackScreenId, ref pos);
         }
 
         public override void OnDestroy()
