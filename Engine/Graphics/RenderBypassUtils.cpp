@@ -79,6 +79,9 @@ namespace Engine {
 		std::string vertex_shadow_depth_path{ Engine::getAssetFilePath("Sources/Shaders/shadow_depth.vert") };
 		std::string fragment_shadow_depth_path{ Engine::getAssetFilePath("Sources/Shaders/shadow_depth.frag") };
 
+		std::string vertex_font_path{ getAssetFilePath("Sources/Shaders/font.vert") };
+		std::string fragment_font_path{ getAssetFilePath("Sources/Shaders/font.frag") };
+
 		// Pair vertex and fragment shader files
 		std::vector<std::pair<std::string, std::string>> shader_files{
 			std::make_pair(vertex_obj_path, fragment_obj_path),
@@ -89,7 +92,8 @@ namespace Engine {
 			std::make_pair(vertex_ui_path, fragment_ui_path),
 			std::make_pair(vertex_hdr_path, fragment_bloom_downsample_path),
 			std::make_pair(vertex_hdr_path, fragment_bloom_upsample_path),
-			std::make_pair(vertex_shadow_depth_path, fragment_shadow_depth_path)
+			std::make_pair(vertex_shadow_depth_path, fragment_shadow_depth_path),
+			std::make_pair(vertex_font_path, fragment_font_path)
 		};
 
 		shd = loadShaderFromStrings(shader_files);

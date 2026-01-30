@@ -18,6 +18,7 @@ namespace Engine {
         ReverbZone = 12,
         BehaviourTree = 13,
         SpriteRenderer = 14,
+        Text = 15,
         Prefab = 100,
         Tag = 101,
 

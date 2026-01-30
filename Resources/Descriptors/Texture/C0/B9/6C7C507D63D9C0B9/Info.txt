@@ -2,6 +2,10 @@
   "name": "WindowsBG.png",
   "guid": "6C7C507D63D9C0B9",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "00000000697B22C1",
+=======
+  "lastImported": "0000000069732E73",
+>>>>>>> main
   "resourceLinks": []
 }

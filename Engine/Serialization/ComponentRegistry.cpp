@@ -26,6 +26,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TextComponent.h"
 
  // Required for quaternion to Euler conversion
 #include <glm/gtc/quaternion.hpp>
@@ -512,6 +513,20 @@ namespace Engine {
         {
 	        auto& meta = REGISTER_COMPONENT(ParticleComponent);
 
+            meta.AddProperty<ParticleComponent, u64>(
+                "ParticleTypeAdvanced",
+                PropertyType::U64,
+                [](const ParticleComponent& c) { return static_cast<u64>(c.ParticleTypeAdvanced.m_Value); },
+                [](ParticleComponent& c, const xresource::instance_guid& v) { c.ParticleTypeAdvanced = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, u64>(
+                "MaterialType",
+                PropertyType::U64,
+                [](const ParticleComponent& c) { return static_cast<u64>(c.MaterialType.m_Value); },
+                [](ParticleComponent& c, const xresource::instance_guid& v) { c.MaterialType = v; }
+            );
+
             meta.AddProperty<ParticleComponent, glm::vec3>(
                 "InitialVelocity",
                 PropertyType::Vec3,
@@ -519,8 +534,36 @@ namespace Engine {
                 [](ParticleComponent& c, const glm::vec3& v) { c.InitialVelocity = v; }
             );
 
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "StartSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.StartSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.StartSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "DefaultSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.DefaultSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.DefaultSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "EndSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.EndSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.EndSize = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, glm::vec3>(
+                "EmissionBoxSize",
+                PropertyType::Vec3,
+                [](const ParticleComponent& c) { return c.EmissionBoxSize; },
+                [](ParticleComponent& c, const glm::vec3& v) { c.EmissionBoxSize = v; }
+            );
+
             meta.AddProperty<ParticleComponent, glm::vec4>(
-            "ColorMin",
+                "ColorMin",
                 PropertyType::Vec4,
                 [](const ParticleComponent& c) { return c.ColorMin; },
                 [](ParticleComponent& c, const glm::vec4& v) { c.ColorMin = v; }
@@ -531,6 +574,13 @@ namespace Engine {
                 PropertyType::Vec4,
                 [](const ParticleComponent& c) { return c.ColorMax; },
                 [](ParticleComponent& c, const glm::vec4& v) { c.ColorMax = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, u32>(
+                "EmitterShape",
+                PropertyType::U32,
+                [](const ParticleComponent& c) { return static_cast<u32>(c.Shape); },
+                [](ParticleComponent& c, const u32& v) { c.Shape = static_cast<EmitterShape>(v); }
             );
 
             meta.AddProperty<ParticleComponent, u32>(
@@ -576,6 +626,27 @@ namespace Engine {
             );
 
             meta.AddProperty<ParticleComponent, float>(
+                "GrowPhaseEnd",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.GrowPhaseEnd; },
+                [](ParticleComponent& c, const float& v) { c.GrowPhaseEnd = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "ShrinkPhaseStart",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.ShrinkPhaseStart; },
+                [](ParticleComponent& c, const float& v) { c.ShrinkPhaseStart = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "EmissionSphereRadius",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.EmissionSphereRadius; },
+                [](ParticleComponent& c, const float& v) { c.EmissionSphereRadius = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
                 "VelocityRandomness",
                 PropertyType::Float,
                 [](const ParticleComponent& c) { return c.VelocityRandomness; },
@@ -587,6 +658,20 @@ namespace Engine {
                 PropertyType::Float,
                 [](const ParticleComponent& c) { return c.LifetimeRandomness; },
                 [](ParticleComponent& c, const float& v) { c.LifetimeRandomness = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "PlayDelay",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.PlayDelay; },
+                [](ParticleComponent& c, const float& v) { c.PlayDelay = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, float>(
+                "DelayAccumualator",
+                PropertyType::Float,
+                [](const ParticleComponent& c) { return c.DelayAccumualator; },
+                [](ParticleComponent& c, const float& v) { c.DelayAccumualator = v; }
             );
 
             meta.AddProperty<ParticleComponent, float>(
@@ -637,6 +722,21 @@ namespace Engine {
                 [](const ParticleComponent& c) { return c.Active; },
                 [](ParticleComponent& c, const bool& v) { c.Active = v; }
             );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "WorldSpace",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.WorldSpace; },
+                [](ParticleComponent& c, const bool& v) { c.WorldSpace = v; }
+            );
+
+            meta.AddProperty<ParticleComponent, bool>(
+                "BurstMode",
+                PropertyType::Bool,
+                [](const ParticleComponent& c) { return c.BurstMode; },
+                [](ParticleComponent& c, const bool& v) { c.BurstMode = v; }
+            );
+
         }
 
         // Register LightComponent
@@ -778,8 +878,68 @@ namespace Engine {
                 [](SpriteRendererComponent& c, const bool& v) {c.IsVisible = v; });
         }
 
+        // Register Text Component
+        {
+            auto& meta = REGISTER_COMPONENT(TextComponent);
+
+            meta.AddProperty<TextComponent, std::string>(
+                "Text",
+                PropertyType::String,
+                [](const TextComponent& c) { return c.text; },
+                [](TextComponent& c, const std::string& v) { c.setText(v); }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "FontSize",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.fontSize;  },
+                [](TextComponent& c, const float& v) { return c.setFontSize(v);  }
+            );
+
+            meta.AddProperty<TextComponent, glm::vec4>(
+                "Color",
+                PropertyType::Vec4,
+                [](const TextComponent& c) {
+                    return glm::vec4(c.color[0], c.color[1], c.color[2], c.color[3]);
+                },
+                [](TextComponent& c, const glm::vec4& v) {
+                    c.setColor(v);
+                }
+            );
+
+            meta.AddProperty<TextComponent, u32>(
+                "Alignment",
+                PropertyType::U32,
+                [](const TextComponent& c) { return static_cast<u32>(c.align); },
+                [](TextComponent& c, const u32& v) {
+                    c.setAlignment(static_cast<TextAlignment>(v));
+                }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "LineSpacing",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.lineSpacing; },
+                [](TextComponent& c, const float& v) { c.lineSpacing = v; }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "LetterSpacing",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.letterSpacing; },
+                [](TextComponent& c, const float& v) { c.setLetterSpacing(v); }
+            );
+
+            meta.AddProperty<TextComponent, float>(
+                "MaxWidth",
+                PropertyType::Float,
+                [](const TextComponent& c) { return c.maxWidth; },
+                [](TextComponent& c, const float& v) { c.maxWidth = v; }
+            );
+        }
+
         LOG_INFO("Component reflection registration complete");
-        LOG_INFO("  - Registered 10 component types");
+        LOG_INFO("  - Registered 11 component types");
     }
 
 } // namespace Engine

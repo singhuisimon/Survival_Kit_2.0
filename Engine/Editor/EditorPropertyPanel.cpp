@@ -97,6 +97,9 @@ namespace Engine
 				// Sprite Renderer Component
 				DisplaySpriteRendererComponent(dotButtonSize);
 
+				// Text Component 
+				DisplayTextComponent(dotButtonSize); 
+
 				// Add Component Button
 				AddComponent();
 
@@ -672,27 +675,89 @@ namespace Engine
 				// Material Editor Section
 				ImGui::SeparatorText("Material Properties");
 
-				// Save Material Button
-				static char materialSaveName[256] = "";
-				ImGui::InputText("Material Name", materialSaveName, sizeof(materialSaveName));
-				ImGui::SameLine();
-				if (ImGui::Button("Save Material")) {
-					if (strlen(materialSaveName) > 0) {
-						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
-						if (material) {
-							std::string filename = std::string(materialSaveName);
-							serializeMaterial(material, filename);
+				// Save Material Section
 
-							AM.scanAndProcess();
-							memset(materialSaveName, 0, sizeof(materialSaveName));
-							ImGui::OpenPopup("Material Saved");
+				// Overwrite Current Material Button
+				if (ImGui::Button("Overwrite Current Material")) {
+					MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+					if (material) {
+						std::string currentMaterialName = AM.getNameFromGuid(mesh.MaterialGuid);
+						if (!currentMaterialName.empty()) {
+							ImGui::OpenPopup("Confirm Overwrite");
 						}
-					}
-					else {
-						ImGui::OpenPopup("Invalid Name");
+						else {
+							ImGui::OpenPopup("No Material Selected");
+						}
 					}
 				}
 
+				// Save As New Material Button (on new row)
+				if (ImGui::Button("Save As New Material")) {
+					ImGui::OpenPopup("Save As New Material");
+				}
+
+				// --- Popups ---
+
+				// Confirm Overwrite Popup
+				if (ImGui::BeginPopupModal("Confirm Overwrite", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+					ImGui::Text("Are you sure you want to overwrite the current material?");
+					ImGui::Separator();
+
+					if (ImGui::Button("Yes", ImVec2(120, 0))) {
+						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+						if (material) {
+							std::string currentMaterialName = AM.getNameFromGuid(mesh.MaterialGuid);
+							serializeMaterial(material, currentMaterialName);
+							AM.scanAndProcess();
+							ImGui::CloseCurrentPopup();
+							ImGui::OpenPopup("Material Saved");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("No", ImVec2(120, 0))) {
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				// Save As New Material Popup
+				static char saveAsName[256] = "";
+				if (ImGui::BeginPopupModal("Save As New Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+					ImGui::Text("Enter a name for the new material:");
+					ImGui::InputText("##SaveAsName", saveAsName, sizeof(saveAsName));
+					ImGui::Separator();
+
+					if (ImGui::Button("Save", ImVec2(120, 0))) {
+						if (strlen(saveAsName) > 0) {
+							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(mesh.MaterialGuid));
+							if (material) {
+								std::string filename = std::string(saveAsName);
+								serializeMaterial(material, filename);
+								AM.scanAndProcess();
+								memset(saveAsName, 0, sizeof(saveAsName));
+								ImGui::CloseCurrentPopup();
+								ImGui::OpenPopup("Material Saved");
+							}
+						}
+						else {
+							ImGui::OpenPopup("Invalid Name");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+						memset(saveAsName, 0, sizeof(saveAsName));
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				// Material Saved Popup
 				if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("Material saved successfully!");
 					if (ImGui::Button("OK")) {
@@ -701,8 +766,18 @@ namespace Engine
 					ImGui::EndPopup();
 				}
 
+				// Invalid Name Popup
 				if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("Please enter a valid material name.");
+					if (ImGui::Button("OK")) {
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				// No Material Selected Popup
+				if (ImGui::BeginPopupModal("No Material Selected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+					ImGui::Text("No material currently selected to overwrite.");
 					if (ImGui::Button("OK")) {
 						ImGui::CloseCurrentPopup();
 					}
@@ -1699,7 +1774,7 @@ namespace Engine
 
 						// Mark as removed
 						prefabComp.MarkComponentRemoved(ComponentTypeID::ParticleSystem, originalJSON);
-						LOG_INFO("Marked RigidBody as REMOVED override");
+						LOG_INFO("Marked Particle Component as REMOVED override");
 					}
 					//return;
 				}
@@ -1711,16 +1786,45 @@ namespace Engine
 
 			if (openParticleComp)
 			{
+				auto clearpc = [](ParticleComponent& pc) { pc.Particles.clear(), pc.EmissionAccumulator = 0.f; pc.DelayAccumualator = 0.f; };
+
 				// Playback Controls
 				ImGui::Text("Playback");
-				if (ImGui::Checkbox("Active###activeParticle", &particleComp.Active))
-				{
-					MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+				if (ImGui::Button("Play###PlayParticle")) {
+					if (particleComp.BurstMode)
+						clearpc(particleComp);
+
+					particleComp.Active = true;
+
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 				}
 				ImGui::SameLine();
-				if (ImGui::Checkbox("Loop", &particleComp.Loop))
+				if (ImGui::Button("Pause###PauseParticle")) {
+					particleComp.Active = false;
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Restart Animation##RestartPlaybackParticle")) {
+					clearpc(particleComp);
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+				ImGui::Spacing();
+
+				if(ImGui::DragFloat("Play Delay", &particleComp.PlayDelay, 0.1f, 0.f, 60.f)) {
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+
+				ImGui::Spacing();
+
+				// Burst Mode Checkbox
+				if (ImGui::Checkbox("Burst Mode", &particleComp.BurstMode))
 				{
-					MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Checkbox("Loop", &particleComp.Loop)) {
+					MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 				}
 
 				ImGui::Spacing();
@@ -1729,6 +1833,44 @@ namespace Engine
 				// Emission Settings
 				if (ImGui::TreeNodeEx("Emission", ImGuiTreeNodeFlags_DefaultOpen))
 				{
+					// Particle Type Dropdown
+					const char* emissionShape[] = { "Point", "Box", "Sphere" };
+					const char* currentShape = emissionShape[static_cast<uint32_t>(particleComp.Shape)];
+
+					if (ImGui::BeginCombo("Emission Shape", currentShape))
+					{
+						for (int i = 0; i < 3; i++)
+						{
+							bool isSelected = (static_cast<uint32_t>(particleComp.Shape) == static_cast<uint32_t>(i));
+							if (ImGui::Selectable(emissionShape[i], isSelected))
+							{
+								particleComp.Shape = static_cast<EmitterShape>(i);
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (isSelected)
+							{
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					// Conditional widgets based on selected shape
+					if (particleComp.Shape == EmitterShape::BOX)
+					{
+						if (ImGui::DragFloat3("Box Size", &particleComp.EmissionBoxSize.x, 0.1f, 0.0f, 100000.0f))
+						{
+							MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+						}
+					}
+					else if (particleComp.Shape == EmitterShape::SPHERE)
+					{
+						if (ImGui::DragFloat("Sphere Radius", &particleComp.EmissionSphereRadius, 0.1f, 0.0f, 100000.0f))
+						{
+							MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+						}
+					}
+
 					if (ImGui::DragInt("Max Particles", (int*)&particleComp.MaxParticles, 1.0f, 1, 10000))
 					{
 						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
@@ -1741,6 +1883,7 @@ namespace Engine
 					{
 						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
 					}
+
 					ImGui::TreePop();
 				}
 
@@ -1769,11 +1912,6 @@ namespace Engine
 						ImGui::EndCombo();
 					}
 
-					if (ImGui::DragFloat("Particle Size", &particleComp.ParticleSize, 0.01f, 0.01f, 10.0f, "%.2f"))
-					{
-						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
-					}
-
 					ImGui::Spacing();
 					ImGui::Text("Color Range");
 					if (ImGui::ColorEdit4("Color Min", &particleComp.ColorMin.x))
@@ -1791,6 +1929,39 @@ namespace Engine
 				// Particle Behavior
 				if (ImGui::TreeNodeEx("Behavior", ImGuiTreeNodeFlags_DefaultOpen))
 				{
+					if(ImGui::Checkbox("World Space##ParticleWorldSpace", &particleComp.WorldSpace)) 
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+					}
+
+					ImGui::Text("Size");
+
+					if (ImGui::DragFloat3("Initial Size", &particleComp.StartSize.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat3("Default Size", &particleComp.DefaultSize.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat3("End Size", &particleComp.EndSize.x, 0.1f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat("Growth Phase End", &particleComp.GrowPhaseEnd, 0.1f, 0.f, 1.f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					if (ImGui::DragFloat("Shrink Phase Start", &particleComp.ShrinkPhaseStart, 0.1f, 0.f, 1.f))
+					{
+						MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+					}
+
+					ImGui::Spacing();
 					ImGui::Text("Velocity");
 					if (ImGui::DragFloat3("Initial Velocity", &particleComp.InitialVelocity.x, 0.1f))
 					{
@@ -1845,6 +2016,232 @@ namespace Engine
 					ImGui::TreePop();
 				}
 
+				if (ImGui::TreeNode("Advanced"))
+				{
+					static bool showWrongTypeParticle = false;
+
+					// Display asset reference fields
+					DisplayAssetField("Mesh", particleComp.ParticleTypeAdvanced, ResourceType::MESH, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+					DisplayAssetField("Material", particleComp.MaterialType, ResourceType::MATERIAL, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+
+					if (showWrongTypeParticle) {
+						ImGui::OpenPopup("Incompatible Asset Type");
+						showWrongTypeParticle = false;
+					}
+
+					if (ImGui::BeginPopup("Incompatible Asset Type")) {
+						ImGui::Text("The dropped asset type does not match the expected type.");
+						if (ImGui::Button("Close")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// Material Editor Section
+					ImGui::SeparatorText("Material Properties");
+
+					// Save Material Section
+
+					// Overwrite Current Material Button
+					if (ImGui::Button("Overwrite Current Material")) {
+						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+						if (material) {
+							std::string currentMaterialName = AM.getNameFromGuid(particleComp.MaterialType);
+							if (!currentMaterialName.empty()) {
+								ImGui::OpenPopup("Confirm Overwrite");
+							}
+							else {
+								ImGui::OpenPopup("No Material Selected");
+							}
+						}
+					}
+
+					// Save As New Material Button (on new row)
+					if (ImGui::Button("Save As New Material")) {
+						ImGui::OpenPopup("Save As New Material");
+					}
+
+					// --- Popups ---
+
+					// Confirm Overwrite Popup
+					if (ImGui::BeginPopupModal("Confirm Overwrite", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Are you sure you want to overwrite the current material?");
+						ImGui::Separator();
+
+						if (ImGui::Button("Yes", ImVec2(120, 0))) {
+							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+							if (material) {
+								std::string currentMaterialName = AM.getNameFromGuid(particleComp.MaterialType);
+								serializeMaterial(material, currentMaterialName);
+								AM.scanAndProcess();
+								ImGui::CloseCurrentPopup();
+								ImGui::OpenPopup("Material Saved");
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("No", ImVec2(120, 0))) {
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+
+					// Save As New Material Popup
+					static char saveAsName[256] = "";
+					if (ImGui::BeginPopupModal("Save As New Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Enter a name for the new material:");
+						ImGui::InputText("##SaveAsName", saveAsName, sizeof(saveAsName));
+						ImGui::Separator();
+
+						if (ImGui::Button("Save", ImVec2(120, 0))) {
+							if (strlen(saveAsName) > 0) {
+								MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+								if (material) {
+									std::string filename = std::string(saveAsName);
+									serializeMaterial(material, filename);
+									AM.scanAndProcess();
+									memset(saveAsName, 0, sizeof(saveAsName));
+									ImGui::CloseCurrentPopup();
+									ImGui::OpenPopup("Material Saved");
+								}
+							}
+							else {
+								ImGui::OpenPopup("Invalid Name");
+							}
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+							memset(saveAsName, 0, sizeof(saveAsName));
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+
+					// Material Saved Popup
+					if (ImGui::BeginPopupModal("Material Saved", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Material saved successfully!");
+						if (ImGui::Button("OK")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// Invalid Name Popup
+					if (ImGui::BeginPopupModal("Invalid Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("Please enter a valid material name.");
+						if (ImGui::Button("OK")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// No Material Selected Popup
+					if (ImGui::BeginPopupModal("No Material Selected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+						ImGui::Text("No material currently selected to overwrite.");
+						if (ImGui::Button("OK")) {
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
+
+					// Get material reference
+					MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(particleComp.MaterialType));
+
+					if (material) {
+						ImGui::Text("Shader: %s", material->shaderName.c_str());
+
+						if (ImGui::CollapsingHeader("Texture Maps")) {
+							DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+						}
+
+						if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
+							if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
+								ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::ColorEdit3("Emission Color", material->emissionColor.data(),
+								ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+						}
+
+						if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
+							if (ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0f, "%.2f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Roughness", &material->roughness, 0.0f, 1.0f, "%.2f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f")) {
+								material->emissionStrength = std::max(0.0f, material->emissionStrength);
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Alpha Threshold", &material->alphaThreshold, 0.0f, 1.0f, "%.3f")) {
+								material->alphaThreshold = std::max(0.0f, std::min(1.0f, material->alphaThreshold));
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::SliderFloat("Ambient Occlusion", &material->ambientOcclusion, 0.0f, 1.0f, "%.3f")) {
+								material->ambientOcclusion = std::max(0.0f, std::min(1.0f, material->ambientOcclusion));
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+						}
+
+						if (ImGui::CollapsingHeader("UV Transform")) {
+							if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f")) {
+								material->tiling[0] = std::max(0.1f, material->tiling[0]);
+								material->tiling[1] = std::max(0.1f, material->tiling[1]);
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+
+							if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f")) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);  // MARK AS OVERRIDDEN
+							}
+						}
+
+						if (ImGui::CollapsingHeader("Render Flags")) {
+							if (ImGui::Checkbox("Enable Emission", &material->enableEmission)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Alpha Test", &material->alphaTest)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Double Sided", &material->doubleSided)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Receive Shadows", &material->receiveShadows)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Cast Shadows", &material->castShadows)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+						}
+					}
+
+					ImGui::SeparatorText("Values for Debugging:");
+					ImGui::Text("Material: %u", particleComp.MaterialType);
+
+					ImGui::TreePop();
+				}
+
 				// Statistics
 				if (ImGui::TreeNode("Statistics"))
 				{
@@ -1880,6 +2277,7 @@ namespace Engine
 				{
 					particleComp.Particles.clear();
 					particleComp.EmissionAccumulator = 0.0f;
+					particleComp.DelayAccumualator = 0.f;
 				}
 			}
 			// ----------------------------------------- Remove Particle Component -------------------------------
@@ -2649,6 +3047,139 @@ namespace Engine
 			}
 		}
 	}
+
+	void EditorPropertyPanel::DisplayTextComponent(ImVec2& buttonSize) {
+
+		if (m_SelectedEntity.HasComponent<TextComponent>()) {
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool  isComponentOverridden = IsComponentOverridden(ComponentTypeID::Text);
+
+			if (isComponentOverridden) 
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
+				bool openTextComp = ImGui::CollapsingHeader("Text Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+				if (isComponentOverridden)
+					ImGui::PopStyleColor();
+
+				bool removeTextComp = false;
+				ImGui::NextColumn();
+
+				if (ImGui::Button("...###TextBtn", buttonSize)) {
+					ImGui::OpenPopup("TextPopUp");
+				}
+				if (ImGui::BeginPopup("TextPopUp")) {
+					if (ImGui::MenuItem("Remove Component")) {
+						removeTextComp = true;
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Columns(1);
+
+				if (openTextComp) {
+					auto& textComp = m_SelectedEntity.GetComponent<TextComponent>();
+
+					// Text content input (multi-line)
+					ImGui::Text("Text Content:");
+					char textBuffer[1024];
+					strncpy_s(textBuffer, sizeof(textBuffer), textComp.text.c_str(), _TRUNCATE);
+
+					if (ImGui::InputTextMultiline("##TextContent", textBuffer, sizeof(textBuffer),
+						ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 4),
+						ImGuiInputTextFlags_AllowTabInput))
+					{
+						textComp.setText(textBuffer);
+						MarkComponentOverridden(ComponentTypeID::Text, "text");
+					}
+
+					ImGui::Spacing();
+
+					// Font Size
+					float fontSize = textComp.fontSize;
+					if (ImGui::DragFloat("Font Size", &fontSize, 0.5f, 1.0f, 200.0f, "%.1f")) {
+						textComp.setFontSize(fontSize);
+						MarkComponentOverridden(ComponentTypeID::Text, "fontSize");
+					}
+
+					// Color Picker
+					float color[4] = {
+						textComp.color[0],
+						textComp.color[1],
+						textComp.color[2],
+						textComp.color[3]
+					};
+
+					if (ImGui::ColorEdit4("Text Color", color)) {
+						textComp.setColor(color[0], color[1], color[2], color[3]);
+						MarkComponentOverridden(ComponentTypeID::Text, "color");
+					}
+
+					ImGui::Spacing();
+					ImGui::SeparatorText("Layout");
+
+					// Alignment
+					const char* alignmentItems[] = { "Left", "Right", "Center", "Justified" };
+					int currentAlignment = static_cast<int>(textComp.align);
+					if (ImGui::Combo("Alignment", &currentAlignment, alignmentItems, IM_ARRAYSIZE(alignmentItems))) {
+						textComp.setAlignment(static_cast<TextAlignment>(currentAlignment));
+						MarkComponentOverridden(ComponentTypeID::Text, "align");
+					}
+
+					// Line Spacing
+					float lineSpacing = textComp.lineSpacing;
+					if (ImGui::DragFloat("Line Spacing", &lineSpacing, 0.01f, 0.5f, 3.0f, "%.2f")) {
+						textComp.lineSpacing = glm::clamp(lineSpacing, 0.5f, 3.0f);
+						textComp.isDirty = true;
+						MarkComponentOverridden(ComponentTypeID::Text, "lineSpacing");
+					}
+
+					// Letter Spacing
+					float letterSpacing = textComp.letterSpacing;
+					if (ImGui::DragFloat("Letter Spacing", &letterSpacing, 0.1f, -10.0f, 10.0f, "%.2f")) {
+						textComp.setLetterSpacing(letterSpacing);
+						MarkComponentOverridden(ComponentTypeID::Text, "letterSpacing");
+					}
+
+					// Max Width (0 = no limit)
+					float maxWidth = textComp.maxWidth;
+					if (ImGui::DragFloat("Max Width", &maxWidth, 1.0f, 0.0f, 2000.0f, "%.1f")) {
+						textComp.maxWidth = glm::max(maxWidth, 0.0f);
+						textComp.isDirty = true;
+						MarkComponentOverridden(ComponentTypeID::Text, "maxWidth");
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("0 = No width limit");
+					}
+
+					ImGui::Spacing();
+					ImGui::SeparatorText("Info");
+
+					// Display bounds (read-only)
+					ImGui::Text("Calculated Width: %.1f", textComp.bounds.z);
+					ImGui::Text("Calculated Height: %.1f", textComp.bounds.w);
+
+					// Dirty flag indicator
+					if (textComp.isDirty) {
+						ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "* Layout needs update");
+					}
+				}
+
+				// Handle component removal
+				if (removeTextComp) {
+					m_SelectedEntity.RemoveComponent<TextComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Text);
+					}
+				}
+			}
+		
+	}
+	
 
 	// Animator Window
 	void EditorPropertyPanel::AnimatorWindow(){
@@ -5129,6 +5660,8 @@ namespace Engine
 					}
 				}
 			}
+
+
 			if (ImGui::IsItemHovered())
 			{
 				if (!hasSpriteRenderer)
@@ -5137,8 +5670,69 @@ namespace Engine
 				}
 			}
 			ImGui::EndDisabled();
+			// ------------------------ Add Text Component ----------------------------
+			{
+				bool hasTextComponent = m_SelectedEntity.HasComponent<TextComponent>();
+				ImGui::BeginDisabled(hasTextComponent);
+
+				if (ImGui::MenuItem("Text Component"))
+				{
+					if (!hasTextComponent)
+					{
+						m_SelectedEntity.AddComponent<TextComponent>();
+						if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+							auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+							// Check if this component exists in the prefab blueprint
+							bool existsInPrefab = false;
+							if (prefabComp.isPrefabRoot) {
+								// For root, check prefab registry
+								Prefab prefab;
+								if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab)) {
+									if (const PrefabEntityData* entityData = prefab.GetRootEntity()) {
+										for (const auto& comp : entityData->components) {
+											if (comp.type == ComponentTypeID::Text) {
+												existsInPrefab = true;
+												break;
+											}
+										}
+									}
+								}
+							}
+
+							// Mark appropriately
+							if (!existsInPrefab) {
+								// New component not in prefab = added override
+								std::string componentJSON = ComponentSerializer::SerializeComponent(
+									m_SelectedEntity, ComponentTypeID::Text);
+								prefabComp.MarkComponentAdded(ComponentTypeID::Text, componentJSON);
+								LOG_INFO("Marked Text as ADDED component (not in prefab)");
+							}
+							else {
+								// Component exists in prefab but was removed, now re-added
+								// Clear the removal flag
+								prefabComp.ClearComponentRemoval(ComponentTypeID::Text);
+								prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Text);
+								LOG_INFO("Marked Text as RESTORED (was removed, now re-added)");
+							}
+						}
+					}
+				}
+				if (ImGui::IsItemHovered())
+				{
+					if (!hasTextComponent)
+					{
+						ImGui::SetTooltip("Renders 2D text on screen.");
+					}
+				}
+				ImGui::EndDisabled();
+			}
 			ImGui::EndPopup(); // end pop up for Add Component  
 		}
+
+		
+
+		
 	}
 
 	// Helper Functions

@@ -2,6 +2,10 @@
   "name": "MainMenu_YesButton.png",
   "guid": "699D807FA3DA8005",
   "tags": [],
+<<<<<<< HEAD
   "lastImported": "00000000697B22C1",
+=======
+  "lastImported": "0000000069732E73",
+>>>>>>> main
   "resourceLinks": []
 }

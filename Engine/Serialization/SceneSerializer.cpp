@@ -17,6 +17,7 @@
 #include "../Component/PrefabComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TextComponent.h"
 
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"
@@ -536,12 +537,53 @@ namespace Engine
 					Value(std::to_string(emitter.ComponentGUID.m_Value).c_str(), allocator),
 					allocator
 				);
+
+				// Particle Type Advanced
+				std::string particleTypeAdvancedName = AM.getNameFromGuid(emitter.ParticleTypeAdvanced);
+				propertiesObj.AddMember("Particle Type Advanced",
+					Value(particleTypeAdvancedName.empty() ? "" : particleTypeAdvancedName.c_str(), allocator),
+					allocator);
+
+				// Material Type
+				std::string materialTypeName = AM.getNameFromGuid(emitter.MaterialType);
+				propertiesObj.AddMember("Material Type",
+					Value(materialTypeName.empty() ? "" : materialTypeName.c_str(), allocator),
+					allocator);
+
 				// Initial Velocity
 				rapidjson::Value velArray(kArrayType);
 				velArray.PushBack(emitter.InitialVelocity.x, allocator);
 				velArray.PushBack(emitter.InitialVelocity.y, allocator);
 				velArray.PushBack(emitter.InitialVelocity.z, allocator);
 				propertiesObj.AddMember("Initial Velocity", velArray, allocator);
+
+				// Start Size
+				rapidjson::Value startSizeArray(kArrayType);
+				startSizeArray.PushBack(emitter.StartSize.x, allocator);
+				startSizeArray.PushBack(emitter.StartSize.y, allocator);
+				startSizeArray.PushBack(emitter.StartSize.z, allocator);
+				propertiesObj.AddMember("Start Size", startSizeArray, allocator);
+
+				// Default Size
+				rapidjson::Value defaultSizeArray(kArrayType);
+				defaultSizeArray.PushBack(emitter.DefaultSize.x, allocator);
+				defaultSizeArray.PushBack(emitter.DefaultSize.y, allocator);
+				defaultSizeArray.PushBack(emitter.DefaultSize.z, allocator);
+				propertiesObj.AddMember("Default Size", defaultSizeArray, allocator);
+
+				// End Size
+				rapidjson::Value endSizeArray(kArrayType);
+				endSizeArray.PushBack(emitter.EndSize.x, allocator);
+				endSizeArray.PushBack(emitter.EndSize.y, allocator);
+				endSizeArray.PushBack(emitter.EndSize.z, allocator);
+				propertiesObj.AddMember("End Size", endSizeArray, allocator);
+
+				// Emission Box Size
+				rapidjson::Value EmissionBoxSizeArray(kArrayType);
+				EmissionBoxSizeArray.PushBack(emitter.EmissionBoxSize.x, allocator);
+				EmissionBoxSizeArray.PushBack(emitter.EmissionBoxSize.y, allocator);
+				EmissionBoxSizeArray.PushBack(emitter.EmissionBoxSize.z, allocator);
+				propertiesObj.AddMember("Emission Box Size", EmissionBoxSizeArray, allocator);
 
 				// Min Color
 				rapidjson::Value minColorArray(kArrayType);
@@ -556,6 +598,9 @@ namespace Engine
 				maxColorArray.PushBack(emitter.ColorMax.y, allocator);
 				maxColorArray.PushBack(emitter.ColorMax.z, allocator);
 				propertiesObj.AddMember("Color Max", maxColorArray, allocator);
+
+				// Emitter Shape
+				propertiesObj.AddMember("Emitter Shape", static_cast<u32>(emitter.Shape), allocator);
 
 				// Max Particles
 				propertiesObj.AddMember("Max Particles", emitter.MaxParticles, allocator);
@@ -575,6 +620,15 @@ namespace Engine
 				// Particle Size
 				propertiesObj.AddMember("Particle Size", emitter.ParticleSize, allocator);
 
+				// Grow Phase End
+				propertiesObj.AddMember("Grow Phase End", emitter.GrowPhaseEnd, allocator);
+
+				// Shrink Phase Start
+				propertiesObj.AddMember("Shrink Phase Start", emitter.ShrinkPhaseStart, allocator);
+
+				// Emission Sphere Radius
+				propertiesObj.AddMember("Emission Sphere Radius", emitter.EmissionSphereRadius, allocator);
+
 				// Randomization parameters
 				propertiesObj.AddMember("Velocity Randomness", emitter.VelocityRandomness, allocator);
 				propertiesObj.AddMember("Lifetime Randomness", emitter.LifetimeRandomness, allocator);
@@ -583,10 +637,16 @@ namespace Engine
 				propertiesObj.AddMember("Max Speed", emitter.MaxSpeed, allocator);
 				propertiesObj.AddMember("Rotation Speed", emitter.RotationSpeed, allocator);
 
+				// Play Delay Parameters
+				propertiesObj.AddMember("Play Delay", emitter.PlayDelay, allocator);
+				propertiesObj.AddMember("Delay Accumulator", emitter.DelayAccumualator, allocator);
+
 				// Boolean parameters
 				propertiesObj.AddMember("Randomize Rotation", emitter.RandomizeRotation, allocator);
 				propertiesObj.AddMember("Loop", emitter.Loop, allocator);
 				propertiesObj.AddMember("Active", emitter.Active, allocator);
+				propertiesObj.AddMember("World Space", emitter.WorldSpace, allocator);
+				propertiesObj.AddMember("Burst Mode", emitter.BurstMode, allocator);
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
@@ -714,6 +774,44 @@ namespace Engine
 				propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
 				propertiesObj.AddMember("IsActive", SpriteRenderer.IsActive, allocator);
 				propertiesObj.AddMember("IsVisible", SpriteRenderer.IsVisible, allocator);
+
+				componentObj.AddMember("Properties", propertiesObj, allocator);
+				componentsArray.PushBack(componentObj, allocator);
+			}
+			//Serialize TextComponent
+			if (entity.HasComponent<TextComponent>()) {
+				LOG_TRACE(" - Serializing TextComponent"); 
+				auto& textComp = entity.GetComponent<TextComponent>(); 
+				Value componentObj(kObjectType);
+				componentObj.AddMember("Type", "TextComponent", allocator); 
+
+				Value propertiesObj(kObjectType);
+
+				propertiesObj.AddMember("ComponentGUID",
+					Value(std::to_string(textComp.ComponentGUID.m_Value).c_str(), allocator), allocator);
+
+				//text content
+				propertiesObj.AddMember("text",
+					Value(textComp.text.c_str(), allocator), allocator);
+
+				//font size
+				propertiesObj.AddMember("fontSize", textComp.fontSize, allocator);
+
+				//color
+				Value colorArr(kArrayType);
+				colorArr.PushBack(textComp.color[0], allocator);
+				colorArr.PushBack(textComp.color[1], allocator);
+				colorArr.PushBack(textComp.color[2], allocator);
+				colorArr.PushBack(textComp.color[3], allocator);
+				propertiesObj.AddMember("color", colorArr, allocator);
+
+				// Alignment (store as int)
+				propertiesObj.AddMember("align", static_cast<int>(textComp.align), allocator);
+
+				// Layout properties
+				propertiesObj.AddMember("lineSpacing", textComp.lineSpacing, allocator);
+				propertiesObj.AddMember("letterSpacing", textComp.letterSpacing, allocator);
+				propertiesObj.AddMember("maxWidth", textComp.maxWidth, allocator);
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
@@ -1151,6 +1249,10 @@ namespace Engine
 							mesh.TextureGuid = AM.getGuidFromName(texName);
 						}
 
+						/*
+						NOTE THIS FIELD IS DEPRECATED, AND IT'S ONLY USED FOR STABILITY & BACKWARD COMPATIBILITY, USED THE NEW 
+						FIELDS ABOVE WHEN REFERENCING THANK YOU!
+						*/
 						// Handle old GUID fields (for backward compatibility)
 						if (properties.HasMember("MeshGuid"))
 						{
@@ -1166,6 +1268,9 @@ namespace Engine
 						{
 							mesh.TextureGuid = xresource::instance_guid{ properties["TextureGuid"].GetUint64() };
 						}
+						/*
+						END NOTE
+						*/
 
 						// Handle other properties
 						if (properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
@@ -1360,6 +1465,21 @@ namespace Engine
 								std::stoull(properties["ComponentGUID"].GetString())
 							);
 						}
+
+						// Particle Type Advanced
+						if (properties.HasMember("Particle Type Advanced") && properties["Particle Type Advanced"].IsString())
+						{
+							std::string particleTypeAdvancedName = properties["Particle Type Advanced"].GetString();
+							emitter.ParticleTypeAdvanced = AM.getGuidFromName(particleTypeAdvancedName);
+						}
+
+						// Material Type
+						if (properties.HasMember("Material Type") && properties["Material Type"].IsString())
+						{
+							std::string materialTypeName = properties["Material Type"].GetString();
+							emitter.MaterialType = AM.getGuidFromName(materialTypeName);
+						}
+
 						// Initial Velocity
 						if (properties.HasMember("Initial Velocity") && properties["Initial Velocity"].IsArray())
 						{
@@ -1370,6 +1490,49 @@ namespace Engine
 								emitter.InitialVelocity.y = velArray[1].GetFloat();
 								emitter.InitialVelocity.z = velArray[2].GetFloat();
 							}
+						}
+
+						// Start Size
+						if (properties.HasMember("Start Size") && properties["Start Size"].IsArray())
+						{
+							const auto& startSizeArray = properties["Start Size"].GetArray();
+							if (startSizeArray.Size() >= 3)
+							{
+								emitter.StartSize.x = startSizeArray[0].GetFloat();
+								emitter.StartSize.y = startSizeArray[1].GetFloat();
+								emitter.StartSize.z = startSizeArray[2].GetFloat();
+							}
+						}
+						// Default Size
+						if (properties.HasMember("Default Size") && properties["Default Size"].IsArray())
+						{
+							const auto& defaultSizeArray = properties["Default Size"].GetArray();
+							if (defaultSizeArray.Size() >= 3)
+							{
+								emitter.DefaultSize.x = defaultSizeArray[0].GetFloat();
+								emitter.DefaultSize.y = defaultSizeArray[1].GetFloat();
+								emitter.DefaultSize.z = defaultSizeArray[2].GetFloat();
+							}
+						}
+						// End Size
+						if (properties.HasMember("End Size") && properties["End Size"].IsArray())
+						{
+							const auto& endSizeArray = properties["End Size"].GetArray();
+							if (endSizeArray.Size() >= 3)
+							{
+								emitter.EndSize.x = endSizeArray[0].GetFloat();
+								emitter.EndSize.y = endSizeArray[1].GetFloat();
+								emitter.EndSize.z = endSizeArray[2].GetFloat();
+							}
+						}
+
+						// Emission Box Size
+						if (properties.HasMember("Emission Box Size") && properties["Emission Box Size"].IsArray()) 
+						{
+							const auto& emissionBoxSizeArray = properties["Emission Box Size"].GetArray();
+							emitter.EmissionBoxSize.x = emissionBoxSizeArray[0].GetFloat();
+							emitter.EmissionBoxSize.y = emissionBoxSizeArray[1].GetFloat();
+							emitter.EmissionBoxSize.z = emissionBoxSizeArray[2].GetFloat();
 						}
 
 						// Color Min
@@ -1396,6 +1559,10 @@ namespace Engine
 							}
 						}
 
+						// Emitter Shape
+						if (properties.HasMember("Emitter Shape"))
+							emitter.Shape = static_cast<EmitterShape>(properties["Emitter Shape"].GetUint());
+
 						// Max Particles
 						if (properties.HasMember("Max Particles"))
 							emitter.MaxParticles = properties["Max Particles"].GetUint();
@@ -1420,6 +1587,18 @@ namespace Engine
 						if (properties.HasMember("Particle Size"))
 							emitter.ParticleSize = properties["Particle Size"].GetFloat();
 
+						// Grow Phase End
+						if (properties.HasMember("Grow Phase End"))
+							emitter.GrowPhaseEnd = properties["Grow Phase End"].GetFloat();
+
+						// Shrink Phase Start
+						if (properties.HasMember("Shrink Phase Start"))
+							emitter.ShrinkPhaseStart = properties["Shrink Phase Start"].GetFloat();
+
+						// Emission Sphere Radius
+						if (properties.HasMember("Emission Sphere Radius"))
+							emitter.EmissionSphereRadius = properties["Emission Sphere Radius"].GetFloat();
+
 						// Randomization parameters
 						if (properties.HasMember("Velocity Randomness"))
 							emitter.VelocityRandomness = properties["Velocity Randomness"].GetFloat();
@@ -1439,6 +1618,12 @@ namespace Engine
 						if (properties.HasMember("Rotation Speed"))
 							emitter.RotationSpeed = properties["Rotation Speed"].GetFloat();
 
+						if (properties.HasMember("Play Delay"))
+							emitter.PlayDelay = properties["Play Delay"].GetFloat();
+
+						if (properties.HasMember("Delay Accumualator"))
+							emitter.DelayAccumualator = properties["Delay Accumualator"].GetFloat();
+
 						// Boolean parameters
 						if (properties.HasMember("Randomize Rotation"))
 							emitter.RandomizeRotation = properties["Randomize Rotation"].GetBool();
@@ -1448,6 +1633,12 @@ namespace Engine
 
 						if (properties.HasMember("Active"))
 							emitter.Active = properties["Active"].GetBool();
+
+						if (properties.HasMember("World Space"))
+							emitter.WorldSpace = properties["World Space"].GetBool();
+
+						if (properties.HasMember("Burst Mode"))
+							emitter.BurstMode = properties["Burst Mode"].GetBool();
 					}
 					else if (componentType == "ScriptComponent")
 					{
@@ -1601,6 +1792,69 @@ namespace Engine
 							spriterenderer.IsVisible = properties["IsVisible"].GetBool();
 						}
 
+					}
+					else if (componentType == "TextComponent") {
+						auto& textComp = entity.AddComponent<TextComponent>();
+
+						// ComponentGUID
+						if (properties.HasMember("ComponentGUID") && properties["ComponentGUID"].IsString())
+						{
+							textComp.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
+
+						// Text content
+						if (properties.HasMember("text") && properties["text"].IsString())
+						{
+							textComp.text = properties["text"].GetString();
+						}
+
+						// Font size
+						if (properties.HasMember("fontSize") && properties["fontSize"].IsFloat())
+						{
+							textComp.fontSize = properties["fontSize"].GetFloat();
+						}
+
+						// Color
+						if (properties.HasMember("color") && properties["color"].IsArray())
+						{
+							const auto& colorArr = properties["color"].GetArray();
+							if (colorArr.Size() >= 4)
+							{
+								textComp.color[0] = colorArr[0].GetFloat();
+								textComp.color[1] = colorArr[1].GetFloat();
+								textComp.color[2] = colorArr[2].GetFloat();
+								textComp.color[3] = colorArr[3].GetFloat();
+							}
+						}
+
+						// Alignment
+						if (properties.HasMember("align") && properties["align"].IsInt())
+						{
+							textComp.align = static_cast<TextAlignment>(properties["align"].GetInt());
+						}
+
+						// Line spacing
+						if (properties.HasMember("lineSpacing") && properties["lineSpacing"].IsFloat())
+						{
+							textComp.lineSpacing = properties["lineSpacing"].GetFloat();
+						}
+
+						// Letter spacing
+						if (properties.HasMember("letterSpacing") && properties["letterSpacing"].IsFloat())
+						{
+							textComp.letterSpacing = properties["letterSpacing"].GetFloat();
+						}
+
+						// Max width
+						if (properties.HasMember("maxWidth") && properties["maxWidth"].IsFloat())
+						{
+							textComp.maxWidth = properties["maxWidth"].GetFloat();
+						}
+
+						// Mark as dirty since layout needs to be recalculated
+						textComp.isDirty = true;
 					}
 				}
 			}

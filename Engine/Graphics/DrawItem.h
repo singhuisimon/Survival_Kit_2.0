@@ -16,6 +16,7 @@
 #include "../Utility/Types.h"
 #include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
+#include "../Component/TextComponent.h"
 
 #include "Asset/ResourceData.h"
 
@@ -29,7 +30,8 @@ namespace Engine{
 	{
 		MESH3D,
 		SPRITE2D,
-		Particle
+		Particle,
+		TEXT
 	};
 
 	/**
@@ -61,7 +63,7 @@ namespace Engine{
 		u32						 m_render_layer			     = 0;
 
 		// Color if the rendered object has self defined colors
-		glm::vec4				 m_color = { 0.f, 0.f, 0.f, 1.f };
+		glm::vec4				 m_color = { 0.5f, 0.5f, 0.5f, 1.f };
 
 		// Resource GUIDs
 		xresource::instance_guid m_mesh_guid = 0;
@@ -72,6 +74,14 @@ namespace Engine{
 		bool     m_render_main_pass = true;		// false for CastType::ShadowsOnly
 		bool     m_receive_shadows = false;		// MeshRendererComponent::ShadowReceive
 		u32		 m_cast_shadow_type = 0u;		// MeshRendererComponent::CastType: 0 = Off,1 = On,2 = TwoSided,3 = ShadowsOnly
+
+		// text data
+		std::string m_text = ""; 
+		float m_fontSize = 24.0f; 
+		TextAlignment m_textAlignment; // 0=left, 1=Center, 2=Right, 3=Justified
+		float m_lineSpacing = 1.0f; 
+		float m_letterSpacing = 0.0f; 
+		float m_maxWidth = 0.0f;
 	};
 
 }

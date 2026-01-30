@@ -24,9 +24,17 @@ namespace Game
         [SerializeField] private float directionY;
         [SerializeField] private float directionZ;
 
-        [SerializeField] private float OGscaleX;
-        [SerializeField] private float OGscaleY;
-        [SerializeField] private float OGscaleZ;
+        private float OGscaleX;
+        private float OGscaleY;
+        private float OGscaleZ;
+
+        [SerializeField] private float worldLocX;
+        [SerializeField] private float worldLocY;
+        [SerializeField] private float worldLocZ;
+
+        [SerializeField] private float shootLocX;
+        [SerializeField] private float shootLocY;
+        [SerializeField] private float shootLocZ;
 
         [SerializeField] private float shootingCooldown = 0.25f;
         
@@ -47,9 +55,9 @@ namespace Game
             targetZ = ownPosition.Z;
 
             Engine.Vector3 ownScale = GetScale((uint)EntityID);
-            OGscaleX = 0.01f;
-            OGscaleY = 0.01f;
-            OGscaleZ = 0.01f;
+            OGscaleX = 0.001f;
+            OGscaleY = 0.001f;
+            OGscaleZ = 0.001f;
 
             Engine.Vector3 disappearScale = new Engine.Vector3(0,0,0);
             SetScale(EntityID, ref disappearScale);
@@ -85,6 +93,10 @@ namespace Game
             Engine.Vector3 appearScale = new Engine.Vector3(OGscaleX,OGscaleY,OGscaleZ);
             SetScale(EntityID, ref appearScale);
 
+            if (isParentCall(payload) == false){
+                return;
+            }
+            
             Engine.Vector3 aim = VectorToString(payload);
             targetX = aim.X;
             targetY = aim.Y;
@@ -115,13 +127,26 @@ namespace Game
             hasSplit = true;
         }
 
+        public bool isParentCall (string payload){
+            
+            string[] parts = payload.Split(',');
+
+            uint parentID = uint.Parse(parts[0]);
+            if(parentID == TransformGetParent((uint)EntityID)){
+                return true;
+            }
+
+            return false;
+            
+        }
+
         public Engine.Vector3 VectorToString(string payload){
             
             string[] parts = payload.Split(',');
 
-            float x = float.Parse(parts[0]);
-            float y = float.Parse(parts[1]);
-            float z = float.Parse(parts[2]);
+            float x = float.Parse(parts[1]);
+            float y = float.Parse(parts[2]);
+            float z = float.Parse(parts[3]);
 
             return new Engine.Vector3(x, y, z);
         }
@@ -131,6 +156,11 @@ namespace Game
         {
             // Get position and Rotation
             Engine.Vector3 globalPosition = SimpleMath.LocalChildtoWorld((uint)EntityID);
+
+            worldLocX = globalPosition.X;
+            worldLocY = globalPosition.Y;
+            worldLocZ = globalPosition.Z;
+
             Quat wormchildRot = Transform.GetRotation(TransformGetParent((uint)EntityID));
 
             Engine.Vector3 forwardDir = wormchildRot.Forward;
@@ -147,6 +177,10 @@ namespace Game
             uint wormBulletID = SceneCreateEntity("WormBullet");
             if (wormBulletID == 0)
                 return;
+
+            shootLocX = spawnPosition.X;
+            shootLocY = spawnPosition.Y;
+            shootLocZ = spawnPosition.Z;
 
             Transform.SetPosition(wormBulletID, ref spawnPosition);
             Transform.SetRotation(wormBulletID, ref wormchildRot);
