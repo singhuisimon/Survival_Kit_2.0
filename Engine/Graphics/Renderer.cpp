@@ -338,6 +338,7 @@ namespace Engine {
 		renderFinalPass(m_finalpass);
 		renderUIPass(m_UIPass, draw_items);
 		renderTextPass(m_textPass, draw_items);
+
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -1599,6 +1600,26 @@ namespace Engine {
 	}
 
 	void Renderer::renderTextPass(RenderPass& pass, std::span<const DrawItem> items) {
+
+		// Update pass viewport if allowed
+		if (pass.auto_aspect) {
+			int vp_w, vp_h;
+			glfwGetWindowSize(glfwGetCurrentContext(), &vp_w, &vp_h);
+
+			// Check if viewport needs update
+			if ((pass.view_port.z != vp_w && vp_w > 0) || (pass.view_port.w != vp_h && vp_h > 0)) {
+				pass.view_port.z = static_cast<float>(vp_w);
+				pass.view_port.w = static_cast<float>(vp_h);
+
+				// Resize FBO (2) for final pass
+				resizeFBO(pass.fbo_handle, vp_w, vp_h);
+
+				// Also update bloom source size (HDR scene size)
+				m_bloomSrcSize = { vp_w, vp_h };
+				resizeBloomMipChain(vp_w, vp_h);
+			}
+		}
+
 		//filter for text items
 		std::vector<const DrawItem*> textItems; 
 		for (const auto& item : items) {

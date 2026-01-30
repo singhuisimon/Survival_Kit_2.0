@@ -43,6 +43,7 @@ namespace Engine {
 			ComponentGUID.GenerateGUID(); 
 		}
 
+		//setters
 		void setText(const std::string& txt) {
 			text = txt;
 			isDirty = true;
@@ -81,6 +82,12 @@ namespace Engine {
 			isDirty = true;
 		}
 
+		void setFontName(const std::string& name) {
+			fontName = name;
+			isDirty = true;
+		}
+
+		//getters
 		float getHeight() const {
 			return bounds.w;
 		}
@@ -88,6 +95,16 @@ namespace Engine {
 		float getWidth() const {
 			return bounds.z;
 		}
+
+		const std::string& getText() const { return text; }
+		const std::string& getFontName() const { return fontName; }
+		float getFontSize() const { return fontSize; }
+		glm::vec4 getColor() const {
+			return glm::vec4(color[0], color[1], color[2], color[3]);
+		}
+
+		TextAlignment getAlignment() const { return align;  }
+		float getLetterSpacing() const { return letterSpacing; }
 	};
 
 }//end of namespace Engine
