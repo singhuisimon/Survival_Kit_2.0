@@ -10,6 +10,11 @@ namespace Engine {
 	static Scene *s_CurrentScene = nullptr;
 
 	void ScriptSystem::OnInit(Scene *scene) {
+		if(m_Scene) {
+			auto &se = MonoScriptEngine::GetInstance();
+			se.EnsureAllScriptInstances(m_Scene, true);
+		}
+
 		s_CurrentScene = scene;
 		SetScriptingCurrentScene(scene);
 

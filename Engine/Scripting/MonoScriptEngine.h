@@ -112,6 +112,21 @@ namespace Engine {
 			return m_AppImage;
 		}
 
+		// ============================================================
+		// Editor/runtime helper: ensure managed instances exist
+		// ============================================================
+		// Ensures a ScriptComponent has a valid managed instance and rooted GCHandle.
+		// - Creates an instance if missing
+		// - Clears garbage/stale handles loaded from disk
+		// - Recreates instances if the type no longer matches ScriptClassName
+		// - Does NOT call OnStart/OnUpdate/OnFixedUpdate
+		MonoObject *EnsureScriptInstance(Scene *scene, std::uint32_t entityID, bool applySerializedFields = true);
+
+		// Ensures every ScriptComponent in the scene has a valid managed instance.
+		// Does NOT call OnStart/OnUpdate/OnFixedUpdate.
+		void EnsureAllScriptInstances(Scene *scene, bool applySerializedFields = true);
+
+
 		// Legacy helper kept for compilation safety (best-effort).
 		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
 		MonoObject *GetObjectFromHandle(void *instancePtr);

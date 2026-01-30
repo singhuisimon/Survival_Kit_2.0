@@ -1635,6 +1635,115 @@ namespace Engine {
 		LOG_INFO("[RebindAllScriptComponents] Complete: rebuilt=", rebuilt, " failed=", failed);
 	}
 
+	MonoObject *MonoScriptEngine::EnsureScriptInstance(Scene *scene, std::uint32_t entityID, bool applySerializedFields) {
+		if(!scene) return nullptr;
+
+		// Ensure Store/Apply uses the right scene
+		SetScriptingCurrentScene(scene);
+
+		if(!m_AppImage || !m_AppAssembly)
+			return nullptr;
+
+		EnsureCorrectDomain();
+
+		auto &reg = scene->GetRegistry();
+		const entt::entity ent = static_cast<entt::entity>(entityID);
+		if(!reg.valid(ent))
+			return nullptr;
+
+		auto *sc = reg.try_get<ScriptComponent>(ent);
+		if(!sc)
+			return nullptr;
+
+		if(sc->ScriptClassName.empty()) {
+			if(sc->GCHandle != 0) {
+				DestroyScriptHandle(sc->GCHandle);
+				sc->GCHandle = 0;
+			}
+			sc->ScriptInstance = nullptr;
+			sc->Started = false;
+			return nullptr;
+		}
+
+		// 1) Resolve via GCHandle
+		MonoObject *inst = nullptr;
+		if(sc->GCHandle != 0) {
+			inst = GetObjectFromGCHandle(sc->GCHandle);
+			if(!inst) {
+				// stale/garbage handle (e.g. loaded from disk)
+				sc->GCHandle = 0;
+			}
+		}
+
+		// 2) Legacy fallback: adopt raw pointer into a tracked handle (if valid)
+		if(!inst && sc->ScriptInstance) {
+			MonoObject *legacy = reinterpret_cast<MonoObject *>(sc->ScriptInstance);
+			if(IsValidMonoObject(legacy) && InstanceMatchesClass(legacy, sc->ScriptClassName)) {
+				const uint32_t h = CreateGCHandleForObject(legacy, false);
+				if(h != 0) {
+					sc->GCHandle = h;
+					inst = legacy;
+				}
+			}
+			else {
+				sc->ScriptInstance = nullptr;
+			}
+		}
+
+		// 3) Wrong type => rebuild
+		if(inst && !InstanceMatchesClass(inst, sc->ScriptClassName)) {
+			if(sc->GCHandle != 0) {
+				DestroyScriptHandle(sc->GCHandle);
+				sc->GCHandle = 0;
+			}
+			inst = nullptr;
+			sc->ScriptInstance = nullptr;
+			sc->Started = false;
+		}
+
+		// 4) Create if missing
+		if(!inst) {
+			MonoObject *created = nullptr;
+			const uint32_t handle = CreateScriptInstanceHandle(sc->ScriptClassName, &created, false);
+			if(handle == 0 || !created) {
+				sc->GCHandle = 0;
+				sc->ScriptInstance = nullptr;
+				sc->Started = false;
+				return nullptr;
+			}
+
+			BindEntityID(created, entityID);
+			if(applySerializedFields)
+				ApplySerializedFieldsFromComponent(entityID, created);
+
+			sc->GCHandle = handle;
+			sc->ScriptInstance = created;
+			sc->Started = false;
+			return created;
+		}
+
+		sc->ScriptInstance = inst; // keep cache synced
+		return inst;
+	}
+
+	void MonoScriptEngine::EnsureAllScriptInstances(Scene *scene, bool applySerializedFields) {
+		if(!scene) return;
+
+		SetScriptingCurrentScene(scene);
+
+		if(!m_AppImage || !m_AppAssembly)
+			return;
+
+		EnsureCorrectDomain();
+
+		auto &reg = scene->GetRegistry();
+		auto view = reg.view<ScriptComponent>();
+		for(auto ent : view) {
+			EnsureScriptInstance(scene, static_cast<std::uint32_t>(ent), applySerializedFields);
+		}
+	}
+
+
 	// Context setters
 	void SetScriptingInputSystem(Input *input) {
 		InternalCalls::SetInputSystem(input);
