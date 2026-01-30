@@ -28,7 +28,8 @@ namespace Game{
         [SerializeField] private float primaryShootNext = 0.0f;
         [SerializeField] private float primarybulletSpeed = 1000.0f;
 
-        [SerializeField] private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
+        //[SerializeField] 
+        private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
         //audio
         //vfx -> trail
 
@@ -47,7 +48,8 @@ namespace Game{
         [SerializeField] private float primaryAltFireAOERange = 30f;
         [SerializeField] private float primaryUltSpeed = 500.0f;
 
-        [SerializeField] private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
+        //[SerializeField] 
+        private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
 
         private string ULTGAINEVENT = "GainUlt";
 
@@ -81,8 +83,10 @@ namespace Game{
 
         #region entity
 
-        [SerializeField] private string firingPointName = "PlayerCam";
-        [SerializeField] private string playerName = "Player";
+        //[SerializeField] 
+        private string firingPointName = "PlayerCam";
+        //[SerializeField] 
+        private string playerName = "Player";
 
         #endregion
 

@@ -11,7 +11,8 @@ using static Engine.Rigidbody;
 namespace Game{
     public class OOBManager : ScriptBehaviour{
 
-        [SerializeField] private string playerName = "Player";
+        //[SerializeField] 
+        private string playerName = "Player";
         [SerializeField] private float originalCountdownOOB = 5.0f;
         [SerializeField] private float countdownOOB = 5.0f;
         [SerializeField] private bool inEnvironment = true;

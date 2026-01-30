@@ -47,7 +47,8 @@ namespace Game
         [SerializeField] private float maxRetargetDelay = 1.5f;
 
         // Death explosion prefab path
-        [SerializeField] private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
+        //[SerializeField] 
+        private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
 
         // Botnet Health
         [SerializeField] private float HP = 3.0f;
