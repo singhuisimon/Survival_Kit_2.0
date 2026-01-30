@@ -50,6 +50,24 @@ namespace Engine {
 		initBloomMipChain(width, height);
 		setDefaultState();
 
+		initFontResources(); 
+		std::vector<std::pair<std::string, std::string>> fontsToLoad = {
+			 {"Quantico-Bold", "Compiled/Font/Quantico-Bold.font"},
+			{"Quantico-BoldItalic", "Compiled/Font/Quantico-BoldItalic.font"},
+			{"Quantico-Regular", "Compiled/Font/Quantico-Regular.font"},
+			{"Quantico-Italic", "Compiled/Font/Quantico-Italic.font"},
+			{"DigitalNumbers-Regular", "Compiled/Font/DigitalNumbers-Regular.font"}
+		};
+
+		for (const auto& [fontName, fontPath] : fontsToLoad) {
+			if (loadFont(getAssetFilePath(fontPath), fontName)) {
+				std::cout << fontName << " loaded successfully!" << std::endl;
+			}
+			else {
+				std::cerr << "Failed to load " << fontName << std::endl;
+			}
+		}
+
 		MeshData skybox_cube = make_cube(); m_skybox = upload_mesh_data(skybox_cube); m_skybox_texture = RenderBypassUtils::loadCubemapHDR();
 		
 		// -------- Materials UBO (binding = 1)  --------
@@ -319,6 +337,7 @@ namespace Engine {
 
 		renderFinalPass(m_finalpass);
 		renderUIPass(m_UIPass, draw_items);
+		renderTextPass(m_textPass, draw_items);
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -369,7 +388,7 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
-			if (item.m_drawitem_type == DrawItemType::SPRITE2D) continue;
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D || item.m_drawitem_type == DrawItemType::TEXT) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -586,6 +605,20 @@ namespace Engine {
 			.depth_test = false,
 			.depth_write = false,
 			.blending = true,
+			.culling = false,
+			.passtype = PassType::FULLSCREEN
+		};
+
+		m_textPass = {
+			.pass_name = "Text Pass",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::FONT),
+			.auto_aspect = true, 
+			.clear_color = false, 
+			.clear_depth = false,
+			.depth_test = false,
+			.depth_write = false,
+			.blending = true, 
 			.culling = false,
 			.passtype = PassType::FULLSCREEN
 		};
@@ -1532,4 +1565,258 @@ namespace Engine {
 		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-}
+
+	void Renderer::initFontResources() {
+
+		//create VAO and VBO
+		glGenVertexArrays(1, &m_fontVAO); 
+		glGenBuffers(1, &m_fontVBO);
+
+		glBindVertexArray(m_fontVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_fontVBO);
+
+		//allocate space for dynamic text 
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 8, nullptr, GL_DYNAMIC_DRAW); 
+
+		//add the vertex layouts 
+		glEnableVertexAttribArray(0); 
+		//position 
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); 
+
+		//text coordinates 
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * sizeof(float)));
+
+		//color 
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(4 * sizeof(float)));
+
+		//bind the buffer and vertex array
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+
+	}
+
+	void Renderer::renderTextPass(RenderPass& pass, std::span<const DrawItem> items) {
+		//filter for text items
+		std::vector<const DrawItem*> textItems; 
+		for (const auto& item : items) {
+			if (item.m_drawitem_type == DrawItemType::TEXT) {
+				textItems.push_back(&item);
+			}
+		}
+
+		//if empty, return
+		if (textItems.empty()) return; 
+
+
+		//group texts by font 
+		std::unordered_map<std::string, std::vector<const DrawItem*>> itemsByFont;
+		for (const auto* item : textItems) {
+			itemsByFont[item->m_fontName].push_back(item);
+		}
+
+		beginFrame(pass); 
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle]; 
+
+		//enable blending
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
+		//set uniforms
+		glm::mat4 ortho = glm::ortho(0.0f, static_cast<float>(pass.view_port.z), 
+									0.0f, static_cast<float>(pass.view_port.w), 
+									-1.0f, 1.0f);
+		prog.setUniform("u_Projection", ortho);
+
+		//bind font atlas 
+		//glActiveTexture(GL_TEXTURE); 
+		//glBindTexture(GL_TEXTURE_2D, m_defaultFont.getAtlasTexture()); 
+		//if (!m_defaultFont.getAtlasTexture()) {
+		//	std::cout << "Atlas Textures are empty" << std::endl;
+		//}
+		//prog.setUniform("u_FontAtlas", 0); 
+
+		glBindVertexArray(m_fontVAO); 
+
+		for (const auto& [fontName, items] : itemsByFont) {
+
+		Font* currentFont = getFont(fontName);
+
+		glActiveTexture(GL_TEXTURE);
+		glBindTexture(GL_TEXTURE_2D, currentFont->getAtlasTexture());
+		prog.setUniform("u_FontAtlas", 0);
+		//render each text item 
+		for (const auto* item : items) {
+			
+			if (item->m_drawitem_type != DrawItemType::TEXT) continue; 
+
+			//extract data from Draw item
+			std::string text = item->m_text; 
+			float fontSize = item->m_fontSize; 
+			glm::vec4 color = item->m_color; 
+			glm::vec3 position(item->m_model_to_world_transform[3]);
+			float lineSpacing = item->m_lineSpacing;
+			float letterSpacing = item->m_letterSpacing; 
+			float maxWidth = item->m_maxWidth;
+
+			float scale = fontSize / currentFont->getBaseSize(); 
+
+			//compute total width 
+			float totalWidth = 0.0f; 
+			for (char c : text) {
+				const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
+				if (glyph) totalWidth += (glyph->advance + letterSpacing) * scale; 
+			}
+			
+			//apply alignment 
+			float startX = position.x; 
+			if (item->m_textAlignment == TextAlignment::Center) {
+				startX -= totalWidth * 0.5f;
+			}
+			else if (item->m_textAlignment == TextAlignment::Right) {
+				startX -= totalWidth; 
+			}
+
+			float currentX = startX; 
+			float currentY = position.y; 
+
+			//render characters
+			for (char c : text) {
+				const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
+				if (!glyph) continue;
+
+				//handle new line characters for multi line
+				if (c == '\n') {
+					currentX = startX;
+					currentY -= fontSize * lineSpacing;
+					continue;
+				}
+
+				float xpos = currentX + glyph->bearing.x * scale;
+				float ypos = currentY - (glyph->size.y - glyph->bearing.y) * scale;
+				float w = glyph->size.x * scale;
+				float h = glyph->size.y * scale;
+
+				float vertices[6][8] = {
+					{ xpos,     ypos + h, glyph->uvMin.x, glyph->uvMin.y, color.r, color.g, color.b, color.a },
+					{ xpos,     ypos,     glyph->uvMin.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+					{ xpos + w, ypos,     glyph->uvMax.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+
+					{ xpos,     ypos + h, glyph->uvMin.x, glyph->uvMin.y, color.r, color.g, color.b, color.a },
+					{ xpos + w, ypos,     glyph->uvMax.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+					{ xpos + w, ypos + h, glyph->uvMax.x, glyph->uvMin.y, color.r, color.g, color.b, color.a }
+				};
+
+				glBindBuffer(GL_ARRAY_BUFFER, m_fontVBO);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+
+				currentX += (glyph->advance + letterSpacing) * scale;
+			}
+		}
+		}
+
+		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_2D, 0); 
+		prog.programFree(); 
+		endFrame(pass); 
+
+	}
+
+	bool Renderer::loadFont(const std::string& filepath, const std::string& fontName) {
+		std::ifstream file(filepath, std::ios::binary);
+		if (!file) {
+			std::cerr << "Failed to open font file: " << filepath << std::endl;
+			return false;
+		}
+
+		Font newFont;
+
+		// Read font metrics
+		file.read(reinterpret_cast<char*>(&newFont.lineHeight), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.ascent), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.descent), sizeof(float));
+		file.read(reinterpret_cast<char*>(&newFont.baseSize), sizeof(float));
+
+		// Read atlas dimensions
+		file.read(reinterpret_cast<char*>(&newFont.atlasWidth), sizeof(int));
+		file.read(reinterpret_cast<char*>(&newFont.atlasHeight), sizeof(int));
+
+		// ===== FIX: Read pixel data BEFORE glyphs (matches FontCompiler order) =====
+		uint32_t pixelDataSize;
+		file.read(reinterpret_cast<char*>(&pixelDataSize), sizeof(uint32_t));
+
+		std::vector<uint8_t> atlasPixels(pixelDataSize);
+		file.read(reinterpret_cast<char*>(atlasPixels.data()), pixelDataSize);
+
+		// Read glyph count
+		uint32_t glyphCount;
+		file.read(reinterpret_cast<char*>(&glyphCount), sizeof(uint32_t));
+
+		// ===== FIX: Read glyphs as GlyphMetrics struct (matches FontCompiler) =====
+		struct GlyphMetrics {
+			uint32_t charCode;
+			float uv_x, uv_y;
+			float uv_width, uv_height;
+			float p_width, p_height;
+			float bearing_x, bearing_y;
+			float advance;
+		};
+
+		for (uint32_t i = 0; i < glyphCount; ++i) {
+			GlyphMetrics metrics;
+			file.read(reinterpret_cast<char*>(&metrics), sizeof(GlyphMetrics));
+
+			Glyph glyph;
+			glyph.uvMin.x = metrics.uv_x;
+			glyph.uvMin.y = metrics.uv_y;
+			glyph.uvMax.x = metrics.uv_x + metrics.uv_width;
+			glyph.uvMax.y = metrics.uv_y + metrics.uv_height;
+			glyph.size.x = metrics.p_width;
+			glyph.size.y = metrics.p_height;
+			glyph.bearing.x = metrics.bearing_x;
+			glyph.bearing.y = metrics.bearing_y;
+			glyph.advance = metrics.advance;
+
+			newFont.glyphs[metrics.charCode] = glyph;
+		}
+
+		file.close();
+
+		// Debug output
+		std::cout << "Font loaded: " << glyphCount << " glyphs, atlas "
+			<< newFont.atlasWidth << "x" << newFont.atlasHeight << std::endl;
+
+		// Create OpenGL texture
+		glGenTextures(1, &newFont.atlasTexture);
+		glBindTexture(GL_TEXTURE_2D, newFont.atlasTexture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+			newFont.atlasWidth, newFont.atlasHeight,
+			0, GL_RGBA, GL_UNSIGNED_BYTE, atlasPixels.data());
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		m_fonts[fontName] = std::move(newFont);
+
+		return true;
+	}
+
+	Font* Renderer::getFont(const std::string& fontName) {
+		auto it = m_fonts.find(fontName);
+		if (it != m_fonts.end()) {
+			return &it->second; //return ptr to font obj
+		}
+		return &m_defaultFont;
+	}
+
+
+}// end of namespace Engine
+

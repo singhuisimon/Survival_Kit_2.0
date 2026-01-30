@@ -1,0 +1,7 @@
+{
+  "name": "2k_mercury.jpg",
+  "guid": "9B4ED06BE74E001D",
+  "tags": [],
+  "lastImported": "0000000069247762",
+  "resourceLinks": []
+}

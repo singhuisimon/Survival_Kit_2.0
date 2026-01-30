@@ -6515,7 +6515,7 @@
                     "Type": "CameraComponent",
                     "Properties": {
                         "Enabled": true,
-                        "Primary": false,
+                        "Primary": true,
                         "Projection": true,
                         "autoAspect": true,
                         "Size": [

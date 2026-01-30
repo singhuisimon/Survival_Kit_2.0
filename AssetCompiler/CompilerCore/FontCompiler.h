@@ -8,7 +8,9 @@
 #include <algorithm>
 
 #include "../freetype/include/freetype/freetype.h"
+#include <filesystem>
 
+namespace fs = std::filesystem; 
 
 
 namespace AssetCompiler {
@@ -39,6 +41,7 @@ namespace AssetCompiler {
 
 	class FontCompiler {
 	public:
+		bool compile(const fs::path& ttfPath, const fs::path& outputPath);
 
 
 	private:
@@ -70,7 +73,6 @@ namespace AssetCompiler {
 			int bearingX, bearingY;
 			float advance;
 		};
-
 
 		/*
 		* @brief Get list of characters to compile based on character set name
@@ -134,6 +136,9 @@ namespace AssetCompiler {
 
 		//serialization
 		std::vector<uint8_t> serializeFontData(const FontMetrics& fontMetrics, const AtlasData& atlas);
+
+		bool writeFontFile(const fs::path& outputPath,
+			const std::vector<uint8_t>& data);
 
 		static FT_Library ftLibrary;
 		static bool ftInitialized;

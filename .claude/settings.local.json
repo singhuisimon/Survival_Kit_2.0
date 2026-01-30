@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /b \"C:\\\\Users\\\\Admin\\\\Source\\\\Repos\\\\Survival_Kit_2.0\\\\Resources\\\\Sources\\\\Audio\")",
+      "Bash(findstr:*)",
+      "Bash(dir:*)"
+    ]
+  }
+}

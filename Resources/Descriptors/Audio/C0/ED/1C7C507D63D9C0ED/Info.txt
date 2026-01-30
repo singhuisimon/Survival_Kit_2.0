@@ -2,6 +2,6 @@
   "name": "Player_Secondary_Reload.wav",
   "guid": "1C7C507D63D9C0ED",
   "tags": [],
-  "lastImported": "0000000069764681",
+  "lastImported": "00000000697C257D",
   "resourceLinks": []
 }

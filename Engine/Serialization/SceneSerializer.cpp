@@ -17,6 +17,7 @@
 #include "../Component/PrefabComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TextComponent.h"
 
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"
@@ -773,6 +774,48 @@ namespace Engine
 				propertiesObj.AddMember("Sprite Layer", SpriteRenderer.SpriteLayer, allocator);
 				propertiesObj.AddMember("IsActive", SpriteRenderer.IsActive, allocator);
 				propertiesObj.AddMember("IsVisible", SpriteRenderer.IsVisible, allocator);
+
+				componentObj.AddMember("Properties", propertiesObj, allocator);
+				componentsArray.PushBack(componentObj, allocator);
+			}
+			//Serialize TextComponent
+			if (entity.HasComponent<TextComponent>()) {
+				LOG_TRACE(" - Serializing TextComponent"); 
+				auto& textComp = entity.GetComponent<TextComponent>(); 
+				Value componentObj(kObjectType);
+				componentObj.AddMember("Type", "TextComponent", allocator); 
+
+				Value propertiesObj(kObjectType);
+
+				propertiesObj.AddMember("ComponentGUID",
+					Value(std::to_string(textComp.ComponentGUID.m_Value).c_str(), allocator), allocator);
+
+				//text content
+				propertiesObj.AddMember("text",
+					Value(textComp.text.c_str(), allocator), allocator);
+
+				//font name
+				propertiesObj.AddMember("fontName",
+					Value(textComp.fontName.c_str(), allocator), allocator);
+
+				//font size
+				propertiesObj.AddMember("fontSize", textComp.fontSize, allocator);
+
+				//color
+				Value colorArr(kArrayType);
+				colorArr.PushBack(textComp.color[0], allocator);
+				colorArr.PushBack(textComp.color[1], allocator);
+				colorArr.PushBack(textComp.color[2], allocator);
+				colorArr.PushBack(textComp.color[3], allocator);
+				propertiesObj.AddMember("color", colorArr, allocator);
+
+				// Alignment (store as int)
+				propertiesObj.AddMember("align", static_cast<int>(textComp.align), allocator);
+
+				// Layout properties
+				propertiesObj.AddMember("lineSpacing", textComp.lineSpacing, allocator);
+				propertiesObj.AddMember("letterSpacing", textComp.letterSpacing, allocator);
+				propertiesObj.AddMember("maxWidth", textComp.maxWidth, allocator);
 
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
@@ -1753,6 +1796,69 @@ namespace Engine
 							spriterenderer.IsVisible = properties["IsVisible"].GetBool();
 						}
 
+					}
+					else if (componentType == "TextComponent") {
+						auto& textComp = entity.AddComponent<TextComponent>();
+
+						// ComponentGUID
+						if (properties.HasMember("ComponentGUID") && properties["ComponentGUID"].IsString())
+						{
+							textComp.ComponentGUID = xresource::instance_guid(
+								std::stoull(properties["ComponentGUID"].GetString())
+							);
+						}
+
+						// Text content
+						if (properties.HasMember("text") && properties["text"].IsString())
+						{
+							textComp.text = properties["text"].GetString();
+						}
+
+						// Font size
+						if (properties.HasMember("fontSize") && properties["fontSize"].IsFloat())
+						{
+							textComp.fontSize = properties["fontSize"].GetFloat();
+						}
+
+						// Color
+						if (properties.HasMember("color") && properties["color"].IsArray())
+						{
+							const auto& colorArr = properties["color"].GetArray();
+							if (colorArr.Size() >= 4)
+							{
+								textComp.color[0] = colorArr[0].GetFloat();
+								textComp.color[1] = colorArr[1].GetFloat();
+								textComp.color[2] = colorArr[2].GetFloat();
+								textComp.color[3] = colorArr[3].GetFloat();
+							}
+						}
+
+						// Alignment
+						if (properties.HasMember("align") && properties["align"].IsInt())
+						{
+							textComp.align = static_cast<TextAlignment>(properties["align"].GetInt());
+						}
+
+						// Line spacing
+						if (properties.HasMember("lineSpacing") && properties["lineSpacing"].IsFloat())
+						{
+							textComp.lineSpacing = properties["lineSpacing"].GetFloat();
+						}
+
+						// Letter spacing
+						if (properties.HasMember("letterSpacing") && properties["letterSpacing"].IsFloat())
+						{
+							textComp.letterSpacing = properties["letterSpacing"].GetFloat();
+						}
+
+						// Max width
+						if (properties.HasMember("maxWidth") && properties["maxWidth"].IsFloat())
+						{
+							textComp.maxWidth = properties["maxWidth"].GetFloat();
+						}
+
+						// Mark as dirty since layout needs to be recalculated
+						textComp.isDirty = true;
 					}
 				}
 			}
