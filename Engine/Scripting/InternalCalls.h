@@ -1,17 +1,17 @@
 /**************************************************************************
- * @file
- * InternalCalls.h
- * @author
- * Varying amounts by team
- * @date
- * 2026/01/06 (YYYY/MM/DD)
- * @brief
- * This header declares the native internal-call bridge used by the Mono
- * scripting layer to invoke engine functionality.
- *
- * InternalCalls are registered with Mono and exposed to C# scripts. Most
- * functions assume a valid "current scene" context has been set by the engine
- * before any calls are made.
+* @file
+* InternalCalls.h
+* @author
+* Varying amounts by team
+* @date
+* 2026/01/06 (YYYY/MM/DD)
+* @brief
+* This header declares the native internal-call bridge used by the Mono
+* scripting layer to invoke engine functionality.
+*
+* InternalCalls are registered with Mono and exposed to C# scripts. Most
+* functions assume a valid "current scene" context has been set by the engine
+* before any calls are made.
 ***************************************************************************/
 
 #pragma once
@@ -24,15 +24,13 @@
 #include <mono/metadata/object.h>
 #include <mono/metadata/reflection.h>
 
-namespace Engine
-{
+namespace Engine {
 	// Forward declarations for context setters (avoid heavy includes in the header)
 	class Scene;
 	class Input;
 	class AudioManager;
 
-	namespace InternalCalls
-	{
+	namespace InternalCalls {
 		// ===== Scripting context (set by ScriptSystem / MonoScriptEngine) =====
 		/**************************************************************************
 		 * @brief
@@ -359,6 +357,35 @@ namespace Engine
 		 * Pointer/reference to a vector value.
 		***************************************************************************/
 		void Rigidbody_AddVelocity(uint64_t entityID, glm::vec3 *delta);
+
+		// ---- Rigidbody velocity access (ECS-level) ----
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
+		 * Result value.
+		***************************************************************************/
+		glm::vec3 Rigidbody_GetAngularVelocity(uint64_t entityID);
+		/**************************************************************************
+		 * @brief
+		 * Sets a rigidbody property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param inVel
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
+		void Rigidbody_SetAngularVelocity(uint64_t entityID, glm::vec3 *inVel);
+		/**************************************************************************
+		 * @brief
+		 * Invokes a rigidbody/physics operation on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param delta
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
+		void Rigidbody_AddAngularVelocity(uint64_t entityID, glm::vec3 *delta);
 
 		// ---- Rigidbody scalar properties ----
 		/**************************************************************************
@@ -1118,7 +1145,7 @@ namespace Engine
 		 * Pointer/reference to a vector value.
 		***************************************************************************/
 		void  AudioManager_SetListenerAttributes(glm::vec3 *position, glm::vec3 *forward,
-			glm::vec3 *up, glm::vec3 *velocity);
+												 glm::vec3 *up, glm::vec3 *velocity);
 
 		// ===== Component presence helpers =====
 		/**************************************************************************
@@ -1284,7 +1311,7 @@ namespace Engine
 		 * @return
 		 * True if point lies within game object, else false.
 		***************************************************************************/
-		bool CollisionSystem2D_IsPointInEntity(uint64_t entityId, glm::vec2* point);
+		bool CollisionSystem2D_IsPointInEntity(uint64_t entityId, glm::vec2 *point);
 
 		void  RNG_Seed(std::uint32_t seed);
 		int   RNG_RandInt(int min, int max);
@@ -1308,14 +1335,14 @@ namespace Engine
  * @param pathStr Managed string provided by the scripting runtime (MonoString*).
  * @return True if the file exists, otherwise false.
  */
-		bool FileExists(MonoString* pathStr);
+		bool FileExists(MonoString *pathStr);
 
 		/**
 		 * @brief Reads the entire content of a text file.
 		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
 		 * @return Managed string containing file content, or empty string on failure.
 		 */
-		MonoString* FileReadAllText(MonoString* pathStr);
+		MonoString *FileReadAllText(MonoString *pathStr);
 
 		/**
 		 * @brief Writes text content to a file, creating directories if needed.
@@ -1323,7 +1350,7 @@ namespace Engine
 		 * @param contentStr Managed string provided by the scripting runtime (MonoString*).
 		 * @return True if write succeeded, otherwise false.
 		 */
-		bool FileWriteAllText(MonoString* pathStr, MonoString* contentStr);
+		bool FileWriteAllText(MonoString *pathStr, MonoString *contentStr);
 
 
 	} // namespace InternalCalls

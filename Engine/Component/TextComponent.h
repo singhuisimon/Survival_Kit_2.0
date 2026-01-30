@@ -23,6 +23,7 @@ namespace Engine {
 		xresource::instance_guid ComponentGUID = 0;
 
 		std::string text = "Text";
+		std::string fontName = "Quantico-Regular"; //FONT SELECTION
 		float fontSize = 24.0f; 
 		std::array<float, 4> color = {1.0f,1.0f,1.0f,1.0f};
 
