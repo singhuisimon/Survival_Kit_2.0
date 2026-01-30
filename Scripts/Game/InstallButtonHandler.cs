@@ -8,6 +8,7 @@ using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Transform;
+using static Engine.Audio;
 
 namespace Game
 {
@@ -22,6 +23,11 @@ namespace Game
         private const string BSOD_SCREEN_2_NAME = "BSOD Screen 2";
         private const string BSOD_SCREEN_3_NAME = "BSOD Screen 3";
         private const string BLACK_SCREEN_NAME = "Black Screen";
+
+        // Audio entity names
+        private const string BGM_OFFICE_AMBIENCE_NAME = "BGM Office Ambience";
+        private const string BGM_ROOM_AMBIENCE_NAME = "BGM Room Ambience";
+        private const string BSOD_ERROR_SOUND_NAME = "UI BSOD Error Sound";
 
         private const string MAIN_GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_Player.json";
         private const int NUM_ERROR_POPUPS = 8;
@@ -69,6 +75,12 @@ namespace Game
         private uint bsodScreen2Id;
         private uint bsodScreen3Id;
         private uint blackScreenId;
+
+        // Audio entity IDs
+        private uint bgmOfficeAmbienceId;
+        private uint bgmRoomAmbienceId;
+        private uint bsodErrorSoundId;
+        private uint[] errorPopupSoundIds = new uint[NUM_ERROR_POPUPS];
 
         // State
         private bool entitiesFound = false;
@@ -187,6 +199,40 @@ namespace Game
             {
                 LogError("InstallButtonHandler: Could not find entity: " + BLACK_SCREEN_NAME);
                 return;
+            }
+
+            // Find audio entities (optional - don't fail if not found)
+            bgmOfficeAmbienceId = SceneFindEntityByName(BGM_OFFICE_AMBIENCE_NAME);
+            if (bgmOfficeAmbienceId == 0)
+            {
+                LogMessage("InstallButtonHandler: BGM Office Ambience not found (optional)");
+            }
+
+            bgmRoomAmbienceId = SceneFindEntityByName(BGM_ROOM_AMBIENCE_NAME);
+            if (bgmRoomAmbienceId == 0)
+            {
+                LogMessage("InstallButtonHandler: BGM Room Ambience not found (optional)");
+            }
+
+            bsodErrorSoundId = SceneFindEntityByName(BSOD_ERROR_SOUND_NAME);
+            if (bsodErrorSoundId == 0)
+            {
+                LogMessage("InstallButtonHandler: BSOD Error Sound not found (optional)");
+            }
+
+            // Find error popup sound entities (one per popup for overlapping sounds)
+            for (int i = 0; i < NUM_ERROR_POPUPS; i++)
+            {
+                string soundName = "UI Error Popup Sound " + (i + 1);
+                errorPopupSoundIds[i] = SceneFindEntityByName(soundName);
+                if (errorPopupSoundIds[i] == 0)
+                {
+                    LogError("InstallButtonHandler: " + soundName + " NOT FOUND!");
+                }
+                else
+                {
+                    LogMessage("InstallButtonHandler: Found " + soundName + " with ID: " + errorPopupSoundIds[i]);
+                }
             }
 
             entitiesFound = true;
@@ -359,6 +405,17 @@ namespace Game
         {
             Vector3 pos = new Vector3(POPUP_VISIBLE_X[index], POPUP_VISIBLE_Y[index], -0.7f - index * 0.01f);
             SetPosition(errorPopupIds[index], ref pos);
+
+            // Play error popup sound using dedicated audio entity for this popup
+            if (errorPopupSoundIds[index] != 0)
+            {
+                AudioPlay(errorPopupSoundIds[index]);
+                LogMessage("InstallButtonHandler: Playing error popup sound " + (index + 1) + " (entity ID: " + errorPopupSoundIds[index] + ")");
+            }
+            else
+            {
+                LogError("InstallButtonHandler: Cannot play sound - entity for popup " + (index + 1) + " is null!");
+            }
         }
 
         private void ShowGlitchOverlay()
@@ -382,6 +439,26 @@ namespace Game
         {
             Vector3 pos = new Vector3(SCREEN_CENTER_X, SCREEN_CENTER_Y, BSOD_1_Z);
             SetPosition(bsodScreen1Id, ref pos);
+
+            // Stop BGM when BSOD appears
+            if (bgmOfficeAmbienceId != 0)
+            {
+                AudioStop(bgmOfficeAmbienceId);
+                LogMessage("InstallButtonHandler: Stopped BGM Office Ambience");
+            }
+
+            if (bgmRoomAmbienceId != 0)
+            {
+                AudioStop(bgmRoomAmbienceId);
+                LogMessage("InstallButtonHandler: Stopped BGM Room Ambience");
+            }
+
+            // Play BSOD error sound
+            if (bsodErrorSoundId != 0)
+            {
+                AudioPlay(bsodErrorSoundId);
+                LogMessage("InstallButtonHandler: Playing BSOD Error Sound");
+            }
         }
 
         private void ShowBSODScreen2()
