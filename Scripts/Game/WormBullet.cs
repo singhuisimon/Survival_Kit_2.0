@@ -55,11 +55,11 @@ namespace Game
             // Check for collisions
             int collisionCount = PhysicsGetCollisionCount();
             
-            // DEBUG: Log if any collisions detected
-            if (enableDebug && collisionCount > 0)
-            {
-                LogMessage("===== COLLISION DETECTED! Total collisions in scene: " + collisionCount + " =====");
-            }
+            // // DEBUG: Log if any collisions detected
+            // if (enableDebug && collisionCount > 0)
+            // {
+            //     LogMessage("===== COLLISION DETECTED! Total collisions in scene: " + collisionCount + " =====");
+            // }
 
             // Check all collisions
             CheckCollisions(collisionCount);
@@ -83,11 +83,11 @@ namespace Game
                 uint entityA, entityB;
                 PhysicsGetCollisionPair(i, out entityA, out entityB);
 
-                // DEBUG: Print ALL collision pairs if debug enabled
-                if (enableDebug)
-                {
-                    LogMessage("Collision pair " + i + ": EntityA=" + entityA + " vs EntityB=" + entityB);
-                }
+                // // DEBUG: Print ALL collision pairs if debug enabled
+                // if (enableDebug)
+                // {
+                //     LogMessage("Collision pair " + i + ": EntityA=" + entityA + " vs EntityB=" + entityB);
+                // }
 
                 // Skip if this collision doesn't involve our bullet
                 if (entityA != self && entityB != self)
@@ -96,21 +96,21 @@ namespace Game
                 // Get the other entity
                 uint other = (entityA == self) ? entityB : entityA;
 
-                // DEBUG: Log when our bullet is involved
-                if (enableDebug)
-                {
-                    LogMessage("!!!!! WORM BULLET " + self + " COLLIDED WITH ENTITY " + other + " !!!!!");
-                }
+                // // DEBUG: Log when our bullet is involved
+                // if (enableDebug)
+                // {
+                //     LogMessage("!!!!! WORM BULLET " + self + " COLLIDED WITH ENTITY " + other + " !!!!!");
+                // }
 
                 // Get tags
                 string selfTag = TagGetTag(self);
                 string otherTag = TagGetTag(other);
 
-                // DEBUG: Log tags
-                if (enableDebug)
-                {
-                    LogMessage("Self tag: '" + selfTag + "' | Other tag: '" + otherTag + "'");
-                }
+                // // DEBUG: Log tags
+                // if (enableDebug)
+                // {
+                //     LogMessage("Self tag: '" + selfTag + "' | Other tag: '" + otherTag + "'");
+                // }
 
                 // Case 1: We are bullet, other is valid target
                 if (IsBulletTag(selfTag) && IsTargetTag(otherTag))

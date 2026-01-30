@@ -1,0 +1,158 @@
+{
+    "Prefab Name": "ParentEntity",
+    "Prefab GUID": 17057630437606803127,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "ParentEntity",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13608761528134730609",
+                            "Position": [
+                                767.0,
+                                987.0,
+                                -82.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "10716562162269046445",
+                            "Tag": "ParentEntity"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13032300775831749493",
+                            "Mesh": "",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 4,
+                    "typeName": "LightComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14185222280438514547",
+                            "Enabled": true,
+                            "Type": 0,
+                            "Color": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Intensity": 0.5,
+                            "Range": 5.0,
+                            "SpotAngleDeg": 30.0,
+                            "IndirectMultiplier": 1.0,
+                            "TypeShadow": 0,
+                            "Resolution": 1024,
+                            "Strength": 1.0,
+                            "Bias": 0.004999999888241291,
+                            "NearPlane": 0.20000000298023224
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "WormChild",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11434613623668212233",
+                            "Position": [
+                                -0.9335387349128724,
+                                -0.4000000059604645,
+                                -0.20000000298023224
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                0.8999999761581421,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18210551942213551783",
+                            "Tag": "WormChild"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17199221146702692875",
+                            "Mesh": "",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

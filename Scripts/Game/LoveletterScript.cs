@@ -5,23 +5,18 @@ using static Engine.Event;
 using static Engine.Transform;
 using static Engine.Quat;
 using static Engine.SimpleMath;
+using static Engine.Tag;
 
 namespace Game
 {
     public class LoveLetterScript : ScriptBehaviour
     {
         // ===== NAME OF ENTITY =====
-        [SerializeField] private string loveletterEntity = "loveletter";
+        [SerializeField] private string loveletterEntity = "LoveLetter";
         private uint loveletterEntityID = 0;
 
-        // ===== MULTIPLE CORES =====
-        [SerializeField] private string[] coreEntities = new string[]
-        {
-            "Core_1", "Core_2", "Core_3"
-        };
-        
-        private uint[] coreEntityIDs;
-        private int selectedCoreIndex = -1;
+        // ===== CORE TAG =====
+        [SerializeField] private string coreTag = "SEMICONDUCTOR";
         private uint selectedCoreEntityID = 0;
 
         // ===== CORE DIMENSIONS =====
@@ -32,13 +27,13 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 1200.0f;
+        [SerializeField] private float moveSpeed = 10.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 3.0f;
+        [SerializeField] private float waitTimeAtSurface = 0.0f;
 
         // ===== HEALTH SYSTEM =====
-        [SerializeField] private int totalLogicBombs = 9;
-        private int logicBombsAlive = 9;
+        [SerializeField] private int totalLogicBombs = 6;
+        private int logicBombsAlive = 6;
         private bool isDead = false;
 
         // ===== MOVEMENT STATE =====
@@ -46,16 +41,21 @@ namespace Game
         private bool isWaitingAtSurface = false;
         private float delayTimer = 0.0f;
         private float waitTimer = 0.0f;
+        
+        // Manual position tracking to bypass physics
+        private Engine.Vector3 currentPosition;
+        private float totalDistanceTraveled = 0.0f;
 
         // ===== TARGET POSITIONS =====
         private Engine.Vector3 corePosition;
+        private Engine.Vector3 startPosition;
         private Engine.Vector3 targetSurfaceCenter;
+        private Engine.Vector3 directionNormalized;
+        private float totalDistance = 0.0f;
         private bool targetCalculated = false;
 
-        // ===== SMOOTH MOVEMENT SETTINGS =====
-        [SerializeField] private float slowDownRadius = 10.0f;
-        [SerializeField] private float minSpeedFactor = 0.1f;
-
+        // ===== RNG =====
+        private static uint s_RngState = 0x12345678u;
         private static bool rngSeeded = false;
 
         public override void OnStart()
@@ -66,7 +66,7 @@ namespace Game
             LogMessage("=== LoveLetter Started ===");
             LogMessage("LoveLetterEntity: " + loveletterEntityID);
             LogMessage("Total LogicBombs: " + totalLogicBombs);
-            LogMessage("Available Cores: " + coreEntities.Length);
+            LogMessage("Core Tag: " + coreTag);
             
             if (loveletterEntityID == 0)
             {
@@ -81,40 +81,35 @@ namespace Game
             // Subscribe to LogicBomb destruction events
             Subscribe("LogicBombDestroyed", OnLogicBombDestroyed);
             
-            // Initialize core IDs array
-            coreEntityIDs = new uint[coreEntities.Length];
-            
-            
+            // Seed RNG if not already done
             if (!rngSeeded)
             {
                 uint timeSeed = (uint)(System.DateTime.Now.Ticks & 0xFFFFFFFF);
-                RNG.Seed(timeSeed);
+                s_RngState = timeSeed;
                 rngSeeded = true;
                 LogMessage("RNG seeded with: " + timeSeed);
             }
             
-            // Select a random core
-            SelectRandomCore();
+            // Select a random core by tag
+            SelectRandomCoreByTag();
             
-            if (selectedCoreIndex >= 0)
+            if (selectedCoreEntityID != 0)
             {
                 // Start movement after delay
                 delayTimer = startDelay;
                 LogMessage("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
-                LogMessage("Selected core: " + coreEntities[selectedCoreIndex] + " (ID: " + selectedCoreEntityID + ")");
-                
+                LogMessage("Selected core ID: " + selectedCoreEntityID);
             }
             else
             {
-                LogError("No valid core found! LoveLetter cannot move.");
+                LogError("No valid core found with tag '" + coreTag + "'! LoveLetter cannot move.");
             }
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            
             // Don't update if dead or no core selected
-            if (isDead || selectedCoreIndex < 0) return;
+            if (isDead || selectedCoreEntityID == 0) return;
 
             // Handle spawn delay
             if (delayTimer > 0.0f)
@@ -123,7 +118,7 @@ namespace Game
                 
                 if (delayTimer <= 0.0f)
                 {
-                    LogMessage("Starting movement to " + coreEntities[selectedCoreIndex] + "!");
+                    LogMessage("Starting movement to SEMICONDUCTOR core!");
                     FindCoreAndCalculateTarget();
                     isMoving = true;
                 }
@@ -143,58 +138,39 @@ namespace Game
                 return;
             }
 
-            // Movement logic
+            // Movement logic using linear interpolation
             if (isMoving && targetCalculated)
             {
-                MoveTowardsTarget(deltaTime);
-                CheckIfReachedTarget();
+                MoveTowardsTargetLinear(deltaTime);
             }
         }
 
-        private void SelectRandomCore()
+        private void SelectRandomCoreByTag()
         {
-            int validCores = 0;
-            for (int i = 0; i < coreEntities.Length; i++)
-            {
-                coreEntityIDs[i] = SceneFindEntityByName(coreEntities[i]);
-                if (coreEntityIDs[i] != 0)
-                {
-                    validCores++;
-                    LogMessage("Found core: " + coreEntities[i] + " (ID: " + coreEntityIDs[i] + ")");
-                }
-                else
-                {
-                    LogMessage("Core not found: " + coreEntities[i]);
-                }
-            }
+            // Find all entities with the SEMICONDUCTOR tag
+            uint[] coreEntities = SceneFindEntitiesByTag(coreTag);
             
-            if (validCores == 0)
+            if (coreEntities == null || coreEntities.Length == 0)
             {
-                selectedCoreIndex = -1;
+                LogError("No cores found with tag: " + coreTag);
                 selectedCoreEntityID = 0;
                 return;
             }
             
-            // Create list of available core indices
-            int[] availableIndices = new int[validCores];
-            int index = 0;
-            for (int i = 0; i < coreEntities.Length; i++)
+            LogMessage("Found " + coreEntities.Length + " cores with tag '" + coreTag + "'");
+            
+            // Select a random core from the available ones
+            if (coreEntities.Length == 1)
             {
-                if (coreEntityIDs[i] != 0)
-                {
-                    availableIndices[index] = i;
-                    index++;
-                }
+                selectedCoreEntityID = coreEntities[0];
+                LogMessage("Only one core available, selected ID: " + selectedCoreEntityID);
             }
-            
-            // Use engine's RNG.RandInt (inclusive: [min, max])
-            int randomIndex = RNG.RandInt(0, validCores - 1);
-            
-            selectedCoreIndex = availableIndices[randomIndex];
-            selectedCoreEntityID = coreEntityIDs[selectedCoreIndex];
-
-            LogMessage("Randomly selected core: " + coreEntities[selectedCoreIndex] + 
-                    " (index: " + randomIndex + " out of " + validCores + ")");
+            else
+            {
+                int randomIndex = RandomRangeInt(0, coreEntities.Length);
+                selectedCoreEntityID = coreEntities[randomIndex];
+                LogMessage("Randomly selected core at index " + randomIndex + ", ID: " + selectedCoreEntityID);
+            }
         }
 
         // ===== HEALTH SYSTEM =====
@@ -208,10 +184,12 @@ namespace Game
             if (parentID == loveletterEntityID)
             {
                 logicBombsAlive--;
+            
                 LogMessage("LogicBomb destroyed! Remaining: " + logicBombsAlive + "/" + totalLogicBombs);
 
                 if (logicBombsAlive <= 0)
                 {
+                    LogMessage(" All LogicBombs destroyed! Calling OnAllLogicBombsDestroyed()");
                     OnAllLogicBombsDestroyed();
                 }
             }
@@ -229,9 +207,6 @@ namespace Game
             isMoving = false;
             isWaitingAtSurface = false;
 
-            // TODO: Add destruction VFX/SFX here
-            // TODO: Spawn upgrade module or rewards
-
             // Publish event for game systems
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
 
@@ -247,6 +222,30 @@ namespace Game
                 corePosition = GetPosition(selectedCoreEntityID);
                 CalculateTargetSurfaceCenter();
                 targetCalculated = true;
+                
+                // Store start position and calculate direction
+                startPosition = GetPosition(loveletterEntityID);
+                currentPosition = startPosition;
+                totalDistanceTraveled = 0.0f;
+                
+                // Calculate total distance
+                float dx = targetSurfaceCenter.X - startPosition.X;
+                float dy = targetSurfaceCenter.Y - startPosition.Y;
+                float dz = targetSurfaceCenter.Z - startPosition.Z;
+                totalDistance = SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
+                
+                // Normalize direction
+                if (totalDistance > 0.001f)
+                {
+                    directionNormalized = new Engine.Vector3(
+                        dx / totalDistance,
+                        dy / totalDistance,
+                        dz / totalDistance
+                    );
+                }
+                
+                LogMessage("Total travel distance: " + totalDistance.ToString("F1") + " units");
+                LogMessage("Movement will take: " + (totalDistance / moveSpeed).ToString("F1") + " seconds at " + moveSpeed + " units/sec");
             }
             else
             {
@@ -338,104 +337,35 @@ namespace Game
                     LogMessage("Targeting BACK face center");
                 }
             }
-            
-            Engine.Vector3 startPos = GetPosition(loveletterEntityID);
-            float initialDistance = CalculateDistance(startPos, targetSurfaceCenter);
-            LogMessage("Starting distance to target: " + initialDistance);
         }
 
-        private void MoveTowardsTarget(float deltaTime)
+        // NEW APPROACH: Linear interpolation based on total distance traveled
+        private void MoveTowardsTargetLinear(float deltaTime)
         {
             if (loveletterEntityID == 0) return;
 
-            Engine.Vector3 currentPos = GetPosition(loveletterEntityID);
+            // Calculate how far we should move this frame (constant speed)
+            float distanceThisFrame = moveSpeed * deltaTime;
+            totalDistanceTraveled += distanceThisFrame;
             
-            // Calculate direction to target
-            float dx = targetSurfaceCenter.X - currentPos.X;
-            float dy = targetSurfaceCenter.Y - currentPos.Y;
-            float dz = targetSurfaceCenter.Z - currentPos.Z;
-            
-            // Calculate distance
-            float distance = SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
-            
-            // If already very close, just snap to target
-            if (distance < 0.5f)
+            // Check if we've reached the target
+            if (totalDistanceTraveled >= totalDistance)
             {
+                // Snap to exact target
                 SetPosition(loveletterEntityID, ref targetSurfaceCenter);
                 OnReachedTarget();
                 return;
             }
             
-            // Normalize direction
-            if (distance > 0.001f)
-            {
-                dx /= distance;
-                dy /= distance;
-                dz /= distance;
-            }
-            else
-            {
-                return;
-            }
-            
-            // Calculate effective speed with smooth slowdown
-            float effectiveSpeed = CalculateEffectiveSpeed(distance);
-            
-            // Calculate movement this frame
-            float movementThisFrame = effectiveSpeed * deltaTime;
-            
-            // Don't overshoot - if we would move past the target, just go to target
-            if (distance <= movementThisFrame)
-            {
-                SetPosition(loveletterEntityID, ref targetSurfaceCenter);
-                OnReachedTarget();
-                return;
-            }
-            
-            // Calculate new position
-            Engine.Vector3 newPos = new Engine.Vector3(
-                currentPos.X + dx * movementThisFrame,
-                currentPos.Y + dy * movementThisFrame,
-                currentPos.Z + dz * movementThisFrame
+            // Calculate new position based on total distance traveled (not physics position)
+            currentPosition = new Engine.Vector3(
+                startPosition.X + directionNormalized.X * totalDistanceTraveled,
+                startPosition.Y + directionNormalized.Y * totalDistanceTraveled,
+                startPosition.Z + directionNormalized.Z * totalDistanceTraveled
             );
             
-            SetPosition(loveletterEntityID, ref newPos);
-        }
-
-        private float CalculateEffectiveSpeed(float distanceToTarget)
-        {
-            // Base speed
-            float speed = moveSpeed;
-            
-            // Apply smooth slowdown when approaching target
-            if (distanceToTarget < slowDownRadius)
-            {
-                // Quadratic ease-out: speed reduces as we get closer
-                float t = distanceToTarget / slowDownRadius; // 1.0 at radius, 0.0 at target
-                speed *= t * t; // Quadratic slowdown (smoother)
-                
-                // Ensure minimum speed
-                if (speed < moveSpeed * minSpeedFactor)
-                {
-                    speed = moveSpeed * minSpeedFactor;
-                }
-            }
-            
-            return speed;
-        }
-
-        private void CheckIfReachedTarget()
-        {
-            if (isWaitingAtSurface) return;
-            
-            Engine.Vector3 currentPos = GetPosition(loveletterEntityID);
-            float distance = CalculateDistance(currentPos, targetSurfaceCenter);
-            
-            if (distance <= 1.0f)
-            {
-                LogMessage("=== REACHED TARGET SURFACE CENTER ===");
-                OnReachedTarget();
-            }
+            // Apply the calculated position
+            SetPosition(loveletterEntityID, ref currentPosition);
         }
 
         private void OnReachedTarget()
@@ -448,22 +378,27 @@ namespace Game
             isWaitingAtSurface = true;
             waitTimer = waitTimeAtSurface;
             
-            LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface center before self-destruct...");
+            LogMessage("=== REACHED TARGET SURFACE ===");
+            LogMessage("Traveled " + totalDistanceTraveled.ToString("F1") + " units in total");
+            LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface before self-destruct...");
         }
 
         private void OnReachedCore()
         {
+            LogMessage("///////////////////////////Start of Onreached.");
             if (isDead) return;
+            LogMessage("Destroying LoveLetter | EntityID: " + loveletterEntityID);
 
             isDead = true;
             LogMessage("=== SELF DESTRUCTING AT CORE ===");
         
             // Publish event
+            Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
             Publish("LoveLetterReachedCore", loveletterEntityID.ToString());
             
             // Self-destruct
             SceneDestroyEntity(loveletterEntityID);
-            LogMessage("///////////////////////////End of the Loveletter movement.");
+            LogMessage("///////////////////////////End of Onreached.");
         }
 
         // ===== HELPER FUNCTIONS =====
@@ -473,6 +408,30 @@ namespace Game
             float dy = b.Y - a.Y;
             float dz = b.Z - a.Z;
             return SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
+        // ===== RNG FUNCTIONS (copied from Botnet) =====
+        private static uint Nextuint()
+        {
+            uint x = s_RngState;
+            if (x == 0)
+                x = 0x12345678u;
+
+            x ^= x << 13;
+            x ^= x >> 17;
+            x ^= x << 5;
+            s_RngState = x;
+            return x;
+        }
+
+        private static int RandomRangeInt(int minInclusive, int maxExclusive)
+        {
+            if (maxExclusive <= minInclusive)
+                return minInclusive;
+
+            uint range = (uint)(maxExclusive - minInclusive);
+            uint r = Nextuint();
+            return minInclusive + (int)(r % range);
         }
 
         public override void OnDestroy()

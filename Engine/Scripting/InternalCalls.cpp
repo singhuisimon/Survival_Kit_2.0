@@ -47,6 +47,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "glm/gtx/matrix_decompose.hpp"
 
 #include <string>
 #include <vector>
@@ -549,47 +550,81 @@ namespace Engine {
 		// Transform
 		// =====================================================================
 		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition) {
-			if(!outPosition) return;
+			if (!outPosition) return;
 			*outPosition = glm::vec3(0.f); // deterministic default
 
 			// RequireMainThread();
 
 			Entity e = GetEntityOrNull(entityID);
-			if(!e || !e.HasComponent<TransformComponent>()) return;
+			if (!e || !e.HasComponent<TransformComponent>()) return;
 
-			const auto &t = e.GetComponent<TransformComponent>();
-			*outPosition = SafeVec3OrZero(t.Position);
+			const auto& t = e.GetComponent<TransformComponent>();
+
+			// FIX: Return WORLD position, not LOCAL position
+			*outPosition = SafeVec3OrZero(glm::vec3(t.WorldTransform[3]));
 		}
 
 		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position) {
-			if(!position) return;
+			if (!position) return;
 
 			// RequireMainThread();
 
 			Entity e = GetEntityOrNull(entityID);
-			if(!e || !e.HasComponent<TransformComponent>()) return;
+			if (!e || !e.HasComponent<TransformComponent>()) return;
 
 			glm::vec3 p = SafeVec3OrZero(*position);
 
-			auto &t = e.GetComponent<TransformComponent>();
-			t.Position = p;
+			auto& t = e.GetComponent<TransformComponent>();
+
+			// FIX: For child entities, convert world position to local
+			if (t.Parent != u32_max) {
+				// Child entity: convert world to local
+				auto view = s_CurrentScene->GetRegistry().view<TransformComponent>();
+				auto& parent_transform = view.get<TransformComponent>(
+					static_cast<entt::entity>(t.Parent));
+
+				// Convert world to local: local = parent_inverse × world
+				glm::mat4 parent_inverse = glm::inverse(parent_transform.WorldTransform);
+				glm::mat4 new_world = t.WorldTransform;
+				new_world[3] = glm::vec4(p, 1.0f); // Set new world position
+
+				glm::mat4 new_local = parent_inverse * new_world;
+
+				// Decompose to get new local position
+				glm::vec3 skew;
+				glm::vec4 perspective;
+				glm::vec3 newScale;
+				glm::quat newRotation;
+				glm::vec3 newLocalPosition;
+
+				glm::decompose(new_local, newScale, newRotation, newLocalPosition, skew, perspective);
+
+				t.Position = newLocalPosition;
+				t.Rotation = newRotation;
+				t.Scale = newScale;
+			}
+			else {
+				// Root entity: world position = local position
+				t.Position = p;
+			}
+
 			t.IsDirty = true;
 		}
 
 		// ---- Rotation -----------------------------------------------------------
 
 		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation) {
-			if(!outRotation) return;
+			if (!outRotation) return;
 			*outRotation = glm::quat(1.f, 0.f, 0.f, 0.f); // identity default
 
-			// RequireMainThread();
-
 			Entity e = GetEntityOrNull(entityID);
-			if(!e || !e.HasComponent<TransformComponent>()) return;
+			if (!e || !e.HasComponent<TransformComponent>()) return;
 
-			const auto &t = e.GetComponent<TransformComponent>();
-			// Optionally normalize on get to keep scripts safe even if native code set bad values
-			*outRotation = SafeNormalizeQuat(t.Rotation);
+			const auto& t = e.GetComponent<TransformComponent>();
+
+			// FIX: Get WORLD rotation from WorldTransform
+			glm::mat3 rotMat = glm::mat3(t.WorldTransform);
+			*outRotation = SafeNormalizeQuat(glm::quat_cast(rotMat));
 		}
 
 		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation) {
@@ -610,17 +645,23 @@ namespace Engine {
 		// ---- Scale --------------------------------------------------------------
 
 		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale) {
-			if(!outScale) return;
+			if (!outScale) return;
 			*outScale = glm::vec3(1.f); // deterministic default
 
-			// RequireMainThread();
-
 			Entity e = GetEntityOrNull(entityID);
-			if(!e || !e.HasComponent<TransformComponent>()) return;
+			if (!e || !e.HasComponent<TransformComponent>()) return;
 
-			const auto &t = e.GetComponent<TransformComponent>();
-			*outScale = SafeScale(t.Scale);
+			const auto& t = e.GetComponent<TransformComponent>();
+
+			// FIX: Get WORLD scale from WorldTransform
+			*outScale = SafeScale(glm::vec3(
+				glm::length(glm::vec3(t.WorldTransform[0])),
+				glm::length(glm::vec3(t.WorldTransform[1])),
+				glm::length(glm::vec3(t.WorldTransform[2]))
+			));
 		}
+
+
 
 		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale) {
 			if(!scale) return;
