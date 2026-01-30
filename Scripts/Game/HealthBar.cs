@@ -21,7 +21,8 @@ namespace Game
 
         // ===== State =====
         private bool initialized = false;
-        private Vector3 initialPosition;  // Store initial position - NEVER CHANGE THIS
+        private Vector3 initialPosition;  // Store initial center position
+        private float initialWidth;  // Store initial width to calculate offset
         private float playerMaxHP = 100.0f;  // Player's actual max HP
         private float hpToWidthRatio = 4.0f;  // 100 HP = 400 width, so ratio is 4
 
@@ -40,7 +41,7 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
             LogMessage("HealthBar: Subscribed to event '" + EVENT_PLAYER_HEALTHCHANGE + "'");
 
-            // Store initial position - THIS NEVER CHANGES
+            // Store initial position and width
             initialPosition = Transform.GetPosition((uint)EntityID);
 
             // Get the actual initial scale to determine real width
@@ -49,6 +50,7 @@ namespace Game
 
             // Use the actual width from the scene as barMaxWidth
             barMaxWidth = actualInitialWidth;
+            initialWidth = actualInitialWidth;
 
             initialized = true;
 
@@ -73,23 +75,35 @@ namespace Game
                     hKeyWasPressed = true;
                     LogMessage("=== H KEY - DAMAGE 20 ===");
 
-                    // Get current scale
+                    // Get current scale and position
                     Vector3 currentScale = Transform.GetScale((uint)EntityID);
+                    Vector3 currentPosition = Transform.GetPosition((uint)EntityID);
                     float currentWidth = currentScale.X;
 
-                    // Reduce width by 20
-                    currentWidth -= 20;
-                    if (currentWidth < 0) currentWidth = 0;
+                    float widthChange = 20;  // Amount to decrease
 
-                    // Update ONLY scale - position stays at initialPosition
+                    // Reduce width by 20
+                    float newWidth = currentWidth - widthChange;
+                    if (newWidth < 0) newWidth = 0;
+
+                    // Update scale
                     Vector3 newScale = new Vector3(
-                        currentWidth,      // Reduced width
+                        newWidth,          // Reduced width
                         currentScale.Y,    // Keep height
                         currentScale.Z     // Keep depth
                     );
                     Transform.SetScale((uint)EntityID, ref newScale);
 
-                    LogMessage("  New Width: " + currentWidth + " / " + barMaxWidth);
+                    // Move center LEFT by half the width decrease to keep left edge fixed
+                    Vector3 newPosition = new Vector3(
+                        currentPosition.X - (widthChange ),
+                        currentPosition.Y,
+                        currentPosition.Z
+                    );
+                    Transform.SetPosition((uint)EntityID, ref newPosition);
+
+                    LogMessage("  Width: " + currentWidth + " -> " + newWidth);
+                    LogMessage("  Position moved left by: " + (widthChange / 2.0f));
                 }
             }
             else
@@ -105,23 +119,34 @@ namespace Game
                     jKeyWasPressed = true;
                     LogMessage("=== J KEY - HEAL 20 ===");
 
-                    // Get current scale
+                    // Get current scale and position
                     Vector3 currentScale = Transform.GetScale((uint)EntityID);
+                    Vector3 currentPosition = Transform.GetPosition((uint)EntityID);
                     float currentWidth = currentScale.X;
 
-                    // Increase width by 20
-                    currentWidth += 20;
-                    if (currentWidth > barMaxWidth) currentWidth = barMaxWidth;
+                    float widthChange = 20;  // Amount to increase
 
-                    // Update ONLY scale
+                    // Increase width by 20
+                    float newWidth = currentWidth + widthChange;
+                    if (newWidth > barMaxWidth) newWidth = barMaxWidth;
+
+                    // Update scale
                     Vector3 newScale = new Vector3(
-                        currentWidth,      // Increased width
+                        newWidth,          // Increased width
                         currentScale.Y,    // Keep height
                         currentScale.Z     // Keep depth
                     );
                     Transform.SetScale((uint)EntityID, ref newScale);
 
-                    LogMessage("  New Width: " + currentWidth + " / " + barMaxWidth);
+                    // Move center RIGHT by half the width increase to keep left edge fixed
+                    Vector3 newPosition = new Vector3(
+                        currentPosition.X + (widthChange / 2.0f),
+                        currentPosition.Y,
+                        currentPosition.Z
+                    );
+                    Transform.SetPosition((uint)EntityID, ref newPosition);
+
+                    LogMessage("  Width: " + currentWidth + " -> " + newWidth);
                 }
             }
             else
@@ -137,23 +162,34 @@ namespace Game
                     kKeyWasPressed = true;
                     LogMessage("=== K KEY - DAMAGE 50 ===");
 
-                    // Get current scale
+                    // Get current scale and position
                     Vector3 currentScale = Transform.GetScale((uint)EntityID);
+                    Vector3 currentPosition = Transform.GetPosition((uint)EntityID);
                     float currentWidth = currentScale.X;
 
-                    // Reduce width by 50
-                    currentWidth -= 50;
-                    if (currentWidth < 0) currentWidth = 0;
+                    float widthChange = 50;  // Amount to decrease
 
-                    // Update ONLY scale
+                    // Reduce width by 50
+                    float newWidth = currentWidth - widthChange;
+                    if (newWidth < 0) newWidth = 0;
+
+                    // Update scale
                     Vector3 newScale = new Vector3(
-                        currentWidth,      // Reduced width
+                        newWidth,          // Reduced width
                         currentScale.Y,    // Keep height
                         currentScale.Z     // Keep depth
                     );
                     Transform.SetScale((uint)EntityID, ref newScale);
 
-                    LogMessage("  New Width: " + currentWidth + " / " + barMaxWidth);
+                    // Move center LEFT by half the width decrease to keep left edge fixed
+                    Vector3 newPosition = new Vector3(
+                        currentPosition.X - (widthChange / 2.0f),
+                        currentPosition.Y,
+                        currentPosition.Z
+                    );
+                    Transform.SetPosition((uint)EntityID, ref newPosition);
+
+                    LogMessage("  Width: " + currentWidth + " -> " + newWidth);
                 }
             }
             else
@@ -179,6 +215,9 @@ namespace Game
                         currentScale.Z     // Keep depth
                     );
                     Transform.SetScale((uint)EntityID, ref newScale);
+
+                    // Reset position to initial
+                    Transform.SetPosition((uint)EntityID, ref initialPosition);
 
                     LogMessage("  Width reset to max: " + barMaxWidth);
                 }
@@ -214,13 +253,22 @@ namespace Game
             // Get current scale
             Vector3 currentScale = Transform.GetScale((uint)EntityID);
 
-            // Set width based on converted HP value - position never changes
+            // Set width based on converted HP value
             Vector3 newScale = new Vector3(
                 currentWidth,      // Width = HP * 4
                 currentScale.Y,    // Keep height
                 currentScale.Z     // Keep depth
             );
             Transform.SetScale((uint)EntityID, ref newScale);
+
+            // Adjust position to keep LEFT edge fixed
+            float widthDifference = initialWidth - currentWidth;
+            Vector3 newPosition = new Vector3(
+                initialPosition.X - (widthDifference * 8),
+                initialPosition.Y,
+                initialPosition.Z
+            );
+            Transform.SetPosition((uint)EntityID, ref newPosition);
 
             LogMessage("=== OnPlayerHealthChange COMPLETE ===");
         }
