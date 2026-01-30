@@ -660,7 +660,7 @@ namespace Engine
             X = x; Y = y; Z = z; W = w;
         }
 
-        public static Quat Identity => new Quat(0f, 0f, 0f, 1f);
+        public static Quat Identity => new Quat(1f, 0f, 0f, 0f);
 
         public Vector3 Forward
         {
