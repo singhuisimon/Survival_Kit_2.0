@@ -37,7 +37,9 @@ namespace Game
         [SerializeField] private float shootLocZ;
 
         [SerializeField] private float shootingCooldown = 0.25f;
-        
+        [SerializeField] private float health;
+
+        private Engine.Vector3 stillPos;
         private const uint INVALID_ENTITY = 0xffffffffu;
         private const string EVENT_HOST_SPLIT = "WormHostSplit";
         private const string EVENT_BULLET_HIT = "BulletHit";
@@ -60,6 +62,7 @@ namespace Game
             OGscaleY = 0.01f;
             OGscaleZ = 0.01f;
 
+            health = 9.0f;
             Engine.Vector3 disappearScale = new Engine.Vector3(0,0,0);
             SetScale(EntityID, ref disappearScale);
 
@@ -77,6 +80,7 @@ namespace Game
                 return;
             }
 
+            Transform.SetPosition(EntityID, ref stillPos);
             shootingTimer -= deltaTime;
 
             if(shootingTimer <= 0.0f){
@@ -105,6 +109,11 @@ namespace Game
             targetY = aim.Y;
             targetZ = aim.Z;
 
+            Engine.Vector3 ownPosition = GetPosition((uint)EntityID);
+            stillPos.X = ownPosition.X;
+            stillPos.Y = ownPosition.Y;
+            stillPos.Z = ownPosition.Z;
+
             //Gave up on aiming for now
             Engine.Vector3 globalPosition = SimpleMath.LocalChildtoWorld((uint)EntityID);
             Engine.Vector3 distanceVec = aim - globalPosition;
@@ -112,30 +121,33 @@ namespace Game
             directionX = distanceVec.X;
             directionY = distanceVec.Y;
             directionZ = distanceVec.Z;
-
-            // float yaw = SimpleMath.Atan2(distanceVec.X, distanceVec.Z);
-            // Engine.Vector3 upAxis = new Engine.Vector3(0.0f, 1.0f, 0.0f);
-            // Quat yawQ = Quat.FromAxisAngle(upAxis, yaw);
-
-            // float horizLen = SimpleMath.Sqrt(distanceVec.X*distanceVec.X + distanceVec.Z*distanceVec.Z);
-            // float pitch = SimpleMath.Atan2(distanceVec.Y, horizLen);
-
-            // Engine.Vector3 localRight = new Engine.Vector3(1.0f, 0.0f, 0.0f);
-            // Engine.Vector3 rightAxis = QuatMultiplyVec3(yawQ,  localRight);
-            // Quat pitchQ = Engine.Quat.FromAxisAngle(rightAxis, -pitch);
-
-            // Quat finalRotation = pitchQ * yawQ;
-            // SetRotation((uint)EntityID, ref finalRotation);
             
             EntityAddRigidBody(EntityID);
             Engine.Vector3 newBoxHalfExtents = new Engine.Vector3(30.0f, 30.0f, 30.0f);
             RigidbodySetBoxHalfExtents(EntityID, ref newBoxHalfExtents);
+            RigidbodySetIsKinematic(EntityID, false);
+            RigidbodySetUseGravity(EntityID, false);
 
             hasSplit = true;
         }
 
         private void OnBulletHit(string eventName, string payload){
             LogMessage("WormChild OnBulletHit: " + eventName + ", " + payload);
+            health -= 1.0f;
+            Transform.SetPosition(EntityID, ref stillPos);
+            if(health > 0){
+                float ratio = health / 9.0f;
+                float currentScaleX = 0.01f * 0.5f * ratio;
+                float currentScaleY = 0.01f * 0.5f * ratio;
+                float currentScaleZ = 0.01f * 0.5f * ratio;
+                
+                Engine.Vector3 currentScale = new Engine.Vector3(currentScaleX,currentScaleY,currentScaleZ);
+                SetScale(EntityID, ref currentScale);
+                LogMessage("WormChild Health: " + health);
+                LogMessage("WormChild ratio: " + ratio);
+            } else {
+                SceneDestroyEntity(EntityID);
+            }
         }
 
         public bool isParentCall (string payload){
