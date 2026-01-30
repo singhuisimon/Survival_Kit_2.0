@@ -28,10 +28,43 @@ namespace Game
         private const float VISIBLE_Y = 360.0f;
         private const float CENTER_X = 640.0f;
 
-        // Button offsets from popup center when visible
-        private const float YES_BUTTON_OFFSET_X = -60.0f;
-        private const float NO_BUTTON_OFFSET_X = 60.0f;
-        private const float BUTTON_OFFSET_Y = -60.0f;
+        // Absolute button positions when visible
+        private const float YES_BUTTON_X = 568.0f;
+        private const float YES_BUTTON_Y = 437.0f;
+        private const float NO_BUTTON_X = 712.0f;
+        private const float NO_BUTTON_Y = 437.0f;
+
+        [SerializeField]
+        private string noButtonEntityName = "QuitConfirmation NoButton";
+
+        // Button dimensions for click detection (matches scale in scene)
+        [SerializeField]
+        private float shutdownButtonWidth = 60.0f;
+
+        [SerializeField]
+        private float shutdownButtonHeight = 20.0f;
+
+        [SerializeField]
+        private float yesNoButtonWidth = 50.0f;
+
+        [SerializeField]
+        private float yesNoButtonHeight = 20.0f;
+
+        [SerializeField]
+        private float popupWidth = 150.0f;
+
+        [SerializeField]
+        private float popupHeight = 100.0f;
+
+        // Animation settings
+        [SerializeField]
+        private float fadeInDuration = 0.1f;
+
+        // Positions - initialized in OnStart
+        private Vector3 hiddenPosition;
+        private Vector3 visiblePopupPosition;
+        private Vector3 visibleYesPosition;
+        private Vector3 visibleNoPosition;
 
         // Entity IDs
         private uint shutdownButtonId;
@@ -42,7 +75,11 @@ namespace Game
         // State
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
-        private bool wasMousePressed = false;  // For edge detection
+        private bool isAnimating = false;
+        private float animationTimer = 0.0f;
+
+        // Input state for edge detection
+        private bool wasMousePressed = false;
 
         public override void OnStart()
         {
@@ -124,11 +161,20 @@ namespace Game
                 {
                     LogMessage("QuitConfirmationPopup: Yes clicked - quitting game");
                     OnYesClicked();
+                    return;
                 }
                 else if (noHit)
                 {
                     LogMessage("QuitConfirmationPopup: No clicked - hiding popup");
                     OnNoClicked();
+                    return;
+                }
+
+                // Click outside popup closes it
+                if (!IsMouseOverButton(mousePos, visiblePopupPosition, popupWidth, popupHeight))
+                {
+                    LogMessage("QuitConfirmationPopup: Clicked outside popup - hiding");
+                    HidePopup();
                 }
             }
             else
@@ -146,20 +192,39 @@ namespace Game
             }
         }
 
+        private bool IsMouseOverButton(Vector2 mousePos, Vector3 buttonPos, float width, float height)
+        {
+            float halfW = width * 0.5f;
+            float halfH = height * 0.5f;
+
+            float minX = buttonPos.X - halfW;
+            float maxX = buttonPos.X + halfW;
+            float minY = buttonPos.Y - halfH;
+            float maxY = buttonPos.Y + halfH;
+
+            return mousePos.X >= minX && mousePos.X <= maxX &&
+                   mousePos.Y >= minY && mousePos.Y <= maxY;
+        }
+
         private void ShowPopup()
         {
+            if (isPopupVisible)
+                return;
+
             isPopupVisible = true;
+            isAnimating = true;
+            animationTimer = 0.0f;
 
             // Move popup to center of screen
             Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
             SetPosition(popupId, ref popupPos);
 
-            // Move Yes button (left of center)
-            Vector3 yesPos = new Vector3(CENTER_X + YES_BUTTON_OFFSET_X, VISIBLE_Y + BUTTON_OFFSET_Y, -0.6f);
+            // Move Yes button to visible position
+            Vector3 yesPos = new Vector3(YES_BUTTON_X, YES_BUTTON_Y, -0.6f);
             SetPosition(yesButtonId, ref yesPos);
 
-            // Move No button (right of center)
-            Vector3 noPos = new Vector3(CENTER_X + NO_BUTTON_OFFSET_X, VISIBLE_Y + BUTTON_OFFSET_Y, -0.6f);
+            // Move No button to visible position
+            Vector3 noPos = new Vector3(NO_BUTTON_X, NO_BUTTON_Y, -0.6f);
             SetPosition(noButtonId, ref noPos);
 
             LogMessage("QuitConfirmationPopup: Popup shown at center");
@@ -168,17 +233,23 @@ namespace Game
         private void HidePopup()
         {
             isPopupVisible = false;
+            isAnimating = false;
+
+            // Move entities off-screen
+            Vector3 hidePos = hiddenPosition;
+            Vector3 yesHidePos = new Vector3(580.0f, -500.0f, -0.3f);
+            Vector3 noHidePos = new Vector3(700.0f, -500.0f, -0.3f);
 
             // Move popup off screen
             Vector3 popupPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
             SetPosition(popupId, ref popupPos);
 
             // Move Yes button off screen
-            Vector3 yesPos = new Vector3(CENTER_X + YES_BUTTON_OFFSET_X, HIDDEN_Y + BUTTON_OFFSET_Y, -0.6f);
+            Vector3 yesPos = new Vector3(YES_BUTTON_X, HIDDEN_Y, -0.6f);
             SetPosition(yesButtonId, ref yesPos);
 
             // Move No button off screen
-            Vector3 noPos = new Vector3(CENTER_X + NO_BUTTON_OFFSET_X, HIDDEN_Y + BUTTON_OFFSET_Y, -0.6f);
+            Vector3 noPos = new Vector3(NO_BUTTON_X, HIDDEN_Y, -0.6f);
             SetPosition(noButtonId, ref noPos);
 
             LogMessage("QuitConfirmationPopup: Popup hidden");
@@ -188,6 +259,7 @@ namespace Game
         {
             // Publish quit event - Game.cpp will handle closing the window
             Publish("QuitGame", "");
+            LogMessage("QuitConfirmationPopup: QuitGame event published");
         }
 
         private void OnNoClicked()

@@ -1,0 +1,14 @@
+{
+  "sourcePath": "\\Resources\\Sources\\Meshes\\E004_botnet_v001.fbx",
+  "meshSettings": {
+    "outputFormat": "CUSTOM",
+    "includePos": true,
+    "includeNormals": true,
+    "includeColors": false,
+    "includeTexCoords": true,
+    "indexType": "UINT32",
+    "scale": 1,
+    "optimizeVertices": true,
+    "generateNormals": false
+  }
+}

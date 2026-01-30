@@ -1,0 +1,70 @@
+{
+    "Prefab Name": "PrimaryWeaponWindow",
+    "Prefab GUID": 17550325996008686067,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "PrimaryWeaponWindow",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4554432807152452049",
+                            "Position": [
+                                706.9000244140625,
+                                329.1000061035156,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                600.0,
+                                400.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2562346436118462933",
+                            "Tag": "PrimaryWeaponWindow"
+                        }
+                    }
+                },
+                {
+                    "type": 14,
+                    "typeName": "SpriteRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1985885683815039449",
+                            "Texture": "PrimaryWeapBar_Window.png",
+                            "Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Quad": 3,
+                            "Sprite Layer": 0,
+                            "IsActive": true,
+                            "IsVisible": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

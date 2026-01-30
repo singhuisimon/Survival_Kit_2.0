@@ -8,6 +8,10 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetVelocity(uint entityID, ref Vector3 vel);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddVelocity(uint entityID, ref Vector3 delta);
 
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern Vector3 Rigidbody_GetAngularVelocity(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetAngularVelocity(uint entityID, ref Vector3 vel);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddAngularVelocity(uint entityID, ref Vector3 delta);
+
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Rigidbody_GetMass(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetMass(uint entityID, float mass);
 
@@ -28,9 +32,12 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern Vector3 Rigidbody_GetBoxHalfExtent(uint entityID);
 
         public static Vector3 RigidbodyGetVelocity(uint entityID) => Rigidbody_GetVelocity(entityID);
-
         public static void RigidbodySetVelocity(uint entityID, ref Vector3 vel) => Rigidbody_SetVelocity(entityID, ref vel);
         public static void RigidbodyAddVelocity(uint entityID, ref Vector3 delta) => Rigidbody_AddVelocity(entityID, ref delta);
+
+        public static Vector3 RigidbodyGetAngularVelocity(uint entityID) => Rigidbody_GetAngularVelocity(entityID);
+        public static void RigidbodySetAngularVelocity(uint entityID, ref Vector3 vel) => Rigidbody_SetAngularVelocity(entityID, ref vel);
+        public static void RigidbodyAddAngularVelocity(uint entityID, ref Vector3 delta) => Rigidbody_AddAngularVelocity(entityID, ref delta);
 
         public static float RigidbodyGetMass(uint entityID) => Rigidbody_GetMass(entityID);
         public static void RigidbodySetMass(uint entityID, float mass) => Rigidbody_SetMass(entityID, mass);

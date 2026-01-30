@@ -52,6 +52,9 @@ namespace Game
 
         private void OnDamageReceived(string eventName, string payload)
         {
+
+            //if(!isInvulnerable) return;
+
             float damage = DamageSystem.ParseAmount(payload);
 
             CurrentHealth -= damage;

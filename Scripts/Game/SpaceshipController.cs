@@ -20,8 +20,10 @@ namespace Game
     public class SpaceshipController : ScriptBehaviour
     {
         // ===== Entity References =====
-        [SerializeField("Camera Entity Name")] private string cameraName = "PlayerCam";
-        [SerializeField("Player Entity Name")] private string playerName = "Player";
+        //[SerializeField("Camera Entity Name")] 
+        private string cameraName = "PlayerCam";
+        //[SerializeField("Player Entity Name")] 
+        private string playerName = "Player";
 
         // ===== Camera Settings =====
         [SerializeField("Mouse Sensitivity")] private float mouseSensitivity = 15f;
@@ -60,9 +62,12 @@ namespace Game
         [SerializeField] private float playerHP = 100.0f;
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
-        [SerializeField] private string EVENT_PLAYER_DAMAGE = "Damage:";
-        [SerializeField] private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
-        [SerializeField] private string EVENT_PLAYER_OOB = "Damage:";
+        //[SerializeField] private 
+        string EVENT_PLAYER_DAMAGE = "Damage:";
+        //[SerializeField] 
+        private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
+        //[SerializeField] 
+        private string EVENT_PLAYER_OOB = "Damage:";
 
         // ======= STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;

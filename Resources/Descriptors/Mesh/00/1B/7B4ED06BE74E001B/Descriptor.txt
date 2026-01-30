@@ -1,0 +1,20 @@
+{
+  "sourcePath": "\\Resources\\Sources\\Meshes\\level_design_v003.fbx",
+  "meshSettings": {
+    "outputFormat": "CUSTOM",
+    "includePos": true,
+    "includeNormals": true,
+    "includeColors": false,
+    "includeTexCoords": true,
+    "indexType": "UINT32",
+    "scale": 1,
+    "positionX": 0,
+    "positionY": 0,
+    "positionZ": 0,
+    "rotationX": 0,
+    "rotationY": 0,
+    "rotationZ": 0,
+    "optimizeVertices": true,
+    "generateNormals": false
+  }
+}

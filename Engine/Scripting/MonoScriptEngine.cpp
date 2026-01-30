@@ -1702,6 +1702,12 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::Rigidbody_SetVelocity));
 		BindInternalCall("Engine.Rigidbody::Rigidbody_AddVelocity",
 						 reinterpret_cast<void *>(InternalCalls::Rigidbody_AddVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_GetAngularVelocity",
+						 reinterpret_cast<void *>(InternalCalls::Rigidbody_GetAngularVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_SetAngularVelocity",
+						 reinterpret_cast<void *>(InternalCalls::Rigidbody_SetAngularVelocity));
+		BindInternalCall("Engine.Rigidbody::Rigidbody_AddAngularVelocity",
+						 reinterpret_cast<void *>(InternalCalls::Rigidbody_AddAngularVelocity));
 
 		BindInternalCall("Engine.Rigidbody::Rigidbody_GetMass",
 						 reinterpret_cast<void *>(InternalCalls::Rigidbody_GetMass));
