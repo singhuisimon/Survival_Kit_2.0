@@ -1,10 +1,12 @@
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Transform;
 using static Engine.Logger;
 using static Engine.Physics;
 using static Engine.Scene;
 using static Engine.Tag;
+using static Engine.Rigidbody;
 
 namespace Game {
 
@@ -12,25 +14,26 @@ namespace Game {
 
         [SerializeField] private float aoeDamage = 30.0f;
         [SerializeField] private float projectileLifetime = 2.0f;
-        
-        private string[] targets = { "botnet", "wormhost", "wormchild", "adware"};
-        private string ultTag = "primaryUltAOE";
+
+        private List<uint> damagedEntities = new List<uint>();
 
         private float elapsedTime = 0.0f;
 
         public override void OnStart(){
-
+            LogMessage("[PrimaryUltAOEDamage] AOE zone spawned: " + EntityID);
         }
         
         public override void OnUpdate(float deltaTime){
             elapsedTime += deltaTime;
+        }
 
+        public override void OnFixedUpdate(float deltaTime){
             if(elapsedTime >= projectileLifetime){
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
 
-            CheckCollisions();
+            //CheckCollisions();
         }
 
         public override void OnDestroy(){
@@ -41,75 +44,41 @@ namespace Game {
 
         private void CheckCollisions()
         {
-            int collisionCount = PhysicsGetCollisionCount();
+            List<uint> hits = CollisionManager.GetPlayerProjectileHits((uint)EntityID);
 
-            for (int i = 0; i < collisionCount; i++)
+            if (hits == null || hits.Count == 0)
+                return;
+
+            foreach (uint targetId in hits)
             {
-                PhysicsGetCollisionPair(i, out uint entityA, out uint entityB);
+                if (AlreadyDamaged(targetId))
+                    continue;
 
-                string tagA = TagGetTag(entityA);
-                string tagB = TagGetTag(entityB);
-
-                // Case 1: A is bullet, B is valid target
-                if (IsBulletTag(tagA) && IsTargetTag(tagB))
-                {
-                    OnBulletHit(entityA, entityB);
-                }
-                // Case 2: B is bullet, A is valid target
-                else if (IsBulletTag(tagB) && IsTargetTag(tagA))
-                {
-                    OnBulletHit(entityB, entityA);
-                }
+                damagedEntities.Add(targetId);
+                OnTargetHit(targetId);
             }
         }
 
-        private bool IsBulletTag(string tag)
+        private bool AlreadyDamaged(uint targetId)
         {
-            if (string.IsNullOrEmpty(tag))
-                return false;
-
-            if (!string.IsNullOrEmpty(ultTag) &&
-                string.Equals(tag, ultTag, StringComparison.OrdinalIgnoreCase))
+            for (int i = 0; i < damagedEntities.Count; i++)
             {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool IsTargetTag(string tag)
-        {
-            if (string.IsNullOrEmpty(tag) || targets == null)
-                return false;
-
-            for (int i = 0; i < targets.Length; i++)
-            {
-                string target = targets[i];
-                if (!string.IsNullOrEmpty(target) &&
-                    string.Equals(tag, target, StringComparison.OrdinalIgnoreCase))
-                {
+                if (damagedEntities[i] == targetId)
                     return true;
-                }
             }
-
-            LogMessage("Tag: " + tag + "is not the target");
             return false;
         }
 
-        // -------- WHEN A VALID TARGET IS HIT --------
 
-        // bulletEntityID = entity that has a "bullet" tag
-        // targetEntityID = entity that has one of TargetTags
-        private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
+        private void OnTargetHit(uint targetEntityID)
         {
-
+            // Deal AOE damage using DamageSystem
             DamageSystem.DealDamage(targetEntityID, aoeDamage, (uint)EntityID);
 
-            // Log
-            LogMessage("AOE SPAWN! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
-
-            // Destroy the bullet that actually hit
-            SceneDestroyEntity(bulletEntityID);
+            LogMessage("[PrimaryUltAOEDamage] AOE hit target " + targetEntityID + " for " + aoeDamage + " damage");
+            
+            // Optional: Spawn hit effect per enemy
+            // SpawnAOEHitEffect(targetEntityID);
         }
 
 

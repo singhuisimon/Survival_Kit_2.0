@@ -1,13 +1,16 @@
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
-using static Engine.Physics;
-using static Engine.Tag;
 using static Engine.Event;
 
 namespace Game
 {
+    /// <summary>
+    /// Primary weapon bullet - updated to use CollisionManager.
+    /// Queries CollisionManager for hits instead of manually checking all collisions.
+    /// </summary>
     public class PrimaryBullet : ScriptBehaviour
     {
         [SerializeField]
@@ -16,13 +19,8 @@ namespace Game
         [SerializeField]
         public float Damage = 10.0f;
 
-        // Tags this bullet can damage
         [SerializeField]
-        private string[] TargetTags = { "botnet", "loveletter", "adware", "wormchild", "wormhost" };
-
-        // Tags that represent bullets (fill this in Inspector with your bullet tag, e.g. "primarybullet")
-        [SerializeField]
-        private string[] BulletTags = { "Primarybullet" };
+        public int UltRecharged = 1;
 
         private float elapsedTime = 0.0f;
 
@@ -32,100 +30,60 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // Lifetime
+            // Lifetime check
             elapsedTime += deltaTime;
             if (elapsedTime >= ProjectileLifetime)
             {
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
+        }
 
-            // Collisions (for ALL bullets, decided by tag)
+        public override void OnFixedUpdate(float deltaTime)
+        {
+            // Check collisions using CollisionManager
             CheckCollisions();
         }
 
-        // -------- COLLISION HANDLING (TAG-BASED, FOR ALL BULLETS) --------
+        // ========================================================================
+        // COLLISION HANDLING - Using CollisionManager (OPTIMIZED!)
+        // ========================================================================
 
         private void CheckCollisions()
         {
-            int collisionCount = PhysicsGetCollisionCount();
-
-            for (int i = 0; i < collisionCount; i++)
+            // Query the CollisionManager for hits
+            List<uint> hits = CollisionManager.GetPlayerProjectileHits((uint)EntityID);
+            
+            if (hits != null && hits.Count > 0)
             {
-                PhysicsGetCollisionPair(i, out uint entityA, out uint entityB);
-
-                string tagA = TagGetTag(entityA);
-                string tagB = TagGetTag(entityB);
-
-                //LogMessage("FIND - Collision pair " + i + ": " + tagA + ", " + tagB + ": EntityA=" + entityA + " vs EntityB=" + entityB);
-
-                // Case 1: A is bullet, B is valid target
-                if (IsBulletTag(tagA) && IsTargetTag(tagB))
+                // Process all hits (in case bullet passed through multiple enemies in one frame)
+                foreach (uint targetId in hits)
                 {
-                    //LogMessage("Both are valid 1");
-                    OnBulletHit(entityA, entityB);
+                    OnBulletHit((uint)EntityID, targetId);
                 }
-                // Case 2: B is bullet, A is valid target
-                else if (IsBulletTag(tagB) && IsTargetTag(tagA))
-                {
-                    //LogMessage("Both are valid 2");
-                    OnBulletHit(entityB, entityA);
-                }
+                
+                // Note: OnBulletHit destroys the bullet, so we only process first frame of hits
+                // The bullet won't exist next frame to check again
             }
         }
 
-        private bool IsBulletTag(string tag)
-        {
-            if (string.IsNullOrEmpty(tag) || BulletTags == null)
-                return false;
+        // ========================================================================
+        // WHEN A VALID TARGET IS HIT
+        // ========================================================================
 
-            for (int i = 0; i < BulletTags.Length; i++)
-            {
-                string bulletTag = BulletTags[i];
-                if (!string.IsNullOrEmpty(bulletTag) &&
-                    string.Equals(tag, bulletTag, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsTargetTag(string tag)
-        {
-            if (string.IsNullOrEmpty(tag) || TargetTags == null)
-                return false;
-
-            for (int i = 0; i < TargetTags.Length; i++)
-            {
-                string target = TargetTags[i];
-                if (!string.IsNullOrEmpty(target) &&
-                    string.Equals(tag, target, StringComparison.OrdinalIgnoreCase))
-                {
-                    //LogMessage(tag + " is part of listed target: " + TargetTags[i]);
-                    return true;
-                }
-            }
-
-            LogMessage("Tag: " + tag + "is not the target");
-            //LogMessage(tag + " is not part of listed target");
-            return false;
-        }
-
-        // -------- WHEN A VALID TARGET IS HIT --------
-
-        // bulletEntityID = entity that has a "bullet" tag
-        // targetEntityID = entity that has one of TargetTags
         private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
         {
-            // Publish event
+            // Deal damage using DamageSystem
+            DamageSystem.DealDamage(targetEntityID, Damage, bulletEntityID);
+            
+            // Publish events
             Publish("BulletHit", targetEntityID.ToString());
             Publish("BulletHitEnemy", true.ToString());
-            //LogMessage("BulletHit: " + targetEntityID.ToString() + "; BulletHitEnemy: " + true.ToString());
-            LogMessage("Event Published! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
+            Publish("GainUlt", UltRecharged.ToString());
+            
+            LogMessage("BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID + " damage=" + Damage);
 
-            // Destroy the bullet that actually hit
+            // Destroy the bullet
             SceneDestroyEntity(bulletEntityID);
         }
 

@@ -1,15 +1,18 @@
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.Physics;
 using static Engine.Event;
 using static Engine.Scene;
+using static Engine.Rigidbody;
 
 namespace Game{
     public class OOBManager : ScriptBehaviour{
 
-        [SerializeField] private string playerName = "Player";
+        //[SerializeField] 
+        private string playerName = "Player";
         [SerializeField] private float originalCountdownOOB = 5.0f;
         [SerializeField] private float countdownOOB = 5.0f;
         [SerializeField] private bool inEnvironment = true;
@@ -27,8 +30,15 @@ namespace Game{
                 LogMessage("[OOBManager] player entity cannot be found");
             }
 
+            LogMessage("[OOBManager] OOB EntityID is: " + EntityID.ToString());
+            LogMessage("[OOBManager] Player EntityID is: " + playerEntityID.ToString());
+
             countdownOOB = originalCountdownOOB;
             inEnvironment = true;
+
+            RigidbodySetMass((uint)EntityID, 1.0f);
+
+            //PhysicsEnableCollisionEvents();
 
             //subscribe to event here
         }
@@ -49,9 +59,9 @@ namespace Game{
         //put physics / detection here if nothing visual is needed/important
         public override void OnFixedUpdate(float deltaTime){
             //add the detection here 
-            CheckPlayerInEnvrionemnt();
+            CheckPlayerInEnvrionment();
 
-            LogMessage("HEY FIXED UPDATING!!!");
+            //LogMessage("HEY FIXED UPDATING!!!");
         }
 
         public override void OnDestroy(){
@@ -59,46 +69,88 @@ namespace Game{
         }
 
 
-        private void CheckPlayerInEnvrionemnt(){
+        private void CheckPlayerInEnvrionment(){
 
-            LogMessage("CHECKING");
-            int count = PhysicsGetCollisionCount();
+            // LogMessage("CHECKING");
+            // int count = PhysicsGetCollisionCount();
 
-            bool playerdetected = false;
+            // bool playerdetected = false;
 
-            if(count <= 0){
-                LogMessage("Count is Zero");
-                return;
-            } 
+            // if(count <= 0){
+            //     LogMessage("Count is Zero");
+            //     return;
+            // } 
 
-            if(playerEntityID == 0){
-                return;
-            }
+            // if(playerEntityID == 0){
+            //     return;
+            // }
 
-            uint self = (uint)EntityID;
+            // uint self = (uint)EntityID;
             
-            for(int i = 0; i < count; i++){
-                uint a, b;
-                PhysicsGetCollisionPair(i, out a, out b);
+            // for(int i = 0; i < count; i++){
+            //     uint a, b;
+            //     PhysicsGetCollisionPair(i, out a, out b);
 
-                if(a != self && b != self)
-                    continue;
+            //     if(a != self && b != self)
+            //         continue;
 
-                uint other = (a == self) ? b : a;
+            //     uint other = (a == self) ? b : a;
 
-                if(other == playerEntityID){
-                    LogMessage("Player is in Environment");
-                    playerdetected = true;
-                } 
+            //     if(other == playerEntityID){
+            //         LogMessage("[OOBManager] Player is in Environment");
+            //         playerdetected = true;
+            //     } 
+            // }
+
+            // if(!playerdetected){
+            //     LogMessage("[OOBManager] Player is not in environment");
+            //     inEnvironment = false;
+            // } else {
+            //     LogMessage("[OOBManager] Player is in Environment");
+            //     inEnvironment = true;
+            // }
+
+            if (playerEntityID == 0)
+            {
+                return;
             }
 
-            if(!playerdetected){
-                LogMessage("Player is not in environment");
+            // Get all entities the player is currently colliding with
+            List<uint> playerCollisions = CollisionManager.GetPlayerCollisions(playerEntityID);
+
+            // Check if our boundary entity is in the player's collision list
+            bool playerDetected = false;
+            if (playerCollisions != null)
+            {
+                uint self = (uint)EntityID;
+                foreach (uint collidedEntity in playerCollisions)
+                {
+                    if (collidedEntity == self)
+                    {
+                        playerDetected = true;
+                        break;
+                    }
+                }
+            }
+
+             // Update environment status
+            if (!playerDetected)
+            {
+                if (inEnvironment)
+                {
+                    LogMessage("[OOBManager] Player left the environment - countdown started!");
+                }
                 inEnvironment = false;
-            } else {
-                LogMessage("Player is in Environment");
+            }
+            else
+            {
+                if (!inEnvironment)
+                {
+                    LogMessage("[OOBManager] Player returned to environment - countdown reset");
+                }
                 inEnvironment = true;
             }
+
         }
 
         private void CountdownStart(float deltaTime){
@@ -117,7 +169,7 @@ namespace Game{
 
             if(elapsedTime >= nextDamageTime){
                 //RECEIVER IS AT SPACESHIP CONTROLLER
-                DamageSystem.DealDamage(playerEntityID, 20.0f, (uint)EntityID);
+                DamageSystem.DealDamage(playerEntityID, 15.0f, (uint)EntityID);
                 nextDamageTime += damageCooldown; //its 20 per second
             }
         }
