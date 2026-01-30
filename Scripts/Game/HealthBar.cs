@@ -8,13 +8,13 @@ namespace Game
 {
     /// <summary>
     /// HealthBar - Visual representation of player health
-    /// SIMPLE VERSION: Position never changes, only scale changes
-    /// The bar will shrink from both sides equally (from center)
+    /// Position adjustment: Move by FULL width change (not half)
+    /// Left edge = Position.X - Width (scale.X is radius, not diameter)
     /// </summary>
     public class HealthBar : ScriptBehaviour
     {
         // ===== Event Names =====
-        private const string EVENT_PLAYER_HEALTHCHANGE = "Damage:";
+        private const string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
 
         // ===== Visual Settings (Set in Editor) =====
         private float barMaxWidth;  // Maximum width at 100% health (set from scene)
@@ -28,9 +28,6 @@ namespace Game
 
         // Key press tracking to prevent multiple triggers per press
         private bool hKeyWasPressed = false;
-        private bool jKeyWasPressed = false;
-        private bool kKeyWasPressed = false;
-        private bool uKeyWasPressed = false;
 
         public override void OnStart()
         {
@@ -54,11 +51,11 @@ namespace Game
 
             initialized = true;
 
-            LogMessage("HealthBar initialized (SIMPLE - CENTER SCALING):");
+            LogMessage("HealthBar initialized:");
             LogMessage("  Max Width (from scene): " + barMaxWidth);
-            LogMessage("  Initial Position (FIXED): X=" + initialPosition.X + ", Y=" + initialPosition.Y);
-            LogMessage("  Bar will scale from center - shrinks equally on both sides");
-            LogMessage("  Test Controls: H=damage(20 width), J=heal(20 width), K=damage(50 width), U=full heal");
+            LogMessage("  Initial Position X: " + initialPosition.X);
+            LogMessage("  Subscribed to event: " + EVENT_PLAYER_HEALTHCHANGE);
+            LogMessage("  Test: Press H to damage (-20 width)");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -66,7 +63,7 @@ namespace Game
             if (!initialized)
                 return;
 
-            // ===== CHEAT CODES FOR TESTING HEALTH =====
+            // ===== TEST CODE - H KEY FOR TESTING =====
             // Press H to deal damage (reduce width by 20)
             if (Input.IsKeyPressed(KeyCode.H))
             {
@@ -94,137 +91,21 @@ namespace Game
                     );
                     Transform.SetScale((uint)EntityID, ref newScale);
 
-                    // Move center LEFT by half the width decrease to keep left edge fixed
+                    // Move center LEFT by FULL width decrease to keep left edge fixed
                     Vector3 newPosition = new Vector3(
-                        currentPosition.X - (widthChange ),
+                        currentPosition.X - widthChange,
                         currentPosition.Y,
                         currentPosition.Z
                     );
                     Transform.SetPosition((uint)EntityID, ref newPosition);
 
                     LogMessage("  Width: " + currentWidth + " -> " + newWidth);
-                    LogMessage("  Position moved left by: " + (widthChange / 2.0f));
+                    LogMessage("  Position moved left by: " + widthChange);
                 }
             }
             else
             {
                 hKeyWasPressed = false;
-            }
-
-            // Press J to heal (increase width by 20)
-            if (Input.IsKeyPressed(KeyCode.J))
-            {
-                if (!jKeyWasPressed)
-                {
-                    jKeyWasPressed = true;
-                    LogMessage("=== J KEY - HEAL 20 ===");
-
-                    // Get current scale and position
-                    Vector3 currentScale = Transform.GetScale((uint)EntityID);
-                    Vector3 currentPosition = Transform.GetPosition((uint)EntityID);
-                    float currentWidth = currentScale.X;
-
-                    float widthChange = 20;  // Amount to increase
-
-                    // Increase width by 20
-                    float newWidth = currentWidth + widthChange;
-                    if (newWidth > barMaxWidth) newWidth = barMaxWidth;
-
-                    // Update scale
-                    Vector3 newScale = new Vector3(
-                        newWidth,          // Increased width
-                        currentScale.Y,    // Keep height
-                        currentScale.Z     // Keep depth
-                    );
-                    Transform.SetScale((uint)EntityID, ref newScale);
-
-                    // Move center RIGHT by half the width increase to keep left edge fixed
-                    Vector3 newPosition = new Vector3(
-                        currentPosition.X + (widthChange / 2.0f),
-                        currentPosition.Y,
-                        currentPosition.Z
-                    );
-                    Transform.SetPosition((uint)EntityID, ref newPosition);
-
-                    LogMessage("  Width: " + currentWidth + " -> " + newWidth);
-                }
-            }
-            else
-            {
-                jKeyWasPressed = false;
-            }
-
-            // Press K to deal big damage (reduce width by 50)
-            if (Input.IsKeyPressed(KeyCode.K))
-            {
-                if (!kKeyWasPressed)
-                {
-                    kKeyWasPressed = true;
-                    LogMessage("=== K KEY - DAMAGE 50 ===");
-
-                    // Get current scale and position
-                    Vector3 currentScale = Transform.GetScale((uint)EntityID);
-                    Vector3 currentPosition = Transform.GetPosition((uint)EntityID);
-                    float currentWidth = currentScale.X;
-
-                    float widthChange = 50;  // Amount to decrease
-
-                    // Reduce width by 50
-                    float newWidth = currentWidth - widthChange;
-                    if (newWidth < 0) newWidth = 0;
-
-                    // Update scale
-                    Vector3 newScale = new Vector3(
-                        newWidth,          // Reduced width
-                        currentScale.Y,    // Keep height
-                        currentScale.Z     // Keep depth
-                    );
-                    Transform.SetScale((uint)EntityID, ref newScale);
-
-                    // Move center LEFT by half the width decrease to keep left edge fixed
-                    Vector3 newPosition = new Vector3(
-                        currentPosition.X - (widthChange / 2.0f),
-                        currentPosition.Y,
-                        currentPosition.Z
-                    );
-                    Transform.SetPosition((uint)EntityID, ref newPosition);
-
-                    LogMessage("  Width: " + currentWidth + " -> " + newWidth);
-                }
-            }
-            else
-            {
-                kKeyWasPressed = false;
-            }
-
-            // Press U to reset to full health
-            if (Input.IsKeyPressed(KeyCode.U))
-            {
-                if (!uKeyWasPressed)
-                {
-                    uKeyWasPressed = true;
-                    LogMessage("=== U KEY - FULL HEAL ===");
-
-                    // Get current scale
-                    Vector3 currentScale = Transform.GetScale((uint)EntityID);
-
-                    // Set to max width
-                    Vector3 newScale = new Vector3(
-                        barMaxWidth,       // Full width
-                        currentScale.Y,    // Keep height
-                        currentScale.Z     // Keep depth
-                    );
-                    Transform.SetScale((uint)EntityID, ref newScale);
-
-                    // Reset position to initial
-                    Transform.SetPosition((uint)EntityID, ref initialPosition);
-
-                    LogMessage("  Width reset to max: " + barMaxWidth);
-                }
-            }
-            else
-            {
-                uKeyWasPressed = false;
             }
         }
 
@@ -262,14 +143,16 @@ namespace Game
             Transform.SetScale((uint)EntityID, ref newScale);
 
             // Adjust position to keep LEFT edge fixed
+            // Position moves by FULL width difference (not half)
             float widthDifference = initialWidth - currentWidth;
             Vector3 newPosition = new Vector3(
-                initialPosition.X - (widthDifference * 8),
+                initialPosition.X - widthDifference,
                 initialPosition.Y,
                 initialPosition.Z
             );
             Transform.SetPosition((uint)EntityID, ref newPosition);
 
+            LogMessage("  Position offset: " + widthDifference);
             LogMessage("=== OnPlayerHealthChange COMPLETE ===");
         }
 
