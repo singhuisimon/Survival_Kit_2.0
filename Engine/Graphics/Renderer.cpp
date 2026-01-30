@@ -239,10 +239,6 @@ namespace Engine {
 				// Begin drawing frame
 				beginFrame(pass);
 				draw(pass, draw_items, cam_view, cam_perspective, cam_pos, lights);
-				if (pass.fbo_handle == 0 && pass.shdpgm_handle == static_cast<u32>(ShaderIndex::MAIN))
-				{	
-					RenderTrails(draw_items, editor_camera, editor_camera.getCamPos());
-				}
 				endFrame(pass);
 
 				// Read ID at mouse position for GPU ID pass
@@ -329,7 +325,7 @@ namespace Engine {
 		}
 
 
-		renderFinalPass(m_finalpass);
+		renderFinalPass(m_finalpass, draw_items, editor_camera);
 		renderUIPass(m_UIPass, draw_items);
 		renderTextPass(m_textPass, draw_items);
 	}
@@ -898,7 +894,7 @@ namespace Engine {
 	}
 
 
-	void Renderer::renderFinalPass(RenderPass& pass) {
+	void Renderer::renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, Camera3D& editor_camera) {
 
 		// Update pass viewport if allowed
 		if (pass.auto_aspect) {
@@ -925,6 +921,7 @@ namespace Engine {
 
 		// Render skybox into HDR FBO 0 after bloom is computed  
 		renderSkyboxHDR();
+		RenderTrails(draw_items, editor_camera, editor_camera.getCamPos());
 
 		// Final composite: HDR scene + bloom -> LDR
 		beginFrame(pass);
@@ -1883,6 +1880,10 @@ namespace Engine {
 
 		if (trailItems.empty())
 			return;
+
+		auto& fbo = m_framebuffers[0];
+
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo.handle());
 
 		auto& shaderProgram = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::TRAIL)];
 

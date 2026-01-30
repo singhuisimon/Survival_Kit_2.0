@@ -306,7 +306,7 @@ namespace Engine {
 		 *			  The render pass containing render data for rendering the
 		 *			  composition pass.
 		 */
-		void renderFinalPass(RenderPass& pass);
+		void renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, Camera3D& editor_camera);
 
 		/**
 		 * @brief	  Renders the UI pass.
