@@ -97,6 +97,13 @@ namespace Engine {
 		// Hot reload support
 		void EnsureCorrectDomain();
 		bool IsInCorrectDomain();
+		// NOTE: Any native thread calling into Mono must be attached.
+		void EnsureThreadAttached();
+
+		// Editor/runtime safety: resolve a possibly-stale MonoObject* (cached raw pointer)
+		// to the current instance address using the owning ScriptComponent's GCHandle.
+		// Returns nullptr if it cannot be resolved safely.
+		MonoObject *ResolveScriptInstance(MonoObject *maybeStale);
 
 		// Getters
 		MonoDomain *GetRootDomain() const {
