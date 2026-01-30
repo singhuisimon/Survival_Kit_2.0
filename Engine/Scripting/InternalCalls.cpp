@@ -979,6 +979,50 @@ namespace Engine {
 		 * @param entityID
 		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
 		 * @return
+		 * Result value.
+		***************************************************************************/
+		glm::vec3 Rigidbody_GetAngularVelocity(uint64_t entityID) {
+			Entity e = GetEntityOrNull(entityID);
+			if(!e || !e.HasComponent<RigidbodyComponent>()) return glm::vec3{};
+			return e.GetComponent<RigidbodyComponent>().AngularVelocity;
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Sets a rigidbody property on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param inVel
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
+		void Rigidbody_SetAngularVelocity(uint64_t entityID, glm::vec3 *inVel) {
+			if(!inVel) return;
+			Entity e = GetEntityOrNull(entityID);
+			if(!e || !e.HasComponent<RigidbodyComponent>()) return;
+			e.GetComponent<RigidbodyComponent>().AngularVelocity = *inVel;
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Invokes a rigidbody/physics operation on the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param delta
+		 * Pointer/reference to a vector value.
+		***************************************************************************/
+		void Rigidbody_AddAngularVelocity(uint64_t entityID, glm::vec3 *delta) {
+			if(!delta) return;
+			Entity e = GetEntityOrNull(entityID);
+			if(!e || !e.HasComponent<RigidbodyComponent>()) return;
+			auto &rb = e.GetComponent<RigidbodyComponent>().AngularVelocity += *delta;
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Gets a rigidbody property from the entity.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @return
 		 * Requested floating-point value.
 		***************************************************************************/
 		float Rigidbody_GetMass(uint64_t entityID) {
@@ -1124,6 +1168,21 @@ namespace Engine {
 			Entity e = GetEntityOrNull(entityID);
 			if(!e || !e.HasComponent<RigidbodyComponent>()) return;
 			e.GetComponent<RigidbodyComponent>().Stop();
+		}
+
+		void Rigidbody_SetBoxHalfExtent(uint64_t entityID, glm::vec3 *newBoxHalfExtents)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<RigidbodyComponent>()) return;
+
+			e.GetComponent<RigidbodyComponent>().BoxHalfExtents = *newBoxHalfExtents;
+		}
+
+		glm::vec3 Rigidbody_GetBoxHalfExtent(uint64_t entityID)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<RigidbodyComponent>()) return glm::vec3{};
+			return e.GetComponent<RigidbodyComponent>().BoxHalfExtents;
 		}
 
 		// =====================================================================

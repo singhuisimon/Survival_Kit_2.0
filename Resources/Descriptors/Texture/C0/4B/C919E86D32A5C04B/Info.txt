@@ -1,0 +1,7 @@
+{
+  "name": "Firewall-active-logo.png",
+  "guid": "C919E86D32A5C04B",
+  "tags": [],
+  "lastImported": "0000000069295017",
+  "resourceLinks": []
+}

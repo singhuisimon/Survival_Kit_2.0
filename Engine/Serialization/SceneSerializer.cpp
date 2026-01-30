@@ -794,6 +794,10 @@ namespace Engine
 				propertiesObj.AddMember("text",
 					Value(textComp.text.c_str(), allocator), allocator);
 
+				//font name
+				propertiesObj.AddMember("fontName",
+					Value(textComp.fontName.c_str(), allocator), allocator);
+
 				//font size
 				propertiesObj.AddMember("fontSize", textComp.fontSize, allocator);
 
