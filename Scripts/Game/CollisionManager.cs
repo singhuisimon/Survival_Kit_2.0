@@ -81,7 +81,7 @@ namespace Game
             { "corebarrier", CollisionCategory.CORE_BARRIER },
             
             // Environment
-            { "obstacle", CollisionCategory.ENVIRONMENT }
+            { "oob", CollisionCategory.ENVIRONMENT }
         };
 
         // ============================================================
@@ -125,18 +125,15 @@ namespace Game
         {
             // Player projectiles can hit:
             new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENEMY),
-            new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENVIRONMENT),
             
             // Enemy projectiles can hit:
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.PLAYER),
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.ALLY),
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.CORE),
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.CORE_BARRIER),
-            new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.ENVIRONMENT),
             
             // Ally projectiles can hit:
             new CollisionRule(CollisionCategory.ALLY_PROJECTILE, CollisionCategory.ENEMY),
-            new CollisionRule(CollisionCategory.ALLY_PROJECTILE, CollisionCategory.ENVIRONMENT),
             
             // Player can hit:
             new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.ENVIRONMENT),
@@ -146,10 +143,8 @@ namespace Game
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.PLAYER),
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.CORE),
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.CORE_BARRIER),
-            new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.ENVIRONMENT),
             
             // Allies can hit:
-            new CollisionRule(CollisionCategory.ALLY, CollisionCategory.ENVIRONMENT),
             new CollisionRule(CollisionCategory.ALLY, CollisionCategory.ENEMY),
             
             // Core barrier can be hit by anything (it's defensive)

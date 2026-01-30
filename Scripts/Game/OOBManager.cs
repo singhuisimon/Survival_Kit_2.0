@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.Physics;
@@ -57,9 +58,9 @@ namespace Game{
         //put physics / detection here if nothing visual is needed/important
         public override void OnFixedUpdate(float deltaTime){
             //add the detection here 
-            CheckPlayerInEnvrionemnt();
+            CheckPlayerInEnvrionment();
 
-            LogMessage("HEY FIXED UPDATING!!!");
+            //LogMessage("HEY FIXED UPDATING!!!");
         }
 
         public override void OnDestroy(){
@@ -67,46 +68,88 @@ namespace Game{
         }
 
 
-        private void CheckPlayerInEnvrionemnt(){
+        private void CheckPlayerInEnvrionment(){
 
-            LogMessage("CHECKING");
-            int count = PhysicsGetCollisionCount();
+            // LogMessage("CHECKING");
+            // int count = PhysicsGetCollisionCount();
 
-            bool playerdetected = false;
+            // bool playerdetected = false;
 
-            if(count <= 0){
-                LogMessage("Count is Zero");
-                return;
-            } 
+            // if(count <= 0){
+            //     LogMessage("Count is Zero");
+            //     return;
+            // } 
 
-            if(playerEntityID == 0){
-                return;
-            }
+            // if(playerEntityID == 0){
+            //     return;
+            // }
 
-            uint self = (uint)EntityID;
+            // uint self = (uint)EntityID;
             
-            for(int i = 0; i < count; i++){
-                uint a, b;
-                PhysicsGetCollisionPair(i, out a, out b);
+            // for(int i = 0; i < count; i++){
+            //     uint a, b;
+            //     PhysicsGetCollisionPair(i, out a, out b);
 
-                if(a != self && b != self)
-                    continue;
+            //     if(a != self && b != self)
+            //         continue;
 
-                uint other = (a == self) ? b : a;
+            //     uint other = (a == self) ? b : a;
 
-                if(other == playerEntityID){
-                    LogMessage("[OOBManager] Player is in Environment");
-                    playerdetected = true;
-                } 
+            //     if(other == playerEntityID){
+            //         LogMessage("[OOBManager] Player is in Environment");
+            //         playerdetected = true;
+            //     } 
+            // }
+
+            // if(!playerdetected){
+            //     LogMessage("[OOBManager] Player is not in environment");
+            //     inEnvironment = false;
+            // } else {
+            //     LogMessage("[OOBManager] Player is in Environment");
+            //     inEnvironment = true;
+            // }
+
+            if (playerEntityID == 0)
+            {
+                return;
             }
 
-            if(!playerdetected){
-                LogMessage("[OOBManager] Player is not in environment");
+            // Get all entities the player is currently colliding with
+            List<uint> playerCollisions = CollisionManager.GetPlayerCollisions(playerEntityID);
+
+            // Check if our boundary entity is in the player's collision list
+            bool playerDetected = false;
+            if (playerCollisions != null)
+            {
+                uint self = (uint)EntityID;
+                foreach (uint collidedEntity in playerCollisions)
+                {
+                    if (collidedEntity == self)
+                    {
+                        playerDetected = true;
+                        break;
+                    }
+                }
+            }
+
+             // Update environment status
+            if (!playerDetected)
+            {
+                if (inEnvironment)
+                {
+                    LogMessage("[OOBManager] Player left the environment - countdown started!");
+                }
                 inEnvironment = false;
-            } else {
-                LogMessage("[OOBManager] Player is in Environment");
+            }
+            else
+            {
+                if (!inEnvironment)
+                {
+                    LogMessage("[OOBManager] Player returned to environment - countdown reset");
+                }
                 inEnvironment = true;
             }
+
         }
 
         private void CountdownStart(float deltaTime){
