@@ -1,6 +1,7 @@
 // Botnet.cs
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Scene;
@@ -23,7 +24,7 @@ namespace Game
 
         // Movement
         [SerializeField] private float acceleration = 300.0f;
-        [SerializeField] private float topSpeed = 400.0f;
+        [SerializeField] private float topSpeed = 40.0f;
 
         // Rotation speed (how fast bot turns towards target)
         [SerializeField] private float rotateSpeed = 5.0f;
@@ -52,7 +53,7 @@ namespace Game
         [SerializeField] private float HP = 3.0f;
 
         // Botnet Damage
-        [SerializeField] private float blastDamage = 10.0f;
+        [SerializeField] private float blastDamage = 20.0f;
 
         //DEBUG
         [SerializeField] private string TARGET = "";
@@ -80,7 +81,8 @@ namespace Game
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
         private const string TAG_ALLIES = "ALLIES";
-        private const string EVENT_BULLET_HIT = "BulletHit";
+        //private const string EVENT_BULLET_HIT = "BulletHit";
+        private string EVENT_BULLET_HIT = "Damage:";
         private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
 
         // ===== Lifecycle =====
@@ -124,6 +126,8 @@ namespace Game
                 isMoving = false;
                 // keep chooseTargetTimer at 0 so OnUpdate retries next frame
             }
+
+            EVENT_BULLET_HIT += EntityID.ToString();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
@@ -177,22 +181,26 @@ namespace Game
 
         private void OnBulletHit(string eventName, string payload)
         {
-            if (isDead || eventName != EVENT_BULLET_HIT)
-                return;
+            // if (isDead || eventName != EVENT_BULLET_HIT)
+            //     return;
 
-            if (!uint.TryParse(payload, out uint hitId))
-                return;
+            // if (!uint.TryParse(payload, out uint hitId))
+            //     return;
 
-            if (hitId != (uint)EntityID){
-                LogMessage("[Botnet] ID DOESN'T MATCH HIT!");
-                return;
-            }
+            // if (hitId != (uint)EntityID){
+            //     LogMessage("[Botnet] ID DOESN'T MATCH HIT!");
+            //     return;
+            // }
 
-            HP -= 1.0f;
+            // HP -= 1.0f;
+
+            float damage = DamageSystem.ParseAmount(payload);
+            HP -= damage;
+
             LogMessage("[Botnet] CurrentBotnetHP is: " + HP.ToString());
             LogMessage("[Botnet] SUCCESS MATCH! REDUCING HEALTH!");
 
-            if (HP <= 1.0f)
+            if (HP <= 0.0f)
             {
                 Publish("BotnetDeath", 1.ToString());
                 Explode();
@@ -299,7 +307,7 @@ namespace Game
                     TARGET = TAG_PLAYER;
                     break;
                 case 1:
-                    chosen = FindFirstEntityWithTag(TAG_SEMICONDUCTOR);
+                    chosen = FindRandomEntityWithTag(TAG_SEMICONDUCTOR);
                     TARGET = TAG_SEMICONDUCTOR;
                     break;
                 case 2:
@@ -443,37 +451,40 @@ namespace Game
 
         // ===== Collision & Explosion =====
 
+        // ========================================================================
+        // BOTNET.CS - UPDATED COLLISION HANDLING
+        // Replace your HandleCollisionTriggers() method (lines 446-481) with this:
+        // ========================================================================
+
         private void HandleCollisionTriggers()
         {
-            int count = PhysicsGetCollisionCount();
-            if (count <= 0)
-                return;
-
             if (targetID == INVALID_ENTITY)
                 return;
 
-            uint self = (uint)EntityID;
+            // Query CollisionManager for what this enemy collided with
+            List<uint> collisions = CollisionManager.GetEnemyCollisions((uint)EntityID);
+            
+            if (collisions == null || collisions.Count == 0)
+                return;
+            
             uint playerID = SceneFindEntityByName("Player");
-
-            for (int i = 0; i < count; ++i)
+            
+            foreach (uint other in collisions)
             {
-                uint a, b;
-                PhysicsGetCollisionPair(i, out a, out b);
-
-                if (a != self && b != self)
-                    continue;
-
-                uint other = (a == self) ? b : a;
-
+                // Check if hit player
                 if (other == playerID)
                 {
                     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
                     Publish("BotnetAttackedPlayer", EntityID.ToString());
                 }
-
+                
+                // Check if hit target
                 if (other == targetID)
                 {
                     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
+                    
+                    //Temporary measure
+                    DamageSystem.DealDamage(targetID, blastDamage, (uint)EntityID);
                     isExploding = true;
                     break;
                 }
@@ -531,6 +542,7 @@ namespace Game
 
                 if (distSq <= radiusSq)
                 {
+                    LogMessage("HI FROM BOTNET WE ARE FUKED");
                     DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }

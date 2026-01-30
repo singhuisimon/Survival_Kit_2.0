@@ -1,127 +1,94 @@
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Transform;
 using static Engine.Logger;
-using static Engine.Physics;
 using static Engine.Scene;
-using static Engine.Tag;
-using static Engine.Rigidbody;
 
-namespace Game {
-
-    public class PrimaryUltAOEDamage : ScriptBehaviour{
-
+namespace Game
+{
+    /// <summary>
+    /// AOE damage zone spawned by the primary ult.
+    /// Damages all enemies within range that collide with it.
+    /// Updated to use CollisionManager for efficient collision detection.
+    /// </summary>
+    public class PrimaryUltAOEDamage : ScriptBehaviour
+    {
         [SerializeField] private float aoeDamage = 30.0f;
         [SerializeField] private float projectileLifetime = 2.0f;
-        
-        private string[] targets = { "botnet", "wormhost", "wormchild", "adware"};
-        private string ultTag = "PrimaryUltExplosion";
 
         private float elapsedTime = 0.0f;
+        
+        // Track which entities we've already damaged (prevent double-damage)
+        private HashSet<uint> damagedEntities = new HashSet<uint>();
 
-        public float test = 0.0f;
-
-        public override void OnStart(){
-
+        public override void OnStart()
+        {
+            LogMessage("[PrimaryUltAOEDamage] AOE zone spawned: " + EntityID);
         }
         
-        public override void OnUpdate(float deltaTime){
+        public override void OnUpdate(float deltaTime)
+        {
+            // Update lifetime
             elapsedTime += deltaTime;
-
-            
-
-            //CheckCollisions();
         }
 
-        public override void OnFixedUpdate(float deltaTime){
-            CheckCollisions();
-
-            if(elapsedTime >= projectileLifetime){
+        public override void OnFixedUpdate(float deltaTime)
+        {
+            // Check lifetime first
+            if (elapsedTime >= projectileLifetime)
+            {
+                LogMessage("[PrimaryUltAOEDamage] Lifetime expired. Damaged " + damagedEntities.Count + " entities total");
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
+            
+            // Check collisions using CollisionManager
+            CheckCollisions();
         }
 
-        public override void OnDestroy(){
-
+        public override void OnDestroy()
+        {
         }
 
-        // -------- COLLISION HANDLING (TAG-BASED, FOR ALL BULLETS) --------
+        // ========================================================================
+        // COLLISION HANDLING - Using CollisionManager (OPTIMIZED!)
+        // ========================================================================
 
         private void CheckCollisions()
         {
-            int collisionCount = PhysicsGetCollisionCount();
-
-            for (int i = 0; i < collisionCount; i++)
+            // Query the CollisionManager for hits
+            // AOE uses PLAYER_PROJECTILE category (same as bullets)
+            List<uint> hits = CollisionManager.GetPlayerProjectileHits((uint)EntityID);
+            
+            if (hits != null && hits.Count > 0)
             {
-                PhysicsGetCollisionPair(i, out uint entityA, out uint entityB);
-
-                string tagA = TagGetTag(entityA);
-                string tagB = TagGetTag(entityB);
-
-                // Case 1: A is bullet, B is valid target
-                if (IsBulletTag(tagA) && IsTargetTag(tagB))
+                // AOE can hit multiple enemies over its lifetime
+                foreach (uint targetId in hits)
                 {
-                    OnBulletHit(entityA, entityB);
-                }
-                // Case 2: B is bullet, A is valid target
-                else if (IsBulletTag(tagB) && IsTargetTag(tagA))
-                {
-                    OnBulletHit(entityB, entityA);
+                    // Only damage each enemy once
+                    if (!damagedEntities.Contains(targetId))
+                    {
+                        OnTargetHit(targetId);
+                        damagedEntities.Add(targetId);
+                    }
                 }
             }
         }
 
-        private bool IsBulletTag(string tag)
+        // ========================================================================
+        // WHEN A VALID TARGET IS HIT
+        // ========================================================================
+
+        private void OnTargetHit(uint targetEntityID)
         {
-            if (string.IsNullOrEmpty(tag))
-                return false;
-
-            if (!string.IsNullOrEmpty(ultTag) &&
-                string.Equals(tag, ultTag, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool IsTargetTag(string tag)
-        {
-            if (string.IsNullOrEmpty(tag) || targets == null)
-                return false;
-
-            for (int i = 0; i < targets.Length; i++)
-            {
-                string target = targets[i];
-                if (!string.IsNullOrEmpty(target) &&
-                    string.Equals(tag, target, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            LogMessage("Tag: " + tag + "is not the target");
-            return false;
-        }
-
-        // -------- WHEN A VALID TARGET IS HIT --------
-
-        // bulletEntityID = entity that has a "bullet" tag
-        // targetEntityID = entity that has one of TargetTags
-        private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
-        {
-
+            // Deal AOE damage using DamageSystem
             DamageSystem.DealDamage(targetEntityID, aoeDamage, (uint)EntityID);
 
-            // Log
-            LogMessage("AOE SPAWN! BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID);
-
-            // Destroy the bullet that actually hit
-            //SceneDestroyEntity(bulletEntityID);
+            LogMessage("[PrimaryUltAOEDamage] AOE hit target " + targetEntityID + " for " + aoeDamage + " damage");
+            
+            // Optional: Spawn hit effect per enemy
+            // SpawnAOEHitEffect(targetEntityID);
         }
-
-
     }
-
 }
