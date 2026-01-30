@@ -18,7 +18,7 @@ namespace Game
 
         // Tags this bullet can damage
         [SerializeField]
-        private string[] TargetTags = { "botnet", "loveletter", "adware", "wormchild" };
+        private string[] TargetTags = { "botnet", "loveletter", "adware", "wormchild", "wormhost" };
 
         // Tags that represent bullets (fill this in Inspector with your bullet tag, e.g. "primarybullet")
         [SerializeField]
