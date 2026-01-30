@@ -54,7 +54,7 @@ namespace Game
         [SerializeField] private float HP = 3.0f;
 
         // Botnet Damage
-        [SerializeField] private float blastDamage = 20.0f;
+        [SerializeField] private float blastDamage = 5.0f;
 
         //DEBUG
         [SerializeField] private string TARGET = "";
