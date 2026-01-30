@@ -401,11 +401,24 @@ int main(int argc, char* argv[]) {
         fs::create_directories(config.outputPath);
     }
 
-    AssetCompiler::FontCompiler compiler;
-    if (compiler.compile("Resources/Sources/Fonts/Quantico-Bold.ttf",
-        "Resources/Compiled/Font/Quantico-Bold.font")) {
-        std::cout << "Success! << std::endl";
+    AssetCompiler::FontCompiler fontCompiler;
+    std::vector<std::pair<std::string, std::string>> fontsToCompile = {
+        {"Resources/Sources/Fonts/Quantico-Bold.ttf",
+         "Resources/Compiled/Font/Quantico-Bold.font"},
+        {"Resources/Sources/Fonts/Quantico-BoldItalic.ttf",
+         "Resources/Compiled/Font/Quantico-BoldItalic.font"},
+        {"Resources/Sources/Fonts/Quantico-Regular.ttf",
+         "Resources/Compiled/Font/Quantico-Regular.font"},
+        {"Resources/Sources/Fonts/Quantico-Italic.ttf",
+         "Resources/Compiled/Font/Quantico-Italic.font"},
+        {"Resources/Sources/Fonts/DigitalNumbers-Regular.ttf",
+         "Resources/Compiled/Font/DigitalNumbers-Regular.font"}
+    };
+    
+    for (const auto& [sourcePath, outputPath] : fontsToCompile) {
+        fontCompiler.compile(sourcePath, outputPath);
     }
+
     // Compile each asset
     int successCount = 0;
     int failCount = 0;

@@ -76,7 +76,8 @@ namespace Engine{
 		u32		 m_cast_shadow_type = 0u;		// MeshRendererComponent::CastType: 0 = Off,1 = On,2 = TwoSided,3 = ShadowsOnly
 
 		// text data
-		std::string m_text = ""; 
+		std::string m_text = "";
+		std::string m_fontName = "Quantico-Regular";
 		float m_fontSize = 24.0f; 
 		TextAlignment m_textAlignment; // 0=left, 1=Center, 2=Right, 3=Justified
 		float m_lineSpacing = 1.0f; 

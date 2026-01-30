@@ -198,6 +198,7 @@ namespace Engine {
 				.m_texture_guid = 0,
 
 				.m_text = textComp.text,
+				.m_fontName = textComp.fontName,
 				.m_fontSize = textComp.fontSize,
 				.m_textAlignment = textComp.align,
 				.m_lineSpacing = textComp.lineSpacing,

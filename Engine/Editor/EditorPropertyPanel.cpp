@@ -3105,6 +3105,34 @@ namespace Engine
 						MarkComponentOverridden(ComponentTypeID::Text, "fontSize");
 					}
 
+					const char* availableFonts[] = {
+										"Quantico-Bold",
+										"Quantico-BoldItalic",
+										"Quantico-Regular",
+										"Quantico-Italic",
+										"DigitalNumbers-Regular"
+					};
+
+					if (ImGui::BeginCombo("Font", textComp.fontName.c_str())) {
+						for (int i = 0; i < IM_ARRAYSIZE(availableFonts); i++) {
+							bool isSelected = (textComp.fontName == availableFonts[i]);
+							if (ImGui::Selectable(availableFonts[i], isSelected)) {
+								textComp.fontName = availableFonts[i];
+								textComp.isDirty = true;
+								MarkComponentOverridden(ComponentTypeID::Text, "fontName");
+							}
+							if (isSelected) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select the font style to use for this text");
+					}
+
+					ImGui::Spacing();
+
 					// Color Picker
 					float color[4] = {
 						textComp.color[0],

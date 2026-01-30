@@ -419,6 +419,7 @@ namespace Engine {
 		glm::mat4 m_ui_projection;
 
 		// ------------- Font ------------------
+		std::unordered_map<std::string, Font> m_fonts; 
 		Font m_defaultFont; 
 		GLuint m_fontVAO = 0; 
 		GLuint m_fontVBO = 0; 
@@ -430,7 +431,8 @@ namespace Engine {
 		* @return true if loaded successfully
 		*/
 		
-		bool loadFont(const std::string& filepath);
+		bool loadFont(const std::string& filepath, const std::string& fontName);
+		Font* getFont(const std::string& fontName);
 
 		/**
 		 * @brief Renders the text pass
