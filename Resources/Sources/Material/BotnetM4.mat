@@ -13,14 +13,14 @@
     ],
     "emissionColor": [
         1.0,
-        1.0,
-        1.0
+        0.0,
+        0.0
     ],
-    "metallic": 0.029999999329447746,
-    "roughness": 0.07000000029802322,
+    "metallic": 1.0,
+    "roughness": 0.5699999928474426,
     "opacity": 1.0,
-    "emissionStrength": 4.650000095367432,
-    "alphaThreshold": 0.5120000243186951,
+    "emissionStrength": 100.0,
+    "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [
         1.0,
