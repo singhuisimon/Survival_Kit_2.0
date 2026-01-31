@@ -19,6 +19,8 @@ namespace Game
         private bool isInvulnerable = true;
 
         private string EVENT_CORE_HIT = "Damage:";
+        private string EVENT_CORE_HEALTHCHANGE = "Core Health Change";
+
 
         public override void OnStart()
         {
@@ -30,6 +32,8 @@ namespace Game
 
             // Subscribe to bullet hits
             Subscribe(EVENT_CORE_HIT, OnDamageReceived);
+            Publish(EVENT_CORE_HEALTHCHANGE, CurrentHealth.ToString());  // ADD THIS
+
 
             LogMessage("CoreMotherboard " + EntityID + " Health initialized");
         }
@@ -58,6 +62,8 @@ namespace Game
             float damage = DamageSystem.ParseAmount(payload);
 
             CurrentHealth -= damage;
+            Publish(EVENT_CORE_HEALTHCHANGE, CurrentHealth.ToString());  // ADD THIS
+
             LogMessage("CoreMotherboard " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
             if(CurrentHealth <= 0.0f){

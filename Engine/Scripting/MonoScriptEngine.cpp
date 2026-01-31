@@ -1557,6 +1557,18 @@ namespace Engine {
 		BindInternalCall("Engine.ParticleSystem::SetEmissionRate",
 			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetEmissionRate));
 
+		// =====================================================================
+// TextComponent
+// =====================================================================
+		BindInternalCall("Engine.Text::Text_SetText",
+			reinterpret_cast<void*>(InternalCalls::Text_SetText));
+		BindInternalCall("Engine.Text::Text_GetText",
+			reinterpret_cast<void*>(InternalCalls::Text_GetText));
+		BindInternalCall("Engine.Text::Text_SetFontSize",
+			reinterpret_cast<void*>(InternalCalls::Text_SetFontSize));
+		BindInternalCall("Engine.Text::Text_GetFontSize",
+			reinterpret_cast<void*>(InternalCalls::Text_GetFontSize));
+
 		LOG_INFO("Internal calls registered");
 	}
 } // namespace Engine

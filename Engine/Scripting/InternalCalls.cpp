@@ -2770,5 +2770,100 @@ namespace Engine {
 			if (!e || !e.HasComponent<ParticleComponent>()) return;
 			e.GetComponent<ParticleComponent>().EmissionRate = rate;
 		}
+
+		 void Text_SetText(uint32_t entityID, MonoString* text) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_SetText: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_SetText: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+
+				// Convert MonoString to C++ string
+				char* utf8 = mono_string_to_utf8(text);
+				if (utf8) {
+					textComp.setText(std::string(utf8));
+					mono_free(utf8);
+				}
+			}
+			else {
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+			}
+		}
+
+		 MonoString* Text_GetText(uint32_t entityID) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_GetText: No scene set");
+				return nullptr;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_GetText: Invalid entity ID ", entityID);
+				return nullptr;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+
+				MonoDomain* domain = mono_domain_get();
+				return mono_string_new(domain, textComp.getText().c_str());
+			}
+
+			return nullptr;
+		}
+
+		 void Text_SetFontSize(uint32_t entityID, float size) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_SetFontSize: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_SetFontSize: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+				textComp.setFontSize(size);
+			}
+		}
+
+		 float Text_GetFontSize(uint32_t entityID) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_GetFontSize: No scene set");
+				return 0.0f;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_GetFontSize: Invalid entity ID ", entityID);
+				return 0.0f;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+				return textComp.getFontSize();
+			}
+
+			return 0.0f;
+		}
 	} // namespace InternalCalls
 } // namespace Engine
