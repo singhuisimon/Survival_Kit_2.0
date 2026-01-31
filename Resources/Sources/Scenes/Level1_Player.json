@@ -3447,7 +3447,7 @@
                         "Position": [
                             640.0,
                             360.0,
-                            -0.5
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3455,8 +3455,8 @@
                             0.0
                         ],
                         "Scale": [
-                            400.0,
-                            300.0,
+                            630.0,
+                            350.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3476,7 +3476,15 @@
                         "Quad": 3,
                         "Sprite Layer": 3,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000015",
+                        "ScriptClassName": "Game.PauseMenuPopup",
+                        "Fields": {}
                     }
                 }
             ]
@@ -3496,8 +3504,8 @@
                         "ComponentGUID": "100000000000000002",
                         "Position": [
                             640.0,
-                            400.0,
-                            -0.6
+                            235.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3505,8 +3513,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3526,7 +3534,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3546,8 +3554,8 @@
                         "ComponentGUID": "100000000000000003",
                         "Position": [
                             640.0,
-                            400.0,
-                            -0.6
+                            235.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3555,8 +3563,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3576,7 +3584,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3596,8 +3604,8 @@
                         "ComponentGUID": "100000000000000004",
                         "Position": [
                             640.0,
-                            350.0,
-                            -0.6
+                            310.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3605,8 +3613,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3626,7 +3634,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3646,8 +3654,8 @@
                         "ComponentGUID": "100000000000000005",
                         "Position": [
                             640.0,
-                            350.0,
-                            -0.6
+                            310.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3655,8 +3663,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3676,7 +3684,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3695,9 +3703,9 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000006",
                         "Position": [
-                            700.0,
-                            300.0,
-                            -0.6
+                            890.0,
+                            525.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3705,8 +3713,8 @@
                             0.0
                         ],
                         "Scale": [
-                            30.0,
-                            30.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3726,7 +3734,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3745,9 +3753,9 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000007",
                         "Position": [
-                            700.0,
-                            300.0,
-                            -0.6
+                            890.0,
+                            525.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3755,8 +3763,8 @@
                             0.0
                         ],
                         "Scale": [
-                            30.0,
-                            30.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3776,7 +3784,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3795,9 +3803,9 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000008",
                         "Position": [
-                            640.0,
-                            300.0,
-                            -0.6
+                            844.0,
+                            415.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3805,8 +3813,8 @@
                             0.0
                         ],
                         "Scale": [
-                            100.0,
-                            10.0,
+                            5.0,
+                            155.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3826,7 +3834,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3845,9 +3853,9 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000009",
                         "Position": [
-                            580.0,
-                            300.0,
-                            -0.6
+                            890.0,
+                            559.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3855,8 +3863,8 @@
                             0.0
                         ],
                         "Scale": [
-                            30.0,
-                            30.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3876,7 +3884,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3895,9 +3903,9 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000010",
                         "Position": [
-                            580.0,
-                            300.0,
-                            -0.6
+                            890.0,
+                            559.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3905,8 +3913,8 @@
                             0.0
                         ],
                         "Scale": [
-                            30.0,
-                            30.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3926,7 +3934,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3946,8 +3954,8 @@
                         "ComponentGUID": "100000000000000011",
                         "Position": [
                             640.0,
-                            250.0,
-                            -0.6
+                            455.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3955,8 +3963,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3976,7 +3984,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3996,8 +4004,8 @@
                         "ComponentGUID": "100000000000000012",
                         "Position": [
                             640.0,
-                            250.0,
-                            -0.6
+                            455.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -4005,8 +4013,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4026,7 +4034,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4046,8 +4054,8 @@
                         "ComponentGUID": "100000000000000013",
                         "Position": [
                             640.0,
-                            200.0,
-                            -0.6
+                            380.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -4055,8 +4063,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4076,7 +4084,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4096,8 +4104,8 @@
                         "ComponentGUID": "100000000000000014",
                         "Position": [
                             640.0,
-                            200.0,
-                            -0.6
+                            380.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -4105,8 +4113,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            40.0,
+                            116.0,
+                            26.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4126,7 +4134,507 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 114,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_MixerFill_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000015",
+                        "Position": [
+                            998.0,
+                            415.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            5.0,
+                            155.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 115,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_MinusButton_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000016",
+                        "Position": [
+                            1044.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 116,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_MinusButton_2_Hovered"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000017",
+                        "Position": [
+                            1044.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 117,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_PlusButton_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000018",
+                        "Position": [
+                            1044.0,
+                            525.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 118,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_PlusButton_2_Hovered"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000019",
+                        "Position": [
+                            1044.0,
+                            525.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_PlusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 119,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_MixerFill_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000020",
+                        "Position": [
+                            1150.0,
+                            415.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            5.0,
+                            155.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 120,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_MinusButton_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000021",
+                        "Position": [
+                            1200.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 121,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_MinusButton_3_Hovered"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000022",
+                        "Position": [
+                            1200.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 122,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_PlusButton_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000023",
+                        "Position": [
+                            1200.0,
+                            526.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 123,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_PlusButton_3_Hovered"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "100000000000000024",
+                        "Position": [
+                            1200.0,
+                            526.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_PlusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
