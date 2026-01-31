@@ -1,6 +1,6 @@
 {
     "Prefab Name": "WormHost",
-    "Prefab GUID": 6395375911957136089,
+    "Prefab GUID": 9054118174586702113,
     "version": 1,
     "entities": [
         {
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6395375911956169423",
+                            "ComponentGUID": "6748275165371336983",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "5242454407349322445",
+                            "ComponentGUID": "18277490211439806741",
                             "Tag": "WormHost"
                         }
                     }
@@ -49,7 +49,7 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9277679673473647315",
+                            "ComponentGUID": "407206890034530587",
                             "Mesh": "E001_worm_host_v001.fbx",
                             "Material": "",
                             "Texture": "",
@@ -69,7 +69,7 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "13889365691900887761",
+                            "ComponentGUID": "15971647202226424089",
                             "Mass": 1.0,
                             "IsKinematic": false,
                             "IsTrigger": false,
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                100.0,
-                                100.0,
-                                100.0
+                                20.0,
+                                20.0,
+                                20.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -102,10 +102,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "5818915159653368533",
+                            "ComponentGUID": "3289510651551910173",
                             "ScriptClassName": "Game.WormHost",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 9459
                         }
                     }
                 }
