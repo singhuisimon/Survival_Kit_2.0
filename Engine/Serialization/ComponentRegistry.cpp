@@ -33,6 +33,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 
+#include "Component/TrailComponent.h"
+
 namespace Engine {
 
     void ComponentRegistry::RegisterAllComponents() {
@@ -165,24 +167,24 @@ namespace Engine {
             auto& meta = REGISTER_COMPONENT(MeshRendererComponent);
 
             meta.AddProperty<MeshRendererComponent, u64>(
-				"MeshGuid",
-                PropertyType::U64,                
-                [](const MeshRendererComponent& c) { return static_cast<u64>(c.MeshGuid.m_Value); },
-				[](MeshRendererComponent& c, const u64& v) { c.MeshGuid = xresource::instance_guid{v}; }
-            );
-
-            meta.AddProperty<MeshRendererComponent, u64>(
-				"MaterialGuid",
+                "MeshGuid",
                 PropertyType::U64,
-				[](const MeshRendererComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
-				[](MeshRendererComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.MeshGuid.m_Value); },
+                [](MeshRendererComponent& c, const u64& v) { c.MeshGuid = xresource::instance_guid{ v }; }
             );
 
             meta.AddProperty<MeshRendererComponent, u64>(
-				"TextureGuid",
-				PropertyType::U64,
-				[](const MeshRendererComponent& c) { return static_cast<u64>(c.TextureGuid.m_Value); },
-				[](MeshRendererComponent& c, const u64& v) { c.TextureGuid = xresource::instance_guid{ v }; }
+                "MaterialGuid",
+                PropertyType::U64,
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
+                [](MeshRendererComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+            );
+
+            meta.AddProperty<MeshRendererComponent, u64>(
+                "TextureGuid",
+                PropertyType::U64,
+                [](const MeshRendererComponent& c) { return static_cast<u64>(c.TextureGuid.m_Value); },
+                [](MeshRendererComponent& c, const u64& v) { c.TextureGuid = xresource::instance_guid{ v }; }
             );
 
             meta.AddProperty<MeshRendererComponent, bool>(
@@ -238,7 +240,7 @@ namespace Engine {
                 "SubmeshIndex",
                 PropertyType::U32,
                 [](const MeshRendererComponent& c) { return c.SubmeshIndex; },
-				[](MeshRendererComponent& c, const u32& v) { c.SubmeshIndex = v; }
+                [](MeshRendererComponent& c, const u32& v) { c.SubmeshIndex = v; }
             );
 
         }
@@ -511,7 +513,7 @@ namespace Engine {
         }
 
         {
-	        auto& meta = REGISTER_COMPONENT(ParticleComponent);
+            auto& meta = REGISTER_COMPONENT(ParticleComponent);
 
             meta.AddProperty<ParticleComponent, u64>(
                 "ParticleTypeAdvanced",
@@ -567,7 +569,7 @@ namespace Engine {
                 PropertyType::Vec4,
                 [](const ParticleComponent& c) { return c.ColorMin; },
                 [](ParticleComponent& c, const glm::vec4& v) { c.ColorMin = v; }
-                );
+            );
 
             meta.AddProperty<ParticleComponent, glm::vec4>(
                 "ColorMax",
@@ -607,15 +609,15 @@ namespace Engine {
             meta.AddProperty<ParticleComponent, float>(
                 "ParticleLifetime",
                 PropertyType::Float,
-				[](const ParticleComponent& c) { return c.ParticleLifetime; },
-				[](ParticleComponent& c, const float& v) { c.ParticleLifetime = v; }
-                );
+                [](const ParticleComponent& c) { return c.ParticleLifetime; },
+                [](ParticleComponent& c, const float& v) { c.ParticleLifetime = v; }
+            );
 
             meta.AddProperty<ParticleComponent, float>(
                 "EmissionAccumulator",
-				PropertyType::Float,
+                PropertyType::Float,
                 [](const ParticleComponent& c) { return c.EmissionAccumulator; },
-				[](ParticleComponent& c, const float& v) { c.EmissionAccumulator = v; }
+                [](ParticleComponent& c, const float& v) { c.EmissionAccumulator = v; }
             );
 
             meta.AddProperty<ParticleComponent, float>(
@@ -713,8 +715,8 @@ namespace Engine {
                 "Loop",
                 PropertyType::Bool,
                 [](const ParticleComponent& c) { return c.Loop; },
-				[](ParticleComponent& c, const bool& v) { c.Loop = v; }
-                );
+                [](ParticleComponent& c, const bool& v) { c.Loop = v; }
+            );
 
             meta.AddProperty<ParticleComponent, bool>(
                 "Active",
@@ -843,12 +845,12 @@ namespace Engine {
 
             meta.AddProperty<SpriteRendererComponent, u64>(
                 "TextureGuid",
-                PropertyType::U64, 
+                PropertyType::U64,
                 [](const SpriteRendererComponent& c) {return static_cast<u64>(c.TextureGuid.m_Value); },
                 [](SpriteRendererComponent& c, const xresource::instance_guid& v) { c.TextureGuid = v; });
 
-			meta.AddProperty<SpriteRendererComponent, glm::vec4>(
-                "Color", 
+            meta.AddProperty<SpriteRendererComponent, glm::vec4>(
+                "Color",
                 PropertyType::Vec4,
                 [](const SpriteRendererComponent& c) { return c.Color; },
                 [](SpriteRendererComponent& c, const glm::vec4& v) { c.Color = v; });
@@ -863,10 +865,10 @@ namespace Engine {
                 "SpriteLayer",
                 PropertyType::U32,
                 [](const SpriteRendererComponent& c) { return c.SpriteLayer; },
-				[](SpriteRendererComponent& c, const u32& v) { c.SpriteLayer = v; });
+                [](SpriteRendererComponent& c, const u32& v) { c.SpriteLayer = v; });
 
             meta.AddProperty<SpriteRendererComponent, bool>(
-                "IsActive", 
+                "IsActive",
                 PropertyType::Bool,
                 [](const SpriteRendererComponent& c) {return c.IsActive; },
                 [](SpriteRendererComponent& c, const bool& v) {c.IsActive = v; });
@@ -885,14 +887,21 @@ namespace Engine {
             meta.AddProperty<TextComponent, std::string>(
                 "Text",
                 PropertyType::String,
-                [](const TextComponent& c) { return c.text; },
+                [](const TextComponent& c) { return c.getText(); },
                 [](TextComponent& c, const std::string& v) { c.setText(v); }
+            );
+
+            meta.AddProperty<TextComponent, std::string>(
+                "FontName",
+                PropertyType::String,
+                [](const TextComponent& c) { return c.getFontName(); },
+                [](TextComponent& c, const std::string& v) { c.setFontName(v); }
             );
 
             meta.AddProperty<TextComponent, float>(
                 "FontSize",
                 PropertyType::Float,
-                [](const TextComponent& c) { return c.fontSize;  },
+                [](const TextComponent& c) { return c.getFontSize();  },
                 [](TextComponent& c, const float& v) { return c.setFontSize(v);  }
             );
 
@@ -900,7 +909,7 @@ namespace Engine {
                 "Color",
                 PropertyType::Vec4,
                 [](const TextComponent& c) {
-                    return glm::vec4(c.color[0], c.color[1], c.color[2], c.color[3]);
+                    return c.getColor();
                 },
                 [](TextComponent& c, const glm::vec4& v) {
                     c.setColor(v);
@@ -910,7 +919,7 @@ namespace Engine {
             meta.AddProperty<TextComponent, u32>(
                 "Alignment",
                 PropertyType::U32,
-                [](const TextComponent& c) { return static_cast<u32>(c.align); },
+                [](const TextComponent& c) { return static_cast<u32>(c.getAlignment()); },
                 [](TextComponent& c, const u32& v) {
                     c.setAlignment(static_cast<TextAlignment>(v));
                 }
@@ -935,6 +944,89 @@ namespace Engine {
                 PropertyType::Float,
                 [](const TextComponent& c) { return c.maxWidth; },
                 [](TextComponent& c, const float& v) { c.maxWidth = v; }
+            );
+        }
+
+        // Register Trail Component
+        {
+            auto& meta = REGISTER_COMPONENT(TrailComponent);
+
+            meta.AddProperty<TrailComponent, u32>(
+                "MaxSegments", 
+                PropertyType::U32,
+                [](const TrailComponent& c) { return c.MaxSegments; },
+                [](TrailComponent& c, const u32& v) { c.MaxSegments = v; }
+            );
+
+            meta.AddProperty<TrailComponent, float>(
+				"SegmentLifetime", 
+                PropertyType::Float, 
+                [](const TrailComponent& c) { return c.SegmentLifetime; },
+                [](TrailComponent& c, const float& v) { c.SegmentLifetime = v; }
+            );
+
+            meta.AddProperty<TrailComponent, float>(
+            "MinDistance",
+                PropertyType::Float,
+                [](const TrailComponent& c) { return c.MinDistance; },
+                [](TrailComponent& c, const float& v) { c.MinDistance = v; }
+            );
+
+            meta.AddProperty<TrailComponent, float>(
+            "SampleInterval",
+                PropertyType::Float,
+                [](const TrailComponent& c) { return c.SampleInterval; },
+                [](TrailComponent& c, const float& v) { c.SampleInterval = v; }
+            );
+
+            meta.AddProperty<TrailComponent, u64>(
+                "MaterialGuid",
+                PropertyType::U64,
+                [](const TrailComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
+                [](TrailComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+            );
+
+            meta.AddProperty<TrailComponent, glm::vec4>(
+            "StartColor",
+                PropertyType::Vec4,
+                [](const TrailComponent& c) { return c.StartColor; },
+                [](TrailComponent& c, const glm::vec4& v) { c.StartColor = v; }
+            );
+
+            meta.AddProperty<TrailComponent, glm::vec4>(
+            "EndColor",
+                PropertyType::Vec4,
+                [](const TrailComponent& c) { return c.EndColor; },
+                [](TrailComponent& c, const glm::vec4& v) { c.EndColor = v; }
+            );
+
+            meta.AddProperty<TrailComponent, float>(
+				"StartWidth",
+                PropertyType::Float,
+                [](const TrailComponent& c) { return c.StartWidth; },
+                [](TrailComponent& c, const float& v) { c.StartWidth = v; }
+            );
+
+            meta.AddProperty<TrailComponent, float>(
+            "EndWidth",
+                PropertyType::Float,
+                [](const TrailComponent& c) { return c.EndWidth; },
+                [](TrailComponent& c, const float& v) { c.EndWidth = v; }
+            );
+
+            meta.AddProperty<TrailComponent, bool>(
+			"Active",
+                PropertyType::Bool,
+                [](const TrailComponent& c) { return c.Active; },
+                [](TrailComponent& c, const bool& v) {c.Active = v; }
+            );
+
+
+            meta.AddProperty<TrailComponent, glm::vec3>(
+                "LocalOffset",
+                PropertyType::Vec3,
+                [](const TrailComponent& c) { return c.LocalOffset; },
+                [](TrailComponent& c, const glm::vec3& v) { c.LocalOffset = v; }
             );
         }
 

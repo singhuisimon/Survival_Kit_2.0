@@ -492,6 +492,10 @@ namespace Engine {
 		***************************************************************************/
 		void  Rigidbody_Stop(uint64_t entityID);
 
+		void Rigidbody_SetBoxHalfExtent(uint64_t entityID, glm::vec3 *newBoxHalfExtents);
+
+		glm::vec3  Rigidbody_GetBoxHalfExtent(uint64_t entityID);
+
 		// ---- Collision events (via PhysicsAPI only) ----
 		/**************************************************************************
 		 * @brief
@@ -1308,6 +1312,28 @@ namespace Engine {
 		 * True if point lies within game object, else false.
 		***************************************************************************/
 		bool CollisionSystem2D_IsPointInEntity(uint64_t entityId, glm::vec2 *point);
+
+		// ===== ParticleSystem =====
+		/**************************************************************************
+		 * @brief
+		 * Sets the velocity to emit particles at.
+		 * @param entityID
+		 * The entity id of the particle emitter.
+		 * @param vel
+		 * The velocity to set to.
+		***************************************************************************/
+		void ParticleSystem_SetEmitterVelocity(uint64_t entityID, glm::vec3* vel);
+
+		/**************************************************************************
+		 * @brief
+		 * Sets the emission rate of a particle emitter.
+		 * @param entityID
+		 * The entity id of the particle emitter.
+		 * @param rate
+		 * The number of particles to emit per second.
+		***************************************************************************/
+		void ParticleSystem_SetEmissionRate(uint64_t entityID, float rate);
+
 
 		void  RNG_Seed(std::uint32_t seed);
 		int   RNG_RandInt(int min, int max);

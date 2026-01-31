@@ -93,6 +93,7 @@ namespace Engine
 		void DisplayAnimatorComponent(ImVec2& buttonSize);
 		void DisplaySpriteRendererComponent(ImVec2& buttonSize);
 		void DisplayTextComponent(ImVec2& buttonSize);
+		void DisplayTrailComponent(ImVec2& buttonSize);
 		void DisplayAssetField(const char* label, xresource::instance_guid& guid, ResourceType expectedType, bool& errorFlag, ComponentTypeID type);
 		
 			   

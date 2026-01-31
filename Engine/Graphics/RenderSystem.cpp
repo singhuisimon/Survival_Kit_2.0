@@ -5,6 +5,7 @@
 #include "../Component/ParticleComponent.h"
 #include "../Component/LightComponent.h"   
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TrailComponent.h"
 #include "Asset/ResourceHelpers.h"
 
 namespace Engine {
@@ -205,6 +206,33 @@ namespace Engine {
 				.m_letterSpacing = textComp.letterSpacing,
 				.m_maxWidth = textComp.maxWidth
 
+				});
+		}
+
+		auto trailView = scene->GetRegistry().view<TrailComponent>();
+		for (auto entity : trailView) {
+			auto& trail = trailView.get<TrailComponent>(entity);
+
+			if (!trail.Active || trail.Segments.size() < 2)
+				continue;
+
+			// Store trail as a single draw item
+			m_drawitems.push_back({
+				.m_model_to_world_transform = glm::mat4(1.0f),  // Segments have world positions
+				.m_drawitem_type = DrawItemType::TRAIL,
+				.m_entity_id = static_cast<u32>(entity),
+				.m_submesh_index = 0,
+				.m_default_mesh_handle = 0,  // Not using default mesh
+				.m_default_material_handle = 0,
+				.m_default_u32texture_handle = 0,
+				.m_mesh_guid = 0,
+				.m_material_guid = trail.MaterialGuid,
+				.m_render_main_pass = true,
+				.m_receive_shadows = false,
+				.m_cast_shadow_type = 0,
+
+				// Store trail data pointer for rendering
+				.m_trail_data = &trail
 				});
 		}
 		

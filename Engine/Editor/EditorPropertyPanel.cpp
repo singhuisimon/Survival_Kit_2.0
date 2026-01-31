@@ -29,6 +29,11 @@ namespace Engine
 		//std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
 		//Bug - Scene Switching
 		m_Scene = m_Editor->GetActiveScene();
+		if(m_Scene) {
+			auto &se = MonoScriptEngine::GetInstance();
+			se.EnsureAllScriptInstances(m_Scene, true);
+		}
+
 		m_SelectedEntity = m_Editor->GetSelectedEntity();
 		m_ScenePath = m_Editor->GetScenePath();
 		m_SceneName = m_Editor->GetSceneName();
@@ -99,6 +104,9 @@ namespace Engine
 
 				// Text Component 
 				DisplayTextComponent(dotButtonSize); 
+
+				// Trail Component
+				DisplayTrailComponent(dotButtonSize);
 
 				// Add Component Button
 				AddComponent();
@@ -2333,7 +2341,19 @@ namespace Engine
 			ImGui::Columns(1);
 			if (openScriptComp)
 			{
-				ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+				SetScriptingCurrentScene(m_Scene);
+				auto &se = MonoScriptEngine::GetInstance();
+				const uint32_t entityID = static_cast<uint32_t>(m_SelectedEntity.GetHandle());
+
+				MonoObject *resolvedInst = nullptr;
+				if(m_Scene && !scriptComp.ScriptClassName.empty())
+					resolvedInst = se.EnsureScriptInstance(m_Scene, entityID, true);
+				if(!resolvedInst && scriptComp.GCHandle != 0)
+					resolvedInst = se.GetObjectFromGCHandle(scriptComp.GCHandle);
+
+				scriptComp.ScriptInstance = resolvedInst;
+
+				ImGui::Text("Instance: %s", resolvedInst ? "Active" : "None");
 				ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
 
 				if (!scriptFiles.empty())
@@ -2354,14 +2374,27 @@ namespace Engine
 								}
 								// Destroy previous script instance if exists
 								if (scriptComp.ScriptInstance)
+									// Destroy previous script instance/handle if exists
 								{
-									MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+									auto &seLocal = MonoScriptEngine::GetInstance();
+									if(scriptComp.GCHandle != 0) {
+										seLocal.DestroyScriptHandle(scriptComp.GCHandle);
+										scriptComp.GCHandle = 0;
+									}
 									scriptComp.ScriptInstance = nullptr;
 									scriptComp.Started = false;
+									scriptComp.SerializedFields.clear();
 								}
 
 								// Assign the new script class name
 								scriptComp.ScriptClassName = selectedClassName;
+
+								// Create/recreate an instance immediately so the inspector can show fields.
+								if(m_Scene && !scriptComp.ScriptClassName.empty()) {
+									SetScriptingCurrentScene(m_Scene);
+									auto &seLocal = MonoScriptEngine::GetInstance();
+									seLocal.EnsureScriptInstance(m_Scene, entityID, true);
+								}
 
 								// DON'T create instance in editor - let ScriptSystem handle it!
 								// Just setting the class name is enough
@@ -2378,9 +2411,9 @@ namespace Engine
 					ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), "Serialized Fields:");
 					ImGui::Separator();
 					// THIS IS THE KEY LINE - renders all [SerializeField] fields
-					if (scriptComp.ScriptInstance)
+					if(resolvedInst)
 					{
-						RenderSerializedFieldsInImGui((MonoObject*)scriptComp.ScriptInstance);
+						RenderSerializedFieldsInImGui(resolvedInst);
 					}
 					else
 					{
@@ -2402,8 +2435,17 @@ namespace Engine
 				}
 			}
 			// Remove Script Component
-			if (removeScriptComp)
+			if(removeScriptComp) {
+				auto &seLocal = MonoScriptEngine::GetInstance();
+				if(scriptComp.GCHandle != 0) {
+					seLocal.DestroyScriptHandle(scriptComp.GCHandle);
+					scriptComp.GCHandle = 0;
+				}
+				scriptComp.ScriptInstance = nullptr;
+				scriptComp.Started = false;
 				m_SelectedEntity.RemoveComponent<ScriptComponent>();
+			}
+
 		}
 	}
 
@@ -3207,7 +3249,146 @@ namespace Engine
 			}
 		
 	}
-	
+
+	void EditorPropertyPanel::DisplayTrailComponent(ImVec2& dotButtonSize) {
+
+		if (m_SelectedEntity.HasComponent<TrailComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, 200.0f);
+
+			bool isComponentOverriden = IsComponentOverridden(ComponentTypeID::Trail);
+			if (isComponentOverriden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
+			bool openTrailComponent = ImGui::CollapsingHeader("Trail Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+			if (isComponentOverriden)
+				ImGui::PopStyleColor();
+
+			bool removeTrailComponent = false;
+
+			ImGui::NextColumn();
+
+			if (ImGui::Button("...###TrailBtn", dotButtonSize))
+			{
+				ImGui::OpenPopup("TrailPopUp");
+			}
+
+			if (ImGui::BeginPopup("TrailPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeTrailComponent = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>())
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						// Store original state BEFORE removal
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Trail);
+						// Mark as removed
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Trail, originalJSON);
+						LOG_INFO("Marked Trail as REMOVED override");
+					}
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openTrailComponent)
+			{
+				auto& trail = m_SelectedEntity.GetComponent<TrailComponent>();
+
+				// ======================= Asset Reference Section =======================
+				ImGui::SeparatorText("Asset References");
+
+				static bool showWrongTypeTrail = false;
+				DisplayAssetField("Material", trail.MaterialGuid, ResourceType::MATERIAL, showWrongTypeTrail, ComponentTypeID::Trail);
+
+				if (showWrongTypeTrail)
+				{
+					ImGui::OpenPopup("Incompatible Asset Type###TrailMaterial");
+					showWrongTypeTrail = false;
+				}
+
+				// Popup for incompatible asset type
+				if (ImGui::BeginPopup("Incompatible Asset Type###TrailMaterial"))
+				{
+					ImGui::Text("The dropped asset type does not match the expected type.");
+					if (ImGui::Button("Close"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Spacing();
+
+				// ======================= Configuration Section =======================
+				ImGui::SeparatorText("Configuration");
+
+				if (ImGui::DragInt("Max Segments", (int*)(&trail.MaxSegments), 1.0f, 1, 500))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::DragFloat("Segment Lifetime", &trail.SegmentLifetime, 0.01f, 0.01f, 10.0f, "%.2f sec"))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::DragFloat("Min Distance", &trail.MinDistance, 0.01f, 0.001f, 5.0f, "%.3f"))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::DragFloat("Sample Interval", &trail.SampleInterval, 0.001f, 0.001f, 1.0f, "%.3f sec"))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				ImGui::Spacing();
+
+				// ======================= Visual Properties Section =======================
+				ImGui::SeparatorText("Visual Properties");
+
+				if (ImGui::ColorEdit4("Start Color", &trail.StartColor.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::ColorEdit4("End Color", &trail.EndColor.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::DragFloat("Start Width", &trail.StartWidth, 0.01f, 0.01f, 10.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::DragFloat("End Width", &trail.EndWidth, 0.01f, 0.0f, 10.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				ImGui::Spacing();
+
+				// ======================= Control Section =======================
+				ImGui::SeparatorText("Control");
+
+				if (ImGui::Checkbox("Active", &trail.Active))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::Checkbox("Emit Trail", &trail.EmitTrail))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				if (ImGui::DragFloat3("Trail Offset", &trail.LocalOffset.x, 0.01f, -10.0f, 10.0f))
+					MarkComponentOverridden(ComponentTypeID::Trail);
+
+				// ======================= Debug Info Section =======================
+				ImGui::Spacing();
+				ImGui::SeparatorText("Debug Info");
+
+				ImGui::BeginDisabled();
+				int currentSegments = static_cast<int>(trail.Segments.size());
+				ImGui::DragInt("Current Segments", &currentSegments, 0.0f, 0, 0);
+				ImGui::EndDisabled();
+			}
+
+			if (removeTrailComponent)
+			{
+				m_SelectedEntity.RemoveComponent<TrailComponent>();
+			}
+		}
+		
+	}
 
 	// Animator Window
 	void EditorPropertyPanel::AnimatorWindow(){
@@ -5689,7 +5870,6 @@ namespace Engine
 				}
 			}
 
-
 			if (ImGui::IsItemHovered())
 			{
 				if (!hasSpriteRenderer)
@@ -5755,12 +5935,77 @@ namespace Engine
 				}
 				ImGui::EndDisabled();
 			}
+
+			// ------------------------ Add Trail Component ----------------------------
+			bool hasTrailComponent = m_SelectedEntity.HasComponent<TrailComponent>();
+			ImGui::BeginDisabled(hasTrailComponent);
+
+			if (ImGui::MenuItem("Trail Component"))
+			{
+				if (!hasTrailComponent)
+				{
+					m_SelectedEntity.AddComponent<TrailComponent>();
+
+					if (m_SelectedEntity.HasComponent<PrefabComponent>())
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+
+						// Check if this component exists in the prefab blueprint
+						bool existsInPrefab = false;
+
+						if (prefabComp.isPrefabRoot)
+						{
+							// For root, check prefab registry
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab))
+							{
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity())
+								{
+									for (const auto& comp : entityData->components)
+									{
+										if (comp.type == ComponentTypeID::Trail)
+										{
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+						// Mark appropriately
+						if (!existsInPrefab)
+						{
+							// New component not in prefab = added override
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Trail);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Trail, componentJSON);
+							LOG_INFO("Marked Trail as ADDED component (not in prefab)");
+						}
+						else
+						{
+							// Component exists in prefab but was removed, now re-added
+							// Clear the removal flag
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Trail);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Trail);
+							LOG_INFO("Marked Trail as RESTORED (was removed, now re-added)");
+						}
+					}
+				}
+			}
+
+			if (ImGui::IsItemHovered())
+			{
+				if (!hasTrailComponent)
+				{
+					ImGui::SetTooltip("Adds trail effect to this object.");
+				}
+			}
+
+			ImGui::EndDisabled();
+
 			ImGui::EndPopup(); // end pop up for Add Component  
 		}
-
-		
-
-		
 	}
 
 	// Helper Functions

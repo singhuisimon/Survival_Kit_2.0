@@ -1,7 +1,6 @@
 #include "ScriptSystem.h"
 #include "MonoScriptEngine.h"
 #include "ScriptHandleUtils.h"
-
 #include "../Component/ScriptComponent.h"
 #include "../ECS/Scene.h"
 #include "../Utility/Logger.h"
@@ -10,9 +9,13 @@ namespace Engine {
 	static Scene *s_CurrentScene = nullptr;
 
 	void ScriptSystem::OnInit(Scene *scene) {
+		if(m_Scene) {
+			auto &se = MonoScriptEngine::GetInstance();
+			se.EnsureAllScriptInstances(m_Scene, true);
+		}
+
 		s_CurrentScene = scene;
 		SetScriptingCurrentScene(scene);
-
 		m_Scene = scene;
 		LOG_INFO("[ScriptSystem] Initialized");
 	}
@@ -31,7 +34,7 @@ namespace Engine {
 
 		std::vector<entt::entity> entities(view.begin(), view.end());
 
-		// Pass 1: Ensure instances exist + Start
+		// Ensure instances
 		for(auto entity : entities) {
 			if(!registry.valid(entity)) continue;
 			auto *script = registry.try_get<ScriptComponent>(entity);
@@ -39,12 +42,7 @@ namespace Engine {
 
 			if(script->GCHandle != 0) {
 				MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
-
-				// If handle is stale / resolves null / wrong type, nuke it so we can rebuild correctly.
 				if(!inst || !se.InstanceMatchesClass(inst, script->ScriptClassName)) {
-					LOG_WARNING("[ScriptSystem] GCHandle mismatch. Expected=", script->ScriptClassName,
-								" entity=", (uint32_t)entity, " -> recreating instance");
-
 					se.DestroyScriptHandle(script->GCHandle);
 					script->GCHandle = 0;
 					script->ScriptInstance = nullptr;
@@ -54,32 +52,22 @@ namespace Engine {
 
 			if(script->GCHandle == 0) {
 				MonoObject *created = nullptr;
-				uint32_t handle = se.CreateScriptInstanceHandle(
-					script->ScriptClassName, &created, false);
-
-				if(handle == 0 || !created) continue;
-
-				se.BindEntityID(created, static_cast<uint32_t>(entity));
-
-				// Apply editor-authored serialized fields stored on ScriptComponent BEFORE OnStart.
-				se.ApplySerializedFieldsFromComponent(static_cast<uint32_t>(entity), created);
-
-				script->GCHandle = handle;
-				script->ScriptInstance = created; // keep editor pointer in sync
-				script->Started = false;
+				uint32_t handle = se.CreateScriptInstanceHandle(script->ScriptClassName, &created, false);
+				if(handle && created) {
+					se.BindEntityID(created, static_cast<uint32_t>(entity));
+					se.ApplySerializedFieldsFromComponent(static_cast<uint32_t>(entity), created);
+					script->GCHandle = handle;
+					script->ScriptInstance = created;
+					script->Started = false;
+				}
 			}
 
+			if(script->GCHandle == 0) continue;
+
+			// Resolve Fresh
 			MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
-			if(!inst) {
-				LOG_WARNING("[ScriptSystem] Failed to resolve: ", script->ScriptClassName);
-				se.DestroyScriptHandle(script->GCHandle);
-				script->GCHandle = 0;
-				script->ScriptInstance = nullptr;
-				script->Started = false;
-				continue;
-			}
+			if(!inst) continue;
 
-			// Keep ScriptInstance synced for editor tooling
 			script->ScriptInstance = inst;
 
 			if(!script->Started) {
@@ -88,65 +76,48 @@ namespace Engine {
 			}
 		}
 
-		// Pass 2: FixedUpdate
+		// Fixed Update
 		int steps = 0;
 		while(m_FixedAccumulator >= m_FixedDeltaSeconds && steps < m_MaxFixedSubsteps) {
 			float fixedDt = m_FixedDeltaSeconds;
 			void *fixedParams[1] = { &fixedDt };
-
 			for(auto entity : entities) {
 				if(!registry.valid(entity)) continue;
 				auto *script = registry.try_get<ScriptComponent>(entity);
 				if(!script || !script->Started || script->GCHandle == 0) continue;
-
 				MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
-				if(inst) {
-					se.CallMethod(inst, "OnFixedUpdate", fixedParams, 1);
-					script->ScriptInstance = inst;
-				}
+				if(inst) se.CallMethod(inst, "OnFixedUpdate", fixedParams, 1);
 			}
-
 			m_FixedAccumulator -= m_FixedDeltaSeconds;
 			++steps;
 		}
 
-		// Pass 3: Update (once per frame)
+		// Update
 		void *params[1] = { &deltaTime };
 		for(auto entity : entities) {
 			if(!registry.valid(entity)) continue;
 			auto *script = registry.try_get<ScriptComponent>(entity);
 			if(!script || !script->Started || script->GCHandle == 0) continue;
-
 			MonoObject *inst = se.GetObjectFromGCHandle(script->GCHandle);
-			if(inst) {
-				se.CallMethod(inst, "OnUpdate", params, 1);
-				script->ScriptInstance = inst;
-			}
+			if(inst) se.CallMethod(inst, "OnUpdate", params, 1);
 		}
 	}
 
 	void ScriptSystem::OnShutdown(Scene *scene) {
 		m_IsShuttingDown = true;
-
 		auto &registry = scene->GetRegistry();
 		auto view = registry.view<ScriptComponent>();
-
 		auto &se = MonoScriptEngine::GetInstance();
-
 		for(auto entity : view) {
 			auto &script = view.get<ScriptComponent>(entity);
-
 			if(script.GCHandle != 0) {
 				se.DestroyScriptHandle(script.GCHandle);
 				script.GCHandle = 0;
 			}
-
 			script.ScriptInstance = nullptr;
 			script.Started = false;
 		}
-
 		s_CurrentScene = nullptr;
 		m_Scene = nullptr;
-		LOG_INFO("[ScriptSystem] Shutdown");
 	}
-} // namespace Engine
+}
