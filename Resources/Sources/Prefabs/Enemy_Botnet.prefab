@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 4613076353720434889,
+    "Prefab GUID": 12177514048596476487,
     "version": 1,
     "entities": [
         {
@@ -51,7 +51,7 @@
                         "Properties": {
                             "ComponentGUID": "16742114490130125945",
                             "Mesh": "E004_botnet_v003.fbx",
-                            "Material": "",
+                            "Material": "BotnetM4.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
