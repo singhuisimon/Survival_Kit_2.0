@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryBullet.prefab",
-    "Prefab GUID": 16559085465389809879,
+    "Prefab GUID": 6602286409784836341,
     "version": 1,
     "entities": [
         {
@@ -128,7 +128,49 @@
                             "ComponentGUID": "14829703208479391955",
                             "ScriptClassName": "Game.PrimaryBullet",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
+                        }
+                    }
+                },
+                {
+                    "type": 16,
+                    "typeName": "TrailComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1304302825455255751",
+                            "Material Type": "",
+                            "Max Segments": 50,
+                            "Segment Lifetime": 1.0,
+                            "Min Distance": 0.10000000149011612,
+                            "Sample Interval": 0.01600000075995922,
+                            "Sample Accumulator": 0.0,
+                            "Start Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "End Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Width": 0.18000000715255737,
+                            "End Width": 0.05000000074505806,
+                            "Last Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Local Offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Has Last Position": false,
+                            "Active": true,
+                            "Emit Trail": true
                         }
                     }
                 }
