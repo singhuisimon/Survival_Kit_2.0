@@ -65,7 +65,7 @@ namespace Game
 
             // ===== TEST CODE - H KEY FOR TESTING =====
             // Press H to deal damage (reduce width by 20)
-            if (Input.IsKeyPressed(KeyCode.H))
+/*            if (Input.IsKeyPressed(KeyCode.H))
             {
                 if (!hKeyWasPressed)
                 {
@@ -106,7 +106,7 @@ namespace Game
             else
             {
                 hKeyWasPressed = false;
-            }
+            }*/
         }
 
         // ===== EVENT HANDLERS =====

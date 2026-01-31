@@ -103,6 +103,7 @@ namespace Game{
 
         private float reloadFinishTime = 0.0f;
         private Vector3 bulletDirection;
+        private string EVENT_AMMO_CHANGE = "AmmoChange";
 
         public override void OnStart(){
 
@@ -133,10 +134,13 @@ namespace Game{
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)
             {
                 primaryAmmo = primaryAmmoMax;
+
                 //stop ui reticle spinning reload
                 //show reload ui banner
                 reloadingPrimary = false;
                 shootAllowed = true;
+                Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());  // ADD THIS
+
                 LogMessage("[PlayerWeapon] Reload complete!");
             }
 
@@ -356,6 +360,8 @@ namespace Game{
                 RigidbodySetVelocity(bulletID, ref bulletVel);
 
                 primaryAmmo -= 1;
+                Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());
+
 
                 //vfx
 

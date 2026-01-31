@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Gunship",
-    "Prefab GUID": 7511151515751940523,
+    "Prefab GUID": 14498134495757681239,
     "version": 1,
     "entities": [
         {
@@ -20,9 +20,9 @@
                                 -952.4028930664064
                             ],
                             "Rotation": [
-                                180.0,
+                                -180.0,
                                 18.26655006408691,
-                                180.0
+                                -180.0
                             ],
                             "Scale": [
                                 0.03999999910593033,
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4628847754234741057",
+                            "ComponentGUID": "12768752238844838337",
                             "Tag": "Gunship"
                         }
                     }
@@ -76,20 +76,20 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "14895357253018403235",
+                            "ComponentGUID": "16803977504970506833",
                             "Position": [
-                                0.0,
+                                -0.0009765625,
                                 0.0,
                                 0.0
                             ],
                             "Rotation": [
-                                0.0,
-                                -0.0,
-                                0.0
+                                -4.071109497693487e-13,
+                                0.0000017075473124350538,
+                                -3.0533325976085657e-13
                             ],
                             "Scale": [
                                 1.0,
-                                1.0,
+                                1.0000001192092896,
                                 1.0
                             ],
                             "Parent": 4294967295,
@@ -102,7 +102,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "1170083240414200227",
+                            "ComponentGUID": "6427683963508884047",
                             "Tag": "GunshipHelper"
                         }
                     }
@@ -112,7 +112,7 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "8554288977682104741",
+                            "ComponentGUID": "16803977504970768979",
                             "ScriptClassName": "Game.GunshipScript",
                             "Started": false,
                             "GCHandle": 0
