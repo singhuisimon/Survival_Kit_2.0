@@ -12,7 +12,7 @@ namespace Game
     public class LoveLetterScript : ScriptBehaviour
     {
         // ===== NAME OF ENTITY =====
-        [SerializeField] private string loveletterEntity = "LoveLetter";
+        [SerializeField] private string loveletterEntity = "loveletter";
         private uint loveletterEntityID = 0;
 
         // ===== CORE TAG =====
@@ -27,13 +27,13 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 10.0f;
+        [SerializeField] private float moveSpeed = 500.0f;
         [SerializeField] private float startDelay = 2.0f;
         [SerializeField] private float waitTimeAtSurface = 0.0f;
 
-        // ===== HEALTH SYSTEM =====
-        [SerializeField] private int totalLogicBombs = 6;
-        private int logicBombsAlive = 6;
+        // ===== SIMPLE HEALTH SYSTEM =====
+        [SerializeField] private float maxHealth = 200.0f;
+        private float currentHealth = 200.0f;
         private bool isDead = false;
 
         // ===== MOVEMENT STATE =====
@@ -58,6 +58,9 @@ namespace Game
         private static uint s_RngState = 0x12345678u;
         private static bool rngSeeded = false;
 
+        // ===== EVENTS =====
+        private const string EVENT_BULLET_HIT = "BulletHit";
+
         public override void OnStart()
         {
             LogMessage("///////////////////////////Start of the Loveletter Script");
@@ -65,7 +68,7 @@ namespace Game
 
             LogMessage("=== LoveLetter Started ===");
             LogMessage("LoveLetterEntity: " + loveletterEntityID);
-            LogMessage("Total LogicBombs: " + totalLogicBombs);
+            LogMessage("Max Health: " + maxHealth);
             LogMessage("Core Tag: " + coreTag);
             
             if (loveletterEntityID == 0)
@@ -75,11 +78,11 @@ namespace Game
             }
             
             // Initialize health system
-            logicBombsAlive = totalLogicBombs;
+            currentHealth = maxHealth;
             isDead = false;
 
-            // Subscribe to LogicBomb destruction events
-            Subscribe("LogicBombDestroyed", OnLogicBombDestroyed);
+            // Subscribe to bullet hit event
+            Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             
             // Seed RNG if not already done
             if (!rngSeeded)
@@ -173,35 +176,57 @@ namespace Game
             }
         }
 
-        // ===== HEALTH SYSTEM =====
-        private void OnLogicBombDestroyed(string eventName, string payload)
+        // ===== SIMPLE DAMAGE SYSTEM =====
+        private void OnBulletHit(string eventName, string payload)
         {
-            // Payload contains the parent LoveLetter's EntityID
-            if (!uint.TryParse(payload, out uint parentID))
+            if (isDead || eventName != EVENT_BULLET_HIT)
                 return;
 
-            // Check if this event is for THIS LoveLetter instance
-            if (parentID == loveletterEntityID)
-            {
-                logicBombsAlive--;
-            
-                LogMessage("LogicBomb destroyed! Remaining: " + logicBombsAlive + "/" + totalLogicBombs);
+            // Parse the entity ID that was hit
+            if (!uint.TryParse(payload, out uint hitId))
+                return;
 
-                if (logicBombsAlive <= 0)
-                {
-                    LogMessage(" All LogicBombs destroyed! Calling OnAllLogicBombsDestroyed()");
-                    OnAllLogicBombsDestroyed();
-                }
+            // Check if this LoveLetter was the one hit
+            if (hitId != loveletterEntityID)
+            {
+                return;
+            }
+
+            LogMessage("=== BULLET HIT LOVELETTER ===");
+            LogMessage("  LoveLetter ID: " + loveletterEntityID);
+            
+            // Take damage
+            TakeDamage(10.0f);
+        }
+
+        private void TakeDamage(float damage)
+        {
+            if (isDead) return;
+
+            currentHealth -= damage;
+            
+            // Clamp health to 0
+            if (currentHealth < 0.0f)
+                currentHealth = 0.0f;
+
+            LogMessage("=== LOVELETTER DAMAGED ===");
+            LogMessage("  Damage Taken: " + damage.ToString("F1"));
+            LogMessage("  Health: " + currentHealth.ToString("F1") + "/" + maxHealth.ToString("F1"));
+
+            // Check if LoveLetter should be destroyed (at 0 HP)
+            if (currentHealth <= 0.0f)
+            {
+                DestroyLoveLetter();
             }
         }
 
-        private void OnAllLogicBombsDestroyed()
+        private void DestroyLoveLetter()
         {
             if (isDead) return;
 
             isDead = true;
-            LogMessage("=== ALL LOGICBOMBS DESTROYED ===");
-            LogMessage("LoveLetter is defeated!");
+            LogMessage("=== LOVELETTER DESTROYED ===");
+            LogMessage("Health reached 0 - LoveLetter destroyed!");
 
             // Stop movement
             isMoving = false;
@@ -339,7 +364,6 @@ namespace Game
             }
         }
 
-        // NEW APPROACH: Linear interpolation based on total distance traveled
         private void MoveTowardsTargetLinear(float deltaTime)
         {
             if (loveletterEntityID == 0) return;
@@ -357,7 +381,7 @@ namespace Game
                 return;
             }
             
-            // Calculate new position based on total distance traveled (not physics position)
+            // Calculate new position based on total distance traveled
             currentPosition = new Engine.Vector3(
                 startPosition.X + directionNormalized.X * totalDistanceTraveled,
                 startPosition.Y + directionNormalized.Y * totalDistanceTraveled,
@@ -392,6 +416,17 @@ namespace Game
             isDead = true;
             LogMessage("=== SELF DESTRUCTING AT CORE ===");
         
+            // Deal massive damage to the core (200 damage)
+            if (selectedCoreEntityID != 0)
+            {
+                LogMessage("Dealing 200 damage to core ID: " + selectedCoreEntityID);
+                
+                // Use DamageSystem like WormBullet does
+                DamageSystem.DealDamage(selectedCoreEntityID, 200.0f, loveletterEntityID);
+                
+                LogMessage("Core damaged successfully");
+            }
+
             // Publish event
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
             Publish("LoveLetterReachedCore", loveletterEntityID.ToString());
@@ -410,7 +445,7 @@ namespace Game
             return SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
-        // ===== RNG FUNCTIONS (copied from Botnet) =====
+        // ===== RNG FUNCTIONS =====
         private static uint Nextuint()
         {
             uint x = s_RngState;
@@ -436,7 +471,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Unsubscribe("LogicBombDestroyed", OnLogicBombDestroyed);
+            Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             LogMessage("=== LoveLetter Destroyed ===");
         }
     }

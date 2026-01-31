@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: LoveLetterV3.prefab",
-    "Prefab GUID": 3197855360912196345,
+    "Prefab Name": "Prefab: loveletterV3.prefab",
+    "Prefab GUID": 15693769827823354141,
     "version": 1,
     "entities": [
         {
-            "Name": "LoveLetter",
+            "Name": "loveletter",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -40,7 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1528884659682050235",
-                            "Tag": "LoveLetter"
+                            "Tag": "loveletter"
                         }
                     }
                 },
@@ -61,6 +61,39 @@
                             "TextureIdx": 0,
                             "SubmeshIndex": 0,
                             "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11835521953148715655",
+                            "Mass": 1.0,
+                            "IsKinematic": true,
+                            "IsTrigger": false,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                80.0,
+                                80.0,
+                                80.0
+                            ],
+                            "SphereRadius": 0.5
                         }
                     }
                 },
@@ -98,36 +131,11 @@
                             "GCHandle": 0
                         }
                     }
-                },
-                {
-                    "type": 4,
-                    "typeName": "LightComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "17299285501175759481",
-                            "Enabled": true,
-                            "Type": 0,
-                            "Color": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "Intensity": 0.5,
-                            "Range": 5.0,
-                            "SpotAngleDeg": 30.0,
-                            "IndirectMultiplier": 1.0,
-                            "TypeShadow": 0,
-                            "Resolution": 1024,
-                            "Strength": 1.0,
-                            "Bias": 0.004999999888241291,
-                            "NearPlane": 0.20000000298023224
-                        }
-                    }
                 }
             ]
         },
         {
-            "Name": "Decoration3",
+            "Name": "logicbomb_1",
             "LocalID": 2,
             "ParentLocalID": 1,
             "components": [
@@ -163,7 +171,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14787481962660790465",
-                            "Tag": "Decoration3"
+                            "Tag": "logicbomb_1"
                         }
                     }
                 },
@@ -192,7 +200,7 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16616981361200595915",
+                            "ComponentGUID": "3223038576723984847",
                             "ScriptClassName": "Game.LogicBombHealth",
                             "Started": false,
                             "GCHandle": 0
@@ -202,7 +210,7 @@
             ]
         },
         {
-            "Name": "LogicBomb",
+            "Name": "logicbomb_2",
             "LocalID": 3,
             "ParentLocalID": 1,
             "components": [
@@ -238,7 +246,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "952423907378626759",
-                            "Tag": "LogicBomb"
+                            "Tag": "logicbomb_2"
                         }
                     }
                 },
@@ -263,44 +271,11 @@
                     }
                 },
                 {
-                    "type": 6,
-                    "typeName": "RigidBodyComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "11121894914493514005",
-                            "Mass": 1.0,
-                            "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": false,
-                            "Velocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "AngularVelocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "LinearDamping": 0.05000000074505806,
-                            "AngularDamping": 0.05000000074505806,
-                            "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
-                            "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
-                            ],
-                            "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3934844810525623245",
+                            "ComponentGUID": "9564106852061987281",
                             "ScriptClassName": "Game.LogicBombHealth",
                             "Started": false,
                             "GCHandle": 0
@@ -310,7 +285,7 @@
             ]
         },
         {
-            "Name": "LogicBomb",
+            "Name": "decoration_1",
             "LocalID": 4,
             "ParentLocalID": 1,
             "components": [
@@ -346,7 +321,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16516864219571060941",
-                            "Tag": "LogicBomb"
+                            "Tag": "decoration_1"
                         }
                     }
                 },
@@ -369,56 +344,11 @@
                             "CastType": 0
                         }
                     }
-                },
-                {
-                    "type": 6,
-                    "typeName": "RigidBodyComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "1322062125335658781",
-                            "Mass": 1.0,
-                            "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": false,
-                            "Velocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "AngularVelocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "LinearDamping": 0.05000000074505806,
-                            "AngularDamping": 0.05000000074505806,
-                            "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
-                            "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
-                            ],
-                            "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
-                    "type": 8,
-                    "typeName": "ScriptComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "6817148572042953679",
-                            "ScriptClassName": "Game.LogicBombHealth",
-                            "Started": false,
-                            "GCHandle": 0
-                        }
-                    }
                 }
             ]
         },
         {
-            "Name": "LogicBomb",
+            "Name": "decoration_2",
             "LocalID": 5,
             "ParentLocalID": 1,
             "components": [
@@ -454,7 +384,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4987649173502591187",
-                            "Tag": "LogicBomb"
+                            "Tag": "decoration_2"
                         }
                     }
                 },
@@ -477,56 +407,11 @@
                             "CastType": 0
                         }
                     }
-                },
-                {
-                    "type": 6,
-                    "typeName": "RigidBodyComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "9968973409887682855",
-                            "Mass": 1.0,
-                            "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": false,
-                            "Velocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "AngularVelocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "LinearDamping": 0.05000000074505806,
-                            "AngularDamping": 0.05000000074505806,
-                            "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
-                            "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
-                            ],
-                            "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
-                    "type": 8,
-                    "typeName": "ScriptComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "7970070076649997265",
-                            "ScriptClassName": "Game.LogicBombHealth",
-                            "Started": false,
-                            "GCHandle": 0
-                        }
-                    }
                 }
             ]
         },
         {
-            "Name": "LogicBomb",
+            "Name": "logicbomb_3",
             "LocalID": 6,
             "ParentLocalID": 1,
             "components": [
@@ -562,7 +447,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "2105345411985473753",
-                            "Tag": "LogicBomb"
+                            "Tag": "logicbomb_3"
                         }
                     }
                 },
@@ -587,44 +472,11 @@
                     }
                 },
                 {
-                    "type": 6,
-                    "typeName": "RigidBodyComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "11698355666798117165",
-                            "Mass": 1.0,
-                            "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": false,
-                            "Velocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "AngularVelocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "LinearDamping": 0.05000000074505806,
-                            "AngularDamping": 0.05000000074505806,
-                            "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
-                            "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
-                            ],
-                            "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "12005295342774109139",
+                            "ComponentGUID": "13022871365882855891",
                             "ScriptClassName": "Game.LogicBombHealth",
                             "Started": false,
                             "GCHandle": 0
@@ -634,7 +486,7 @@
             ]
         },
         {
-            "Name": "Decoration",
+            "Name": "logicbomb_4",
             "LocalID": 7,
             "ParentLocalID": 1,
             "components": [
@@ -670,7 +522,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "375963155075203295",
-                            "Tag": "Decoration"
+                            "Tag": "logicbomb_4"
                         }
                     }
                 },
@@ -693,11 +545,23 @@
                             "CastType": 0
                         }
                     }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4375960081331962325",
+                            "ScriptClassName": "Game.LogicBombHealth",
+                            "Started": false,
+                            "GCHandle": 0
+                        }
+                    }
                 }
             ]
         },
         {
-            "Name": "LogicBomb",
+            "Name": "logicbomb_5",
             "LocalID": 8,
             "ParentLocalID": 1,
             "components": [
@@ -733,7 +597,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "7869952935019708645",
-                            "Tag": "LogicBomb"
+                            "Tag": "logicbomb_5"
                         }
                     }
                 },
@@ -758,44 +622,11 @@
                     }
                 },
                 {
-                    "type": 6,
-                    "typeName": "RigidBodyComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "5462932076184187",
-                            "Mass": 1.0,
-                            "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": false,
-                            "Velocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "AngularVelocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "LinearDamping": 0.05000000074505806,
-                            "AngularDamping": 0.05000000074505806,
-                            "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
-                            "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
-                            ],
-                            "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9805295721234432637",
+                            "ComponentGUID": "340734815208161751",
                             "ScriptClassName": "Game.LogicBombHealth",
                             "Started": false,
                             "GCHandle": 0
@@ -805,7 +636,7 @@
             ]
         },
         {
-            "Name": "Decoration2",
+            "Name": "decoration_3",
             "LocalID": 9,
             "ParentLocalID": 1,
             "components": [
@@ -841,7 +672,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "375963155075203307",
-                            "Tag": "Decoration2"
+                            "Tag": "decoration_3"
                         }
                     }
                 },
@@ -868,7 +699,7 @@
             ]
         },
         {
-            "Name": "LogicBomb",
+            "Name": "logicbomb_6",
             "LocalID": 10,
             "ParentLocalID": 1,
             "components": [
@@ -904,7 +735,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6717031430412861681",
-                            "Tag": "LogicBomb"
+                            "Tag": "logicbomb_6"
                         }
                     }
                 },
@@ -929,44 +760,11 @@
                     }
                 },
                 {
-                    "type": 6,
-                    "typeName": "RigidBodyComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "8075913464324997763",
-                            "Mass": 1.0,
-                            "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": false,
-                            "Velocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "AngularVelocity": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "LinearDamping": 0.05000000074505806,
-                            "AngularDamping": 0.05000000074505806,
-                            "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
-                            "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
-                            ],
-                            "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "1734845188987404933",
+                            "ComponentGUID": "12446410613580513753",
                             "ScriptClassName": "Game.LogicBombHealth",
                             "Started": false,
                             "GCHandle": 0

@@ -11,7 +11,7 @@ namespace Game
     {
         // ===== SPAWNER SETTINGS =====
        
-        private string loveletterPrefabPath = "Sources/Prefabs/" + "LoveLetterV3.prefab";
+        private string loveletterPrefabPath = "Sources/Prefabs/" + "loveletterv4.prefab";
         
         [SerializeField] private string[] spawnWallNames = new string[]
         {
