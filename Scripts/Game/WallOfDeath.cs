@@ -29,7 +29,7 @@ namespace Game
         [SerializeField] private bool HorizontalX = true;  // Left/Right movement
         [SerializeField] private bool VerticalY = false;   // Up/Down movement
         [SerializeField] private bool DepthZ = false;      // Forward/Back movement
-        
+        [SerializeField] private bool CollidedWithPlayer = false;
         // DIRECTION (Checked = Positive, Unchecked = Negative)
         [SerializeField] private bool PositiveDirection = true;
         
@@ -168,6 +168,10 @@ namespace Game
         /// </summary>
         private void CheckCollisionWithPlayer()
         {
+            if(CollidedWithPlayer){
+                return;
+            }
+            
             // Query what the player collided with
             List<uint> playerCollisions = CollisionManager.GetPlayerCollisions(playerID);
             
@@ -178,6 +182,7 @@ namespace Game
                 {
                     if (collidedEntityId == (uint)EntityID)
                     {
+                        CollidedWithPlayer = true;
                         // Player touched this moving wall - deal lethal damage
                         DamageSystem.DealDamage(playerID, Damage, (uint)EntityID);
                         LogMessage("[WallOfDeath] PLAYER HIT MOVING WALL! Dealing " + Damage + " damage");
