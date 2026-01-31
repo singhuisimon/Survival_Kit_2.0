@@ -1,5 +1,6 @@
 using Engine;
 using System;
+using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Physics;
@@ -11,7 +12,7 @@ namespace Game
     public class WormBullet : ScriptBehaviour
     {
         [SerializeField]
-        public float ProjectileLifetime = 2.0f;
+        public float ProjectileLifetime = 6.0f;
 
         [SerializeField]
         public float Damage = 10.0f;
@@ -52,17 +53,19 @@ namespace Game
                 return;
             }
 
-            // Check for collisions
-            int collisionCount = PhysicsGetCollisionCount();
-            
-            // DEBUG: Log if any collisions detected
-            if (enableDebug && collisionCount > 0)
+            // Check for collisions using CollisionManager (same as Botnet)
+            List<uint> collisions = CollisionManager.GetEnemyProjectileHits((uint)EntityID);
+
+            if (collisions == null || collisions.Count == 0)
+                return;
+
+            if (enableDebug)
             {
-                LogMessage("===== COLLISION DETECTED! Total collisions in scene: " + collisionCount + " =====");
+                LogMessage("===== COLLISION DETECTED! Collision count: " + collisions.Count + " =====");
             }
 
             // Check all collisions
-            CheckCollisions(collisionCount);
+            CheckCollisions(collisions);
 
             // DEBUG: Find and track player position
             if (enableDebug)
@@ -71,62 +74,39 @@ namespace Game
 
         // -------- COLLISION HANDLING (TAG-BASED, SAME AS PRIMARYBULLET) --------
 
-        private void CheckCollisions(int collisionCount)
+        private void CheckCollisions(List<uint> collisions)
         {
-            if (collisionCount <= 0)
+            if (collisions == null || collisions.Count == 0)
                 return;
 
             uint self = (uint)EntityID;
 
-            for (int i = 0; i < collisionCount; i++)
+            foreach (uint other in collisions)
             {
-                uint entityA, entityB;
-                PhysicsGetCollisionPair(i, out entityA, out entityB);
-
-                // DEBUG: Print ALL collision pairs if debug enabled
-                if (enableDebug)
-                {
-                    LogMessage("Collision pair " + i + ": EntityA=" + entityA + " vs EntityB=" + entityB);
-                }
-
-                // Skip if this collision doesn't involve our bullet
-                if (entityA != self && entityB != self)
-                    continue;
-
-                // Get the other entity
-                uint other = (entityA == self) ? entityB : entityA;
-
-                // DEBUG: Log when our bullet is involved
+                // DEBUG: Log collision
                 if (enableDebug)
                 {
                     LogMessage("!!!!! WORM BULLET " + self + " COLLIDED WITH ENTITY " + other + " !!!!!");
                 }
 
-                // Get tags
-                string selfTag = TagGetTag(self);
+                // Get other entity's tag
                 string otherTag = TagGetTag(other);
 
-                // DEBUG: Log tags
+                // DEBUG: Log tag
                 if (enableDebug)
                 {
-                    LogMessage("Self tag: '" + selfTag + "' | Other tag: '" + otherTag + "'");
+                    LogMessage("Other entity tag: '" + otherTag + "'");
                 }
 
-                // Case 1: We are bullet, other is valid target
-                if (IsBulletTag(selfTag) && IsTargetTag(otherTag))
+                // Check if it's a valid target
+                if (IsTargetTag(otherTag))
                 {
                     OnBulletHitTarget(self, other);
                     return; // Exit after first hit
                 }
-                // Case 2: Other is bullet (shouldn't happen, but for safety)
-                else if (IsBulletTag(otherTag) && IsTargetTag(selfTag))
-                {
-                    OnBulletHitTarget(other, self);
-                    return;
-                }
                 else if (enableDebug)
                 {
-                    LogMessage("Tag mismatch - no valid hit detected");
+                    LogMessage("Tag mismatch - not a valid target");
                 }
             }
         }
