@@ -19,6 +19,12 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 
 namespace Engine
 {
@@ -421,15 +427,18 @@ namespace Engine
 					{
 						auto newEntity = m_Scene->CreateEntity("New Entity");
 						newEntity.AddComponent<TagComponent>("New Entity");
-						newEntity.AddComponent<TransformComponent>();
+						auto& childTransform = newEntity.AddComponent<TransformComponent>();
 
+						// Set default values
 						if (entity.HasComponent<TransformComponent>()) {
 							auto& parentTransform = entity.GetComponent<TransformComponent>();
-							parentTransform.Children.push_back((uint32_t)newEntity);
-							auto& childTransform = newEntity.GetComponent<TransformComponent>();
-							childTransform.SetParent(entity);
-						}
 
+							
+							childTransform.WorldTransform = parentTransform.WorldTransform;
+
+							// Now call SetParent
+							TransformSystem::SetParent(m_Scene, newEntity.GetHandle(), entity.GetHandle());
+						}
 						if (entity.HasComponent<PrefabComponent>())
 						{
 							auto& parentPrefab = entity.GetComponent<PrefabComponent>();
@@ -1088,6 +1097,17 @@ namespace Engine
 			compObj.AddMember("type", static_cast<int>(ComponentTypeID::SpriteRenderer), allocator);
 			compObj.AddMember("typeName", "SpriteRendererComponent", allocator);
 			compObj.AddMember("data", rapidjson::Value(spriteRendererJSON.c_str(), allocator), allocator);
+			componentsArray.PushBack(compObj, allocator);
+		}
+
+		// Trail Component
+		if (entity.HasComponent<TrailComponent>())
+		{
+			std::string trailJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Trail);
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Trail), allocator);
+			compObj.AddMember("typeName", "TrailComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(trailJSON.c_str(), allocator), allocator);
 			componentsArray.PushBack(compObj, allocator);
 		}
 

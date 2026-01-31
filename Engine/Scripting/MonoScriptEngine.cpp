@@ -1549,6 +1549,13 @@ namespace Engine {
 
 
 
+		// Particle System
+		// =====================================================================
+		BindInternalCall("Engine.ParticleSystem::SetEmitterVelocity",
+			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetEmitterVelocity));
+
+		BindInternalCall("Engine.ParticleSystem::SetEmissionRate",
+			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetEmissionRate));
 
 		LOG_INFO("Internal calls registered");
 	}

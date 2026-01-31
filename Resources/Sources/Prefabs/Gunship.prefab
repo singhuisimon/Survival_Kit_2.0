@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Gunship",
-    "Prefab GUID": 16738692809979045151,
+    "Prefab GUID": 7511151515751940523,
     "version": 1,
     "entities": [
         {
@@ -13,21 +13,21 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3480095506996818433",
+                            "ComponentGUID": "4860677560785862851",
                             "Position": [
-                                0.0,
-                                -79.38986206054688,
-                                0.0
+                                798.6957397460938,
+                                -376.24957275390625,
+                                -952.4028930664064
                             ],
                             "Rotation": [
-                                0.0,
-                                0.0,
-                                0.0
+                                180.0,
+                                18.26655006408691,
+                                180.0
                             ],
                             "Scale": [
-                                0.05000000074505806,
-                                0.05000000074505806,
-                                0.05000000074505806
+                                0.03999999910593033,
+                                0.03999999910593033,
+                                0.03999999910593033
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3480095506996818433",
+                            "ComponentGUID": "4628847754234741057",
                             "Tag": "Gunship"
                         }
                     }
@@ -49,18 +49,73 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3480095506996818433",
+                            "ComponentGUID": "14660510349944733975",
                             "Mesh": "A9005_gunship_v001.fbx",
                             "Material": "Gunship_Allies.mat",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 0
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "GunshipHelper",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14895357253018403235",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1170083240414200227",
+                            "Tag": "GunshipHelper"
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8554288977682104741",
+                            "ScriptClassName": "Game.GunshipScript",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
