@@ -436,5 +436,16 @@ namespace Game
                 instance = null;
             }
         }
+
+        /// <summary>
+        /// Check if ANY player projectiles hit enemies this frame (for hit markers, sounds, etc.)
+        /// </summary>
+        public static bool HasAnyPlayerProjectileHits()
+        {
+            if (instance == null || instance.playerProjectileHits == null)
+                return false;
+
+            return instance.playerProjectileHits.Count > 0;
+        }
     }
 }

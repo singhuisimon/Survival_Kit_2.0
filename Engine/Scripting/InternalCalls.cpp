@@ -2668,5 +2668,55 @@ namespace Engine {
 			auto sys = s_CurrentScene->GetSystem<CollisionSystem2D>();
 			return sys->IsPointInEntity(static_cast<entt::entity>(entityId), *point);
 		}
+
+		// =====================================================================
+		// SpriteRenderer
+		// =====================================================================
+
+		 void SpriteRenderer_SetIsVisible(uint32_t entityID, bool visible) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_SetIsVisible: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_SetIsVisible: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<SpriteRendererComponent>(entity)) {
+				auto& sprite = registry.get<SpriteRendererComponent>(entity);
+				sprite.SetIsVisible(visible);
+			}
+			else {
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no SpriteRendererComponent");
+			}
+		}
+
+		 bool SpriteRenderer_GetIsVisible(uint32_t entityID) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_GetIsVisible: No scene set");
+				return false;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_GetIsVisible: Invalid entity ID ", entityID);
+				return false;
+			}
+
+			if (registry.all_of<SpriteRendererComponent>(entity)) {
+				auto& sprite = registry.get<SpriteRendererComponent>(entity);
+				return sprite.GetIsVisible();
+			}
+
+			return false;
+		}
+
 	} // namespace InternalCalls
 } // namespace Engine

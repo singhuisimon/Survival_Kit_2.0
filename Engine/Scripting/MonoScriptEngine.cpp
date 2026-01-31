@@ -1963,6 +1963,17 @@ namespace Engine {
 		BindInternalCall("Engine.Collision2D::IsPointInEntity",
 						 reinterpret_cast<void *>(InternalCalls::CollisionSystem2D_IsPointInEntity));
 
+		// =====================================================================
+// SpriteRenderer
+// =====================================================================
+		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_SetIsVisible",
+			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_SetIsVisible));
+		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_GetIsVisible",
+			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_GetIsVisible));
+
+
+
+
 		LOG_INFO("Internal calls registered");
 	}
 } // namespace Engine
