@@ -1,0 +1,115 @@
+{
+    "Prefab Name": "Obstacle_Wall_WallofDeath",
+    "Prefab GUID": 10933649739741299237,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Obstacle_Wall_WallofDeath",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6898424473616400923",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                100.0,
+                                100.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1710277702885589529",
+                            "Tag": "Obstacle_Wall_WallofDeath"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6898424473616941599",
+                            "Mesh": "",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1710277702885999133",
+                            "Mass": 1.0,
+                            "IsKinematic": true,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                50.0,
+                                50.0,
+                                0.5
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5745502969010242081",
+                            "ScriptClassName": "Game.WallOfDeath",
+                            "Started": false,
+                            "GCHandle": 83
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

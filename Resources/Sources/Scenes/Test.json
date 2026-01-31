@@ -1,0 +1,14 @@
+{
+    "Scene": "New Scene",
+    "Version": "1.0",
+    "Entities": [],
+    "Settings": [
+        {
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0,
+            "GlobalBias": 0.004999999888241291
+        }
+    ]
+}

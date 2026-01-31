@@ -325,22 +325,29 @@ namespace Engine
 				}
 
 				// Pose push for kinematic bodies (or if transform changed)
-				glm::vec3 curPos = tc.Position;
+				/*glm::vec3 curPos = tc.Position;
 				glm::quat curRot = AsQuat(tc.Rotation);
 				float     dotq = std::abs(glm::dot(curRot, ap.lastRot));
 				bool      rotChanged = (1.0f - dotq) > 1e-4f;
-				bool      posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
+				bool      posChanged = !NearlyEqualVec3(curPos, ap.lastPos);*/
+				glm::vec3 worldPos = glm::vec3(tc.WorldTransform[3]);  // FIXED: Get from WorldTransform
+				glm::mat3 worldRotMat = glm::mat3(tc.WorldTransform);
+				glm::quat worldRot = glm::quat_cast(worldRotMat);      // FIXED: World rotation
+
+				float dotq = std::abs(glm::dot(worldRot, ap.lastRot));
+				bool rotChanged = (1.0f - dotq) > 1e-4f;
+				bool posChanged = !NearlyEqualVec3(worldPos, ap.lastPos);
 
 				if (posChanged || rotChanged)
 				{
 					mBodyInterface->SetPositionAndRotation(
 						id,
-						ToJPHRVec3(curPos),
-						ToJPHQuat(curRot),
+						ToJPHRVec3(worldPos),
+						ToJPHQuat(worldRot),
 						JPH::EActivation::Activate
 					);
-					ap.lastPos = curPos;
-					ap.lastRot = curRot;
+					ap.lastPos = worldPos;
+					ap.lastRot = worldRot;
 				}
 
 				// Velocity push for dynamics
@@ -371,7 +378,7 @@ namespace Engine
 				JPH::RVec3 p{}; JPH::Quat q{};
 				mBodyInterface->GetPositionAndRotation(id, p, q);
 
-				tc.Position = glm::vec3(
+				/*tc.Position = glm::vec3(
 					static_cast<float>(p.GetX()),
 					static_cast<float>(p.GetY()),
 					static_cast<float>(p.GetZ())
@@ -381,7 +388,41 @@ namespace Engine
 
 				AppliedProps &ap = mApplied[e];
 				ap.lastPos = tc.Position;
-				ap.lastRot = AsQuat(tc.Rotation);
+				ap.lastRot = AsQuat(tc.Rotation);*/
+				glm::vec3 physicsWorldPos = glm::vec3(
+					static_cast<float>(p.GetX()),
+					static_cast<float>(p.GetY()),
+					static_cast<float>(p.GetZ())
+				);
+				glm::quat physicsWorldRot = ToGLM(q);
+
+				if (tc.Parent == u32_max) {
+					// Root entity: world = local
+					tc.Position = physicsWorldPos;
+					FromJPHRotation(q, tc.Rotation);
+				}
+				else {
+					// Child entity: convert world to local
+					// Get parent's world transform
+					auto& parent_tc = reg.get<TransformComponent>(static_cast<entt::entity>(tc.Parent));
+
+					// Convert world position to local: local = parent_inverse × world
+					glm::mat4 parent_inverse = glm::inverse(parent_tc.WorldTransform);
+					glm::vec4 localPos = parent_inverse * glm::vec4(physicsWorldPos, 1.0f);
+					tc.Position = glm::vec3(localPos);
+
+					// Convert world rotation to local
+					glm::mat3 parentWorldRotMat = glm::mat3(parent_tc.WorldTransform);
+					glm::quat parentWorldRot = glm::quat_cast(parentWorldRotMat);
+					tc.Rotation = glm::inverse(parentWorldRot) * physicsWorldRot;
+				}
+
+				tc.IsDirty = true;
+
+				AppliedProps& ap = mApplied[e];
+				ap.lastPos = physicsWorldPos;  // Store world position
+				ap.lastRot = physicsWorldRot;  // Store world rotation
+
 
 				if (!rb.IsKinematic)
 				{
@@ -602,11 +643,13 @@ namespace Engine
 		auto &rb = reg.get<RigidbodyComponent>(e);
 
 		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
-
+		glm::vec3 worldPos = glm::vec3(tc.WorldTransform[3]);
+		glm::mat3 worldRotMat = glm::mat3(tc.WorldTransform);
+		glm::quat worldRot = glm::quat_cast(worldRotMat);
 		JPH::BodyCreationSettings settings(
 			shape,
-			ToJPHRVec3(tc.Position),
-			ToJPHRotation(tc.Rotation),
+			ToJPHRVec3(worldPos),
+			ToJPHRotation(worldRot),
 			ToMotionType(rb),
 			ToObjectLayer(rb)
 		);
