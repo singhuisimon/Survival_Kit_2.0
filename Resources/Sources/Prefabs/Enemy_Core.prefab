@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Core.prefab",
-    "Prefab GUID": 6174321299498353207,
+    "Prefab GUID": 15399663661328482503,
     "version": 1,
     "entities": [
         {
@@ -94,29 +94,6 @@
                                 75.0
                             ],
                             "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
-                    "type": 9,
-                    "typeName": "AudioComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "12515389574834569763",
-                            "FilePath": "Botnet_Explosion.wav",
-                            "Type": 1,
-                            "State": 2,
-                            "Volume": 1.0,
-                            "Pitch": 1.0,
-                            "Loop": false,
-                            "Mute": false,
-                            "ReverbProperties": 1.0,
-                            "Is3D": true,
-                            "MinDistance": 1.0,
-                            "MaxDistance": 100.0,
-                            "RolloffMode": 0,
-                            "DopplerLevel": 1.0,
-                            "Pan2D": 0.0
                         }
                     }
                 }

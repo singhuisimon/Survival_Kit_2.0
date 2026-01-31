@@ -75,6 +75,7 @@ namespace Game
             { "adware", CollisionCategory.ENEMY },
             { "wormhost", CollisionCategory.ENEMY },
             { "wormchild", CollisionCategory.ENEMY },
+            { "enemy_core", CollisionCategory.ENEMY },
             
             // Objectives
             { "semiconductor", CollisionCategory.CORE },
