@@ -86,7 +86,8 @@ namespace Game
             
             // Environment
             { "oob", CollisionCategory.ENVIRONMENT },
-            { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT }
+            { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT },
+            { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT }
         };
 
         // ============================================================
