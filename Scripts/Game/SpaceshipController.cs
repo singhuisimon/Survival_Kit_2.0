@@ -755,6 +755,8 @@ namespace Game
             {
                 //publish event here
                 //do what you need to do here
+                Publish("PlayerDead", "");  // ADD THIS
+
             }
         }
 
