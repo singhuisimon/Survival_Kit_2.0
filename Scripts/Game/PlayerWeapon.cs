@@ -342,7 +342,7 @@ namespace Game{
 
                 //End of where the calculate firing pos 
                 
-                Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+                Vector3 scale = new Vector3(0.025f, 0.025f, 0.025f);
 
                 uint bulletID = 0;
                 bulletID = PrefabInstantiateWithTransform(PrimaryBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
