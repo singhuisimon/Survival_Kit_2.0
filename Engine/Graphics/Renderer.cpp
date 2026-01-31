@@ -284,6 +284,8 @@ namespace Engine {
 					}
 				}
 			}
+
+			renderFinalPass(m_finalpass, draw_items, editor_camera.getLookAt(), editor_camera.getPerspective(), editor_camera.getCamPos());
 		}
 		else {
 			// For rendering all enabled camera displays
@@ -332,13 +334,13 @@ namespace Engine {
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 
 				}
+
+				renderFinalPass(m_finalpass, draw_items, view, proj, cam.second);
 			}
 		}
 
-		renderFinalPass(m_finalpass, draw_items, editor_camera);
 		renderUIPass(m_UIPass, draw_items);
 		renderTextPass(m_textPass, draw_items);
-
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -905,7 +907,7 @@ namespace Engine {
 	}
 
 
-	void Renderer::renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, Camera3D& editor_camera) {
+	void Renderer::renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, const glm::mat4& view, const glm::mat4& proj, glm::vec3 const& cam_pos) {
 
 		// Update pass viewport if allowed
 		if (pass.auto_aspect) {
@@ -932,7 +934,7 @@ namespace Engine {
 
 		// Render skybox into HDR FBO 0 after bloom is computed  
 		renderSkyboxHDR();
-		RenderTrails(draw_items, editor_camera, editor_camera.getCamPos());
+		RenderTrails(draw_items, view, proj, cam_pos);
 
 		// Final composite: HDR scene + bloom -> LDR
 		beginFrame(pass);
@@ -1934,7 +1936,7 @@ namespace Engine {
 		glVertexArrayElementBuffer(m_TrailVAO, m_TrailEBO);
 	}
 
-	void Renderer::RenderTrails(std::span<const DrawItem> trailItems, const Camera3D& camera, const glm::vec3& camPos) {
+	void Renderer::RenderTrails(std::span<const DrawItem> trailItems, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camPos) {
 
 		if (trailItems.empty())
 			return;
@@ -1948,7 +1950,7 @@ namespace Engine {
 		shaderProgram.programUse();
 
 		// Set camera uniforms
-		glm::mat4 viewProj = camera.getPerspective() * camera.getLookAt();
+		glm::mat4 viewProj = proj * view;
 		shaderProgram.setUniform("u_ViewProjection", viewProj);
 		shaderProgram.setUniform("u_CameraPos", camPos);
 
