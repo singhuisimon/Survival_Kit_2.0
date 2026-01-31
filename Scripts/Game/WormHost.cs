@@ -56,15 +56,20 @@ namespace Game
             timer = 0.0f;
 
             RigidbodySetIsKinematic(EntityID, true);
+            Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
+            RigidbodySetBoxHalfExtents(EntityID, ref extents);
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            if (hasSplit || playerID == INVALID_ENTITY)
+            if (playerID == INVALID_ENTITY)
+            {
+                SceneDestroyEntity(EntityID);
                 return;
-            
+            }
+
             Vector3 ownPosition = GetPosition(EntityID);
             Vector3 targetPosition = GetPosition(playerID);
             Vector3 direction = targetPosition - ownPosition;
