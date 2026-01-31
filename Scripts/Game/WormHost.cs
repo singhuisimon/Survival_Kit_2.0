@@ -69,33 +69,34 @@ namespace Game
             Vector3 targetPosition = GetPosition(playerID);
             Vector3 direction = targetPosition - ownPosition;
 
-            // Rotation
-            // float yaw = SimpleMath.Atan2(direction.X, direction.Z) + SimpleMath.PI;
-            // Vector3 upAxis = new Vector3(0, 1, 0);
-            // Quat yawQ = Quat.FromAxisAngle(upAxis, yaw);
+            // Rotation - aim at player
+            float magnitude = SimpleMath.Sqrt(
+                direction.X * direction.X +
+                direction.Y * direction.Y +
+                direction.Z * direction.Z
+            );
 
-            // float horizLen = SimpleMath.Sqrt(direction.X * direction.X + direction.Z * direction.Z);
-            // float pitch = SimpleMath.Atan2(direction.Y, horizLen);
+            if (magnitude < 0.001f)
+                return;
 
-            // Vector3 localRight = new Vector3(1, 0, 0);
-            // Vector3 rightAxis = SimpleMath.QuatMultiplyVec3(yawQ, localRight);
-            // Quat pitchQ = Quat.FromAxisAngle(rightAxis, -pitch);
+            // Normalize direction
+            float invMag = 1.0f / magnitude;
+            Vector3 toTarget = new Vector3(
+                direction.X * invMag,
+                direction.Y * invMag,
+                direction.Z * invMag
+            );
 
-            // Quat finalRotation = pitchQ * yawQ;
-            // SetRotation(EntityID, ref finalRotation);
+            // Use the same method as Botnet - create rotation from forward to target
+            Vector3 forward = Vector3.Forward; // This should be (0, 0, -1) based on your engine
+            Quat targetRot = QuaternionFromTo(forward, toTarget);
+            SetRotation(EntityID, ref targetRot);
 
             if (SimpleMath.Sqrt(direction.X*direction.X + direction.Y*direction.Y + direction.Z*direction.Z) < 0.001f)
                 return;
 
             Quat lookRot = SimpleMath.LookRotation(-direction, Vector3.Up);
             SetRotation(EntityID, ref lookRot);
-
-            // Movement
-            float magnitude = SimpleMath.Sqrt(
-                direction.X * direction.X +
-                direction.Y * direction.Y +
-                direction.Z * direction.Z
-            );
 
             if (magnitude < 250.0f)
             {
@@ -200,37 +201,113 @@ namespace Game
         // BARE MINIMUM
         public void ShootAtTarget()
         {
-            Engine.Vector3 globalPosition = GetPosition(EntityID);
-            Quat rot = Transform.GetRotation(EntityID);
-            Engine.Vector3 directionDir = rot.Forward;
+            if (playerID == INVALID_ENTITY)
+                return;
 
+            // Get positions
+            Vector3 wormPos = GetPosition(EntityID);
+            Vector3 playerPos = GetPosition(playerID);
+
+            // Calculate direction to player
+            Vector3 direction = new Vector3(
+                playerPos.X - wormPos.X,
+                playerPos.Y - wormPos.Y,
+                playerPos.Z - wormPos.Z
+            );
+
+            // Normalize direction
+            float magnitude = SimpleMath.Sqrt(
+                direction.X * direction.X +
+                direction.Y * direction.Y +
+                direction.Z * direction.Z
+            );
+
+            if (magnitude < 0.001f)
+                return;
+
+            float invMag = 1.0f / magnitude;
+            Vector3 directionNorm = new Vector3(
+                direction.X * invMag,
+                direction.Y * invMag,
+                direction.Z * invMag
+            );
+
+            // Spawn bullet slightly in front
             float spawnDist = 1.5f;
-            float bulletForce = 100.0f;
+            Vector3 spawnPosition = new Vector3(
+                wormPos.X + directionNorm.X * spawnDist,
+                wormPos.Y + directionNorm.Y * spawnDist,
+                wormPos.Z + directionNorm.Z * spawnDist
+            );
 
-            Engine.Vector3 spawnPosition = globalPosition + directionDir * spawnDist;
-
+            // Create bullet
             uint wormBulletID = SceneCreateEntity("WormBullet");
             if (wormBulletID == 0)
                 return;
 
             Transform.SetPosition(wormBulletID, ref spawnPosition);
-            Transform.SetRotation(wormBulletID, ref rot);
 
+            // Set rotation to face the direction (optional, for visual)
+            Vector3 forward = Vector3.Forward;
+            Quat bulletRot = QuaternionFromTo(forward, directionNorm);
+            Transform.SetRotation(wormBulletID, ref bulletRot);
+
+            // Setup rigidbody
             EntityAddRigidBody(wormBulletID);
             RigidbodySetIsKinematic(wormBulletID, false);
             RigidbodySetUseGravity(wormBulletID, false);
 
+            // Set tag
             TagSetTag(wormBulletID, "WormBullet");
 
-            Engine.Vector3 force = directionDir * bulletForce;
+            // Apply force in the direction of the player
+            float bulletForce = 100.0f;
+            Vector3 force = new Vector3(
+                directionNorm.X * bulletForce,
+                directionNorm.Y * bulletForce,
+                directionNorm.Z * bulletForce
+            );
             RigidbodyAddForce(wormBulletID, ref force);
 
-            Engine.Vector3 extents = new Engine.Vector3(2.0f, 2.0f, 2.0f);
+            // Set collision box
+            Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
             RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
 
+            // Add visuals and script
             EntityAddMeshRenderer(wormBulletID);
             EntityAddScript(wormBulletID, "Game.WormBullet");
+        }
 
+        private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
+        {
+            float dot = from.X * to.X + from.Y * to.Y + from.Z * to.Z;
+
+            if (dot < -0.9999f)
+            {
+                Quat q180;
+                q180.X = 0.0f;
+                q180.Y = 1.0f;
+                q180.Z = 0.0f;
+                q180.W = 0.0f;
+                return q180;
+            }
+
+            Vector3 cross = new Vector3(
+                from.Y * to.Z - from.Z * to.Y,
+                from.Z * to.X - from.X * to.Z,
+                from.X * to.Y - from.Y * to.X
+            );
+
+            float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
+            float invS = 1.0f / s;
+
+            Quat q;
+            q.X = cross.X * invS;
+            q.Y = cross.Y * invS;
+            q.Z = cross.Z * invS;
+            q.W = 0.5f * s;
+
+            return q;
         }
     }
 }
