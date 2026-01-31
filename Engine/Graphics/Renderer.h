@@ -306,7 +306,7 @@ namespace Engine {
 		 *			  The render pass containing render data for rendering the
 		 *			  composition pass.
 		 */
-		void renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, Camera3D& editor_camera);
+		void renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, const glm::mat4& view, const glm::mat4& proj, glm::vec3 const& cam_pos);
 
 		/**
 		 * @brief	  Renders the UI pass.
@@ -460,7 +460,7 @@ namespace Engine {
 		GLuint m_TrailEBO;
 
 		void InitTrailResources();
-		void RenderTrails(std::span<const DrawItem> trailItems, const Camera3D& camera, const glm::vec3& camPos);
+		void RenderTrails(std::span<const DrawItem> trailItems, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camPos);
 		void BuildTrailGeometry(const TrailComponent& trail, std::vector<TrailVertex>& vertices, std::vector<u32>& indices);
 	};
 
