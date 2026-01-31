@@ -1540,6 +1540,15 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::CollisionSystem2D_IsPointInEntity));
 
 		// =====================================================================
+// SpriteRenderer
+// =====================================================================
+		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_SetIsVisible",
+			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_SetIsVisible));
+		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_GetIsVisible",
+			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_GetIsVisible));
+
+
+
 		// Particle System
 		// =====================================================================
 		BindInternalCall("Engine.ParticleSystem::SetEmitterVelocity",

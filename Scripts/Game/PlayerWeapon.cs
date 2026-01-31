@@ -103,6 +103,7 @@ namespace Game{
 
         private float reloadFinishTime = 0.0f;
         private Vector3 bulletDirection;
+        private string EVENT_AMMO_CHANGE = "AmmoChange";
 
         public override void OnStart(){
 
@@ -136,10 +137,13 @@ namespace Game{
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)
             {
                 primaryAmmo = primaryAmmoMax;
+
                 //stop ui reticle spinning reload
                 //show reload ui banner
                 reloadingPrimary = false;
                 shootAllowed = true;
+                Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());  // ADD THIS
+
                 LogMessage("[PlayerWeapon] Reload complete!");
             }
 
@@ -345,7 +349,7 @@ namespace Game{
 
                 //End of where the calculate firing pos 
                 
-                Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+                Vector3 scale = new Vector3(0.025f, 0.025f, 0.025f);
 
                 uint bulletID = 0;
                 bulletID = PrefabInstantiateWithTransform(PrimaryBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
@@ -359,6 +363,8 @@ namespace Game{
                 RigidbodySetVelocity(bulletID, ref bulletVel);
 
                 primaryAmmo -= 1;
+                Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());
+
 
                 //vfx
 
@@ -480,9 +486,16 @@ namespace Game{
             Vector3 playerPos = GetPosition(playerEntityID);
             Quat playerRot = GetRotation(playerEntityID);
 
-            // Calculate spawn position (offset to the right of the player)
-            Vector3 offset = playerRot.Right * 5.0f;
-            bulletSpawnPos = playerPos + offset;
+            // Calculate spawn position at gun tips (forward and slightly to the right/left)
+                // Adjust these values based on your mesh's gun positions
+                float forwardOffset = 4.0f;  // Distance in front of player
+                float sideOffset = -0.1f;     // Distance to the side (for gun position)
+                float heightOffset = 0.0f;   // Vertical adjustment if needed
+                
+                Vector3 offset = (playerRot.Forward * forwardOffset) + 
+                                (playerRot.Right * sideOffset) +
+                                (playerRot.Up * heightOffset);
+                bulletSpawnPos = playerPos + offset;
 
             // Calculate bullet rotation (pointing in firing direction)
             bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);

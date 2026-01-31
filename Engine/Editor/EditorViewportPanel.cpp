@@ -3,6 +3,9 @@
 #include "../Scripting/MonoScriptEngine.h"
 #include <algorithm>
 #include <ImGuizmo.h>
+#include <glm/gtc/matrix_inverse.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>  
 
 namespace Engine
 {
@@ -75,6 +78,7 @@ namespace Engine
     {
         //if (m_PlayState != PlayState::STOP) return;
         Renderer* m_Renderer = m_Editor->GetRenderer();
+        Scene* scene = m_Editor->GetActiveScene();
         if (!entity || !m_Renderer || !entity.HasComponent<TransformComponent>()) return;
 
         // Get the camera
@@ -84,9 +88,9 @@ namespace Engine
         auto& tc = entity.GetComponent<TransformComponent>();
 
         // Build transform matrix from position, rotation, and scale
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Position);
-        transform = transform * glm::mat4_cast(tc.Rotation);
-        transform = glm::scale(transform, tc.Scale);
+        glm::mat4 transform = tc.WorldTransform;
+        //transform = transform * glm::mat4_cast(tc.Rotation);
+        //transform = glm::scale(transform, tc.Scale);
 
         // Set up ImGuizmo
         ImGuizmo::SetOrthographic(false);
@@ -122,19 +126,90 @@ namespace Engine
                 if (m_Operation == ImGuizmo::TRANSLATE)
                 {
                     // Extract and set new position
-                    glm::vec3 newPosition = glm::vec3(transform[3]);
-                    tc.SetPosition(newPosition);
+                    /*glm::vec3 newPosition = glm::vec3(transform[3]);
+                    tc.SetPosition(newPosition);*/
+                    // Extract new world position
+                    glm::vec3 newWorldPosition = glm::vec3(transform[3]);
+
+                    if (tc.Parent == u32_max) {
+                        // Root entity: world position = local position
+                        tc.SetPosition(newWorldPosition);
+                    }
+                    else {
+                        // Child entity: convert world position to local space
+                        auto& registry = scene->GetRegistry();
+                        auto view = registry.view<TransformComponent>();
+
+                        // Check if parent exists
+                        entt::entity parentEntity = static_cast<entt::entity>(tc.Parent);
+                        if (registry.valid(parentEntity) && registry.all_of<TransformComponent>(parentEntity)) {
+                            auto& parent_transform = registry.get<TransformComponent>(parentEntity);
+
+                            // Convert world to local: local = parent_inverse × world
+                            glm::mat4 parent_inverse = glm::inverse(parent_transform.WorldTransform);
+                            glm::mat4 newLocalTransform = parent_inverse * transform;
+
+                            // Decompose to get new local position
+                            glm::vec3 skew;
+                            glm::vec4 perspective;
+                            glm::vec3 newScale;
+                            glm::quat newRotation;
+                            glm::vec3 newLocalPosition;
+
+                            glm::decompose(newLocalTransform, newScale, newRotation,
+                                newLocalPosition, skew, perspective);
+
+                            // Update transform
+                            tc.Position = newLocalPosition;
+                            tc.Rotation = newRotation;
+                            tc.Scale = newScale;
+                            tc.IsDirty = true;
+                        }
+                    }
                 }
                 else if (m_Operation == ImGuizmo::ROTATE)
                 {
-                    // Extract rotation matrix and convert to quaternion
+                    //// Extract rotation matrix and convert to quaternion
+                    //glm::mat3 rotationMatrix;
+                    //rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
+                    //rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
+                    //rotationMatrix[2] = glm::normalize(glm::vec3(transform[2]));
+
+                    //glm::quat newRotation = glm::quat_cast(rotationMatrix);
+                    //tc.Rotation = newRotation;
+                    //tc.IsDirty = true;
                     glm::mat3 rotationMatrix;
                     rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
                     rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
                     rotationMatrix[2] = glm::normalize(glm::vec3(transform[2]));
 
-                    glm::quat newRotation = glm::quat_cast(rotationMatrix);
-                    tc.Rotation = newRotation;
+                    glm::quat newWorldRotation = glm::quat_cast(rotationMatrix);
+
+                    if (tc.Parent == u32_max) {
+                        // Root entity: world rotation = local rotation
+                        tc.Rotation = newWorldRotation;
+                    }
+                    else {
+                        // Child entity: convert world rotation to local
+                        auto& registry = scene->GetRegistry();
+                        auto view = registry.view<TransformComponent>();
+
+                        entt::entity parentEntity = static_cast<entt::entity>(tc.Parent);
+                        if (registry.valid(parentEntity) && registry.all_of<TransformComponent>(parentEntity)) {
+                            auto& parent_transform = registry.get<TransformComponent>(parentEntity);
+
+                            // Get parent's world rotation from its WorldTransform
+                            glm::mat3 parentRotationMatrix;
+                            parentRotationMatrix[0] = glm::normalize(glm::vec3(parent_transform.WorldTransform[0]));
+                            parentRotationMatrix[1] = glm::normalize(glm::vec3(parent_transform.WorldTransform[1]));
+                            parentRotationMatrix[2] = glm::normalize(glm::vec3(parent_transform.WorldTransform[2]));
+                            glm::quat parentWorldRotation = glm::quat_cast(parentRotationMatrix);
+
+                            // Local rotation = parent_world_inverse × world_rotation
+                            tc.Rotation = glm::inverse(parentWorldRotation) * newWorldRotation;
+                        }
+                    }
+
                     tc.IsDirty = true;
                 }
                 else if (m_Operation == ImGuizmo::SCALE)
