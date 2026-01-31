@@ -1,6 +1,6 @@
 {
-  "name": "PauseMenu_EngineBG.png",
-  "guid": "A540D0824E60802B",
+  "name": "E005_loveletter6piece_v004.fbx",
+  "guid": "D44698826EBFC003",
   "tags": [],
   "lastImported": "00000000697E407F",
   "resourceLinks": []
