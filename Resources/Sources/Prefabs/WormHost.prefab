@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 12177514048596476487,
+    "Prefab Name": "WormHost",
+    "Prefab GUID": 6395375911957136089,
     "version": 1,
     "entities": [
         {
-            "Name": "botnet",
+            "Name": "WormHost",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,10 +13,10 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16742114490130125945",
+                            "ComponentGUID": "6395375911956169423",
                             "Position": [
                                 0.0,
-                                -2.9802322387695313e-8,
+                                0.0,
                                 0.0
                             ],
                             "Rotation": [
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16742114490130125945",
-                            "Tag": "botnet"
+                            "ComponentGUID": "5242454407349322445",
+                            "Tag": "WormHost"
                         }
                     }
                 },
@@ -49,9 +49,9 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16742114490130125945",
-                            "Mesh": "E004_botnet_v003.fbx",
-                            "Material": "BotnetM4.mat",
+                            "ComponentGUID": "9277679673473647315",
+                            "Mesh": "E001_worm_host_v001.fbx",
+                            "Material": "",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -69,11 +69,11 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "601213425638908771",
+                            "ComponentGUID": "13889365691900887761",
                             "Mass": 1.0,
                             "IsKinematic": false,
-                            "IsTrigger": true,
-                            "UseGravity": false,
+                            "IsTrigger": false,
+                            "UseGravity": true,
                             "Velocity": [
                                 0.0,
                                 0.0,
@@ -89,34 +89,11 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                5.0,
-                                5.0,
-                                5.0
+                                100.0,
+                                100.0,
+                                100.0
                             ],
                             "SphereRadius": 0.5
-                        }
-                    }
-                },
-                {
-                    "type": 9,
-                    "typeName": "AudioComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "601213425638908771",
-                            "FilePath": "Botnet_Ambient.wav",
-                            "Type": 1,
-                            "State": 0,
-                            "Volume": 1.0,
-                            "Pitch": 1.0,
-                            "Loop": true,
-                            "Mute": false,
-                            "ReverbProperties": 1.0,
-                            "Is3D": true,
-                            "MinDistance": 31.780000686645508,
-                            "MaxDistance": 276.7699890136719,
-                            "RolloffMode": 0,
-                            "DopplerLevel": 1.003999948501587,
-                            "Pan2D": 0.0
                         }
                     }
                 },
@@ -125,10 +102,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "11007352189747626285",
-                            "ScriptClassName": "Game.Botnet",
-                            "Started": true,
-                            "GCHandle": 19
+                            "ComponentGUID": "5818915159653368533",
+                            "ScriptClassName": "Game.WormHost",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }

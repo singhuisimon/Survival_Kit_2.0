@@ -130,7 +130,7 @@ namespace Engine
 
 				ImGui::Separator();
 
-				ImGui::MenuItem("HDR Settings", nullptr, &m_ShowHDRSettings);
+				ImGui::MenuItem("Render Settings", nullptr, &m_ShowHDRSettings);
 
 				ImGui::EndMenu();
 			}

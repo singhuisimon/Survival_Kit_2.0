@@ -30,7 +30,7 @@
         0.0,
         0.0
     ],
-    "enableEmission": false,
+    "enableEmission": true,
     "alphaTest": false,
     "doubleSided": false,
     "receiveShadows": true,

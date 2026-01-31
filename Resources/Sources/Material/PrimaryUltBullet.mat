@@ -1,26 +1,26 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Particle_Circle2.png",
+    "baseMap": "",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
     "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
-        0.9803921580314636,
-        0.4709727168083191,
-        0.4709727168083191
-    ],
-    "emissionColor": [
-        1.0,
+        0.0,
         0.0,
         0.0
     ],
+    "emissionColor": [
+        0.0432526059448719,
+        0.0,
+        0.07352942228317261
+    ],
     "metallic": 0.0,
-    "roughness": 0.6000000238418579,
+    "roughness": 0.0,
     "opacity": 1.0,
-    "emissionStrength": 1.0,
-    "alphaThreshold": 0.5,
+    "emissionStrength": 1.8899999856948853,
+    "alphaThreshold": 0.5009999871253967,
     "ambientOcclusion": 0.5,
     "tiling": [
         1.0,

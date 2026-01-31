@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 12177514048596476487,
+    "Prefab Name": "PrimaryUltExplosion",
+    "Prefab GUID": 9692336290588147967,
     "version": 1,
     "entities": [
         {
-            "Name": "botnet",
+            "Name": "PrimaryUltExplosion",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,10 +13,10 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16742114490130125945",
+                            "ComponentGUID": "3927728767552913651",
                             "Position": [
                                 0.0,
-                                -2.9802322387695313e-8,
+                                0.0,
                                 0.0
                             ],
                             "Rotation": [
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                0.009999999776482582,
-                                0.009999999776482582,
-                                0.009999999776482582
+                                5.0,
+                                5.0,
+                                5.0
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16742114490130125945",
-                            "Tag": "botnet"
+                            "ComponentGUID": "11421718547497418993",
+                            "Tag": "PrimaryUltExplosion"
                         }
                     }
                 },
@@ -49,14 +49,14 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16742114490130125945",
-                            "Mesh": "E004_botnet_v003.fbx",
-                            "Material": "BotnetM4.mat",
+                            "ComponentGUID": "2198346510642921717",
+                            "Mesh": "",
+                            "Material": "",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
-                            "MeshType": 0,
+                            "MeshType": 2,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
                             "SubmeshIndex": 0,
@@ -69,7 +69,7 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "601213425638908771",
+                            "ComponentGUID": "18339247575138861303",
                             "Mass": 1.0,
                             "IsKinematic": false,
                             "IsTrigger": true,
@@ -87,13 +87,13 @@
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
-                            "CollideType": 1,
+                            "CollideType": 2,
                             "BoxHalfExtent": [
-                                5.0,
-                                5.0,
-                                5.0
+                                0.5,
+                                0.5,
+                                0.5
                             ],
-                            "SphereRadius": 0.5
+                            "SphereRadius": 2.5
                         }
                     }
                 },
@@ -102,20 +102,20 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "601213425638908771",
-                            "FilePath": "Botnet_Ambient.wav",
+                            "ComponentGUID": "2198346510643265785",
+                            "FilePath": "Player_Secondary_Fire_Impact_Explosion.wav",
                             "Type": 1,
                             "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
-                            "Loop": true,
+                            "Loop": false,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 31.780000686645508,
-                            "MaxDistance": 276.7699890136719,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
                             "RolloffMode": 0,
-                            "DopplerLevel": 1.003999948501587,
+                            "DopplerLevel": 1.0,
                             "Pan2D": 0.0
                         }
                     }
@@ -125,10 +125,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "11007352189747626285",
-                            "ScriptClassName": "Game.Botnet",
-                            "Started": true,
-                            "GCHandle": 19
+                            "ComponentGUID": "14304022309015339259",
+                            "ScriptClassName": "Game.PrimaryUltAOEDamage",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
