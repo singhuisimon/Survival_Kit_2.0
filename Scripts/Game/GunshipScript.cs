@@ -32,7 +32,7 @@ namespace Game
         // === PRIVATE STATES ===
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint currentTarget = INVALID_ENTITY;    // enemy to shoot at
-        private float fireCooldown = 0f;               
+        private float fireCooldown = 5.0f;               
         private Quat turretRotation;  
 
         private uint gunshipID = INVALID_ENTITY; // getting the ID of the read gunship entity
