@@ -1,11 +1,11 @@
 {
     "shaderName": "StandardMetallicRoughness",
     "baseMap": "",
-    "normalMap": "51086a3e194041",
-    "metallicMap": "0",
-    "roughnessMap": "0",
-    "emissionMap": "0",
-    "occlusionMap": "0",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
     "baseColor": [
         1.0,
         1.0,
@@ -30,7 +30,7 @@
         0.0,
         0.0
     ],
-    "enableEmission": false,
+    "enableEmission": true,
     "alphaTest": false,
     "doubleSided": false,
     "receiveShadows": true,
