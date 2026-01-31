@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Obstacle_Wall_Indestructable.prefab",
-    "Prefab GUID": 1562635281071489607,
+    "Prefab Name": "Prefab: Enemy_Core.prefab",
+    "Prefab GUID": 6174321299498353207,
     "version": 1,
     "entities": [
         {
-            "Name": "Obstacle_Wall_Indestructable",
+            "Name": "Enemy_Core",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4943132159055200795",
+                            "ComponentGUID": "15974154088651932187",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                100.0,
-                                100.0,
-                                100.0
+                                150.0,
+                                150.0,
+                                150.0
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "7248975168268894745",
-                            "Tag": "Obstacle_Wall_Indestructable"
+                            "ComponentGUID": "6750782051797156377",
+                            "Tag": "Enemy_Core"
                         }
                     }
                 },
@@ -49,9 +49,9 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2637289149841588767",
+                            "ComponentGUID": "15397693336348852765",
                             "Mesh": "",
-                            "Material": "",
+                            "Material": "Enemy_Core.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -69,7 +69,7 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "15895886452820279837",
+                            "ComponentGUID": "16550614840955896351",
                             "Mass": 1.0,
                             "IsKinematic": false,
                             "IsTrigger": true,
@@ -89,23 +89,34 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                50.0,
-                                50.0,
-                                50.0
+                                75.0,
+                                75.0,
+                                75.0
                             ],
                             "SphereRadius": 0.5
                         }
                     }
                 },
                 {
-                    "type": 8,
-                    "typeName": "ScriptComponent",
+                    "type": 9,
+                    "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3213749902146028065",
-                            "ScriptClassName": "Game.IndestructableColliderCube",
-                            "Started": false,
-                            "GCHandle": 75
+                            "ComponentGUID": "12515389574834569763",
+                            "FilePath": "Botnet_Explosion.wav",
+                            "Type": 1,
+                            "State": 2,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
                         }
                     }
                 }
