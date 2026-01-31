@@ -1373,7 +1373,9 @@ namespace Engine {
 		 * @return True if write succeeded, otherwise false.
 		 */
 		bool FileWriteAllText(MonoString *pathStr, MonoString *contentStr);
-
+		// SpriteRenderer
+		 void SpriteRenderer_SetIsVisible(uint32_t entityID, bool visible);
+		 bool SpriteRenderer_GetIsVisible(uint32_t entityID);
 
 	} // namespace InternalCalls
 } // namespace Engine
