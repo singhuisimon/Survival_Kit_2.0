@@ -205,6 +205,9 @@ namespace Engine {
 				GLenum internalFormat = (nrChannels == 4) ? GL_RGBA16F : GL_RGB16F;
 				GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
 
+				std::cout << "Channels: " << nrChannels << std::endl;
+				std::cout << "First pixel: " << data[0] << ", " << data[1] << ", " << data[2] << std::endl;
+
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 					0, internalFormat, width, height, 0, format, GL_FLOAT, data
 				);

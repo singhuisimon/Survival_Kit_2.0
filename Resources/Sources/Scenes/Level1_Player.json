@@ -2089,7 +2089,7 @@
                     "Properties": {
                         "ComponentGUID": "4947609348160487749",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "Firewall_Active.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -2140,7 +2140,7 @@
                     "Properties": {
                         "ComponentGUID": "1488844834345386315",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "Firewall_Active.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -2191,7 +2191,7 @@
                     "Properties": {
                         "ComponentGUID": "7253452357380129105",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "Firewall_Active.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -2295,7 +2295,7 @@
                         "Mesh": "",
                         "Material": "OOB.mat",
                         "Texture": "",
-                        "Visible": true,
+                        "Visible": false,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
                         "MeshType": 0,
@@ -3387,7 +3387,7 @@
             "BloomStrength": 0.0010000000474974513,
             "BloomFilterRadius": 0.0010000000474974513,
             "Exposure": 5.0,
-            "GlobalBias": 0.0
+            "GlobalBias": 0.004999999888241291
         }
     ]
 }
