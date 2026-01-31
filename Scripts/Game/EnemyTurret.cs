@@ -12,52 +12,39 @@ using static Engine.Transform;
 
 namespace Game
 {
-    public class WormHost : ScriptBehaviour
+    public class EnemyTurret : ScriptBehaviour
     {
-        // Movement / AI
-        [SerializeField] private bool isStationary = false;
-        [SerializeField] private bool hasSplit = false;
-
-        [SerializeField] private float speed = 50f;
-        [SerializeField] private float stationaryTimer = 10.0f;
-        private float timer = 0.0f;
+        // Range
+        [SerializeField] private bool inRange = false;
 
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint playerID = INVALID_ENTITY;
         private const string TAG_PLAYER = "Player";
 
         // Health
-        [SerializeField] private float health = 18.0f;
+        [SerializeField] private float health = 10.0f;
 
         // Events
         private const string EVENT_BULLET_HIT = "BulletHit";
-        //private const string EVENT_HOST_SPLIT = "WormHostSplit";
 
-        // Worm Child
-        private string wormChildPrefabName = "WormChild";
-        [SerializeField] private int childCount = 3;
-
-        // BARE MINIMUM
+        // Shooting
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
 
         // Lifecycle
         public override void OnStart()
         {
-            LogMessage("======= WormHost started (EntityID = " + EntityID + ") =======");
+            LogMessage("======= EnemyTurret started (EntityID = " + EntityID + ") =======");
 
-            // TODO: Set Target
-
+            TagSetTag(EntityID, "EnemyTurret");
+            
             playerID = SceneFindEntityByName(TAG_PLAYER);
             LogMessage("======= playerID: " + playerID + " =======");
 
-            isStationary = false;
-            hasSplit = false;
-            timer = 0.0f;
+            inRange = false;
 
             RigidbodySetIsKinematic(EntityID, true);
-            Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
-            RigidbodySetBoxHalfExtents(EntityID, ref extents);
+            RigidbodySetUseGravity(EntityID, false);
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
         }
@@ -65,11 +52,8 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {
             if (playerID == INVALID_ENTITY)
-            {
-                SceneDestroyEntity(EntityID);
                 return;
-            }
-
+            
             Vector3 ownPosition = GetPosition(EntityID);
             Vector3 targetPosition = GetPosition(playerID);
             Vector3 direction = targetPosition - ownPosition;
@@ -81,57 +65,23 @@ namespace Game
                 direction.Z * direction.Z
             );
 
-            if (magnitude < 0.001f)
-                return;
-
-            // Normalize direction
-            float invMag = 1.0f / magnitude;
-            Vector3 toTarget = new Vector3(
-                direction.X * invMag,
-                direction.Y * invMag,
-                direction.Z * invMag
-            );
-
-            // Use the same method as Botnet - create rotation from forward to target
-            Vector3 forward = Vector3.Forward; // This should be (0, 0, -1) based on your engine
-            Quat targetRot = QuaternionFromTo(forward, toTarget);
-            SetRotation(EntityID, ref targetRot);
-
-            if (SimpleMath.Sqrt(direction.X*direction.X + direction.Y*direction.Y + direction.Z*direction.Z) < 0.001f)
-                return;
-
-            Quat lookRot = SimpleMath.LookRotation(-direction, Vector3.Up);
-            SetRotation(EntityID, ref lookRot);
-
             if (magnitude < 250.0f)
             {
-                isStationary = true;
+                inRange = true;
+
             } else {
-                isStationary = false;
+                
+                inRange = false;
             }
 
-            if (isStationary)
+            if (inRange)
             {
-                // timer += deltaTime;
-
-                // if (timer >= stationaryTimer)
-                // {
-                    //OnSplit();
-                    // BARE MINIMUM
-                    shootingTimer -= deltaTime;
-                    if (shootingTimer <= 0.0f)
-                    {
-                        ShootAtTarget();
-                        shootingTimer = shootingCooldown;
-                    }
-                //}
-            }
-            else
-            {
-                float inverseMag = 1.0f / magnitude;
-                Vector3 normDirection = direction * inverseMag;
-                Vector3 newPosition = ownPosition + normDirection * speed * deltaTime;
-                SetPosition(EntityID, ref newPosition);
+                shootingTimer -= deltaTime;
+                if (shootingTimer <= 0.0f)
+                {
+                    ShootAtTarget();
+                    shootingTimer = shootingCooldown;
+                }
             }
         }
 
@@ -143,15 +93,20 @@ namespace Game
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
+            LogMessage("OnBulletHit called! Payload: " + payload + " | My EntityID: " + EntityID);
+
             uint hitEntityID = uint.Parse(payload.Split(',')[0]);
-            if (hitEntityID != EntityID)
+            if (hitEntityID != EntityID){
+                LogMessage("Ignoring (hitEntityID=" + hitEntityID + ")");
                 return;
+            }
             
             Vector3 emptyVec = new Vector3(0, 0, 0);
+            RigidbodySetVelocity(EntityID, ref emptyVec);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
 
             health -= 1.0f;
-            LogMessage("WormHost hit! Health: " + health);
+            LogMessage("EnemyTurret hit! Health: " + health);
 
             if (health <= 0)
             {
@@ -159,51 +114,6 @@ namespace Game
             }
         }
 
-        // Split & Spawn Children - FOR LATER
-        private void OnSplit()
-        {
-            if (hasSplit)
-                return;
-
-            hasSplit = true;
-
-            Vector3 spawnPos = GetPosition(EntityID);
-            LogMessage("======= WormHost splitting =======");
-
-            string wormChildPrefabPath = "Sources/Prefabs/WormChild.prefab";
-
-            Engine.Vector3[] offset = { new Vector3(0, 40, 0), new Vector3(40, -40, 0), new Vector3(-40, -40, 0)};
-
-            for (int i = 0; i < childCount; i++)
-            {
-                uint childID = PrefabInstantiate(wormChildPrefabPath);
-
-                if (childID == 0)
-                {
-                    LogError("Failed to spawn WormChild prefab from: " + wormChildPrefabPath);
-                    return;
-                }
-
-                Vector3 childPos = spawnPos;
-
-                if (i < offset.Length)
-                {
-                    childPos += offset[i];
-                }
-
-                SetPosition(childID, ref childPos);
-
-            }
-
-            //Publish(EVENT_HOST_SPLIT, EntityID.ToString());
-
-            // Remove host after split
-            Vector3 zero = new Vector3(0, 0, 0);
-            RigidbodySetBoxHalfExtents(EntityID, ref zero);
-            SceneDestroyEntity(EntityID);
-        }
-
-        // BARE MINIMUM
         public void ShootAtTarget()
         {
             if (playerID == INVALID_ENTITY)
@@ -246,24 +156,24 @@ namespace Game
             );
 
             // Create bullet
-            uint wormBulletID = SceneCreateEntity("WormBullet");
-            if (wormBulletID == 0)
+            uint enemyTurretBulletID = SceneCreateEntity("EnemyTurretBullet");
+            if (enemyTurretBulletID == 0)
                 return;
 
-            Transform.SetPosition(wormBulletID, ref spawnPosition);
+            Transform.SetPosition(enemyTurretBulletID, ref spawnPosition);
 
             // Set rotation to face the direction (optional, for visual)
             Vector3 forward = Vector3.Forward;
             Quat bulletRot = QuaternionFromTo(forward, directionNorm);
-            Transform.SetRotation(wormBulletID, ref bulletRot);
+            Transform.SetRotation(enemyTurretBulletID, ref bulletRot);
 
             // Setup rigidbody
-            EntityAddRigidBody(wormBulletID);
-            RigidbodySetIsKinematic(wormBulletID, false);
-            RigidbodySetUseGravity(wormBulletID, false);
+            EntityAddRigidBody(enemyTurretBulletID);
+            RigidbodySetIsKinematic(enemyTurretBulletID, false);
+            RigidbodySetUseGravity(enemyTurretBulletID, false);
 
             // Set tag
-            TagSetTag(wormBulletID, "WormBullet");
+            TagSetTag(enemyTurretBulletID, "EnemyTurretBullet");
 
             // Apply force in the direction of the player
             float bulletForce = 100.0f;
@@ -272,15 +182,17 @@ namespace Game
                 directionNorm.Y * bulletForce,
                 directionNorm.Z * bulletForce
             );
-            RigidbodyAddForce(wormBulletID, ref force);
+            RigidbodyAddForce(enemyTurretBulletID, ref force);
 
             // Set collision box
             Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
-            RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
+            RigidbodySetBoxHalfExtents(enemyTurretBulletID, ref extents);
 
-            // Add visuals and script
-            EntityAddMeshRenderer(wormBulletID);
-            EntityAddScript(wormBulletID, "Game.WormBullet");
+            // Add visuals and script - Using WormBullet
+            EntityAddMeshRenderer(enemyTurretBulletID);
+            EntityAddScript(enemyTurretBulletID, "Game.WormBullet");
+
+            LogMessage("Turret fired bullet at player!");
         }
 
         private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
