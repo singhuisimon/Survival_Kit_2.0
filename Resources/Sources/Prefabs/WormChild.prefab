@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "WormHost",
-    "Prefab GUID": 9054118174586702113,
+    "Prefab Name": "WormChild",
+    "Prefab GUID": 11883117611060887989,
     "version": 1,
     "entities": [
         {
-            "Name": "WormHost",
+            "Name": "WormChild",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6748275165371336983",
+                            "ComponentGUID": "8424353097236955563",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "18277490211439806741",
-                            "Tag": "WormHost"
+                            "ComponentGUID": "1506824069595873705",
+                            "Tag": "WormChild"
                         }
                     }
                 },
@@ -49,8 +49,8 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "407206890034530587",
-                            "Mesh": "E001_worm_host_v001.fbx",
+                            "ComponentGUID": "15918342877181919663",
+                            "Mesh": "E002_worm_child_v001.fbx",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
@@ -69,7 +69,7 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "15971647202226424089",
+                            "ComponentGUID": "6694970840326914477",
                             "Mass": 1.0,
                             "IsKinematic": false,
                             "IsTrigger": false,
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                20.0,
-                                20.0,
-                                20.0
+                                100.0,
+                                100.0,
+                                100.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -102,10 +102,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3289510651551910173",
-                            "ScriptClassName": "Game.WormHost",
+                            "ComponentGUID": "2083284821902475697",
+                            "ScriptClassName": "Game.WormChild",
                             "Started": false,
-                            "GCHandle": 9459
+                            "GCHandle": 0
                         }
                     }
                 }
