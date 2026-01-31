@@ -64,11 +64,11 @@ namespace Game
         [SerializeField] private float playerHP = 100.0f;
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
-        //[SerializeField] private 
+        //[SerializeField] private
         string EVENT_PLAYER_DAMAGE = "Damage:";
-        //[SerializeField] 
+        //[SerializeField]
         private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
-        //[SerializeField] 
+        //[SerializeField]
         private string EVENT_PLAYER_OOB = "Damage:";
 
         // ======= STATE OF COLLISION / IN ENVIRONMENT
@@ -188,6 +188,10 @@ namespace Game
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
+            // Don't process input when game is paused (check global state)
+            if (GameState.IsPaused)
+                return;
+
             // Handle cursor toggle
             HandleCursorToggle();
 
@@ -210,6 +214,15 @@ namespace Game
         {
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
+
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+            {
+                // Stop physics movement while paused
+                Vector3 zero = Vector3.Zero;
+                RigidbodySetVelocity(playerEntityID, ref zero);
+                return;
+            }
 
             // All physics/movement happens here
             HandleMovementPhysics(deltaTime);

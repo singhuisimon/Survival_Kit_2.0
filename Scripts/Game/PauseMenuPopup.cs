@@ -45,6 +45,10 @@ namespace Game
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
         private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_Player.json";
 
+        // Pause events - other scripts subscribe to these
+        private const string EVENT_GAME_PAUSED = "GamePaused";
+        private const string EVENT_GAME_RESUMED = "GameResumed";
+
         // Screen-space positions (like SettingsPopup uses)
         // Center of screen is approximately (640, 360) for 1280x720
         private const float CENTER_X = 640.0f;
@@ -258,9 +262,18 @@ namespace Game
             {
                 LogMessage("PauseMenuPopup: Main Menu clicked - returning to main menu");
                 LogMessage("Scene path: " + MAIN_MENU_SCENE_PATH);
-                HidePauseMenu();
-                // Show cursor for main menu navigation
+
+                // Reset all pause state BEFORE scene change
+                isPaused = false;
+                GameState.IsPaused = false;
+
+                // Show cursor for main menu
                 Input.SetCursorVisible(true);
+
+                // Notify scripts game is resumed before scene change
+                Event.Publish(EVENT_GAME_RESUMED, "");
+
+                // Load main menu scene
                 Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
                 return;
             }
@@ -360,6 +373,11 @@ namespace Game
             // Show cursor for menu interaction
             Input.SetCursorVisible(true);
 
+            // Set global pause state
+            GameState.IsPaused = true;
+
+            // Notify other scripts that game is paused (for scripts that use events)
+            Event.Publish(EVENT_GAME_PAUSED, "");
             LogMessage("PauseMenuPopup: Menu shown at screen center");
         }
 
@@ -398,6 +416,12 @@ namespace Game
             SetPosition(plusButtonHoveredId3, ref hidePos2);
             SetPosition(minusButtonId3, ref hidePos2);
             SetPosition(minusButtonHoveredId3, ref hidePos2);
+
+            // Clear global pause state
+            GameState.IsPaused = false;
+
+            // Notify other scripts that game is resumed (for scripts that use events)
+            Event.Publish(EVENT_GAME_RESUMED, "");
 
             // Hide cursor for gameplay
             Input.SetCursorVisible(false);

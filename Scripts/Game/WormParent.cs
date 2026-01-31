@@ -62,6 +62,10 @@ namespace Game
                 return;
             }
 
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Get direction vector with regards to updated player position
             // TODO: Find allies/core
             Vector3 ownPosition = GetPosition((uint)EntityID);

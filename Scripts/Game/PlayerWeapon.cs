@@ -126,6 +126,10 @@ namespace Game{
 
         public override void OnUpdate(float deltaTime){
 
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             elapsedTime += deltaTime;//primaryAltReady = true;
 
             // Check if reload finished

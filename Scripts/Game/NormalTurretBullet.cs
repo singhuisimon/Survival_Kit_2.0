@@ -41,10 +41,14 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Hit Something (Collide with something)
             if (hasHit)
                 return;
-            
+
             // Update lifetime
             elapsedTime += deltaTime;
             
