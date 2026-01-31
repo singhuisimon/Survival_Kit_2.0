@@ -17,6 +17,7 @@
 #include "../Component/ParticleComponent.h"
 #include "../Component/BehaviourTreeComponent.h"
 #include "../Component/ScriptComponent.h"
+#include "../Component/TrailComponent.h"
 #include "../Scripting/ScriptSerializer.h"
 
 #include "../Utility/Logger.h"
@@ -509,6 +510,72 @@ namespace Engine {
 				propertiesObj.AddMember("Sprite Layer", spriteRenderer.SpriteLayer, allocator);
 				propertiesObj.AddMember("IsActive", spriteRenderer.IsActive, allocator);
 				propertiesObj.AddMember("IsVisible", spriteRenderer.IsVisible, allocator);
+				break;
+			}
+			case ComponentTypeID::Trail:
+			{
+				if (!entity.HasComponent<TrailComponent>()) {
+					return "{}";
+				}
+				auto& trail = entity.GetComponent<TrailComponent>();
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(trail.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
+
+				// Material Type
+				std::string materialTypeName = AM.getNameFromGuid(trail.MaterialGuid);
+				propertiesObj.AddMember("Material Type",
+					Value(materialTypeName.empty() ? "" : materialTypeName.c_str(), allocator),
+					allocator);
+
+				// Config parameters
+				propertiesObj.AddMember("Max Segments", trail.MaxSegments, allocator);
+				propertiesObj.AddMember("Segment Lifetime", trail.SegmentLifetime, allocator);
+				propertiesObj.AddMember("Min Distance", trail.MinDistance, allocator);
+				propertiesObj.AddMember("Sample Interval", trail.SampleInterval, allocator);
+				propertiesObj.AddMember("Sample Accumulator", trail.SampleAccumulator, allocator);
+
+				// Start Color
+				rapidjson::Value startColorArray(kArrayType);
+				startColorArray.PushBack(trail.StartColor.x, allocator);
+				startColorArray.PushBack(trail.StartColor.y, allocator);
+				startColorArray.PushBack(trail.StartColor.z, allocator);
+				startColorArray.PushBack(trail.StartColor.w, allocator);
+				propertiesObj.AddMember("Start Color", startColorArray, allocator);
+
+				// End Color
+				rapidjson::Value endColorArray(kArrayType);
+				endColorArray.PushBack(trail.EndColor.x, allocator);
+				endColorArray.PushBack(trail.EndColor.y, allocator);
+				endColorArray.PushBack(trail.EndColor.z, allocator);
+				endColorArray.PushBack(trail.EndColor.w, allocator);
+				propertiesObj.AddMember("End Color", endColorArray, allocator);
+
+				// Width parameters
+				propertiesObj.AddMember("Start Width", trail.StartWidth, allocator);
+				propertiesObj.AddMember("End Width", trail.EndWidth, allocator);
+
+				// Last Position
+				rapidjson::Value lastPosArray(kArrayType);
+				lastPosArray.PushBack(trail.LastPosition.x, allocator);
+				lastPosArray.PushBack(trail.LastPosition.y, allocator);
+				lastPosArray.PushBack(trail.LastPosition.z, allocator);
+				propertiesObj.AddMember("Last Position", lastPosArray, allocator);
+
+				// Local Offset
+				rapidjson::Value offsetArray(kArrayType);
+				offsetArray.PushBack(trail.LocalOffset.x, allocator);
+				offsetArray.PushBack(trail.LocalOffset.y, allocator);
+				offsetArray.PushBack(trail.LocalOffset.z, allocator);
+				propertiesObj.AddMember("Local Offset", offsetArray, allocator);
+
+				// Boolean parameters
+				propertiesObj.AddMember("Has Last Position", trail.HasLastPosition, allocator);
+				propertiesObj.AddMember("Active", trail.Active, allocator);
+				propertiesObj.AddMember("Emit Trail", trail.EmitTrail, allocator);
+
 				break;
 			}
 			default:
@@ -1224,6 +1291,101 @@ namespace Engine {
 
 				return true;
 			}
+			case ComponentTypeID::Trail:
+			{
+				if (!entity.HasComponent<TrailComponent>()) {
+					entity.AddComponent<TrailComponent>();
+				}
+				auto& trail = entity.GetComponent<TrailComponent>();
+				if (properties.HasMember("ComponentGUID")) {
+					trail.ComponentGUID = xresource::instance_guid(
+						std::stoull(properties["ComponentGUID"].GetString())
+					);
+				}
+
+				// Material Type
+				if (properties.HasMember("Material Type") && properties["Material Type"].IsString()) {
+					std::string materialTypeName = properties["Material Type"].GetString();
+					trail.MaterialGuid = AM.getGuidFromName(materialTypeName);
+				}
+
+				// Config parameters
+				if (properties.HasMember("Max Segments"))
+					trail.MaxSegments = properties["Max Segments"].GetUint();
+
+				if (properties.HasMember("Segment Lifetime"))
+					trail.SegmentLifetime = properties["Segment Lifetime"].GetFloat();
+
+				if (properties.HasMember("Min Distance"))
+					trail.MinDistance = properties["Min Distance"].GetFloat();
+
+				if (properties.HasMember("Sample Interval"))
+					trail.SampleInterval = properties["Sample Interval"].GetFloat();
+
+				if (properties.HasMember("Sample Accumulator"))
+					trail.SampleAccumulator = properties["Sample Accumulator"].GetFloat();
+
+				// Start Color
+				if (properties.HasMember("Start Color") && properties["Start Color"].IsArray()) {
+					const auto& startColorArray = properties["Start Color"].GetArray();
+					if (startColorArray.Size() >= 4) {
+						trail.StartColor.x = startColorArray[0].GetFloat();
+						trail.StartColor.y = startColorArray[1].GetFloat();
+						trail.StartColor.z = startColorArray[2].GetFloat();
+						trail.StartColor.w = startColorArray[3].GetFloat();
+					}
+				}
+
+				// End Color
+				if (properties.HasMember("End Color") && properties["End Color"].IsArray()) {
+					const auto& endColorArray = properties["End Color"].GetArray();
+					if (endColorArray.Size() >= 4) {
+						trail.EndColor.x = endColorArray[0].GetFloat();
+						trail.EndColor.y = endColorArray[1].GetFloat();
+						trail.EndColor.z = endColorArray[2].GetFloat();
+						trail.EndColor.w = endColorArray[3].GetFloat();
+					}
+				}
+
+				// Width parameters
+				if (properties.HasMember("Start Width"))
+					trail.StartWidth = properties["Start Width"].GetFloat();
+
+				if (properties.HasMember("End Width"))
+					trail.EndWidth = properties["End Width"].GetFloat();
+
+				// Last Position
+				if (properties.HasMember("Last Position") && properties["Last Position"].IsArray()) {
+					const auto& lastPosArray = properties["Last Position"].GetArray();
+					if (lastPosArray.Size() >= 3) {
+						trail.LastPosition.x = lastPosArray[0].GetFloat();
+						trail.LastPosition.y = lastPosArray[1].GetFloat();
+						trail.LastPosition.z = lastPosArray[2].GetFloat();
+					}
+				}
+
+				// Local Offset
+				if (properties.HasMember("Local Offset") && properties["Local Offset"].IsArray()) {
+					const auto& offsetArray = properties["Local Offset"].GetArray();
+					if (offsetArray.Size() >= 3) {
+						trail.LocalOffset.x = offsetArray[0].GetFloat();
+						trail.LocalOffset.y = offsetArray[1].GetFloat();
+						trail.LocalOffset.z = offsetArray[2].GetFloat();
+					}
+				}
+
+				// Boolean parameters
+				if (properties.HasMember("Has Last Position"))
+					trail.HasLastPosition = properties["Has Last Position"].GetBool();
+
+				if (properties.HasMember("Active"))
+					trail.Active = properties["Active"].GetBool();
+
+				if (properties.HasMember("Emit Trail"))
+					trail.EmitTrail = properties["Emit Trail"].GetBool();
+
+				return true;
+			}
 			default:
 				LOG_WARNING("Unknown component type: ", static_cast<u32>(type));
 				return false;
@@ -1248,6 +1410,7 @@ namespace Engine {
 			case ComponentTypeID::Prefab: return "PrefabComponent";
 			case ComponentTypeID::Tag: return "TagComponent";
 			case ComponentTypeID::SpriteRenderer: return "SpriteRendererComponent";
+			case ComponentTypeID::Trail: return "TrailComponent";
 			default: return "UnknownComponent";
 		}
 	}

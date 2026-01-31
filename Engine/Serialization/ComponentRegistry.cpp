@@ -1023,7 +1023,7 @@ namespace Engine {
 
 
             meta.AddProperty<TrailComponent, glm::vec3>(
-                "Trail Offset",
+                "LocalOffset",
                 PropertyType::Vec3,
                 [](const TrailComponent& c) { return c.LocalOffset; },
                 [](TrailComponent& c, const glm::vec3& v) { c.LocalOffset = v; }

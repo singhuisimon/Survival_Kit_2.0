@@ -1,8 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
-
 #include "../../External/xresource_guid/include/xresource_guid.h"
 #include "../Utility/Types.h"
+#include "../Serialization/ComponentRegistry.h"
 
 namespace Engine
 {
@@ -17,6 +17,10 @@ namespace Engine
 
 	struct TrailComponent
 	{
+		static constexpr ComponentTypeID TypeID = ComponentTypeID::Trail;
+		static constexpr const char* TypeName = "TrailComponent";
+		xresource::instance_guid ComponentGUID;
+
 		// Buffer of segments
 		std::vector<TrailSegment> Segments;
 
@@ -45,6 +49,10 @@ namespace Engine
 		bool HasLastPosition = false;
 
 		glm::vec3 LocalOffset = glm::vec3(0.f);
+
+		TrailComponent() :
+			ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()) {  }
+
 	};
 
 }
