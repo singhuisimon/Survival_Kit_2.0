@@ -59,6 +59,7 @@ namespace Game
             // Enemy projectiles
             { "enemybullet", CollisionCategory.ENEMY_PROJECTILE },
             { "enemymissile", CollisionCategory.ENEMY_PROJECTILE },
+            { "wormbullet", CollisionCategory.ENEMY_PROJECTILE },
             
             // Ally projectiles
             { "sentrybullet", CollisionCategory.ALLY_PROJECTILE },
