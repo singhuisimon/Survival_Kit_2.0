@@ -1646,9 +1646,11 @@ namespace Engine {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 		//set uniforms
-		glm::mat4 ortho = glm::ortho(0.0f, static_cast<float>(pass.view_port.z), 
-									0.0f, static_cast<float>(pass.view_port.w), 
-									-1.0f, 1.0f);
+		// Use same fixed coordinate system as UI pass (1280x720)
+		//glm::mat4 ortho = glm::ortho(pass.view_port.x, 1280.0f,
+		//	720.0f, pass.view_port.y,
+		//	-1.0f, 1.0f);
+		glm::mat4 ortho = glm::ortho(pass.view_port.x, 1280.0f, pass.view_port.y, 720.0f, -1.0f, 1.0f);
 		prog.setUniform("u_Projection", ortho);
 
 		//bind font atlas 
