@@ -29,6 +29,11 @@ namespace Engine
 		//std::cout << "SelectedEntity: " << (uint32_t)m_SelectedEntity.GetHandle() << "\n";
 		//Bug - Scene Switching
 		m_Scene = m_Editor->GetActiveScene();
+		if(m_Scene) {
+			auto &se = MonoScriptEngine::GetInstance();
+			se.EnsureAllScriptInstances(m_Scene, true);
+		}
+
 		m_SelectedEntity = m_Editor->GetSelectedEntity();
 		m_ScenePath = m_Editor->GetScenePath();
 		m_SceneName = m_Editor->GetSceneName();
@@ -2336,7 +2341,19 @@ namespace Engine
 			ImGui::Columns(1);
 			if (openScriptComp)
 			{
-				ImGui::Text("Instance: %s", scriptComp.ScriptInstance ? "Active" : "None");
+				SetScriptingCurrentScene(m_Scene);
+				auto &se = MonoScriptEngine::GetInstance();
+				const uint32_t entityID = static_cast<uint32_t>(m_SelectedEntity.GetHandle());
+
+				MonoObject *resolvedInst = nullptr;
+				if(m_Scene && !scriptComp.ScriptClassName.empty())
+					resolvedInst = se.EnsureScriptInstance(m_Scene, entityID, true);
+				if(!resolvedInst && scriptComp.GCHandle != 0)
+					resolvedInst = se.GetObjectFromGCHandle(scriptComp.GCHandle);
+
+				scriptComp.ScriptInstance = resolvedInst;
+
+				ImGui::Text("Instance: %s", resolvedInst ? "Active" : "None");
 				ImGui::Text("Started: %s", scriptComp.Started ? "Yes" : "No");
 
 				if (!scriptFiles.empty())
@@ -2357,14 +2374,27 @@ namespace Engine
 								}
 								// Destroy previous script instance if exists
 								if (scriptComp.ScriptInstance)
+									// Destroy previous script instance/handle if exists
 								{
-									MonoScriptEngine::GetInstance().DestroyScriptInstance((MonoObject*)scriptComp.ScriptInstance);
+									auto &seLocal = MonoScriptEngine::GetInstance();
+									if(scriptComp.GCHandle != 0) {
+										seLocal.DestroyScriptHandle(scriptComp.GCHandle);
+										scriptComp.GCHandle = 0;
+									}
 									scriptComp.ScriptInstance = nullptr;
 									scriptComp.Started = false;
+									scriptComp.SerializedFields.clear();
 								}
 
 								// Assign the new script class name
 								scriptComp.ScriptClassName = selectedClassName;
+
+								// Create/recreate an instance immediately so the inspector can show fields.
+								if(m_Scene && !scriptComp.ScriptClassName.empty()) {
+									SetScriptingCurrentScene(m_Scene);
+									auto &seLocal = MonoScriptEngine::GetInstance();
+									seLocal.EnsureScriptInstance(m_Scene, entityID, true);
+								}
 
 								// DON'T create instance in editor - let ScriptSystem handle it!
 								// Just setting the class name is enough
@@ -2381,9 +2411,9 @@ namespace Engine
 					ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), "Serialized Fields:");
 					ImGui::Separator();
 					// THIS IS THE KEY LINE - renders all [SerializeField] fields
-					if (scriptComp.ScriptInstance)
+					if(resolvedInst)
 					{
-						RenderSerializedFieldsInImGui((MonoObject*)scriptComp.ScriptInstance);
+						RenderSerializedFieldsInImGui(resolvedInst);
 					}
 					else
 					{
@@ -2405,8 +2435,17 @@ namespace Engine
 				}
 			}
 			// Remove Script Component
-			if (removeScriptComp)
+			if(removeScriptComp) {
+				auto &seLocal = MonoScriptEngine::GetInstance();
+				if(scriptComp.GCHandle != 0) {
+					seLocal.DestroyScriptHandle(scriptComp.GCHandle);
+					scriptComp.GCHandle = 0;
+				}
+				scriptComp.ScriptInstance = nullptr;
+				scriptComp.Started = false;
 				m_SelectedEntity.RemoveComponent<ScriptComponent>();
+			}
+
 		}
 	}
 
