@@ -191,10 +191,6 @@ namespace Engine {
 		auto &se = MonoScriptEngine::GetInstance();
 		se.EnsureCorrectDomain();
 
-		// CRITICAL: String allocation triggers GC.
-		// Instance pointer might become invalid inside this function if not careful.
-		// We rely on RenderSerializedFieldsInImGui to handle the stale pointer update.
-
 		switch(value.type) {
 			case SerializedFieldInfo::FieldType::Int:
 			{
@@ -242,9 +238,6 @@ namespace Engine {
 		ImGui::Separator();
 
 		for(const auto &fieldInfo : fields) {
-			// CRITICAL FIX: Re-resolve instance *every* iteration.
-			// The previous iteration's SetFieldValue (specifically string) could have triggered GC.
-			// This moves the object in memory. 'scriptInstance' from the start of the function is now stale.
 			scriptInstance = se.ResolveScriptInstance(scriptInstance);
 
 			if(!scriptInstance) {
@@ -267,14 +260,19 @@ namespace Engine {
 					break;
 				case SerializedFieldInfo::FieldType::String:
 				{
-					char buf[256];
-					strncpy_s(buf, value.stringValue.c_str(), 255);
-					if(ImGui::InputText(fieldInfo.displayName.c_str(), buf, 256)) {
-						value.stringValue = buf;
-						changed = true;
-					}
+					char buf[256]{};
+					strncpy_s(buf, value.stringValue.c_str(), _TRUNCATE);
+
+					ImGui::BeginDisabled(true);
+					ImGui::InputText(fieldInfo.displayName.c_str(),
+									 buf,
+									 IM_ARRAYSIZE(buf),
+									 ImGuiInputTextFlags_ReadOnly);
+					ImGui::EndDisabled();
+
 					break;
 				}
+
 				default: break;
 			}
 
