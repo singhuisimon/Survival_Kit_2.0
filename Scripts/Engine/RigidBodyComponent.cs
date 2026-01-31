@@ -8,6 +8,10 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetVelocity(uint entityID, ref Vector3 vel);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddVelocity(uint entityID, ref Vector3 delta);
 
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern Vector3 Rigidbody_GetAngularVelocity(uint entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetAngularVelocity(uint entityID, ref Vector3 vel);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddAngularVelocity(uint entityID, ref Vector3 delta);
+
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Rigidbody_GetMass(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetMass(uint entityID, float mass);
 
@@ -24,10 +28,16 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_AddForce(uint entityID, ref Vector3 force);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_Stop(uint entityID);
 
-        public static Vector3 RigidbodyGetVelocity(uint entityID) => Rigidbody_GetVelocity(entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Rigidbody_SetBoxHalfExtent(uint entityID, ref Vector3 boxHalf);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern Vector3 Rigidbody_GetBoxHalfExtent(uint entityID);
 
+        public static Vector3 RigidbodyGetVelocity(uint entityID) => Rigidbody_GetVelocity(entityID);
         public static void RigidbodySetVelocity(uint entityID, ref Vector3 vel) => Rigidbody_SetVelocity(entityID, ref vel);
         public static void RigidbodyAddVelocity(uint entityID, ref Vector3 delta) => Rigidbody_AddVelocity(entityID, ref delta);
+
+        public static Vector3 RigidbodyGetAngularVelocity(uint entityID) => Rigidbody_GetAngularVelocity(entityID);
+        public static void RigidbodySetAngularVelocity(uint entityID, ref Vector3 vel) => Rigidbody_SetAngularVelocity(entityID, ref vel);
+        public static void RigidbodyAddAngularVelocity(uint entityID, ref Vector3 delta) => Rigidbody_AddAngularVelocity(entityID, ref delta);
 
         public static float RigidbodyGetMass(uint entityID) => Rigidbody_GetMass(entityID);
         public static void RigidbodySetMass(uint entityID, float mass) => Rigidbody_SetMass(entityID, mass);
@@ -44,6 +54,9 @@ namespace Engine
 
         public static void RigidbodyAddForce(uint entityID, ref Vector3 force) => Rigidbody_AddForce(entityID, ref force);
         public static void RigidbodyStop(uint entityID) => Rigidbody_Stop(entityID);
+
+        public static void RigidbodySetBoxHalfExtents(uint entityID, ref Vector3 boxHalf) => Rigidbody_SetBoxHalfExtent(entityID, ref boxHalf);
+        public static Vector3 RigidbodyGetBoxHalfExtents(uint entityID) => Rigidbody_GetBoxHalfExtent(entityID);
 
         // Instance-style API still fine to keep
         private uint ID => Entity.EntityID;
@@ -64,5 +77,10 @@ namespace Engine
 
         public void AddForce(Vector3 force) => Rigidbody_AddForce(ID, ref force);
         public void Stop() => Rigidbody_Stop(ID);
+        public Vector3 BoxHalfExtents
+        {
+            get { return Rigidbody_GetBoxHalfExtent(ID); }
+            set { Rigidbody_SetBoxHalfExtent(ID, ref value);}
+        }
     }
 }

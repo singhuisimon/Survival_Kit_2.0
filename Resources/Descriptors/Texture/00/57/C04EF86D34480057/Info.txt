@@ -1,0 +1,7 @@
+{
+  "name": "left.jpg",
+  "guid": "C04EF86D34480057",
+  "tags": [],
+  "lastImported": "00000000692956A0",
+  "resourceLinks": []
+}

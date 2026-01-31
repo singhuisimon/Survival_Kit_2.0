@@ -277,30 +277,54 @@ namespace Engine
         }
 
         public static Vector3 LocalChildtoWorld (uint childID){
-            Vector3 childPosition = GetPosition((uint)childID);
-            Vector3 parentPosition = GetPosition(TransformGetParent((uint)childID));
-            return parentPosition + childPosition;
+
+            // Vector3 childLocalPosition = GetPosition(childID);
+            // uint parentID = TransformGetParent(childID);
+            // Vector3 parentWorldPosition = GetPosition(parentID);
+            // Quat parentRotation = GetRotation(parentID);
+            
+            // // Rotate the child's local position by parent's rotation, then add to parent's world position
+            // return parentWorldPosition + (QuatMultiplyVec3(parentRotation, childLocalPosition));
+
+            Vector3 childLocalPosition = GetPosition(childID);
+            uint parentID = TransformGetParent(childID);
+            Vector3 parentWorldPosition = GetPosition(parentID);
+            
+            // Empirical offset formula
+            float offsetX = childLocalPosition.X * 0.76f;
+            float offsetY = childLocalPosition.Y - 1.0f;
+            float offsetZ = childLocalPosition.X * 0.65f;
+            
+            return new Vector3(
+                parentWorldPosition.X + offsetX,
+                parentWorldPosition.Y + offsetY,
+                parentWorldPosition.Z + offsetZ
+            );
+
         }
 
         public static Vector3 QuatMultiplyVec3 (Quat q, Vector3 v)
         {
-            float x = q.X;
-            float y = q.Y;
-            float z = q.Z;
-            float w = q.W;
+            float x2 = q.X * 2.0f;
+            float y2 = q.Y * 2.0f;
+            float z2 = q.Z * 2.0f;
+            float xx2 = q.X * x2;
+            float yy2 = q.Y * y2;
+            float zz2 = q.Z * z2;
+            float xy2 = q.X * y2;
+            float xz2 = q.X * z2;
+            float yz2 = q.Y * z2;
+            float wx2 = q.W * x2;
+            float wy2 = q.W * y2;
+            float wz2 = q.W * z2;
 
-            // Cross product:
-            float crossX = 2.0f * (y * v.Z - z * v.Y);
-            float crossY = 2.0f * (z * v.X - x * v.Z);
-            float crossZ = 2.0f * (x * v.Y - y * v.X);
-
-            // Final rotated vector: v + w*t + cross(q.xyz, t)
-            float rotatedX = v.X + w * crossX + (y * crossZ - z * crossY);
-            float rotatedY = v.Y + w * crossY + (z * crossX - x * crossZ);
-            float rotatedZ = v.Z + w * crossZ + (x * crossY - y * crossX);
-
-            return new Engine.Vector3(rotatedX, rotatedY, rotatedZ);
+            return new Engine.Vector3(
+                (1.0f - yy2 - zz2) * v.X + (xy2 - wz2) * v.Y + (xz2 + wy2) * v.Z,
+                (xy2 + wz2) * v.X + (1.0f - xx2 - zz2) * v.Y + (yz2 - wx2) * v.Z,
+                (xz2 - wy2) * v.X + (yz2 + wx2) * v.Y + (1.0f - xx2 - yy2) * v.Z
+            );
         }
+
         public static Quat QuatFromBasis(Vector3 right, Vector3 up, Vector3 forward)
         {
             float m00 = right.X, m01 = up.X, m02 = forward.X;
@@ -636,7 +660,7 @@ namespace Engine
             X = x; Y = y; Z = z; W = w;
         }
 
-        public static Quat Identity => new Quat(0f, 0f, 0f, 1f);
+        public static Quat Identity => new Quat(1f, 0f, 0f, 0f);
 
         public Vector3 Forward
         {

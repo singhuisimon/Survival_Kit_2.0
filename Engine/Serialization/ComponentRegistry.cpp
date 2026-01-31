@@ -887,14 +887,21 @@ namespace Engine {
             meta.AddProperty<TextComponent, std::string>(
                 "Text",
                 PropertyType::String,
-                [](const TextComponent& c) { return c.text; },
+                [](const TextComponent& c) { return c.getText(); },
                 [](TextComponent& c, const std::string& v) { c.setText(v); }
+            );
+
+            meta.AddProperty<TextComponent, std::string>(
+                "FontName",
+                PropertyType::String,
+                [](const TextComponent& c) { return c.getFontName(); },
+                [](TextComponent& c, const std::string& v) { c.setFontName(v); }
             );
 
             meta.AddProperty<TextComponent, float>(
                 "FontSize",
                 PropertyType::Float,
-                [](const TextComponent& c) { return c.fontSize;  },
+                [](const TextComponent& c) { return c.getFontSize();  },
                 [](TextComponent& c, const float& v) { return c.setFontSize(v);  }
             );
 
@@ -902,7 +909,7 @@ namespace Engine {
                 "Color",
                 PropertyType::Vec4,
                 [](const TextComponent& c) {
-                    return glm::vec4(c.color[0], c.color[1], c.color[2], c.color[3]);
+                    return c.getColor();
                 },
                 [](TextComponent& c, const glm::vec4& v) {
                     c.setColor(v);
@@ -912,7 +919,7 @@ namespace Engine {
             meta.AddProperty<TextComponent, u32>(
                 "Alignment",
                 PropertyType::U32,
-                [](const TextComponent& c) { return static_cast<u32>(c.align); },
+                [](const TextComponent& c) { return static_cast<u32>(c.getAlignment()); },
                 [](TextComponent& c, const u32& v) {
                     c.setAlignment(static_cast<TextAlignment>(v));
                 }
