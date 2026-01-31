@@ -81,7 +81,8 @@ namespace Game
             { "corebarrier", CollisionCategory.CORE_BARRIER },
             
             // Environment
-            { "oob", CollisionCategory.ENVIRONMENT }
+            { "oob", CollisionCategory.ENVIRONMENT },
+            { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT }
         };
 
         // ============================================================
