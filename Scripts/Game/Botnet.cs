@@ -23,8 +23,8 @@ namespace Game
         // ===== Serialized Fields (Editable in Inspector) =====
 
         // Movement
-        [SerializeField] private float acceleration = 300.0f;
-        [SerializeField] private float topSpeed = 400.0f;
+        [SerializeField] private float acceleration = 200.0f;
+        [SerializeField] private float topSpeed = 300.0f;
 
         // Rotation speed (how fast bot turns towards target)
         [SerializeField] private float rotateSpeed = 5.0f;
@@ -54,7 +54,7 @@ namespace Game
         [SerializeField] private float HP = 3.0f;
 
         // Botnet Damage
-        [SerializeField] private float blastDamage = 20.0f;
+        [SerializeField] private float blastDamage = 5.0f;
 
         //DEBUG
         [SerializeField] private string TARGET = "";

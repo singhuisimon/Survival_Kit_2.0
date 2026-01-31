@@ -19,6 +19,7 @@ namespace Engine {
         BehaviourTree = 13,
         SpriteRenderer = 14,
         Text = 15,
+        Trail = 16,
         Prefab = 100,
         Tag = 101,
 

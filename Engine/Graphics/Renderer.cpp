@@ -330,12 +330,12 @@ namespace Engine {
 					draw(pass, draw_items, view, proj, cam.second, lights);
 
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
+
 				}
 			}
 		}
 
-
-		renderFinalPass(m_finalpass);
+		renderFinalPass(m_finalpass, draw_items, editor_camera);
 		renderUIPass(m_UIPass, draw_items);
 		renderTextPass(m_textPass, draw_items);
 
@@ -389,7 +389,7 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
-			if (item.m_drawitem_type == DrawItemType::SPRITE2D || item.m_drawitem_type == DrawItemType::TEXT) continue;
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D || item.m_drawitem_type == DrawItemType::TEXT || item.m_drawitem_type == DrawItemType::TRAIL) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -905,7 +905,7 @@ namespace Engine {
 	}
 
 
-	void Renderer::renderFinalPass(RenderPass& pass) {
+	void Renderer::renderFinalPass(RenderPass& pass, std::span<const DrawItem> draw_items, Camera3D& editor_camera) {
 
 		// Update pass viewport if allowed
 		if (pass.auto_aspect) {
@@ -932,6 +932,7 @@ namespace Engine {
 
 		// Render skybox into HDR FBO 0 after bloom is computed  
 		renderSkyboxHDR();
+		RenderTrails(draw_items, editor_camera, editor_camera.getCamPos());
 
 		// Final composite: HDR scene + bloom -> LDR
 		beginFrame(pass);
@@ -1245,6 +1246,7 @@ namespace Engine {
 	 */
 	void Renderer::initBasicGeometry() {
 		RenderBypassUtils::loadBasicPrimitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
+		InitTrailResources();
 	}
 
 	/**
@@ -1832,6 +1834,7 @@ namespace Engine {
 		return true;
 	}
 
+	
 	Font* Renderer::getFont(const std::string& fontName) {
 		auto it = m_fonts.find(fontName);
 		if (it != m_fonts.end()) {
@@ -1840,6 +1843,166 @@ namespace Engine {
 		return &m_defaultFont;
 	}
 
+	void Renderer::BuildTrailGeometry(const TrailComponent& trail, std::vector<TrailVertex>& vertices, std::vector<u32>& indices) {
+		vertices.clear();
+		indices.clear();
 
+		size_t segmentCount = trail.Segments.size();
+
+		// Generate quad strip vertices
+		for (size_t i = 0; i < segmentCount; ++i) {
+			const TrailSegment& segment = trail.Segments[i];
+
+			// Calculate UV coordinates
+			float u = static_cast<float>(i) / static_cast<float>(segmentCount - 1);
+			float normalizedAge = segment.TimeStamp / trail.SegmentLifetime;
+
+			// Two vertices per segment (left and right edge)
+			// The actual offset is computed in vertex shader based on camera right vector
+
+			TrailVertex leftVert;
+			leftVert.Position = segment.Position;
+			leftVert.Tangent = segment.Normal;  // Actually tangent
+			leftVert.UV = glm::vec2(u, 0.0f);
+			leftVert.Width = segment.Width;
+			leftVert.Age = normalizedAge;
+
+			TrailVertex rightVert;
+			rightVert.Position = segment.Position;
+			rightVert.Tangent = segment.Normal;
+			rightVert.UV = glm::vec2(u, 1.0f);
+			rightVert.Width = segment.Width;
+			rightVert.Age = normalizedAge;
+
+			vertices.push_back(leftVert);
+			vertices.push_back(rightVert);
+		}
+
+		// Generate indices for triangle strip
+		for (size_t i = 0; i < segmentCount - 1; ++i) {
+			uint32_t baseIdx = static_cast<uint32_t>(i * 2);
+
+			// First triangle
+			indices.push_back(baseIdx);
+			indices.push_back(baseIdx + 2);
+			indices.push_back(baseIdx + 1);
+
+			// Second triangle
+			indices.push_back(baseIdx + 1);
+			indices.push_back(baseIdx + 2);
+			indices.push_back(baseIdx + 3);
+		}
+	}
+
+	void Renderer::InitTrailResources() {
+		glCreateVertexArrays(1, &m_TrailVAO);
+		glCreateBuffers(1, &m_TrailVBO);
+		glCreateBuffers(1, &m_TrailEBO);
+
+		// Position attribute
+		glEnableVertexArrayAttrib(m_TrailVAO, 0);
+		glVertexArrayAttribFormat(m_TrailVAO, 0, 3, GL_FLOAT, GL_FALSE,
+			offsetof(TrailVertex, Position));
+		glVertexArrayAttribBinding(m_TrailVAO, 0, 0);
+
+		// Tangent attribute
+		glEnableVertexArrayAttrib(m_TrailVAO, 1);
+		glVertexArrayAttribFormat(m_TrailVAO, 1, 3, GL_FLOAT, GL_FALSE,
+			offsetof(TrailVertex, Tangent));
+		glVertexArrayAttribBinding(m_TrailVAO, 1, 0);
+
+		// UV attribute
+		glEnableVertexArrayAttrib(m_TrailVAO, 2);
+		glVertexArrayAttribFormat(m_TrailVAO, 2, 2, GL_FLOAT, GL_FALSE,
+			offsetof(TrailVertex, UV));
+		glVertexArrayAttribBinding(m_TrailVAO, 2, 0);
+
+		// Width attribute
+		glEnableVertexArrayAttrib(m_TrailVAO, 3);
+		glVertexArrayAttribFormat(m_TrailVAO, 3, 1, GL_FLOAT, GL_FALSE,
+			offsetof(TrailVertex, Width));
+		glVertexArrayAttribBinding(m_TrailVAO, 3, 0);
+
+		// Age attribute
+		glEnableVertexArrayAttrib(m_TrailVAO, 4);
+		glVertexArrayAttribFormat(m_TrailVAO, 4, 1, GL_FLOAT, GL_FALSE,
+			offsetof(TrailVertex, Age));
+		glVertexArrayAttribBinding(m_TrailVAO, 4, 0);
+
+		// Bind VBO to binding point 0
+		glVertexArrayVertexBuffer(m_TrailVAO, 0, m_TrailVBO, 0, sizeof(TrailVertex));
+		glVertexArrayElementBuffer(m_TrailVAO, m_TrailEBO);
+	}
+
+	void Renderer::RenderTrails(std::span<const DrawItem> trailItems, const Camera3D& camera, const glm::vec3& camPos) {
+
+		if (trailItems.empty())
+			return;
+
+		auto& fbo = m_framebuffers[0];
+
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo.handle());
+
+		auto& shaderProgram = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::TRAIL)];
+
+		shaderProgram.programUse();
+
+		// Set camera uniforms
+		glm::mat4 viewProj = camera.getPerspective() * camera.getLookAt();
+		shaderProgram.setUniform("u_ViewProjection", viewProj);
+		shaderProgram.setUniform("u_CameraPos", camPos);
+
+		// Enable blending for trails
+		glDisable(GL_DEPTH_TEST);        // Don't test against depth buffer
+		glDepthMask(GL_FALSE);           // Don't write to depth buffer
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		for (const auto& item : trailItems) {
+			const TrailComponent* trail = item.m_trail_data;
+
+			if (!trail || trail->Segments.size() < 2)
+				continue;
+
+			// Build vertex buffer for this trail
+			std::vector<TrailVertex> vertices;
+			std::vector<uint32_t> indices;
+
+			BuildTrailGeometry(*trail, vertices, indices);
+
+			// Upload to GPU (use dynamic VAO/VBO or persistent mapping)
+			glBindVertexArray(m_TrailVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_TrailVBO);
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(TrailVertex),
+				vertices.data(), GL_DYNAMIC_DRAW);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_TrailEBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t),
+				indices.data(), GL_DYNAMIC_DRAW);
+
+			// Set trail-specific uniforms
+			shaderProgram.setUniform("u_StartColor", trail->StartColor);
+			shaderProgram.setUniform("u_EndColor", trail->EndColor);
+
+			// Bind material texture if available
+			if (trail->MaterialGuid != 0) {
+				// Load material texture
+				// std::string matPath = AM.getNamedFromGuid(trail->MaterialGuid);
+				// Bind texture...
+			}
+
+			// Draw
+			glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
+				GL_UNSIGNED_INT, nullptr);
+		}
+
+		// Restore state
+		glEnable(GL_DEPTH_TEST);         // Re-enable depth testing
+		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
+
+		shaderProgram.programFree();
+	}
 }// end of namespace Engine
 

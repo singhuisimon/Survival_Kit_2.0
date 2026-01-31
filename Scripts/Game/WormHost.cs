@@ -18,8 +18,8 @@ namespace Game
         [SerializeField] private bool isStationary = false;
         [SerializeField] private bool hasSplit = false;
 
-        [SerializeField] private float speed = 20f;
-        [SerializeField] private float stationaryTimer = 100.0f;
+        [SerializeField] private float speed = 50f;
+        [SerializeField] private float stationaryTimer = 10.0f;
         private float timer = 0.0f;
 
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -27,15 +27,19 @@ namespace Game
         private const string TAG_PLAYER = "Player";
 
         // Health
-        [SerializeField] private float health = 10.0f;
+        [SerializeField] private float health = 18.0f;
 
         // Events
         private const string EVENT_BULLET_HIT = "BulletHit";
-        private const string EVENT_HOST_SPLIT = "WormHostSplit";
+        //private const string EVENT_HOST_SPLIT = "WormHostSplit";
 
         // Worm Child
-        [SerializeField] private string wormChildPrefabName = "WormChild";
+        private string wormChildPrefabName = "WormChild";
         [SerializeField] private int childCount = 3;
+
+        // BARE MINIMUM
+        [SerializeField] private float shootingCooldown = 0.25f;
+        private float shootingTimer = 0.0f;
 
         // Lifecycle
         public override void OnStart()
@@ -58,50 +62,64 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // TODO: To add finding target script
-
             if (hasSplit || playerID == INVALID_ENTITY)
                 return;
-
+            
             Vector3 ownPosition = GetPosition(EntityID);
             Vector3 targetPosition = GetPosition(playerID);
             Vector3 direction = targetPosition - ownPosition;
 
-            // Rotation
-            float yaw = SimpleMath.Atan2(direction.X, direction.Z) + SimpleMath.PI;
-            Vector3 upAxis = new Vector3(0, 1, 0);
-            Quat yawQ = Quat.FromAxisAngle(upAxis, yaw);
-
-            float horizLen = SimpleMath.Sqrt(direction.X * direction.X + direction.Z * direction.Z);
-            float pitch = SimpleMath.Atan2(direction.Y, horizLen);
-
-            Vector3 localRight = new Vector3(1, 0, 0);
-            Vector3 rightAxis = SimpleMath.QuatMultiplyVec3(yawQ, localRight);
-            Quat pitchQ = Quat.FromAxisAngle(rightAxis, -pitch);
-
-            Quat finalRotation = pitchQ * yawQ;
-            SetRotation(EntityID, ref finalRotation);
-
-            // Movement
+            // Rotation - aim at player
             float magnitude = SimpleMath.Sqrt(
                 direction.X * direction.X +
                 direction.Y * direction.Y +
                 direction.Z * direction.Z
             );
 
-            if (magnitude < 50.0f)
+            if (magnitude < 0.001f)
+                return;
+
+            // Normalize direction
+            float invMag = 1.0f / magnitude;
+            Vector3 toTarget = new Vector3(
+                direction.X * invMag,
+                direction.Y * invMag,
+                direction.Z * invMag
+            );
+
+            // Use the same method as Botnet - create rotation from forward to target
+            Vector3 forward = Vector3.Forward; // This should be (0, 0, -1) based on your engine
+            Quat targetRot = QuaternionFromTo(forward, toTarget);
+            SetRotation(EntityID, ref targetRot);
+
+            if (SimpleMath.Sqrt(direction.X*direction.X + direction.Y*direction.Y + direction.Z*direction.Z) < 0.001f)
+                return;
+
+            Quat lookRot = SimpleMath.LookRotation(-direction, Vector3.Up);
+            SetRotation(EntityID, ref lookRot);
+
+            if (magnitude < 250.0f)
             {
                 isStationary = true;
+            } else {
+                isStationary = false;
             }
 
             if (isStationary)
             {
-                timer += deltaTime;
+                // timer += deltaTime;
 
-                if (timer >= stationaryTimer)
-                {
-                    OnSplit();
-                }
+                // if (timer >= stationaryTimer)
+                // {
+                    //OnSplit();
+                    // BARE MINIMUM
+                    shootingTimer -= deltaTime;
+                    if (shootingTimer <= 0.0f)
+                    {
+                        ShootAtTarget();
+                        shootingTimer = shootingCooldown;
+                    }
+                //}
             }
             else
             {
@@ -136,7 +154,7 @@ namespace Game
             }
         }
 
-        // Split & Spawn Children
+        // Split & Spawn Children - FOR LATER
         private void OnSplit()
         {
             if (hasSplit)
@@ -147,28 +165,149 @@ namespace Game
             Vector3 spawnPos = GetPosition(EntityID);
             LogMessage("======= WormHost splitting =======");
 
-            // for (int i = 0; i < childCount; i++)
-            // {
-            //     uint child = PrefabInstantiate(wormChildPrefabName);
-            //     if (child == INVALID_ENTITY)
-            //         continue;
+            string wormChildPrefabPath = "Sources/Prefabs/WormChild.prefab";
 
-            //     Vector3 offset = new Vector3(
-            //         SimpleMath.Cos(i * 2.0f) * 20.0f,
-            //         0.0f,
-            //         SimpleMath.Sin(i * 2.0f) * 20.0f
-            //     );
+            Engine.Vector3[] offset = { new Vector3(0, 40, 0), new Vector3(40, -40, 0), new Vector3(-40, -40, 0)};
 
-            //     Vector3 childPos = spawnPos + offset;
-            //     SetPosition(child, ref childPos);
-            // }
+            for (int i = 0; i < childCount; i++)
+            {
+                uint childID = PrefabInstantiate(wormChildPrefabPath);
 
-            // Publish(EVENT_HOST_SPLIT, EntityID.ToString());
+                if (childID == 0)
+                {
+                    LogError("Failed to spawn WormChild prefab from: " + wormChildPrefabPath);
+                    return;
+                }
+
+                Vector3 childPos = spawnPos;
+
+                if (i < offset.Length)
+                {
+                    childPos += offset[i];
+                }
+
+                SetPosition(childID, ref childPos);
+
+            }
+
+            //Publish(EVENT_HOST_SPLIT, EntityID.ToString());
 
             // Remove host after split
             Vector3 zero = new Vector3(0, 0, 0);
             RigidbodySetBoxHalfExtents(EntityID, ref zero);
             SceneDestroyEntity(EntityID);
+        }
+
+        // BARE MINIMUM
+        public void ShootAtTarget()
+        {
+            if (playerID == INVALID_ENTITY)
+                return;
+
+            // Get positions
+            Vector3 wormPos = GetPosition(EntityID);
+            Vector3 playerPos = GetPosition(playerID);
+
+            // Calculate direction to player
+            Vector3 direction = new Vector3(
+                playerPos.X - wormPos.X,
+                playerPos.Y - wormPos.Y,
+                playerPos.Z - wormPos.Z
+            );
+
+            // Normalize direction
+            float magnitude = SimpleMath.Sqrt(
+                direction.X * direction.X +
+                direction.Y * direction.Y +
+                direction.Z * direction.Z
+            );
+
+            if (magnitude < 0.001f)
+                return;
+
+            float invMag = 1.0f / magnitude;
+            Vector3 directionNorm = new Vector3(
+                direction.X * invMag,
+                direction.Y * invMag,
+                direction.Z * invMag
+            );
+
+            // Spawn bullet slightly in front
+            float spawnDist = 1.5f;
+            Vector3 spawnPosition = new Vector3(
+                wormPos.X + directionNorm.X * spawnDist,
+                wormPos.Y + directionNorm.Y * spawnDist,
+                wormPos.Z + directionNorm.Z * spawnDist
+            );
+
+            // Create bullet
+            uint wormBulletID = SceneCreateEntity("WormBullet");
+            if (wormBulletID == 0)
+                return;
+
+            Transform.SetPosition(wormBulletID, ref spawnPosition);
+
+            // Set rotation to face the direction (optional, for visual)
+            Vector3 forward = Vector3.Forward;
+            Quat bulletRot = QuaternionFromTo(forward, directionNorm);
+            Transform.SetRotation(wormBulletID, ref bulletRot);
+
+            // Setup rigidbody
+            EntityAddRigidBody(wormBulletID);
+            RigidbodySetIsKinematic(wormBulletID, false);
+            RigidbodySetUseGravity(wormBulletID, false);
+
+            // Set tag
+            TagSetTag(wormBulletID, "WormBullet");
+
+            // Apply force in the direction of the player
+            float bulletForce = 100.0f;
+            Vector3 force = new Vector3(
+                directionNorm.X * bulletForce,
+                directionNorm.Y * bulletForce,
+                directionNorm.Z * bulletForce
+            );
+            RigidbodyAddForce(wormBulletID, ref force);
+
+            // Set collision box
+            Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
+            RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
+
+            // Add visuals and script
+            EntityAddMeshRenderer(wormBulletID);
+            EntityAddScript(wormBulletID, "Game.WormBullet");
+        }
+
+        private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
+        {
+            float dot = from.X * to.X + from.Y * to.Y + from.Z * to.Z;
+
+            if (dot < -0.9999f)
+            {
+                Quat q180;
+                q180.X = 0.0f;
+                q180.Y = 1.0f;
+                q180.Z = 0.0f;
+                q180.W = 0.0f;
+                return q180;
+            }
+
+            Vector3 cross = new Vector3(
+                from.Y * to.Z - from.Z * to.Y,
+                from.Z * to.X - from.X * to.Z,
+                from.X * to.Y - from.Y * to.X
+            );
+
+            float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
+            float invS = 1.0f / s;
+
+            Quat q;
+            q.X = cross.X * invS;
+            q.Y = cross.Y * invS;
+            q.Z = cross.Z * invS;
+            q.W = 0.5f * s;
+
+            return q;
         }
     }
 }

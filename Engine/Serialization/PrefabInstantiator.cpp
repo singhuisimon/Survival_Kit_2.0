@@ -16,6 +16,7 @@
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TrailComponent.h"
 
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
@@ -437,7 +438,8 @@ namespace Engine
             ComponentTypeID::ParticleSystem,
             ComponentTypeID::Script,
             ComponentTypeID::BehaviourTree,
-			ComponentTypeID::SpriteRenderer
+			ComponentTypeID::SpriteRenderer,
+            ComponentTypeID::Trail
         };
 
         for (const auto& prefabEntity : prefab.entities) {
@@ -516,6 +518,9 @@ namespace Engine
                 case ComponentTypeID::SpriteRenderer:
                     existsOnEntity = sceneEntity.HasComponent<SpriteRendererComponent>();
 					break;
+                case ComponentTypeID::Trail:
+                    existsOnEntity = sceneEntity.HasComponent<TrailComponent>();
+                    break;
                 default:
                     break;
                 }
@@ -900,7 +905,10 @@ namespace Engine
                     newEntityData.components.push_back(
                         PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::SpriteRenderer));
                 }
-
+                if (childEntity.HasComponent<TrailComponent>()) {
+                    newEntityData.components.push_back(
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Trail));
+                }
                 prefab.entities.push_back(newEntityData);
                 sceneHandleToPrefabLocalID[childID] = newEntityData.localID;
 
@@ -1007,6 +1015,10 @@ namespace Engine
         case ComponentTypeID::SpriteRenderer:
             if (entity.HasComponent<SpriteRendererComponent>())
                 entity.RemoveComponent<SpriteRendererComponent>();
+            break;
+        case ComponentTypeID::Trail:
+            if (entity.HasComponent<TrailComponent>())
+                entity.RemoveComponent<TrailComponent>();
             break;
         default:
             LOG_WARNING("Unknown component type for removal: ", static_cast<u32>(type));
