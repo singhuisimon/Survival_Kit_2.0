@@ -1,0 +1,7 @@
+{
+  "name": "Paused_PlusButton.png",
+  "guid": "1540D0824E60801F",
+  "tags": [],
+  "lastImported": "00000000697DBF02",
+  "resourceLinks": []
+}
