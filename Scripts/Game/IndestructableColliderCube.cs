@@ -55,7 +55,7 @@ namespace Game {
                 foreach (uint collidedEntityId in playerCollision)
                 {
                     if(collidedEntityId == (uint)EntityID){
-                        InContact = true;
+                        DamagePlayer = true;
                         DamageSystem.DealDamage(playerID, Damage, (uint)EntityID);
 
                         LogMessage("[IndestructableColliderCube] Player contacted lethal wall - dealing " + Damage + " damage");
