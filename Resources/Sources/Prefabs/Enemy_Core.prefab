@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Core.prefab",
-    "Prefab GUID": 15399663661328482503,
+    "Prefab GUID": 1857453931077714119,
     "version": 1,
     "entities": [
         {
@@ -94,6 +94,18 @@
                                 75.0
                             ],
                             "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7622061454111801539",
+                            "ScriptClassName": "Game.EnemyCore",
+                            "Started": false,
+                            "GCHandle": 19
                         }
                     }
                 }
