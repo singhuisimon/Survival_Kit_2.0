@@ -1100,6 +1100,17 @@ namespace Engine
 			componentsArray.PushBack(compObj, allocator);
 		}
 
+		// Trail Component
+		if (entity.HasComponent<TrailComponent>())
+		{
+			std::string trailJSON = ComponentSerializer::SerializeComponent(entity, ComponentTypeID::Trail);
+			rapidjson::Value compObj(rapidjson::kObjectType);
+			compObj.AddMember("type", static_cast<int>(ComponentTypeID::Trail), allocator);
+			compObj.AddMember("typeName", "TrailComponent", allocator);
+			compObj.AddMember("data", rapidjson::Value(trailJSON.c_str(), allocator), allocator);
+			componentsArray.PushBack(compObj, allocator);
+		}
+
 		doc.AddMember("components", componentsArray, allocator);
 
 		rapidjson::StringBuffer buffer;

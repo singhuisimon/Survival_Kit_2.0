@@ -53,6 +53,8 @@ namespace Engine {
 		uint32_t   CreateScriptInstanceHandle(const std::string &className, MonoObject **outInstance = nullptr, bool pinned = false);
 		MonoObject *GetObjectFromGCHandle(uint32_t gcHandle);
 		void       DestroyScriptHandle(uint32_t gcHandle);
+		uint32_t   CreateGCHandleForObject(MonoObject *obj, bool pinned = false);
+		void       FreeGCHandle(uint32_t gcHandle);
 
 		// Legacy API (NO LONGER ROOTS/OWNS LIFETIME):
 		// Returns a raw MonoObject*; caller must immediately create/store a GCHandle,
@@ -95,6 +97,13 @@ namespace Engine {
 		// Hot reload support
 		void EnsureCorrectDomain();
 		bool IsInCorrectDomain();
+		// NOTE: Any native thread calling into Mono must be attached.
+		void EnsureThreadAttached();
+
+		// Editor/runtime safety: resolve a possibly-stale MonoObject* (cached raw pointer)
+		// to the current instance address using the owning ScriptComponent's GCHandle.
+		// Returns nullptr if it cannot be resolved safely.
+		MonoObject *ResolveScriptInstance(MonoObject *maybeStale);
 
 		// Getters
 		MonoDomain *GetRootDomain() const {
@@ -109,6 +118,21 @@ namespace Engine {
 		MonoImage *GetImage() const {
 			return m_AppImage;
 		}
+
+		// ============================================================
+		// Editor/runtime helper: ensure managed instances exist
+		// ============================================================
+		// Ensures a ScriptComponent has a valid managed instance and rooted GCHandle.
+		// - Creates an instance if missing
+		// - Clears garbage/stale handles loaded from disk
+		// - Recreates instances if the type no longer matches ScriptClassName
+		// - Does NOT call OnStart/OnUpdate/OnFixedUpdate
+		MonoObject *EnsureScriptInstance(Scene *scene, std::uint32_t entityID, bool applySerializedFields = true);
+
+		// Ensures every ScriptComponent in the scene has a valid managed instance.
+		// Does NOT call OnStart/OnUpdate/OnFixedUpdate.
+		void EnsureAllScriptInstances(Scene *scene, bool applySerializedFields = true);
+
 
 		// Legacy helper kept for compilation safety (best-effort).
 		// If you have a GCHandle, call GetObjectFromGCHandle(handle) instead.
@@ -141,6 +165,7 @@ namespace Engine {
 		MonoImage *m_AppImage = nullptr;
 		std::string   m_AssemblyPath;
 		std::unordered_map<std::string, MonoClass *> m_ClassCache;
+		std::unordered_set<std::uint32_t> m_LiveGCHandles;
 	};
 
 } // namespace Engine

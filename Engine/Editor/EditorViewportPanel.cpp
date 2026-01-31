@@ -436,7 +436,8 @@ namespace Engine
                 // Load the original scene
                 activeScene->LoadFromFile(m_OriginalScenePath);
                 RestoreEditModeScriptFieldOverrides(activeScene);
-
+                auto &se = Engine::MonoScriptEngine::GetInstance();
+                se.EnsureAllScriptInstances(activeScene, true);
                 // Reset scene name and path in Editor
                 m_Editor->SetScenePath(m_OriginalScenePath);
                 m_Editor->SetSceneName(m_OriginalSceneName);

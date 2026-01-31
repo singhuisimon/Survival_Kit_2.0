@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "WormHost",
-    "Prefab GUID": 9054118174586702113,
+    "Prefab Name": "Prefab: Enemy_Core.prefab",
+    "Prefab GUID": 1857453931077714119,
     "version": 1,
     "entities": [
         {
-            "Name": "WormHost",
+            "Name": "Enemy_Core",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6748275165371336983",
+                            "ComponentGUID": "15974154088651932187",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                0.009999999776482582,
-                                0.009999999776482582,
-                                0.009999999776482582
+                                150.0,
+                                150.0,
+                                150.0
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "18277490211439806741",
-                            "Tag": "WormHost"
+                            "ComponentGUID": "6750782051797156377",
+                            "Tag": "Enemy_Core"
                         }
                     }
                 },
@@ -49,9 +49,9 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "407206890034530587",
-                            "Mesh": "E001_worm_host_v001.fbx",
-                            "Material": "",
+                            "ComponentGUID": "15397693336348852765",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -69,11 +69,11 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "15971647202226424089",
+                            "ComponentGUID": "16550614840955896351",
                             "Mass": 1.0,
                             "IsKinematic": false,
-                            "IsTrigger": false,
-                            "UseGravity": true,
+                            "IsTrigger": true,
+                            "UseGravity": false,
                             "Velocity": [
                                 0.0,
                                 0.0,
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                20.0,
-                                20.0,
-                                20.0
+                                75.0,
+                                75.0,
+                                75.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -102,10 +102,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3289510651551910173",
-                            "ScriptClassName": "Game.WormHost",
+                            "ComponentGUID": "7622061454111801539",
+                            "ScriptClassName": "Game.EnemyCore",
                             "Started": false,
-                            "GCHandle": 9459
+                            "GCHandle": 19
                         }
                     }
                 }

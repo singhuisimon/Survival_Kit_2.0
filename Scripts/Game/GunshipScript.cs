@@ -38,8 +38,9 @@ namespace Game
         private uint gunshipID = INVALID_ENTITY; // getting the ID of the read gunship entity
         private bool initialized = false;
 
-        // Tags of enemies to shoot (right now, currently testing with botnet in Level1_Player)
-        private readonly string[] enemyTags = { "botnet"};
+        // List of enemies to verify and target
+        private readonly string[] enemyTags = { "botnet" , "wormhost" , "wormchild" , "loveletter" };
+
 
         // Start up
         public override void OnStart() 
@@ -70,10 +71,13 @@ namespace Game
 
                 turretRotation = GetRotation(gunshipID);
 
-                Subscribe("GunshipDamage: " + gunshipID, OnTakeDamage);
+                Subscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
                 
                 initialized = true;
             }
+
+            //DebugFireOnKey();
+
             // does not do anything is Gunship is dead
             if (isDead)
                 return;
@@ -184,6 +188,76 @@ namespace Game
             return nearestEnemy;
         }
 
+        // Press K to force the gunship to fire one bullet (This is used for Debugging)
+        private void DebugFireOnKey() 
+        {
+            if (!Input.IsKeyReleased(KeyCode.K)) 
+                return;
+
+            // Must be initalized
+            if (gunshipID == 0 || gunshipID == INVALID_ENTITY)
+            {
+                LogWarning("[GunshipDebug] Can't fire yet: gunshipID not ready.");
+                return;
+            }
+
+            fireCooldown = 0.0f;
+
+            Vector3 gunPos = GetPosition(gunshipID);
+            Vector3 helperPos = GetPosition((uint)EntityID);
+
+            Vector3 dir;
+            if (currentTarget != INVALID_ENTITY)
+            {
+                Vector3 targetPos = GetPosition(currentTarget);
+                dir = new Vector3(targetPos.X - gunPos.X, targetPos.Y - gunPos.Y, targetPos.Z - gunPos.Z);
+            }
+            else
+            {
+                Quat gunRot = GetRotation(gunshipID);
+                dir = gunRot.Forward;
+            }
+
+            float lenSq = dir.X * dir.X + dir.Y * dir.Y + dir.Z * dir.Z;
+            if (lenSq < 0.0001f)
+            {
+                LogWarning("[GunshipDebug] Direction too small, not firing.");
+                return;
+            }
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            dir.X *= invLen; dir.Y *= invLen; dir.Z *= invLen;
+
+            float muzzleDist = 1.0f;
+            Vector3 spawnPos = new Vector3 (
+                gunPos.X + dir.X * muzzleDist,
+                gunPos.Y + dir.Y * muzzleDist,
+                gunPos.Z + dir.Z * muzzleDist
+            );
+
+            Quat bulletRot = SimpleMath.LookRotation(dir, Vector3.Up);
+            Vector3 bulletScale = new Vector3(0.3f, 0.2f, 0.15f);
+
+            uint bulletID = PrefabInstantiateWithTransform (
+                bulletPrefabPath,
+                ref spawnPos,
+                ref bulletRot,
+                ref bulletScale,
+                false
+            );
+
+            if (bulletID == 0 || bulletID == INVALID_ENTITY) 
+            {
+                LogError("[GunshipDebug] Failed to spawn bullet.");
+                return;
+            }
+
+            Vector3 vel = new Vector3(dir.X * bulletSpeed, dir.Y * bulletSpeed, dir.Z * bulletSpeed);
+            RigidbodySetVelocity(bulletID, ref vel);
+
+            // LogMessage($"[GunshipDebug] gunPos=({gunPos.X},{gunPos.Y},{gunPos.Z}) helperPos=({helperPos.X},{helperPos.Y},{helperPos.Z})");
+            // LogMessage($"[GunshipDebug] spawnPos=({spawnPos.X},{spawnPos.Y},{spawnPos.Z}) dir=({dir.X},{dir.Y},{dir.Z}) bulletID={bulletID}");
+        }
+
         // Turret Rotation
 
         // ===== THIS FUNCTION IS CURRENTLY NOT BEING USED AS OF RIGHT NOW ======
@@ -247,7 +321,7 @@ namespace Game
 
            // Shoot from helper position (hidden inside the Gunship)
            uint self = (uint)EntityID;
-           Vector3 myPos = GetPosition(self);
+           Vector3 myPos = GetPosition(gunshipID);
 
            // Enemy Position
            Vector3 targetPos = GetPosition(currentTarget);
@@ -341,7 +415,7 @@ namespace Game
             LogMessage("Gunship destroyed!");
             
             // Publish death event 
-            Publish("GunshipDeath", EntityID.ToString());
+            Publish("GunshipDeath", gunshipID.ToString());
             
             
             // Destroy the gunship

@@ -59,6 +59,7 @@ namespace Game
             // Enemy projectiles
             { "enemybullet", CollisionCategory.ENEMY_PROJECTILE },
             { "enemymissile", CollisionCategory.ENEMY_PROJECTILE },
+            { "wormbullet", CollisionCategory.ENEMY_PROJECTILE },
             
             // Ally projectiles
             { "sentrybullet", CollisionCategory.ALLY_PROJECTILE },
@@ -75,13 +76,15 @@ namespace Game
             { "adware", CollisionCategory.ENEMY },
             { "wormhost", CollisionCategory.ENEMY },
             { "wormchild", CollisionCategory.ENEMY },
+            { "enemy_core", CollisionCategory.ENEMY },
             
             // Objectives
             { "semiconductor", CollisionCategory.CORE },
             { "corebarrier", CollisionCategory.CORE_BARRIER },
             
             // Environment
-            { "oob", CollisionCategory.ENVIRONMENT }
+            { "oob", CollisionCategory.ENVIRONMENT },
+            { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT }
         };
 
         // ============================================================

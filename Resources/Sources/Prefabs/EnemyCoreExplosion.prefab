@@ -1,0 +1,85 @@
+{
+    "Prefab Name": "Prefab: EnemyCoreExplosion.prefab",
+    "Prefab GUID": 15936084598191899897,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "EnemyCoreExplosion",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4133768455900135615",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3557307703596712125",
+                            "Tag": "EnemyCoreExplosion"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "98543189776515265",
+                            "FilePath": "Core Destruction.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 51.75299835205078,
+                            "MaxDistance": 552.2169799804688,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17968826511183839471",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 187
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

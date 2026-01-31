@@ -7,20 +7,20 @@
     "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
-        0.0,
-        0.7941179275512695,
-        1.0
+        0.8627451062202454,
+        0.7358708381652832,
+        0.0
     ],
     "emissionColor": [
-        1.0,
-        1.0,
-        1.0
+        0.22549021244049072,
+        0.01638510636985302,
+        0.0033160357270389795
     ],
-    "metallic": 0.0,
-    "roughness": 1.0,
+    "metallic": 0.029999999329447746,
+    "roughness": 0.07000000029802322,
     "opacity": 1.0,
-    "emissionStrength": 100.0,
-    "alphaThreshold": 0.5,
+    "emissionStrength": 25.43000030517578,
+    "alphaThreshold": 0.5120000243186951,
     "ambientOcclusion": 0.5,
     "tiling": [
         1.0,
@@ -30,7 +30,7 @@
         0.0,
         0.0
     ],
-    "enableEmission": false,
+    "enableEmission": true,
     "alphaTest": false,
     "doubleSided": false,
     "receiveShadows": true,

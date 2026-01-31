@@ -7,6 +7,7 @@ using static Engine.Camera;
 using static Engine.Input;
 using static Engine.Rigidbody;
 using static Engine.Event;
+using static Engine.ParticleSystem;
 using System.Collections.Specialized;
 
 namespace Game
@@ -664,6 +665,39 @@ namespace Game
             Vector3 finalVelocity = forwardVelocity + strafeVelocity + verticalVelocity;
             RigidbodySetVelocity(playerEntityID, ref finalVelocity);
 
+            // Particle trail
+            float currentSpeed = finalVelocity.Magnitude;
+
+            // Emission rate scaling
+            float maxEmissionRate = 80.0f;   // Lots of particles when fast
+            float minEmissionRate = 1.0f;    // Single particle at very low speed
+            float stopThreshold = 1.0f;      // Below this = complete stop
+
+            // Calculate speed ratio (0.0 to 1.0)
+            float speedRatio = SimpleMath.Clamp(currentSpeed / forwardSpeed, 0.0f, 1.0f);
+
+            float emissionRate;
+            if (currentSpeed < stopThreshold)
+            {
+                // Nearly stopped - emit final particle then stop
+                emissionRate = 0.0f;
+            }
+            else if (speedRatio < 0.1f) // Less than 10% speed
+            {
+                // Very slow - just 1-2 particles per second
+                emissionRate = minEmissionRate;
+            }
+            else
+            {
+                // Scale emission rate with speed (quadratic for better feel)
+                emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
+            }
+
+            SetEmissionRate(playerEntityID, emissionRate);
+
+            // Velocity still scales with speed for particle direction
+            Vector3 exhaustVelocity = -finalVelocity.Normalized * 100.0f;
+            SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
 
             // Settle camera position
             Vector3 camPos = GetPosition(cameraEntityID);
