@@ -126,7 +126,8 @@ namespace Game{
 
         public override void OnUpdate(float deltaTime){
 
-            elapsedTime += deltaTime;//primaryAltReady = true;
+            elapsedTime += deltaTime;
+            primaryAltReady = true;
 
             // Check if reload finished
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)
@@ -476,9 +477,16 @@ namespace Game{
             Vector3 playerPos = GetPosition(playerEntityID);
             Quat playerRot = GetRotation(playerEntityID);
 
-            // Calculate spawn position (offset to the right of the player)
-            Vector3 offset = playerRot.Right * 5.0f;
-            bulletSpawnPos = playerPos + offset;
+            // Calculate spawn position at gun tips (forward and slightly to the right/left)
+                // Adjust these values based on your mesh's gun positions
+                float forwardOffset = 4.0f;  // Distance in front of player
+                float sideOffset = -0.1f;     // Distance to the side (for gun position)
+                float heightOffset = 0.0f;   // Vertical adjustment if needed
+                
+                Vector3 offset = (playerRot.Forward * forwardOffset) + 
+                                (playerRot.Right * sideOffset) +
+                                (playerRot.Up * heightOffset);
+                bulletSpawnPos = playerPos + offset;
 
             // Calculate bullet rotation (pointing in firing direction)
             bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
