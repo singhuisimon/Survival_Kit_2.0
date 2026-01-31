@@ -23,7 +23,7 @@ namespace Game
 
         // This bullet's own tag
         [SerializeField]
-        private string[] BulletTags = { "WormBullet" };
+        private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
 
         private float elapsedTime = 0.0f;
 
