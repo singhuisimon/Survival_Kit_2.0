@@ -13,6 +13,8 @@
 #include "../Component/LightComponent.h"
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
+#include "../Component/TrailComponent.h"
+
 #include "../Utility/Logger.h"
 #include "../Asset/AssetManager.h"
 #include "../Serialization/ComponentSerializer.h"
@@ -244,6 +246,11 @@ namespace Engine {
         if (entity.HasComponent<SpriteRendererComponent>()) {
             entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::SpriteRenderer));
 			LOG_DEBUG("  + SpriteRendererComponent");
+        }
+
+        if (entity.HasComponent<TrailComponent>()) {
+            entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Trail));
+            LOG_DEBUG("  + TrailComponent");
         }
 
         //// Serialize SpriteRendererComponent

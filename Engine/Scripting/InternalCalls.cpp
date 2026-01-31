@@ -2668,5 +2668,17 @@ namespace Engine {
 			auto sys = s_CurrentScene->GetSystem<CollisionSystem2D>();
 			return sys->IsPointInEntity(static_cast<entt::entity>(entityId), *point);
 		}
+
+		void ParticleSystem_SetEmitterVelocity(uint64_t entityID, glm::vec3* vel) {
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<ParticleComponent>()) return;
+			e.GetComponent<ParticleComponent>().InitialVelocity = (*vel);
+		}
+
+		void ParticleSystem_SetEmissionRate(uint64_t entityID, float rate) {
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<ParticleComponent>()) return;
+			e.GetComponent<ParticleComponent>().EmissionRate = rate;
+		}
 	} // namespace InternalCalls
 } // namespace Engine

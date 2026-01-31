@@ -35,6 +35,7 @@
 #include "ParticleSystem/ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
 #include "Physics/CollisionSystem2D.h"
+#include "ParticleSystem/TrailSystem.h"
 
 #include "Event/EventSystem.h"
 
@@ -401,6 +402,7 @@ void Game::AddAllSystems()
 	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
 	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
 	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
+	m_ActiveScene->AddSystem<Engine::TrailSystem>();
 }
 
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
@@ -418,6 +420,7 @@ void Game::AddAllSystemsToScene(Engine::Scene* scene)
 	scene->AddSystem<Engine::ParticleSystem>();
 	scene->AddSystem<Engine::AnimationSystem>();
 	scene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
+	scene->AddSystem<Engine::TrailSystem>();
 }
 
 void Game::CreateDefaultScene()

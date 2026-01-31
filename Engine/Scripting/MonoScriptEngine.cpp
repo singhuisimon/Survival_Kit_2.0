@@ -1539,6 +1539,15 @@ namespace Engine {
 		BindInternalCall("Engine.Collision2D::IsPointInEntity",
 						 reinterpret_cast<void *>(InternalCalls::CollisionSystem2D_IsPointInEntity));
 
+		// =====================================================================
+		// Particle System
+		// =====================================================================
+		BindInternalCall("Engine.ParticleSystem::SetEmitterVelocity",
+			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetEmitterVelocity));
+
+		BindInternalCall("Engine.ParticleSystem::SetEmissionRate",
+			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetEmissionRate));
+
 		LOG_INFO("Internal calls registered");
 	}
 } // namespace Engine
