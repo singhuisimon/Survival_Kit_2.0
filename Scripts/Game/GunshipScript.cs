@@ -38,8 +38,8 @@ namespace Game
         private uint gunshipID = INVALID_ENTITY; // getting the ID of the read gunship entity
         private bool initialized = false;
 
-        // Tags of enemies to shoot (right now, currently testing with botnet in Level1_Player)
-        private readonly string[] enemyTags = { "botnet"};
+        // List of enemies to verify and target
+        private readonly string[] enemyTags = { "botnet" , "wormhost" , "wormchild" , "loveletter" };
 
 
         // Start up
