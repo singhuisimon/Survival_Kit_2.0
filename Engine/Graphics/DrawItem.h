@@ -17,6 +17,7 @@
 #include "../Asset/ResourceTypes.h"
 #include <glm/glm.hpp>
 #include "../Component/TextComponent.h"
+#include  "../Component/TrailComponent.h"
 
 #include "Asset/ResourceData.h"
 
@@ -31,7 +32,8 @@ namespace Engine{
 		MESH3D,
 		SPRITE2D,
 		Particle,
-		TEXT
+		TEXT,
+		TRAIL
 	};
 
 	/**
@@ -83,6 +85,9 @@ namespace Engine{
 		float m_lineSpacing = 1.0f; 
 		float m_letterSpacing = 0.0f; 
 		float m_maxWidth = 0.0f;
+
+		// Trail data
+		TrailComponent* m_trail_data = nullptr;
 	};
 
 }
