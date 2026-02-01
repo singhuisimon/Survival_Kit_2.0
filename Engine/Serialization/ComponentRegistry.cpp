@@ -916,6 +916,13 @@ namespace Engine {
                 }
             );
 
+            meta.AddProperty<TextComponent, bool>(
+                "IsVisible",
+                PropertyType::Bool,
+                [](const TextComponent& c) { return c.isVisible; },
+                [](TextComponent& c, const bool& v) { c.setVisible(v); }
+            );
+
             meta.AddProperty<TextComponent, u32>(
                 "Alignment",
                 PropertyType::U32,
