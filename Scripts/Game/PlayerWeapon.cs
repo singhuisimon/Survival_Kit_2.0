@@ -26,7 +26,7 @@ namespace Game{
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
         [SerializeField] private float primaryShootRate = 0.05f; 
         [SerializeField] private float primaryShootNext = 0.0f;
-        [SerializeField] private float primarybulletSpeed = 1000.0f;
+        [SerializeField] private float primarybulletSpeed = 10000.0f;
 
         //[SerializeField] 
         private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
@@ -46,7 +46,7 @@ namespace Game{
 
         [SerializeField] private bool primaryAltReady = false;
         [SerializeField] private float primaryAltFireAOERange = 30f;
-        [SerializeField] private float primaryUltSpeed = 500.0f;
+        [SerializeField] private float primaryUltSpeed = 5000.0f;
 
         //[SerializeField] 
         private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
