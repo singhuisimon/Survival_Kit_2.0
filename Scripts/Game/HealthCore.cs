@@ -22,6 +22,7 @@ namespace Game
         private string EVENT_CORE_HIT = "Damage:";
         private string EVENT_CORE_HEALTHCHANGE = "Core Health Change";
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_GAME_WIN = "GameWin";
 
         public override void OnStart()
         {
@@ -34,7 +35,8 @@ namespace Game
 
             // Subscribe to bullet hits
             Subscribe(EVENT_CORE_HIT, OnDamageReceived);
-            Subscribe(EVENT_PLAYER_DEAD, OnPlayerDeath);
+            Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Subscribe(EVENT_GAME_WIN, OnGameEnd);
             Publish(EVENT_CORE_HEALTHCHANGE, CurrentHealth.ToString());  // ADD THIS
 
 
@@ -57,7 +59,7 @@ namespace Game
             }
         }
 
-        private void OnPlayerDeath(string eventName, string payload){
+        private void OnGameEnd(string eventName, string payload){
             LogMessage("CoreMotherboard " + EntityID.ToString() + "is now immune!");
             isgameover = true;
         }
@@ -97,6 +99,8 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_CORE_HIT, OnDamageReceived);
+            Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
             LogMessage("CoreMotherboard " + EntityID + " destroyed");
         }
     }
