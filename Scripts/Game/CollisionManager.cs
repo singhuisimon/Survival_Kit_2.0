@@ -27,7 +27,7 @@ namespace Game
         // ============================================================
         // COLLISION CATEGORIES - Define what each entity type is
         // ============================================================
-        
+
         public enum CollisionCategory
         {
             PLAYER_PROJECTILE,
@@ -45,8 +45,8 @@ namespace Game
         // ============================================================
         // TAG TO CATEGORY MAPPING
         // ============================================================
-        
-        private static readonly Dictionary<string, CollisionCategory> TagToCategory = 
+
+        private static readonly Dictionary<string, CollisionCategory> TagToCategory =
             new Dictionary<string, CollisionCategory>()
         {
             // Player projectiles (all lowercase keys)
@@ -87,32 +87,33 @@ namespace Game
             // Environment
             { "oob", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT },
+            { "obstacle_wall_destructable", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT }
         };
 
         // ============================================================
         // COLLISION STORAGE - Organized by collision type
         // ============================================================
-        
+
         // Projectile hits entity
         private Dictionary<uint, List<uint>> playerProjectileHits = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> enemyProjectileHits = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> allyProjectileHits = new Dictionary<uint, List<uint>>();
-        
+
         // Entity collisions
         private Dictionary<uint, List<uint>> playerCollisions = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> allyCollisions = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> enemyCollisions = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> coreCollisions = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> barrierCollisions = new Dictionary<uint, List<uint>>();
-        
+
         // Environment collisions (everything that hit environment)
         private Dictionary<uint, List<uint>> environmentCollisions = new Dictionary<uint, List<uint>>();
-        
+
         // ============================================================
         // COLLISION RULES - Define what can collide with what
         // ============================================================
-        
+
         private struct CollisionRule
         {
             public CollisionCategory CategoryA;
@@ -156,7 +157,7 @@ namespace Game
             // Core barrier can be hit by anything (it's defensive)
             new CollisionRule(CollisionCategory.CORE_BARRIER, CollisionCategory.ENEMY_PROJECTILE),
             new CollisionRule(CollisionCategory.CORE_BARRIER, CollisionCategory.ENEMY),
-            
+
             new CollisionRule(CollisionCategory.CORE, CollisionCategory.ENEMY_PROJECTILE),
             new CollisionRule(CollisionCategory.CORE, CollisionCategory.ENEMY),
         };
@@ -174,21 +175,21 @@ namespace Game
         {
             // Clear all collision storage
             ClearAllCollisions();
-            
+
             // Process all physics collisions
             int collisionCount = PhysicsGetCollisionCount();
-            
+
             for (int i = 0; i < collisionCount; i++)
             {
                 PhysicsGetCollisionPair(i, out uint entityA, out uint entityB);
-                
+
                 // Get tags and categories
                 string tagA = TagGetTag(entityA);
                 string tagB = TagGetTag(entityB);
-                
+
                 CollisionCategory categoryA = GetCategory(tagA);
                 CollisionCategory categoryB = GetCategory(tagB);
-                
+
                 // Check if this collision should be recorded
                 if (ShouldRecordCollision(categoryA, categoryB))
                 {
@@ -218,12 +219,12 @@ namespace Game
         {
             if (string.IsNullOrEmpty(tag))
                 return CollisionCategory.UNKNOWN;
-                
+
             // Convert to lowercase for case-insensitive lookup
             string tagLower = tag.ToLower();
             if (TagToCategory.TryGetValue(tagLower, out CollisionCategory category))
                 return category;
-                
+
             return CollisionCategory.UNKNOWN;
         }
 
@@ -244,7 +245,7 @@ namespace Game
         private void RecordCollision(uint entityA, CollisionCategory catA, uint entityB, CollisionCategory catB)
         {
             // Record based on category combinations
-            
+
             // PROJECTILE HITS
             if (catA == CollisionCategory.PLAYER_PROJECTILE)
             {
@@ -254,7 +255,7 @@ namespace Game
             {
                 RecordHit(playerProjectileHits, entityB, entityA);
             }
-            
+
             if (catA == CollisionCategory.ENEMY_PROJECTILE)
             {
                 RecordHit(enemyProjectileHits, entityA, entityB);
@@ -263,7 +264,7 @@ namespace Game
             {
                 RecordHit(enemyProjectileHits, entityB, entityA);
             }
-            
+
             if (catA == CollisionCategory.ALLY_PROJECTILE)
             {
                 RecordHit(allyProjectileHits, entityA, entityB);
@@ -272,7 +273,7 @@ namespace Game
             {
                 RecordHit(allyProjectileHits, entityB, entityA);
             }
-            
+
             // ENTITY COLLISIONS
             if (catA == CollisionCategory.PLAYER)
             {
@@ -282,7 +283,7 @@ namespace Game
             {
                 RecordHit(playerCollisions, entityB, entityA);
             }
-            
+
             if (catA == CollisionCategory.ALLY)
             {
                 RecordHit(allyCollisions, entityA, entityB);
@@ -291,7 +292,7 @@ namespace Game
             {
                 RecordHit(allyCollisions, entityB, entityA);
             }
-            
+
             if (catA == CollisionCategory.ENEMY)
             {
                 RecordHit(enemyCollisions, entityA, entityB);
@@ -300,7 +301,7 @@ namespace Game
             {
                 RecordHit(enemyCollisions, entityB, entityA);
             }
-            
+
             if (catA == CollisionCategory.CORE)
             {
                 RecordHit(coreCollisions, entityA, entityB);
@@ -309,7 +310,7 @@ namespace Game
             {
                 RecordHit(coreCollisions, entityB, entityA);
             }
-            
+
             if (catA == CollisionCategory.CORE_BARRIER)
             {
                 RecordHit(barrierCollisions, entityA, entityB);
@@ -318,7 +319,7 @@ namespace Game
             {
                 RecordHit(barrierCollisions, entityB, entityA);
             }
-            
+
             // ENVIRONMENT COLLISIONS
             if (catA == CollisionCategory.ENVIRONMENT)
             {
@@ -426,12 +427,12 @@ namespace Game
                 LogMessage("[CollisionManager] ERROR: Instance is null!");
                 return null;
             }
-            
+
             if (dict.TryGetValue(key, out var targets))
             {
                 return targets;
             }
-            
+
             return null;
         }
 
