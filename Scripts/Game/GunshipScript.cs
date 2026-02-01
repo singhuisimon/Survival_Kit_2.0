@@ -40,7 +40,9 @@ namespace Game
 
         // List of enemies to verify and target
         private readonly string[] enemyTags = { "botnet" , "wormhost" , "wormchild" , "loveletter" };
-
+        
+        private string GAMEOVEREVENT = "GameOver";
+        private bool disableshooting = false;
 
         // Start up
         public override void OnStart() 
@@ -48,9 +50,12 @@ namespace Game
             LogMessage("====Gunship Helper Started====");
             LogMessage("Helper EntityID: " + EntityID);
 
+            Subscribe(GAMEOVEREVENT, OnGameOver);
+
             // not detecting Gunship here (might not be ready on frame 0)
             initialized = false;
             isDead = false;
+            disableshooting = false;
         }
 
         // update loop
@@ -74,6 +79,10 @@ namespace Game
                 Subscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
                 
                 initialized = true;
+            }
+
+            if(disableshooting){
+                return;
             }
 
             //DebugFireOnKey();
@@ -102,9 +111,15 @@ namespace Game
         // Gunship dies lol
         public override void OnDestroy()
         {
+            Unsubscribe(GAMEOVEREVENT, OnGameOver);
             if (gunshipID != INVALID_ENTITY) 
                 Unsubscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
 
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            LogMessage("[Gunship] detect game over disabling shooting");
+            disableshooting = true;
         }
 
         // Targeting System
