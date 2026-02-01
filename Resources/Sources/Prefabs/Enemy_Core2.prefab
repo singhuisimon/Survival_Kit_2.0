@@ -1,0 +1,221 @@
+{
+    "Prefab Name": "Enemy_Core2",
+    "Prefab GUID": 805115752058268857,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Enemy_Core2",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14640173807328686653",
+                            "Position": [
+                                -5504.39404296875,
+                                -438.72698974609375,
+                                643.2869873046875
+                            ],
+                            "Rotation": [
+                                46.99998474121094,
+                                -53.00000762939453,
+                                0.000011349317901476752
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12334330798126410595",
+                            "Tag": "Enemy_Core2"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Enemy_CoreX",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15974154088651932187",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                30.0,
+                                30.0,
+                                30.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6569723275092176035",
+                            "Tag": "Enemy_CoreX"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15397693336348852765",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16550614840955896351",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                75.0,
+                                75.0,
+                                75.0
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7622061454111801539",
+                            "ScriptClassName": "Game.EnemyCore",
+                            "Started": false,
+                            "GCHandle": 11467
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_Core",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14063713055015430735",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                43.99998092651367,
+                                52.999996185302734,
+                                -0.000002837329020621837
+                            ],
+                            "Scale": [
+                                9.000000953674316,
+                                9.000000953674316,
+                                9.000000953674316
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1381576504361364655",
+                            "Tag": "Decor_EnemyCore_Core"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7722644779677936211",
+                            "Mesh": "",
+                            "Material": "EnemyCore_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
