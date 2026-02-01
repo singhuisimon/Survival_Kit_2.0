@@ -72,8 +72,8 @@ namespace Game
         private Vector3 camAimTarget = Vector3.Zero;
 
         // ===== Camera Direction Vectors =====
-        private Vector3 cameraForward; 
-        private Vector3 cameraUp; 
+        private Vector3 cameraForward;
+        private Vector3 cameraUp;
         private Vector3 cameraRight;
 
         // ===== Camera Rotation Radians =====
@@ -216,8 +216,8 @@ namespace Game
 
             // Update player rotation
             Quat playerRot = GetRotation(playerEntityID);
-            Quat modelOffset = Quat.FromAxisAngle(Vector3.Right, modelXRotationOffset * SimpleMath.DEG_TO_RAD);
-            Quat targetRot = (camRot * modelOffset).Normalized();
+            Quat modelXOffset = Quat.FromAxisAngle(Vector3.Right, modelXRotationOffset * SimpleMath.DEG_TO_RAD);
+            Quat targetRot = (camRot * modelXOffset).Normalized();
 
             // Treat playerRotationSpeed as an ANGULAR SPEED (radians/sec).
             playerRot = RotateTowards(playerRot, targetRot, playerRotationSpeed, deltaTime);
@@ -249,54 +249,48 @@ namespace Game
             else
                 moveDir = Vector3.Zero;
 
-            // Choose a speed (simple + predictable): same speed in all directions.
-            // If you want separate forward/back/strafe speeds, we can re-introduce them.
-            //float speed = forwardSpeed;
-            //Vector3 playerVel = moveDir * speed;
-            //RigidbodySetVelocity(playerEntityID, ref playerVel);
+            // Particle trail
+            float currentSpeed = moveDir.Magnitude;
 
-            //// Particle trail
-            //float currentSpeed = finalVelocity.Magnitude;
+            // Emission rate scaling
+            float maxEmissionRate = 80.0f;   // Lots of particles when fast
+            float minEmissionRate = 1.0f;    // Single particle at very low speed
+            float stopThreshold = 1.0f;      // Below this = complete stop
 
-            //// Emission rate scaling
-            //float maxEmissionRate = 80.0f;   // Lots of particles when fast
-            //float minEmissionRate = 1.0f;    // Single particle at very low speed
-            //float stopThreshold = 1.0f;      // Below this = complete stop
+            // Calculate speed ratio (0.0 to 1.0)
+            float speedRatio = SimpleMath.Clamp(currentSpeed / forwardSpeed, 0.0f, 1.0f);
 
-            //// Calculate speed ratio (0.0 to 1.0)
-            //float speedRatio = SimpleMath.Clamp(currentSpeed / forwardSpeed, 0.0f, 1.0f);
+            float emissionRate;
+            if (currentSpeed < stopThreshold)
+            {
+                // Nearly stopped - emit final particle then stop
+                emissionRate = 0.0f;
+            }
+            else if (speedRatio < 0.1f) // Less than 10% speed
+            {
+                // Very slow - just 1-2 particles per second
+                emissionRate = minEmissionRate;
+            }
+            else
+            {
+                // Scale emission rate with speed (quadratic for better feel)
+                emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
+            }
 
-            //float emissionRate;
-            //if (currentSpeed < stopThreshold)
-            //{
-            //    // Nearly stopped - emit final particle then stop
-            //    emissionRate = 0.0f;
-            //}
-            //else if (speedRatio < 0.1f) // Less than 10% speed
-            //{
-            //    // Very slow - just 1-2 particles per second
-            //    emissionRate = minEmissionRate;
-            //}
-            //else
-            //{
-            //    // Scale emission rate with speed (quadratic for better feel)
-            //    emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
-            //}
+            SetEmissionRate(playerEntityID, emissionRate);
 
-            //SetEmissionRate(playerEntityID, emissionRate);
+            // Velocity still scales with speed for particle direction
+            Vector3 exhaustVelocity = -moveDir.Normalized * 100.0f;
+            SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
 
-            //// Velocity still scales with speed for particle direction
-            //Vector3 exhaustVelocity = -finalVelocity.Normalized * 100.0f;
-            //SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
+            Vector3 playerVel = moveDir * forwardSpeed; // or choose forward/back/strafe like earlier
+            RigidbodySetVelocity(playerEntityID, ref playerVel);
 
-            //Vector3 playerVel = moveDir * forwardSpeed; // or choose forward/back/strafe like earlier
-            //RigidbodySetVelocity(playerEntityID, ref playerVel);
-
-            //if (moveDir.SqrMagnitude < 1e-8f)
-            //{
-            //    Vector3 zero = Vector3.Zero;
-            //    RigidbodySetVelocity(playerEntityID, ref zero);
-            //}
+            if (moveDir.SqrMagnitude < 1e-8f)
+            {
+                Vector3 zero = Vector3.Zero;
+                RigidbodySetVelocity(playerEntityID, ref zero);
+            }
 
             Vector3 playerPos = GetPosition(playerEntityID);
             playerPos = playerPos + moveDir * moveSpeed * deltaTime;
@@ -332,7 +326,7 @@ namespace Game
             SetTarget(cameraEntityID, ref camAimTarget);
 
             //---------------------- DEBUG LOG --------------------------//
-            //float distSmoothDesired = Vector3.Distance(smoothCamPos, desiredCameraPos);
+            //float distSmoothDesired = Vector3.Distance(smoothCamPos, desiredCamPos);
             //LogMessage("[SpaceshipController] Dist from smooth to desired: " + distSmoothDesired);
             //float distCamPlayer = Vector3.Distance(camPos, playerPos);
             //LogMessage("[SpaceshipController] Dist from camera to player: " + distCamPlayer);
