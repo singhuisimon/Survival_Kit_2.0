@@ -740,6 +740,11 @@ namespace Game
 
         private void OnDamageReceived(string eventName, string payload)
         {
+
+            if(playerHP <= 0){
+                return;
+            }
+
             float damage = DamageSystem.ParseAmount(payload);
 
             playerHP -= damage;
@@ -756,7 +761,6 @@ namespace Game
                 //publish event here
                 //do what you need to do here
                 Publish("PlayerDead", "");  // ADD THIS
-
             }
         }
 
