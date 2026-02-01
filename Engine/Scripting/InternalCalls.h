@@ -1377,5 +1377,11 @@ namespace Engine {
 		 void SpriteRenderer_SetIsVisible(uint32_t entityID, bool visible);
 		 bool SpriteRenderer_GetIsVisible(uint32_t entityID);
 
+		 // TextComponent
+		  void Text_SetText(uint32_t entityID, MonoString* text);
+		  MonoString* Text_GetText(uint32_t entityID);
+		  void Text_SetFontSize(uint32_t entityID, float size);
+		  float Text_GetFontSize(uint32_t entityID);
+
 	} // namespace InternalCalls
 } // namespace Engine

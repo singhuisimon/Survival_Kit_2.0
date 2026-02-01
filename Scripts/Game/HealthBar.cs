@@ -24,7 +24,7 @@ namespace Game
         private Vector3 initialPosition;  // Store initial center position
         private float initialWidth;  // Store initial width to calculate offset
         private float playerMaxHP = 100.0f;  // Player's actual max HP
-        private float hpToWidthRatio = 4.0f;  // 100 HP = 400 width, so ratio is 4
+        private float hpToWidthRatio;  // 100 HP = 400 width, so ratio is 4
 
         // Key press tracking to prevent multiple triggers per press
         private bool hKeyWasPressed = false;
@@ -48,6 +48,7 @@ namespace Game
             // Use the actual width from the scene as barMaxWidth
             barMaxWidth = actualInitialWidth;
             initialWidth = actualInitialWidth;
+            hpToWidthRatio = barMaxWidth / playerMaxHP;  // If bar is 220.5 wide, ratio = 220.5/100 = 2.205
 
             initialized = true;
 

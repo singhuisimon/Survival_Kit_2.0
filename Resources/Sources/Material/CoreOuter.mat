@@ -1,26 +1,26 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "",
+    "baseMap": "level_Design_Grid_Texture.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
     "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
-        1.0,
-        1.0,
+        0.37745100259780884,
+        0.8718283176422119,
         1.0
     ],
     "emissionColor": [
         0.0,
-        0.6764705181121826,
+        0.29411840438842773,
         1.0
     ],
-    "metallic": 0.0,
-    "roughness": 0.6000000238418579,
-    "opacity": 0.20999999344348907,
-    "emissionStrength": 4.949999809265137,
-    "alphaThreshold": 0.5,
+    "metallic": 0.029999999329447746,
+    "roughness": 0.05999999865889549,
+    "opacity": 0.03999999910593033,
+    "emissionStrength": 40.09000015258789,
+    "alphaThreshold": 0.5249999761581421,
     "ambientOcclusion": 0.5,
     "tiling": [
         1.0,

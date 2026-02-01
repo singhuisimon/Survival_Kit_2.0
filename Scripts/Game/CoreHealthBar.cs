@@ -7,33 +7,34 @@ using static Engine.Event;
 namespace Game
 {
     /// <summary>
-    /// AmmoBar - Visual representation of player ammo
+    /// CoreHealthBar - Visual representation of core/motherboard health
     /// Position adjustment: Move by FULL width change (not half)
     /// Left edge = Position.X - Width (scale.X is radius, not diameter)
-    /// Attach this to the ammo bar sprite entity
+    /// Attach this to the core health bar sprite entity
+    /// NOTE: There is only one core in the game, so we use a simple global event
     /// </summary>
-    public class AmmoBar : ScriptBehaviour
+    public class CoreHealthBar : ScriptBehaviour
     {
         // ===== Event Names =====
-        private const string EVENT_AMMO_CHANGE = "AmmoChange";
+        private const string EVENT_CORE_HEALTHCHANGE = "Core Health Change";
 
         // ===== Visual Settings =====
-        private float barMaxWidth;  // Maximum width at full ammo (set from scene)
+        private float barMaxWidth;  // Maximum width at 100% health (set from scene)
 
         // ===== State =====
         private bool initialized = false;
         private Vector3 initialPosition;  // Store initial center position
         private float initialWidth;  // Store initial width to calculate offset
-        private float ammoToWidthRatio;  // Calculated: barMaxWidth / 100
+        private float hpToWidthRatio;  // Calculated: barMaxWidth / 100
 
         public override void OnStart()
         {
-            LogMessage("=== AmmoBar OnStart ===");
-            LogMessage("AmmoBar EntityID: " + EntityID);
+            LogMessage("=== CoreHealthBar OnStart ===");
+            LogMessage("CoreHealthBar EntityID: " + EntityID);
 
-            // Subscribe to ammo update events from PlayerWeapon
-            Event.Subscribe(EVENT_AMMO_CHANGE, OnAmmoChange);
-            LogMessage("AmmoBar: Subscribed to event '" + EVENT_AMMO_CHANGE + "'");
+            // Subscribe to core health update events
+            Event.Subscribe(EVENT_CORE_HEALTHCHANGE, OnCoreHealthChange);
+            LogMessage("CoreHealthBar: Subscribed to event '" + EVENT_CORE_HEALTHCHANGE + "'");
 
             // Store initial position and width
             initialPosition = Transform.GetPosition((uint)EntityID);
@@ -46,15 +47,15 @@ namespace Game
             barMaxWidth = actualInitialWidth;
             initialWidth = actualInitialWidth;
 
-            // Calculate ratio: Since max ammo is always 100, ratio = barMaxWidth / 100
-            ammoToWidthRatio = barMaxWidth / 100.0f;
+            // Calculate ratio: Since max HP is always 100, ratio = barMaxWidth / 100
+            hpToWidthRatio = barMaxWidth / 100.0f;
 
             initialized = true;
 
-            LogMessage("AmmoBar initialized:");
+            LogMessage("CoreHealthBar initialized:");
             LogMessage("  Max Width (from scene): " + barMaxWidth);
             LogMessage("  Initial Position X: " + initialPosition.X);
-            LogMessage("  Ammo to Width Ratio: " + ammoToWidthRatio);
+            LogMessage("  HP to Width Ratio: " + hpToWidthRatio);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -65,32 +66,32 @@ namespace Game
 
         // ===== EVENT HANDLERS =====
 
-        private void OnAmmoChange(string eventName, string payload)
+        private void OnCoreHealthChange(string eventName, string payload)
         {
-            LogMessage("=== OnAmmoChange CALLED ===");
+            LogMessage("=== OnCoreHealthChange CALLED ===");
             LogMessage("  Payload: '" + payload + "'");
 
-            if (!float.TryParse(payload, out float currentAmmo))
+            if (!float.TryParse(payload, out float currentHP))
             {
-                LogError("AmmoBar: Failed to parse currentAmmo from payload: " + payload);
+                LogError("CoreHealthBar: Failed to parse currentHP from payload: " + payload);
                 return;
             }
 
-            // Clamp ammo to valid range (0-100)
-            if (currentAmmo < 0.0f) currentAmmo = 0.0f;
-            if (currentAmmo > 100.0f) currentAmmo = 100.0f;
+            // Clamp HP to valid range (0-100)
+            if (currentHP < 0.0f) currentHP = 0.0f;
+            if (currentHP > 100.0f) currentHP = 100.0f;
 
-            // Convert ammo to width (ratio calculated from bar width / 100)
-            float currentWidth = currentAmmo * ammoToWidthRatio;
+            // Convert HP to width (ratio calculated from bar width / 100)
+            float currentWidth = currentHP * hpToWidthRatio;
 
-            LogMessage("  Current Ammo: " + currentAmmo + " -> Width: " + currentWidth);
+            LogMessage("  Current Core HP: " + currentHP + " -> Width: " + currentWidth);
 
             // Get current scale
             Vector3 currentScale = Transform.GetScale((uint)EntityID);
 
-            // Set width based on converted ammo value
+            // Set width based on converted HP value
             Vector3 newScale = new Vector3(
-                currentWidth,      // Width = Ammo * 4
+                currentWidth,      // Width = HP * ratio
                 currentScale.Y,    // Keep height
                 currentScale.Z     // Keep depth
             );
@@ -107,15 +108,15 @@ namespace Game
             Transform.SetPosition((uint)EntityID, ref newPosition);
 
             LogMessage("  Position offset: " + widthDifference);
-            LogMessage("=== OnAmmoChange COMPLETE ===");
+            LogMessage("=== OnCoreHealthChange COMPLETE ===");
         }
 
         public override void OnDestroy()
         {
             // Clean up event subscriptions
-            Event.Unsubscribe(EVENT_AMMO_CHANGE, OnAmmoChange);
+            Event.Unsubscribe(EVENT_CORE_HEALTHCHANGE, OnCoreHealthChange);
 
-            LogMessage("=== AmmoBar Destroyed ===");
+            LogMessage("=== CoreHealthBar Destroyed ===");
         }
     }
 }

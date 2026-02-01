@@ -28,7 +28,10 @@ namespace Engine
 						m_Editor->SetScenePath(m_CurrScenePath);
 						m_SceneIsNew = true;
 						m_Editor->SetPrefabPath("");
-						
+						Renderer* renderer = m_Editor->GetRenderer();
+						Camera3D& cam = renderer->getEditorCamera();
+						cam.setEditorCamPosition(glm::vec3(0.f, 5.f, 5.f));
+						cam.setEditorCamTarget(glm::vec3(0.f, 0.f, 0.f));
 					}
 				}
 				
@@ -43,6 +46,10 @@ namespace Engine
 					m_CurrPrefabPath = "";
 					m_Editor->SetPrefabPath(m_CurrPrefabPath);
 					m_SceneIsNew = false;
+					Renderer* renderer = m_Editor->GetRenderer();
+					Camera3D& cam = renderer->getEditorCamera();
+					cam.setEditorCamPosition(glm::vec3(0.f, 5.f, 5.f));
+					cam.setEditorCamTarget(glm::vec3(0.f, 0.f, 0.f));
 				}
 				if (ImGui::IsItemHovered())
 				{
@@ -91,6 +98,10 @@ namespace Engine
 					m_CurrScenePath = "";
 					m_Editor->SetScenePath(m_CurrScenePath);
 					m_SceneIsNew = false;
+					Renderer* renderer = m_Editor->GetRenderer();
+					Camera3D& cam = renderer->getEditorCamera();
+					cam.setEditorCamPosition(glm::vec3(0.f, 5.f, 5.f));
+					cam.setEditorCamTarget(glm::vec3(0.f, 0.f, 0.f));
 				}
 				
 				if (ImGui::MenuItem("Save Prefab", nullptr, false, hasPrefabPath))

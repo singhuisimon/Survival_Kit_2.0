@@ -12,6 +12,10 @@ namespace Game
         // ===== SPAWNER SETTINGS =====
        
         private string loveletterPrefabPath = "Sources/Prefabs/" + "loveletterv4.prefab";
+        private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+        private const string EVENT_LOVELETTER_REACHED_CORE = "LoveLetterReachedCore";
+        private const string GAMEOVER = "GameOver";
         
         [SerializeField] private string[] spawnWallNames = new string[]
         {
@@ -50,8 +54,7 @@ namespace Game
         private float nextSpawnTime = 0.0f;
         private int activeLetterCount = 0;
         private int totalSpawned = 0;
-        private bool isInitialized = false;
-        
+        private bool isInitialized = false;        
         private static bool rngSeeded = false;
 
         public override void OnStart()
@@ -98,9 +101,12 @@ namespace Game
             LogMessage("Infinite spawning enabled - will spawn continuously until game ends");
             
             // Subscribe to LoveLetter destruction events
-            Subscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
-            Subscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
-            
+            Event.Subscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
+            Event.Subscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Subscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
+            Event.Subscribe(GAMEOVER, OnGameOver);
             // Set initial spawn timer
             spawnTimer = initialDelay;
             nextSpawnTime = GetRandomSpawnInterval();
@@ -278,13 +284,26 @@ namespace Game
         {
             // Additional handling if needed when letter reaches core
             LogWarning("!!! A LoveLetter reached the core! !!!");
+            Publish("CoreMotherboardDestroyed", payload);
         }
 
         public override void OnDestroy()
         {
-            Unsubscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
-            Unsubscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
+            //AudioStop((uint)EntityID);
+            Event.Unsubscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
+            Event.Unsubscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Unsubscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
+            Event.Unsubscribe(GAMEOVER, OnGameOver);
             LogMessage("=== LoveLetterSpawner Destroyed (Total spawned: " + totalSpawned + ") ===");
+        }
+
+        private void OnGameOver(string eventName, string payload)
+        {
+            LogMessage("Game Over event received: " + eventName);
+            // Stop spawning when game is over
+            isInitialized = false;
         }
     }
 }
