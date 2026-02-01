@@ -15,6 +15,7 @@ namespace Game
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_LOVELETTER_REACHED_CORE = "LoveLetterReachedCore";
+        private const string GAMEOVER = "GameOver";
         
         [SerializeField] private string[] spawnWallNames = new string[]
         {
@@ -53,8 +54,7 @@ namespace Game
         private float nextSpawnTime = 0.0f;
         private int activeLetterCount = 0;
         private int totalSpawned = 0;
-        private bool isInitialized = false;
-        
+        private bool isInitialized = false;        
         private static bool rngSeeded = false;
 
         public override void OnStart()
@@ -101,12 +101,12 @@ namespace Game
             LogMessage("Infinite spawning enabled - will spawn continuously until game ends");
             
             // Subscribe to LoveLetter destruction events
-            Subscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
-            Subscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
-            Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
-            Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
-            Subscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
-            
+            Event.Subscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
+            Event.Subscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Subscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
+            Event.Subscribe(GAMEOVER, OnGameOver);
             // Set initial spawn timer
             spawnTimer = initialDelay;
             nextSpawnTime = GetRandomSpawnInterval();
@@ -290,11 +290,12 @@ namespace Game
         public override void OnDestroy()
         {
             //AudioStop((uint)EntityID);
-            Unsubscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
-            Unsubscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
-            Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
-            Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
-            Unsubscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
+            Event.Unsubscribe("LoveLetterDestroyed", OnLoveLetterDestroyed);
+            Event.Unsubscribe("LoveLetterReachedCore", OnLoveLetterReachedCore);
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Unsubscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
+            Event.Unsubscribe(GAMEOVER, OnGameOver);
             LogMessage("=== LoveLetterSpawner Destroyed (Total spawned: " + totalSpawned + ") ===");
         }
 
