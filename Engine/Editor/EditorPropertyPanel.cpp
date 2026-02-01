@@ -3175,6 +3175,18 @@ namespace Engine
 
 					ImGui::Spacing();
 
+					// Visibility checkbox
+					bool isVisible = textComp.isShown();
+					if (ImGui::Checkbox("Is Visible", &isVisible)) {
+						textComp.setVisible(isVisible);
+						MarkComponentOverridden(ComponentTypeID::Text, "isVisible");
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Toggle text visibility (uses alpha channel)");
+					}
+
+					ImGui::Spacing();
+
 					// Color Picker
 					float color[4] = {
 						textComp.color[0],

@@ -790,6 +790,11 @@ namespace Engine {
 				colorArr.PushBack(textComp.color[3], allocator);
 				propertiesObj.AddMember("color", colorArr, allocator);
 
+				//isVisible
+				propertiesObj.AddMember("isVisible",
+					textComp.isVisible, allocator);
+
+
 				// Alignment (store as int)
 				propertiesObj.AddMember("align", static_cast<int>(textComp.align), allocator);
 
@@ -1754,6 +1759,11 @@ namespace Engine {
 							textComp.text = properties["text"].GetString();
 						}
 
+						//font name
+						if (properties.HasMember("fontName") && properties["fontName"].IsString()) {
+							textComp.fontName = properties["fontName"].GetString();
+						}
+
 						// Font size
 						if(properties.HasMember("fontSize") && properties["fontSize"].IsFloat()) {
 							textComp.fontSize = properties["fontSize"].GetFloat();
@@ -1768,6 +1778,11 @@ namespace Engine {
 								textComp.color[2] = colorArr[2].GetFloat();
 								textComp.color[3] = colorArr[3].GetFloat();
 							}
+						}
+
+						//isVisible
+						if (properties.HasMember("isVisible") && properties["isVisible"].IsBool()) {
+							textComp.setVisible(properties["isVisible"].GetBool());
 						}
 
 						// Alignment

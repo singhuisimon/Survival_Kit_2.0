@@ -32,6 +32,13 @@ namespace Game {
 
         private int wormsSpawnedThisCycle = 0;
 
+        private bool gameRunning = true;
+
+        // Game lose condition
+        private const string GAMEOVER = "GameOver";
+
+        // Game win condition
+
         public override void OnStart(){
             timer = interval;
 
@@ -48,32 +55,39 @@ namespace Game {
             if(wall3ID == 0){
                 LogMessage("[Worm Spawning] Warning: Wall3 not found!");
             }
+
+            gameRunning = true;
+
+            Event.Subscribe(GAMEOVER, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime){
 
-            timer -= deltaTime;
+            if (gameRunning){
+                
+                timer -= deltaTime;
 
-            if(timer <= 0.0f){
+                if(timer <= 0.0f){
 
-                wormsSpawnedThisCycle = 0;
+                    wormsSpawnedThisCycle = 0;
 
-                for(int i = 0; i < maxWorms; i++){
-                    try {
-                        SpawnWormOnRandomWall();
+                    for(int i = 0; i < maxWorms; i++){
+                        try {
+                            SpawnWormOnRandomWall();
+                        }
+                        catch(Exception e) {
+                            LogMessage("[WormSpawning] ERROR during spawn: " + e.ToString());
+                        }
                     }
-                    catch(Exception e) {
-                        LogMessage("[WormSpawning] ERROR during spawn: " + e.ToString());
-                    }
+                    
+                    timer = interval;
+                    
                 }
-                
-                timer = interval;
-                
             }
         }
 
         public override void OnDestroy(){
-
+            Event.Unsubscribe(GAMEOVER, OnGameOver);
         }
 
         private void SpawnWormOnRandomWall(){
@@ -131,6 +145,10 @@ namespace Game {
             Vector3 worldPosition = wallPosition + rotatedOffset;
             
             return worldPosition;
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            gameRunning = false;
         }
     }
 
