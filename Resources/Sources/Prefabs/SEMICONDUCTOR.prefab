@@ -1,0 +1,368 @@
+{
+    "Prefab Name": "SEMICONDUCTOR",
+    "Prefab GUID": 11369100325965283631,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "SEMICONDUCTOR",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15900363641908576543",
+                            "Position": [
+                                -293.97662353515625,
+                                -200.0,
+                                -224.11676025390625
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                150.0,
+                                150.0,
+                                150.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2653605903852225151",
+                            "Tag": "SEMICONDUCTOR"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11865138375784775969",
+                            "Mesh": "",
+                            "Material": "CoreOuter.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15322750612248530623",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                75.0,
+                                75.0,
+                                75.0
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11863986098428055233",
+                            "ScriptClassName": "Game.HealthCore",
+                            "Started": true,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "InnerCore",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9639718068951728327",
+                            "Position": [
+                                0.0,
+                                0.0000016689300537109375,
+                                0.000011444091796875
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.699999988079071,
+                                0.699999988079071,
+                                0.699999988079071
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12522021830468845765",
+                            "Tag": "InnerCore"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15404325591986127051",
+                            "Mesh": "",
+                            "Material": "CoreInner.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "InnermostCore",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2145728289022197969",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.10546875,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.19999995827674863,
+                                0.19999994337558744,
+                                0.19999994337558744
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6757414307449585871",
+                            "Tag": "InnermostCore"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6180953555146293461",
+                            "Mesh": "",
+                            "Material": "Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 11,
+                    "typeName": "AnimatorComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "playing": true,
+                            "respectClipLoop": true,
+                            "controller": 0,
+                            "currentClipIndex": 0,
+                            "currentTime": 0.0029296875,
+                            "playbackSpeed": 1.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Particles",
+            "LocalID": 4,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14827864839706771731",
+                            "Position": [
+                                -300.0,
+                                -210.0,
+                                -220.0
+                            ],
+                            "Rotation": [
+                                90.0,
+                                -0.0,
+                                90.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5604492802851995921",
+                            "Tag": "Particles"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "Core.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.5,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                15.0,
+                                10.0,
+                                15.0
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Max": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Emitter Shape": 1,
+                            "Max Particles": 50,
+                            "Particle Type": 0,
+                            "Emission Rate": 10.0,
+                            "Particle Lifetime": 4.0,
+                            "Emission Accumulator": 0.7705078125,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 180.0,
+                            "Min Speed": 10.0,
+                            "Max Speed": 25.0,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 7312.40185546875,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": true,
+                            "Burst Mode": false
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
