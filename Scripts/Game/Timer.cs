@@ -2,6 +2,8 @@ using System;
 using Engine;
 using static Engine.Logger;
 using static Engine.Text;
+using static Engine.Event;
+
 
 namespace Game
 {
@@ -46,7 +48,12 @@ namespace Game
 
 			// Clamp to 0 (don't go negative)
 			if (remainingTime < 0.0f)
+			{
+
 				remainingTime = 0.0f;
+				Publish("TimerFinished", "");  // ADD THIS
+			}
+			
 
 			// Update display
 			UpdateTimerDisplay();
