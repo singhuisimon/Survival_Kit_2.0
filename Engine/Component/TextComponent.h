@@ -87,6 +87,20 @@ namespace Engine {
 			isDirty = true;
 		}
 
+		void setVisible(bool visible) {
+			if (visible) {
+				//can see -> restore alpha to 1
+				color[3] = 1.0f; 
+			}
+			else {
+				color[3] = 0.0f; //invisible
+			}
+		}
+
+		bool isVisible() const {
+			return color[3] > 0.0f;
+		}
+
 		//getters
 		float getHeight() const {
 			return bounds.w;
