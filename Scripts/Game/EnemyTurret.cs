@@ -25,11 +25,14 @@ namespace Game
         [SerializeField] private float health = 10.0f;
 
         // Events
-        private const string EVENT_BULLET_HIT = "BulletHit";
+        private string EVENT_BULLET_HIT = "Damage:";
+        private const string GAMEOVER = "GameOver";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
+
+        string EnemyTurretBulletPrefabPath = "Sources/Prefabs/EnemyTurretBullet.prefab";
 
         // Lifecycle
         public override void OnStart()
@@ -46,7 +49,9 @@ namespace Game
             RigidbodySetIsKinematic(EntityID, true);
             RigidbodySetUseGravity(EntityID, false);
 
+            EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(GAMEOVER, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -88,6 +93,7 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(GAMEOVER, OnGameOver);
         }
 
         // Combat
@@ -95,11 +101,11 @@ namespace Game
         {
             LogMessage("OnBulletHit called! Payload: " + payload + " | My EntityID: " + EntityID);
 
-            uint hitEntityID = uint.Parse(payload.Split(',')[0]);
-            if (hitEntityID != EntityID){
-                LogMessage("Ignoring (hitEntityID=" + hitEntityID + ")");
-                return;
-            }
+            // uint hitEntityID = uint.Parse(payload.Split(',')[0]);
+            // if (hitEntityID != EntityID){
+            //     LogMessage("Ignoring (hitEntityID=" + hitEntityID + ")");
+            //     return;
+            // }
             
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetVelocity(EntityID, ref emptyVec);
@@ -156,7 +162,7 @@ namespace Game
             );
 
             // Create bullet
-            uint enemyTurretBulletID = SceneCreateEntity("EnemyTurretBullet");
+            uint enemyTurretBulletID = PrefabInstantiateScene(EnemyTurretBulletPrefabPath);
             if (enemyTurretBulletID == 0)
                 return;
 
@@ -171,7 +177,7 @@ namespace Game
             EntityAddRigidBody(enemyTurretBulletID);
             RigidbodySetIsKinematic(enemyTurretBulletID, false);
             RigidbodySetUseGravity(enemyTurretBulletID, false);
-
+            
             // Set tag
             TagSetTag(enemyTurretBulletID, "EnemyTurretBullet");
 
@@ -225,6 +231,10 @@ namespace Game
             q.W = 0.5f * s;
 
             return q;
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            SceneDestroyEntity(EntityID);
         }
     }
 }

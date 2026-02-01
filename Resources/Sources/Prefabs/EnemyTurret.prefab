@@ -1,6 +1,6 @@
 {
     "Prefab Name": "EnemyTurret",
-    "Prefab GUID": 10510179433264333349,
+    "Prefab GUID": 12052064173021740283,
     "version": 1,
     "entities": [
         {
@@ -51,7 +51,7 @@
                         "Properties": {
                             "ComponentGUID": "15121865451691328031",
                             "Mesh": "",
-                            "Material": "",
+                            "Material": "EnemyTurret.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                10.0,
-                                10.0,
-                                10.0
+                                30.0,
+                                30.0,
+                                30.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -105,7 +105,7 @@
                             "ComponentGUID": "4169111157926363681",
                             "ScriptClassName": "Game.EnemyTurret",
                             "Started": false,
-                            "GCHandle": 83
+                            "GCHandle": 7667
                         }
                     }
                 }
