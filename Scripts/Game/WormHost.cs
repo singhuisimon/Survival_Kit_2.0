@@ -30,7 +30,7 @@ namespace Game
         [SerializeField] private float health = 18.0f;
 
         // Events
-        private const string EVENT_BULLET_HIT = "BulletHit";
+        private string EVENT_BULLET_HIT = "Damage:";
         //private const string EVENT_HOST_SPLIT = "WormHostSplit";
 
         // Worm Child
@@ -40,6 +40,9 @@ namespace Game
         // BARE MINIMUM
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
+
+        // Game lose condition
+        private const string GAMEOVER = "GameOver";
 
         // Lifecycle
         public override void OnStart()
@@ -59,7 +62,9 @@ namespace Game
             Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
             RigidbodySetBoxHalfExtents(EntityID, ref extents);
 
+            EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(GAMEOVER, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -138,14 +143,15 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(GAMEOVER, OnGameOver);
         }
 
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
-            uint hitEntityID = uint.Parse(payload.Split(',')[0]);
-            if (hitEntityID != EntityID)
-                return;
+            // uint hitEntityID = uint.Parse(payload.Split(',')[0]);
+            // if (hitEntityID != EntityID)
+            //     return;
             
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
@@ -313,6 +319,10 @@ namespace Game
             q.W = 0.5f * s;
 
             return q;
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            SceneDestroyEntity(EntityID);
         }
     }
 }
