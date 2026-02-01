@@ -3,133 +3,37 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1,
+            "ID": 1048576,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Decor_core"
+                        "Tag": "LIGHTING_DirectionalLight"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "13229438815941732175",
-                        "PrefabAssetGuid": "1857453931077714119",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Enemy_Core.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8041292045211019089\",\"Mesh\":\"\",\"Material\":\"test.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8041292045211019089\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5158988283693803341\",\"Position\":[0.0000152587890625,9.5367431640625e-7,-0.0000019073486328125],\"Rotation\":[50.00002670288086,-41.0,-0.000018100176021107472],\"Scale\":[0.30000001192092896,0.30000001192092896,0.30000001192092896],\"Parent\":7340090,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16688203329762273099\",\"Tag\":\"Decor_core\"}}",
-                                "modifiedPropertyNames": [
-                                    "Tag"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5158988283693803341",
-                        "Position": [
-                            0.0000152587890625,
-                            9.5367431640625e-7,
-                            -0.0000019073486328125
-                        ],
-                        "Rotation": [
-                            50.00002670288086,
-                            -41.0,
-                            -0.000018100176021107472
-                        ],
-                        "Scale": [
-                            0.30000001192092896,
-                            0.30000001192092896,
-                            0.30000001192092896
-                        ],
-                        "Parent": 7340090,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "8041292045211019089",
-                        "Mesh": "",
-                        "Material": "test.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 6291478,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "LIGHTING_DirectionalLight2"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "16688203329739786311",
-                        "PrefabAssetGuid": "16111742577436182589",
+                        "ComponentGUID": "5334892552281771647",
+                        "PrefabAssetGuid": "9370117818404195451",
                         "isPrefabRoot": true,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
                         "prefabName": "LIGHTING_DirectionalLight",
-                        "prefabVersion": 2,
+                        "prefabVersion": 1,
                         "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/LIGHTING_DirectionalLight.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12931128093033529529\",\"Position\":[-234.0772247314453,0.0,0.0],\"Rotation\":[-4.8610005378723145,-32.99995040893555,89.0831527709961],\"Scale\":[1.0,1.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12931128093033529529\",\"Position\":[-234.0772247314453,0.0,0.0],\"Rotation\":[-170.86099243164063,-32.99999237060547,89.0830307006836],\"Scale\":[1.0,1.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14382360320523945945\",\"Tag\":\"LIGHTING_DirectionalLight\"}}",
-                                "modifiedPropertyNames": [
-                                    "Tag"
-                                ]
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4181971047673056227\",\"Tag\":\"LIGHTING_DirectionalLight\"}}"
                             },
                             {
                                 "componentType": 4,
@@ -150,9 +54,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -4.861001491546631,
-                            -32.99995040893555,
-                            89.0831527709961
+                            -170.86099243164063,
+                            -32.99999237060547,
+                            89.0830307006836
                         ],
                         "Scale": [
                             1.0,
@@ -188,43 +92,42 @@
             ]
         },
         {
-            "ID": 32,
+            "ID": 12,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "AltFireIcon"
+                        "Tag": "Decor_EnemyCore_CoreLines4"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "12294757172271546805",
-                        "PrefabAssetGuid": "15244482986795221507",
-                        "isPrefabRoot": true,
+                        "ComponentGUID": "14558264589129941567",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "AltFireIcon",
+                        "prefabName": "Enemy_Core",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3615555430101680567\",\"Position\":[782.2000122070313,249.39999389648438,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[500.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8299105532010950311\",\"Position\":[0.0148162841796875,0.09799575805664063,0.0],\"Rotation\":[180.0,-0.0,0.0],\"Scale\":[-0.09999996423721313,-0.09999996423721313,-11.899999618530273],\"Parent\":33554503,\"Children\":[]}}"
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12334330798134914725\",\"Tag\":\"Decor_EnemyCore_CoreLines4\"}}"
                             },
                             {
-                                "componentType": 14,
+                                "componentType": 2,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11209257720669815221\",\"Texture\":\"AlternateFire_Icon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":true,\"IsVisible\":true}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9452027036617911979\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
                             }
                         ]
                     }
@@ -232,11 +135,447 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "3615555430101680567",
+                        "ComponentGUID": "8299105532010950311",
                         "Position": [
-                            782.2000122070313,
-                            249.39999389648438,
+                            0.0148162841796875,
+                            0.09799575805664063,
                             0.0
+                        ],
+                        "Rotation": [
+                            180.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            -0.09999996423721313,
+                            -0.09999996423721313,
+                            -11.899999618530273
+                        ],
+                        "Parent": 33554503,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "9452027036617911979",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Decor_EnemyCore_CoreLines3"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "12828882332219671095",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1958037256671112863\",\"Position\":[0.017486572265625,-0.0020723342895507813,0.0],\"Rotation\":[-130.0,-15.000007629394531,71.0],\"Scale\":[0.09999989718198776,0.10000001639127731,9.0],\"Parent\":33554503,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10028487788919041693\",\"Tag\":\"Decor_EnemyCore_CoreLines3\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"228654999760940707\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1958037256671112863",
+                        "Position": [
+                            0.017486572265625,
+                            -0.0020723342895507813,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -130.0,
+                            -15.000007629394531,
+                            71.0
+                        ],
+                        "Scale": [
+                            0.09999989718198776,
+                            0.10000001639127731,
+                            9.0
+                        ],
+                        "Parent": 33554503,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "228654999760940707",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Decor_EnemyCore_CoreLines2"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "9946578570702553647",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15793095311951834775\",\"Position\":[-0.071563720703125,0.11164093017578125,-0.11291122436523438],\"Rotation\":[111.00000762939453,-57.00008010864258,37.99999237060547],\"Scale\":[-0.30000004172325134,-16.29999351501465,-0.05000000074505806],\"Parent\":33554503,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12910791550434717333\",\"Tag\":\"Decor_EnemyCore_CoreLines2\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9452027036614291099\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15793095311951834775",
+                        "Position": [
+                            -0.071563720703125,
+                            0.11164093017578125,
+                            -0.11291122436523438
+                        ],
+                        "Rotation": [
+                            110.99999237060547,
+                            -57.00010299682617,
+                            37.999996185302734
+                        ],
+                        "Scale": [
+                            -0.30000004172325134,
+                            -16.29999351501465,
+                            -0.05000000074505806
+                        ],
+                        "Parent": 33554503,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "9452027036614291099",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 22020154,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Decor_EnemyCore_CoreLines"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "9946578570702553639",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8299105532004626063\",\"Position\":[-0.0489959716796875,-0.004176139831542969,0.013401031494140625],\"Rotation\":[46.00001525878906,-6.000000476837158,0.000012018670531688258],\"Scale\":[0.09999998658895493,11.899994850158691,0.10000000149011612],\"Parent\":33554503,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9452027036611473037\",\"Tag\":\"Decor_EnemyCore_CoreLines\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17522477568859467411\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8299105532004626063",
+                        "Position": [
+                            -0.0489959716796875,
+                            -0.004176139831542969,
+                            0.013401031494140625
+                        ],
+                        "Rotation": [
+                            46.00001525878906,
+                            -6.000001430511475,
+                            0.000012018670531688258
+                        ],
+                        "Scale": [
+                            0.09999998658895493,
+                            11.899994850158691,
+                            0.10000000149011612
+                        ],
+                        "Parent": 33554503,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "17522477568859467411",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 31457299,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Decor_EnemyCore_Core"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6487814056882012703",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14063713055015430735\",\"Position\":[0.0000152587890625,0.0,0.0],\"Rotation\":[43.99998092651367,52.999996185302734,-0.000002837329020621837],\"Scale\":[0.30000001192092896,0.30000001192092896,0.30000001192092896],\"Parent\":33554503,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16946016816532548173\",\"Tag\":\"Decor_EnemyCore_Core\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7722644779677936211\",\"Mesh\":\"\",\"Material\":\"EnemyCore_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14063713055015430735",
+                        "Position": [
+                            0.0000152587890625,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            43.99998092651367,
+                            52.999996185302734,
+                            -0.000002837329020621837
+                        ],
+                        "Scale": [
+                            0.30000001192092896,
+                            0.30000001192092896,
+                            0.30000001192092896
+                        ],
+                        "Parent": 33554503,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "7722644779677936211",
+                        "Mesh": "",
+                        "Material": "EnemyCore_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 33554503,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Enemy_Core"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "7064274809185436183",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Core.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15974154088651932187\",\"Position\":[-5504.39404296875,-438.72662353515625,643.2869873046875],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[30.0,30.0,30.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8875566284284242183\",\"Tag\":\"Enemy_Core\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15397693336348852765\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16550614840955896351\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7622061454111801539\",\"ScriptClassName\":\"Game.EnemyCore\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            31457299,
+                            22020154,
+                            1,
+                            2,
+                            12,
+                            13
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15974154088651932187",
+                        "Position": [
+                            -5504.39404296875,
+                            -438.72662353515625,
+                            643.2869873046875
                         ],
                         "Rotation": [
                             0.0,
@@ -244,28 +583,73 @@
                             0.0
                         ],
                         "Scale": [
-                            500.0,
-                            500.0,
-                            1.0
+                            30.0,
+                            30.0,
+                            30.0
                         ],
                         "Parent": 4294967295,
-                        "Children": []
+                        "Children": [
+                            31457299,
+                            22020154,
+                            1,
+                            2,
+                            12,
+                            13
+                        ]
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_Icon.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
+                        "ComponentGUID": "15397693336348852765",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "16550614840955896351",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
                         ],
-                        "Quad": 3,
-                        "Sprite Layer": 1,
-                        "IsActive": true,
-                        "IsVisible": true
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            75.0,
+                            75.0,
+                            75.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "7622061454111801539",
+                        "ScriptClassName": "Game.EnemyCore"
                     }
                 }
             ]
@@ -375,43 +759,75 @@
             ]
         },
         {
-            "ID": 23,
+            "ID": 13,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "ENVIRONMENT_LevelDesign"
+                        "Tag": "Decor_EnemyCore_CoreLines5"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "9946578570702553671",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10604948541225414319\",\"Position\":[0.002166748046875,0.027998924255371094,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.09999996423721313,25.699995040893555,0.09999996423721313],\"Parent\":33554503,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18098938321169919661\",\"Tag\":\"Decor_EnemyCore_CoreLines5\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13487252302742597299\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "4947609348173578587",
+                        "ComponentGUID": "10604948541225414319",
                         "Position": [
-                            -14.100000381469727,
-                            0.0,
+                            0.002166748046875,
+                            0.027998924255371094,
                             0.0
                         ],
                         "Rotation": [
-                            -0.000010018003195000347,
-                            -89.98021697998047,
+                            0.0,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
-                            15.0,
-                            15.0,
-                            15.0
+                            0.09999996423721313,
+                            25.699995040893555,
+                            0.09999996423721313
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 33554503,
                         "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "6100530852782408029",
-                        "Mesh": "trench_run_v001.fbx",
-                        "Material": "Mat_Level2_LevelDesign.mat",
+                        "ComponentGUID": "13487252302742597299",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -1039,12 +1455,45 @@
             ]
         },
         {
-            "ID": 0,
+            "ID": 7340054,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "LIGHTING_DirectionalLight"
+                        "Tag": "LIGHTING_DirectionalLight2"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "146745781550812791",
+                        "PrefabAssetGuid": "18017029102955793543",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "LIGHTING_DirectionalLight2",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/LIGHTING_DirectionalLight2.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12931128093033529529\",\"Position\":[-234.0772247314453,0.0,0.0],\"Rotation\":[-4.861001491546631,-32.99995040893555,89.0831527709961],\"Scale\":[1.0,1.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11099500075314137869\",\"Tag\":\"LIGHTING_DirectionalLight2\"}}"
+                            },
+                            {
+                                "componentType": 4,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785731771\",\"Enabled\":true,\"Type\":0,\"Color\":[1.0,1.0,1.0],\"Intensity\":100.0,\"Range\":5.0,\"SpotAngleDeg\":30.0,\"IndirectMultiplier\":10.0,\"TypeShadow\":0,\"Resolution\":1024,\"Strength\":1.0,\"Bias\":0.004999999888241291,\"NearPlane\":0.20000000298023224}}"
+                            }
+                        ]
                     }
                 },
                 {
@@ -1057,9 +1506,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -170.86099243164063,
-                            -32.99999237060547,
-                            89.0830307006836
+                            -4.861001491546631,
+                            -32.99995040893555,
+                            89.0831527709961
                         ],
                         "Scale": [
                             1.0,
@@ -3054,147 +3503,6 @@
             ]
         },
         {
-            "ID": 7340090,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Enemy_Core"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "16688203329744558371",
-                        "PrefabAssetGuid": "1857453931077714119",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Enemy_Core.prefab",
-                        "prefabVersion": 2,
-                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Core.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15974154088651932187\",\"Position\":[-5504.39404296875,-438.72662353515625,643.2869873046875],\"Rotation\":[135.0,-39.000003814697266,-179.99993896484375],\"Scale\":[30.0,30.0,30.0],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"547302265264662029\",\"Tag\":\"Enemy_Core\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15397693336348852765\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16550614840955896351\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7622061454111801539\",\"ScriptClassName\":\"Game.EnemyCore\",\"Started\":false,\"GCHandle\":4379}}"
-                            }
-                        ],
-                        "childEntityIDs": [
-                            1
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15974154088651932187",
-                        "Position": [
-                            -5504.39404296875,
-                            -438.72662353515625,
-                            643.2869873046875
-                        ],
-                        "Rotation": [
-                            135.0,
-                            -39.000003814697266,
-                            -179.99993896484375
-                        ],
-                        "Scale": [
-                            30.0,
-                            30.0,
-                            30.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            1
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "15397693336348852765",
-                        "Mesh": "",
-                        "Material": "Enemy_Core.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "16550614840955896351",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": true,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            75.0,
-                            75.0,
-                            75.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "7622061454111801539",
-                        "ScriptClassName": "Game.EnemyCore",
-                        "Fields": {
-                            "CurrentHealth": 50000.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
             "ID": 13631558,
             "Components": [
                 {
@@ -3288,6 +3596,173 @@
                         "Strength": 1.0,
                         "Bias": 0.004999999888241291,
                         "NearPlane": 0.20000000298023224
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048599,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "ENVIRONMENT_LevelDesign"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "13405343084529421935",
+                        "PrefabAssetGuid": "14558264589132876425",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "ENVIRONMENT_LevelDesign",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/ENVIRONMENT_LevelDesign.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4947609348173578587\",\"Position\":[-14.100000381469727,0.0,0.0],\"Rotation\":[-0.000010018003195000347,-89.98021697998047,0.0],\"Scale\":[15.0,15.0,15.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13981803836829075803\",\"Tag\":\"ENVIRONMENT_LevelDesign\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6100530852782408029\",\"Mesh\":\"trench_run_v001.fbx\",\"Material\":\"Mat_Level2_LevelDesign.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4947609348173578587",
+                        "Position": [
+                            -14.100000381469727,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -0.000010018003195000347,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            15.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "6100530852782408029",
+                        "Mesh": "trench_run_v001.fbx",
+                        "Material": "Mat_Level2_LevelDesign.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 32,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "AltFireIcon"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "12294757172271546805",
+                        "PrefabAssetGuid": "15244482986795221507",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "AltFireIcon",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3615555430101680567\",\"Position\":[782.2000122070313,249.39999389648438,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[500.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11209257720669815221\",\"Texture\":\"AlternateFire_Icon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":true,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3615555430101680567",
+                        "Position": [
+                            782.2000122070313,
+                            249.39999389648438,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            500.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "AlternateFire_Icon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
