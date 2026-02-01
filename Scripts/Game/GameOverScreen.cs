@@ -3,6 +3,7 @@ using Engine;
 using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
+using static Engine.Audio;
 
 namespace Game
 {
@@ -38,10 +39,12 @@ namespace Game
         {
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
             SetIsVisible((uint)EntityID, true);
+            AudioPlay((uint)EntityID);
         }
 
         public override void OnDestroy()
         {
+            AudioStop((uint)EntityID);
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
             LogMessage("=== GameOverScreen Destroyed ===");
