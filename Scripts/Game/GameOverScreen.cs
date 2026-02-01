@@ -17,8 +17,10 @@ namespace Game
     {
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+        private const string GAMEOVER = "GameOver";
 
         private bool initialized = false;
+        private bool playaudio = false;
 
         public override void OnStart()
         {
@@ -36,12 +38,23 @@ namespace Game
             LogMessage("[GameOverScreen] Initialized - waiting for lose condition");
         }
 
+        public override void OnUpdate(float deltaTime){
+            if(!playaudio){
+                return;
+            }
+
+            AudioPlay((uint)EntityID);
+            playaudio = false;
+        }
+
         private void OnGameOver(string eventName, string payload)
         {
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
-            StopAll();
+            //StopAll();
+            //FadeOutAll(5.0f);
             SetIsVisible((uint)EntityID, true);
-            AudioPlay((uint)EntityID);
+            playaudio = true;
+            Publish(GAMEOVER, "");
         }
 
         public override void OnDestroy()
