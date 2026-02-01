@@ -51,7 +51,7 @@ namespace Game
         {
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
             //StopAll();
-            FadeOutAll(5.0f);
+            //FadeOutAll(5.0f);
             SetIsVisible((uint)EntityID, true);
             playaudio = true;
             Publish(GAMEOVER, "");
