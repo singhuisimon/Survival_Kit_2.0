@@ -1,0 +1,3305 @@
+{
+    "Scene": "level2_player",
+    "Version": "1.0",
+    "Entities": [
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Decor_core"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "13229438815941732175",
+                        "PrefabAssetGuid": "1857453931077714119",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Enemy_Core.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8041292045211019089\",\"Mesh\":\"\",\"Material\":\"test.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8041292045211019089\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5158988283693803341\",\"Position\":[0.0000152587890625,9.5367431640625e-7,-0.0000019073486328125],\"Rotation\":[50.00002670288086,-41.0,-0.000018100176021107472],\"Scale\":[0.30000001192092896,0.30000001192092896,0.30000001192092896],\"Parent\":7340090,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16688203329762273099\",\"Tag\":\"Decor_core\"}}",
+                                "modifiedPropertyNames": [
+                                    "Tag"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5158988283693803341",
+                        "Position": [
+                            0.0000152587890625,
+                            9.5367431640625e-7,
+                            -0.0000019073486328125
+                        ],
+                        "Rotation": [
+                            50.00002670288086,
+                            -41.0,
+                            -0.000018100176021107472
+                        ],
+                        "Scale": [
+                            0.30000001192092896,
+                            0.30000001192092896,
+                            0.30000001192092896
+                        ],
+                        "Parent": 7340090,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "8041292045211019089",
+                        "Mesh": "",
+                        "Material": "test.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 6291478,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "LIGHTING_DirectionalLight2"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "16688203329739786311",
+                        "PrefabAssetGuid": "16111742577436182589",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "LIGHTING_DirectionalLight",
+                        "prefabVersion": 2,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/LIGHTING_DirectionalLight.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12931128093033529529\",\"Position\":[-234.0772247314453,0.0,0.0],\"Rotation\":[-4.8610005378723145,-32.99995040893555,89.0831527709961],\"Scale\":[1.0,1.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14382360320523945945\",\"Tag\":\"LIGHTING_DirectionalLight\"}}",
+                                "modifiedPropertyNames": [
+                                    "Tag"
+                                ]
+                            },
+                            {
+                                "componentType": 4,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785731771\",\"Enabled\":true,\"Type\":0,\"Color\":[1.0,1.0,1.0],\"Intensity\":100.0,\"Range\":5.0,\"SpotAngleDeg\":30.0,\"IndirectMultiplier\":10.0,\"TypeShadow\":0,\"Resolution\":1024,\"Strength\":1.0,\"Bias\":0.004999999888241291,\"NearPlane\":0.20000000298023224}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12931128093033529529",
+                        "Position": [
+                            -234.0772247314453,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -4.861001491546631,
+                            -32.99995040893555,
+                            89.0831527709961
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785731771",
+                        "Enabled": true,
+                        "Type": 0,
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Intensity": 100.0,
+                        "Range": 5.0,
+                        "SpotAngleDeg": 30.0,
+                        "IndirectMultiplier": 10.0,
+                        "TypeShadow": 0,
+                        "Resolution": 1024,
+                        "Strength": 1.0,
+                        "Bias": 0.004999999888241291,
+                        "NearPlane": 0.20000000298023224
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 32,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "AltFireIcon"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "12294757172271546805",
+                        "PrefabAssetGuid": "15244482986795221507",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "AltFireIcon",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3615555430101680567\",\"Position\":[782.2000122070313,249.39999389648438,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[500.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11209257720669815221\",\"Texture\":\"AlternateFire_Icon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":true,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3615555430101680567",
+                        "Position": [
+                            782.2000122070313,
+                            249.39999389648438,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            500.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "AlternateFire_Icon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3145780,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CollisionManager"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3816062370590296875",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "16498198921265728301",
+                        "ScriptClassName": "Game.CollisionManager"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097183,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "OOB"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5011592139811090341",
+                        "Position": [
+                            0.0,
+                            -115.0,
+                            -583.9447021484375
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            2373.89697265625,
+                            1000.0,
+                            1723.749267578125
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "11352660415149010855",
+                        "Mesh": "",
+                        "Material": "OOB.mat",
+                        "Texture": "",
+                        "Visible": false,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 1,
+                        "currentClipIndex": 0,
+                        "currentTime": 28.24169921875,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 23,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "ENVIRONMENT_LevelDesign"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4947609348173578587",
+                        "Position": [
+                            -14.100000381469727,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -0.000010018003195000347,
+                            -89.98021697998047,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            15.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "6100530852782408029",
+                        "Mesh": "trench_run_v001.fbx",
+                        "Material": "Mat_Level2_LevelDesign.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 45,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "StageCount"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7106610401567539731",
+                        "Position": [
+                            17.700000762939453,
+                            682.7999877929688,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "14024139429208752661",
+                        "text": "STAGE 2",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 24.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 38,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SecondayWeaponUI"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4800767392328679905",
+                        "PrefabAssetGuid": "14091561482188407303",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "SecondayWeaponUI",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"733251668581761455\",\"Position\":[520.0,250.8000030517578,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[800.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11785718472973238703\",\"Texture\":\"AlternateFire_Window.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":0,\"IsActive\":true,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "733251668581761455",
+                        "Position": [
+                            520.0,
+                            250.8000030517578,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            800.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "AlternateFire_Window.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 48,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "TImer"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8835992658497995303",
+                        "Position": [
+                            1075.4000244140625,
+                            650.5,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "1918463630861206067",
+                        "ScriptClassName": "Game.Timer"
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "9988914163104956969",
+                        "text": "00 m : 00s",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 24.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5242974,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CoreHealthBarWindow"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17559764205801641737",
+                        "Position": [
+                            640.0,
+                            466.3999938964844,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            750.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "M4TempCoreHP_Window.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 54,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "WinScreen"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "130006815191499605",
+                        "Position": [
+                            640.0,
+                            300.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1000.0,
+                            600.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "2435849824408339295",
+                        "ScriptClassName": "Game.WinScreen"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "DefenceSuccess.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 3,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 57,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "LooseScreen"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14541525622778495835",
+                        "Position": [
+                            640.0,
+                            340.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1000.0,
+                            600.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "7130368651406902311",
+                        "FilePath": "Player Death.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8776918099747013473",
+                        "ScriptClassName": "Game.GameOverScreen"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "DefenceFailed.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 3,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 35,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "PrimaryWeaponFrame"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "765542126204256715",
+                        "PrefabAssetGuid": "10056336216064360959",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "PrimaryWeaponFrame",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3039094677800141245\",\"Position\":[710.5999755859375,328.29998779296875,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[595.5999755859375,399.20001220703125,1.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18126786748310897079\",\"Tag\":\"PrimaryWeaponFrame\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14091561482186932667\",\"Texture\":\"PrimaryWeapBar_Frame.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":true,\"IsVisible\":true}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3039094677800141245",
+                        "Position": [
+                            623.4000244140625,
+                            335.20001220703125,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            684.5999755859375,
+                            400.70001220703125,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "PrimaryWeapBar_Frame.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 34,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "ICESentryText"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "8259531906148204995",
+                        "PrefabAssetGuid": "5444650197636940283",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "ICESentryText",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7074319943949779395\",\"Position\":[270.29998779296875,140.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[10.0,5.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6021110949939003837\",\"Tag\":\"ICESentryText\"}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7074319943949779395",
+                        "Position": [
+                            270.29998779296875,
+                            140.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            10.0,
+                            5.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 33,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "HealthBarWindow"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6530149649237426621",
+                        "PrefabAssetGuid": "7750493206851027471",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "HealthBarWindow",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1585047724748882401\",\"Position\":[640.0,245.3000030517578,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[750.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462943\",\"Tag\":\"HealthBarWindow\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4291728693028733411\",\"Texture\":\"PlayerHPWindow.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":0,\"IsActive\":true,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1585047724748882401",
+                        "Position": [
+                            640.0,
+                            245.3000030517578,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            750.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "PlayerHPWindow.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "LIGHTING_DirectionalLight"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12931128093033529529",
+                        "Position": [
+                            -234.0772247314453,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -170.86099243164063,
+                            -32.99999237060547,
+                            89.0830307006836
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785731771",
+                        "Enabled": true,
+                        "Type": 0,
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Intensity": 100.0,
+                        "Range": 5.0,
+                        "SpotAngleDeg": 30.0,
+                        "IndirectMultiplier": 10.0,
+                        "TypeShadow": 0,
+                        "Resolution": 1024,
+                        "Strength": 1.0,
+                        "Bias": 0.004999999888241291,
+                        "NearPlane": 0.20000000298023224
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 36,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "PrimaryWeaponWindow"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "13447678676879770067",
+                        "PrefabAssetGuid": "17550325996008686067",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "PrimaryWeaponWindow",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4554432807152452049\",\"Position\":[706.9000244140625,329.1000061035156,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[600.0,400.0,1.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462933\",\"Tag\":\"PrimaryWeaponWindow\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1985885683815039449\",\"Texture\":\"PrimaryWeapBar_Window.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":0,\"IsActive\":true,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4554432807152452049",
+                        "Position": [
+                            614.0,
+                            250.39999389648438,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            700.0,
+                            494.20001220703125,
+                            0.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "PrimaryWeapBar_Window.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 53,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CoreHealthCount"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14831858265129091917",
+                        "Position": [
+                            812.0,
+                            675.5,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "18290622778950370129",
+                        "ScriptClassName": "Game.CoreHealthCount"
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "9643711494398460751",
+                        "text": "100/100\n",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 12.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048579,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Player"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "2554834551572381907",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Position\":[-42.65132141113281,-137.7088623046875,-105.93164825439453],\"Rotation\":[0.6036109328269958,0.38336724042892456,-0.4662128686904907],\"Scale\":[0.15000000596046448,0.15000000596046448,0.15000000596046448],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Tag\":\"Player\"}}"
+                            },
+                            {
+                                "componentType": 3,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": true,
+                                "originalComponentJSON": "{\"Properties\":{}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerBackWings.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"\",\"Initial Velocity\":[0.0,1.0,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[0.0,0.0,0.699999988079071],\"Color Max\":[0.30000001192092896,0.30000001192092896,1.0],\"Emitter Shape\":0,\"Max Particles\":1000,\"Particle Type\":0,\"Emission Rate\":5.0,\"Particle Lifetime\":2.0,\"Emission Accumulator\":0.0,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":15.0,\"Min Speed\":0.5,\"Max Speed\":1.5,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            }
+                        ],
+                        "childEntityIDs": [
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            1048604
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16100272381120889775",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            6.225637889656355e-7,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.019999999552965164,
+                            0.019999999552965164,
+                            0.019999999552965164
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            1048604
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerBackWings.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "16732350830320074971",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "PlayerParticleTrail.mat",
+                        "Initial Velocity": [
+                            -0.0,
+                            -0.0,
+                            -0.0
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            1.5,
+                            1.5,
+                            1.5
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Max": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Emitter Shape": 0,
+                        "Max Particles": 1000,
+                        "Particle Type": 1,
+                        "Emission Rate": 0.0,
+                        "Particle Lifetime": 1.2000000476837158,
+                        "Emission Accumulator": 0.762939453125,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 10.0,
+                        "Min Speed": 0.5,
+                        "Max Speed": 1.5,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": false,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": true,
+                        "Burst Mode": false
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9026023440310174993",
+                        "ScriptClassName": "Game.PlayerWeapon",
+                        "Fields": {
+                            "shootAllowed": false,
+                            "primaryShooting": false,
+                            "reloadingPrimary": false,
+                            "primaryAmmo": 0,
+                            "CAMSHAKE_primaryFire": 0.05000000074505806,
+                            "primaryAmmoMax": 100,
+                            "primaryUltSpeed": 500.0,
+                            "primaryReloadDelay": 1.5,
+                            "primaryShootRate": 0.05000000074505806,
+                            "primaryShootNext": 0.0,
+                            "primarybulletSpeed": 1000.0,
+                            "chargeDelayRate": 0.5,
+                            "chargeDelayNext": 0.0,
+                            "primaryAltCharging": false,
+                            "primaryChargeRate": 0.10000000149011612,
+                            "muzzleDistance": 5.0,
+                            "primaryChargeNext": 0.0,
+                            "primaryAltCharge": 0,
+                            "primaryAltChargeMax": 30,
+                            "primaryAltReady": false,
+                            "primaryAltFireAOERange": 30.0,
+                            "CAMSHAKE_primaryFireDuration": 0.5,
+                            "CAMSHAKE_primaryAltFire": 0.1599999964237213,
+                            "CAMSHAKE_primaryAltFireDuration": 0.5
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_0"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15813431854551122139",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerBackWings.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9759204105783231409",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerBackWings.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_1"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15813431854551122147",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":1}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13217968619603772339",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 1,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 6,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_2"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11201745836123734251",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":2}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9759204105783231413",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 2,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 7,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_3"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560786075891",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":3}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13217968619603772343",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 3,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 8,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_4"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6590059817696346363",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":4}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16100272381120889785",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 4,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 9,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_5"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1978373799268958467",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":5}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1688753573535302587",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 5,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 10,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_6"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "13507588845337428235",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":6}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1112292821231879101",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 6,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 11,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "player_7"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5437138313089499411",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":7}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12641507867300348863",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerMaterial.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 7,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 40,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "SentryWindow"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "9988914163059769841",
+                        "PrefabAssetGuid": "8903414711457645067",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "SentryWindow",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9956623705429098921\",\"Position\":[680.0,265.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[720.0,480.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17550325996007473573\",\"Tag\":\"SentryWindow\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6597571702242427305\",\"Texture\":\"SentryWindows.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":0,\"IsActive\":true,\"IsVisible\":true}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9956623705429098921",
+                        "Position": [
+                            680.0,
+                            265.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            720.0,
+                            480.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "SentryWindows.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 9437240,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CoreHealthBarRefill"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14100999691982395151",
+                        "Position": [
+                            660.7999877929688,
+                            62.5,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            205.0,
+                            7.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "7183470664354652525",
+                        "ScriptClassName": "Game.CoreHealthBar"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "M4TempCoreHP_Fill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 2,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 27,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "PlayerCam"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7571492693698003779",
+                        "Position": [
+                            767.7905883789063,
+                            194.9381561279297,
+                            -74.92496490478516
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": false,
+                        "Projection": false,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.8879055976867676,
+                        "FOV": 90.0,
+                        "NearPlane": 1.090000033378601,
+                        "FarPlane": 5000.0,
+                        "Target": [
+                            767.7905883789063,
+                            194.9381561279297,
+                            -82.42496490478516
+                        ]
+                    }
+                },
+                {
+                    "Type": "ListenerComponent",
+                    "Properties": {
+                        "ComponentGUID": "4151941185164985965",
+                        "Active": true
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9026023440309814373",
+                        "ScriptClassName": "Game.SpaceshipController",
+                        "Fields": {
+                            "mouseSensitivity": 15.0,
+                            "backwardSpeed": 200.0,
+                            "strafeAcceleration": 15.0,
+                            "mouseSmoothing": 0.15000000596046448,
+                            "cameraFollowSpeed": 15.0,
+                            "verticalSpeed": 200.0,
+                            "strafeDeceleration": 12.0,
+                            "strafeSpeed": 250.0,
+                            "pitchLimitDegrees": 65.0,
+                            "playerRotationSpeed": 5.0,
+                            "maxTurnSpeed": 3.0,
+                            "forwardSpeed": 333.0,
+                            "cameraDistanceBack": 15.0,
+                            "cameraHeightOffset": 0.0,
+                            "cameraRotationSpeed": 8.0,
+                            "cameraLookHeight": 8.0,
+                            "modelYRotationOffset": -90.0,
+                            "modelRotationOffset": 180.0,
+                            "startWithCursorLocked": true,
+                            "playerHP": 100.0,
+                            "inEnvironment": true,
+                            "countdownOOB": 5.0,
+                            "originalCountdownOOB": 5.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 59,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Firewall_activevoidscreen"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16847368631995482981",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Firewall-active-void.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048602,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "PlayerHealth"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "790813281478640227",
+                        "Position": [
+                            640.0,
+                            330.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            700.0,
+                            400.0,
+                            203.60000610351563
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Example_PlayerHPDefault.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 29,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Crosshair"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1595312745398124927",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            25.0,
+                            25.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4551116682031235669",
+                        "ScriptClassName": "Game.Hitmarker"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Crosshair_HitBorder.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 30,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Crosshair2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13124527791467757955",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            20.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Crosshair_Base.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048604,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "FiringPosition"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "17036590170330694843",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "Tag"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17613050922634446013\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11271982647296459961",
+                        "Position": [
+                            1000.0,
+                            400.0,
+                            -125.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            10.0,
+                            10.0,
+                            10.0
+                        ],
+                        "Parent": 1048579,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "17613050922634446013",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": false,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 47,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "scoreboard"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3647845887758467615",
+                        "Position": [
+                            1075.4000244140625,
+                            682.7999877929688,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            100.0,
+                            85.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "18059364695356834353",
+                        "ScriptClassName": ""
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "189081373945365027",
+                        "text": "SCORE 0000000",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 24.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4194404,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CoreHealthBarFrame"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15253921196586768131",
+                        "Position": [
+                            640.0,
+                            92.30000305175781,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            207.60000610351563,
+                            7.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "M4TempCoreHP_Frame.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 44,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "HealthCount"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9988914163073827341",
+                        "Position": [
+                            813.0,
+                            58.5,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "6530149649288249903",
+                        "ScriptClassName": "Game.HealthCount"
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "189081373915742735",
+                        "text": "20/100",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 12.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048615,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "WeaponBarReload"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10315724205064143441",
+                        "Position": [
+                            1069.1429443359375,
+                            682.9000244140625,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            52.54296112060547,
+                            6.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "14350949471189976069",
+                        "ScriptClassName": "Game.AmmoBar"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "PrimaryWeapBar_Fill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 2,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 43,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "WeaponAmmoCount"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "765542126216987139",
+                        "Position": [
+                            1202.300048828125,
+                            58.5,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "2494924383129240073",
+                        "ScriptClassName": "Game.AmmoCount"
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "10565374915375432199",
+                        "text": "74/100",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 12.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 42,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "HealthBarFill"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8835992658460180989",
+                        "Position": [
+                            462.3999938964844,
+                            683.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            44.099998474121094,
+                            6.199999809265137,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "1342002878556946987",
+                        "ScriptClassName": "Game.HealthBar"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "PlayerHPBar.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 7340090,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Enemy_Core"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "16688203329744558371",
+                        "PrefabAssetGuid": "1857453931077714119",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Enemy_Core.prefab",
+                        "prefabVersion": 2,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Core.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15974154088651932187\",\"Position\":[-5504.39404296875,-438.72662353515625,643.2869873046875],\"Rotation\":[135.0,-39.000003814697266,-179.99993896484375],\"Scale\":[30.0,30.0,30.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"547302265264662029\",\"Tag\":\"Enemy_Core\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15397693336348852765\",\"Mesh\":\"\",\"Material\":\"Enemy_Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16550614840955896351\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7622061454111801539\",\"ScriptClassName\":\"Game.EnemyCore\",\"Started\":false,\"GCHandle\":4379}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15974154088651932187",
+                        "Position": [
+                            -5504.39404296875,
+                            -438.72662353515625,
+                            643.2869873046875
+                        ],
+                        "Rotation": [
+                            135.0,
+                            -39.000003814697266,
+                            -179.99993896484375
+                        ],
+                        "Scale": [
+                            30.0,
+                            30.0,
+                            30.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "15397693336348852765",
+                        "Mesh": "",
+                        "Material": "Enemy_Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "16550614840955896351",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            75.0,
+                            75.0,
+                            75.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "7622061454111801539",
+                        "ScriptClassName": "Game.EnemyCore",
+                        "Fields": {
+                            "CurrentHealth": 50000.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 13631558,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "LIGHTING_EnemyCore"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5158988283688052203",
+                        "PrefabAssetGuid": "6311909788279523421",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: LIGHTING_DirectionalLight2.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/LIGHTING_DirectionalLight2.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12931128093033529529\",\"Position\":[-234.0772247314453,0.0,0.0],\"Rotation\":[-4.861001491546631,-32.99995040893555,89.0831527709961],\"Scale\":[1.0,1.0,1.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14382360320523945945\",\"Tag\":\"LIGHTING_DirectionalLight2\"}}",
+                                "modifiedPropertyNames": [
+                                    "Tag"
+                                ]
+                            },
+                            {
+                                "componentType": 4,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785731771\",\"Enabled\":true,\"Type\":0,\"Color\":[1.0,1.0,1.0],\"Intensity\":100.0,\"Range\":5.0,\"SpotAngleDeg\":30.0,\"IndirectMultiplier\":10.0,\"TypeShadow\":0,\"Resolution\":1024,\"Strength\":1.0,\"Bias\":0.004999999888241291,\"NearPlane\":0.20000000298023224}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12931128093033529529",
+                        "Position": [
+                            -5463.6953125,
+                            -420.22113037109375,
+                            681.4212646484375
+                        ],
+                        "Rotation": [
+                            35.1390266418457,
+                            -32.99995040893555,
+                            130.08299255371094
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785731771",
+                        "Enabled": true,
+                        "Type": 2,
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Intensity": 100.0,
+                        "Range": 166.10000610351563,
+                        "SpotAngleDeg": 81.0,
+                        "IndirectMultiplier": 10.0,
+                        "TypeShadow": 0,
+                        "Resolution": 1024,
+                        "Strength": 1.0,
+                        "Bias": 0.004999999888241291,
+                        "NearPlane": 0.20000000298023224
+                    }
+                }
+            ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": true,
+            "BloomStrength": 0.0010000000474974513,
+            "BloomFilterRadius": 0.0010000000474974513,
+            "Exposure": 5.0,
+            "GlobalBias": 0.004999999888241291
+        }
+    ]
+}

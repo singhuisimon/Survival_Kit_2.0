@@ -3,7 +3,7 @@ using Engine;
 using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
-using static Engine.Audio;
+using static Engine.AudioManager;
 
 namespace Game
 {
@@ -36,13 +36,12 @@ namespace Game
         private void OnWin(string eventName, string payload)
         {
             LogMessage("[WinScreen] Win! Timer finished!");
+            StopAll();
             SetIsVisible((uint)EntityID, true);
-            AudioPlay((uint)EntityID);
         }
 
         public override void OnDestroy()
         {
-            AudioStop((uint)EntityID);
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnWin);
             LogMessage("=== WinScreen Destroyed ===");
         }
