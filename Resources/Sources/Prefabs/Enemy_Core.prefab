@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Core.prefab",
-    "Prefab GUID": 8041292045221062527,
+    "Prefab GUID": 6888370540620327499,
     "version": 1,
     "entities": [
         {
@@ -105,7 +105,7 @@
                             "ComponentGUID": "7622061454111801539",
                             "ScriptClassName": "Game.EnemyCore",
                             "Started": false,
-                            "GCHandle": 4379
+                            "GCHandle": 4587
                         }
                     }
                 }
@@ -147,7 +147,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16688203329762273099",
+                            "ComponentGUID": "7464831292921325799",
                             "Tag": "Decor_core"
                         }
                     }
