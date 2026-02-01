@@ -17,6 +17,7 @@ namespace Game
         private const float SPAWN_GRACE_TIME = 0.5f;
         private float spawnTimer = 0.0f;
         private bool isInvulnerable = true;
+        private bool isgameover = false;
 
         private string EVENT_CORE_HIT = "Damage:";
         private string EVENT_CORE_HEALTHCHANGE = "Core Health Change";
@@ -27,6 +28,7 @@ namespace Game
             CurrentHealth = MaxHealth;
             isDead = false;
             isInvulnerable = true;
+            isgameover = false;
             spawnTimer = SPAWN_GRACE_TIME;
             EVENT_CORE_HIT += EntityID.ToString();
 
@@ -57,13 +59,13 @@ namespace Game
 
         private void OnPlayerDeath(string eventName, string payload){
             LogMessage("CoreMotherboard " + EntityID.ToString() + "is now immune!");
-            isInvulnerable = false;
+            isgameover = true;
         }
 
         private void OnDamageReceived(string eventName, string payload)
         {
 
-            if(!isInvulnerable) return;
+            if(isgameover) return;
 
             float damage = DamageSystem.ParseAmount(payload);
 
