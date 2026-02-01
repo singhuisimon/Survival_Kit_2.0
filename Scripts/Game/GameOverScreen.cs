@@ -4,6 +4,7 @@ using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
 using static Engine.Audio;
+using static Engine.AudioManager;
 
 namespace Game
 {
@@ -38,6 +39,7 @@ namespace Game
         private void OnGameOver(string eventName, string payload)
         {
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
+            StopAll();
             SetIsVisible((uint)EntityID, true);
             AudioPlay((uint)EntityID);
         }
