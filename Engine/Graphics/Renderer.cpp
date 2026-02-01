@@ -153,6 +153,7 @@ namespace Engine {
 		}
 
 		pass.depth_test ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+
 		glDepthFunc(GL_LESS);
 		glDepthMask(pass.depth_write ? GL_TRUE : GL_FALSE);
 
@@ -523,6 +524,9 @@ namespace Engine {
 		}
 
 		prog.programFree();
+
+		renderSkyboxHDR();
+		RenderTrails(draw_items, v, p, cam_pos);
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
@@ -864,7 +868,7 @@ namespace Engine {
 	 */
 	void Renderer::renderSkyboxHDR()
 	{
-		// If we don't have any bloom initialized or framebuffers, bail early
+		//If we don't have any bloom initialized or framebuffers, bail early
 		if (m_framebuffers.empty()) return;
 
 		// Bind the HDR scene framebuffer explicitly (FBO 0)
@@ -933,8 +937,7 @@ namespace Engine {
 		renderBloomUpsamples(m_bloomFilterRadius);  // 0.005f as default, tweak as needed
 
 		// Render skybox into HDR FBO 0 after bloom is computed  
-		renderSkyboxHDR();
-		RenderTrails(draw_items, view, proj, cam_pos);
+		
 
 		// Final composite: HDR scene + bloom -> LDR
 		beginFrame(pass);
