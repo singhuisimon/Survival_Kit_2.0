@@ -85,6 +85,8 @@ namespace Game
         //private const string EVENT_BULLET_HIT = "BulletHit";
         private string EVENT_BULLET_HIT = "Damage:";
         private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
+        private const string EVENT_GAME_OVER = "GameOver";
+        private const string EVENT_GAME_WIN = "GameWin";
 
         // ===== Lifecycle =====
 
@@ -131,7 +133,9 @@ namespace Game
             EVENT_BULLET_HIT += EntityID.ToString();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
-            Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Subscribe(EVENT_GAME_OVER, OnGameEnd);
+            Subscribe(EVENT_GAME_WIN, OnGameEnd);
+            //Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -165,7 +169,9 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
-            Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Unsubscribe(EVENT_GAME_OVER, OnGameEnd);
+            Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
+            //Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         // ===== Public API =====
@@ -208,23 +214,34 @@ namespace Game
             }
         }
 
-        private void OnSpawnDisable(string eventName, string payload)
-        {
-            if (isDead || eventName != EVENT_SPAWN_DISABLE)
+        private void OnGameEnd(string eventName, string payload){
+            if(isDead){
                 return;
-
-            if (!bool.TryParse(payload, out bool active))
-                return;
-
-            if (!active)
-            {
-                isDead = true;
-                isExploding = false;
-
-                LogMessage("Destroying itself as spawn is disabled");
-                SceneDestroyEntity((uint)EntityID);
             }
+
+            LogMessage("[Botnet] Detect game end. Event is: " + eventName);
+            isDead = true;
+            isExploding = false;
+            SceneDestroyEntity((uint)EntityID);
         }
+
+        // private void OnSpawnDisable(string eventName, string payload)
+        // {
+        //     if (isDead || eventName != EVENT_SPAWN_DISABLE)
+        //         return;
+
+        //     if (!bool.TryParse(payload, out bool active))
+        //         return;
+
+        //     if (!active)
+        //     {
+        //         isDead = true;
+        //         isExploding = false;
+
+        //         LogMessage("Destroying itself as spawn is disabled");
+        //         SceneDestroyEntity((uint)EntityID);
+        //     }
+        // }
 
         public void BruteForceAttack()
         {
