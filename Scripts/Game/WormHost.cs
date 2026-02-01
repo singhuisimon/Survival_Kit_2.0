@@ -155,6 +155,7 @@ namespace Game
 
             if (health <= 0)
             {
+                Publish("WormHostDead", EntityID.ToString());  // ADD THIS
                 SceneDestroyEntity(EntityID);
             }
         }
