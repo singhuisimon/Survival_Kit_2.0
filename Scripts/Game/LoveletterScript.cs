@@ -32,8 +32,8 @@ namespace Game
         [SerializeField] private float waitTimeAtSurface = 0.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
-        [SerializeField] private float maxHealth = 200.0f;
-        private float currentHealth = 200.0f;
+        [SerializeField] private float maxHealth = 100.0f;
+        private float currentHealth = 100.0f;
         private bool isDead = false;
 
         // ===== MOVEMENT STATE =====
@@ -59,7 +59,8 @@ namespace Game
         private static bool rngSeeded = false;
 
         // ===== EVENTS =====
-        private const string EVENT_BULLET_HIT = "BulletHit";
+        //private const string EVENT_BULLET_HIT = "BulletHit";
+        private string EVENT_BULLET_HIT = "Damage:";
 
         public override void OnStart()
         {
@@ -82,6 +83,9 @@ namespace Game
             isDead = false;
 
             // Subscribe to bullet hit event
+            //(EVENT_BULLET_HIT, OnBulletHit);
+
+            EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             
             // Seed RNG if not already done
