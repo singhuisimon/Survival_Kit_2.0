@@ -16,7 +16,7 @@ namespace Game
     {
         // ===== Event Names =====
         private const string EVENT_BOTNET_DEAD = "BotnetDeath";
-        private const string EVENT_LOVELETTER_DEAD = "LoveLetterDestroyed";
+        private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
         private const string EVENT_WORMHOST_DEAD = "WormHostDead";
 
         // ===== Settings =====

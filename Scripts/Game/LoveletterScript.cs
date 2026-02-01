@@ -235,7 +235,7 @@ namespace Game
             // Stop movement
             isMoving = false;
             isWaitingAtSurface = false;
-
+            Publish("LoveLetterKilled", loveletterEntityID.ToString());
             // Publish event for game systems
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
 
