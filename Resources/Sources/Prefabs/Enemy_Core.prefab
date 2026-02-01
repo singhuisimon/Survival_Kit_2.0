@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Core.prefab",
-    "Prefab GUID": 1857453931077714119,
+    "Prefab GUID": 8041292045221062527,
     "version": 1,
     "entities": [
         {
@@ -15,19 +15,19 @@
                         "Properties": {
                             "ComponentGUID": "15974154088651932187",
                             "Position": [
-                                0.0,
-                                0.0,
-                                0.0
+                                -5504.39404296875,
+                                -438.72662353515625,
+                                643.2869873046875
                             ],
                             "Rotation": [
-                                0.0,
-                                -0.0,
-                                0.0
+                                135.0,
+                                -39.000003814697266,
+                                -179.99993896484375
                             ],
                             "Scale": [
-                                150.0,
-                                150.0,
-                                150.0
+                                30.0,
+                                30.0,
+                                30.0
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -105,7 +105,70 @@
                             "ComponentGUID": "7622061454111801539",
                             "ScriptClassName": "Game.EnemyCore",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 4379
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_core",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5158988283693803341",
+                            "Position": [
+                                0.0000152587890625,
+                                9.5367431640625e-7,
+                                -0.0000019073486328125
+                            ],
+                            "Rotation": [
+                                50.00002670288086,
+                                -41.0,
+                                -0.000018100176021107472
+                            ],
+                            "Scale": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                0.30000001192092896
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16688203329762273099",
+                            "Tag": "Decor_core"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8041292045211019089",
+                            "Mesh": "",
+                            "Material": "test.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 }
