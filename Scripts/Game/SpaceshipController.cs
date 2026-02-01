@@ -249,39 +249,41 @@ namespace Game
             else
                 moveDir = Vector3.Zero;
 
-            // Particle trail
-            float currentSpeed = moveDir.Magnitude;
 
-            // Emission rate scaling
-            float maxEmissionRate = 80.0f;   // Lots of particles when fast
-            float minEmissionRate = 1.0f;    // Single particle at very low speed
-            float stopThreshold = 1.0f;      // Below this = complete stop
+            emitParticles(moveDir);
+            //// Particle trail
+            //float currentSpeed = moveDir.Magnitude;
 
-            // Calculate speed ratio (0.0 to 1.0)
-            float speedRatio = SimpleMath.Clamp(currentSpeed / forwardSpeed, 0.0f, 1.0f);
+            //// Emission rate scaling
+            //float maxEmissionRate = 80.0f;   // Lots of particles when fast
+            //float minEmissionRate = 1.0f;    // Single particle at very low speed
+            //float stopThreshold = 1.0f;      // Below this = complete stop
 
-            float emissionRate;
-            if (currentSpeed < stopThreshold)
-            {
-                // Nearly stopped - emit final particle then stop
-                emissionRate = 0.0f;
-            }
-            else if (speedRatio < 0.1f) // Less than 10% speed
-            {
-                // Very slow - just 1-2 particles per second
-                emissionRate = minEmissionRate;
-            }
-            else
-            {
-                // Scale emission rate with speed (quadratic for better feel)
-                emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
-            }
+            //// Calculate speed ratio (0.0 to 1.0)
+            //float speedRatio = SimpleMath.Clamp(currentSpeed / forwardSpeed, 0.0f, 1.0f);
 
-            SetEmissionRate(playerEntityID, emissionRate);
+            //float emissionRate;
+            //if (currentSpeed < stopThreshold)
+            //{
+            //    // Nearly stopped - emit final particle then stop
+            //    emissionRate = 0.0f;
+            //}
+            //else if (speedRatio < 0.1f) // Less than 10% speed
+            //{
+            //    // Very slow - just 1-2 particles per second
+            //    emissionRate = minEmissionRate;
+            //}
+            //else
+            //{
+            //    // Scale emission rate with speed (quadratic for better feel)
+            //    emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
+            //}
 
-            // Velocity still scales with speed for particle direction
-            Vector3 exhaustVelocity = -moveDir.Normalized * 100.0f;
-            SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
+            //SetEmissionRate(playerEntityID, emissionRate);
+
+            //// Velocity still scales with speed for particle direction
+            //Vector3 exhaustVelocity = -moveDir.Normalized * 100.0f;
+            //SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
 
             Vector3 playerVel = moveDir * forwardSpeed; // or choose forward/back/strafe like earlier
             RigidbodySetVelocity(playerEntityID, ref playerVel);
@@ -359,6 +361,45 @@ namespace Game
                 //do what you need to do here
                 Publish("PlayerDead", "");  // ADD THIS
             }
+        }
+
+        private void emitParticles(Vector3 moveDir)
+        {
+            // Particle trail
+            float currentSpeed = moveDir.Magnitude;
+
+            // Emission rate scaling
+            float maxEmissionRate = 80.0f;   // Lots of particles when fast
+            float minEmissionRate = 1.0f;    // Single particle at very low speed
+            float stopThreshold = 1.0f;      // Below this = complete stop
+
+            // Calculate speed ratio (0.0 to 1.0)
+            float speedRatio = SimpleMath.Clamp((currentSpeed * moveSpeed)/ moveSpeed, 0.0f, 1.0f);
+
+            LogMessage("speedRatio: " + speedRatio);
+
+            float emissionRate;
+            if (currentSpeed < stopThreshold)
+            {
+                // Nearly stopped - emit final particle then stop
+                emissionRate = 0.0f;
+            }
+            else if (speedRatio < 0.1f) // Less than 10% speed
+            {
+                // Very slow - just 1-2 particles per second
+                emissionRate = minEmissionRate;
+            }
+            else
+            {
+                // Scale emission rate with speed (quadratic for better feel)
+                emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
+            }
+
+            SetEmissionRate(playerEntityID, emissionRate);
+
+            // Velocity still scales with speed for particle direction
+            Vector3 exhaustVelocity = -moveDir.Normalized * 50.0f;
+            SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
         }
 
         // ========================================
