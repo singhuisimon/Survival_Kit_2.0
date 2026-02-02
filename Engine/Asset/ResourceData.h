@@ -100,6 +100,7 @@ namespace Engine {
         bool doubleSided    = false;
         bool receiveShadows = true;
         bool castShadows    = true;
+        bool treatBlacksAsTransparent = true;
     };
 
     /**

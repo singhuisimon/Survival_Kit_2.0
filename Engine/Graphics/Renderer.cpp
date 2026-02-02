@@ -462,6 +462,7 @@ namespace Engine {
 			 {
 
 			    prog.setUniform("uEmissive", material_resource->enableEmission);
+				prog.setUniform("uBlacksAsTransparent", material_resource->treatBlacksAsTransparent);
 				
 
 				// New workflow has no ambient lighting

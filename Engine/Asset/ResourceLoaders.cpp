@@ -553,6 +553,9 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
     if (doc.HasMember("castShadows"))
         material->castShadows = doc["castShadows"].GetBool();
 
+    if (doc.HasMember("treatBlacksAsTransparent"))
+        material->treatBlacksAsTransparent = doc["treatBlacksAsTransparent"].GetBool();
+
     return material.release();
 }
 
