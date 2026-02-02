@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "MainExplosion1",
-    "Prefab GUID": 16494434197364359417,
+    "Prefab Name": "Prefab: MainExplosion1.prefab",
+    "Prefab GUID": 7699537444612309361,
     "version": 1,
     "entities": [
         {
@@ -88,7 +88,7 @@
                                 1.0
                             ],
                             "Emitter Shape": 0,
-                            "Max Particles": 1000,
+                            "Max Particles": 1,
                             "Particle Type": 0,
                             "Emission Rate": 1.0,
                             "Particle Lifetime": 0.15000000596046448,
@@ -104,7 +104,7 @@
                             "Max Speed": 10.0,
                             "Rotation Speed": 276.0,
                             "Play Delay": 0.0,
-                            "Delay Accumulator": 77.60751342773438,
+                            "Delay Accumulator": 0.0,
                             "Randomize Rotation": true,
                             "Loop": false,
                             "Active": true,
@@ -200,7 +200,7 @@
                                 1.0
                             ],
                             "Emitter Shape": 0,
-                            "Max Particles": 1000,
+                            "Max Particles": 1,
                             "Particle Type": 1,
                             "Emission Rate": 1.0,
                             "Particle Lifetime": 0.30000001192092896,
@@ -216,12 +216,12 @@
                             "Max Speed": 0.0,
                             "Rotation Speed": 90.0,
                             "Play Delay": 0.0,
-                            "Delay Accumulator": 113.4958953857422,
+                            "Delay Accumulator": 0.0,
                             "Randomize Rotation": false,
                             "Loop": false,
                             "Active": true,
                             "World Space": false,
-                            "Burst Mode": false
+                            "Burst Mode": true
                         }
                     }
                 }
@@ -312,7 +312,7 @@
                                 1.0
                             ],
                             "Emitter Shape": 0,
-                            "Max Particles": 1000,
+                            "Max Particles": 1,
                             "Particle Type": 0,
                             "Emission Rate": 1.0,
                             "Particle Lifetime": 0.30000001192092896,
@@ -328,12 +328,12 @@
                             "Max Speed": 0.0,
                             "Rotation Speed": 90.0,
                             "Play Delay": 0.0,
-                            "Delay Accumulator": 113.4958953857422,
+                            "Delay Accumulator": 0.0,
                             "Randomize Rotation": true,
                             "Loop": false,
                             "Active": true,
                             "World Space": false,
-                            "Burst Mode": false
+                            "Burst Mode": true
                         }
                     }
                 }
