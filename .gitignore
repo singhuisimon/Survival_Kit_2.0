@@ -178,8 +178,8 @@ External/openFBX/build/
 # ==================================
 # Generated metadata and compiled assets (auto-generated, don't commit)   
 Resources/Compiled/
-Resources/DB 
-Resources/Descriptors
+Resources/DB/
+Resources/Descriptors/
 
 # ==================================
 # Scripting (Future)

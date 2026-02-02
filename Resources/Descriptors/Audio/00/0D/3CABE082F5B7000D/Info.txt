@@ -1,7 +1,0 @@
-{
-  "name": "BGM_Combat_Phase_v002.wav",
-  "guid": "3CABE082F5B7000D",
-  "tags": [],
-  "lastImported": "0000000069805C5C",
-  "resourceLinks": []
-}

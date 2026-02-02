@@ -1,7 +1,0 @@
-{
-  "name": "M4TempCoreHP_Frame.png",
-  "guid": "D0445082EFF88009",
-  "tags": [],
-  "lastImported": "0000000069804562",
-  "resourceLinks": []
-}

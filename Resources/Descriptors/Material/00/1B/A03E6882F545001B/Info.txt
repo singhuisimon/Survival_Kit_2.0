@@ -1,7 +1,0 @@
-{
-  "name": "EnemyTurretBullet.mat",
-  "guid": "A03E6882F545001B",
-  "tags": [],
-  "lastImported": "0000000069805A94",
-  "resourceLinks": []
-}

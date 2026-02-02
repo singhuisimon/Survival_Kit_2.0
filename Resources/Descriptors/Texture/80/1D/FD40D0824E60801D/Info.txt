@@ -1,7 +1,0 @@
-{
-  "name": "Paused_MixerFill.png",
-  "guid": "FD40D0824E60801D",
-  "tags": [],
-  "lastImported": "0000000069807BAD",
-  "resourceLinks": []
-}

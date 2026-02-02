@@ -1,7 +1,0 @@
-{
-  "name": "CoreInner.mat",
-  "guid": "0CABE082F5B70013",
-  "tags": [],
-  "lastImported": "0000000069805C5C",
-  "resourceLinks": []
-}

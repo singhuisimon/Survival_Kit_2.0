@@ -1,7 +1,0 @@
-{
-  "name": "Worm Shoot.wav",
-  "guid": "603E6882F5450011",
-  "tags": [],
-  "lastImported": "0000000069805A94",
-  "resourceLinks": []
-}

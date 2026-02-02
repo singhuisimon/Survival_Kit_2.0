@@ -1,7 +1,0 @@
-{
-  "name": "Paused_HowToPlayButton_Hovered.png",
-  "guid": "ED40D0824E608013",
-  "tags": [],
-  "lastImported": "0000000069807BAD",
-  "resourceLinks": []
-}
