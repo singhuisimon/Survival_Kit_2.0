@@ -782,9 +782,9 @@ namespace Engine
         }
 
         // ========================================================================
-        // STEP 1: Apply component overrides to existing entities
+        // Apply component overrides to existing entities
         // ========================================================================
-        LOG_INFO("Step 1: Applying component overrides to existing entities");
+      
         ApplyEntityOverrides(entity, scene, &prefab.entities[0]);
 
         for (u32 childID : prefabComp.childEntityIDs) {
@@ -815,10 +815,8 @@ namespace Engine
         }
 
         // ========================================================================
-        // STEP 2: Remove deleted entities from prefab
+        // Remove deleted entities from prefab
         // ========================================================================
-        LOG_INFO("Step 2: Removing deleted entities from prefab");
-
         std::set<u32> existingSceneHandles;
         existingSceneHandles.insert(static_cast<u32>(entity.GetHandle()));
         for (u32 childID : prefabComp.childEntityIDs) {
@@ -843,9 +841,9 @@ namespace Engine
         }
 
         // ========================================================================
-        // STEP 3: Add new entities to prefab (ADDED components - not full entities)
+        //  Add new entities to prefab (ADDED components - not full entities)
         // ========================================================================
-        LOG_INFO("Step 3: Applying added/removed components to prefab");
+    
         u32 nextLocalID = 1;
         for (const auto& prefabEntity : prefab.entities) {
             if (prefabEntity.localID >= nextLocalID) {
@@ -978,6 +976,7 @@ namespace Engine
 
         // Save the modified prefab back to disk
         std::string prefabPath = PrefabRegistry::Get().GetPrefabPath(prefabComp.PrefabAssetGuid);
+
         if (prefabPath.empty()) {
             LOG_ERROR("Could not find prefab path for GUID: ", prefabComp.PrefabAssetGuid.m_Value);
             return false;
@@ -987,6 +986,11 @@ namespace Engine
 
         if (!PrefabSerializer::SerializePrefab(prefab, prefabPath)) {
             LOG_ERROR("Failed to save prefab to: ", prefabPath);
+            return false;
+        }
+        std::string resourcesPath = convertAssetPathToRootResources(prefabPath);
+        if (!PrefabSerializer::SerializePrefab(prefab, resourcesPath)) {
+            LOG_ERROR("Failed to save prefab to: ", resourcesPath);
             return false;
         }
 

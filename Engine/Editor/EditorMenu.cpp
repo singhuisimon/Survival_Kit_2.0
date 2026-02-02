@@ -758,11 +758,9 @@ namespace Engine
 		Scene* currentScene = m_Editor->GetActiveScene();
 		if (!currentScene) return;
 
-		// Find the prefab root entity in the scene
-		// This assumes the scene contains only the prefab we're editing
 		Entity prefabRoot = Entity{};
 
-		// Method 1: Try to find an entity with PrefabComponent that's a root
+		//  find an entity with PrefabComponent that's a root
 		auto view = currentScene->GetRegistry().view<PrefabComponent>();
 		for (auto entity : view) {
 			Entity e(entity, &currentScene->GetRegistry());
@@ -773,7 +771,7 @@ namespace Engine
 			}
 		}
 
-		// Method 2: Use the currently selected entity if no root found
+		//  Use the currently selected entity if no root found
 		if (!prefabRoot) {
 			prefabRoot = m_Editor->GetSelectedEntity();
 			if (!prefabRoot) {
