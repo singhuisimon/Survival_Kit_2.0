@@ -1569,6 +1569,9 @@ namespace Engine {
 		BindInternalCall("Engine.Text::Text_GetFontSize",
 			reinterpret_cast<void*>(InternalCalls::Text_GetFontSize));
 
+		BindInternalCall("Engine.Text::Text_SetIsVisible", reinterpret_cast<void*>(InternalCalls::Text_SetIsVisible));
+		BindInternalCall("Engine.Text::Text_GetIsVisible", reinterpret_cast<void*>(InternalCalls::Text_GetIsVisible));
+
 		LOG_INFO("Internal calls registered");
 	}
 } // namespace Engine

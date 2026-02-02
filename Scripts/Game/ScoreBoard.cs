@@ -10,6 +10,7 @@ namespace Game
     /// ScoreBoard - Tracks and displays player score
     /// Attach this to the score text entity
     /// Displays as "SCORE 0000000" (7 digit zero-padded)
+    /// Hides on win or lose
     /// 
     /// Points:
     ///   Botnet       = 10
@@ -18,10 +19,15 @@ namespace Game
     /// </summary>
     public class ScoreBoard : ScriptBehaviour
     {
-        // ===== Event Names =====
+        // ===== Enemy Death Events =====
         private const string EVENT_BOTNET_DEAD = "BotnetDeath";
         private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
         private const string EVENT_WORMHOST_DEAD = "WormHostDead";
+
+        // ===== Game Over Events =====
+        private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+        private const string EVENT_TIMER_FINISHED = "TimerFinished";
 
         // ===== Points =====
         private const int POINTS_BOTNET = 10;
@@ -36,10 +42,15 @@ namespace Game
             LogMessage("=== ScoreBoard OnStart ===");
             LogMessage("ScoreBoard EntityID: " + EntityID);
 
-            // Subscribe to all enemy death events
+            // Subscribe to enemy death events
             Event.Subscribe(EVENT_BOTNET_DEAD, OnBotnetKilled);
             Event.Subscribe(EVENT_LOVELETTER_DEAD, OnLoveLetterKilled);
             Event.Subscribe(EVENT_WORMHOST_DEAD, OnWormHostKilled);
+
+            // Subscribe to game over events
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
 
             // Initialize score
             score = 0;
@@ -48,7 +59,7 @@ namespace Game
             LogMessage("[ScoreBoard] Initialized");
         }
 
-        // ===== EVENT HANDLERS =====
+        // ===== ENEMY KILL HANDLERS =====
 
         private void OnBotnetKilled(string eventName, string payload)
         {
@@ -71,6 +82,14 @@ namespace Game
             UpdateScoreDisplay();
         }
 
+        // ===== GAME OVER =====
+
+        private void OnGameOver(string eventName, string payload)
+        {
+            LogMessage("[ScoreBoard] Game over - hiding text");
+            Text.SetIsVisible((uint)EntityID, false);
+        }
+
         // ===== DISPLAY =====
 
         private void UpdateScoreDisplay()
@@ -85,7 +104,9 @@ namespace Game
             Event.Unsubscribe(EVENT_BOTNET_DEAD, OnBotnetKilled);
             Event.Unsubscribe(EVENT_LOVELETTER_DEAD, OnLoveLetterKilled);
             Event.Unsubscribe(EVENT_WORMHOST_DEAD, OnWormHostKilled);
-
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
             LogMessage("=== ScoreBoard Destroyed ===");
         }
     }
