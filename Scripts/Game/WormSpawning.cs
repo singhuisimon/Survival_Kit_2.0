@@ -64,6 +64,9 @@ namespace Game {
         }
 
         public override void OnUpdate(float deltaTime){
+            // Don't spawn when game is paused
+            if (GameState.IsPaused)
+                return;
 
             if (gameRunning){
                 

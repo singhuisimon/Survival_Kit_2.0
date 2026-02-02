@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Event;
+using static Engine.Rigidbody;
 
 namespace Game
 {
@@ -23,6 +24,8 @@ namespace Game
         public int UltRecharged = 1;
 
         private float elapsedTime = 0.0f;
+        private Vector3 savedVelocity = Vector3.Zero;
+        private bool wasPaused = false;
 
         public override void OnStart()
         {
@@ -30,6 +33,26 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Handle pause - save/restore velocity
+            if (GameState.IsPaused)
+            {
+                if (!wasPaused)
+                {
+                    // Just paused - save velocity and stop
+                    savedVelocity = RigidbodyGetVelocity((uint)EntityID);
+                    Vector3 zero = Vector3.Zero;
+                    RigidbodySetVelocity((uint)EntityID, ref zero);
+                    wasPaused = true;
+                }
+                return;
+            }
+            else if (wasPaused)
+            {
+                // Just unpaused - restore velocity
+                RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
+                wasPaused = false;
+            }
+
             // Lifetime check
             elapsedTime += deltaTime;
             if (elapsedTime >= ProjectileLifetime)
@@ -41,6 +64,10 @@ namespace Game
 
         public override void OnFixedUpdate(float deltaTime)
         {
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Check collisions using CollisionManager
             CheckCollisions();
         }

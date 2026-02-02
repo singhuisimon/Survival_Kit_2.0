@@ -1,0 +1,7 @@
+{
+  "name": "E005_loveletter_v003_Emissive.png",
+  "guid": "3C4698826EBFC00D",
+  "tags": [],
+  "lastImported": "00000000697E407F",
+  "resourceLinks": []
+}

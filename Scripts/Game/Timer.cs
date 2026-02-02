@@ -51,6 +51,10 @@ namespace Game
             if (!initialized || gameOver)
                 return;
 
+            // Don't count down when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Count down
             remainingTime -= (deltaTime / 2);
 
@@ -59,6 +63,7 @@ namespace Game
             {
                 remainingTime = 0.0f;
                 gameOver = true;
+                Text.SetIsVisible((uint)EntityID, false);
                 Publish("TimerFinished", "");
                 LogMessage("[TimerUI] Timer finished! Win!");
             }
@@ -71,6 +76,7 @@ namespace Game
         {
             LogMessage("[TimerUI] Game over triggered by: " + eventName + " - Timer stopped");
             gameOver = true;
+            Text.SetIsVisible((uint)EntityID, false);
         }
 
         private void UpdateTimerDisplay()

@@ -1,0 +1,7 @@
+{
+  "name": "DraftExample4.png",
+  "guid": "8540D0824E60800F",
+  "tags": [],
+  "lastImported": "00000000697DBF02",
+  "resourceLinks": []
+}

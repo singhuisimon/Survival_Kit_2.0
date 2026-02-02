@@ -77,6 +77,11 @@ namespace Game
                 return;
             }
 
+
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             Vector3 ownPosition = GetPosition(EntityID);
             Vector3 targetPosition = GetPosition(playerID);
             Vector3 direction = targetPosition - ownPosition;

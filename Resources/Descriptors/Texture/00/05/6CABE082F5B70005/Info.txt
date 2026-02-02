@@ -1,0 +1,7 @@
+{
+  "name": "Crosshair_KillMark.png",
+  "guid": "6CABE082F5B70005",
+  "tags": [],
+  "lastImported": "0000000069805C5C",
+  "resourceLinks": []
+}

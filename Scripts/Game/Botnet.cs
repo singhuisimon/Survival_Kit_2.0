@@ -88,6 +88,10 @@ namespace Game
         private const string EVENT_GAME_OVER = "GameOver";
         private const string EVENT_GAME_WIN = "GameWin";
 
+        // Pause state
+        private Vector3 savedVelocity = Vector3.Zero;
+        private bool wasPaused = false;
+
         // ===== Lifecycle =====
 
         public override void OnStart()
@@ -142,6 +146,26 @@ namespace Game
         {
             if (isDead)
                 return;
+
+            // Handle pause - save/restore velocity
+            if (GameState.IsPaused)
+            {
+                if (!wasPaused)
+                {
+                    // Just paused - save velocity and stop
+                    savedVelocity = RigidbodyGetVelocity((uint)EntityID);
+                    Vector3 zero = Vector3.Zero;
+                    RigidbodySetVelocity((uint)EntityID, ref zero);
+                    wasPaused = true;
+                }
+                return;
+            }
+            else if (wasPaused)
+            {
+                // Just unpaused - restore velocity
+                RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
+                wasPaused = false;
+            }
 
             if (isStunned)
             {
