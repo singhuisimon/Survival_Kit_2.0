@@ -1,7 +1,0 @@
-{
-  "name": "Particle_star.png",
-  "guid": "54C55881E7FF4031",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}

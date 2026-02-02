@@ -1,7 +1,0 @@
-{
-  "name": "Enemy_Core.mat",
-  "guid": "567AD882BF8D804B",
-  "tags": [],
-  "lastImported": "00000000697F83B6",
-  "resourceLinks": []
-}

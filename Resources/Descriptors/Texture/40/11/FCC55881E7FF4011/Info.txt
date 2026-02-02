@@ -1,7 +1,0 @@
-{
-  "name": "DigitalSquare.png",
-  "guid": "FCC55881E7FF4011",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}

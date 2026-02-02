@@ -1,7 +1,0 @@
-{
-  "name": "stone_normal.jpg",
-  "guid": "F04EF86D34480071",
-  "tags": [],
-  "lastImported": "00000000692956A0",
-  "resourceLinks": []
-}

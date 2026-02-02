@@ -1,7 +1,0 @@
-{
-  "name": "PrimaryWeapBar_ReloadFill.png",
-  "guid": "FE7AD882BF8D8037",
-  "tags": [],
-  "lastImported": "00000000697F83B6",
-  "resourceLinks": []
-}

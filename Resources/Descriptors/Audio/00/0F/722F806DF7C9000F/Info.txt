@@ -1,7 +1,0 @@
-{
-  "name": "Flotilla_Gunship_Ambient.wav",
-  "guid": "722F806DF7C9000F",
-  "tags": [],
-  "lastImported": "00000000692C64A4",
-  "resourceLinks": []
-}

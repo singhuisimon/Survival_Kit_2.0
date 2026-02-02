@@ -1,7 +1,0 @@
-{
-  "name": "Firewall_Logo.mat",
-  "guid": "584EF86D34480085",
-  "tags": [],
-  "lastImported": "00000000692956A0",
-  "resourceLinks": []
-}

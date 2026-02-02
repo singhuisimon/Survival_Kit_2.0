@@ -1,7 +1,0 @@
-{
-  "name": "stone_color.jpg",
-  "guid": "9919E86D32A5C06F",
-  "tags": [],
-  "lastImported": "0000000069295017",
-  "resourceLinks": []
-}

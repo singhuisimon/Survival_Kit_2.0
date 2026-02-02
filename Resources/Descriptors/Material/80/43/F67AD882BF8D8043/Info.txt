@@ -1,7 +1,0 @@
-{
-  "name": "BotnetM4.mat",
-  "guid": "F67AD882BF8D8043",
-  "tags": [],
-  "lastImported": "00000000697F83B6",
-  "resourceLinks": []
-}

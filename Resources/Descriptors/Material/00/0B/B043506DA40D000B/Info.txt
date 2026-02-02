@@ -1,7 +1,0 @@
-{
-  "name": "ShutdownButton.mat",
-  "guid": "B043506DA40D000B",
-  "tags": [],
-  "lastImported": "00000000692C64A4",
-  "resourceLinks": []
-}

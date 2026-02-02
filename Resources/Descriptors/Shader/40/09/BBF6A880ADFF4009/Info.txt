@@ -1,7 +1,0 @@
-{
-  "name": "font.vert",
-  "guid": "BBF6A880ADFF4009",
-  "tags": [],
-  "lastImported": "0000000069776F4F",
-  "resourceLinks": []
-}

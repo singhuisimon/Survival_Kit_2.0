@@ -1,7 +1,0 @@
-{
-  "name": "object_picking.vert",
-  "guid": "0C7C507D63D9C03B",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}

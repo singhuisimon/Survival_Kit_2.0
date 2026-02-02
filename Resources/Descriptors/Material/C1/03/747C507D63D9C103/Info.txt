@@ -1,7 +1,0 @@
-{
-  "name": "LevelDesign_GroundBelow.mat",
-  "guid": "747C507D63D9C103",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}

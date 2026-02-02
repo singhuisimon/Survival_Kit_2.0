@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_NoButton.png",
-  "guid": "699D807FA3DA8001",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}
