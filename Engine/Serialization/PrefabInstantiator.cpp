@@ -88,6 +88,61 @@ namespace Engine
             return Entity{};
         }
         RebuildPrefabHierarchy(prefab, localIDToEntity, scene);
+        if (parent && parent.HasComponent<TransformComponent>() &&
+            rootEntity.HasComponent<TransformComponent>()) {
+
+            LOG_INFO("=== Setting up scene parent relationship ===");
+
+            auto& rootTransform = rootEntity.GetComponent<TransformComponent>();
+            auto& parentTransform = parent.GetComponent<TransformComponent>();
+
+            // Set the parent
+            rootTransform.Parent = static_cast<u32>(parent.GetHandle());
+
+            // Add to parent's children
+            u32 rootHandle = static_cast<u32>(rootEntity.GetHandle());
+            auto it = std::find(parentTransform.Children.begin(),
+                parentTransform.Children.end(),
+                rootHandle);
+            if (it == parentTransform.Children.end()) {
+                parentTransform.Children.push_back(rootHandle);
+                LOG_INFO("Added prefab root to parent's children list");
+            }
+            //if (parent.HasComponent<PrefabComponent>()) {
+            //    auto& parentPrefabComp = parent.GetComponent<PrefabComponent>();
+
+            //    // Add root entity to parent's child tracking
+            //    if (std::find(parentPrefabComp.childEntityIDs.begin(),
+            //        parentPrefabComp.childEntityIDs.end(),
+            //        rootHandle) == parentPrefabComp.childEntityIDs.end()) {
+            //        parentPrefabComp.childEntityIDs.push_back(rootHandle);
+            //        LOG_INFO("Added prefab root to parent's PrefabComponent childEntityIDs");
+            //    }
+            //}
+            if (parent.HasComponent<PrefabComponent>()) {
+                auto& parentPrefabComp = parent.GetComponent<PrefabComponent>();
+
+                LOG_INFO("Adding all ", localIDToEntity.size(), " prefab entities to scene parent tracking");
+
+                // Add ALL entities from the prefab to parent's child tracking
+                for (const auto& [localID, entity] : localIDToEntity) {
+                    u32 entityHandle = static_cast<u32>(entity.GetHandle());
+
+                    // Check if not already in the list
+                    auto childIt = std::find(parentPrefabComp.childEntityIDs.begin(),
+                        parentPrefabComp.childEntityIDs.end(),
+                        entityHandle);
+
+                    if (childIt == parentPrefabComp.childEntityIDs.end()) {
+                        parentPrefabComp.childEntityIDs.push_back(entityHandle);
+                        LOG_DEBUG("  Added entity ", entityHandle, " to scene parent's childEntityIDs");
+                    }
+                }
+            }
+
+            LOG_INFO("=== Scene parent relationship established ===");
+        }
+
         PrefabComponent* prefabComp = nullptr;
         if (rootEntity.HasComponent<PrefabComponent>()) {
             prefabComp = &rootEntity.GetComponent<PrefabComponent>();
@@ -1365,7 +1420,10 @@ namespace Engine
             }
 
             Entity sceneEntity = it->second;
-
+            if (!sceneEntity || !scene->GetRegistry().valid(sceneEntity.GetHandle())) {
+                LOG_WARNING("Invalid entity for: ", prefabEntity.name);
+                continue;
+            }
             if (!sceneEntity.HasComponent<TransformComponent>()) {
                 LOG_WARNING("Entity missing TransformComponent: ", prefabEntity.name);
                 continue;
@@ -1379,7 +1437,10 @@ namespace Engine
                 auto parentIt = localIDToEntity.find(prefabEntity.parentLocalID);
                 if (parentIt != localIDToEntity.end()) {
                     Entity parentEntity = parentIt->second;
-
+                    if (!parentEntity || !scene->GetRegistry().valid(parentEntity.GetHandle())) {
+                        LOG_WARNING("Invalid parent entity for: ", prefabEntity.name);
+                        continue;
+                    }
                     if (parentEntity && parentEntity.HasComponent<TransformComponent>()) {
                         auto& parentTransform = parentEntity.GetComponent<TransformComponent>();
                         u32 childHandle = static_cast<u32>(sceneEntity.GetHandle());

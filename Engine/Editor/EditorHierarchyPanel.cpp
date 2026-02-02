@@ -542,10 +542,50 @@ namespace Engine
 
 	void EditorHierarchyPanel::DeleteEntityTree(Scene* scene) 
 	{
+		if (!scene || entitiesToDelete.empty()) return;
+		auto& registry = scene->GetRegistry();
+
+		// Calculate depth for each entity
+		std::vector<std::pair<Entity, int>> entitiesWithDepth;
+
 		for (auto& entity : entitiesToDelete) {
+			if (!registry.valid(entity.GetHandle())) continue;
+
+			// Calculate hierarchy depth
+			int depth = 0;
+			Entity current = entity;
+			while (current && current.HasComponent<TransformComponent>()) {
+				auto& transform = current.GetComponent<TransformComponent>();
+				if (transform.Parent == u32_max) break;
+
+				Entity parent(static_cast<entt::entity>(transform.Parent), &registry);
+				if (!registry.valid(parent.GetHandle())) break;
+
+				current = parent;
+				depth++;
+			}
+
+			entitiesWithDepth.push_back({ entity, depth });
+		}
+
+		// Sort by depth (highest = deepest = delete first)
+		std::sort(entitiesWithDepth.begin(), entitiesWithDepth.end(),
+			[](const auto& a, const auto& b) {
+				return a.second > b.second;
+			});
+
+		// Delete in order (children before parents)
+		for (auto& [entity, depth] : entitiesWithDepth) {
+			if (registry.valid(entity.GetHandle())) {
+				scene->DestroyEntity(entity);
+			}
+		}
+
+		entitiesToDelete.clear();
+		/*for (auto& entity : entitiesToDelete) {
 			scene->DestroyEntity(entity);
 		}
-		entitiesToDelete.clear();
+		entitiesToDelete.clear();*/
 	}
 
 	void EditorHierarchyPanel::CheckParentlessChildren(Scene* scene)
@@ -696,6 +736,12 @@ namespace Engine
 						}
 						else
 						{
+							LOG_INFO("=== Instantiating prefab as sub-entity ===");
+							LOG_INFO("Prefab file: ", file.name);
+							if (parentOfPrefabEntity) {
+								LOG_INFO("Parent: ", parentOfPrefabEntity.GetComponent<TagComponent>().Tag);
+							}
+
 							Entity prefabInstance = PrefabInstantiator::InstantiatePrefabFromFile(
 								scene,
 								file.fullPath,
@@ -704,9 +750,56 @@ namespace Engine
 
 							if (prefabInstance)
 							{
+								LOG_INFO("Prefab instantiated successfully");
+
+								// === CRITICAL: Ensure parent-child relationship ===
+								if (parentOfPrefabEntity &&
+									prefabInstance.HasComponent<TransformComponent>() &&
+									parentOfPrefabEntity.HasComponent<TransformComponent>())
+								{
+									auto& childTransform = prefabInstance.GetComponent<TransformComponent>();
+
+									// Double-check parent is set
+									if (childTransform.Parent != static_cast<u32>(parentOfPrefabEntity.GetHandle()))
+									{
+										LOG_WARNING("Parent not set by InstantiatePrefabFromFile, setting manually");
+										TransformSystem::SetParent(scene, prefabInstance.GetHandle(), parentOfPrefabEntity.GetHandle());
+									}
+
+									// === Add to parent's PrefabComponent childEntityIDs ===
+									if (parentOfPrefabEntity.HasComponent<PrefabComponent>())
+									{
+										auto& parentPrefabComp = parentOfPrefabEntity.GetComponent<PrefabComponent>();
+										u32 newEntityHandle = static_cast<u32>(prefabInstance.GetHandle());
+
+										// Check if not already in the list
+										auto it = std::find(parentPrefabComp.childEntityIDs.begin(),
+											parentPrefabComp.childEntityIDs.end(),
+											newEntityHandle);
+
+										if (it == parentPrefabComp.childEntityIDs.end())
+										{
+											parentPrefabComp.childEntityIDs.push_back(newEntityHandle);
+											LOG_INFO("Added entity ", newEntityHandle, " to parent's childEntityIDs");
+										}
+
+										// === Track as added entity in prefab root ===
+										Entity parentPrefabRoot = FindPrefabRoot(parentOfPrefabEntity);
+										if (parentPrefabRoot && parentPrefabRoot.HasComponent<PrefabComponent>())
+										{
+											auto& rootPrefabComp = parentPrefabRoot.GetComponent<PrefabComponent>();
+											rootPrefabComp.MarkEntityAdded(newEntityHandle);
+											LOG_INFO("Tracked addition of prefab sub-entity in root prefab");
+										}
+									}
+
+									LOG_INFO("Parent-child relationship confirmed");
+								}
+
 								// Select the newly created entity
 								m_Editor->SetCurrSelectedEntity(prefabInstance);
 								m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabInstance.GetHandle()));
+
 							}
 							else {
 								LOG_ERROR("Failed to instantiate prefab: ", file.fullPath);
