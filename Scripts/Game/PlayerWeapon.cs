@@ -145,6 +145,11 @@ namespace Game{
             if(Input.IsKeyPressed(KeyCode.O)){
                 PrimaryAltCharge_Reward();
             }
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
+            elapsedTime += deltaTime;//primaryAltReady = true;
 
             // Check if reload finished
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)

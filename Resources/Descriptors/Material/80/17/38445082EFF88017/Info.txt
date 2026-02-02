@@ -1,0 +1,7 @@
+{
+  "name": "EnemyCore_Core.mat",
+  "guid": "38445082EFF88017",
+  "tags": [],
+  "lastImported": "0000000069804562",
+  "resourceLinks": []
+}

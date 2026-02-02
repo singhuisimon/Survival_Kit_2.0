@@ -10,7 +10,7 @@ namespace Game {
 
     public class BotnetSpawning : ScriptBehaviour{
 
-        [SerializeField] private float interval = 2.0f;
+        [SerializeField] private float interval = 5.0f;
         [SerializeField] private int maxBotnets = 20;
 
         private string wall1Name = "Wall1";
@@ -61,6 +61,10 @@ namespace Game {
         }
 
         public override void OnUpdate(float deltaTime){
+            // Don't spawn when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // if(currentBotnetCount >= maxBotnets){
             //     return;
             // }

@@ -1,0 +1,7 @@
+{
+  "name": "CoreOuter.mat",
+  "guid": "CCABE082F5B70015",
+  "tags": [],
+  "lastImported": "0000000069805C5C",
+  "resourceLinks": []
+}

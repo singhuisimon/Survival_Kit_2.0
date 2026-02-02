@@ -230,3 +230,4 @@ CTestTestfile.cmake
 # ==================================
 *.stackdump
 #core.*
+/nul

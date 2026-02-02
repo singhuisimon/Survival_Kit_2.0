@@ -87,6 +87,10 @@ namespace Game
                 return;
             }
 
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             //DebugFireOnKey();
 
             // does not do anything is Gunship is dead

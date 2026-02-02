@@ -48,6 +48,12 @@ namespace Game
         {
             LogMessage("MainMenuButtonSounds: Initializing...");
 
+            // Ensure cursor is visible in main menu (safety net for scene transitions)
+            Input.SetCursorVisible(true);
+
+            // Reset pause state in case we came from game scene
+            GameState.IsPaused = false;
+
             // Find audio entity
             clickAudioId = SceneFindEntityByName(CLICK_AUDIO_ENTITY);
 

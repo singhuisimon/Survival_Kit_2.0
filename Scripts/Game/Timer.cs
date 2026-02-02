@@ -51,6 +51,10 @@ namespace Game
             if (!initialized || gameOver)
                 return;
 
+            // Don't count down when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Count down
             remainingTime -= (deltaTime / 2);
 

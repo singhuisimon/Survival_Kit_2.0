@@ -167,6 +167,12 @@ namespace Game
                 return;
             }
 
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+            {
+                return;
+            }
+
             // update elapsed time
             elapsedTime += deltaTime;
             float currentTime = elapsedTime;
