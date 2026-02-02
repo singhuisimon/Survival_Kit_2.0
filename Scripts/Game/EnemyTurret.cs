@@ -19,6 +19,7 @@ namespace Game
 
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint playerID = INVALID_ENTITY;
+        private uint mainExplosionID = INVALID_ENTITY;
         private const string TAG_PLAYER = "Player";
 
         // Health
@@ -31,9 +32,12 @@ namespace Game
         // Shooting
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
+        private float explosionTimer = 1.0f;
+        private bool exploding = false;
 
         string EnemyTurretBulletPrefabPath = "Sources/Prefabs/EnemyTurretBullet.prefab";
         string EnemyTurretBulletExplosionPrefabPath = "Sources/Prefabs/EnemyTurretExplosion.prefab";
+        string MainExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";
 
         // Lifecycle
         public override void OnStart()
@@ -80,13 +84,22 @@ namespace Game
                 inRange = false;
             }
 
-            if (inRange)
+            if (inRange && !exploding)
             {
                 shootingTimer -= deltaTime;
                 if (shootingTimer <= 0.0f)
                 {
                     ShootAtTarget();
                     shootingTimer = shootingCooldown;
+                }
+            }
+
+            if(exploding && mainExplosionID != INVALID_ENTITY){
+                explosionTimer -= deltaTime;
+                if (explosionTimer <= 0.0f)
+                {
+                    SceneDestroyEntity(mainExplosionID);
+                    SceneDestroyEntity(EntityID);
                 }
             }
         }
@@ -100,6 +113,9 @@ namespace Game
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
+            if (exploding)
+                return;
+
             LogMessage("OnBulletHit called! Payload: " + payload + " | My EntityID: " + EntityID);
 
             // uint hitEntityID = uint.Parse(payload.Split(',')[0]);
@@ -115,17 +131,25 @@ namespace Game
             health -= 1.0f;
             LogMessage("EnemyTurret hit! Health: " + health);
 
-            if (health <= 0)
-            {
-                if (!string.IsNullOrEmpty(EnemyTurretBulletExplosionPrefabPath))
-                {
-                    uint explosionID = PrefabInstantiate(EnemyTurretBulletExplosionPrefabPath);
-                    Vector3 myPos = Transform.GetPosition((uint)EntityID);
-                    Transform.SetPosition(explosionID, ref myPos);
-                    AudioPlay(explosionID);
-                }
-                SceneDestroyEntity(EntityID);
-            }
+            if (health > 0)
+                return;
+
+            exploding = true;
+
+            uint explosionID = PrefabInstantiate(EnemyTurretBulletExplosionPrefabPath);
+            Vector3 myPos = Transform.GetPosition(EntityID);
+            Transform.SetPosition(explosionID, ref myPos);
+            AudioPlay(explosionID);
+
+            mainExplosionID = PrefabInstantiate(MainExplosionPrefabPath);
+            Transform.SetPosition(mainExplosionID, ref myPos);
+
+            Vector3 newScale = new Vector3(20.0f, 20.0f, 20.0f);
+            Transform.SetScale(mainExplosionID, ref newScale);
+
+            Vector3 emptyScale = new Vector3(0.0f, 0.0f, 0.0f);
+            Transform.SetScale(EntityID, ref emptyScale);
+
         }
 
         public void ShootAtTarget()
