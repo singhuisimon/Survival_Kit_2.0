@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "EnemyTurretBullet",
-    "Prefab GUID": 16568215825570840773,
+    "Prefab Name": "EnemyTurretExplosion",
+    "Prefab GUID": 13961854298270041113,
     "version": 1,
     "entities": [
         {
-            "Name": "EnemyTurretBullet",
+            "Name": "EnemyTurretExplosion",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9688597958291261995",
+                            "ComponentGUID": "17997079564390876173",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,28 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "17182587738235767337",
-                            "Tag": "EnemyTurretBullet"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "2194608178346805805",
-                            "Mesh": "",
-                            "Material": "EnemyTurretBullet.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 0,
-                            "CastType": 0
+                            "ComponentGUID": "703256995288171531",
+                            "Tag": "EnemyTurretExplosion"
                         }
                     }
                 },
@@ -69,21 +49,33 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "18379146660872716859",
-                            "FilePath": "Worm Shoot.wav",
+                            "ComponentGUID": "16267697307480933391",
+                            "FilePath": "Botnet_Explosion.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.503000020980835,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 1.0,
-                            "MaxDistance": 100.0,
+                            "MinDistance": 50.66899871826172,
+                            "MaxDistance": 323.72100830078125,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16267697307483489301",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 315
                         }
                     }
                 }

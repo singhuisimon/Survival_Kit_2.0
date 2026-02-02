@@ -33,6 +33,7 @@ namespace Game
         private float shootingTimer = 0.0f;
 
         string EnemyTurretBulletPrefabPath = "Sources/Prefabs/EnemyTurretBullet.prefab";
+        string EnemyTurretBulletExplosionPrefabPath = "Sources/Prefabs/EnemyTurretExplosion.prefab";
 
         // Lifecycle
         public override void OnStart()
@@ -116,6 +117,13 @@ namespace Game
 
             if (health <= 0)
             {
+                if (!string.IsNullOrEmpty(EnemyTurretBulletExplosionPrefabPath))
+                {
+                    uint explosionID = PrefabInstantiate(EnemyTurretBulletExplosionPrefabPath);
+                    Vector3 myPos = Transform.GetPosition((uint)EntityID);
+                    Transform.SetPosition(explosionID, ref myPos);
+                    AudioPlay(explosionID);
+                }
                 SceneDestroyEntity(EntityID);
             }
         }
