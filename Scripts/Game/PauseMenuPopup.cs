@@ -131,6 +131,8 @@ namespace Game
 
         // HUD element IDs (to hide when paused)
         private uint[] hudElementIds;
+        // Original positions of HUD elements (to restore when unpaused)
+        private Vector3[] hudElementOriginalPositions;
 
         // State
         private bool isPaused = false;
@@ -170,14 +172,20 @@ namespace Game
             minusButtonId3 = SceneFindEntityByName(MINUS_BUTTON_3_NAME);
             minusButtonHoveredId3 = SceneFindEntityByName(MINUS_BUTTON_3_HOVERED_NAME);
 
-            // Find HUD elements to hide when paused
+            // Find HUD elements to hide when paused and store their original positions
             hudElementIds = new uint[HUD_ELEMENT_NAMES.Length];
+            hudElementOriginalPositions = new Vector3[HUD_ELEMENT_NAMES.Length];
             for (int i = 0; i < HUD_ELEMENT_NAMES.Length; i++)
             {
                 hudElementIds[i] = SceneFindEntityByName(HUD_ELEMENT_NAMES[i]);
                 if (hudElementIds[i] == 0)
                 {
                     LogMessage("PauseMenuPopup: HUD element not found: " + HUD_ELEMENT_NAMES[i]);
+                }
+                else
+                {
+                    // Store original position so we can restore it later
+                    hudElementOriginalPositions[i] = GetPosition(hudElementIds[i]);
                 }
             }
 
@@ -415,12 +423,13 @@ namespace Game
             SetPosition(plusButtonHoveredId3, ref hidePos);
             SetPosition(minusButtonHoveredId3, ref hidePos);
 
-            // Hide HUD elements
+            // Hide HUD elements by moving them off-screen
+            Vector3 hudHidePos = new Vector3(CENTER_X, HIDDEN_Y, 0.0f);
             for (int i = 0; i < hudElementIds.Length; i++)
             {
                 if (hudElementIds[i] != 0)
                 {
-                    SetIsVisible(hudElementIds[i], false);
+                    SetPosition(hudElementIds[i], ref hudHidePos);
                 }
             }
 
@@ -471,12 +480,12 @@ namespace Game
             SetPosition(minusButtonId3, ref hidePos2);
             SetPosition(minusButtonHoveredId3, ref hidePos2);
 
-            // Show HUD elements again
+            // Show HUD elements again by restoring their original positions
             for (int i = 0; i < hudElementIds.Length; i++)
             {
                 if (hudElementIds[i] != 0)
                 {
-                    SetIsVisible(hudElementIds[i], true);
+                    SetPosition(hudElementIds[i], ref hudElementOriginalPositions[i]);
                 }
             }
 
