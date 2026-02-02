@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Gunship",
-    "Prefab GUID": 14498134495757681239,
+    "Prefab Name": "Prefab: Gunship.prefab",
+    "Prefab GUID": 2724132980133514753,
     "version": 1,
     "entities": [
         {
@@ -20,9 +20,9 @@
                                 -952.4028930664064
                             ],
                             "Rotation": [
-                                -180.0,
+                                180.0,
                                 18.26655006408691,
-                                -180.0
+                                180.0
                             ],
                             "Scale": [
                                 0.03999999910593033,
@@ -61,6 +61,29 @@
                             "TextureIdx": 0,
                             "SubmeshIndex": 0,
                             "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8488740503167356413",
+                            "FilePath": "Flotilla_Gunship_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": true,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 5.353000164031982,
+                            "MaxDistance": 150.5570068359375,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
                         }
                     }
                 }
@@ -115,7 +138,7 @@
                             "ComponentGUID": "16803977504970768979",
                             "ScriptClassName": "Game.GunshipScript",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 16459
                         }
                     }
                 }
