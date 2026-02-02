@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryBullet.prefab",
-    "Prefab GUID": 6602286409784836341,
+    "Prefab GUID": 8950315483331553347,
     "version": 1,
     "entities": [
         {
@@ -106,16 +106,16 @@
                             "FilePath": "Player_Primary_Fire.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 0.13899999856948853,
+                            "Volume": 0.05299999937415123,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
                             "ReverbProperties": 1.0,
-                            "Is3D": false,
-                            "MinDistance": 4.165999889373779,
-                            "MaxDistance": 104.14900207519533,
+                            "Is3D": true,
+                            "MinDistance": 18.665000915527344,
+                            "MaxDistance": 256.70001220703125,
                             "RolloffMode": 0,
-                            "DopplerLevel": 1.0,
+                            "DopplerLevel": 1.4730000495910645,
                             "Pan2D": 0.0
                         }
                     }
@@ -128,7 +128,7 @@
                             "ComponentGUID": "14829703208479391955",
                             "ScriptClassName": "Game.PrimaryBullet",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 13139
                         }
                     }
                 },

@@ -357,7 +357,7 @@ namespace Game
             playerHP -= damage;
 
             LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player " + playerEntityID.ToString() + " gets damage! Health: " + playerHP.ToString() + "/" + playerOriginalHP.ToString());
-
+            LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player from payload" + payload);
             //Send event here to ui 
             //take note playerHP is a float!
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
