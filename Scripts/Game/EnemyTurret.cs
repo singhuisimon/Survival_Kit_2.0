@@ -19,17 +19,25 @@ namespace Game
 
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint playerID = INVALID_ENTITY;
+        private uint mainExplosionID = INVALID_ENTITY;
         private const string TAG_PLAYER = "Player";
 
         // Health
         [SerializeField] private float health = 10.0f;
 
         // Events
-        private const string EVENT_BULLET_HIT = "BulletHit";
+        private string EVENT_BULLET_HIT = "Damage:";
+        private const string GAMEOVER = "GameOver";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
+        private float explosionTimer = 1.0f;
+        private bool exploding = false;
+
+        string EnemyTurretBulletPrefabPath = "Sources/Prefabs/EnemyTurretBullet.prefab";
+        string EnemyTurretBulletExplosionPrefabPath = "Sources/Prefabs/EnemyTurretExplosion.prefab";
+        string MainExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";
 
         // Lifecycle
         public override void OnStart()
@@ -46,7 +54,9 @@ namespace Game
             RigidbodySetIsKinematic(EntityID, true);
             RigidbodySetUseGravity(EntityID, false);
 
+            EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(GAMEOVER, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -74,7 +84,7 @@ namespace Game
                 inRange = false;
             }
 
-            if (inRange)
+            if (inRange && !exploding)
             {
                 shootingTimer -= deltaTime;
                 if (shootingTimer <= 0.0f)
@@ -83,23 +93,36 @@ namespace Game
                     shootingTimer = shootingCooldown;
                 }
             }
+
+            if(exploding && mainExplosionID != INVALID_ENTITY){
+                explosionTimer -= deltaTime;
+                if (explosionTimer <= 0.0f)
+                {
+                    SceneDestroyEntity(mainExplosionID);
+                    SceneDestroyEntity(EntityID);
+                }
+            }
         }
 
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(GAMEOVER, OnGameOver);
         }
 
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
+            if (exploding)
+                return;
+
             LogMessage("OnBulletHit called! Payload: " + payload + " | My EntityID: " + EntityID);
 
-            uint hitEntityID = uint.Parse(payload.Split(',')[0]);
-            if (hitEntityID != EntityID){
-                LogMessage("Ignoring (hitEntityID=" + hitEntityID + ")");
-                return;
-            }
+            // uint hitEntityID = uint.Parse(payload.Split(',')[0]);
+            // if (hitEntityID != EntityID){
+            //     LogMessage("Ignoring (hitEntityID=" + hitEntityID + ")");
+            //     return;
+            // }
             
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetVelocity(EntityID, ref emptyVec);
@@ -108,10 +131,25 @@ namespace Game
             health -= 1.0f;
             LogMessage("EnemyTurret hit! Health: " + health);
 
-            if (health <= 0)
-            {
-                SceneDestroyEntity(EntityID);
-            }
+            if (health > 0)
+                return;
+
+            exploding = true;
+
+            uint explosionID = PrefabInstantiate(EnemyTurretBulletExplosionPrefabPath);
+            Vector3 myPos = Transform.GetPosition(EntityID);
+            Transform.SetPosition(explosionID, ref myPos);
+            AudioPlay(explosionID);
+
+            mainExplosionID = PrefabInstantiate(MainExplosionPrefabPath);
+            Transform.SetPosition(mainExplosionID, ref myPos);
+
+            Vector3 newScale = new Vector3(20.0f, 20.0f, 20.0f);
+            Transform.SetScale(mainExplosionID, ref newScale);
+
+            Vector3 emptyScale = new Vector3(0.0f, 0.0f, 0.0f);
+            Transform.SetScale(EntityID, ref emptyScale);
+
         }
 
         public void ShootAtTarget()
@@ -156,7 +194,7 @@ namespace Game
             );
 
             // Create bullet
-            uint enemyTurretBulletID = SceneCreateEntity("EnemyTurretBullet");
+            uint enemyTurretBulletID = PrefabInstantiateScene(EnemyTurretBulletPrefabPath);
             if (enemyTurretBulletID == 0)
                 return;
 
@@ -171,7 +209,7 @@ namespace Game
             EntityAddRigidBody(enemyTurretBulletID);
             RigidbodySetIsKinematic(enemyTurretBulletID, false);
             RigidbodySetUseGravity(enemyTurretBulletID, false);
-
+            
             // Set tag
             TagSetTag(enemyTurretBulletID, "EnemyTurretBullet");
 
@@ -225,6 +263,10 @@ namespace Game
             q.W = 0.5f * s;
 
             return q;
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            SceneDestroyEntity(EntityID);
         }
     }
 }

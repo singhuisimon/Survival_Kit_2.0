@@ -15,14 +15,12 @@ namespace Game
         public float ProjectileLifetime = 6.0f;
 
         [SerializeField]
-        public float Damage = 10.0f;
+        public float Damage = 1.0f;
 
         // Target tags - entities this bullet can damage
-        [SerializeField]
         private string[] TargetTags = { "Player" };
 
         // This bullet's own tag
-        [SerializeField]
         private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
 
         private float elapsedTime = 0.0f;

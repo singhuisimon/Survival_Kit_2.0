@@ -61,6 +61,8 @@ namespace Game
         // ===== EVENTS =====
         //private const string EVENT_BULLET_HIT = "BulletHit";
         private string EVENT_BULLET_HIT = "Damage:";
+        private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
 
         public override void OnStart()
         {
@@ -87,6 +89,8 @@ namespace Game
 
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(GAMEWIN, OnGameOver);
             
             // Seed RNG if not already done
             if (!rngSeeded)
@@ -183,46 +187,38 @@ namespace Game
         // ===== SIMPLE DAMAGE SYSTEM =====
         private void OnBulletHit(string eventName, string payload)
         {
+            // if (isDead || eventName != EVENT_BULLET_HIT)
+            //     return;
+
+            // // Parse the entity ID that was hit
+            // if (!uint.TryParse(payload, out uint hitId))
+            //     return;
+
+            // // Check if this LoveLetter was the one hit
+            // if (hitId != loveletterEntityID)
+            // {
+            //     return;
+            // }
+
+            // LogMessage("=== BULLET HIT LOVELETTER ===");
+            // LogMessage("  LoveLetter ID: " + loveletterEntityID);
+            
+            // // Take damage
+            // TakeDamage(10.0f);
             if (isDead || eventName != EVENT_BULLET_HIT)
                 return;
-
-            // Parse the entity ID that was hit
-            if (!uint.TryParse(payload, out uint hitId))
-                return;
-
-            // Check if this LoveLetter was the one hit
-            if (hitId != loveletterEntityID)
-            {
-                return;
-            }
-
-            LogMessage("=== BULLET HIT LOVELETTER ===");
-            LogMessage("  LoveLetter ID: " + loveletterEntityID);
-            
-            // Take damage
-            TakeDamage(10.0f);
-        }
-
-        private void TakeDamage(float damage)
-        {
-            if (isDead) return;
-
+            float damage = DamageSystem.ParseAmount(payload);
             currentHealth -= damage;
-            
-            // Clamp health to 0
             if (currentHealth < 0.0f)
                 currentHealth = 0.0f;
 
-            LogMessage("=== LOVELETTER DAMAGED ===");
-            LogMessage("  Damage Taken: " + damage.ToString("F1"));
-            LogMessage("  Health: " + currentHealth.ToString("F1") + "/" + maxHealth.ToString("F1"));
-
-            // Check if LoveLetter should be destroyed (at 0 HP)
             if (currentHealth <= 0.0f)
             {
+                Publish("LoveLetterDeath", 1.ToString());
                 DestroyLoveLetter();
             }
         }
+
 
         private void DestroyLoveLetter()
         {
@@ -476,7 +472,19 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(GAMEWIN, OnGameOver);
+
             LogMessage("=== LoveLetter Destroyed ===");
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            if (isDead)
+                return;
+            isDead = true;
+            isMoving = false;
+            isWaitingAtSurface = false;
+            SceneDestroyEntity(loveletterEntityID);
         }
     }
 }
