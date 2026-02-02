@@ -232,7 +232,11 @@ void main()
     if (isTexture) {
         vec4 texSample = texture(Texture2D, TexCoord * tiling + offset);
         albedo *= texSample.rgb;
-        texAlpha = texSample.a;
+
+        // Convert luminance to alpha - black becomes transparent
+        float luminance = dot(texSample.rgb, vec3(0.299, 0.587, 0.114));
+        texAlpha = luminance;  // Black (0,0,0) = 0.0 alpha, White (1,1,1) = 1.0 alpha
+        //texAlpha = texSample.a;
     }
 
     if (uParticle) {

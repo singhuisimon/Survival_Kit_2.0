@@ -42,6 +42,7 @@ namespace Game
         private readonly string[] enemyTags = { "botnet" , "wormhost" , "wormchild" , "loveletter" };
         
         private string GAMEOVEREVENT = "GameOver";
+        private string GAMEWINEVENT = "GameWin";
         private bool disableshooting = false;
 
         // Start up
@@ -50,7 +51,8 @@ namespace Game
             LogMessage("====Gunship Helper Started====");
             LogMessage("Helper EntityID: " + EntityID);
 
-            Subscribe(GAMEOVEREVENT, OnGameOver);
+            Subscribe(GAMEOVEREVENT, OnGameEnd);
+            Subscribe(GAMEWINEVENT, OnGameEnd);
 
             // not detecting Gunship here (might not be ready on frame 0)
             initialized = false;
@@ -111,13 +113,14 @@ namespace Game
         // Gunship dies lol
         public override void OnDestroy()
         {
-            Unsubscribe(GAMEOVEREVENT, OnGameOver);
+            Unsubscribe(GAMEOVEREVENT, OnGameEnd);
+            Unsubscribe(GAMEWINEVENT, OnGameEnd);
             if (gunshipID != INVALID_ENTITY) 
                 Unsubscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
 
         }
 
-        private void OnGameOver(string eventName, string payload){
+        private void OnGameEnd(string eventName, string payload){
             LogMessage("[Gunship] detect game over disabling shooting");
             disableshooting = true;
         }

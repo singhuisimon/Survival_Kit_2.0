@@ -18,13 +18,13 @@
     ],
     "metallic": 0.0,
     "roughness": 0.0,
-    "opacity": 0.019999999552965164,
+    "opacity": 1.0,
     "emissionStrength": 1.0,
     "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [
-        1.0,
-        1.0
+        1.5,
+        1.100000023841858
     ],
     "offset": [
         0.0,

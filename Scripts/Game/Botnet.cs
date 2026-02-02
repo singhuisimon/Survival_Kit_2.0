@@ -85,6 +85,8 @@ namespace Game
         //private const string EVENT_BULLET_HIT = "BulletHit";
         private string EVENT_BULLET_HIT = "Damage:";
         private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
+        private const string EVENT_GAME_OVER = "GameOver";
+        private const string EVENT_GAME_WIN = "GameWin";
 
         // ===== Lifecycle =====
 
@@ -131,7 +133,9 @@ namespace Game
             EVENT_BULLET_HIT += EntityID.ToString();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
-            Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Subscribe(EVENT_GAME_OVER, OnGameEnd);
+            Subscribe(EVENT_GAME_WIN, OnGameEnd);
+            //Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -165,7 +169,9 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
-            Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Unsubscribe(EVENT_GAME_OVER, OnGameEnd);
+            Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
+            //Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         // ===== Public API =====
@@ -208,23 +214,34 @@ namespace Game
             }
         }
 
-        private void OnSpawnDisable(string eventName, string payload)
-        {
-            if (isDead || eventName != EVENT_SPAWN_DISABLE)
+        private void OnGameEnd(string eventName, string payload){
+            if(isDead){
                 return;
-
-            if (!bool.TryParse(payload, out bool active))
-                return;
-
-            if (!active)
-            {
-                isDead = true;
-                isExploding = false;
-
-                LogMessage("Destroying itself as spawn is disabled");
-                SceneDestroyEntity((uint)EntityID);
             }
+
+            LogMessage("[Botnet] Detect game end. Event is: " + eventName);
+            isDead = true;
+            isExploding = false;
+            SceneDestroyEntity((uint)EntityID);
         }
+
+        // private void OnSpawnDisable(string eventName, string payload)
+        // {
+        //     if (isDead || eventName != EVENT_SPAWN_DISABLE)
+        //         return;
+
+        //     if (!bool.TryParse(payload, out bool active))
+        //         return;
+
+        //     if (!active)
+        //     {
+        //         isDead = true;
+        //         isExploding = false;
+
+        //         LogMessage("Destroying itself as spawn is disabled");
+        //         SceneDestroyEntity((uint)EntityID);
+        //     }
+        // }
 
         public void BruteForceAttack()
         {
@@ -368,22 +385,28 @@ namespace Game
                 targetPos.Z - myPos.Z
             );
 
-            float lenSq = toTarget.X * toTarget.X +
-                          toTarget.Y * toTarget.Y +
-                          toTarget.Z * toTarget.Z;
-            if (lenSq <= 0.0001f)
+            // Normalize target direction
+            if (!TryNormalize(ref toTarget))
                 return;
 
-            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-            toTarget.X *= invLen;
-            toTarget.Y *= invLen;
-            toTarget.Z *= invLen;
-
-            // FIX: use engine's forward basis (Vector3.Forward is (0,0,-1) in your SimpleMath.cs)
-            Vector3 forward = Vector3.Forward;
-
             Quat currentRot = Transform.GetRotation(self);
-            Quat targetRot = QuaternionFromTo(forward, toTarget);
+
+            // IMPORTANT:
+            // Set this to the botnet mesh's "forward" axis in LOCAL space.
+            // If your botnet model faces +X by default, use Vector3.Right instead of Vector3.Forward.
+            Vector3 localForward = Vector3.Forward;
+
+            // Compute current forward in WORLD space from current rotation
+            Vector3 currentForward = RotateVectorByQuat(currentRot, localForward);
+            if (!TryNormalize(ref currentForward))
+                return;
+
+            // Delta rotation from where we're facing -> where we want to face
+            Quat delta = QuaternionFromToSafe(currentForward, toTarget);
+
+            // Absolute target orientation
+            Quat targetRot = Mul(delta, currentRot);
+            NormalizeQuat(ref targetRot);
 
             float t = SimpleMath.Clamp(rotateSpeed * deltaTime, 0.0f, 1.0f);
             Quat newRot = Nlerp(currentRot, targetRot, t);
@@ -676,5 +699,125 @@ namespace Game
             int idx = RandomRangeInt(0, entities.Length);
             return entities[idx];
         }
+
+        private static bool TryNormalize(ref Vector3 v)
+        {
+            float lenSq = v.X * v.X + v.Y * v.Y + v.Z * v.Z;
+            if (lenSq <= 0.000001f)
+                return false;
+
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            v.X *= invLen;
+            v.Y *= invLen;
+            v.Z *= invLen;
+            return true;
+        }
+
+        private static Vector3 Cross(in Vector3 a, in Vector3 b)
+        {
+            return new Vector3(
+                a.Y * b.Z - a.Z * b.Y,
+                a.Z * b.X - a.X * b.Z,
+                a.X * b.Y - a.Y * b.X
+            );
+        }
+
+        private static float Dot(in Vector3 a, in Vector3 b)
+        {
+            return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+        }
+
+        private static Quat Mul(in Quat a, in Quat b)
+        {
+            Quat r;
+            r.W = a.W * b.W - a.X * b.X - a.Y * b.Y - a.Z * b.Z;
+            r.X = a.W * b.X + a.X * b.W + a.Y * b.Z - a.Z * b.Y;
+            r.Y = a.W * b.Y - a.X * b.Z + a.Y * b.W + a.Z * b.X;
+            r.Z = a.W * b.Z + a.X * b.Y - a.Y * b.X + a.Z * b.W;
+            return r;
+        }
+
+        private static Vector3 RotateVectorByQuat(in Quat q, in Vector3 v)
+        {
+            // v' = q * (v,0) * conj(q)
+            Quat vq;
+            vq.X = v.X; vq.Y = v.Y; vq.Z = v.Z; vq.W = 0.0f;
+
+            Quat qc;
+            qc.X = -q.X; qc.Y = -q.Y; qc.Z = -q.Z; qc.W = q.W;
+
+            Quat t = Mul(q, vq);
+            Quat r = Mul(t, qc);
+
+            return new Vector3(r.X, r.Y, r.Z);
+        }
+
+        private static void NormalizeQuat(ref Quat q)
+        {
+            float lenSq = q.X * q.X + q.Y * q.Y + q.Z * q.Z + q.W * q.W;
+            if (lenSq <= 0.000001f)
+                return;
+
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            q.X *= invLen;
+            q.Y *= invLen;
+            q.Z *= invLen;
+            q.W *= invLen;
+        }
+
+        private static Quat QuaternionFromToSafe(Vector3 from, Vector3 to)
+        {
+            // Ensure both are unit
+            if (!TryNormalize(ref from) || !TryNormalize(ref to))
+            {
+                Quat id;
+                id.X = 0; id.Y = 0; id.Z = 0; id.W = 1;
+                return id;
+            }
+
+            float dot = Dot(from, to);
+            dot = SimpleMath.Clamp(dot, -1.0f, 1.0f);
+
+            // Nearly identical -> identity
+            if (dot > 0.9999f)
+            {
+                Quat id;
+                id.X = 0; id.Y = 0; id.Z = 0; id.W = 1;
+                return id;
+            }
+
+            // Nearly opposite -> 180 around any orthogonal axis
+            if (dot < -0.9999f)
+            {
+                Vector3 axis = Cross(from, Vector3.Up);
+                if (!TryNormalize(ref axis))
+                {
+                    axis = Cross(from, Vector3.Right);
+                    TryNormalize(ref axis);
+                }
+
+                Quat q180;
+                q180.X = axis.X;
+                q180.Y = axis.Y;
+                q180.Z = axis.Z;
+                q180.W = 0.0f;
+                return q180;
+            }
+
+            Vector3 cross = Cross(from, to);
+
+            float s = SimpleMath.Sqrt((1.0f + dot) * 2.0f);
+            float invS = 1.0f / s;
+
+            Quat q;
+            q.X = cross.X * invS;
+            q.Y = cross.Y * invS;
+            q.Z = cross.Z * invS;
+            q.W = 0.5f * s;
+
+            NormalizeQuat(ref q);
+            return q;
+        }
+
     }
 }

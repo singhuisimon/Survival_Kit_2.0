@@ -27,6 +27,9 @@ namespace Engine {
 		float fontSize = 24.0f; 
 		std::array<float, 4> color = {1.0f,1.0f,1.0f,1.0f};
 
+		//visibility
+		bool isVisible = true;
+
 		//layout
 		TextAlignment align = TextAlignment::Left;
 		float lineSpacing = 1.0f;
@@ -85,6 +88,22 @@ namespace Engine {
 		void setFontName(const std::string& name) {
 			fontName = name;
 			isDirty = true;
+		}
+
+		void setVisible(bool visible) {
+
+			isVisible = visible;
+			if (visible) {
+				//can see -> restore alpha to 1
+				color[3] = 1.0f; 
+			}
+			else {
+				color[3] = 0.0f; //invisible
+			}
+		}
+
+		bool isShown() const {
+			return isVisible;
 		}
 
 		//getters

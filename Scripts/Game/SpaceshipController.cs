@@ -59,6 +59,10 @@ namespace Game
         private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
         //[SerializeField] 
         private string EVENT_PLAYER_OOB = "Damage:";
+        private string EVENT_GAMEWIN = "GameWin";
+        private string EVENT_GAMEEND = "GameEnd";
+
+        private bool endscene = false;
 
         // ======= STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -125,6 +129,8 @@ namespace Game
 
             Subscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
             Subscribe(EVENT_PLAYER_OOB, OnDamageReceived);
+            Subscribe(EVENT_GAMEEND, OnGameEnd);
+            Subscribe(EVENT_GAMEWIN, OnGameEnd);
 
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - physics in FixedUpdate, visuals in Update");
@@ -161,6 +167,8 @@ namespace Game
             SetCursorVisible(cursorWasVisible);
             Unsubscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
             Unsubscribe(EVENT_PLAYER_OOB, OnDamageReceived);
+            Unsubscribe(EVENT_GAMEEND, OnGameEnd);
+            Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
         }
 
         // ========================================
@@ -340,7 +348,7 @@ namespace Game
         private void OnDamageReceived(string eventName, string payload)
         {
 
-            if(playerHP <= 0){
+            if(playerHP <= 0 || endscene){
                 return;
             }
 
@@ -361,6 +369,11 @@ namespace Game
                 //do what you need to do here
                 Publish("PlayerDead", "");  // ADD THIS
             }
+        }
+
+        private void OnGameEnd(string eventName, string payload){
+            LogMessage("[Spaceship Controller] Detect game end condition: " + eventName);
+            endscene = true;
         }
 
         private void emitParticles(Vector3 moveDir)

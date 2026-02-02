@@ -41,8 +41,9 @@ namespace Game
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
 
-        // Game lose condition
+        // Game lose / win condition
         private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
 
         // Lifecycle
         public override void OnStart()
@@ -65,6 +66,7 @@ namespace Game
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(GAMEWIN, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -144,6 +146,7 @@ namespace Game
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(GAMEWIN, OnGameOver);
         }
 
         // Combat
@@ -161,6 +164,7 @@ namespace Game
 
             if (health <= 0)
             {
+                Publish("WormHostDead", EntityID.ToString());  // ADD THIS
                 SceneDestroyEntity(EntityID);
             }
         }
