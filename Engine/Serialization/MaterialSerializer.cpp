@@ -94,6 +94,7 @@ namespace Engine {
         doc.AddMember("doubleSided", mat->doubleSided, allocator);
         doc.AddMember("receiveShadows", mat->receiveShadows, allocator);
         doc.AddMember("castShadows", mat->castShadows, allocator);
+        doc.AddMember("treatBlacksAsTransparent", mat->treatBlacksAsTransparent, allocator);
 
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer); // PrettyWriter for readable formatting
