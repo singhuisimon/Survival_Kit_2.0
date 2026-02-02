@@ -119,6 +119,10 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Don't update if dead or no core selected
             if (isDead || selectedCoreEntityID == 0) return;
 
