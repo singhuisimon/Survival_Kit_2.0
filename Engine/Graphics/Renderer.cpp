@@ -25,6 +25,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/norm.hpp>
 #include <GLFW/glfw3.h>
 
 #include "Asset/ResourceData.h"
@@ -153,6 +154,7 @@ namespace Engine {
 		}
 
 		pass.depth_test ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+
 		glDepthFunc(GL_LESS);
 		glDepthMask(pass.depth_write ? GL_TRUE : GL_FALSE);
 
@@ -203,6 +205,21 @@ namespace Engine {
 
 	void Renderer::render_frame(std::span<const DrawItem> draw_items, std::span<std::pair<CameraComponent, glm::vec3>> camera_list, std::span<const LightCPU> lights) {
 
+		// Partition opaque vs transparent
+		auto is_transparent = [](const DrawItem& item) {
+			// Load material and check opacity < 1.0
+			if (auto* mat = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid))) {
+				return mat->opacity < 1.0f;
+			}
+			return false;
+			};
+
+		// Create mutable copy for sorting
+		std::vector<DrawItem> sorted_items(draw_items.begin(), draw_items.end());
+
+		auto mid = std::partition(sorted_items.begin(), sorted_items.end(),
+			[&](const DrawItem& item) { return !is_transparent(item); });
+
 	 	// Render through editor camera
 	 	if (isEditorCamOn) {
 
@@ -211,6 +228,16 @@ namespace Engine {
 			glm::vec3& cam_pos  = editor_camera.getCamPos();
 
 			bool shadowRenderedForThisFrame = false;
+
+			glm::vec3 camera_pos = editor_camera.getCamPos();
+
+			// Sort transparent items by distance from camera
+			std::sort(mid, sorted_items.end(), 
+					  [&](const DrawItem& a, const DrawItem& b) {
+						  glm::vec3 posA = glm::vec3(a.m_model_to_world_transform[3]);
+						  glm::vec3 posB = glm::vec3(b.m_model_to_world_transform[3]);
+						  return glm::distance2(posA, camera_pos) > glm::distance2(posB, camera_pos);
+					  });
 
 	 		for (auto& pass : m_passes) {
 
@@ -242,14 +269,14 @@ namespace Engine {
 
 					// Render the shadow map once (use the main HDR/object pass camera matrices)
 					if (!shadowRenderedForThisFrame) {
-						renderShadowMap(draw_items, lights, cam_view, cam_perspective);
+						renderShadowMap(sorted_items, lights, cam_view, cam_perspective);
 						shadowRenderedForThisFrame = true;
 					}
 				}
 
 				// Begin drawing frame
 				beginFrame(pass);
-				draw(pass, draw_items, cam_view, cam_perspective, cam_pos, lights);
+				draw(pass, sorted_items, cam_view, cam_perspective, cam_pos, lights);
 				endFrame(pass);
 
 				// Read ID at mouse position for GPU ID pass
@@ -285,7 +312,7 @@ namespace Engine {
 				}
 			}
 
-			renderFinalPass(m_finalpass, draw_items, editor_camera.getLookAt(), editor_camera.getPerspective(), editor_camera.getCamPos());
+			renderFinalPass(m_finalpass, sorted_items, editor_camera.getLookAt(), editor_camera.getPerspective(), editor_camera.getCamPos());
 		}
 		else {
 			// For rendering all enabled camera displays
@@ -294,7 +321,17 @@ namespace Engine {
 				// Determine camera projection once, and render a shadow map for this camera.
 				glm::mat4 view = cam.first.View;
 				glm::mat4 proj = (cam.first.Projection == 0) ? cam.first.Persp : cam.first.Ortho;
-				renderShadowMap(draw_items, lights, view, proj);
+				renderShadowMap(sorted_items, lights, view, proj);
+
+				glm::vec3 camera_pos = cam.second;
+
+				// Sort transparent items by distance from camera
+				std::sort(mid, sorted_items.end(),
+					[&](const DrawItem& a, const DrawItem& b) {
+						glm::vec3 posA = glm::vec3(a.m_model_to_world_transform[3]);
+						glm::vec3 posB = glm::vec3(b.m_model_to_world_transform[3]);
+						return glm::distance2(posA, camera_pos) > glm::distance2(posB, camera_pos);
+					});
 
 				for (auto& pass : m_passes) {
 
@@ -329,18 +366,18 @@ namespace Engine {
 
 					// cam.first is the actual underlying camera object
 					// cam.second is the camera's position using the transform component
-					draw(pass, draw_items, view, proj, cam.second, lights);
+					draw(pass, sorted_items, view, proj, cam.second, lights);
 
 					endFrame(pass); // (Future): Unbind fbo if TargetTexture is used (May need new PassType to separate editor fbo and TargetTexture fbo)
 
 				}
 
-				renderFinalPass(m_finalpass, draw_items, view, proj, cam.second);
+				renderFinalPass(m_finalpass, sorted_items, view, proj, cam.second);
 			}
 		}
 
-		renderUIPass(m_UIPass, draw_items);
-		renderTextPass(m_textPass, draw_items);
+		renderUIPass(m_UIPass, sorted_items);
+		renderTextPass(m_textPass, sorted_items);
 	}
 
 	void Renderer::draw(RenderPass const& pass,
@@ -523,6 +560,9 @@ namespace Engine {
 		}
 
 		prog.programFree();
+
+		renderSkyboxHDR();
+		RenderTrails(draw_items, v, p, cam_pos);
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
@@ -555,6 +595,22 @@ namespace Engine {
 		};
 
 		m_passes.push_back(first_pass);
+
+		RenderPass transparent_pass
+		{
+			.pass_name = "Transparent Pass",
+			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
+			.shdpgm_handle = static_cast<size_t>(ShaderIndex::MAIN),
+			.auto_aspect = true,
+			.clear_color = false,  // ADD THIS - don't erase opaque objects!
+			.clear_depth = false,
+			.depth_test = true,
+			.depth_write = false,
+			.blending = true,
+			.culling = false
+		};
+
+		m_passes.push_back(transparent_pass);
 
 		RenderPass gpu_id_pass
 		{
@@ -864,7 +920,7 @@ namespace Engine {
 	 */
 	void Renderer::renderSkyboxHDR()
 	{
-		// If we don't have any bloom initialized or framebuffers, bail early
+		//If we don't have any bloom initialized or framebuffers, bail early
 		if (m_framebuffers.empty()) return;
 
 		// Bind the HDR scene framebuffer explicitly (FBO 0)
@@ -933,8 +989,7 @@ namespace Engine {
 		renderBloomUpsamples(m_bloomFilterRadius);  // 0.005f as default, tweak as needed
 
 		// Render skybox into HDR FBO 0 after bloom is computed  
-		renderSkyboxHDR();
-		RenderTrails(draw_items, view, proj, cam_pos);
+		
 
 		// Final composite: HDR scene + bloom -> LDR
 		beginFrame(pass);

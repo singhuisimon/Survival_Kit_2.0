@@ -17,19 +17,28 @@ namespace Game
         private const float SPAWN_GRACE_TIME = 0.5f;
         private float spawnTimer = 0.0f;
         private bool isInvulnerable = true;
+        private bool isgameover = false;
 
         private string EVENT_CORE_HIT = "Damage:";
+        private string EVENT_CORE_HEALTHCHANGE = "Core Health Change";
+        private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_GAME_WIN = "GameWin";
 
         public override void OnStart()
         {
             CurrentHealth = MaxHealth;
             isDead = false;
             isInvulnerable = true;
+            isgameover = false;
             spawnTimer = SPAWN_GRACE_TIME;
             EVENT_CORE_HIT += EntityID.ToString();
 
             // Subscribe to bullet hits
             Subscribe(EVENT_CORE_HIT, OnDamageReceived);
+            Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Subscribe(EVENT_GAME_WIN, OnGameEnd);
+            Publish(EVENT_CORE_HEALTHCHANGE, CurrentHealth.ToString());  // ADD THIS
+
 
             LogMessage("CoreMotherboard " + EntityID + " Health initialized");
         }
@@ -50,14 +59,21 @@ namespace Game
             }
         }
 
+        private void OnGameEnd(string eventName, string payload){
+            LogMessage("CoreMotherboard " + EntityID.ToString() + "is now immune!");
+            isgameover = true;
+        }
+
         private void OnDamageReceived(string eventName, string payload)
         {
 
-            //if(!isInvulnerable) return;
+            if(isgameover) return;
 
             float damage = DamageSystem.ParseAmount(payload);
 
             CurrentHealth -= damage;
+            Publish(EVENT_CORE_HEALTHCHANGE, CurrentHealth.ToString());  // ADD THIS
+
             LogMessage("CoreMotherboard " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
             if(CurrentHealth <= 0.0f){
@@ -83,6 +99,8 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_CORE_HIT, OnDamageReceived);
+            Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
             LogMessage("CoreMotherboard " + EntityID + " destroyed");
         }
     }

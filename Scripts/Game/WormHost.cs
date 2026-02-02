@@ -30,7 +30,7 @@ namespace Game
         [SerializeField] private float health = 18.0f;
 
         // Events
-        private const string EVENT_BULLET_HIT = "BulletHit";
+        private string EVENT_BULLET_HIT = "Damage:";
         //private const string EVENT_HOST_SPLIT = "WormHostSplit";
 
         // Worm Child
@@ -40,6 +40,10 @@ namespace Game
         // BARE MINIMUM
         [SerializeField] private float shootingCooldown = 0.25f;
         private float shootingTimer = 0.0f;
+
+        // Game lose / win condition
+        private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
 
         // Lifecycle
         public override void OnStart()
@@ -56,14 +60,23 @@ namespace Game
             timer = 0.0f;
 
             RigidbodySetIsKinematic(EntityID, true);
+            Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
+            RigidbodySetBoxHalfExtents(EntityID, ref extents);
 
+            EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(GAMEWIN, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            if (hasSplit || playerID == INVALID_ENTITY)
+            if (playerID == INVALID_ENTITY)
+            {
+                SceneDestroyEntity(EntityID);
                 return;
+            }
+
 
             // Don't update when game is paused
             if (GameState.IsPaused)
@@ -137,14 +150,16 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(GAMEWIN, OnGameOver);
         }
 
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
-            uint hitEntityID = uint.Parse(payload.Split(',')[0]);
-            if (hitEntityID != EntityID)
-                return;
+            // uint hitEntityID = uint.Parse(payload.Split(',')[0]);
+            // if (hitEntityID != EntityID)
+            //     return;
             
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
@@ -154,6 +169,7 @@ namespace Game
 
             if (health <= 0)
             {
+                Publish("WormHostDead", EntityID.ToString());  // ADD THIS
                 SceneDestroyEntity(EntityID);
             }
         }
@@ -312,6 +328,10 @@ namespace Game
             q.W = 0.5f * s;
 
             return q;
+        }
+
+        private void OnGameOver(string eventName, string payload){
+            SceneDestroyEntity(EntityID);
         }
     }
 }

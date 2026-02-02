@@ -1,0 +1,7 @@
+{
+  "name": "E005_loveletter_v003_BaseColor.png",
+  "guid": "567AD882BF8D4021",
+  "tags": [],
+  "lastImported": "00000000697F83B5",
+  "resourceLinks": []
+}

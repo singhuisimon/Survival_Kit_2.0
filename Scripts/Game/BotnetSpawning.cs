@@ -4,6 +4,7 @@ using static Engine.Transform;
 using static Engine.Scene;
 using static Engine.Prefab;
 using static Engine.Logger;
+using static Engine.Event;
 
 namespace Game {
 
@@ -26,9 +27,15 @@ namespace Game {
 
         private string botnetprefab = "Sources/Prefabs/Enemy_Botnet.prefab";
 
+        private string GAMEOVEREVENT = "GameOver";
+        private const string GAMEWINEVENT = "GameWin";
+
         [SerializeField] private float timer = 0.0f;
         [SerializeField] private float spawnDistance = 1.5f;
         [SerializeField] private int currentBotnetCount = 0;
+
+        private bool canSpawn = true;
+
         //private Random random = new Random();
 
         public override void OnStart(){
@@ -47,12 +54,21 @@ namespace Game {
             if(wall3ID == 0){
                 LogMessage("[Botnet Spawning] Warning: Wall3 not found!");
             }
+
+            canSpawn = true;
+            Subscribe(GAMEOVEREVENT, OnGameEnd);
+            Subscribe(GAMEWINEVENT, OnGameEnd);
         }
 
         public override void OnUpdate(float deltaTime){
             // if(currentBotnetCount >= maxBotnets){
             //     return;
             // }
+
+            if(!canSpawn){
+                LogMessage("[BOTNETSTOPSPAWNING]");
+                return;
+            }
 
             timer -= deltaTime;
 
@@ -71,7 +87,13 @@ namespace Game {
         }
 
         public override void OnDestroy(){
+            Unsubscribe(GAMEOVEREVENT, OnGameEnd);
+            Unsubscribe(GAMEWINEVENT, OnGameEnd);
+        }
 
+        private void OnGameEnd(string eventName, string payload){
+            LogMessage("[BotnetSpawning] GameOver detected disallowing spawning");
+            canSpawn = false;
         }
 
         private void SpawnBotnetOnRandomWall(){

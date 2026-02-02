@@ -549,7 +549,7 @@ namespace Engine {
 		// =====================================================================
 		// Transform
 		// =====================================================================
-		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition) {
+		void Transform_GetPosition(uint64_t entityID, glm::vec3* outPosition) {
 			if (!outPosition) return;
 			*outPosition = glm::vec3(0.f); // deterministic default
 
@@ -559,12 +559,10 @@ namespace Engine {
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
 			const auto& t = e.GetComponent<TransformComponent>();
-
-			// FIX: Return WORLD position, not LOCAL position
-			*outPosition = SafeVec3OrZero(glm::vec3(t.WorldTransform[3]));
+			*outPosition = SafeVec3OrZero(t.Position);
 		}
 
-		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position) {
+		void Transform_SetPosition(uint64_t entityID, glm::vec3* position) {
 			if (!position) return;
 
 			// RequireMainThread();
@@ -575,105 +573,67 @@ namespace Engine {
 			glm::vec3 p = SafeVec3OrZero(*position);
 
 			auto& t = e.GetComponent<TransformComponent>();
-
-			// FIX: For child entities, convert world position to local
-			if (t.Parent != u32_max) {
-				// Child entity: convert world to local
-				auto view = s_CurrentScene->GetRegistry().view<TransformComponent>();
-				auto& parent_transform = view.get<TransformComponent>(
-					static_cast<entt::entity>(t.Parent));
-
-				// Convert world to local: local = parent_inverse � world
-				glm::mat4 parent_inverse = glm::inverse(parent_transform.WorldTransform);
-				glm::mat4 new_world = t.WorldTransform;
-				new_world[3] = glm::vec4(p, 1.0f); // Set new world position
-
-				glm::mat4 new_local = parent_inverse * new_world;
-
-				// Decompose to get new local position
-				glm::vec3 skew;
-				glm::vec4 perspective;
-				glm::vec3 newScale;
-				glm::quat newRotation;
-				glm::vec3 newLocalPosition;
-
-				glm::decompose(new_local, newScale, newRotation, newLocalPosition, skew, perspective);
-
-				t.Position = newLocalPosition;
-				t.Rotation = newRotation;
-				t.Scale = newScale;
-			}
-			else {
-				// Root entity: world position = local position
-				t.Position = p;
-			}
-
+			t.Position = p;
 			t.IsDirty = true;
 		}
 
 		// ---- Rotation -----------------------------------------------------------
 
-		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation) {
+		void Transform_GetRotation(uint64_t entityID, glm::quat* outRotation) {
 			if (!outRotation) return;
 			*outRotation = glm::quat(1.f, 0.f, 0.f, 0.f); // identity default
+
+			// RequireMainThread();
 
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
 			const auto& t = e.GetComponent<TransformComponent>();
-
-			// FIX: Get WORLD rotation from WorldTransform
-			glm::mat3 rotMat = glm::mat3(t.WorldTransform);
-			*outRotation = SafeNormalizeQuat(glm::quat_cast(rotMat));
+			// Optionally normalize on get to keep scripts safe even if native code set bad values
+			*outRotation = SafeNormalizeQuat(t.Rotation);
 		}
 
-		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation) {
-			if(!rotation) return;
+		void Transform_SetRotation(uint64_t entityID, glm::quat* rotation) {
+			if (!rotation) return;
 
 			// RequireMainThread();
 
 			Entity e = GetEntityOrNull(entityID);
-			if(!e || !e.HasComponent<TransformComponent>()) return;
+			if (!e || !e.HasComponent<TransformComponent>()) return;
 
 			glm::quat r = SafeNormalizeQuat(*rotation);
 
-			auto &t = e.GetComponent<TransformComponent>();
+			auto& t = e.GetComponent<TransformComponent>();
 			t.Rotation = r;
 			t.IsDirty = true;
 		}
 
 		// ---- Scale --------------------------------------------------------------
 
-		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale) {
+		void Transform_GetScale(uint64_t entityID, glm::vec3* outScale) {
 			if (!outScale) return;
 			*outScale = glm::vec3(1.f); // deterministic default
+
+			// RequireMainThread();
 
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<TransformComponent>()) return;
 
 			const auto& t = e.GetComponent<TransformComponent>();
-
-			// FIX: Get WORLD scale from WorldTransform
-			*outScale = SafeScale(glm::vec3(
-				glm::length(glm::vec3(t.WorldTransform[0])),
-				glm::length(glm::vec3(t.WorldTransform[1])),
-				glm::length(glm::vec3(t.WorldTransform[2]))
-			));
+			*outScale = SafeScale(t.Scale);
 		}
 
-
-
-		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale) {
-			if(!scale) return;
+		void Transform_SetScale(uint64_t entityID, glm::vec3* scale) {
+			if (!scale) return;
 
 			// RequireMainThread();
 
 			Entity e = GetEntityOrNull(entityID);
-			if(!e || !e.HasComponent<TransformComponent>()) return;
+			if (!e || !e.HasComponent<TransformComponent>()) return;
 
 			glm::vec3 s = SafeScale(*scale);
 
-			auto &t = e.GetComponent<TransformComponent>();
+			auto& t = e.GetComponent<TransformComponent>();
 			t.Scale = s;
 			t.IsDirty = true;
 		}
@@ -2769,6 +2729,101 @@ namespace Engine {
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<ParticleComponent>()) return;
 			e.GetComponent<ParticleComponent>().EmissionRate = rate;
+		}
+
+		 void Text_SetText(uint32_t entityID, MonoString* text) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_SetText: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_SetText: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+
+				// Convert MonoString to C++ string
+				char* utf8 = mono_string_to_utf8(text);
+				if (utf8) {
+					textComp.setText(std::string(utf8));
+					mono_free(utf8);
+				}
+			}
+			else {
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+			}
+		}
+
+		 MonoString* Text_GetText(uint32_t entityID) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_GetText: No scene set");
+				return nullptr;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_GetText: Invalid entity ID ", entityID);
+				return nullptr;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+
+				MonoDomain* domain = mono_domain_get();
+				return mono_string_new(domain, textComp.getText().c_str());
+			}
+
+			return nullptr;
+		}
+
+		 void Text_SetFontSize(uint32_t entityID, float size) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_SetFontSize: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_SetFontSize: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+				textComp.setFontSize(size);
+			}
+		}
+
+		 float Text_GetFontSize(uint32_t entityID) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] Text_GetFontSize: No scene set");
+				return 0.0f;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] Text_GetFontSize: Invalid entity ID ", entityID);
+				return 0.0f;
+			}
+
+			if (registry.all_of<TextComponent>(entity)) {
+				auto& textComp = registry.get<TextComponent>(entity);
+				return textComp.getFontSize();
+			}
+
+			return 0.0f;
 		}
 	} // namespace InternalCalls
 } // namespace Engine

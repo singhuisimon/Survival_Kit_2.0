@@ -1,0 +1,7 @@
+{
+  "name": "Core Barrier Destroy.wav",
+  "guid": "167AD882BF8D803D",
+  "tags": [],
+  "lastImported": "00000000697F83B6",
+  "resourceLinks": []
+}

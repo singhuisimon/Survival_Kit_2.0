@@ -60,6 +60,7 @@ namespace Game
             { "enemybullet", CollisionCategory.ENEMY_PROJECTILE },
             { "enemymissile", CollisionCategory.ENEMY_PROJECTILE },
             { "wormbullet", CollisionCategory.ENEMY_PROJECTILE },
+            { "enemyturretbullet", CollisionCategory.ENEMY_PROJECTILE },
             
             // Ally projectiles
             { "sentrybullet", CollisionCategory.ALLY_PROJECTILE },
@@ -77,6 +78,7 @@ namespace Game
             { "wormhost", CollisionCategory.ENEMY },
             { "wormchild", CollisionCategory.ENEMY },
             { "enemy_core", CollisionCategory.ENEMY },
+            { "enemyturret", CollisionCategory.ENEMY },
             
             // Objectives
             { "semiconductor", CollisionCategory.CORE },

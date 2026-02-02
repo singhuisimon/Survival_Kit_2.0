@@ -24,8 +24,7 @@ namespace Game
         private bool initialized = false;
         private Vector3 initialPosition;  // Store initial center position
         private float initialWidth;  // Store initial width to calculate offset
-        private float playerMaxAmmo = 100.0f;  // Player's actual max ammo
-        private float ammoToWidthRatio = 4.0f;  // 100 ammo = 400 width, so ratio is 4
+        private float ammoToWidthRatio;  // Calculated: barMaxWidth / 100
 
         public override void OnStart()
         {
@@ -47,12 +46,15 @@ namespace Game
             barMaxWidth = actualInitialWidth;
             initialWidth = actualInitialWidth;
 
+            // Calculate ratio: Since max ammo is always 100, ratio = barMaxWidth / 100
+            ammoToWidthRatio = barMaxWidth / 100.0f;
+
             initialized = true;
 
             LogMessage("AmmoBar initialized:");
             LogMessage("  Max Width (from scene): " + barMaxWidth);
             LogMessage("  Initial Position X: " + initialPosition.X);
-            LogMessage("  Subscribed to event: " + EVENT_AMMO_CHANGE);
+            LogMessage("  Ammo to Width Ratio: " + ammoToWidthRatio);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -76,9 +78,9 @@ namespace Game
 
             // Clamp ammo to valid range (0-100)
             if (currentAmmo < 0.0f) currentAmmo = 0.0f;
-            if (currentAmmo > playerMaxAmmo) currentAmmo = playerMaxAmmo;
+            if (currentAmmo > 100.0f) currentAmmo = 100.0f;
 
-            // Convert ammo to width (100 ammo = 400 width)
+            // Convert ammo to width (ratio calculated from bar width / 100)
             float currentWidth = currentAmmo * ammoToWidthRatio;
 
             LogMessage("  Current Ammo: " + currentAmmo + " -> Width: " + currentWidth);

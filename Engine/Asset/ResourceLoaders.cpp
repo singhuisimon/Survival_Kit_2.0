@@ -148,13 +148,13 @@ xresource::loader<Engine::ResourceGUID::texture_type_guid_v>::Load(
         currentHeight = std::max(1, currentHeight / 2);
     }
 
-    // Check for OpenGL errors
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        glDeleteTextures(1, &texture->textureID);
-		LOG_WARNING("OpenGL error occurred while creating texture: 0x%X", error);
-        return nullptr;
-    }
+  //  // Check for OpenGL errors
+  //  GLenum error = glGetError();
+  //  if (error != GL_NO_ERROR) {
+  //      glDeleteTextures(1, &texture->textureID);
+		//LOG_WARNING("OpenGL error occurred while creating texture: 0x%X", error);
+  //      return nullptr;
+  //  }
 
     glBindTexture(GL_TEXTURE_2D, 0);
 

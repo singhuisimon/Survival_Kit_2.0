@@ -1,0 +1,7 @@
+{
+  "name": "trails.frag",
+  "guid": "8E7AD882BF8D400B",
+  "tags": [],
+  "lastImported": "00000000697F83B5",
+  "resourceLinks": []
+}

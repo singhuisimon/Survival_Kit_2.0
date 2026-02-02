@@ -42,11 +42,11 @@ namespace Game
                 return;
 
             // TEST: Press H to manually toggle hit marker for testing
-            if (IsKeyPressed(KeyCode.H))
+     /*       if (IsKeyPressed(KeyCode.H))
             {
                 LogMessage("[Hitmarker] TEST: H key pressed - showing hit marker");
                 ShowHitMarker();
-            }
+            }*/
 
             // Check if any player projectiles hit enemies this frame
             bool hitDetected = CheckForHits();
