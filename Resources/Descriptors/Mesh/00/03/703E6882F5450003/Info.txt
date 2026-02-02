@@ -1,0 +1,7 @@
+{
+  "name": "trench_run_v001.fbx",
+  "guid": "703E6882F5450003",
+  "tags": [],
+  "lastImported": "0000000069805A94",
+  "resourceLinks": []
+}

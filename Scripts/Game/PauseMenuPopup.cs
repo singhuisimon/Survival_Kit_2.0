@@ -3,6 +3,9 @@ using System;
 using static Engine.Scene;
 using static Engine.Logger;
 using static Engine.Transform;
+using static Engine.AudioManager;
+using static Engine.SpriteRenderer;
+using static Engine.Text;
 
 namespace Game
 {
@@ -40,6 +43,30 @@ namespace Game
         private const string PLUS_BUTTON_3_HOVERED_NAME = "Paused_PlusButton_3_Hovered";
         private const string MINUS_BUTTON_3_NAME = "Paused_MinusButton_3";
         private const string MINUS_BUTTON_3_HOVERED_NAME = "Paused_MinusButton_3_Hovered";
+
+        // HUD elements to hide when paused
+        private static readonly string[] HUD_ELEMENT_NAMES = {
+            "TImer",
+            "StageCount",
+            "scoreboard",
+            "WeaponAmmoCount",
+            "HealthCount",
+            "CoreHealthCount",
+            "HealthBarFill",
+            "HealthBarWindow",
+            "PlayerHealth",
+            "PrimaryWeaponFrame",
+            "PrimaryWeaponWindow",
+            "SecondayWeaponUI",
+            "SentryWindow",
+            "AltFireIcon",
+            "WeaponBarReload",
+            "CoreHealthBarRefill",
+            "CoreHealthBarFrame",
+            "CoreHealthBarWindow",
+            "Crosshair",
+            "Crosshair2"
+        };
 
         // Scene paths for navigation
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
@@ -102,6 +129,9 @@ namespace Game
         private uint minusButtonId3;
         private uint minusButtonHoveredId3;
 
+        // HUD element IDs (to hide when paused)
+        private uint[] hudElementIds;
+
         // State
         private bool isPaused = false;
         private bool entitiesFound = false;
@@ -139,6 +169,17 @@ namespace Game
             plusButtonHoveredId3 = SceneFindEntityByName(PLUS_BUTTON_3_HOVERED_NAME);
             minusButtonId3 = SceneFindEntityByName(MINUS_BUTTON_3_NAME);
             minusButtonHoveredId3 = SceneFindEntityByName(MINUS_BUTTON_3_HOVERED_NAME);
+
+            // Find HUD elements to hide when paused
+            hudElementIds = new uint[HUD_ELEMENT_NAMES.Length];
+            for (int i = 0; i < HUD_ELEMENT_NAMES.Length; i++)
+            {
+                hudElementIds[i] = SceneFindEntityByName(HUD_ELEMENT_NAMES[i]);
+                if (hudElementIds[i] == 0)
+                {
+                    LogMessage("PauseMenuPopup: HUD element not found: " + HUD_ELEMENT_NAMES[i]);
+                }
+            }
 
             // Log found entities
             LogMessage("PauseMenuPopup: bgId=" + bgId);
@@ -263,6 +304,10 @@ namespace Game
                 LogMessage("PauseMenuPopup: Main Menu clicked - returning to main menu");
                 LogMessage("Scene path: " + MAIN_MENU_SCENE_PATH);
 
+                // Stop all game audio before transitioning
+                StopGroup(AudioType.BGM);
+                StopGroup(AudioType.SFX);
+
                 // Reset all pause state BEFORE scene change
                 isPaused = false;
                 GameState.IsPaused = false;
@@ -370,6 +415,15 @@ namespace Game
             SetPosition(plusButtonHoveredId3, ref hidePos);
             SetPosition(minusButtonHoveredId3, ref hidePos);
 
+            // Hide HUD elements
+            for (int i = 0; i < hudElementIds.Length; i++)
+            {
+                if (hudElementIds[i] != 0)
+                {
+                    SetIsVisible(hudElementIds[i], false);
+                }
+            }
+
             // Show cursor for menu interaction
             Input.SetCursorVisible(true);
 
@@ -416,6 +470,15 @@ namespace Game
             SetPosition(plusButtonHoveredId3, ref hidePos2);
             SetPosition(minusButtonId3, ref hidePos2);
             SetPosition(minusButtonHoveredId3, ref hidePos2);
+
+            // Show HUD elements again
+            for (int i = 0; i < hudElementIds.Length; i++)
+            {
+                if (hudElementIds[i] != 0)
+                {
+                    SetIsVisible(hudElementIds[i], true);
+                }
+            }
 
             // Clear global pause state
             GameState.IsPaused = false;
