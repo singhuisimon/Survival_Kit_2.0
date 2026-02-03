@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: loveletterv4.prefab",
-    "Prefab GUID": 325948587071505223,
+    "Prefab GUID": 15058982186816389321,
     "version": 1,
     "entities": [
         {
@@ -128,7 +128,7 @@
                             "ComponentGUID": "43180580602823207",
                             "ScriptClassName": "Game.LoveLetterScript",
                             "Started": false,
-                            "GCHandle": 211
+                            "GCHandle": 19
                         }
                     }
                 },
