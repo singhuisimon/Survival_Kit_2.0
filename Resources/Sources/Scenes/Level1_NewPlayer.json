@@ -3,190 +3,6 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 61,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "InnermostCore"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "16864732120509514223",
-                        "PrefabAssetGuid": "11369100325965283631",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "SEMICONDUCTOR",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2145728289022197969\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.10546875,-0.0,0.0],\"Scale\":[0.19999995827674866,0.19999994337558746,0.19999994337558746],\"Parent\":1048589,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6180953555146293461\",\"Mesh\":\"\",\"Material\":\"Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 11,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"playing\":true,\"respectClipLoop\":true,\"controller\":0,\"currentClipIndex\":0,\"currentTime\":0.0029296875,\"playbackSpeed\":1.0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "2145728289022197969",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.10546875,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.19999995827674866,
-                            0.19999994337558746,
-                            0.19999994337558746
-                        ],
-                        "Parent": 1048589,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "6180953555146293461",
-                        "Mesh": "",
-                        "Material": "Core.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AnimatorComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "playing": true,
-                        "respectClipLoop": true,
-                        "controller": 0,
-                        "currentClipIndex": 0,
-                        "currentTime": 0.0029296875,
-                        "playbackSpeed": 1.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 55,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "InnerCore"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "7064899331351314919",
-                        "PrefabAssetGuid": "11369100325965283631",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "SEMICONDUCTOR",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9639718068951728327\",\"Position\":[0.0,0.0000016689300537109375,0.000011444091796875],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.699999988079071,0.699999988079071,0.699999988079071],\"Parent\":1048589,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12522021830468845765\",\"Tag\":\"InnerCore\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15404325591986127051\",\"Mesh\":\"\",\"Material\":\"CoreInner.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "9639718068951728327",
-                        "Position": [
-                            0.0,
-                            0.0000016689300537109375,
-                            0.000011444091796875
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.699999988079071,
-                            0.699999988079071,
-                            0.699999988079071
-                        ],
-                        "Parent": 1048589,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "15404325591986127051",
-                        "Mesh": "",
-                        "Material": "CoreInner.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
             "ID": 123,
             "Components": [
                 {
@@ -1388,7 +1204,7 @@
                         "Quad": 3,
                         "Sprite Layer": 3,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -3974,22 +3790,54 @@
             ]
         },
         {
-            "ID": 24,
+            "ID": 55,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Cruiser"
+                        "Tag": "InnerCore"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "7064899331351314919",
+                        "PrefabAssetGuid": "11369100325965283631",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "SEMICONDUCTOR",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9639718068951728327\",\"Position\":[0.0,0.0000016689300537109375,0.000011444091796875],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.699999988079071,0.699999988079071,0.699999988079071],\"Parent\":1048589,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12522021830468845765\",\"Tag\":\"InnerCore\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15404325591986127051\",\"Mesh\":\"\",\"Material\":\"CoreInner.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "8982834614303277413",
+                        "ComponentGUID": "9639718068951728327",
                         "Position": [
-                            121.17807006835938,
-                            -438.3467102050781,
-                            -171.99790954589844
+                            0.0,
+                            0.0000016689300537109375,
+                            0.000011444091796875
                         ],
                         "Rotation": [
                             0.0,
@@ -3997,20 +3845,20 @@
                             0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
+                            0.699999988079071,
+                            0.699999988079071,
+                            0.699999988079071
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 1048589,
                         "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "3218227091269140839",
-                        "Mesh": "A9004_cruiser_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
+                        "ComponentGUID": "15404325591986127051",
+                        "Mesh": "",
+                        "Material": "CoreInner.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -4272,43 +4120,81 @@
             ]
         },
         {
-            "ID": 1048598,
+            "ID": 61,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Dreadnought"
+                        "Tag": "InnermostCore"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "16864732120509514223",
+                        "PrefabAssetGuid": "11369100325965283631",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "SEMICONDUCTOR",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2145728289022197969\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.10546875,-0.0,0.0],\"Scale\":[0.19999995827674866,0.19999994337558746,0.19999994337558746],\"Parent\":1048589,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6180953555146293461\",\"Mesh\":\"\",\"Material\":\"Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 11,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"playing\":true,\"respectClipLoop\":true,\"controller\":0,\"currentClipIndex\":0,\"currentTime\":0.0029296875,\"playbackSpeed\":1.0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11865138375820280161",
+                        "ComponentGUID": "2145728289022197969",
                         "Position": [
-                            -798.2805786132813,
-                            -415.9496765136719,
-                            -416.16143798828125
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
-                            0.000005008954758523032,
-                            -86.0199966430664,
-                            0.000005008954758523032
+                            0.10546875,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
+                            0.19999995827674866,
+                            0.19999994337558746,
+                            0.19999994337558746
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 1048589,
                         "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "10135756118911435113",
-                        "Mesh": "A9003_dreadnought_v002.fbx",
-                        "Material": "Gunship_Allies.mat",
+                        "ComponentGUID": "6180953555146293461",
+                        "Mesh": "",
+                        "Material": "Core.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -4318,6 +4204,18 @@
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0029296875,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
