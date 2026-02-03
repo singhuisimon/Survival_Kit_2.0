@@ -1546,6 +1546,10 @@ namespace Engine {
 			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_SetIsVisible));
 		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_GetIsVisible",
 			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_GetIsVisible));
+		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_SetColor",
+			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_SetColor));
+		BindInternalCall("Engine.SpriteRenderer::SpriteRenderer_GetColor",
+			reinterpret_cast<void*>(InternalCalls::SpriteRenderer_GetColor));
 
 
 
