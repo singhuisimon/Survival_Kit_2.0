@@ -139,6 +139,7 @@ namespace Game
         private bool entitiesFound = false;
         private bool wasPauseKeyPressed = false;
         private bool wasMousePressed = false;
+        private bool gameEnded = false;
 
         public override void OnStart()
         {
@@ -200,6 +201,12 @@ namespace Game
 
             entitiesFound = (bgId != 0);
             isPaused = false;
+            gameEnded = false;
+
+            // Subscribe to win/lose events to block pause menu
+            Event.Subscribe("GameOver", OnGameEnded);
+            Event.Subscribe("GameWin", OnGameEnded);
+            Event.Subscribe("GameRestart", OnGameRestart);
 
             // Hide all initially
             HidePauseMenu();
@@ -211,6 +218,13 @@ namespace Game
         {
             if (!entitiesFound)
                 return;
+
+            // Block pause menu when win/lose screen is active
+            if (gameEnded)
+            {
+                wasPauseKeyPressed = Input.IsKeyPressed(KeyCode.P);
+                return;
+            }
 
             // Handle P key to toggle pause
             bool pauseKeyPressed = Input.IsKeyPressed(KeyCode.P);
@@ -499,8 +513,27 @@ namespace Game
             Input.SetCursorVisible(false);
         }
 
+        private void OnGameEnded(string eventName, string payload)
+        {
+            LogMessage("PauseMenuPopup: Game ended (" + eventName + ") - disabling pause menu");
+            gameEnded = true;
+
+            // If pause menu is open when game ends, close it
+            if (isPaused)
+                HidePauseMenu();
+        }
+
+        private void OnGameRestart(string eventName, string payload)
+        {
+            LogMessage("PauseMenuPopup: Game restarted - re-enabling pause menu");
+            gameEnded = false;
+        }
+
         public override void OnDestroy()
         {
+            Event.Unsubscribe("GameOver", OnGameEnded);
+            Event.Unsubscribe("GameWin", OnGameEnded);
+            Event.Unsubscribe("GameRestart", OnGameRestart);
             LogMessage("PauseMenuPopup: Destroyed");
         }
     }
