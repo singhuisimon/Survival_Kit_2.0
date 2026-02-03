@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
+    "baseColor": [
+        1.0,
+        0.8823529481887817,
+        0.0
+    ],
+    "emissionColor": [
+        1.0,
+        0.6764705777168274,
+        0.0
+    ],
+    "metallic": 0.0,
+    "roughness": 0.07000000029802322,
+    "opacity": 1.0,
+    "emissionStrength": 1.090000033378601,
+    "alphaThreshold": 0.5120000243186951,
+    "ambientOcclusion": 0.5,
+    "tiling": [
+        1.0,
+        1.0
+    ],
+    "offset": [
+        0.0,
+        0.0
+    ],
+    "enableEmission": true,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": true,
+    "castShadows": true,
+    "treatBlacksAsTransparent": true
+}
