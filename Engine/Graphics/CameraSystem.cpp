@@ -53,6 +53,8 @@ namespace Engine {
 				}
 			}
 
+
+			camera.RebuildProjection();
 			// Always build view transform
 			camera.View = glm::lookAt(trans.Position, camera.Target, { 0.0f, 1.0f, 0.0f }); // Default up is 0.0f, 1.0f, 0.0f
 		}
