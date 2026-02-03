@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: loveletterv4.prefab",
-    "Prefab GUID": 15058982186816389321,
+    "Prefab GUID": 1460547829938344025,
     "version": 1,
     "entities": [
         {
@@ -20,7 +20,7 @@
                                 0.0
                             ],
                             "Rotation": [
-                                0.0,
+                                92.83399200439452,
                                 -0.0,
                                 0.0
                             ],
@@ -105,10 +105,10 @@
                             "ComponentGUID": "13584545890048394049",
                             "FilePath": "Loveletter_Ambient.wav",
                             "Type": 1,
-                            "State": 0,
-                            "Volume": 1.0,
+                            "State": 2,
+                            "Volume": 1.2200000286102295,
                             "Pitch": 1.0,
-                            "Loop": false,
+                            "Loop": true,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
@@ -127,8 +127,8 @@
                         "Properties": {
                             "ComponentGUID": "43180580602823207",
                             "ScriptClassName": "Game.LoveLetterScript",
-                            "Started": false,
-                            "GCHandle": 19
+                            "Started": true,
+                            "GCHandle": 1811
                         }
                     }
                 },
@@ -142,7 +142,7 @@
                             "respectClipLoop": true,
                             "controller": 0,
                             "currentClipIndex": 0,
-                            "currentTime": 5.02890157699585,
+                            "currentTime": 2.5787220001220703,
                             "playbackSpeed": 1.0
                         }
                     }
