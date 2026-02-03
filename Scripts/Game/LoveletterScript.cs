@@ -20,6 +20,8 @@ namespace Game
         [SerializeField] private string coreTag = "SEMICONDUCTOR";
         private uint selectedCoreEntityID = 0;
 
+        // ===== PREFAB =====
+        [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
 
         // ===== CORE DIMENSIONS =====
@@ -251,6 +253,16 @@ namespace Game
             Publish("LoveLetterKilled", loveletterEntityID.ToString());
             // Publish event for game systems
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
+
+            // Spawn in a prefab for death audio
+            Vector3 spawnPos = GetPosition((uint)EntityID);
+            Quat spawnRot = GetRotation((uint)EntityID);
+            Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+            uint explosion = PrefabInstantiateWithTransform(deathPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+            if(explosion == 0){
+                LogMessage("[LoveletterScript] loveletter explosion entity fail to instantiate");
+                return;
+            }
 
             // Destroy the LoveLetter
             SceneDestroyEntity(loveletterEntityID);

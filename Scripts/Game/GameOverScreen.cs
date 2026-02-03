@@ -3,6 +3,7 @@ using Engine;
 using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
+using static Engine.Scene;
 using static Engine.Audio;
 using static Engine.AudioManager;
 
@@ -18,14 +19,32 @@ namespace Game
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string GAMEOVER = "GameOver";
+        private const string PlayerDeadName = "PlayerDeath";
+        private const string CoreDestructionName = "CoreDestruction";
+
+        private uint playerdeadID = 0;
+        private uint coredestructionID = 0;
 
         private bool initialized = false;
         private bool playaudio = false;
+
+        private string currEvent = "";
 
         public override void OnStart()
         {
             LogMessage("=== GameOverScreen OnStart ===");
             LogMessage("GameOverScreen EntityID: " + EntityID);
+
+            playerdeadID = SceneFindEntityByName(PlayerDeadName);
+            coredestructionID = SceneFindEntityByName(CoreDestructionName);
+
+            if(playerdeadID == 0){
+                LogMessage("[GameOverScreen] playerdead entity cannot be found");
+            }
+            
+            if(coredestructionID == 0){
+                LogMessage("[GameOverScreen] coredestruction entity cannot be found");
+            }
 
             // Subscribe to both lose conditions
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
@@ -43,7 +62,16 @@ namespace Game
                 return;
             }
 
-            AudioPlay((uint)EntityID);
+            if(currEvent == EVENT_PLAYER_DEAD){
+                AudioPlay(playerdeadID);
+                LogMessage("[GameOverScreen] player dead audio is playing");
+            }
+
+            if(currEvent == EVENT_CORE_DESTROYED){
+                AudioPlay(coredestructionID);
+                LogMessage("[GameOverScreen] core destruction audio is playing");
+            }
+
             playaudio = false;
         }
 
@@ -53,7 +81,9 @@ namespace Game
 
             StopGroup(AudioType.BGM);
             StopGroup(AudioType.SFX);
+
             SetIsVisible((uint)EntityID, true);
+            currEvent = eventName;
             playaudio = true;
             Publish(GAMEOVER, "");
         }

@@ -17,6 +17,7 @@ namespace Game
         private const string EVENT_LOVELETTER_REACHED_CORE = "LoveLetterReachedCore";
         private const string GAMEOVER = "GameOver";
         private const string GAMEWIN = "GameWin";
+        private const string warpingInPrefab = "Sources/Prefabs/Loveletter_warping.prefab";
         
         [SerializeField] private string[] spawnWallNames = new string[]
         {
@@ -229,6 +230,14 @@ namespace Game
             // Increment counters
             activeLetterCount++;
             totalSpawned++;
+
+            // Instantiate the audioprefab
+            Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+            uint warpingInID = PrefabInstantiateWithTransform(warpingInPrefab, ref spawnPos, ref wallRot, ref scale, false);
+            if(warpingInID == 0){
+                LogMessage("[LoveletterSpawn] loveletter warping in entity fail to instantiate");
+                return;
+            }
             
             LogMessage("LOVELETTER SPAWNED #" + totalSpawned);
             LogMessage(" Wall: " + wallName + " (Index: " + randomWallIndex + ")");
