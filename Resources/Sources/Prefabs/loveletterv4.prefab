@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: loveletterv4.prefab",
-    "Prefab GUID": 11630643358705778887,
+    "Prefab GUID": 325948587071505223,
     "version": 1,
     "entities": [
         {
@@ -51,7 +51,7 @@
                         "Properties": {
                             "ComponentGUID": "15533100392661991667",
                             "Mesh": "E005_loveletterCombined_v004.fbx",
-                            "Material": "",
+                            "Material": "loveletterv4.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -98,14 +98,37 @@
                     }
                 },
                 {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13584545890048394049",
+                            "FilePath": "Loveletter_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 50.2130012512207,
+                            "MaxDistance": 365.46099853515625,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
                             "ComponentGUID": "43180580602823207",
                             "ScriptClassName": "Game.LoveLetterScript",
-                            "Started": true,
-                            "GCHandle": 19
+                            "Started": false,
+                            "GCHandle": 211
                         }
                     }
                 },

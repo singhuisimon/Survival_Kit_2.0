@@ -18,12 +18,10 @@ namespace Game
 
         // ===== CORE TAG =====
         [SerializeField] private string coreTag = "SEMICONDUCTOR";
+        private uint selectedCoreEntityID = 0;
 
         // ===== PREFAB =====
         [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
-
-        private uint selectedCoreEntityID = 0;
-
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
 
         // ===== CORE DIMENSIONS =====
