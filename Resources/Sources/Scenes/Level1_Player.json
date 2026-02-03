@@ -3100,6 +3100,15 @@
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16187705639371801403\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ],
                         "childEntityIDs": [
@@ -3193,6 +3202,26 @@
                             0.5
                         ],
                         "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "16187705639371801403",
+                        "FilePath": "Player_Ambience.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 1.3680000305175781,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 },
                 {
