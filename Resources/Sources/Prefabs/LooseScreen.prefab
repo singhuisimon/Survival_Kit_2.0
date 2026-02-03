@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "LooseScreen",
-    "Prefab GUID": 4129053754404822789,
+    "Prefab Name": "Prefab: LooseScreen.prefab",
+    "Prefab GUID": 3970838429273948373,
     "version": 1,
     "entities": [
         {
@@ -52,7 +52,7 @@
                             "ComponentGUID": "8776918099747013473",
                             "ScriptClassName": "Game.GameOverScreen",
                             "Started": false,
-                            "GCHandle": 4139
+                            "GCHandle": 19
                         }
                     }
                 },
@@ -128,7 +128,7 @@
                             "FilePath": "Player Death.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 0.8029999732971191,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -194,7 +194,7 @@
                             "FilePath": "Core Destruction.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 1.2020000219345093,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
