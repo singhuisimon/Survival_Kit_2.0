@@ -1,15 +1,15 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "lvl1_level_design_v003_COMBINED_COLOUR.png",
+    "baseMap": "",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
     "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
-        1.0,
-        1.0,
-        1.0
+        0.0,
+        0.0,
+        0.0
     ],
     "emissionColor": [
         0.0,
@@ -19,9 +19,9 @@
     "metallic": 0.0,
     "roughness": 0.0,
     "opacity": 1.0,
-    "emissionStrength": 0.8999999761581421,
-    "alphaThreshold": 0.4819999933242798,
-    "ambientOcclusion": 0.48500001430511475,
+    "emissionStrength": 1.0,
+    "alphaThreshold": 0.5,
+    "ambientOcclusion": 0.5,
     "tiling": [
         1.0,
         1.0
@@ -30,10 +30,10 @@
         0.0,
         0.0
     ],
-    "enableEmission": true,
+    "enableEmission": false,
     "alphaTest": false,
     "doubleSided": false,
     "receiveShadows": true,
     "castShadows": true,
-    "treatBlacksAsTransparent": false
+    "treatBlacksAsTransparent": true
 }
