@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "SEMICONDUCTOR",
-    "Prefab GUID": 11369100325965283631,
+    "Prefab Name": "Prefab: SEMICONDUCTOR.prefab",
+    "Prefab GUID": 3179884947895714893,
     "version": 1,
     "entities": [
         {
@@ -98,14 +98,37 @@
                     }
                 },
                 {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16438482250874045513",
+                            "FilePath": "Core_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": true,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 52.55500030517578,
+                            "MaxDistance": 502.072998046875,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
                             "ComponentGUID": "11863986098428055233",
                             "ScriptClassName": "Game.HealthCore",
-                            "Started": true,
-                            "GCHandle": 19
+                            "Started": false,
+                            "GCHandle": 235
                         }
                     }
                 }
@@ -353,7 +376,7 @@
                             "Max Speed": 25.0,
                             "Rotation Speed": 0.0,
                             "Play Delay": 0.0,
-                            "Delay Accumulator": 7312.40185546875,
+                            "Delay Accumulator": 0.0,
                             "Randomize Rotation": true,
                             "Loop": false,
                             "Active": true,
