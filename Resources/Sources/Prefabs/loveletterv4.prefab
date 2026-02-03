@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: loveletterv4.prefab",
-    "Prefab GUID": 18148073295123824839,
+    "Prefab GUID": 15058982186816389321,
     "version": 1,
     "entities": [
         {
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                0.009999999776482582,
-                                0.009999999776482582,
-                                0.009999999776482582
+                                0.007000000216066837,
+                                0.007000000216066837,
+                                0.007000000216066837
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -51,7 +51,7 @@
                         "Properties": {
                             "ComponentGUID": "15533100392661991667",
                             "Mesh": "E005_loveletterCombined_v004.fbx",
-                            "Material": "",
+                            "Material": "loveletterv4.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -89,11 +89,34 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                80.0,
-                                80.0,
-                                80.0
+                                100.0,
+                                100.0,
+                                100.0
                             ],
                             "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13584545890048394049",
+                            "FilePath": "Loveletter_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 50.2130012512207,
+                            "MaxDistance": 365.46099853515625,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
                         }
                     }
                 },
@@ -105,7 +128,22 @@
                             "ComponentGUID": "43180580602823207",
                             "ScriptClassName": "Game.LoveLetterScript",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
+                        }
+                    }
+                },
+                {
+                    "type": 11,
+                    "typeName": "AnimatorComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "playing": true,
+                            "respectClipLoop": true,
+                            "controller": 0,
+                            "currentClipIndex": 0,
+                            "currentTime": 5.02890157699585,
+                            "playbackSpeed": 1.0
                         }
                     }
                 }

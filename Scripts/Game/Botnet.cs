@@ -10,6 +10,7 @@ using static Engine.Physics;
 using static Engine.Rigidbody;
 using static Engine.Audio;
 using static Engine.Tag;
+using static Engine.Transform;
 
 namespace Game
 {
@@ -49,6 +50,7 @@ namespace Game
         // Death explosion prefab path
         //[SerializeField] 
         private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
+        private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
 
         // Botnet Health
         [SerializeField] private float HP = 3.0f;
@@ -227,6 +229,16 @@ namespace Game
 
             float damage = DamageSystem.ParseAmount(payload);
             HP -= damage;
+
+            //instantiate the hitmarker audio
+            Vector3 spawnPos = GetPosition((uint)EntityID);
+            Quat spawnRot = GetRotation((uint)EntityID);
+            Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
+            uint hitmarkerID = 0;
+            hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+            if(hitmarkerID == 0){
+                LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+            }
 
             LogMessage("[Botnet] CurrentBotnetHP is: " + HP.ToString());
             LogMessage("[Botnet] SUCCESS MATCH! REDUCING HEALTH!");
