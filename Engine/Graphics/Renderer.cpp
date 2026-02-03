@@ -217,7 +217,7 @@ namespace Engine {
 		// Create mutable copy for sorting
 		std::vector<DrawItem> sorted_items(draw_items.begin(), draw_items.end());
 
-		auto mid = std::partition(sorted_items.begin(), sorted_items.end(),
+		auto mid = std::stable_partition(sorted_items.begin(), sorted_items.end(),
 			[&](const DrawItem& item) { return !is_transparent(item); });
 
 	 	// Render through editor camera
