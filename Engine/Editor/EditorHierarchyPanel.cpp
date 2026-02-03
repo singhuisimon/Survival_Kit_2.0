@@ -37,11 +37,10 @@ namespace Engine
 		bool isPrefabScene = false;
 		if (ImGui::Begin("Hierarchy", &m_Editor->GetHierarchyWindowRef()))
 		{
-			if (m_Scene) {
+			if (!m_Editor->GetPrefabPath().empty()) {
 				std::string sceneName = m_Scene->GetName();
 				// Check if scene name indicates it's a prefab
-				isPrefabScene = (sceneName.find("Prefab:") == 0) ||
-					(sceneName.find("prefab") != std::string::npos);
+				isPrefabScene = true;
 			}
 			ImGui::BeginDisabled(isPrefabScene);
 			if (ImGui::Button("Create Entity"))
