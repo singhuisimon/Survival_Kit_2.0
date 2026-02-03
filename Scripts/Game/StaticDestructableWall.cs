@@ -1,92 +1,101 @@
-// StaticDestructableWall.cs
 using Engine;
+using Game;
 using System.Collections.Generic;
-using static Engine.Event;
+using static Engine.Logger;
 using static Engine.Scene;
+using static Engine.Transform;
 
 namespace Game
 {
-    public class StaticDestructableWall : ScriptBehaviour
+    /// <summary>
+    /// Moving wall of death that travels at constant speed and kills the player on contact.
+    /// Attach to 'Obstacle_Wall_WallofDeath' prefab with tag "obstacle_wall_wallofdeath".
+    /// 
+    /// INSPECTOR SETUP (Pick ONE axis, then pick direction):
+    /// - Check ONE axis: HorizontalX, VerticalY, or DepthZ
+    /// - Check PositiveDirection for +axis, uncheck for -axis
+    /// 
+    /// Examples:
+    /// - Move Right:   HorizontalX=true,  PositiveDirection=true
+    /// - Move Left:    HorizontalX=true,  PositiveDirection=false
+    /// - Move Up:      VerticalY=true,    PositiveDirection=true
+    /// - Move Down:    VerticalY=true,    PositiveDirection=false
+    /// - Move Forward: DepthZ=true,       PositiveDirection=true
+    /// - Move Back:    DepthZ=true,       PositiveDirection=false
+    /// </summary>
+    public class StaticDestructableWall: ScriptBehaviour
     {
-        [SerializeField] private float HP = 25.0f;
-        [SerializeField] private float collisionDamageToPlayer = 9999.0f;
+        [SerializeField] private bool CollidedWithPlayer = false;
 
-        private const string PLAYER_NAME = "Player";
-        private const string DAMAGE_EVENT_PREFIX = "Damage:";
+        // Movement & Damage
+        [SerializeField] private float Health = 25.0f;
+        [SerializeField] private float Damage = 9999.0f;
 
-        private uint _playerId;
-        private string _selfDamageEvent;
-        private string _playerDamageEvent;
-
-        private bool _wasPlayerCollidingLastFrame = false;
+        // Internal state
+        private string playerName = "Player";
+        private uint playerID = 0;
+        private bool isInitialized = false;
 
         public override void OnStart()
         {
-            _playerId = SceneFindEntityByName(PLAYER_NAME);
-
-            _selfDamageEvent = DAMAGE_EVENT_PREFIX + ((uint)EntityID).ToString();
-            _playerDamageEvent = DAMAGE_EVENT_PREFIX + _playerId.ToString();
-
-            Subscribe(_selfDamageEvent, OnDamaged);
+            // Find player
+            playerID = SceneFindEntityByName(playerName);
+            if (playerID == 0)
+            {
+                LogMessage("[StaticWallOfDeath] ERROR: Player entity not found in scene!");
+                return;
+            }
+            isInitialized = true;
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // CollisionManager stores "entity -> environment objects it hit this frame"
-            List<uint> envHits = CollisionManager.GetEnvironmentCollisions(_playerId);
+        }
 
-            bool collidingNow = false;
-            uint self = (uint)EntityID;
+        public override void OnFixedUpdate(float deltaTime)
+        {
+            if (!isInitialized || playerID == 0)
+                return;
 
-            if (envHits != null)
-            {
-                for (int i = 0; i < envHits.Count; ++i)
-                {
-                    if (envHits[i] == self)
-                    {
-                        collidingNow = true;
-                        break;
-                    }
-                }
-            }
-
-            // Fire once on enter (instant-kill damage event)
-            if (collidingNow && !_wasPlayerCollidingLastFrame)
-            {
-                Publish(_playerDamageEvent, collisionDamageToPlayer.ToString());
-                Engine.Logger.LogMessage("Damaging Player!!!!");
-            }
-
-            _wasPlayerCollidingLastFrame = collidingNow;
+            // Check for collision with player
+            CheckCollisionWithPlayer();
         }
 
         public override void OnDestroy()
         {
-            Unsubscribe(_selfDamageEvent, OnDamaged);
+            LogMessage("[WallOfDeath] Wall destroyed");
         }
 
-        private void OnDamaged(string eventName, string payload)
+        /// <summary>
+        /// Check if player collided with this wall
+        /// </summary>
+        private void CheckCollisionWithPlayer()
         {
-            float dmg = ParseDamageAmount(payload);
-            HP -= dmg;
-
-            if (HP <= 0.0f)
+            if (CollidedWithPlayer)
             {
-                SceneDestroyEntity((uint)EntityID);
+                return;
             }
-        }
 
-        private static float ParseDamageAmount(string payload)
-        {
-            // Accept "amount" or "amount|source" (common pattern)
-            if (string.IsNullOrEmpty(payload))
-                return 1.0f;
+            // Query what the player collided with
+            List<uint> playerCollisions = CollisionManager.GetPlayerCollisions(playerID);
 
-            int sep = payload.IndexOf('|');
-            if (sep >= 0)
-                payload = payload.Substring(0, sep);
+            if (playerCollisions != null && playerCollisions.Count > 0)
+            {
+                // Check if THIS wall is in the player's collision list
+                foreach (uint collidedEntityId in playerCollisions)
+                {
+                    if (collidedEntityId == (uint)EntityID)
+                    {
+                        CollidedWithPlayer = true;
+                        // Player touched this moving wall - deal lethal damage
+                        DamageSystem.DealDamage(playerID, Damage, (uint)EntityID);
+                        LogMessage("[StaticWallOfDeath] PLAYER HIT WALL! Dealing " + Damage + " damage");
 
-            return float.Parse(payload);
+                        // Only deal damage once per frame
+                        return;
+                    }
+                }
+            }
         }
     }
 }
