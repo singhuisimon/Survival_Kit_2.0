@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "",
+    "baseMap": "E005_loveletter_v003_BaseColor.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
@@ -12,9 +12,9 @@
         1.0
     ],
     "emissionColor": [
-        0.0,
-        0.0,
-        0.0
+        1.0,
+        0.029411792755126953,
+        0.029411792755126953
     ],
     "metallic": 0.0,
     "roughness": 0.0,
@@ -30,7 +30,7 @@
         0.0,
         0.0
     ],
-    "enableEmission": false,
+    "enableEmission": true,
     "alphaTest": false,
     "doubleSided": false,
     "receiveShadows": true,
