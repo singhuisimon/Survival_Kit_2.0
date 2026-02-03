@@ -932,27 +932,10 @@
                             1.0
                         ],
                         "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "7130368651406902311",
-                        "FilePath": "Player Death.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
+                        "Children": [
+                            63,
+                            64
+                        ]
                     }
                 },
                 {
@@ -4174,7 +4157,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SEMICONDUCTOR",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SEMICONDUCTOR.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5893,6 +5875,114 @@
                         "Active": true,
                         "World Space": true,
                         "Burst Mode": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 63,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "PlayerDeath"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860017880395154229",
+                        "Position": [
+                            5.960464477539063e-8,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 57,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "8895243146519429947",
+                        "FilePath": "Player Death.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 64,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "CoreDestruction"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9471703898822591289",
+                        "Position": [
+                            5.960464477539063e-8,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 57,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "10624625403430224701",
+                        "FilePath": "Core Destruction.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
