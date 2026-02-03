@@ -18,7 +18,7 @@ namespace Game
         [SerializeField] private bool isStationary = false;
         [SerializeField] private bool hasSplit = false;
 
-        [SerializeField] private float speed = 80f;
+        [SerializeField] private float speed = 50f;
         [SerializeField] private float stationaryTimer = 10.0f;
         private float timer = 0.0f;
 
@@ -159,47 +159,76 @@ namespace Game
             Unsubscribe(GAMEWIN, OnGameOver);
         }
 
-        // NEW: Update target to track closest valid entity
+        // NEW: Update target with priority: Player first, then Gunship if player is far
+        [SerializeField] private float playerPriorityRange = 250.0f; // Range within which player is always prioritized
+        
         private void UpdateTarget()
         {
             Vector3 wormPos = GetPosition(EntityID);
             
-            float closestDistance = float.MaxValue;
-            uint closestTarget = INVALID_ENTITY;
+            uint selectedTarget = INVALID_ENTITY;
+            float playerDist = float.MaxValue;
+            float gunshipDist = float.MaxValue;
 
-            // Check player
+            // Check player distance
+            bool playerExists = false;
             if (playerID != INVALID_ENTITY && EntityExists(playerID))
             {
                 Vector3 playerPos = GetPosition(playerID);
-                float playerDist = CalculateDistance(wormPos, playerPos);
-                
-                if (playerDist < closestDistance)
-                {
-                    closestDistance = playerDist;
-                    closestTarget = playerID;
-                }
+                playerDist = CalculateDistance(wormPos, playerPos);
+                playerExists = true;
             }
 
-            // Check gunship
+            // Check gunship distance
+            bool gunshipExists = false;
             if (gunshipID != INVALID_ENTITY && EntityExists(gunshipID))
             {
                 Vector3 gunshipPos = GetPosition(gunshipID);
-                float gunshipDist = CalculateDistance(wormPos, gunshipPos);
-                
-                if (gunshipDist < closestDistance)
+                gunshipDist = CalculateDistance(wormPos, gunshipPos);
+                gunshipExists = true;
+            }
+
+            // PRIORITY LOGIC:
+            // 1. If player is within priority range, always target player
+            // 2. If player is far away, target gunship if it's closer
+            // 3. If both are far, target the closest one
+            
+            if (playerExists && playerDist <= playerPriorityRange)
+            {
+                // Player is nearby - always prioritize player
+                selectedTarget = playerID;
+            }
+            else if (playerExists && gunshipExists)
+            {
+                // Both exist but player is far - choose closest
+                if (gunshipDist < playerDist)
                 {
-                    closestDistance = gunshipDist;
-                    closestTarget = gunshipID;
+                    selectedTarget = gunshipID;
                 }
+                else
+                {
+                    selectedTarget = playerID;
+                }
+            }
+            else if (playerExists)
+            {
+                // Only player exists
+                selectedTarget = playerID;
+            }
+            else if (gunshipExists)
+            {
+                // Only gunship exists
+                selectedTarget = gunshipID;
             }
 
             // Update current target if it changed
-            if (currentTargetID != closestTarget)
+            if (currentTargetID != selectedTarget)
             {
-                currentTargetID = closestTarget;
+                currentTargetID = selectedTarget;
                 if (currentTargetID != INVALID_ENTITY)
                 {
-                    LogMessage("WormHost: New target locked - EntityID: " + currentTargetID);
+                    string targetName = (currentTargetID == playerID) ? "Player" : "Gunship";
+                    LogMessage("WormHost: New target locked - " + targetName + " (EntityID: " + currentTargetID + ")");
                 }
             }
         }
