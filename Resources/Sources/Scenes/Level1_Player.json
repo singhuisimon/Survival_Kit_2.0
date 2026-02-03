@@ -3,60 +3,6 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 64,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "CoreDestruction"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "9471703898822591289",
-                        "Position": [
-                            5.960464477539063e-8,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 57,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "10624625403430224701",
-                        "FilePath": "Core Destruction.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
             "ID": 63,
             "Components": [
                 {
@@ -1634,20 +1580,20 @@
             ]
         },
         {
-            "ID": 1048577,
+            "ID": 64,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "BotnetSpawner"
+                        "Tag": "CoreDestruction"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "10613260846001786413",
+                        "ComponentGUID": "9471703898822591289",
                         "Position": [
-                            0.0,
+                            5.960464477539063e-8,
                             0.0,
                             0.0
                         ],
@@ -1661,22 +1607,28 @@
                             1.0,
                             1.0
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 57,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "10036800093698575919",
-                        "ScriptClassName": "Game.BotnetSpawning",
-                        "Fields": {
-                            "interval": 2.0,
-                            "timer": 0.0,
-                            "maxBotnets": 20,
-                            "spawnDistance": 1.5,
-                            "currentBotnetCount": 0
-                        }
+                        "ComponentGUID": "10624625403430224701",
+                        "FilePath": "Core Destruction.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -4139,7 +4091,7 @@
                         ],
                         "Depth": 0,
                         "Aspect": 1.9190404415130615,
-                        "FOV": 110.0,
+                        "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
                         "Target": [
@@ -5413,7 +5365,7 @@
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "189081373915742735",
-                        "text": "100/100\n",
+                        "text": "80/100",
                         "fontName": "Quantico-Regular",
                         "fontSize": 12.0,
                         "color": [
@@ -5445,7 +5397,7 @@
                     "Properties": {
                         "ComponentGUID": "8835992658460180989",
                         "Position": [
-                            638.7999877929688,
+                            594.699951171875,
                             683.0,
                             0.0
                         ],
@@ -5455,7 +5407,7 @@
                             0.0
                         ],
                         "Scale": [
-                            220.5,
+                            176.39999389648438,
                             6.199999809265137,
                             1.0
                         ],
@@ -5592,7 +5544,7 @@
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "189081373945365027",
-                        "text": "SCORE 0000000",
+                        "text": "SCORE 0000050",
                         "fontName": "Quantico-Regular",
                         "fontSize": 24.0,
                         "color": [
