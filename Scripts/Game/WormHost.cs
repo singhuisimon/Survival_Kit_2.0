@@ -24,7 +24,10 @@ namespace Game
 
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint playerID = INVALID_ENTITY;
+        private uint gunshipID = INVALID_ENTITY;
+        private uint currentTargetID = INVALID_ENTITY;
         private const string TAG_PLAYER = "Player";
+        private const string TAG_GUNSHIP = "Gunship";
 
         // Health
         [SerializeField] private float health = 18.0f;
@@ -50,10 +53,12 @@ namespace Game
         {
             LogMessage("======= WormHost started (EntityID = " + EntityID + ") =======");
 
-            // TODO: Set Target
-
+            // Find both player and gunship
             playerID = SceneFindEntityByName(TAG_PLAYER);
             LogMessage("======= playerID: " + playerID + " =======");
+
+            gunshipID = SceneFindEntityByName(TAG_GUNSHIP);
+            LogMessage("======= gunshipID: " + gunshipID + " =======");
 
             isStationary = false;
             hasSplit = false;
@@ -71,22 +76,26 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            if (playerID == INVALID_ENTITY)
-            {
-                SceneDestroyEntity(EntityID);
-                return;
-            }
-
-
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
 
+            // Update target - find closest valid target
+            UpdateTarget();
+
+            // If no valid targets exist, destroy self
+            if (currentTargetID == INVALID_ENTITY)
+            {
+                LogMessage("WormHost: No valid targets found, destroying");
+                SceneDestroyEntity(EntityID);
+                return;
+            }
+
             Vector3 ownPosition = GetPosition(EntityID);
-            Vector3 targetPosition = GetPosition(playerID);
+            Vector3 targetPosition = GetPosition(currentTargetID);
             Vector3 direction = targetPosition - ownPosition;
 
-            // Rotation - aim at player
+            // Rotation - aim at target
             float magnitude = SimpleMath.Sqrt(
                 direction.X * direction.X +
                 direction.Y * direction.Y +
@@ -115,6 +124,7 @@ namespace Game
             Quat lookRot = SimpleMath.LookRotation(-direction, Vector3.Up);
             SetRotation(EntityID, ref lookRot);
 
+            // Check if close enough to become stationary and shoot
             if (magnitude < 250.0f)
             {
                 isStationary = true;
@@ -124,22 +134,17 @@ namespace Game
 
             if (isStationary)
             {
-                // timer += deltaTime;
-
-                // if (timer >= stationaryTimer)
-                // {
-                    //OnSplit();
-                    // BARE MINIMUM
-                    shootingTimer -= deltaTime;
-                    if (shootingTimer <= 0.0f)
-                    {
-                        ShootAtTarget();
-                        shootingTimer = shootingCooldown;
-                    }
-                //}
+                // Shooting logic
+                shootingTimer -= deltaTime;
+                if (shootingTimer <= 0.0f)
+                {
+                    ShootAtTarget();
+                    shootingTimer = shootingCooldown;
+                }
             }
             else
             {
+                // Movement logic
                 float inverseMag = 1.0f / magnitude;
                 Vector3 normDirection = direction * inverseMag;
                 Vector3 newPosition = ownPosition + normDirection * speed * deltaTime;
@@ -154,13 +159,103 @@ namespace Game
             Unsubscribe(GAMEWIN, OnGameOver);
         }
 
+        // NEW: Update target with priority: Player first, then Gunship if player is far
+        [SerializeField] private float playerPriorityRange = 250.0f; // Range within which player is always prioritized
+        
+        private void UpdateTarget()
+        {
+            Vector3 wormPos = GetPosition(EntityID);
+            
+            uint selectedTarget = INVALID_ENTITY;
+            float playerDist = float.MaxValue;
+            float gunshipDist = float.MaxValue;
+
+            // Check player distance
+            bool playerExists = false;
+            if (playerID != INVALID_ENTITY && EntityExists(playerID))
+            {
+                Vector3 playerPos = GetPosition(playerID);
+                playerDist = CalculateDistance(wormPos, playerPos);
+                playerExists = true;
+            }
+
+            // Check gunship distance
+            bool gunshipExists = false;
+            if (gunshipID != INVALID_ENTITY && EntityExists(gunshipID))
+            {
+                Vector3 gunshipPos = GetPosition(gunshipID);
+                gunshipDist = CalculateDistance(wormPos, gunshipPos);
+                gunshipExists = true;
+            }
+
+            // PRIORITY LOGIC:
+            // 1. If player is within priority range, always target player
+            // 2. If player is far away, target gunship if it's closer
+            // 3. If both are far, target the closest one
+            
+            if (playerExists && playerDist <= playerPriorityRange)
+            {
+                // Player is nearby - always prioritize player
+                selectedTarget = playerID;
+            }
+            else if (playerExists && gunshipExists)
+            {
+                // Both exist but player is far - choose closest
+                if (gunshipDist < playerDist)
+                {
+                    selectedTarget = gunshipID;
+                }
+                else
+                {
+                    selectedTarget = playerID;
+                }
+            }
+            else if (playerExists)
+            {
+                // Only player exists
+                selectedTarget = playerID;
+            }
+            else if (gunshipExists)
+            {
+                // Only gunship exists
+                selectedTarget = gunshipID;
+            }
+
+            // Update current target if it changed
+            if (currentTargetID != selectedTarget)
+            {
+                currentTargetID = selectedTarget;
+                if (currentTargetID != INVALID_ENTITY)
+                {
+                    string targetName = (currentTargetID == playerID) ? "Player" : "Gunship";
+                    LogMessage("WormHost: New target locked - " + targetName + " (EntityID: " + currentTargetID + ")");
+                }
+            }
+        }
+
+        // Helper method to check if entity still exists
+        private bool EntityExists(uint entityID)
+        {
+            if (entityID == 0 || entityID == INVALID_ENTITY)
+                return false;
+
+            // Try to get the entity's tag - if it fails, entity doesn't exist
+            string tag = TagGetTag(entityID);
+            return !string.IsNullOrEmpty(tag);
+        }
+
+        // Helper method to calculate distance between two points
+        private float CalculateDistance(Vector3 a, Vector3 b)
+        {
+            float dx = b.X - a.X;
+            float dy = b.Y - a.Y;
+            float dz = b.Z - a.Z;
+            return SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
-            // uint hitEntityID = uint.Parse(payload.Split(',')[0]);
-            // if (hitEntityID != EntityID)
-            //     return;
-            
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
 
@@ -169,7 +264,7 @@ namespace Game
 
             if (health <= 0)
             {
-                Publish("WormHostDead", EntityID.ToString());  // ADD THIS
+                Publish("WormHostDead", EntityID.ToString());
                 SceneDestroyEntity(EntityID);
             }
         }
@@ -218,21 +313,21 @@ namespace Game
             SceneDestroyEntity(EntityID);
         }
 
-        // BARE MINIMUM
+        // MODIFIED: Shoot at current target (player or gunship)
         public void ShootAtTarget()
         {
-            if (playerID == INVALID_ENTITY)
+            if (currentTargetID == INVALID_ENTITY)
                 return;
 
             // Get positions
             Vector3 wormPos = GetPosition(EntityID);
-            Vector3 playerPos = GetPosition(playerID);
+            Vector3 targetPos = GetPosition(currentTargetID);
 
-            // Calculate direction to player
+            // Calculate direction to target
             Vector3 direction = new Vector3(
-                playerPos.X - wormPos.X,
-                playerPos.Y - wormPos.Y,
-                playerPos.Z - wormPos.Z
+                targetPos.X - wormPos.X,
+                targetPos.Y - wormPos.Y,
+                targetPos.Z - wormPos.Z
             );
 
             // Normalize direction
@@ -280,7 +375,7 @@ namespace Game
             // Set tag
             TagSetTag(wormBulletID, "WormBullet");
 
-            // Apply force in the direction of the player
+            // Apply force in the direction of the target
             float bulletForce = 100.0f;
             Vector3 force = new Vector3(
                 directionNorm.X * bulletForce,
@@ -330,7 +425,8 @@ namespace Game
             return q;
         }
 
-        private void OnGameOver(string eventName, string payload){
+        private void OnGameOver(string eventName, string payload)
+        {
             SceneDestroyEntity(EntityID);
         }
     }
