@@ -27,9 +27,9 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 500.0f;
+        [SerializeField] private float moveSpeed = 100.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 0.0f;
+        [SerializeField] private float waitTimeAtSurface = 20.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
         [SerializeField] private float maxHealth = 100.0f;
