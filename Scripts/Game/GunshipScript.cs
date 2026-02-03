@@ -23,7 +23,7 @@ namespace Game
         private bool isDead = false;
 
         // === WEAPON INFORMATION ===
-        [SerializeField] private float fireRate = 0.1f;
+        [SerializeField] private float fireRate = 5.0f;
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
         [SerializeField] private float bulletSpeed = 3000f;
@@ -39,7 +39,7 @@ namespace Game
         private bool initialized = false;
 
         // List of enemies to verify and target
-        private readonly string[] enemyTags = { "botnet" , "wormhost" , "wormchild" , "loveletter" };
+        private readonly string[] enemyTags = { "botnet" , "WormHost" , "wormchild" , "loveletter" };
         
         private string GAMEOVEREVENT = "GameOver";
         private string GAMEWINEVENT = "GameWin";
