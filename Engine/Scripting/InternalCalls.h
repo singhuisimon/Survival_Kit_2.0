@@ -1376,6 +1376,8 @@ namespace Engine {
 		// SpriteRenderer
 		 void SpriteRenderer_SetIsVisible(uint32_t entityID, bool visible);
 		 bool SpriteRenderer_GetIsVisible(uint32_t entityID);
+		 void SpriteRenderer_SetColor(uint32_t entityID, float r, float g, float b, float a);
+		 void SpriteRenderer_GetColor(uint32_t entityID, float* r, float* g, float* b, float* a);
 
 		 // TextComponent
 		  void Text_SetText(uint32_t entityID, MonoString* text);
