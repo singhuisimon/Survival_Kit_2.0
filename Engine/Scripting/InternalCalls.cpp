@@ -2719,6 +2719,53 @@ namespace Engine {
 			return false;
 		}
 
+		 void SpriteRenderer_SetColor(uint32_t entityID, float r, float g, float b, float a) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_SetColor: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_SetColor: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<SpriteRendererComponent>(entity)) {
+				auto& sprite = registry.get<SpriteRendererComponent>(entity);
+				sprite.SetColor(glm::vec4(r, g, b, a));
+			}
+			else {
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no SpriteRendererComponent");
+			}
+		}
+
+		 void SpriteRenderer_GetColor(uint32_t entityID, float* r, float* g, float* b, float* a) {
+			if (!s_CurrentScene) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_GetColor: No scene set");
+				return;
+			}
+
+			auto& registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity)) {
+				LOG_ERROR("[InternalCalls] SpriteRenderer_GetColor: Invalid entity ID ", entityID);
+				return;
+			}
+
+			if (registry.all_of<SpriteRendererComponent>(entity)) {
+				auto& sprite = registry.get<SpriteRendererComponent>(entity);
+				glm::vec4 const& color = sprite.GetColor();
+				*r = color.r;
+				*g = color.g;
+				*b = color.b;
+				*a = color.a;
+			}
+		}
+
 		void ParticleSystem_SetEmitterVelocity(uint64_t entityID, glm::vec3* vel) {
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<ParticleComponent>()) return;
