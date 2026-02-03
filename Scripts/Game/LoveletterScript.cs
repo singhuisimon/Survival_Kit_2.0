@@ -24,6 +24,8 @@ namespace Game
 
         private uint selectedCoreEntityID = 0;
 
+        [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
+
         // ===== CORE DIMENSIONS =====
         [SerializeField] private float coreHalfSizeX = 37.5f;
         [SerializeField] private float coreHalfSizeY = 37.5f;
@@ -32,9 +34,9 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 500.0f;
+        [SerializeField] private float moveSpeed = 100.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 0.0f;
+        [SerializeField] private float waitTimeAtSurface = 20.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
         [SerializeField] private float maxHealth = 100.0f;
@@ -220,6 +222,16 @@ namespace Game
             currentHealth -= damage;
             if (currentHealth < 0.0f)
                 currentHealth = 0.0f;
+
+            //instantiate the hitmarker audio
+            Vector3 spawnPos = GetPosition((uint)EntityID);
+            Quat spawnRot = GetRotation((uint)EntityID);
+            Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
+            uint hitmarkerID = 0;
+            hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+            if(hitmarkerID == 0){
+                LogMessage("[LoveletterScript] Player Hit! But hitmarkerID fail to instantiate");
+            }
 
             if (currentHealth <= 0.0f)
             {

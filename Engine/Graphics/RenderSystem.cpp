@@ -149,7 +149,14 @@ namespace Engine {
 
 		auto spriteView = scene->GetRegistry().group<TransformComponent, SpriteRendererComponent>();
 
-		spriteView.sort<SpriteRendererComponent>([](SpriteRendererComponent const& a, SpriteRendererComponent const& b) {return a.SpriteLayer < b.SpriteLayer; });
+		spriteView.sort<SpriteRendererComponent>(
+			[](const SpriteRendererComponent& a, const SpriteRendererComponent& b) {
+				return a.SpriteLayer < b.SpriteLayer;
+			},
+			[](const auto& first, const auto& last, auto compare) {
+				std::stable_sort(first, last, compare);
+			}
+		);
 
 		for (auto entity : spriteView) 
 		{

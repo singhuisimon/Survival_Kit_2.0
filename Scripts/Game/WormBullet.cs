@@ -19,7 +19,7 @@ namespace Game
         public float Damage = 1.0f;
 
         // Target tags - entities this bullet can damage
-        private string[] TargetTags = { "Player" };
+        private string[] TargetTags = { "Player", "Gunship" };
 
         // This bullet's own tag
         private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
@@ -34,6 +34,7 @@ namespace Game
 
         public override void OnStart()
         {
+            TagSetTag((uint)EntityID, "WormBullet");
             if (enableDebug)
             {
                 LogMessage("===== WormBullet STARTED =====");
@@ -44,6 +45,7 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+      
             // Handle pause - save/restore velocity
             if (GameState.IsPaused)
             {
