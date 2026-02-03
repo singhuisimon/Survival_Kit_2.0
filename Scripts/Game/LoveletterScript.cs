@@ -6,6 +6,7 @@ using static Engine.Transform;
 using static Engine.Quat;
 using static Engine.SimpleMath;
 using static Engine.Tag;
+using static Engine.Prefab;
 
 namespace Game
 {
