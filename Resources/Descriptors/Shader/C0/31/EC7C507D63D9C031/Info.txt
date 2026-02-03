@@ -1,7 +1,0 @@
-{
-  "name": "debug.frag",
-  "guid": "EC7C507D63D9C031",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}

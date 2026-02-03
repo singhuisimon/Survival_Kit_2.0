@@ -2825,5 +2825,24 @@ namespace Engine {
 
 			return 0.0f;
 		}
+
+		  void Text_SetIsVisible(uint32_t entityID, bool visible) {
+			 auto& registry = s_CurrentScene->GetRegistry();
+			 entt::entity entity = static_cast<entt::entity>(entityID);
+			 if (registry.all_of<TextComponent>(entity)) {
+				 auto& text = registry.get<TextComponent>(entity);
+				 text.setVisible(visible);
+			 }
+		 }
+
+		  bool Text_GetIsVisible(uint32_t entityID) {
+			 auto& registry = s_CurrentScene->GetRegistry();
+			 entt::entity entity = static_cast<entt::entity>(entityID);
+			 if (registry.all_of<TextComponent>(entity)) {
+				 auto& text = registry.get<TextComponent>(entity);
+				 return text.isShown();
+			 }
+			 return false;
+		 }
 	} // namespace InternalCalls
 } // namespace Engine

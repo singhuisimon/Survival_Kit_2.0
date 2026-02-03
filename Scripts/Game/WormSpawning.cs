@@ -36,6 +36,7 @@ namespace Game {
 
         // Game lose condition
         private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
 
         // Game win condition
 
@@ -59,9 +60,13 @@ namespace Game {
             gameRunning = true;
 
             Event.Subscribe(GAMEOVER, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime){
+            // Don't spawn when game is paused
+            if (GameState.IsPaused)
+                return;
 
             if (gameRunning){
                 
@@ -88,6 +93,7 @@ namespace Game {
 
         public override void OnDestroy(){
             Event.Unsubscribe(GAMEOVER, OnGameOver);
+            Event.Unsubscribe(GAMEWIN, OnGameOver);
         }
 
         private void SpawnWormOnRandomWall(){

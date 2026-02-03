@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Prefab: LIGHTING_DirectionalLight2.prefab",
-    "Prefab GUID": 13805899568224028767,
+    "Prefab Name": "LIGHTING_DirectionalLight2",
+    "Prefab GUID": 146745781549665417,
     "version": 1,
     "entities": [
         {
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "14382360320523945945",
+                            "ComponentGUID": "11099500075314137869",
                             "Tag": "LIGHTING_DirectionalLight2"
                         }
                     }

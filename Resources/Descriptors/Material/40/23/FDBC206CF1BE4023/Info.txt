@@ -1,7 +1,0 @@
-{
-  "name": "Firewall_Void.mat",
-  "guid": "FDBC206CF1BE4023",
-  "tags": [],
-  "lastImported": "0000000069284C79",
-  "resourceLinks": []
-}

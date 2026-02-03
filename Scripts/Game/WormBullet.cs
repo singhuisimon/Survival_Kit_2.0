@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Physics;
+using static Engine.Rigidbody;
 using static Engine.Tag;
 using static Engine.Event;
 
@@ -15,17 +16,17 @@ namespace Game
         public float ProjectileLifetime = 6.0f;
 
         [SerializeField]
-        public float Damage = 10.0f;
+        public float Damage = 1.0f;
 
         // Target tags - entities this bullet can damage
-        [SerializeField]
         private string[] TargetTags = { "Player" };
 
         // This bullet's own tag
-        [SerializeField]
         private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
 
         private float elapsedTime = 0.0f;
+        private Vector3 savedVelocity = Vector3.Zero;
+        private bool wasPaused = false;
 
         // DEBUG: Toggle debug messages on/off
         [SerializeField]
@@ -43,6 +44,26 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Handle pause - save/restore velocity
+            if (GameState.IsPaused)
+            {
+                if (!wasPaused)
+                {
+                    // Just paused - save velocity and stop
+                    savedVelocity = RigidbodyGetVelocity((uint)EntityID);
+                    Vector3 zero = Vector3.Zero;
+                    RigidbodySetVelocity((uint)EntityID, ref zero);
+                    wasPaused = true;
+                }
+                return;
+            }
+            else if (wasPaused)
+            {
+                // Just unpaused - restore velocity
+                RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
+                wasPaused = false;
+            }
+
             // Lifetime - bullet destroys itself after ProjectileLifetime seconds
             elapsedTime += deltaTime;
             if (elapsedTime >= ProjectileLifetime)

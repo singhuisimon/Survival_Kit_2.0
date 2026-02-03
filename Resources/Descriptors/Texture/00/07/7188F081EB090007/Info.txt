@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_VolumeFill.png",
-  "guid": "7188F081EB090007",
-  "tags": [],
-  "lastImported": "00000000697C31A4",
-  "resourceLinks": []
-}

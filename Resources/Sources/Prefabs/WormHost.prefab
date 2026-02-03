@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "WormHost",
-    "Prefab GUID": 9054118174586702113,
+    "Prefab Name": "Prefab: WormHost.prefab",
+    "Prefab GUID": 5485727957110309983,
     "version": 1,
     "entities": [
         {
@@ -98,6 +98,29 @@
                     }
                 },
                 {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17014943003178271835",
+                            "FilePath": "Worm_Host_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": true,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 30.19700050354004,
+                            "MaxDistance": 403.0169982910156,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
@@ -105,7 +128,7 @@
                             "ComponentGUID": "3289510651551910173",
                             "ScriptClassName": "Game.WormHost",
                             "Started": false,
-                            "GCHandle": 9459
+                            "GCHandle": 235
                         }
                     }
                 }

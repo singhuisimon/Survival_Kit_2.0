@@ -1,7 +1,0 @@
-{
-  "name": "mecury.mat",
-  "guid": "BB4ED06BE74E0037",
-  "tags": [],
-  "lastImported": "0000000069247762",
-  "resourceLinks": []
-}

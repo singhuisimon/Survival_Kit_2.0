@@ -1,7 +1,0 @@
-{
-  "name": "Skybox_Engine_v1_006.png",
-  "guid": "D119E86D32A5C06B",
-  "tags": [],
-  "lastImported": "0000000069295017",
-  "resourceLinks": []
-}

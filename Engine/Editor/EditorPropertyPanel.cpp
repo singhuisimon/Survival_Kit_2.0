@@ -876,6 +876,9 @@ namespace Engine
 						if (ImGui::Checkbox("Cast Shadows", &material->castShadows)) {
 							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
 						}
+						if (ImGui::Checkbox("Treat Blacks As Transparent", &material->treatBlacksAsTransparent)) {
+							MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+						}
 					}
 				}
 
@@ -2239,6 +2242,9 @@ namespace Engine
 								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 							}
 							if (ImGui::Checkbox("Cast Shadows", &material->castShadows)) {
+								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
+							}
+							if (ImGui::Checkbox("Treat Blacks As Transparent", &material->treatBlacksAsTransparent)) {
 								MarkComponentOverridden(ComponentTypeID::ParticleSystem);
 							}
 						}

@@ -85,6 +85,12 @@ namespace Game
         //private const string EVENT_BULLET_HIT = "BulletHit";
         private string EVENT_BULLET_HIT = "Damage:";
         private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
+        private const string EVENT_GAME_OVER = "GameOver";
+        private const string EVENT_GAME_WIN = "GameWin";
+
+        // Pause state
+        private Vector3 savedVelocity = Vector3.Zero;
+        private bool wasPaused = false;
 
         // ===== Lifecycle =====
 
@@ -131,13 +137,35 @@ namespace Game
             EVENT_BULLET_HIT += EntityID.ToString();
 
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
-            Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Subscribe(EVENT_GAME_OVER, OnGameEnd);
+            Subscribe(EVENT_GAME_WIN, OnGameEnd);
+            //Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
         {
             if (isDead)
                 return;
+
+            // Handle pause - save/restore velocity
+            if (GameState.IsPaused)
+            {
+                if (!wasPaused)
+                {
+                    // Just paused - save velocity and stop
+                    savedVelocity = RigidbodyGetVelocity((uint)EntityID);
+                    Vector3 zero = Vector3.Zero;
+                    RigidbodySetVelocity((uint)EntityID, ref zero);
+                    wasPaused = true;
+                }
+                return;
+            }
+            else if (wasPaused)
+            {
+                // Just unpaused - restore velocity
+                RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
+                wasPaused = false;
+            }
 
             if (isStunned)
             {
@@ -165,7 +193,9 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
-            Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
+            Unsubscribe(EVENT_GAME_OVER, OnGameEnd);
+            Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
+            //Unsubscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         // ===== Public API =====
@@ -208,23 +238,34 @@ namespace Game
             }
         }
 
-        private void OnSpawnDisable(string eventName, string payload)
-        {
-            if (isDead || eventName != EVENT_SPAWN_DISABLE)
+        private void OnGameEnd(string eventName, string payload){
+            if(isDead){
                 return;
-
-            if (!bool.TryParse(payload, out bool active))
-                return;
-
-            if (!active)
-            {
-                isDead = true;
-                isExploding = false;
-
-                LogMessage("Destroying itself as spawn is disabled");
-                SceneDestroyEntity((uint)EntityID);
             }
+
+            LogMessage("[Botnet] Detect game end. Event is: " + eventName);
+            isDead = true;
+            isExploding = false;
+            SceneDestroyEntity((uint)EntityID);
         }
+
+        // private void OnSpawnDisable(string eventName, string payload)
+        // {
+        //     if (isDead || eventName != EVENT_SPAWN_DISABLE)
+        //         return;
+
+        //     if (!bool.TryParse(payload, out bool active))
+        //         return;
+
+        //     if (!active)
+        //     {
+        //         isDead = true;
+        //         isExploding = false;
+
+        //         LogMessage("Destroying itself as spawn is disabled");
+        //         SceneDestroyEntity((uint)EntityID);
+        //     }
+        // }
 
         public void BruteForceAttack()
         {

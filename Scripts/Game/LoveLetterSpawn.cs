@@ -16,6 +16,7 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_LOVELETTER_REACHED_CORE = "LoveLetterReachedCore";
         private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
         
         [SerializeField] private string[] spawnWallNames = new string[]
         {
@@ -107,6 +108,7 @@ namespace Game
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Subscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
             Event.Subscribe(GAMEOVER, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
             // Set initial spawn timer
             spawnTimer = initialDelay;
             nextSpawnTime = GetRandomSpawnInterval();
@@ -118,8 +120,12 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Don't spawn when game is paused
+            if (GameState.IsPaused)
+                return;
+
             if (!isInitialized) return;
-            
+
             // Update spawn timer
             spawnTimer -= deltaTime;
             
@@ -296,6 +302,7 @@ namespace Game
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Unsubscribe(EVENT_LOVELETTER_REACHED_CORE, OnGameOver); 
             Event.Unsubscribe(GAMEOVER, OnGameOver);
+            Event.Unsubscribe(GAMEWIN, OnGameOver);
             LogMessage("=== LoveLetterSpawner Destroyed (Total spawned: " + totalSpawned + ") ===");
         }
 

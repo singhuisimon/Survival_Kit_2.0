@@ -1,7 +1,0 @@
-{
-  "name": "Explosion3.mat",
-  "guid": "F94AD88070404031",
-  "tags": [],
-  "lastImported": "0000000069764681",
-  "resourceLinks": []
-}

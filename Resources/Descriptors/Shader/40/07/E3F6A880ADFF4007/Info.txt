@@ -1,7 +1,0 @@
-{
-  "name": "font.frag",
-  "guid": "E3F6A880ADFF4007",
-  "tags": [],
-  "lastImported": "0000000069776F4F",
-  "resourceLinks": []
-}

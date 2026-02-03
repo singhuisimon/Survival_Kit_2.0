@@ -15,6 +15,7 @@ namespace Game
     public class WinScreen : ScriptBehaviour
     {
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string GAMEWIN = "GameWin";
 
         private bool initialized = false;
 
@@ -36,8 +37,10 @@ namespace Game
         private void OnWin(string eventName, string payload)
         {
             LogMessage("[WinScreen] Win! Timer finished!");
-            StopAll();
+            StopGroup(AudioType.BGM);
+            StopGroup(AudioType.SFX);
             SetIsVisible((uint)EntityID, true);
+            Publish(GAMEWIN, "");
         }
 
         public override void OnDestroy()

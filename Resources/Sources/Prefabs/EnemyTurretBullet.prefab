@@ -1,0 +1,93 @@
+{
+    "Prefab Name": "EnemyTurretBullet",
+    "Prefab GUID": 16568215825570840773,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "EnemyTurretBullet",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9688597958291261995",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17182587738235767337",
+                            "Tag": "EnemyTurretBullet"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2194608178346805805",
+                            "Mesh": "",
+                            "Material": "EnemyTurretBullet.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18379146660872716859",
+                            "FilePath": "Worm Shoot.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

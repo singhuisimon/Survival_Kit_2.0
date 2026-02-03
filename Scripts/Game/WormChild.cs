@@ -42,6 +42,10 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             Transform.SetPosition(EntityID, ref stillPos);
 
             shootingTimer -= deltaTime;

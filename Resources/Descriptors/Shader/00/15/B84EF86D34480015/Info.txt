@@ -1,7 +1,0 @@
-{
-  "name": "debug.vert",
-  "guid": "B84EF86D34480015",
-  "tags": [],
-  "lastImported": "00000000692956A0",
-  "resourceLinks": []
-}

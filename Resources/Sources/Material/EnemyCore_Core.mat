@@ -12,14 +12,14 @@
         0.0
     ],
     "emissionColor": [
-        1.0,
-        0.2647058963775635,
-        0.0
+        0.039215683937072754,
+        0.01872582919895649,
+        0.01018838956952095
     ],
     "metallic": 1.0,
     "roughness": 1.0,
     "opacity": 1.0,
-    "emissionStrength": 100.0,
+    "emissionStrength": 65.7300033569336,
     "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [
@@ -31,8 +31,8 @@
         0.0
     ],
     "enableEmission": true,
-    "alphaTest": true,
+    "alphaTest": false,
     "doubleSided": false,
-    "receiveShadows": true,
-    "castShadows": true
+    "receiveShadows": false,
+    "castShadows": false
 }

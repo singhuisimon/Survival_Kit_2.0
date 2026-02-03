@@ -10,7 +10,7 @@ namespace Game {
 
     public class BotnetSpawning : ScriptBehaviour{
 
-        [SerializeField] private float interval = 2.0f;
+        [SerializeField] private float interval = 5.0f;
         [SerializeField] private int maxBotnets = 20;
 
         private string wall1Name = "Wall1";
@@ -28,6 +28,7 @@ namespace Game {
         private string botnetprefab = "Sources/Prefabs/Enemy_Botnet.prefab";
 
         private string GAMEOVEREVENT = "GameOver";
+        private const string GAMEWINEVENT = "GameWin";
 
         [SerializeField] private float timer = 0.0f;
         [SerializeField] private float spawnDistance = 1.5f;
@@ -55,10 +56,15 @@ namespace Game {
             }
 
             canSpawn = true;
-            Subscribe(GAMEOVEREVENT, OnGameOver);
+            Subscribe(GAMEOVEREVENT, OnGameEnd);
+            Subscribe(GAMEWINEVENT, OnGameEnd);
         }
 
         public override void OnUpdate(float deltaTime){
+            // Don't spawn when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // if(currentBotnetCount >= maxBotnets){
             //     return;
             // }
@@ -85,10 +91,11 @@ namespace Game {
         }
 
         public override void OnDestroy(){
-            Unsubscribe(GAMEOVEREVENT, OnGameOver);
+            Unsubscribe(GAMEOVEREVENT, OnGameEnd);
+            Unsubscribe(GAMEWINEVENT, OnGameEnd);
         }
 
-        private void OnGameOver(string eventName, string payload){
+        private void OnGameEnd(string eventName, string payload){
             LogMessage("[BotnetSpawning] GameOver detected disallowing spawning");
             canSpawn = false;
         }

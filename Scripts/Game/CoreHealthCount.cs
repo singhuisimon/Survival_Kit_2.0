@@ -9,13 +9,18 @@ namespace Game
     /// <summary>
     /// CoreHealthCount - Displays core health as "100/100" text
     /// Attach this to a text entity
-    /// Listens to the same "Core Health Change" event as CoreHealthBar
+    /// Hides on win or lose
     /// </summary>
     public class CoreHealthCount : ScriptBehaviour
     {
         // ===== Event Names =====
         private const string EVENT_CORE_HEALTHCHANGE = "Core Health Change";
         private const float MaxHealth = 100.0f;
+
+        // ===== Game Over Events =====
+        private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+        private const string EVENT_TIMER_FINISHED = "TimerFinished";
 
         // ===== State =====
         private bool initialized = false;
@@ -27,6 +32,11 @@ namespace Game
 
             // Subscribe to core health change events
             Event.Subscribe(EVENT_CORE_HEALTHCHANGE, OnCoreHealthChange);
+
+            // Subscribe to game over events
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
 
             // Set initial text
             SetText((uint)EntityID, "100/100");
@@ -43,19 +53,26 @@ namespace Game
                 return;
             }
 
-            // Clamp
             if (currentHP < 0.0f) currentHP = 0.0f;
             if (currentHP > MaxHealth) currentHP = MaxHealth;
 
-            // Format as "100/100"
             int current = (int)currentHP;
             int max = (int)MaxHealth;
             SetText((uint)EntityID, current + "/" + max);
         }
 
+        private void OnGameOver(string eventName, string payload)
+        {
+            LogMessage("[CoreHealthCount] Game over - hiding text");
+            Text.SetIsVisible((uint)EntityID, false);
+        }
+
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_CORE_HEALTHCHANGE, OnCoreHealthChange);
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
             LogMessage("=== CoreHealthCount Destroyed ===");
         }
     }

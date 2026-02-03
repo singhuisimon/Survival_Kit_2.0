@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Prefab: LIGHTING_DirectionalLight.prefab",
-    "Prefab GUID": 9770674302100129907,
+    "Prefab Name": "LIGHTING_DirectionalLight",
+    "Prefab GUID": 14558264589135006845,
     "version": 1,
     "entities": [
         {
@@ -20,9 +20,9 @@
                                 0.0
                             ],
                             "Rotation": [
-                                -4.861001491546631,
-                                -32.99995040893555,
-                                89.0831527709961
+                                -170.86099243164065,
+                                -32.99999237060547,
+                                89.0830307006836
                             ],
                             "Scale": [
                                 1.0,
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "14382360320523945945",
+                            "ComponentGUID": "4181971047673056227",
                             "Tag": "LIGHTING_DirectionalLight"
                         }
                     }

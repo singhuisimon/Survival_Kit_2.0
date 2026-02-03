@@ -31,19 +31,19 @@ namespace Game
         [SerializeField("Pitch Limit (Degrees)")] private float pitchLimitDegrees = 80.0f;
 
         // ===== Camera Positioning =====
-        [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 5.0f;
-        [SerializeField("Camera Distance Behind")] private float cameraDistanceBack = 10.0f;
+        [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 20.0f;
+        [SerializeField("Camera Distance Behind")] private float cameraDistanceBack = 30.0f;
         [SerializeField("Camera Look Distance")] private float cameraLookDistance = 1000.0f;
 
         // ===== Camera Movement  =====
         // Catch-up feel (bigger = snappier, smaller = more “laggy”)
-        [SerializeField("Camera Follow Smooth")] private float cameraFollowSmooth = 10.0f;
+        [SerializeField("Camera Follow Smooth")] private float cameraFollowSmooth = 1.8f;
         [SerializeField("Yaw Speed")] private float yawSpeed = 0.05f;
         [SerializeField("Pitch Speed")] private float pitchSpeed = 0.02f;
-        [SerializeField("Forward Speed")] private float forwardSpeed = 50.0f;
+        [SerializeField("Spaceship Speed")] private float spaceshipSpeed = 100.0f;
 
         // ===== Player Rotation =====
-        [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 1.0f;
+        [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 1.25f;
         [SerializeField("Model X Rotation Offset")] private float modelXRotationOffset = -90.0f;
 
         // ===== Cursor Control =====
@@ -53,12 +53,16 @@ namespace Game
         [SerializeField] private float playerHP = 100.0f;
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
-        //[SerializeField] private 
+        //[SerializeField] private
         string EVENT_PLAYER_DAMAGE = "Damage:";
-        //[SerializeField] 
+        //[SerializeField]
         private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
-        //[SerializeField] 
+        //[SerializeField]
         private string EVENT_PLAYER_OOB = "Damage:";
+        private string EVENT_GAMEWIN = "GameWin";
+        private string EVENT_GAMEEND = "GameEnd";
+
+        private bool endscene = false;
 
         // ======= STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -125,6 +129,8 @@ namespace Game
 
             Subscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
             Subscribe(EVENT_PLAYER_OOB, OnDamageReceived);
+            Subscribe(EVENT_GAMEEND, OnGameEnd);
+            Subscribe(EVENT_GAMEWIN, OnGameEnd);
 
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - physics in FixedUpdate, visuals in Update");
@@ -133,6 +139,10 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
+                return;
+
+            // Don't process input when game is paused (check global state)
+            if (GameState.IsPaused)
                 return;
 
             // Handle cursor toggle
@@ -151,6 +161,15 @@ namespace Game
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+            {
+                // Stop physics movement while paused
+                Vector3 zero = Vector3.Zero;
+                RigidbodySetVelocity(playerEntityID, ref zero);
+                return;
+            }
+
             // All physics/movement happens here
             HandleMovementPhysics(deltaTime);
         }
@@ -161,6 +180,8 @@ namespace Game
             SetCursorVisible(cursorWasVisible);
             Unsubscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
             Unsubscribe(EVENT_PLAYER_OOB, OnDamageReceived);
+            Unsubscribe(EVENT_GAMEEND, OnGameEnd);
+            Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
         }
 
         // ========================================
@@ -224,7 +245,6 @@ namespace Game
             SetRotation(playerEntityID, ref playerRot);
         }
 
-        private float moveSpeed = 100.0f;
         private void HandleMovementPhysics(float deltaTime)
         {
             // Get S and W (-1 to 1) and A and D (-1 to 1)
@@ -285,17 +305,17 @@ namespace Game
             //Vector3 exhaustVelocity = -moveDir.Normalized * 100.0f;
             //SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
 
-            Vector3 playerVel = moveDir * forwardSpeed; // or choose forward/back/strafe like earlier
-            RigidbodySetVelocity(playerEntityID, ref playerVel);
+            //Vector3 playerVel = moveDir * spaceshipSpeed; // or choose forward/back/strafe like earlier
+            //RigidbodySetVelocity(playerEntityID, ref playerVel);
 
-            if (moveDir.SqrMagnitude < 1e-8f)
-            {
-                Vector3 zero = Vector3.Zero;
-                RigidbodySetVelocity(playerEntityID, ref zero);
-            }
+            //if (moveDir.SqrMagnitude < 1e-8f)
+            //{
+            //    Vector3 zero = Vector3.Zero;
+            //    RigidbodySetVelocity(playerEntityID, ref zero);
+            //}
 
             Vector3 playerPos = GetPosition(playerEntityID);
-            playerPos = playerPos + moveDir * moveSpeed * deltaTime;
+            playerPos = playerPos + moveDir * spaceshipSpeed * deltaTime;
             SetPosition(playerEntityID, ref playerPos);
             // ----------------------------
             // (b)(c) Camera "plays catch" while staying 5 above & 10 behind
@@ -340,7 +360,7 @@ namespace Game
         private void OnDamageReceived(string eventName, string payload)
         {
 
-            if(playerHP <= 0){
+            if(playerHP <= 0 || endscene){
                 return;
             }
 
@@ -349,7 +369,7 @@ namespace Game
             playerHP -= damage;
 
             LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player " + playerEntityID.ToString() + " gets damage! Health: " + playerHP.ToString() + "/" + playerOriginalHP.ToString());
-
+            LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player from payload" + payload);
             //Send event here to ui 
             //take note playerHP is a float!
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
@@ -363,6 +383,11 @@ namespace Game
             }
         }
 
+        private void OnGameEnd(string eventName, string payload){
+            LogMessage("[Spaceship Controller] Detect game end condition: " + eventName);
+            endscene = true;
+        }
+
         private void emitParticles(Vector3 moveDir)
         {
             // Particle trail
@@ -374,7 +399,7 @@ namespace Game
             float stopThreshold = 1.0f;      // Below this = complete stop
 
             // Calculate speed ratio (0.0 to 1.0)
-            float speedRatio = SimpleMath.Clamp((currentSpeed * moveSpeed)/ moveSpeed, 0.0f, 1.0f);
+            float speedRatio = SimpleMath.Clamp((currentSpeed * spaceshipSpeed) / spaceshipSpeed, 0.0f, 1.0f);
 
             LogMessage("speedRatio: " + speedRatio);
 

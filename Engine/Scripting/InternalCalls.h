@@ -1383,5 +1383,7 @@ namespace Engine {
 		  void Text_SetFontSize(uint32_t entityID, float size);
 		  float Text_GetFontSize(uint32_t entityID);
 
+		  void Text_SetIsVisible(uint32_t entityID, bool visible);
+		  bool Text_GetIsVisible(uint32_t entityID);
 	} // namespace InternalCalls
 } // namespace Engine

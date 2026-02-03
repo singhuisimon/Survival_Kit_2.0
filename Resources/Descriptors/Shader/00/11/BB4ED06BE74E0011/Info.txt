@@ -1,7 +1,0 @@
-{
-  "name": "skybox.frag",
-  "guid": "BB4ED06BE74E0011",
-  "tags": [],
-  "lastImported": "0000000069284C79",
-  "resourceLinks": []
-}

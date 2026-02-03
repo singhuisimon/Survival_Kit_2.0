@@ -1,7 +1,0 @@
-{
-  "name": "Particle_DigitalShapes2.png",
-  "guid": "1F01B881E73AC02B",
-  "tags": [],
-  "lastImported": "00000000697C226B",
-  "resourceLinks": []
-}

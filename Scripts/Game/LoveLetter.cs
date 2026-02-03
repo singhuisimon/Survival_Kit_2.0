@@ -123,6 +123,10 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
             // Handle start delay
             if (delayTimer > 0.0f)
             {

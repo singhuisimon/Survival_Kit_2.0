@@ -50,8 +50,9 @@ namespace Game
         private void OnGameOver(string eventName, string payload)
         {
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
-            //StopAll();
-            //FadeOutAll(5.0f);
+
+            StopGroup(AudioType.BGM);
+            StopGroup(AudioType.SFX);
             SetIsVisible((uint)EntityID, true);
             playaudio = true;
             Publish(GAMEOVER, "");

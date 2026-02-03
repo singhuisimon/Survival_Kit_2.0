@@ -17,6 +17,7 @@ namespace Game{
     public class PlayerWeapon : ScriptBehaviour{
 
         [SerializeField] private bool shootAllowed;
+        [SerializeField] private bool gameEnd;
 
         #region primary
         [SerializeField] private bool primaryShooting = false;  //player is currently shooting
@@ -26,7 +27,7 @@ namespace Game{
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
         [SerializeField] private float primaryShootRate = 0.05f; 
         [SerializeField] private float primaryShootNext = 0.0f;
-        [SerializeField] private float primarybulletSpeed = 1000.0f;
+        [SerializeField] private float primarybulletSpeed = 10000.0f;
 
         //[SerializeField] 
         private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
@@ -46,12 +47,14 @@ namespace Game{
 
         [SerializeField] private bool primaryAltReady = false;
         [SerializeField] private float primaryAltFireAOERange = 30f;
-        [SerializeField] private float primaryUltSpeed = 500.0f;
+        [SerializeField] private float primaryUltSpeed = 5000.0f;
 
         //[SerializeField] 
         private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
 
         private string ULTGAINEVENT = "GainUlt";
+        private string GAMEWIN = "GameWin";
+        private string GAMEOVER = "GameOver";
 
         //2 audio for primary alt fire
         //not sure what is layermask
@@ -109,6 +112,7 @@ namespace Game{
 
             //Initialize Values
             shootAllowed = true;
+            gameEnd = false;
             primaryAmmo = primaryAmmoMax;
             primaryAltCharge = 0;
 
@@ -123,12 +127,29 @@ namespace Game{
             }
 
             Subscribe(ULTGAINEVENT, UltCharging);
+            Subscribe(GAMEOVER, OnGameStateChange);
+            Subscribe(GAMEWIN, OnGameStateChange);
         }
 
         public override void OnUpdate(float deltaTime){
 
             elapsedTime += deltaTime;
-            primaryAltReady = true;
+            //primaryAltReady = true;
+
+            if(gameEnd){
+                LogMessage("[CamControl] player isnt allow to shoot as game ended!");
+                return;
+            }
+
+            //Cheatcode
+            if(Input.IsKeyPressed(KeyCode.O)){
+                PrimaryAltCharge_Reward();
+            }
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+
+            elapsedTime += deltaTime;//primaryAltReady = true;
 
             // Check if reload finished
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)
@@ -144,11 +165,6 @@ namespace Game{
                 LogMessage("[PlayerWeapon] Reload complete!");
             }
 
-            //Cheatcode
-            if(Input.IsKeyPressed(KeyCode.O)){
-                PrimaryAltCharge_Reward();
-            }
-            
             if(!shootAllowed){
                 LogMessage("[CamControl] player isnt allow to shoot!");
                 return;
@@ -168,6 +184,8 @@ namespace Game{
 
         public override void OnDestroy(){
             Unsubscribe(ULTGAINEVENT, UltCharging);
+            Unsubscribe(GAMEWIN, OnGameStateChange);
+            Unsubscribe(GAMEOVER, OnGameStateChange);
         }
 
         private void PrimaryShoot(){
@@ -463,6 +481,12 @@ namespace Game{
                 primaryAltReady = true;
                 LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
             }
+        }
+
+        private void OnGameStateChange(string eventName, string payload){
+            LogMessage("[PlayerWeapon] Game State change detected. State is currently: " + eventName);
+            gameEnd = false;
+            shootAllowed = false;
         }
 
         private bool CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot){

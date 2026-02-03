@@ -1,7 +1,0 @@
-{
-  "name": "Flare6.png",
-  "guid": "04C55881E7FF4019",
-  "tags": [],
-  "lastImported": "00000000697C257D",
-  "resourceLinks": []
-}

@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Prefab: ENVIRONMENT_LevelDesign.prefab",
-    "Prefab GUID": 10923595806739212517,
+    "Prefab Name": "ENVIRONMENT_LevelDesign",
+    "Prefab GUID": 4181971047671253643,
     "version": 1,
     "entities": [
         {
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "12652978063648745381",
+                            "ComponentGUID": "13981803836829075803",
                             "Tag": "ENVIRONMENT_LevelDesign"
                         }
                     }

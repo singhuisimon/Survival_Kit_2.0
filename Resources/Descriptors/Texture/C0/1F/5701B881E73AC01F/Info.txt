@@ -1,7 +1,0 @@
-{
-  "name": "Particle_Circle2.png",
-  "guid": "5701B881E73AC01F",
-  "tags": [],
-  "lastImported": "00000000697C226B",
-  "resourceLinks": []
-}

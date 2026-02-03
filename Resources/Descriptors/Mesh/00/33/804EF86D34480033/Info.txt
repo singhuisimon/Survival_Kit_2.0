@@ -1,7 +1,0 @@
-{
-  "name": "E002_worm_child_v001.fbx",
-  "guid": "804EF86D34480033",
-  "tags": [],
-  "lastImported": "00000000692956A0",
-  "resourceLinks": []
-}
