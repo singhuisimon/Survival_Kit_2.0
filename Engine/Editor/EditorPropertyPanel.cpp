@@ -1074,14 +1074,14 @@ namespace Engine
 				ImGui::Separator();
 
 				float volume = audio.Volume;
-				if (ImGui::SliderFloat("Volume", &volume, 0.f, 1.f))
+				if (ImGui::SliderFloat("Volume", &volume, 0.f, 2.f))
 				{
 					audio.SetVolume(volume);
 					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
 				float pitch = audio.Pitch;
-				if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 1.f))
+				if (ImGui::SliderFloat("Pitch", &pitch, 0.f, 2.f))
 				{
 					audio.SetPitch(pitch);
 					MarkComponentOverridden(ComponentTypeID::Audio);
