@@ -3,6 +3,67 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 65,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Audio_PlayerMove"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5550792659551191879",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "2092028145730782025",
+                        "FilePath": "Player_Move.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4974331907248390987",
+                        "ScriptClassName": "Game.PlayerMoveAudio"
+                    }
+                }
+            ]
+        },
+        {
             "ID": 123,
             "Components": [
                 {
@@ -1264,176 +1325,6 @@
             ]
         },
         {
-            "ID": 1048589,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "SEMICONDUCTOR"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "8217820835958161887",
-                        "PrefabAssetGuid": "11369100325965283631",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "SEMICONDUCTOR",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-293.97662353515625,-200.0,-224.11676025390625],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11865138375784775969\",\"Mesh\":\"\",\"Material\":\"CoreOuter.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11863986098428055233\",\"ScriptClassName\":\"Game.HealthCore\",\"Started\":false,\"GCHandle\":0}}"
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6182897493944947785\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ],
-                        "childEntityIDs": [
-                            1048577,
-                            1048601,
-                            3145783
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15900363641908576543",
-                        "Position": [
-                            -339.9901123046875,
-                            -200.0,
-                            -394.70599365234375
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            150.0,
-                            150.0,
-                            150.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            1048577,
-                            1048601,
-                            3145783
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "11865138375784775969",
-                        "Mesh": "",
-                        "Material": "CoreOuter.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "15322750612248530623",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": true,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            75.0,
-                            75.0,
-                            75.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "6182897493944947785",
-                        "FilePath": "Core_Ambient.wav",
-                        "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 50.12200164794922,
-                        "MaxDistance": 503.1050109863281,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11863986098428055233",
-                        "ScriptClassName": "Game.HealthCore"
-                    }
-                }
-            ]
-        },
-        {
             "ID": 34,
             "Components": [
                 {
@@ -2189,138 +2080,6 @@
             ]
         },
         {
-            "ID": 62,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Particles"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "9370742340565008885",
-                        "PrefabAssetGuid": "11369100325965283631",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "SEMICONDUCTOR",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14827864839706771731\",\"Position\":[-300.0,-210.0,-220.0],\"Rotation\":[90.0,-0.0,90.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048589,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5604492802851995921\",\"Tag\":\"Particles\"}}"
-                            },
-                            {
-                                "componentType": 5,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14827864839706771731",
-                        "Position": [
-                            -300.0,
-                            -210.0,
-                            -220.0
-                        ],
-                        "Rotation": [
-                            90.0,
-                            -0.0,
-                            90.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 1048589,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "Particle Type Advanced": "",
-                        "Material Type": "Core.mat",
-                        "Initial Velocity": [
-                            0.0,
-                            1.5,
-                            0.0
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            15.0,
-                            10.0,
-                            15.0
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Max": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Emitter Shape": 1,
-                        "Max Particles": 50,
-                        "Particle Type": 0,
-                        "Emission Rate": 10.0,
-                        "Particle Lifetime": 4.0,
-                        "Emission Accumulator": 0.7705078125,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.699999988079071,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 180.0,
-                        "Min Speed": 10.0,
-                        "Max Speed": 25.0,
-                        "Rotation Speed": 0.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": true,
-                        "Loop": false,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
-                    }
-                }
-            ]
-        },
-        {
             "ID": 35,
             "Components": [
                 {
@@ -2899,9 +2658,9 @@
                             "shootAllowed": false,
                             "primaryShooting": false,
                             "reloadingPrimary": false,
+                            "primaryAmmo": 0,
                             "CAMSHAKE_primaryFire": 0.05000000074505806,
                             "primaryAmmoMax": 100,
-                            "primaryAmmo": 0,
                             "primaryUltSpeed": 500.0,
                             "primaryReloadDelay": 1.5,
                             "primaryShootRate": 0.05000000074505806,
@@ -2910,8 +2669,8 @@
                             "chargeDelayRate": 0.5,
                             "chargeDelayNext": 0.0,
                             "primaryAltCharging": false,
-                            "muzzleDistance": 5.0,
                             "primaryChargeRate": 0.10000000149011612,
+                            "muzzleDistance": 5.0,
                             "primaryChargeNext": 0.0,
                             "primaryAltCharge": 0,
                             "primaryAltChargeMax": 30,
@@ -3652,8 +3411,8 @@
                         "ScriptClassName": "Game.BotnetSpawning",
                         "Fields": {
                             "interval": 2.0,
-                            "timer": 0.0,
                             "maxBotnets": 20,
+                            "timer": 0.0,
                             "spawnDistance": 1.5,
                             "currentBotnetCount": 0
                         }
@@ -3785,89 +3544,6 @@
                     "Properties": {
                         "ComponentGUID": "8226414618868793991",
                         "ScriptClassName": "Game.SpaceshipController"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 55,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "InnerCore"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "7064899331351314919",
-                        "PrefabAssetGuid": "11369100325965283631",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "SEMICONDUCTOR",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9639718068951728327\",\"Position\":[0.0,0.0000016689300537109375,0.000011444091796875],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.699999988079071,0.699999988079071,0.699999988079071],\"Parent\":1048589,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12522021830468845765\",\"Tag\":\"InnerCore\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15404325591986127051\",\"Mesh\":\"\",\"Material\":\"CoreInner.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "9639718068951728327",
-                        "Position": [
-                            0.0,
-                            0.0000016689300537109375,
-                            0.000011444091796875
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.699999988079071,
-                            0.699999988079071,
-                            0.699999988079071
-                        ],
-                        "Parent": 1048589,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "15404325591986127051",
-                        "Mesh": "",
-                        "Material": "CoreInner.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
                     }
                 }
             ]
@@ -4120,48 +3796,43 @@
             ]
         },
         {
-            "ID": 61,
+            "ID": 38,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "InnermostCore"
+                        "Tag": "SecondayWeaponUI"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "16864732120509514223",
-                        "PrefabAssetGuid": "11369100325965283631",
-                        "isPrefabRoot": false,
+                        "ComponentGUID": "4800767392328679905",
+                        "PrefabAssetGuid": "14091561482188407303",
+                        "isPrefabRoot": true,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "SEMICONDUCTOR",
+                        "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2145728289022197969\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.10546875,-0.0,0.0],\"Scale\":[0.19999995827674866,0.19999994337558746,0.19999994337558746],\"Parent\":1048589,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"733251668581761455\",\"Position\":[520.0,250.8000030517578,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[800.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}"
                             },
                             {
-                                "componentType": 2,
+                                "componentType": 14,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6180953555146293461\",\"Mesh\":\"\",\"Material\":\"Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 11,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"playing\":true,\"respectClipLoop\":true,\"controller\":0,\"currentClipIndex\":0,\"currentTime\":0.0029296875,\"playbackSpeed\":1.0}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11785718472973238703\",\"Texture\":\"AlternateFire_Window.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":0,\"IsActive\":true,\"IsVisible\":true}}"
                             }
                         ]
                     }
@@ -4169,53 +3840,40 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "2145728289022197969",
+                        "ComponentGUID": "733251668581761455",
                         "Position": [
-                            0.0,
-                            0.0,
+                            520.0,
+                            250.8000030517578,
                             0.0
                         ],
                         "Rotation": [
-                            0.10546875,
+                            0.0,
                             -0.0,
                             0.0
                         ],
                         "Scale": [
-                            0.19999995827674866,
-                            0.19999994337558746,
-                            0.19999994337558746
+                            800.0,
+                            500.0,
+                            1.0
                         ],
-                        "Parent": 1048589,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "6180953555146293461",
-                        "Mesh": "",
-                        "Material": "Core.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AnimatorComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "playing": true,
-                        "respectClipLoop": true,
-                        "controller": 0,
-                        "currentClipIndex": 0,
-                        "currentTime": 0.0029296875,
-                        "playbackSpeed": 1.0
+                        "Texture": "AlternateFire_Window.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4325,9 +3983,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -299.5929870605469,
-                            -185.52099609375,
-                            -442.6000061035156
+                            -799.8251342773438,
+                            -402.771240234375,
+                            -136.4805450439453
                         ],
                         "Rotation": [
                             -180.0,
@@ -4518,9 +4176,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            385.8429870605469,
-                            -218.22900390625,
-                            -349.3389892578125
+                            648.1566162109375,
+                            -68.8310775756836,
+                            -390.9233703613281
                         ],
                         "Rotation": [
                             -180.0,
@@ -5505,43 +5163,219 @@
             ]
         },
         {
-            "ID": 38,
+            "ID": 1048637,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "SecondayWeaponUI"
+                        "Tag": "SEMICONDUCTOR"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "4800767392328679905",
-                        "PrefabAssetGuid": "14091561482188407303",
+                        "ComponentGUID": "15996513763143467769",
+                        "PrefabAssetGuid": "3179884947895714893",
                         "isPrefabRoot": true,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "SecondayWeaponUI",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SEMICONDUCTOR.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"733251668581761455\",\"Position\":[520.0,250.8000030517578,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[800.0,500.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-293.97662353515625,-200.0,-224.11676025390625],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}"
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}"
                             },
                             {
-                                "componentType": 14,
+                                "componentType": 2,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11785718472973238703\",\"Texture\":\"AlternateFire_Window.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":0,\"IsActive\":true,\"IsVisible\":true}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11865138375784775969\",\"Mesh\":\"\",\"Material\":\"CoreOuter.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16438482250874045513\",\"FilePath\":\"Core_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":52.55500030517578,\"MaxDistance\":502.072998046875,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11863986098428055233\",\"ScriptClassName\":\"Game.HealthCore\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            13,
+                            14,
+                            15
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15900363641908576543",
+                        "Position": [
+                            -389.9940185546875,
+                            -200.0,
+                            -468.0501708984375
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            150.0,
+                            150.0,
+                            150.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            13,
+                            14,
+                            15
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "11865138375784775969",
+                        "Mesh": "",
+                        "Material": "CoreOuter.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "15322750612248530623",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            75.0,
+                            75.0,
+                            75.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "16438482250874045513",
+                        "FilePath": "Core_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 52.55500030517578,
+                        "MaxDistance": 502.072998046875,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11863986098428055233",
+                        "ScriptClassName": "Game.HealthCore"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 13,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "InnerCore"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5043759469378421505",
+                        "PrefabAssetGuid": "3179884947895714893",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9639718068951728327\",\"Position\":[0.0,0.0000016689300537109375,0.000011444091796875],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.699999988079071,0.699999988079071,0.699999988079071],\"Parent\":1048637,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12522021830468845765\",\"Tag\":\"InnerCore\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15404325591986127051\",\"Mesh\":\"\",\"Material\":\"CoreInner.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14774164696410211153\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ]
                     }
@@ -5549,10 +5383,878 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "733251668581761455",
+                        "ComponentGUID": "9639718068951728327",
                         "Position": [
-                            520.0,
-                            250.8000030517578,
+                            0.0,
+                            0.0000016689300537109375,
+                            0.000011444091796875
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.699999988079071,
+                            0.699999988079071,
+                            0.699999988079071
+                        ],
+                        "Parent": 1048637,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "15404325591986127051",
+                        "Mesh": "",
+                        "Material": "CoreInner.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "14774164696410211153",
+                        "FilePath": "Core_Health_Damage_Alert.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 14,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "InnermostCore"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11384827744716079881",
+                        "PrefabAssetGuid": "3179884947895714893",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2145728289022197969\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.10546875,-0.0,0.0],\"Scale\":[0.19999995827674866,0.19999994337558746,0.19999994337558746],\"Parent\":1048637,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6180953555146293461\",\"Mesh\":\"\",\"Material\":\"Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 11,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"playing\":true,\"respectClipLoop\":true,\"controller\":0,\"currentClipIndex\":0,\"currentTime\":0.0029296875,\"playbackSpeed\":1.0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2145728289022197969",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.10546875,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.19999995827674866,
+                            0.19999994337558746,
+                            0.19999994337558746
+                        ],
+                        "Parent": 1048637,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "6180953555146293461",
+                        "Mesh": "",
+                        "Material": "Core.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0029296875,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 15,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Particles"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11384827744716079887",
+                        "PrefabAssetGuid": "3179884947895714893",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14827864839706771731\",\"Position\":[-300.0,-210.0,-220.0],\"Rotation\":[90.0,-0.0,90.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048637,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5604492802851995921\",\"Tag\":\"Particles\"}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14827864839706771731",
+                        "Position": [
+                            -389.0,
+                            -200.0,
+                            -468.0
+                        ],
+                        "Rotation": [
+                            90.0,
+                            -0.0,
+                            90.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048637,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "Core.mat",
+                        "Initial Velocity": [
+                            0.0,
+                            1.5,
+                            0.0
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            15.0,
+                            10.0,
+                            15.0
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Max": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Emitter Shape": 1,
+                        "Max Particles": 50,
+                        "Particle Type": 0,
+                        "Emission Rate": 10.0,
+                        "Particle Lifetime": 4.0,
+                        "Emission Accumulator": 0.7705078125,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 180.0,
+                        "Min Speed": 10.0,
+                        "Max Speed": 25.0,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": true,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": true,
+                        "Burst Mode": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 17,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5043759469380977433",
+                        "PrefabAssetGuid": "2724132980133514753",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[-180.0,18.266550064086914,-180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8488740503167356413\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.353000164031982,\"MaxDistance\":150.5570068359375,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            18
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            -688.1275634765625,
+                            -345.65130615234375,
+                            -695.7079467773438
+                        ],
+                        "Rotation": [
+                            180.0,
+                            18.266550064086914,
+                            180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            18
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "8488740503167356413",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.353000164031982,
+                        "MaxDistance": 150.5570068359375,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 18,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1008534203257013025",
+                        "PrefabAssetGuid": "2724132980133514753",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":17,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16803977504970506833",
+                        "Position": [
+                            -0.0009765625,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -4.071109497693487e-13,
+                            0.0000017075473124350538,
+                            -3.0533325976085657e-13
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0000001192092896,
+                            1.0
+                        ],
+                        "Parent": 17,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "16803977504970768979",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 22,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15996513763147596587",
+                        "PrefabAssetGuid": "2724132980133514753",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[-180.0,18.266550064086914,-180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8488740503167356413\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.353000164031982,\"MaxDistance\":150.5570068359375,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            23
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            -182.0192413330078,
+                            -496.03472900390625,
+                            888.9649658203125
+                        ],
+                        "Rotation": [
+                            180.0,
+                            18.266550064086914,
+                            180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            23
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "8488740503167356413",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.353000164031982,
+                        "MaxDistance": 150.5570068359375,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 23,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "2737916460168856371",
+                        "PrefabAssetGuid": "2724132980133514753",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":22,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16803977504970506833",
+                        "Position": [
+                            -0.0009765625,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -4.071109497693487e-13,
+                            0.0000017075473124350538,
+                            -3.0533325976085657e-13
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0000001192092896,
+                            1.0
+                        ],
+                        "Parent": 22,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "16803977504970768979",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 24,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4467298717081781053",
+                        "PrefabAssetGuid": "2724132980133514753",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[-180.0,18.266550064086914,-180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8488740503167356413\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.353000164031982,\"MaxDistance\":150.5570068359375,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            55
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            166.57730102539063,
+                            -173.92425537109375,
+                            406.1313171386719
+                        ],
+                        "Rotation": [
+                            180.0,
+                            18.266550064086914,
+                            180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            55
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "8488740503167356413",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.353000164031982,
+                        "MaxDistance": 150.5570068359375,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 55,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5620220221688628037",
+                        "PrefabAssetGuid": "2724132980133514753",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":24,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16803977504970506833",
+                        "Position": [
+                            -0.0009765625,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -4.071109497693487e-13,
+                            0.0000017075473124350538,
+                            -3.0533325976085657e-13
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0000001192092896,
+                            1.0
+                        ],
+                        "Parent": 24,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "16803977504970768979",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 62,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Audio_WeaponReload"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18404285898377724773",
+                        "Position": [
+                            0.0,
+                            0.0,
                             0.0
                         ],
                         "Rotation": [
@@ -5561,8 +6263,8 @@
                             0.0
                         ],
                         "Scale": [
-                            800.0,
-                            500.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -5570,19 +6272,23 @@
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_Window.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 0,
-                        "IsActive": true,
-                        "IsVisible": true
+                        "ComponentGUID": "2839845586185503591",
+                        "FilePath": "Primary_Reload.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]

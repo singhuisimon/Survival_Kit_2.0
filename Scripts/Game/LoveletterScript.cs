@@ -42,7 +42,7 @@ namespace Game
 
         // ===== SIMPLE HEALTH SYSTEM =====
         [SerializeField] private float maxHealth = 100.0f;
-        private float currentHealth = 100.0f;
+        [SerializeField] private float currentHealth = 100.0f;
         private bool isDead = false;
 
         // ===== MOVEMENT STATE =====
@@ -225,8 +225,10 @@ namespace Game
                 return;
             float damage = DamageSystem.ParseAmount(payload);
             currentHealth -= damage;
-            if (currentHealth < 0.0f)
+            
+            if (currentHealth < 0.0f){
                 currentHealth = 0.0f;
+            }
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
             if(attackerId != INVALID_ENTITY){
@@ -242,6 +244,12 @@ namespace Game
                         LogMessage("[LoveletterScript] Player Hit! But hitmarkerID fail to instantiate");
                     }
                 }
+            }
+
+            if (currentHealth <= 0.0f)
+            {
+                Publish("LoveLetterDeath", 1.ToString());
+                DestroyLoveLetter();
             }
         }
 

@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: audio_hitmarker.prefab",
-    "Prefab GUID": 4097299860260455975,
+    "Prefab Name": "Prefab: audio_Player_Kill.prefab",
+    "Prefab GUID": 8132525126384961077,
     "version": 1,
     "entities": [
         {
-            "Name": "audio_hitmarker",
+            "Name": "audio_Player_Kill",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "49927187906053511",
+                            "ComponentGUID": "5169754705885119297",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9849759977066599205",
-                            "Tag": "audio_hitmarker"
+                            "ComponentGUID": "10934362228919354175",
+                            "Tag": "audio_Player_Kill"
                         }
                     }
                 },
@@ -49,11 +49,11 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6967456215547659657",
-                            "FilePath": "Player_Hitmarker.wav",
+                            "ComponentGUID": "15546048247346987843",
+                            "FilePath": "Player_Kill.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.9919999837875366,
+                            "Volume": 0.8190000057220459,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -72,7 +72,7 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4661613206334752139",
+                            "ComponentGUID": "16698969751954162501",
                             "ScriptClassName": "Game.GameDelaySoundPrefab",
                             "Started": false,
                             "GCHandle": 467

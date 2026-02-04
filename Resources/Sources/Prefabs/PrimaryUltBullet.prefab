@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "PrimaryUltBullet",
-    "Prefab GUID": 1621885758344331537,
+    "Prefab Name": "Prefab: PrimaryUltBullet.prefab",
+    "Prefab GUID": 16674903641464586441,
     "version": 1,
     "entities": [
         {
@@ -98,6 +98,29 @@
                     }
                 },
                 {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14945521384552923333",
+                            "FilePath": "Player_Secondary_Fire.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 0.07599999755620956,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 50.81800079345703,
+                            "MaxDistance": 218.41799926757813,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
@@ -105,7 +128,7 @@
                             "ComponentGUID": "9692336290588672261",
                             "ScriptClassName": "Game.PrimaryUltFire",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
                         }
                     }
                 }

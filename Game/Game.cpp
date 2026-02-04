@@ -1417,6 +1417,13 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
+	// Reload current game scene (Level1_NewPlayer)
+	if (input.IsKeyJustPressed(GLFW_KEY_R) && !editorCamToggle)
+	{
+		LOG_INFO("=== RELOADING GAME SCENE ===");
+		LoadSceneFromEvent("Resources/Sources/Scenes/Level1_NewPlayer.json");
+	}
+
 	// UNCOMMENT IF YOU NEED TO SPAWN A FIRST TIME INSTANCE OF A ENTITY THAT HAS SUBMESH HERE - AMANDA
 	// ADJUST THE SUBMESH COUNT ACCORDINGLY ARIGATO
 	// SAME FOR THE NAME!

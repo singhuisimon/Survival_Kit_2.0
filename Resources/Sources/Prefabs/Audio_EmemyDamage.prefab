@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: audio_hitmarker.prefab",
-    "Prefab GUID": 4097299860260455975,
+    "Prefab Name": "Prefab: Audio_EmemyDamage.prefab",
+    "Prefab GUID": 14197703944110263389,
     "version": 1,
     "entities": [
         {
-            "Name": "audio_hitmarker",
+            "Name": "Audio_EmemyDamage",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "49927187906053511",
+                            "ComponentGUID": "5550792659556811605",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9849759977066599205",
-                            "Tag": "audio_hitmarker"
+                            "ComponentGUID": "2092028145736270675",
+                            "Tag": "Audio_EmemyDamage"
                         }
                     }
                 },
@@ -49,11 +49,11 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6967456215547659657",
-                            "FilePath": "Player_Hitmarker.wav",
+                            "ComponentGUID": "18232929210232406871",
+                            "FilePath": "Enemy Deal Damage.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.9919999837875366,
+                            "Volume": 0.40700000524520874,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -72,10 +72,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4661613206334752139",
+                            "ComponentGUID": "6703714164164559705",
                             "ScriptClassName": "Game.GameDelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 467
+                            "GCHandle": 827
                         }
                     }
                 }
