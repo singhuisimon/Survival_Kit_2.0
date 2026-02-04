@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "",
+    "baseMap": "E004_botnet_v003_COLOURS COMBINED_Flipped.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
