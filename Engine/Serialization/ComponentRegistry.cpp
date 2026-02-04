@@ -44,11 +44,18 @@ namespace Engine {
         {
             auto& meta = REGISTER_COMPONENT(TagComponent);
             meta.AddProperty<TagComponent, std::string>(
+                "Name",
+                PropertyType::String,
+                [](const TagComponent& c) { return c.Name; },
+                [](TagComponent& c, const std::string& v) { c.Name = v; }
+            );
+            meta.AddProperty<TagComponent, std::string>(
                 "Tag",
                 PropertyType::String,
                 [](const TagComponent& c) { return c.Tag; },
                 [](TagComponent& c, const std::string& v) { c.Tag = v; }
             );
+
         }
 
         // Register TransformComponent

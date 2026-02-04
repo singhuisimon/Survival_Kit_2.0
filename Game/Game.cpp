@@ -950,7 +950,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	for (auto entityHandle : view)
 	{
 		auto &tag = view.get<Engine::TagComponent>(entityHandle);
-		if (tag.Tag == "Player")
+		if (tag.Name == "Player")
 		{ // change to whatever name you want
 			foundEntity = Engine::Entity(entityHandle, &registry);
 			found = true;
@@ -964,7 +964,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	for (auto entityHandle : view)
 	{
 		auto &camTag = view.get<Engine::TagComponent>(entityHandle);
-		if (camTag.Tag == "MainCamera")
+		if (camTag.Name == "MainCamera")
 		{
 			GameCam = Engine::Entity(entityHandle, &registry);
 			GameCamFound = true;
@@ -977,7 +977,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	for (auto entityHandle : view)
 	{
 		auto &camTag = view.get<Engine::TagComponent>(entityHandle);
-		if (camTag.Tag == "SecondCamera")
+		if (camTag.Name == "SecondCamera")
 		{
 			SecCam = Engine::Entity(entityHandle, &registry);
 			SecCamFound = true;
@@ -990,7 +990,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	for (auto entityHandle : view)
 	{
 		auto &timerBarUITag = view.get<Engine::TagComponent>(entityHandle);
-		if (timerBarUITag.Tag == "TimerBar")
+		if (timerBarUITag.Name == "TimerBar")
 		{
 			timerBarUI = Engine::Entity(entityHandle, &registry);
 			timerBarUIFound = true;
@@ -1003,7 +1003,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	for (auto entityHandle : view)
 	{
 		auto &healthUITag = view.get<Engine::TagComponent>(entityHandle);
-		if (healthUITag.Tag == "HealthBar")
+		if (healthUITag.Name == "HealthBar")
 		{
 			healthBarUI = Engine::Entity(entityHandle, &registry);
 			healthBarUIFound = true;

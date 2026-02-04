@@ -6,6 +6,7 @@ namespace Engine
     {
         // Register as: "Engine.Scene::Scene_*" (same method names)
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern uint Scene_FindEntityByName(string name);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern uint Scene_FindEntityByTag(string tag);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern uint Scene_CreateEntity(string name);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Scene_DestroyEntity(uint entity);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern uint[] Scene_FindEntitiesByTag(string tag);
@@ -24,6 +25,7 @@ namespace Engine
         public static void EntityAddTag(uint entityID) => Entity_AddTag(entityID);
 
         public static uint SceneFindEntityByName(string name) => Scene_FindEntityByName(name ?? string.Empty);
+        public static uint SceneFindEntityByTag(string tag) => Scene_FindEntityByTag(tag ?? string.Empty);
         public static uint SceneCreateEntity(string name) => Scene_CreateEntity(name ?? string.Empty);
         public static void SceneDestroyEntity(uint entity) => Scene_DestroyEntity(entity);
         public static uint[] SceneFindEntitiesByTag(string tag) => Scene_FindEntitiesByTag(tag ?? string.Empty);

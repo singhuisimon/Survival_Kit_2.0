@@ -179,7 +179,7 @@ namespace Engine
         }
 
         std::string rootEntityName = rootEntity.HasComponent<TagComponent>()
-            ? rootEntity.GetComponent<TagComponent>().Tag
+            ? rootEntity.GetComponent<TagComponent>().Name
             : "Unknown";
 
         LOG_INFO("Successfully instantiated prefab '", prefab.name,
@@ -344,7 +344,7 @@ namespace Engine
             Entity addedEntity(static_cast<entt::entity>(addedHandle), &scene->GetRegistry());
             if (addedEntity) {
                 std::string entityName = addedEntity.HasComponent<TagComponent>()
-                    ? addedEntity.GetComponent<TagComponent>().Tag : "Unknown";
+                    ? addedEntity.GetComponent<TagComponent>().Name : "Unknown";
                 LOG_INFO("Removing added entity: ", entityName);
                 scene->DestroyEntity(addedEntity);
 
@@ -794,7 +794,7 @@ namespace Engine
             PrefabEntityData* childPrefabData = nullptr;
 
             if (childEntity.HasComponent<TagComponent>()) {
-                std::string childName = childEntity.GetComponent<TagComponent>().Tag;
+                std::string childName = childEntity.GetComponent<TagComponent>().Name;
                 for (auto& prefabEntity : prefab.entities) {
                     if (prefabEntity.name == childName && prefabEntity.parentLocalID == prefab.entities[0].localID) {
                         childPrefabData = &prefabEntity;
@@ -867,7 +867,7 @@ namespace Engine
                 if (!childEntity) continue;
 
                 std::string childName = childEntity.HasComponent<TagComponent>()
-                    ? childEntity.GetComponent<TagComponent>().Tag
+                    ? childEntity.GetComponent<TagComponent>().Name
                     : "Unknown";
 
                 LOG_INFO("Adding new entity: ", childName);
@@ -1223,7 +1223,7 @@ namespace Engine
         }
 
         LOG_INFO("Reverting entity: ", entity.HasComponent<TagComponent>() ?
-            entity.GetComponent<TagComponent>().Tag : "Unknown");
+            entity.GetComponent<TagComponent>().Name : "Unknown");
 
         // Restore removed components
         auto removedComponents = prefabComp.GetRemovedComponents();
@@ -1289,7 +1289,7 @@ namespace Engine
         auto& prefabComp = entity.GetComponent<PrefabComponent>();
 
         LOG_INFO("Applying overrides for entity: ",
-            entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().Tag : "Unknown");
+            entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().Name : "Unknown");
 
         // Handle removed components
         auto removedComponents = prefabComp.GetRemovedComponents();
@@ -1488,7 +1488,7 @@ namespace Engine
 
             // Find this entity in the prefab by name
             if (current.HasComponent<TagComponent>()) {
-                std::string name = current.GetComponent<TagComponent>().Tag;
+                std::string name = current.GetComponent<TagComponent>().Name;
 
                 for (const auto& prefabEntity : prefab.entities) {
                     if (prefabEntity.name == name) {

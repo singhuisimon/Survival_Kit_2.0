@@ -32,7 +32,9 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			//float leftColumnWidth = 200.0f * m_Editor->GetFontScale();
 			ImGui::Columns(2, nullptr, true);
+			//ImGui::SetColumnWidth(0, leftColumnWidth);
 			//static std::string selectedFolder = "";
 			//static ResourceType selectedType = ResourceType::UNKNOWN;
 
@@ -149,9 +151,12 @@ namespace Engine
 				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
 				ImGui::Separator();
 
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
+			
+				const float baseThumbnailSize = 150.0f;
+				const float thumbnailSize = baseThumbnailSize * m_Editor->GetFontScale(); // Scale the box
+				const float padding = 10.0f * m_Editor->GetFontScale();
 				const float cellSize = thumbnailSize + padding;
+			
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 				int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
 
@@ -283,8 +288,9 @@ namespace Engine
 
 				ImGui::Separator();
 
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
+				const float baseThumbnailSize = 150.0f;
+				const float thumbnailSize = baseThumbnailSize * m_Editor->GetFontScale(); // Scale the box
+				const float padding = 10.0f * m_Editor->GetFontScale();
 				const float cellSize = thumbnailSize + padding;
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));

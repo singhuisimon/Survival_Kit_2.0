@@ -97,6 +97,9 @@ namespace Engine
 
 		std::string m_CurrentPrefabPath;
 		std::string m_CurrentPrefabName;
+
+		float m_FontScale = 0.70f;
+		ImGuiStyle m_BaseStyle;
 	
 	public:
 		
@@ -179,6 +182,14 @@ namespace Engine
 		u32 GetPickedID() { return m_PickedID; }
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
+
+		float GetFontScale() { return m_FontScale; }
+		ImGuiStyle GetBaseStyle() { return m_BaseStyle; }
+		
+		void SetFontScale(float fontScale)
+		{
+			m_FontScale = fontScale;
+		}
 		void ViewportClickAndTeleport();
 		bool GetEditorIsPlaying();
 		// ================== Helper Function ======================

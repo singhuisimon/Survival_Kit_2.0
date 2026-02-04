@@ -54,6 +54,7 @@ namespace Engine {
 				propertiesObj.AddMember("ComponentGUID",
 										Value(std::to_string(tag.ComponentGUID.m_Value).c_str(), allocator),
 										allocator);
+				propertiesObj.AddMember("Name", Value(tag.Name.c_str(), allocator), allocator);
 				propertiesObj.AddMember("Tag", Value(tag.Tag.c_str(), allocator),
 										allocator);
 
@@ -623,7 +624,9 @@ namespace Engine {
 						std::stoull(properties["ComponentGUID"].GetString())
 					);
 				}
-
+				if (properties.HasMember("Name")) {
+					tag.Name = properties["Name"].GetString();
+				}
 				if(properties.HasMember("Tag")) {
 					tag.Tag = properties["Tag"].GetString();
 				}

@@ -117,6 +117,15 @@ namespace Engine {
 		uint64_t Scene_FindEntityByName(MonoString *nameString);
 		/**************************************************************************
 		 * @brief
+		 * Finds an entity by tag in the current scene.
+		 * @param tagString
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @return
+		 * Entity identifier (0 if not found / invalid).
+		***************************************************************************/
+		uint64_t Scene_FindEntityByTag(MonoString* TagString);
+		/**************************************************************************
+		 * @brief
 		 * Returns the native entity ID associated with a managed Entity wrapper.
 		 * @param entityObj
 		 * Managed object provided by the scripting runtime (MonoObject*).

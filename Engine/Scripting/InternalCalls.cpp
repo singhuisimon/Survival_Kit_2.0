@@ -407,6 +407,23 @@ namespace Engine {
 			return static_cast<uint32_t>(entity);
 		}
 
+		uint64_t Scene_FindEntityByTag(MonoString* tagString) {
+			if (!s_CurrentScene || !tagString)
+				return 0;
+
+			char* tagStr = mono_string_to_utf8(tagString);
+			if (!tagStr)
+				return 0;
+
+			std::string tag(tagStr);
+			mono_free(tagStr);
+
+			if (tag.empty())
+				return 0;
+
+			Entity entity = s_CurrentScene->FindEntityByTag(tag);
+			return static_cast<uint32_t>(entity);
+		}
 		// =====================================================================
 		// Logging
 		// =====================================================================

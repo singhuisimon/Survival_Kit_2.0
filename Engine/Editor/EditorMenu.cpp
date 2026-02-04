@@ -585,7 +585,7 @@ namespace Engine
 
 			// Pre-fill with selected entity's name if available
 			if (selectedEntity.HasComponent<TagComponent>()) {
-				std::string entityName = selectedEntity.GetComponent<TagComponent>().Tag;
+				std::string entityName = selectedEntity.GetComponent<TagComponent>().Name;
 				size_t copySize = entityName.size();
 				size_t maxSize = sizeof(saveAsDefaultPrefabName) - 1;
 				if (copySize > maxSize) {
@@ -605,7 +605,7 @@ namespace Engine
 			// Show selected entity name
 			std::string selectedName = "None";
 			if (selectedEntity.HasComponent<TagComponent>()) {
-				selectedName = selectedEntity.GetComponent<TagComponent>().Tag;
+				selectedName = selectedEntity.GetComponent<TagComponent>().Name;
 			}
 			ImGui::Text("Selected Entity: %s", selectedName.c_str());
 

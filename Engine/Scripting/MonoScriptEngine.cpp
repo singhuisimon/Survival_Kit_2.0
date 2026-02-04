@@ -1190,6 +1190,8 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::Scene_DestroyEntity));
 		BindInternalCall("Engine.Scene::Scene_FindEntityByName",
 						 reinterpret_cast<void *>(InternalCalls::Scene_FindEntityByName));
+		BindInternalCall("Engine.Scene::Scene_FindEntityByTag",
+						reinterpret_cast<void*>(InternalCalls::Scene_FindEntityByTag));
 		BindInternalCall("Engine.Scene::Scene_FindEntitiesByTag",
 						 reinterpret_cast<void *>(InternalCalls::Scene_FindEntitiesByTag));
 		BindInternalCall("Engine.Scene::Entity_AddScript",

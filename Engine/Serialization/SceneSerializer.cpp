@@ -109,6 +109,7 @@ namespace Engine {
 				componentObj.AddMember("Type", "TagComponent", allocator);
 
 				Value propertiesObj(kObjectType);
+				propertiesObj.AddMember("Name", Value(tag.Name.c_str(), allocator), allocator);
 				propertiesObj.AddMember("Tag", Value(tag.Tag.c_str(), allocator), allocator);
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 
@@ -965,7 +966,11 @@ namespace Engine {
 				const Value &components = entityObj["Components"];
 				for(SizeType j = 0; j < components.Size(); j++) {
 					if(components[j]["Type"].GetString() == std::string("TagComponent")) {
-						entityName = components[j]["Properties"]["Tag"].GetString();
+						const auto& props = components[j]["Properties"];
+						if (props.HasMember("Name"))
+							entityName = props["Name"].GetString();
+						else if (props.HasMember("Tag"))
+							entityName = props["Tag"].GetString();
 						break;
 					}
 				}
@@ -1002,8 +1007,17 @@ namespace Engine {
 
 					// Deserialize specific component types
 					if(componentType == "TagComponent") {
-						auto &tag = entity.AddComponent<TagComponent>();
-						tag.Tag = properties["Tag"].GetString();
+						auto& tagComp = entity.AddComponent<TagComponent>();
+
+						// Load the Name
+						if (properties.HasMember("Name"))
+							tagComp.Name = properties["Name"].GetString();
+					
+						// Load the Tag
+						if (properties.HasMember("Tag"))
+						{
+							tagComp.Tag = properties["Tag"].GetString();
+						}
 					}
 					else if(componentType == "PrefabComponent") {
 						LOG_TRACE("  - Deserializing PrefabComponent");

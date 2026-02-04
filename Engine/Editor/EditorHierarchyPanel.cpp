@@ -133,7 +133,7 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
 			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
 			{
-				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
+				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Name.c_str());
 			}
 			ImGui::Separator();
 			ImGui::BeginChild("##EntityListAttach", ImVec2(0, 300), true);
@@ -150,7 +150,7 @@ namespace Engine
 				// Only show main entities (no parent) that aren't the entity itself
 				if (transform.Parent == u32_max && entity != entityToAttach)
 				{
-					std::string entityName = entity.GetComponent<TagComponent>().Tag;
+					std::string entityName = entity.GetComponent<TagComponent>().Name;
 
 					// Make them selectable - user must CLICK to attach
 					if (ImGui::Selectable(entityName.c_str()))
@@ -162,7 +162,7 @@ namespace Engine
 						auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
 						childTransform.SetParent(entity);
 
-						LOG_INFO("Attached '", entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
+						LOG_INFO("Attached '", entityToAttach.GetComponent<TagComponent>().Name.c_str(),
 							"' as child of '", entityName.c_str(), "'");
 
 						entityToAttach = Entity{};  // Clear after successful attach
@@ -231,7 +231,7 @@ namespace Engine
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
 
-		bool openedTree = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+		bool openedTree = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Name.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -241,7 +241,7 @@ namespace Engine
 			m_Editor->SetCurrSelectedEntity(entity);
 			m_Editor->RetrievePickedID(static_cast<u32>(entity.GetHandle()));
 
-			LOG_DEBUG("Selected entity: ", tag.Tag.c_str());
+			LOG_DEBUG("Selected entity: ", tag.Name.c_str());
 			LOG_DEBUG("new currSelectedEntity: ", static_cast<uint32_t>(m_Editor->GetSelectedEntity().GetHandle()));
 			//LOG_DEBUG("NEW m_PickedID: ", m_PickedID);
 			LOG_DEBUG("Editor's picked ID: ", m_Editor->GetPickedID());
@@ -267,7 +267,7 @@ namespace Engine
 						// Only track if it has a valid prefabLocalID
 						if (entityPrefabComp.prefabLocalID != 0) {
 							std::string entityName = entity.HasComponent<TagComponent>()
-								? entity.GetComponent<TagComponent>().Tag : "Unknown";
+								? entity.GetComponent<TagComponent>().Name : "Unknown";
 
 							// Serialize entity data BEFORE deletion
 							std::string entityData = SerializeEntityForRevert(entity);
@@ -339,7 +339,7 @@ namespace Engine
 
 								if (childPrefabComp.prefabLocalID != 0) {
 									std::string childName = childEntity.HasComponent<TagComponent>()
-										? childEntity.GetComponent<TagComponent>().Tag : "Unknown";
+										? childEntity.GetComponent<TagComponent>().Name : "Unknown";
 
 									std::string childData = SerializeEntityForRevert(childEntity);
 
@@ -381,7 +381,7 @@ namespace Engine
 						if (currentSelectedEntity)
 						{
 							LOG_DEBUG(" ========== Start Create Prefab =========");
-							std::string entityName = currentSelectedEntity.GetComponent<TagComponent>().Tag;
+							std::string entityName = currentSelectedEntity.GetComponent<TagComponent>().Name;
 							//LOG_DEBUG(" entityName: ", entityName);
 							auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 							
@@ -711,7 +711,7 @@ namespace Engine
 			// Add parent info display
 			if (parentOfPrefabEntity)
 			{
-				std::string parentName = parentOfPrefabEntity.GetComponent<TagComponent>().Tag;
+				std::string parentName = parentOfPrefabEntity.GetComponent<TagComponent>().Name;
 				ImGui::Text("Will attach to: %s", parentName.c_str());
 				ImGui::Separator();
 			}
@@ -738,7 +738,7 @@ namespace Engine
 							LOG_INFO("=== Instantiating prefab as sub-entity ===");
 							LOG_INFO("Prefab file: ", file.name);
 							if (parentOfPrefabEntity) {
-								LOG_INFO("Parent: ", parentOfPrefabEntity.GetComponent<TagComponent>().Tag);
+								LOG_INFO("Parent: ", parentOfPrefabEntity.GetComponent<TagComponent>().Name);
 							}
 
 							Entity prefabInstance = PrefabInstantiator::InstantiatePrefabFromFile(
@@ -850,7 +850,7 @@ namespace Engine
 				return;
 			}
 
-			std::string entityName = entityToReplace.GetComponent<TagComponent>().Tag;
+			std::string entityName = entityToReplace.GetComponent<TagComponent>().Name;
 			ImGui::Text("Replace entity '%s' with prefab:", entityName.c_str());
 			ImGui::Separator();
 
@@ -1003,7 +1003,7 @@ namespace Engine
 	}
 
 	std::string EditorHierarchyPanel::SerializeEntityForRevert(Entity entity) {
-		// This is a simplified version - you can expand it to serialize full entity state
+		
 		if (!entity) {
 			return "";
 		}
@@ -1015,9 +1015,13 @@ namespace Engine
 		// Add entity name
 		if (entity.HasComponent<TagComponent>()) {
 			auto& tag = entity.GetComponent<TagComponent>();
+			doc.AddMember("Name",
+				rapidjson::Value(tag.Name.c_str(), allocator), allocator);
 			doc.AddMember("Tag",
 				rapidjson::Value(tag.Tag.c_str(), allocator), allocator);
 		}
+
+
 
 		// Serialize ALL components
 		rapidjson::Value componentsArray(rapidjson::kArrayType);

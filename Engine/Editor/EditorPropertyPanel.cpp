@@ -130,28 +130,54 @@ namespace Engine
 		// Display entity name (TagComponent)
 		if (m_SelectedEntity.HasComponent<TagComponent>())
 		{
+			
+			float scale = m_Editor->GetFontScale();
 			auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
+		
+			
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Tag);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
+			bool openTagComponent = ImGui::CollapsingHeader("Tag Component", ImGuiTreeNodeFlags_DefaultOpen);
+
 			if (isComponentOverridden)
 				ImGui::PopStyleColor();
-
-			char buffer[256];
-			strncpy_s(buffer, sizeof(buffer), tag.Tag.c_str(), _TRUNCATE);
-			if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			
+			if (openTagComponent)
 			{
-				std::string newTag = buffer;
-				newTag.erase(newTag.find_last_not_of(" \t\n\r\f\v") + 1);
-				newTag.erase(0, newTag.find_first_not_of(" \t\n\r\f\v"));
-
-				if (!newTag.empty())
+				ImGui::PushItemWidth(200.0f * scale);
+				char buffer[256];
+				strncpy_s(buffer, sizeof(buffer), tag.Name.c_str(), _TRUNCATE);
+				if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					tag.Tag = newTag;
-					MarkComponentOverridden(ComponentTypeID::Tag, "Tag");
+					std::string newName = buffer;
+
+					newName.erase(newName.find_last_not_of(" \t\n\r\f\v") + 1);
+					newName.erase(0, newName.find_first_not_of(" \t\n\r\f\v"));
+
+					if (!newName.empty())
+					{
+						tag.Name = newName;
+						MarkComponentOverridden(ComponentTypeID::Tag, "Name");
+
+					}
 
 				}
+				char tagBuf[256];
+				strncpy_s(tagBuf, sizeof(tagBuf), tag.Tag.c_str(), _TRUNCATE);
+				if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf), ImGuiInputTextFlags_EnterReturnsTrue)) {
+					std::string newTag = tagBuf;
+					newTag.erase(newTag.find_last_not_of(" \t\n\r\f\v") + 1);
+					newTag.erase(0, newTag.find_first_not_of(" \t\n\r\f\v"));
+					if (!newTag.empty())
+					{
+						tag.Tag = newTag;
+						MarkComponentOverridden(ComponentTypeID::Tag, "Tag");
 
+					}
+				}
+				ImGui::PopItemWidth();
 			}
 		}
 	}
@@ -162,7 +188,7 @@ namespace Engine
 		if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool openPrefabComp = ImGui::CollapsingHeader("Prefab Component", ImGuiTreeNodeFlags_DefaultOpen);
 
 			bool removePrefabComp = false;
@@ -377,22 +403,24 @@ namespace Engine
 	void EditorPropertyPanel::DisplayRigidBodyComponent(ImVec2& buttonSize){
 		if (m_SelectedEntity.HasComponent<RigidbodyComponent>())
 		{
+			float scale = m_Editor->GetFontScale();
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::RigidBody);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
 			// col 1: RigidBody component header
-			bool openRigidBody = ImGui::CollapsingHeader("Rigid Body", ImGuiTreeNodeFlags_DefaultOpen);
+			bool openRigidBody = ImGui::CollapsingHeader("Rigid Body Component", ImGuiTreeNodeFlags_DefaultOpen);
 
 			if (isComponentOverridden)
 				ImGui::PopStyleColor();
 
 			bool removeRigidBody = false; // for remove part
-			// col2: ...
+	
 			ImGui::NextColumn();
+			
 			if (ImGui::Button("...###RigidbodyBtn", buttonSize))
 			{
 				ImGui::OpenPopup("RigidBodyPopUp");
@@ -421,7 +449,7 @@ namespace Engine
 			if (openRigidBody)
 			{
 				auto& rigidBody = m_SelectedEntity.GetComponent<RigidbodyComponent>();
-
+				
 				// Mass
 				float rigidMass = rigidBody.GetMass();
 				if (ImGui::DragFloat("Mass", &rigidMass, 0.1f, 0.0f, 1000.0f))
@@ -569,6 +597,7 @@ namespace Engine
 				bool isStatic = rigidBody.IsStatic();
 				ImGui::Checkbox("Is Static", &isStatic);
 				ImGui::EndDisabled();
+				
 			}
 
 			// Remove Rigid Body Component
@@ -585,7 +614,7 @@ namespace Engine
 			ImGui::Separator();
 
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			// Check if this component is overridden
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::MeshRenderer);
@@ -911,7 +940,7 @@ namespace Engine
 			ImGui::Separator();
 
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Audio);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -1237,7 +1266,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::ReverbZone);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -1374,7 +1403,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Listerner);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -1439,7 +1468,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			bool openBTComponent = ImGui::CollapsingHeader("Behaviour Tree Component", ImGuiTreeNodeFlags_DefaultOpen);
 
@@ -1752,7 +1781,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::ParticleSystem);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -2308,7 +2337,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Script);
 			if (isComponentOverridden)
@@ -2462,7 +2491,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Light);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -2658,7 +2687,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Camera);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -2827,7 +2856,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Animator);
 			if (isComponentOverridden)
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
@@ -3002,7 +3031,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			bool isComponentOverriden = IsComponentOverridden(ComponentTypeID::SpriteRenderer);
 			if (isComponentOverriden)
@@ -3101,7 +3130,7 @@ namespace Engine
 		if (m_SelectedEntity.HasComponent<TextComponent>()) {
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			bool  isComponentOverridden = IsComponentOverridden(ComponentTypeID::Text);
 
@@ -3274,7 +3303,7 @@ namespace Engine
 		{
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, headerWidth);
 
 			bool isComponentOverriden = IsComponentOverridden(ComponentTypeID::Trail);
 			if (isComponentOverriden)
@@ -5179,7 +5208,7 @@ namespace Engine
 	void EditorPropertyPanel::AddComponent(){
 		ImGui::Separator();
 		ImVec2 windowSize = ImGui::GetWindowSize(); // get Properties window sizes
-		ImVec2  addComponetbtnSize(140, 40); // set button size
+		ImVec2  addComponetbtnSize(240, 60); // set button size
 
 		// Calculate centered position for x axis
 		ImGui::SetCursorPosX((windowSize.x - addComponetbtnSize.x) * 0.5f);

@@ -7,10 +7,59 @@ namespace Engine
 	{
 		if (!m_Editor->GetPerformanceProfileWindowRef()) return;
 		std::weak_ptr<TracyProfiler> profilerWeak = m_Editor->GetProfiler();
-		ImGui::SetNextWindowSize(ImVec2(500, 300));
+		ImGui::SetNextWindowSize(ImVec2(500, 420), ImGuiCond_FirstUseEver);
 
 		if (ImGui::Begin("Performance Profile", &m_Editor->GetPerformanceProfileWindowRef(), ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Text("Editor Settings:");
+
+			float currentScale = m_Editor->GetFontScale();
+			if (ImGui::SliderFloat("UI Scale", &currentScale, 0.5f, 2.0f, "%.2f"))
+			{
+				m_Editor->SetFontScale(currentScale);
+
+				// Update Font scale (this is fine as it's an absolute set)
+				ImGui::GetIO().FontGlobalScale = currentScale;
+
+				// Fix: Start from the 1.0 base style every time
+				ImGui::GetStyle() = m_Editor->GetBaseStyle();
+
+				// Scale the fresh style by the absolute currentScale
+				ImGui::GetStyle().ScaleAllSizes(currentScale);
+			}
+
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Adjusts the size of all text and UI elements.");
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Spacing();
+
+
+			// Theme Editor
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Text("Theme Settings:");
+
+			static int currentTheme = 0; // 0: Dark, 1: Light, 2: Classic
+			const char* themes[] = { "Dark", "Light", "Classic"};
+
+			if (ImGui::Combo("Editor Theme", &currentTheme, themes, IM_ARRAYSIZE(themes)))
+			{
+				switch (currentTheme)
+				{
+				case 0: ImGui::StyleColorsDark(); break;
+				case 1: ImGui::StyleColorsLight(); break;
+				case 2: ImGui::StyleColorsClassic(); break;
+				}
+
+				// IMPORTANT: Re-apply your current UI Scale after switching themes
+				// Switching themes resets all padding/sizes to 1.0f scale defaults.
+				float currentScale = m_Editor->GetFontScale();
+				ImGui::GetStyle().ScaleAllSizes(currentScale);
+			}
+
 			ImGui::Text("Tracy Window:");
 			// Launches Tracy.exe when copied to correct folder
 			if (ImGui::Button("Launch Tracy Window"))
