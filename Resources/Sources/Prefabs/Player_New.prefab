@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Player_New",
-    "Prefab GUID": 14186101895932910849,
+    "Prefab Name": "Prefab: Player_New.prefab",
+    "Prefab GUID": 11291298886907086695,
     "version": 1,
     "entities": [
         {
-            "Name": "Player_New",
+            "Name": "Player",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -40,7 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14762562648235121599",
-                            "Tag": "Player_New"
+                            "Tag": "Player"
                         }
                     }
                 },
@@ -197,7 +197,7 @@
                             "ComponentGUID": "9026023440310174993",
                             "ScriptClassName": "Game.PlayerWeapon",
                             "Started": false,
-                            "GCHandle": 18419
+                            "GCHandle": 627
                         }
                     }
                 }
