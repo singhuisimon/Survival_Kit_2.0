@@ -21,22 +21,15 @@ namespace Engine {
 		(void)ts;
 
 		auto& registry = scene->GetRegistry();
-		auto camView = registry.view<CameraComponent>();
+		auto view = registry.view<CameraComponent, TransformComponent>();
 
-		for (auto cam : camView) {
+		for (auto entity : view) {
 
-			// Get entity's camera component
-			Entity entity(cam, &registry);
-			auto& camera = entity.GetComponent<CameraComponent>();
+			auto& camera = view.get<CameraComponent>(entity);
+			auto& trans = view.get<TransformComponent>(entity);
 
 			// Camera must be enabled to proceed
 			if (!camera.Enabled) { continue; }
-
-			// Check if it has transform component
-			if (!entity.HasComponent<TransformComponent>()) continue;
-			
-			// Get transform component
-			auto& trans = entity.GetComponent<TransformComponent>();
 
 			// Update aspect ratio if autoAspect is on 
 			if (camera.autoAspect) {
