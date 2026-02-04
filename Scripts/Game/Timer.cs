@@ -46,7 +46,7 @@ namespace Game
             LogMessage("[TimerUI] Initialized - Starting at " + startingTime + " seconds");
         }
 
-        public override void OnFixedUpdate(float deltaTime)
+        public override void OnUpdate(float deltaTime)
         {
             if (!initialized || gameOver)
                 return;
