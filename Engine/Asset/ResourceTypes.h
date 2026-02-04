@@ -42,6 +42,12 @@ enum class ResourceType {
 	SHADER,
 	ENTITY_PREFAB,
 	SCENE_PREFAB,
+	PREFAB,
+	SCENE,
+	ANIMATIONCLIPS,
+	AUDIOSETTING,
+	FONTS,
+	ANIMATIONCONTROLLERS,
 	UNKNOWN
 };
 
@@ -66,6 +72,18 @@ inline std::string resourceTypeToString(ResourceType type) {
 		return "EntityPrefab";
 	case ResourceType::SCENE_PREFAB:
 		return "ScenePrefab";
+	case ResourceType::PREFAB:
+		return "Prefab";
+	case ResourceType::SCENE:
+		return "Scene";
+	case ResourceType::ANIMATIONCLIPS:
+		return "AnimationClips";
+	case ResourceType::ANIMATIONCONTROLLERS:
+		return "AnimationControllers";
+	case ResourceType::FONTS:
+		return "Fonts";
+	case ResourceType::AUDIOSETTING:
+		return "AudioSetting";
 	default:
 		return "Unknown";
 	}
@@ -90,6 +108,18 @@ inline ResourceType stringToResourceType(const std::string& type_str) {
 		return ResourceType::ENTITY_PREFAB;
 	if (type_str == "ScenePrefab")
 		return ResourceType::SCENE_PREFAB;
+	if (type_str == "Prefab")
+		return ResourceType::PREFAB;
+	if (type_str == "Scene")
+		return ResourceType::SCENE;
+	if (type_str == "AnimationClips")
+		return ResourceType::ANIMATIONCLIPS;
+	if (type_str == "AnimationControllers")
+		return ResourceType::ANIMATIONCONTROLLERS;
+	if (type_str == "Fonts")
+		return ResourceType::FONTS;
+	if (type_str == "AudioSetting")
+		return ResourceType::AUDIOSETTING;
 	return ResourceType::UNKNOWN;
 }
 /**
@@ -121,7 +151,16 @@ inline std::vector<std::string> getResourceTypeExtension(ResourceType type) {
 
 	case ResourceType::SCENE_PREFAB:
 		return { "sprefab" };
-
+	case ResourceType::PREFAB:
+		return { "prefab" };
+	case ResourceType::SCENE:
+		return { "json" };
+	case ResourceType::ANIMATIONCLIPS:
+		return { "animclip" };
+	case ResourceType::ANIMATIONCONTROLLERS:
+		return { "animcontroller" };
+	case ResourceType::FONTS:
+		return { "ttf" };
 	default:
 		return {};
 
@@ -146,7 +185,7 @@ inline ResourceType detectResourceTypeFromPath(const std::string& file_path) {
 	std::transform(file_extension.begin(), file_extension.end(), file_extension.begin(), ::tolower);
 
 	//check resource type
-	for (int i = 0; i <= static_cast<int>(ResourceType::SCENE_PREFAB); ++i) {
+	for (int i = 0; i <= static_cast<int>(ResourceType::UNKNOWN); ++i) {
 		ResourceType type = static_cast<ResourceType>(i);
 		auto extensions = getResourceTypeExtension(type); //get the string of the extensions
 

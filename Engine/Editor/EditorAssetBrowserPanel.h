@@ -56,6 +56,7 @@ namespace Engine
 		char m_SearchBuffer[256] = "";
 		std::string m_SearchQuery = "";
 		std::vector<FilteredAssetInfo> m_FilteredAssets;
+		ResourceType m_FilterType = ResourceType::UNKNOWN;
 
 
 

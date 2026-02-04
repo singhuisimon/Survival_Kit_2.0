@@ -467,25 +467,48 @@ namespace Engine
 			// ===== SEARCH BAR =====
 			ImGui::Text("Search:");
 			ImGui::SameLine();
-
+			ImGui::PushItemWidth(500.0f);
 			if (ImGui::InputText("##AssetSearch", m_SearchBuffer, sizeof(m_SearchBuffer)))
 			{
 				m_SearchQuery = std::string(m_SearchBuffer);
 				FilterAssetsBySearchQuery();
 			}
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			ImGui::PushItemWidth(150.0f);
+			if (ImGui::BeginCombo("##TypeFilter", resourceTypeToString(m_FilterType).c_str()))
+			{
+				if (ImGui::Selectable("All Types", m_FilterType == ResourceType::UNKNOWN))
+				{
+					m_FilterType = ResourceType::UNKNOWN;
+					FilterAssetsBySearchQuery(); // Refresh search
+				}
 
+				for (int i = 1; i < (int)ResourceType::UNKNOWN; i++)
+				{
+					ResourceType t = static_cast<ResourceType>(i);
+					if (ImGui::Selectable(resourceTypeToString(t).c_str(), m_FilterType == t))
+					{
+						m_FilterType = t;
+						FilterAssetsBySearchQuery(); // Refresh search
+					}
+				}
+				ImGui::EndCombo();
+			}
+			ImGui::PopItemWidth();
 			ImGui::SameLine();
 			if (ImGui::Button("Clear"))
 			{
 				m_SearchBuffer[0] = '\0';
 				m_SearchQuery = "";
+				m_FilterType = ResourceType::UNKNOWN;
 				m_FilteredAssets.clear();
 				selectedResourcesIndex = -1;
 			}
 
 			ImGui::Separator();
 
-			bool isSearching = !m_SearchQuery.empty();
+			bool isSearching = !m_SearchQuery.empty() || m_FilterType != ResourceType::UNKNOWN;
 
 			ImGui::Columns(2, nullptr, true);
 
@@ -1052,9 +1075,9 @@ namespace Engine
 			// Convert asset name to lowercase
 			std::string lowerFileName = fileName;
 			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
-
-			// Check if the file name contains the search query
-			if (lowerFileName.find(lowerQuery) != std::string::npos)
+			bool matchesText = lowerFileName.find(m_SearchQuery) != std::string::npos;
+			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (record->type == m_FilterType);
+			if (matchesText && matchesType)
 			{
 				FilteredAssetInfo info;
 				info.fileName = fileName;
@@ -1115,16 +1138,29 @@ namespace Engine
 				SearchFolderRecursive(folderPath + asset.name + "/", displayFolder, lowerQuery);
 				continue;
 			}
-
+			ResourceType assetType = detectResourceTypeFromPath(asset.fullPath);
+			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (assetType == m_FilterType);
 			// Convert asset name to lowercase
 			std::string lowerFileName = asset.name;
 			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
+			bool matchesText = lowerQuery.empty() || lowerFileName.find(lowerQuery) != std::string::npos;
+			
+			if (m_FilterType != ResourceType::UNKNOWN) {
+				std::string ext = std::filesystem::path(asset.name).extension().string();
+				// Map your extensions to ResourceTypes
+				if (m_FilterType == ResourceType::ENTITY_PREFAB && ext != ".prefab") matchesType = false;
+				else if (m_FilterType == ResourceType::SCENE_PREFAB && ext != ".json") matchesType = false;
+				else if (m_FilterType == ResourceType::MESH && ext != ".fbx") matchesType = false;
+			}
 
-			// Check if the file name contains the search query (ONLY filename, not folder)
-			if (lowerFileName.find(lowerQuery) != std::string::npos)
+			//bool matchesText = lowerQuery.empty() || lowerFileName.find(lowerQuery) != std::string::npos;
+
+			if (matchesText && matchesType)
 			{
 				FilteredAssetInfo info;
 				info.fileName = asset.name;
+
+				// Re-use path logic for consistent tooltips
 				std::filesystem::path p(asset.fullPath);
 				info.folderPath = p.parent_path().filename().string();
 
