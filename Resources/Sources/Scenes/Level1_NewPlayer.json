@@ -5367,6 +5367,15 @@
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
                                 "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15404325591986127051\",\"Mesh\":\"\",\"Material\":\"CoreInner.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14774164696410211153\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ]
                     }
@@ -5409,6 +5418,26 @@
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "14774164696410211153",
+                        "FilePath": "Core_Health_Damage_Alert.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
