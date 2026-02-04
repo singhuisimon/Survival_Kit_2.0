@@ -69,6 +69,7 @@ namespace Game
             // Entities
             { "player", CollisionCategory.PLAYER },
             { "gunshiphelper", CollisionCategory.ALLY },
+            { "gunship", CollisionCategory.ALLY },
             { "sentry", CollisionCategory.ALLY },
             
             // Enemies
