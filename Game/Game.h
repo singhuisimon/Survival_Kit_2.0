@@ -56,6 +56,7 @@ private:
     bool m_IsFirstPausedFrame = true;
 
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
+	std::string m_CurrentScenePath;
 
     void AddAllSystems();
     void AddAllSystemsToScene(Engine::Scene* scene);

@@ -32,22 +32,26 @@ namespace Engine {
         void EnableFileLogging(const std::string& filepath);
 
         template<typename... Args>
-        void Log(LogLevel level, Args&&... args) {
+        void Log(LogLevel level, Args&&... args)
+        {
+#ifdef DEBUG
             if (level < m_MinLevel) return;
-
             std::lock_guard<std::mutex> lock(m_Mutex);
-
             std::ostringstream oss;
             oss << "[" << GetLevelString(level) << "] ";
             (oss << ... << args);
-
             std::string message = oss.str();
             std::cout << message << std::endl;
-
-            if (m_FileLoggingEnabled && m_FileStream.is_open()) {
+            if (m_FileLoggingEnabled && m_FileStream.is_open())
+            {
                 m_FileStream << message << std::endl;
                 m_FileStream.flush();
             }
+#else
+            // Suppress unused parameter warnings in release builds
+            (void)level;
+            ((void)args, ...);
+#endif
         }
 
         // Convenience methods

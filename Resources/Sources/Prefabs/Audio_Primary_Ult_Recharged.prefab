@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: audio_hitmarker.prefab",
-    "Prefab GUID": 4097299860260455975,
+    "Prefab Name": "Audio_Primary_Ult_Recharged",
+    "Prefab GUID": 2839845586191860599,
     "version": 1,
     "entities": [
         {
-            "Name": "audio_hitmarker",
+            "Name": "Audio_Primary_Ult_Recharged",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "49927187906053511",
+                            "ComponentGUID": "2839845586187436911",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9849759977066599205",
-                            "Tag": "audio_hitmarker"
+                            "ComponentGUID": "1686924081580589933",
+                            "Tag": "Audio_Primary_Ult_Recharged"
                         }
                     }
                 },
@@ -49,11 +49,11 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6967456215547659657",
-                            "FilePath": "Player_Hitmarker.wav",
+                            "ComponentGUID": "11486756870739460977",
+                            "FilePath": "Player_Secondary_Reload.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.9919999837875366,
+                            "Volume": 1.0,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -72,10 +72,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4661613206334752139",
+                            "ComponentGUID": "12639678375349846899",
                             "ScriptClassName": "Game.GameDelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 467
+                            "GCHandle": 227
                         }
                     }
                 }
