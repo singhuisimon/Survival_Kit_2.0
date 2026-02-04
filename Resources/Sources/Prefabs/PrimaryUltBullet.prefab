@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryUltBullet.prefab",
-    "Prefab GUID": 16674903641464586441,
+    "Prefab GUID": 1785062091527995621,
     "version": 1,
     "entities": [
         {
@@ -51,7 +51,7 @@
                         "Properties": {
                             "ComponentGUID": "15456943813623808267",
                             "Mesh": "",
-                            "Material": "testma2.mat",
+                            "Material": "PrimaryUltBullet.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -128,7 +128,7 @@
                             "ComponentGUID": "9692336290588672261",
                             "ScriptClassName": "Game.PrimaryUltFire",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 }
