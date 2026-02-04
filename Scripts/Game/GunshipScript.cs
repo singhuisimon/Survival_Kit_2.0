@@ -51,6 +51,8 @@ namespace Game
             LogMessage("====Gunship Helper Started====");
             LogMessage("Helper EntityID: " + EntityID);
 
+            TagSetTag((uint)EntityID, "GunshipHelper");
+
             Subscribe(GAMEOVEREVENT, OnGameEnd);
             Subscribe(GAMEWINEVENT, OnGameEnd);
 

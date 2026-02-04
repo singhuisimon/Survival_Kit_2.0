@@ -83,8 +83,8 @@ namespace Game
         private const string TAG_SEMICONDUCTOR = "SEMICONDUCTOR";
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
-        private const string TAG_ALLIES = "ALLIES";
-        //private const string TAG_ALLIES = "Gunship";
+        //private const string TAG_ALLIES = "ALLIES";
+        private const string TAG_ALLIES = "Gunship";
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
         //private const string EVENT_BULLET_HIT = "BulletHit";
@@ -361,6 +361,7 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
+            //int choice = 3; // detect Gunship only for testing
             LogMessage("[Botnet] CHOICE IS: " + choice.ToString() + "for entity: " + EntityID.ToString());
 
             uint chosen = INVALID_ENTITY;

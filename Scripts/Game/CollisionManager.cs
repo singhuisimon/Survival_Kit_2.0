@@ -80,7 +80,6 @@ namespace Game
             { "wormchild", CollisionCategory.ENEMY },
             { "enemy_core", CollisionCategory.ENEMY },
             { "enemyturret", CollisionCategory.ENEMY },
-            { "gunship", CollisionCategory.ENEMY },
             
             // Objectives
             { "semiconductor", CollisionCategory.CORE },
