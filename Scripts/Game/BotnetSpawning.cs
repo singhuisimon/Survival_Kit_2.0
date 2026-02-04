@@ -169,7 +169,7 @@ namespace Game {
 
         private void CheckCurrentBotnetCount(){
             currentBotnetCount = SceneFindEntitiesByTag(BOTNETTAG).Length;
-            LogMessage("[BotnetSpawning] Current botnet count exceeds max botnet allowed! " + currentBotnetCount.ToString() + "/" + maxBotnets.ToString());
+            LogMessage("[BotnetSpawning] Current botnet count is: " + currentBotnetCount.ToString() + "/" + maxBotnets.ToString());
         }
     }
 
