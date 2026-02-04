@@ -42,7 +42,7 @@ namespace Game
 
         // ===== SIMPLE HEALTH SYSTEM =====
         [SerializeField] private float maxHealth = 100.0f;
-        private float currentHealth = 100.0f;
+        [SerializeField] private float currentHealth = 100.0f;
         private bool isDead = false;
 
         // ===== MOVEMENT STATE =====
