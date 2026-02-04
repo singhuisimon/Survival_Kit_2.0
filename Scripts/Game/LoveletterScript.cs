@@ -20,6 +20,10 @@ namespace Game
         [SerializeField] private string coreTag = "SEMICONDUCTOR";
         private uint selectedCoreEntityID = 0;
 
+        // ===== BULLET TAG ======
+        private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
+        private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
         // ===== PREFAB =====
         [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
@@ -68,6 +72,9 @@ namespace Game
         private string EVENT_BULLET_HIT = "Damage:";
         private const string GAMEOVER = "GameOver";
         private const string GAMEWIN = "GameWin";
+
+        // ==== OTHER VALUES =====
+        private const uint INVALID_ENTITY = 0xffffffffu;
 
         public override void OnStart()
         {
@@ -221,20 +228,20 @@ namespace Game
             if (currentHealth < 0.0f)
                 currentHealth = 0.0f;
 
-            //instantiate the hitmarker audio
-            Vector3 spawnPos = GetPosition((uint)EntityID);
-            Quat spawnRot = GetRotation((uint)EntityID);
-            Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
-            uint hitmarkerID = 0;
-            hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
-            if(hitmarkerID == 0){
-                LogMessage("[LoveletterScript] Player Hit! But hitmarkerID fail to instantiate");
-            }
-
-            if (currentHealth <= 0.0f)
-            {
-                Publish("LoveLetterDeath", 1.ToString());
-                DestroyLoveLetter();
+            uint attackerId = DamageSystem.ParseAttackerId(payload);
+            if(attackerId != INVALID_ENTITY){
+                string attackerTag = TagGetTag(attackerId);
+                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
+                    //instantiate the hitmarker audio
+                    Vector3 spawnPos = GetPosition((uint)EntityID);
+                    Quat spawnRot = GetRotation((uint)EntityID);
+                    Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
+                    uint hitmarkerID = 0;
+                    hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                    if(hitmarkerID == 0){
+                        LogMessage("[LoveletterScript] Player Hit! But hitmarkerID fail to instantiate");
+                    }
+                }
             }
         }
 
