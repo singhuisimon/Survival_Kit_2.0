@@ -5,6 +5,7 @@ using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Rigidbody;
+using static Engine.Audio;
 
 namespace Game
 {
@@ -29,6 +30,7 @@ namespace Game
 
         public override void OnStart()
         {
+            
         }
 
         public override void OnUpdate(float deltaTime)
@@ -52,6 +54,8 @@ namespace Game
                 RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
                 wasPaused = false;
             }
+
+            AudioPlay((uint)EntityID);
 
             // Lifetime check
             elapsedTime += deltaTime;
@@ -109,6 +113,8 @@ namespace Game
             Publish("GainUlt", UltRecharged.ToString());
             
             LogMessage("BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID + " damage=" + Damage);
+
+            AudioStop((uint)EntityID);
 
             // Destroy the bullet
             SceneDestroyEntity(bulletEntityID);
