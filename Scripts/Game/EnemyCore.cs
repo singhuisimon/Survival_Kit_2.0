@@ -84,7 +84,7 @@ namespace Game
             Quat spawnrot = GetRotation((uint)EntityID);
             Vector3 spawnscale = GetScale((uint)EntityID);
 
-            // Spawn the ult bullet
+            // Spawn the explosion
             uint explosion = PrefabInstantiateWithTransform(EnemyCore_ExplosionPrefab, ref spawnpos, ref spawnrot, ref spawnscale, false);
             if(explosion == 0){
                 LogMessage("[EnemyCore] EnemyCore_ExplosionPrefab fail to instantiate");
@@ -92,6 +92,8 @@ namespace Game
             } else {
                 LogMessage("[EnemyCore] Instantiating EnemyCore_ExplosionPrefab success! ID is: " + explosion.ToString());
             }
+
+            Publish("EnemyCoreDeath", "");
 
             SceneDestroyEntity((uint)EntityID);            
         }

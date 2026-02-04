@@ -1204,7 +1204,7 @@
                         "Quad": 3,
                         "Sprite Layer": 3,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2630,7 +2630,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Player_New"
+                        "Tag": "Player"
                     }
                 },
                 {
@@ -2899,9 +2899,9 @@
                             "shootAllowed": false,
                             "primaryShooting": false,
                             "reloadingPrimary": false,
-                            "primaryAmmo": 0,
                             "CAMSHAKE_primaryFire": 0.05000000074505806,
                             "primaryAmmoMax": 100,
+                            "primaryAmmo": 0,
                             "primaryUltSpeed": 500.0,
                             "primaryReloadDelay": 1.5,
                             "primaryShootRate": 0.05000000074505806,
@@ -2910,8 +2910,8 @@
                             "chargeDelayRate": 0.5,
                             "chargeDelayNext": 0.0,
                             "primaryAltCharging": false,
-                            "primaryChargeRate": 0.10000000149011612,
                             "muzzleDistance": 5.0,
+                            "primaryChargeRate": 0.10000000149011612,
                             "primaryChargeNext": 0.0,
                             "primaryAltCharge": 0,
                             "primaryAltChargeMax": 30,
@@ -3652,8 +3652,8 @@
                         "ScriptClassName": "Game.BotnetSpawning",
                         "Fields": {
                             "interval": 2.0,
-                            "maxBotnets": 20,
                             "timer": 0.0,
+                            "maxBotnets": 20,
                             "spawnDistance": 1.5,
                             "currentBotnetCount": 0
                         }
