@@ -45,10 +45,10 @@ namespace Game
         [SerializeField] private float maxInheritedSpeed = 250.0f;
 
         // Guarantee bullet forward speed is at least this much faster than player forward speed.
-        [SerializeField] private float minBulletOverPlayerSpeed = 50.0f;
+        [SerializeField] private float minBulletOverPlayerSpeed = 100.0f;
 
         // Absolute minimum forward speed for the bullet (world space).
-        [SerializeField] private float minWorldBulletSpeed = 150.0f;
+        [SerializeField] private float minWorldBulletSpeed = 300.0f;
 
         //[SerializeField]
         private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
