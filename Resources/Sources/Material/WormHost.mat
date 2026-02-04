@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Firewall_active.png",
+    "baseMap": "",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
@@ -8,20 +8,20 @@
     "occlusionMap": "",
     "baseColor": [
         1.0,
-        0.0,
+        0.8823529481887817,
         0.0
     ],
     "emissionColor": [
         1.0,
-        0.0,
+        0.6764705777168274,
         0.0
     ],
     "metallic": 0.0,
-    "roughness": 0.0,
+    "roughness": 0.07000000029802322,
     "opacity": 1.0,
-    "emissionStrength": 1.7999999523162842,
-    "alphaThreshold": 1.0,
-    "ambientOcclusion": 1.0,
+    "emissionStrength": 1.090000033378601,
+    "alphaThreshold": 0.5120000243186951,
+    "ambientOcclusion": 0.5,
     "tiling": [
         1.0,
         1.0

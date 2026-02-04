@@ -27,7 +27,7 @@ namespace Game
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
         [SerializeField] private float bulletSpeed = 3000f;
-        [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/PrimaryBullet.prefab";
+        [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
 
         // === PRIVATE STATES ===
         private const uint INVALID_ENTITY = 0xffffffffu;

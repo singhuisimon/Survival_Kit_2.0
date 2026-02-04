@@ -15,6 +15,7 @@ namespace Game
     public class WinScreen : ScriptBehaviour
     {
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
         private const string GAMEWIN = "GameWin";
 
         private bool initialized = false;
@@ -26,6 +27,7 @@ namespace Game
 
             // Subscribe to timer finished
             Event.Subscribe(EVENT_TIMER_FINISHED, OnWin);
+            Event.Subscribe(ENEMY_CORE_DEATH, OnWin);
 
             // Start hidden
             SetIsVisible((uint)EntityID, false);
@@ -46,6 +48,7 @@ namespace Game
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnWin);
+            Event.Unsubscribe(ENEMY_CORE_DEATH, OnWin);
             LogMessage("=== WinScreen Destroyed ===");
         }
     }

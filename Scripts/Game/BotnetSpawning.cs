@@ -27,6 +27,7 @@ namespace Game {
 
         private string botnetprefab = "Sources/Prefabs/Enemy_Botnet.prefab";
 
+        private string BOTNETTAG = "botnet";
         private string GAMEOVEREVENT = "GameOver";
         private const string GAMEWINEVENT = "GameWin";
 
@@ -65,9 +66,12 @@ namespace Game {
             if (GameState.IsPaused)
                 return;
 
-            // if(currentBotnetCount >= maxBotnets){
-            //     return;
-            // }
+            CheckCurrentBotnetCount();
+
+            if(currentBotnetCount >= maxBotnets){
+                LogMessage("[BotnetSpawning] Current botnet count exceeds max botnet allowed! " + currentBotnetCount.ToString() + "/" + maxBotnets.ToString());
+                return;
+            }
 
             if(!canSpawn){
                 LogMessage("[BOTNETSTOPSPAWNING]");
@@ -135,11 +139,9 @@ namespace Game {
                 return; //comment this for debugging temp
             }
 
-            currentBotnetCount++;
             LogMessage("Spawning Botnet Current Count is: " + currentBotnetCount.ToString() +
             " on wall " + (wallIndex + 1).ToString() + " at " + spawnPosition.ToString());
-            
-            
+   
         }
 
         private Vector3 GetRandomPositionOnWall(uint wallEntityID, float wallWidth, float wallHeight){
@@ -163,6 +165,11 @@ namespace Game {
             Vector3 worldPosition = wallPosition + rotatedOffset;
             
             return worldPosition;
+        }
+
+        private void CheckCurrentBotnetCount(){
+            currentBotnetCount = SceneFindEntitiesByTag(BOTNETTAG).Length;
+            LogMessage("[BotnetSpawning] Current botnet count is: " + currentBotnetCount.ToString() + "/" + maxBotnets.ToString());
         }
     }
 

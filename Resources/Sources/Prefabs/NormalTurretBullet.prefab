@@ -1,6 +1,6 @@
 {
     "Prefab Name": "NormalTurretBullet",
-    "Prefab GUID": 3929531950767898929,
+    "Prefab GUID": 4169506987283125203,
     "version": 1,
     "entities": [
         {
@@ -13,11 +13,11 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "14708449052447573071",
+                            "ComponentGUID": "8204732253400765361",
                             "Position": [
-                                9.139241218566896,
                                 0.0,
-                                0.03385651111602783
+                                0.0,
+                                0.0
                             ],
                             "Rotation": [
                                 0.0,
@@ -25,8 +25,8 @@
                                 0.0
                             ],
                             "Scale": [
-                                0.30000001192092896,
-                                0.20000000298023224,
+                                0.15000000596046448,
+                                0.15000000596046448,
                                 0.15000000596046448
                             ],
                             "Parent": 4294967295,
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "18341050758352961779",
+                            "ComponentGUID": "18004565042558964655",
                             "Tag": "NormalTurretBullet"
                         }
                     }
@@ -49,18 +49,18 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3179234006381429845",
-                            "Mesh": "Temp_PlayerPrimaryBullet.fbx",
-                            "Material": "PrimaryBullet.mat",
+                            "ComponentGUID": "7051810748794426311",
+                            "Mesh": "Temp_PrimarySecondaryBullet.fbx",
+                            "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 0
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 },
@@ -69,7 +69,7 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "8367380777110881361",
+                            "ComponentGUID": "710742473456669635",
                             "Mass": 1.0,
                             "IsKinematic": false,
                             "IsTrigger": false,
@@ -102,20 +102,20 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "12402606043238302807",
-                            "FilePath": "Player_primary_alt_fire.wav",
+                            "ComponentGUID": "8204732253401207749",
+                            "FilePath": "Player_Primary_Fire.wav",
                             "Type": 1,
-                            "State": 2,
-                            "Volume": 0.45100000500679016,
+                            "State": 0,
+                            "Volume": 0.4880000054836273,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 4.185999870300293,
-                            "MaxDistance": 104.63200378417967,
+                            "MinDistance": 18.8439998626709,
+                            "MaxDistance": 256.2539978027344,
                             "RolloffMode": 0,
-                            "DopplerLevel": 1.0,
+                            "DopplerLevel": 1.4780000448226929,
                             "Pan2D": 0.0
                         }
                     }
@@ -123,7 +123,56 @@
                 {
                     "type": 8,
                     "typeName": "ScriptComponent",
-                    "data": {}
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15122261281046205391",
+                            "ScriptClassName": "Game.NormalTurretBullet",
+                            "Started": false,
+                            "GCHandle": 2291
+                        }
+                    }
+                },
+                {
+                    "type": 16,
+                    "typeName": "TrailComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7628271501097948105",
+                            "Material Type": "",
+                            "Max Segments": 50,
+                            "Segment Lifetime": 1.0,
+                            "Min Distance": 0.10000000149011612,
+                            "Sample Interval": 0.01600000075995922,
+                            "Sample Accumulator": 0.0,
+                            "Start Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "End Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Width": 0.10000000149011612,
+                            "End Width": 0.05000000074505806,
+                            "Last Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Local Offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Has Last Position": false,
+                            "Active": true,
+                            "Emit Trail": true
+                        }
+                    }
                 }
             ]
         }
