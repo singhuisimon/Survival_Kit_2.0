@@ -1,13 +1,17 @@
 using Engine;
 using System;
 using static Engine.Scene;
+using static Engine.Audio;
 
 namespace Game
 {
-    public class GameSoundPrefabLifetime : ScriptBehaviour
+    public class GameDelaySoundPrefab : ScriptBehaviour
     {
         [SerializeField]
-        public float Lifetime = 2.0f;
+        public float Lifetime = 5.0f;
+
+        [SerializeField]
+        public float delayedTime = 0.5f;
 
         //for debug purpose
         [SerializeField]
@@ -16,13 +20,15 @@ namespace Game
         private float savedTime = 0.0f;
         private bool wasPaused = false;
 
+        private bool played = false;
+
         public override void OnStart()
         {
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            
+
             // Handle pause - pause timer
             if (GameState.IsPaused)
             {
@@ -42,6 +48,14 @@ namespace Game
 
             // Lifetime
             elapsedTime += deltaTime;
+
+            if(elapsedTime >= delayedTime){
+                if(!played){
+                    AudioPlay((uint)EntityID);
+                    played = true;
+                }
+            }
+
             if (elapsedTime >= Lifetime)
             {
                 SceneDestroyEntity((uint)EntityID);
