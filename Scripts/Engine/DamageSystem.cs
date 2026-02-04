@@ -51,5 +51,30 @@ namespace Engine
 
             return defaultValue;
         }
+
+        /// <summary>
+        /// Parse "attacker=" from the payload string.
+        /// Returns the attacker entity ID, or 0 if not found.
+        /// </summary>
+        public static uint ParseAttackerId(string payload, uint defaultValue = 0)
+        {
+            if (string.IsNullOrEmpty(payload))
+                return defaultValue;
+
+            // Expect "amount=10;attacker=5" style.
+            string[] parts = payload.Split(';');
+            for (int i = 0; i < parts.Length; ++i)
+            {
+                string part = parts[i];
+                if (part.StartsWith("attacker=", StringComparison.OrdinalIgnoreCase))
+                {
+                    string value = part.Substring("attacker=".Length);
+                    if (uint.TryParse(value, out uint result))
+                        return result;
+                }
+            }
+
+            return defaultValue;
+        }
     }
 }

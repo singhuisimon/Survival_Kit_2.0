@@ -63,12 +63,12 @@ namespace Game
             { "enemyturretbullet", CollisionCategory.ENEMY_PROJECTILE },
             
             // Ally projectiles
-            { "sentrybullet", CollisionCategory.ALLY_PROJECTILE },
+            { "normalturretbullet", CollisionCategory.ALLY_PROJECTILE },
             { "allybullet", CollisionCategory.ALLY_PROJECTILE },
             
             // Entities
             { "player", CollisionCategory.PLAYER },
-            { "ally", CollisionCategory.ALLY },
+            { "gunshiphelper", CollisionCategory.ALLY },
             { "sentry", CollisionCategory.ALLY },
             
             // Enemies
@@ -151,6 +151,7 @@ namespace Game
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.PLAYER),
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.CORE),
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.CORE_BARRIER),
+            new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.ALLY),
             
             // Allies can hit:
             new CollisionRule(CollisionCategory.ALLY, CollisionCategory.ENEMY),

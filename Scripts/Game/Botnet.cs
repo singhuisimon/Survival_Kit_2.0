@@ -84,6 +84,9 @@ namespace Game
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
         private const string TAG_ALLIES = "ALLIES";
+        //private const string TAG_ALLIES = "Gunship";
+        private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
+        private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
         //private const string EVENT_BULLET_HIT = "BulletHit";
         private string EVENT_BULLET_HIT = "Damage:";
         private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
@@ -230,15 +233,23 @@ namespace Game
             float damage = DamageSystem.ParseAmount(payload);
             HP -= damage;
 
-            //instantiate the hitmarker audio
-            Vector3 spawnPos = GetPosition((uint)EntityID);
-            Quat spawnRot = GetRotation((uint)EntityID);
-            Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
-            uint hitmarkerID = 0;
-            hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
-            if(hitmarkerID == 0){
-                LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+            uint attackerId = DamageSystem.ParseAttackerId(payload);
+            if(attackerId != INVALID_ENTITY){
+                string attackerTag = TagGetTag(attackerId);
+                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
+                    //instantiate the hitmarker audio
+                    Vector3 spawnPos = GetPosition((uint)EntityID);
+                    Quat spawnRot = GetRotation((uint)EntityID);
+                    Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
+                    uint hitmarkerID = 0;
+                    hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                    if(hitmarkerID == 0){
+                        LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+                    }
+                }
             }
+
+            
 
             LogMessage("[Botnet] CurrentBotnetHP is: " + HP.ToString());
             LogMessage("[Botnet] SUCCESS MATCH! REDUCING HEALTH!");
