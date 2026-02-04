@@ -18,8 +18,8 @@ namespace Game
     {
 
         // === HEALTH INFORMATION ===
-        [SerializeField] private float maxHealth = 75f;
-        private float currentHealth = 75f;
+        [SerializeField] private float maxHealth = 10f; //original is 75f
+        private float currentHealth = 10f;
         private bool isDead = false;
 
         // === WEAPON INFORMATION ===
@@ -78,7 +78,9 @@ namespace Game
 
                 turretRotation = GetRotation(gunshipID);
 
-                Subscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
+                //Subscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
+                Subscribe("Damage:" + gunshipID, OnTakeDamage);
+                Subscribe("Damage:" + (uint)EntityID, OnTakeDamage);
                 
                 initialized = true;
             }
@@ -120,7 +122,9 @@ namespace Game
             Unsubscribe(GAMEOVEREVENT, OnGameEnd);
             Unsubscribe(GAMEWINEVENT, OnGameEnd);
             if (gunshipID != INVALID_ENTITY) 
-                Unsubscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
+                //Unsubscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
+                Unsubscribe("Damage:" + gunshipID, OnTakeDamage);
+                Unsubscribe("Damage:" + (uint)EntityID, OnTakeDamage);
 
         }
 
@@ -398,6 +402,7 @@ namespace Game
                 dir.Z * bulletSpeed
             );
 
+
             RigidbodySetVelocity(bulletID, ref velocity);
 
             LogMessage("Gunship fired PrimaryBullet at target " + currentTarget);
@@ -407,12 +412,20 @@ namespace Game
 
         private void OnTakeDamage(string eventName, string payload)
         {
+            LogMessage("[Gunship] OnTakeDamage fired! payload=" + payload + " event=" + eventName);
+            LogMessage("Gunship Health:" + currentHealth);
+            LogMessage("[Gunship] eventName = " + eventName + " helper=" + (uint)EntityID + " parent=" + gunshipID);
+
             if (isDead)
                 return;
             
             // Parse damage amount
-            if (!float.TryParse(payload, out float damage))
+            float damage = ExtractFirstFloat(payload);
+            if (damage <= 0f)
+            {
+                LogWarning("[Gunship] Could not parse damage from payload: " + payload);
                 return;
+            }
             
             // Apply damage
             currentHealth -= damage;
@@ -423,8 +436,34 @@ namespace Game
             // Check if dead
             if (currentHealth <= 0f)
             {
+                LogMessage("Gunship is dead, currentHealth:" + currentHealth);;
                 Die();
             }
+        }
+
+        // So that Gunship can take damage
+        private float ExtractFirstFloat(string payload) 
+        {
+            if (string.IsNullOrEmpty(payload)) 
+                return 0f;
+
+            // common seperators used in event payloads
+            char[] seps = new char [] { '|', ',', ';', ':', ' ' };
+            string[] parts = payload.Split(seps, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                // Strip common key=value formats
+                string token = parts[i];
+                int eq = token.IndexOf('=');
+                if (eq >= 0 && eq < token.Length - 1)
+                    token = token.Substring(eq + 1);
+
+            if (float.TryParse(token, out float val))
+                return val;
+            }
+
+            return 0f;
         }
 
         // Gunship Dies due to too much Damage Taken

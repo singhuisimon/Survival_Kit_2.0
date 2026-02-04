@@ -19,7 +19,8 @@ namespace Game
         public float Damage = 1.0f;
 
         // Target tags - entities this bullet can damage
-        private string[] TargetTags = { "Player", "Gunship" };
+        //private string[] TargetTags = { "Player", "Gunship" };
+        private string[] TargetTags = { "Player", "ALLIES", "Gunship", "GunshipHelper"}; //Added by Rio
 
         // This bullet's own tag
         private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
