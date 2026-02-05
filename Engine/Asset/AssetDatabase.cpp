@@ -119,12 +119,18 @@ namespace Engine {
 						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 					}
 
+#ifndef DISABLE_EDITOR
 					//editor load from the root repo resources
 					std::string sourceRoot = Engine::getRootResourcesPath();
+#else
+					std::string sourceRoot = Engine::getAssetsPath();
+#endif
+					//LOG_DEBUG("std::string sourceRoot = Engine::getAssetsPath() in Load(): ", sourceRoot);
 					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
 					//normalize with function NormalizePath
 					rec.sourcePath = NormalizePath(fullPath.string());
+					std::cout << "std::string sourceRoot = Engine::getAssetsPath() in AssetDatabase(): " << fullPath <<"\n";
 				}
 				else {
 					rec.sourcePath = NormalizePath(sourcePath);

@@ -243,8 +243,15 @@ namespace Engine {
 				else if (pathWithoutResources.find("/Resources/") == 0) {
 					pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
 				}
+
+#ifndef DISABLE_EDITOR
+				//editor load from the root repo resources
 				std::string sourceRoot = Engine::getRootResourcesPath();
+#else
+				std::string sourceRoot = Engine::getAssetsPath();
+#endif
 				fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
+				std::cout << "std::string sourceRoot = Engine::getAssetsPath() in Asset Scanner.cpp: " << fullPath << "\n";
 
 				//normalize here as well for safety
 				absolutePath = fullPath.lexically_normal().generic_string(); 

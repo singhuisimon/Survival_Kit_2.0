@@ -101,9 +101,13 @@ namespace Engine {
 			//resource path (get from the /Resources not from the build folder)
 			//std::string sourcesPath = Engine::getAssetsPath();
 
+#ifndef DISABLE_EDITOR
 			std::string sourcesPath = Engine::getRootResourcesPath();
 			std::cout << "AssetManager: SourcesPath = " << sourcesPath << std::endl;
-
+#else
+			std::string sourcesPath = Engine::getAssetsPath();
+			std::cout << "AssetManager: SourcesPath createDefaultConfig = " << sourcesPath << std::endl;
+#endif
 			//get the build/Resources path for compiled path
 			std::string assetsPath = Engine::getAssetsPath();
 
