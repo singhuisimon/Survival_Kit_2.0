@@ -29,6 +29,10 @@ namespace Game
         private const string TAG_PLAYER = "Player";
         private const string TAG_GUNSHIP = "Gunship";
 
+        private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
+        private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+        private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
+
         // Health
         [SerializeField] private float health = 18.0f;
 
@@ -261,6 +265,22 @@ namespace Game
 
             health -= 1.0f;
             LogMessage("WormHost hit! Health: " + health);
+
+            uint attackerId = DamageSystem.ParseAttackerId(payload);
+            if(attackerId != INVALID_ENTITY){
+                string attackerTag = TagGetTag(attackerId);
+                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
+                    //instantiate the hitmarker audio
+                    Vector3 spawnPos = GetPosition((uint)EntityID);
+                    Quat spawnRot = GetRotation((uint)EntityID);
+                    Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
+                    uint hitmarkerID = 0;
+                    hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                    if(hitmarkerID == 0){
+                        LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+                    }
+                }
+            }
 
             if (health <= 0)
             {

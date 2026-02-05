@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryUltExplosion.prefab",
-    "Prefab GUID": 1110463329272725723,
+    "Prefab GUID": 15136176701390536905,
     "version": 1,
     "entities": [
         {
@@ -53,7 +53,7 @@
                             "Mesh": "",
                             "Material": "",
                             "Texture": "",
-                            "Visible": true,
+                            "Visible": false,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
                             "MeshType": 0,
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                5.0,
-                                5.0,
-                                5.0
+                                10.0,
+                                10.0,
+                                10.0
                             ],
                             "SphereRadius": 2.5
                         }
