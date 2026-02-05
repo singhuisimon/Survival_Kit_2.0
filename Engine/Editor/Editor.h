@@ -188,6 +188,10 @@ namespace Engine
 		bool& GetPropertyWindowRef() { return m_PropertyWindow; }
 		bool& GetAnimatorWindowRef() { return m_AnimatorWindow; }
 		bool& GetPerformanceProfileWindowRef() { return m_PerformanceProfileWindow; }
+
+		void immediatelyCompile() {
+			AM.CompileAllAsset(0);
+		}
 	};
 }
 

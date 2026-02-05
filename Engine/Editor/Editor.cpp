@@ -67,7 +67,7 @@ namespace Engine
     void Editor::OnUpdate(Timestep ts, GLuint texhandle)
     {
         if (!m_Initialized) return;
-
+#ifndef DISABLE_EDITOR
         StartImguiFrame();
 
         // Enable Docking Function
@@ -82,13 +82,13 @@ namespace Engine
         m_EditorPerformance->PerformanceProfilePanel(ts);
 
         m_EditorAsset->AssetBrowserPanel();
-
+#endif
         RenderViewport(texhandle);
-
+#ifndef DISABLE_EDITOR
         CompleteFrame();
 
         m_EditorHierarchy->DeleteEntityTree(m_ActiveScene);
-
+#endif
     }
 
     void Editor::StartImguiFrame()

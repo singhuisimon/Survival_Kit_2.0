@@ -14,7 +14,8 @@
       "configurationType": "Release",
       "buildRoot": "${projectDir}\\build\\Release",
       "installRoot": "${projectDir}\\build\\install\\Release",
-      "inheritEnvironments": [ "msvc_x64_x64" ]
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "cmakeCommandArgs": "-DBUILD_INSTALLER=ON"
     }
   ]
 }

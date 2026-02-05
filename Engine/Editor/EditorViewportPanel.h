@@ -35,7 +35,15 @@ namespace Engine
 		std::string m_OriginalSceneName;
 
 	public:
-		EditorViewportPanel(Editor* editor) : m_Editor(editor) {};
+		EditorViewportPanel(Editor* editor)
+			: m_Editor(editor)
+#ifdef DISABLE_EDITOR
+			, m_PlayState(PlayState::PLAY) // Starts in PLAY mode for installers/builds
+#else
+			, m_PlayState(PlayState::STOP) // Starts in STOP mode for development/editing
+#endif
+		{
+		};
 		~EditorViewportPanel() = default;
 
 		void ManipulateEntityTransform(Entity& entity, EditorViewport m_ImGuizmoViewportData);

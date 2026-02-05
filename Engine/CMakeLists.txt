@@ -32,9 +32,21 @@ file(GLOB_RECURSE ASSET_HEADERS "${ENGINE_ROOT}/Asset/*.h")
 file(GLOB_RECURSE UTILITY_SOURCES "${ENGINE_ROOT}/Utility/*.cpp")
 file(GLOB_RECURSE UTILITY_HEADERS "${ENGINE_ROOT}/Utility/*.h")
 
-# Editor Module
-file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
-file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
+# Editor Module (conditional)
+option(BUILD_INSTALLER "Build without editor for installer" OFF)
+# Add DISABLE_EDITOR preprocessor definition for installer builds
+if(BUILD_INSTALLER)
+    add_compile_definitions(DISABLE_EDITOR)
+endif()
+if(BUILD_INSTALLER)
+    message(STATUS "  Skipping Editor module (installer build)")
+    set(EDITOR_SOURCES "")
+    set(EDITOR_HEADERS "")
+else()
+    file(GLOB_RECURSE EDITOR_SOURCES "${ENGINE_ROOT}/Editor/*.cpp")
+    file(GLOB_RECURSE EDITOR_HEADERS "${ENGINE_ROOT}/Editor/*.h")
+    message(STATUS "  Including Editor module")
+endif()
 
 # Physics Module
 file(GLOB_RECURSE PHYSICS_SOURCES "${ENGINE_ROOT}/Physics/*.cpp")
@@ -167,9 +179,11 @@ source_group("Asset\\Source" FILES ${ASSET_SOURCES})
 source_group("Utility\\Header" FILES ${UTILITY_HEADERS})
 source_group("Utility\\Source" FILES ${UTILITY_SOURCES})
 
-# Editor Module
-source_group("Editor\\Header" FILES ${EDITOR_HEADERS})
-source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
+# Editor Module (conditional)
+if(NOT BUILD_INSTALLER)
+    source_group("Editor\\Header" FILES ${EDITOR_HEADERS})
+    source_group("Editor\\Source" FILES ${EDITOR_SOURCES})
+endif()
 
 # Serialization Module
 source_group("Serialization\\Header" FILES ${SERIALIZATION_HEADERS})

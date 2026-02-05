@@ -8,6 +8,13 @@ add_executable(GameEngine
     Game.cpp
     Game.h
 )
+# Inherit BUILD_INSTALLER option from Engine
+if(BUILD_INSTALLER)
+    message(STATUS "  Building INSTALLER version (Editor disabled)")
+    target_compile_definitions(GameEngine PRIVATE DISABLE_EDITOR)
+else()
+    message(STATUS "  Building DEVELOPMENT version (Editor enabled)")
+endif()
 
 set_target_properties(GameEngine PROPERTIES
     FOLDER "Game"

@@ -47,11 +47,12 @@ private:
     std::vector<std::unique_ptr<Engine::Scene>> m_Scenes;
     Engine::Scene* m_ActiveScene = nullptr;
     // Editor 
-
+#ifndef DISABLE_EDITOR
     std::unique_ptr<Engine::Editor> m_Editor; 
+    bool m_EditorEnable = true;
+#endif
     std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
     float m_ColorShift = 0.0f;
-    bool m_EditorEnable = true;
     bool m_EditorJustPaused = false;
     bool m_IsFirstPausedFrame = true;
 

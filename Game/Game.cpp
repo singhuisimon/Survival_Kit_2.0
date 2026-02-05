@@ -4,7 +4,9 @@
 #include "Utility/Logger.h"
 #include "Utility/AssetPath.h"
 #include "ECS/Components.h"
+#ifndef DISABLE_EDITOR
 #include "Editor/Editor.h"
+#endif
 #include "Serialization/ComponentRegistry.h"
 #include "Audio/AudioSystem.h"
 #include "Audio/AudioEffectSystem.h"
@@ -63,7 +65,10 @@
 Game::Game()
 	: Application("Guardian of The MotherBoard", 1280, 720)
 	, m_ActiveScene(nullptr)
+#ifndef DISABLE_EDITOR
 	, m_Editor(nullptr)
+#endif
+
 	, m_ColorShift(0.0f)
 {
 	LOG_INFO("Game constructor body executing");
@@ -76,7 +81,9 @@ Game::Game()
 Game::Game()
 	: Application("Property-Based ECS Engine", 1280, 720)
 	, m_ActiveScene(nullptr)
+#ifndef DISABLE_EDITOR
 	, m_Editor(nullptr)
+#endif
 	, m_ColorShift(0.0f)
 {
 	LOG_INFO("Game constructor body executing");
@@ -172,10 +179,12 @@ void Game::OnInit()
 
 	// Step 4: Create scene
 	LOG_INFO("Step 4: Creating scene object...");
+#ifndef DISABLE_EDITOR
 	try
 	{
 		//m_Scenes.push_back(std::make_unique<Engine::Scene>("Main Scene"));
 		// Editor get scene
+
 		if (!m_Editor)
 		{
 			m_Editor = std::make_unique<Engine::Editor>(GetWindow());
@@ -186,6 +195,7 @@ void Game::OnInit()
 			LOG_INFO("Editor initialized successfully.");
 
 		}
+#endif
 		// Create initial scenes
 		try
 		{
@@ -195,10 +205,13 @@ void Game::OnInit()
 				LOG_CRITICAL("Failed to create initial scene!");
 				return;
 			}
+#ifndef DISABLE_EDITOR
+
 			m_Editor->SetActiveScene(mainScene);
 			LOG_INFO("  -> Scene created at address: ", (void*)mainScene);
-
+#endif
 		}
+
 		catch (const std::exception& e)
 		{
 			LOG_CRITICAL("Failed to create scenes: ", e.what());
@@ -206,12 +219,15 @@ void Game::OnInit()
 		}
 
 		//LOG_INFO("  -> Scene created at address: ", (void *)m_Scene.get());
+#ifndef DISABLE_EDITOR
 	}
+
 	catch (const std::exception &e)
 	{
 		LOG_CRITICAL("  -> Exception while creating scene: ", e.what());
 		return;
 	}
+#endif
 
 	// Step 5: Add systems to the scene
 	LOG_INFO("Step 5: Adding systems to scene...");
@@ -253,15 +269,21 @@ void Game::OnInit()
 	{
 		if (m_ActiveScene)
 		{
-
+#ifndef DISABLE_EDITOR
 			loadedFromFile = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+#else 
+			loadedFromFile = m_ActiveScene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/EpilepsyWarning.json"));
+#endif
 		}
 
 		if (loadedFromFile)
 		{
 			LOG_INFO("  -> Scene loaded from file successfully");
+#ifndef DISABLE_EDITOR
 			m_CurrentScenePath = "Resources/Sources/Scenes/ExampeScene.json";
-
+#else
+			m_CurrentScenePath = "Resources/Sources/Scenes/EpilepsyWarning.json";
+#endif
 			// Update settings from loaded scene
 			m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
 			m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
@@ -326,8 +348,9 @@ void Game::OnInit()
 		LOG_INFO("tracy-profiler path: %s", result.c_str());
 
 		m_TracyProfiler->SetTracyPath(result);
-
+#ifndef DISABLE_EDITOR
 		m_Editor->SetTracy(m_TracyProfiler);
+#endif
 	}
 	catch (const std::exception &e)
 	{
@@ -792,7 +815,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	// Get editor camera toggle and editor mode for renderer reference
 	auto &editorCamToggle = m_Renderer->getEditorCamToggle();
 	auto &editorModeToggle = m_Renderer->getEditorModeToggle();
-
+#ifndef DISABLE_EDITOR
 	// Add this somewhere in your input handling:
 	if (input.IsKeyJustPressed(GLFW_KEY_F3))
 	{
@@ -820,7 +843,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 		LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
-
+#endif
 	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
 	//{
 	//	LOG_INFO("[Game] Hot-reload requested, clearing script instances...");
@@ -846,9 +869,12 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//}
 
 	// When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
+#ifdef DISABLE_EDITOR
+	if (true)
+#else
 	if (!m_EditorEnable || (m_EditorEnable && m_Editor->GetEditorIsPlaying()))
+#endif
 	{
-
 		if (m_EditorJustPaused)
 		{
 			m_AudioManager->PauseAll(false);
@@ -1227,6 +1253,8 @@ void Game::OnUpdate(Engine::Timestep ts)
 	////sphereTrans.IsDirty = true;
 
 	// Editor camera controls
+#ifndef DISABLE_EDITOR
+
 	if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
 	{
 
@@ -1327,15 +1355,16 @@ void Game::OnUpdate(Engine::Timestep ts)
 	{
 		LOG_DEBUG("Space pressed - Jump action!");
 	}
-
+#endif
 	// Mouse buttons
 	if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT))
 	{
 		auto mousePos = input.GetMousePosition();
 		LOG_DEBUG("Left mouse clicked at: (", mousePos.x, ", ", mousePos.y, ")");
-
+#ifndef DISABLE_EDITOR
 		// Retrieve picked ID and send it to editor
 		m_Editor->RetrievePickedID(m_Renderer->getPickedID());
+#endif
 	}
 	if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_RIGHT))
 	{
@@ -1357,7 +1386,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		input.SetCursorVisible(newVisibility);
 		LOG_INFO("Cursor visibility toggled: ", newVisibility ? "VISIBLE" : "HIDDEN");
 	}
-
+#ifndef DISABLE_EDITOR
 	if (input.IsKeyJustPressed(GLFW_KEY_F2))
 	{
 		LOG_INFO("F2 pressed - Creating test entity with velocity...");
@@ -1388,6 +1417,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_INFO("Created falling entity ID: ", (uint32_t)newEntity, " with velocity (will demonstrate MovementSystem)");
 	}
 
+
 	// Serialization controls
 	if (input.IsKeyJustPressed(GLFW_KEY_F5))
 	{
@@ -1417,7 +1447,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 			LOG_ERROR("Load failed!");
 		}
 	}
-
+#endif
 	// Reload current game scene
 	if (input.IsKeyJustPressed(GLFW_KEY_U) && !editorCamToggle)
 	{
@@ -1499,7 +1529,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	// Update Editor To Do
 	//m_Editor->OnUpdate(Engine::Timestep ts);
 	//m_Renderer->get_imgui_texture();
-
+#ifndef DISABLE_EDITOR
 	if (m_EditorEnable)
 	{
 		m_Editor->OnUpdate(ts, m_Renderer->get_imgui_texture());
@@ -1507,7 +1537,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 	m_Editor->SetEditorViewport(m_Renderer->getEditorViewport());
 	m_TracyProfiler->OnUpdate();
-
+#endif
 	Engine::EventSystem::Instance().DispatchQueued();
 }
 
@@ -1549,7 +1579,9 @@ void Game::OnShutdown()
 	m_ActiveScene = nullptr;
 
 	m_AudioManager.reset();
+#ifndef DISABLE_EDITOR
 	m_Editor.reset();
+#endif
 	m_TracyProfiler.reset();
 
 	LOG_INFO("Game shutdown complete");
@@ -1572,13 +1604,14 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 	m_ActiveScene = scenePtr;
 	return scenePtr;
 }
-
+#ifndef DISABLE_EDITOR
 void Game::RequestNewSceneFromEditor(const std::string& name)
 {
 	Engine::Scene* newScene = CreateScene(name);
 	m_Editor->SetActiveScene(newScene);
 	LOG_INFO("New scene created and set as active: ", name);
 }
+#endif
 
 void Game::LoadSceneFromEvent(const std::string& scenePath)
 {

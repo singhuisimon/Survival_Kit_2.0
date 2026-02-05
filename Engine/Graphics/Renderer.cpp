@@ -1313,8 +1313,9 @@ namespace Engine {
 	void Renderer::setDefaultState() {
 		// Set default picked entity ID
 		pickedID = NO_HIT;
+#ifndef DISABLE_EDITOR
 		isEditorCamOn = true;
-
+#endif
 		// This is needed for mouse collision to work properly
 		auto pass = m_UIPass;
 		m_ui_projection = glm::ortho(pass.view_port.x, 1280.f, 720.f, pass.view_port.y, -1.f, 1.f);
