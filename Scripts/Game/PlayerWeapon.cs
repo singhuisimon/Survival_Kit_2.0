@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Camera;
 using static Engine.Event;
 using static Engine.Audio;
+using static Engine.AudioManager;
 
 namespace Game
 {
@@ -249,6 +250,9 @@ namespace Game
             wasTKeyPressed = tKeyPressed;
             if (tKeyJustPressed)
             {
+                AudioManager.StopGroup(AudioType.BGM);
+                AudioManager.StopGroup(AudioType.SFX);
+                Input.SetCursorVisible(false);
                 Event.Publish("LoadScene", "Resources/Sources/Scenes/level2_player.json");
             }
 

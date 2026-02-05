@@ -5861,7 +5861,7 @@
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-293.97662353515625,-200.0,-224.11676025390625],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-389.0,-200.0,-468.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}",
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
@@ -5882,7 +5882,7 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
                             },
                             {
                                 "componentType": 9,
@@ -5953,7 +5953,7 @@
                     "Properties": {
                         "ComponentGUID": "15322750612248530623",
                         "Mass": 1.0,
-                        "IsKinematic": false,
+                        "IsKinematic": true,
                         "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
@@ -6241,7 +6241,7 @@
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14827864839706771731\",\"Position\":[-300.0,-210.0,-220.0],\"Rotation\":[90.0,-0.0,90.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":13,\"Children\":[]}}",
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14827864839706771731\",\"Position\":[-389.0,-210.0,-468.0],\"Rotation\":[90.0,-0.0,90.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":13,\"Children\":[]}}",
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
