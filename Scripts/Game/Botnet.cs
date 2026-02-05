@@ -85,7 +85,7 @@ namespace Game
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
         //private const string TAG_ALLIES = "ALLIES";
-        private const string TAG_ALLIES = "Gunship";
+        private const string TAG_ALLIES = "GunshipHelper";
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
         //private const string EVENT_BULLET_HIT = "BulletHit";
@@ -559,6 +559,8 @@ namespace Game
                 // Check if hit target
                 if (other == targetID)
                 {
+
+
                     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     
                     //Temporary measure

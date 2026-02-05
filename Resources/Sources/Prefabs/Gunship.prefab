@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Gunship",
-    "Prefab GUID": 17428975104284131755,
+    "Prefab Name": "Prefab: Gunship.prefab",
+    "Prefab GUID": 2766398210789052379,
     "version": 1,
     "entities": [
         {
@@ -20,9 +20,9 @@
                                 -952.4028930664064
                             ],
                             "Rotation": [
-                                180.0,
+                                -180.0,
                                 18.26655006408691,
-                                180.0
+                                -180.0
                             ],
                             "Scale": [
                                 0.03999999910593033,
@@ -114,8 +114,8 @@
                         "Properties": {
                             "ComponentGUID": "3017456296697774503",
                             "Mass": 1.0,
-                            "IsKinematic": true,
-                            "IsTrigger": false,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
                                 0.0,
@@ -141,6 +141,29 @@
                     }
                 },
                 {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18330838522979176399",
+                            "FilePath": "Flotilla_Gunship_Ambient.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 0.5109999775886536,
+                            "Pitch": 1.0,
+                            "Loop": true,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 5.291999816894531,
+                            "MaxDistance": 150.4429931640625,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
@@ -148,7 +171,7 @@
                             "ComponentGUID": "8554288977682104741",
                             "ScriptClassName": "Game.GunshipScript",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 1803
                         }
                     }
                 }

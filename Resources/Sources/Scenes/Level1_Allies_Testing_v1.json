@@ -3,133 +3,6 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 62,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Audio_WeaponReload"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "18404285898377724773",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "2839845586185503591",
-                        "FilePath": "Primary_Reload.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 55,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5620220221688628037",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":24,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970506833",
-                        "Position": [
-                            166.57733154296875,
-                            -173.92425537109375,
-                            406.1313171386719
-                        ],
-                        "Rotation": [
-                            -180.0,
-                            18.266550064086914,
-                            -180.0
-                        ],
-                        "Scale": [
-                            0.03999999910593033,
-                            0.04000000283122063,
-                            0.03999999910593033
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
             "ID": 67,
             "Components": [
                 {
@@ -165,7 +38,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -204,8 +80,8 @@
                     "Properties": {
                         "ComponentGUID": "3017456296697774503",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -233,261 +109,6 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "8554288977682104741",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 23,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "2737916460168856371",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":22,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970506833",
-                        "Position": [
-                            -182.0192108154297,
-                            -496.03472900390625,
-                            888.9649658203125
-                        ],
-                        "Rotation": [
-                            -180.0,
-                            18.266550064086914,
-                            -180.0
-                        ],
-                        "Scale": [
-                            0.03999999910593033,
-                            0.04000000283122063,
-                            0.03999999910593033
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 68,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "15273430936557651483",
-                        "PrefabAssetGuid": "17428975104284131755",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Gunship",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048600,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14895357253018403235",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 1048600,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "3017456296697774503",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "8554288977682104741",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 18,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "1008534203257013025",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":17,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970506833",
-                        "Position": [
-                            -688.1275024414063,
-                            -345.65130615234375,
-                            -695.7079467773438
-                        ],
-                        "Rotation": [
-                            -180.0,
-                            18.266550064086914,
-                            -180.0
-                        ],
-                        "Scale": [
-                            0.03999999910593033,
-                            0.04000000283122063,
-                            0.03999999910593033
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970768979",
                         "ScriptClassName": "Game.GunshipScript"
                     }
                 }
@@ -529,7 +150,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -568,8 +192,8 @@
                     "Properties": {
                         "ComponentGUID": "3017456296697774503",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -966,7 +590,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: SEMICONDUCTOR.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SEMICONDUCTOR.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1970,74 +1593,55 @@
             ]
         },
         {
-            "ID": 50,
+            "ID": 62,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5206539961440290013",
-                        "PrefabAssetGuid": "11615830734240563797",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Gunship",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":1048625,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
+                        "Tag": "Audio_WeaponReload"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970506833",
+                        "ComponentGUID": "18404285898377724773",
                         "Position": [
-                            648.1566772460938,
-                            -68.8310775756836,
-                            -390.9233703613281
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.04000000283122063,
-                            0.03999999910593033
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
+                        "ComponentGUID": "2839845586185503591",
+                        "FilePath": "Primary_Reload.wav",
+                        "Type": 1,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
@@ -2078,7 +1682,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -2117,8 +1724,8 @@
                     "Properties": {
                         "ComponentGUID": "3017456296697774503",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -2152,7 +1759,7 @@
             ]
         },
         {
-            "ID": 46,
+            "ID": 68,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -2163,8 +1770,8 @@
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "2324236199922517193",
-                        "PrefabAssetGuid": "11615830734240563797",
+                        "ComponentGUID": "15273430936557651483",
+                        "PrefabAssetGuid": "17428975104284131755",
                         "isPrefabRoot": false,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
@@ -2175,19 +1782,28 @@
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":1048617,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048600,\"Children\":[]}}"
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
                             }
                         ]
                     }
@@ -2195,30 +1811,60 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970506833",
+                        "ComponentGUID": "14895357253018403235",
                         "Position": [
-                            -799.8250732421875,
-                            -402.771240234375,
-                            -136.48052978515625
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.04000000283122063,
-                            0.03999999910593033
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 1048600,
                         "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970768979",
+                        "ComponentGUID": "8554288977682104741",
                         "ScriptClassName": "Game.GunshipScript"
                     }
                 }
@@ -2322,8 +1968,8 @@
                     "Properties": {
                         "ComponentGUID": "3744215890486642149",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -6667,7 +6313,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -6706,8 +6355,8 @@
                     "Properties": {
                         "ComponentGUID": "3017456296697774503",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,

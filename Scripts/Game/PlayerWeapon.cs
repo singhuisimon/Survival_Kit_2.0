@@ -28,7 +28,7 @@ namespace Game
         [SerializeField] private int primaryAmmo = 0;
         [SerializeField] private int primaryAmmoMax = 100;
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
-        [SerializeField] private float primaryShootRate = 0.05f;
+        [SerializeField] private float primaryShootRate = 0.1f;
         [SerializeField] private float primaryShootNext = 0.0f;
         [SerializeField] private float primarybulletSpeed = 10000.0f;
 
