@@ -32,6 +32,7 @@ namespace Game
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
+        private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
         // Health
         [SerializeField] private float health = 18.0f;
@@ -267,23 +268,25 @@ namespace Game
             LogMessage("WormHost hit! Health: " + health);
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY){
+            if(attackerId != INVALID_ENTITY && health > 0.0f){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
                     //instantiate the hitmarker audio
-                    Vector3 spawnPos = GetPosition((uint)EntityID);
-                    Quat spawnRot = GetRotation((uint)EntityID);
-                    Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
                     uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
                     if(hitmarkerID == 0){
-                        LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+                        LogMessage("[WormHost] Player Hit! But hitmarkerID fail to instantiate");
                     }
                 }
             }
 
             if (health <= 0)
             {
+                uint playerkillID = 0;
+                playerkillID = PrefabInstantiate(playerKillPrefab);
+                if(playerkillID == 0){
+                    LogMessage("[WormHost] Player Kill WormHost! But playerkillID fail to instantiate");
+                }
                 Publish("WormHostDead", EntityID.ToString());
                 SceneDestroyEntity(EntityID);
             }

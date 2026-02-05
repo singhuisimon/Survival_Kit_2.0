@@ -11,7 +11,7 @@ namespace Game
         public float Lifetime = 5.0f;
 
         [SerializeField]
-        public float delayedTime = 0.5f;
+        public float delayedTime = 0.3f;
 
         //for debug purpose
         [SerializeField]

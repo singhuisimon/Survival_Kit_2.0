@@ -396,7 +396,9 @@ namespace Game
             {
                 //play sfx -> notify player ult is ready
                 //spawn the prefab here
-                PrefabInstantiate(PrimaryUltChargedPrefab);
+                if(!primaryAltReady){
+                    PrefabInstantiate(PrimaryUltChargedPrefab);
+                }
 
                 primaryAltReady = true;
 
@@ -495,9 +497,12 @@ namespace Game
             }
             else
             {
-                PrefabInstantiate(PrimaryUltChargedPrefab);
+                if (!primaryAltReady)
+                {
+                    PrefabInstantiate(PrimaryUltChargedPrefab);
+                    LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
+                }
                 primaryAltReady = true;
-                LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
             }
         }
 
