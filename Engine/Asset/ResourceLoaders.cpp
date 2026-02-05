@@ -428,7 +428,8 @@ xresource::loader<Engine::ResourceGUID::material_type_guid_v>::Load(
 
     // Get the source file path
     std::string filepath = Engine::AM.getNameFromGuid(guid.m_Instance);
-    std::string prefix = Engine::getRootResourcesPath() + "/Sources/Material/";
+    //std::string prefix = Engine::getRootResourcesPath() + "/Sources/Material/";
+    std::string prefix = Engine::getAssetsPath() + "/Sources/Material/";
 	filepath = prefix + filepath;
 
     // Check if file exists

@@ -113,11 +113,11 @@ void Game::OnInit()
 	}
 	else
 	{
-		LOG_INFO("Performing initial asset scan...");
+		/*LOG_INFO("Performing initial asset scan...");
 		Engine::AM.scanAndProcess();
 
 		LOG_INFO("Initial asset scan complete - found ",
-			Engine::AM.db().Count(), " assets");
+			Engine::AM.db().Count(), " assets");*/
 	}
 
 	Engine::RM.startUp();
@@ -254,13 +254,13 @@ void Game::OnInit()
 		if (m_ActiveScene)
 		{
 
-			loadedFromFile = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+			loadedFromFile = m_ActiveScene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/EpilepsyWarning.json"));
 		}
 
 		if (loadedFromFile)
 		{
 			LOG_INFO("  -> Scene loaded from file successfully");
-			m_CurrentScenePath = "Resources/Sources/Scenes/ExampeScene.json";
+			m_CurrentScenePath = "Resources/Sources/Scenes/EpilepsyWarning.json";
 
 			// Update settings from loaded scene
 			m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
@@ -794,32 +794,32 @@ void Game::OnUpdate(Engine::Timestep ts)
 	auto &editorModeToggle = m_Renderer->getEditorModeToggle();
 
 	// Add this somewhere in your input handling:
-	if (input.IsKeyJustPressed(GLFW_KEY_F3))
-	{
-		m_EditorEnable = !m_EditorEnable;
-		editorModeToggle = m_EditorEnable;
-		editorCamToggle = false;
-		LOG_INFO("Editor toggled: ", m_EditorEnable);
-	}
+	//if (input.IsKeyJustPressed(GLFW_KEY_F3))
+	//{
+	//	m_EditorEnable = !m_EditorEnable;
+	//	editorModeToggle = m_EditorEnable;
+	//	editorCamToggle = false;
+	//	LOG_INFO("Editor toggled: ", m_EditorEnable);
+	//}
 
-	// Editor camera toggle
-	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
-	{
-		editorCamToggle = !editorCamToggle;
+	//// Editor camera toggle
+	//if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
+	//{
+	//	editorCamToggle = !editorCamToggle;
 
-		if (!editorCamToggle)
-		{
-			// Lock & hide cursor (free-look mode)
-			//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		}
-		else
-		{
-			// Restore normal cursor
-			//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
+	//	if (!editorCamToggle)
+	//	{
+	//		// Lock & hide cursor (free-look mode)
+	//		//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//	}
+	//	else
+	//	{
+	//		// Restore normal cursor
+	//		//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	//	}
 
-		LOG_INFO("Editor camera toggled: ", editorCamToggle);
-	}
+	//	LOG_INFO("Editor camera toggled: ", editorCamToggle);
+	//}
 
 	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
 	//{
@@ -846,8 +846,8 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//}
 
 	// When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
-	if (!m_EditorEnable || (m_EditorEnable && m_Editor->GetEditorIsPlaying()))
-	{
+	/*if (!m_EditorEnable || (m_EditorEnable && m_Editor->GetEditorIsPlaying()))
+	{*/
 
 		if (m_EditorJustPaused)
 		{
@@ -865,33 +865,33 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 		// Update audio manager if exists
 		m_AudioManager->OnUpdate(ts);
-	}
-	else
-	{ // When Editor is ON but gameplay is NOT PLAYING: Update Transform, Camera and Render systems
+	//}
+	//else
+	//{ // When Editor is ON but gameplay is NOT PLAYING: Update Transform, Camera and Render systems
 
-		m_EditorJustPaused = true;
+	//	m_EditorJustPaused = true;
 
-		auto &sceneSystems = m_ActiveScene->GetSystemRegistry();
+	//	auto &sceneSystems = m_ActiveScene->GetSystemRegistry();
 
-		Engine::TransformSystem *transformSystem = sceneSystems.GetSystem<Engine::TransformSystem>();
-		transformSystem->OnUpdate(m_ActiveScene, ts);
+	//	Engine::TransformSystem *transformSystem = sceneSystems.GetSystem<Engine::TransformSystem>();
+	//	transformSystem->OnUpdate(m_ActiveScene, ts);
 
-		if (m_IsFirstPausedFrame)
-		{
-			Engine::BehaviourTreeSystem *BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
-			BTSystem->LoadBehaviourTrees(m_ActiveScene);
-			m_IsFirstPausedFrame = false;
-		}
+	//	if (m_IsFirstPausedFrame)
+	//	{
+	//		Engine::BehaviourTreeSystem *BTSystem = sceneSystems.GetSystem<Engine::BehaviourTreeSystem>();
+	//		BTSystem->LoadBehaviourTrees(m_ActiveScene);
+	//		m_IsFirstPausedFrame = false;
+	//	}
 
-		Engine::CameraSystem *camSystem = sceneSystems.GetSystem<Engine::CameraSystem>();
-		camSystem->OnUpdate(m_ActiveScene, ts);
+	//	Engine::CameraSystem *camSystem = sceneSystems.GetSystem<Engine::CameraSystem>();
+	//	camSystem->OnUpdate(m_ActiveScene, ts);
 
-		Engine::RenderSystem *renderSystem = sceneSystems.GetSystem<Engine::RenderSystem>();
-		renderSystem->OnUpdate(m_ActiveScene, ts);
+	//	Engine::RenderSystem *renderSystem = sceneSystems.GetSystem<Engine::RenderSystem>();
+	//	renderSystem->OnUpdate(m_ActiveScene, ts);
 
-		m_AudioManager->PauseAll(true);
+	//	m_AudioManager->PauseAll(true);
 
-	}
+	//}
 
 	/*if (input.IsKeyJustPressed(GLFW_KEY_P))
 	{
@@ -1227,77 +1227,77 @@ void Game::OnUpdate(Engine::Timestep ts)
 	////sphereTrans.IsDirty = true;
 
 	// Editor camera controls
-	if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
-	{
+	//if (input.IsKeyPressed(GLFW_KEY_LEFT_SHIFT) && editorCamToggle)
+	//{
 
-		auto &editorCam = m_Renderer->getEditorCamera();
+	//	auto &editorCam = m_Renderer->getEditorCamera();
 
-		// Check for left or right mouse click
-		uint32_t mouse = 2;
-		if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-			mouse = GLFW_MOUSE_BUTTON_LEFT;
-		}
-		else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
-		{
-			mouse = GLFW_MOUSE_BUTTON_RIGHT;
-		}
+	//	// Check for left or right mouse click
+	//	uint32_t mouse = 2;
+	//	if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+	//	{
+	//		mouse = GLFW_MOUSE_BUTTON_LEFT;
+	//	}
+	//	else if (input.IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+	//	{
+	//		mouse = GLFW_MOUSE_BUTTON_RIGHT;
+	//	}
 
-		// Cursor orbiting
-		editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
+	//	// Cursor orbiting
+	//	editorCam.cameraOnCursor(input.GetMouseDelta().x, input.GetMouseDelta().y, mouse);
 
-		// Zooming in-and-out scrolling
-		double scrollY_offset = input.GetScrollDelta().y;
-		if (scrollY_offset != 0)
-		{
-			editorCam.cameraOnScroll(scrollY_offset);
-		}
+	//	// Zooming in-and-out scrolling
+	//	double scrollY_offset = input.GetScrollDelta().y;
+	//	if (scrollY_offset != 0)
+	//	{
+	//		editorCam.cameraOnScroll(scrollY_offset);
+	//	}
 
-		// Check moving input
-		if (input.IsKeyPressed(GLFW_KEY_W))
-		{
-			editorCam.moveCamForward();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_A))
-		{
-			editorCam.moveCamLeft();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_S))
-		{
-			editorCam.moveCamBack();
-		}
-		if (input.IsKeyPressed(GLFW_KEY_D))
-		{
-			editorCam.moveCamRight();
-		}
+	//	// Check moving input
+	//	if (input.IsKeyPressed(GLFW_KEY_W))
+	//	{
+	//		editorCam.moveCamForward();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_A))
+	//	{
+	//		editorCam.moveCamLeft();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_S))
+	//	{
+	//		editorCam.moveCamBack();
+	//	}
+	//	if (input.IsKeyPressed(GLFW_KEY_D))
+	//	{
+	//		editorCam.moveCamRight();
+	//	}
 
-	}
+	//}
 
-	// Test the DSP Global Effects
+	//// Test the DSP Global Effects
 
-	FMOD::DSP *dsp = nullptr;
-	if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
-	{
-		dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
-		m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
-			FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
-	}
+	//FMOD::DSP *dsp = nullptr;
+	//if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
+	//{
+	//	dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
+	//	m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
+	//		FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
+	//}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
-	{
-		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
-	}
-	if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET))
-	{
-		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
-	}
+	//if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
+	//{
+	//	m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
+	//}
+	//if (input.IsKeyJustPressed(GLFW_KEY_RIGHT_BRACKET))
+	//{
+	//	m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, false);
+	//}
 
-	if (dsp)
-	{
-		float cutoff;
-		dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
-		LOG_INFO("LowPass cutoff currently: ", cutoff);
-	}
+	//if (dsp)
+	//{
+	//	float cutoff;
+	//	dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
+	//	LOG_INFO("LowPass cutoff currently: ", cutoff);
+	//}
 
 	// Move player in/out of the reverb radius with QE to feel falloff
 	/*if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
@@ -1323,10 +1323,10 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//}
 
 	// Action keys - one-time press
-	if (input.IsKeyJustPressed(GLFW_KEY_SPACE))
+	/*if (input.IsKeyJustPressed(GLFW_KEY_SPACE))
 	{
 		LOG_DEBUG("Space pressed - Jump action!");
-	}
+	}*/
 
 	// Mouse buttons
 	if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT))
@@ -1335,7 +1335,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_DEBUG("Left mouse clicked at: (", mousePos.x, ", ", mousePos.y, ")");
 
 		// Retrieve picked ID and send it to editor
-		m_Editor->RetrievePickedID(m_Renderer->getPickedID());
+		//m_Editor->RetrievePickedID(m_Renderer->getPickedID());
 	}
 	if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_RIGHT))
 	{
@@ -1358,65 +1358,65 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_INFO("Cursor visibility toggled: ", newVisibility ? "VISIBLE" : "HIDDEN");
 	}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_F2))
-	{
-		LOG_INFO("F2 pressed - Creating test entity with velocity...");
-		static int entityCounter = 0;
+	//if (input.IsKeyJustPressed(GLFW_KEY_F2))
+	//{
+	//	LOG_INFO("F2 pressed - Creating test entity with velocity...");
+	//	static int entityCounter = 0;
 
-		auto newEntity = m_ActiveScene->CreateEntity("DynamicEntity_" + std::to_string(entityCounter));
-		newEntity.AddComponent<Engine::TagComponent>("DynamicEntity_" + std::to_string(entityCounter));
+	//	auto newEntity = m_ActiveScene->CreateEntity("DynamicEntity_" + std::to_string(entityCounter));
+	//	newEntity.AddComponent<Engine::TagComponent>("DynamicEntity_" + std::to_string(entityCounter));
 
-		auto &transform = newEntity.AddComponent<Engine::TransformComponent>();
-		transform.Position = glm::vec3(entityCounter * 2.0f, 10.0f, 0);
-		transform.Rotation = glm::vec3(0, 0, 0);
-		transform.Scale = glm::vec3(1, 1, 1);
+	//	auto &transform = newEntity.AddComponent<Engine::TransformComponent>();
+	//	transform.Position = glm::vec3(entityCounter * 2.0f, 10.0f, 0);
+	//	transform.Rotation = glm::vec3(0, 0, 0);
+	//	transform.Scale = glm::vec3(1, 1, 1);
 
-		// Add rigidbody with random velocity to demonstrate MovementSystem
-		auto &rb = newEntity.AddComponent<Engine::RigidbodyComponent>();
-		rb.Mass = 1.0f;
-		rb.UseGravity = true;
-		rb.IsKinematic = false;
-		rb.Velocity = glm::vec3(
-			(entityCounter % 2 == 0 ? 1.0f : -1.0f),
-			0.0f,
-			0.0f
-		);
+	//	// Add rigidbody with random velocity to demonstrate MovementSystem
+	//	auto &rb = newEntity.AddComponent<Engine::RigidbodyComponent>();
+	//	rb.Mass = 1.0f;
+	//	rb.UseGravity = true;
+	//	rb.IsKinematic = false;
+	//	rb.Velocity = glm::vec3(
+	//		(entityCounter % 2 == 0 ? 1.0f : -1.0f),
+	//		0.0f,
+	//		0.0f
+	//	);
 
-		newEntity.AddComponent<Engine::MeshRendererComponent>();
+	//	newEntity.AddComponent<Engine::MeshRendererComponent>();
 
-		entityCounter++;
-		LOG_INFO("Created falling entity ID: ", (uint32_t)newEntity, " with velocity (will demonstrate MovementSystem)");
-	}
+	//	entityCounter++;
+	//	LOG_INFO("Created falling entity ID: ", (uint32_t)newEntity, " with velocity (will demonstrate MovementSystem)");
+	//}
 
-	// Serialization controls
-	if (input.IsKeyJustPressed(GLFW_KEY_F5))
-	{
-		LOG_INFO("=== SAVING SCENE ===");
-		bool success = m_ActiveScene->SaveToFile("Resources/Sources/Scenes/SavedScene.json");
-		LOG_INFO(success ? "Scene saved!" : "Save failed!");
-	}
+	//// Serialization controls
+	//if (input.IsKeyJustPressed(GLFW_KEY_F5))
+	//{
+	//	LOG_INFO("=== SAVING SCENE ===");
+	//	bool success = m_ActiveScene->SaveToFile("Resources/Sources/Scenes/SavedScene.json");
+	//	LOG_INFO(success ? "Scene saved!" : "Save failed!");
+	//}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_F9))
-	{
-		LOG_INFO("=== LOADING SCENE ===");
+	//if (input.IsKeyJustPressed(GLFW_KEY_F9))
+	//{
+	//	LOG_INFO("=== LOADING SCENE ===");
 
-		// Shutdown systems before loading new scene
-		m_ActiveScene->ShutdownSystems();
+	//	// Shutdown systems before loading new scene
+	//	m_ActiveScene->ShutdownSystems();
 
-		bool success = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+	//	bool success = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
-		// Reinitialize systems after loading
-		if (success)
-		{
-			AddAllSystems();
-			m_ActiveScene->InitializeSystems();
-			LOG_INFO("Scene loaded and systems reinitialized!");
-		}
-		else
-		{
-			LOG_ERROR("Load failed!");
-		}
-	}
+	//	// Reinitialize systems after loading
+	//	if (success)
+	//	{
+	//		AddAllSystems();
+	//		m_ActiveScene->InitializeSystems();
+	//		LOG_INFO("Scene loaded and systems reinitialized!");
+	//	}
+	//	else
+	//	{
+	//		LOG_ERROR("Load failed!");
+	//	}
+	//}
 
 	// Reload current game scene
 	if (input.IsKeyJustPressed(GLFW_KEY_U) && !editorCamToggle)
@@ -1612,6 +1612,7 @@ void Game::LoadSceneFromEvent(const std::string& scenePath)
 		if (!success)
 		{
 			LOG_ERROR("  -> Failed to load scene from file!");
+			std::cout << "Error hereeeee\n";
 			LOG_WARNING("  -> Attempting to create default scene as fallback...");
 			CreateDefaultScene();
 			AddAllSystems();

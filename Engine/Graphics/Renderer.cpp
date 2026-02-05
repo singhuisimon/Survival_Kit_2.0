@@ -1313,7 +1313,7 @@ namespace Engine {
 	void Renderer::setDefaultState() {
 		// Set default picked entity ID
 		pickedID = NO_HIT;
-		isEditorCamOn = true;
+		isEditorCamOn = false;
 
 		// This is needed for mouse collision to work properly
 		auto pass = m_UIPass;

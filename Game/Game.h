@@ -51,7 +51,7 @@ private:
     std::unique_ptr<Engine::Editor> m_Editor; 
     std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
     float m_ColorShift = 0.0f;
-    bool m_EditorEnable = true;
+    bool m_EditorEnable = false;
     bool m_EditorJustPaused = false;
     bool m_IsFirstPausedFrame = true;
 

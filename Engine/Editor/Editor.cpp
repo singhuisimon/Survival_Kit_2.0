@@ -70,24 +70,24 @@ namespace Engine
 
         StartImguiFrame();
 
-        // Enable Docking Function
-        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+        //// Enable Docking Function
+        //ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-        m_EditorMenu->EditorTopMenu();
+        //m_EditorMenu->EditorTopMenu();
 
-        m_EditorHierarchy->HierarchyPanel();
+        //m_EditorHierarchy->HierarchyPanel();
 
-        m_EditorProperty->PropertyPanel();
+        //m_EditorProperty->PropertyPanel();
 
-        m_EditorPerformance->PerformanceProfilePanel(ts);
+        //m_EditorPerformance->PerformanceProfilePanel(ts);
 
-        m_EditorAsset->AssetBrowserPanel();
+        //m_EditorAsset->AssetBrowserPanel();
 
         RenderViewport(texhandle);
 
-        CompleteFrame();
+     /*   CompleteFrame();
 
-        m_EditorHierarchy->DeleteEntityTree(m_ActiveScene);
+        m_EditorHierarchy->DeleteEntityTree(m_ActiveScene);*/
 
     }
 

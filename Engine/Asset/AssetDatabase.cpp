@@ -120,7 +120,8 @@ namespace Engine {
 					}
 
 					//editor load from the root repo resources
-					std::string sourceRoot = Engine::getRootResourcesPath();
+					//std::string sourceRoot = Engine::getRootResourcesPath();
+					std::string sourceRoot = Engine::getAssetsPath();
 					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
 
 					//normalize with function NormalizePath

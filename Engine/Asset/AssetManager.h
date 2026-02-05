@@ -101,7 +101,8 @@ namespace Engine {
 			//resource path (get from the /Resources not from the build folder)
 			//std::string sourcesPath = Engine::getAssetsPath();
 
-			std::string sourcesPath = Engine::getRootResourcesPath();
+			//std::string sourcesPath = Engine::getRootResourcesPath();
+			std::string sourcesPath = Engine::getAssetsPath();
 			std::cout << "AssetManager: SourcesPath = " << sourcesPath << std::endl;
 
 			//get the build/Resources path for compiled path
