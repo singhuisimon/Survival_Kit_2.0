@@ -130,6 +130,7 @@ namespace Game
         private uint firingPointEntityID = 0;
         private uint playerEntityID = 0;
         private bool isKeyRPressedPreviously = false;
+        private bool wasTKeyPressed = false;
         private float elapsedTime = 0.0f;
 
         private float reloadFinishTime = 0.0f;
@@ -241,6 +242,16 @@ namespace Game
             {
                 PrimaryAltCharge_Reward();
             }
+
+            //Cheatcode - Skip to Level 2
+            bool tKeyPressed = Input.IsKeyPressed(KeyCode.T);
+            bool tKeyJustPressed = tKeyPressed && !wasTKeyPressed;
+            wasTKeyPressed = tKeyPressed;
+            if (tKeyJustPressed)
+            {
+                Event.Publish("LoadScene", "Resources/Sources/Scenes/level2_player.json");
+            }
+
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
