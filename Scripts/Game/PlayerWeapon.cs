@@ -380,7 +380,7 @@ namespace Game
         private void UltCharging(string eventName, string payload)
         {
             if (primaryAltReady || eventName != ULTGAINEVENT){
-                LogMessage("AltCharge is ready returning from charging")
+                LogMessage("AltCharge is ready returning from charging");
                 return;
             }
 
