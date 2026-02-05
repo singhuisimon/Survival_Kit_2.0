@@ -272,11 +272,11 @@ namespace Game
             PrimaryShoot();
 
             //Spawn botnet
-            if (Input.IsKeyReleased(KeyCode.J))
-            {
-                uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
-                LogMessage("Spawning botnet");
-            }
+            // if (Input.IsKeyReleased(KeyCode.J))
+            // {
+            //     uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
+            //     LogMessage("Spawning botnet");
+            // }
 
         }
 
@@ -379,8 +379,10 @@ namespace Game
 
         private void UltCharging(string eventName, string payload)
         {
-            if (primaryAltReady || eventName != ULTGAINEVENT)
+            if (primaryAltReady || eventName != ULTGAINEVENT){
+                LogMessage("AltCharge is ready returning from charging")
                 return;
+            }
 
             if (!int.TryParse(payload, out int gainAmount))
                 return;
