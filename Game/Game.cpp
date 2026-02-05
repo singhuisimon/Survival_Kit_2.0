@@ -276,7 +276,7 @@ void Game::OnInit()
 #ifndef DISABLE_EDITOR
 			loadedFromFile = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
 #else 
-			loadedFromFile = m_ActiveScene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/Level1_NewPlayer.json"));
+			loadedFromFile = m_ActiveScene->LoadFromFile(Engine::getAssetFilePath("Sources/Scenes/EpilepsyWarning.json"));
 #endif
 		}
 
@@ -286,7 +286,7 @@ void Game::OnInit()
 #ifndef DISABLE_EDITOR
 			m_CurrentScenePath = "Resources/Sources/Scenes/ExampeScene.json";
 #else
-			m_CurrentScenePath = "Resources/Sources/Scenes/Level1_NewPlayer.json";
+			m_CurrentScenePath = "Resources/Sources/Scenes/EpilepsyWarning.json";
 #endif
 			// Update settings from loaded scene
 			m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
