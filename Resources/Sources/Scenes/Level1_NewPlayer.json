@@ -1400,7 +1400,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1461,7 +1461,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1544,7 +1544,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2155,7 +2155,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2300,7 +2300,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2368,74 +2368,136 @@
             ]
         },
         {
-            "ID": 2,
+            "ID": 61,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "Particles"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "14811161064395342711",
+                        "PrefabAssetGuid": "11352396550574604511",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14827864839706771731\",\"Position\":[-300.0,-210.0,-220.0],\"Rotation\":[90.0,-0.0,90.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":13,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5604492802851995921\",\"Tag\":\"Particles\"}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "4860677560785862851",
+                        "ComponentGUID": "14827864839706771731",
                         "Position": [
-                            798.6957397460938,
-                            -376.24957275390625,
-                            -952.4028930664063
+                            -389.0,
+                            -210.0,
+                            -468.0
                         ],
                         "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
+                            90.0,
+                            -0.0,
+                            90.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            12
-                        ]
+                        "Parent": 13,
+                        "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "ParticleComponent",
                     "Properties": {
-                        "ComponentGUID": "14660510349944733975",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "10794583512373204043",
-                        "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 5.109000205993652,
-                        "MaxDistance": 150.3489990234375,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "Core.mat",
+                        "Initial Velocity": [
+                            0.0,
+                            1.5,
+                            0.0
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            15.0,
+                            10.0,
+                            15.0
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Max": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Emitter Shape": 1,
+                        "Max Particles": 50,
+                        "Particle Type": 0,
+                        "Emission Rate": 10.0,
+                        "Particle Lifetime": 4.0,
+                        "Emission Accumulator": 0.7705078125,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 180.0,
+                        "Min Speed": 10.0,
+                        "Max Speed": 25.0,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": true,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": true,
+                        "Burst Mode": false
                     }
                 }
             ]
@@ -2459,7 +2521,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "player",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/player.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2627,7 +2689,7 @@
                         "FilePath": "Player_Ambience.wav",
                         "Type": 1,
                         "State": 0,
-                        "Volume": 1.3680000305175781,
+                        "Volume": 1.003999948501587,
                         "Pitch": 1.0,
                         "Loop": true,
                         "Mute": false,
@@ -3578,7 +3640,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -3871,7 +3933,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3936,71 +3998,30 @@
             ]
         },
         {
-            "ID": 12,
+            "ID": 13,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15582833502900700339",
-                        "Position": [
-                            -0.0009765625,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            -4.071109497693487e-13,
-                            0.0000017075473124350538,
-                            -3.0533325976085657e-13
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0000001192092896,
-                            1.0
-                        ],
-                        "Parent": 2,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16159294255204304053",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048617,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "SEMICONDUCTOR"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "8665304475260175553",
-                        "PrefabAssetGuid": "11615830734240563797",
+                        "ComponentGUID": "2129024513720025951",
+                        "PrefabAssetGuid": "11352396550574604511",
                         "isPrefabRoot": true,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "Gunship",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
                         "prefabVersion": 1,
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-293.97662353515625,-200.0,-224.11676025390625],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}",
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
@@ -4009,63 +4030,73 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}"
                             },
                             {
                                 "componentType": 2,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11865138375784775969\",\"Mesh\":\"\",\"Material\":\"CoreOuter.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
                             },
                             {
                                 "componentType": 9,
-                                "isAddedComponent": true,
+                                "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9641662007767372877\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16438482250874045513\",\"FilePath\":\"Core_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":52.55500030517578,\"MaxDistance\":502.072998046875,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11863986098428055233\",\"ScriptClassName\":\"Game.HealthCore\",\"Started\":false,\"GCHandle\":0}}"
                             }
                         ],
                         "childEntityIDs": [
-                            46
+                            14,
+                            15,
+                            61
                         ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "4860677560785862851",
+                        "ComponentGUID": "15900363641908576543",
                         "Position": [
-                            -799.8251342773438,
-                            -402.771240234375,
-                            -136.4805450439453
+                            -389.0,
+                            -200.0,
+                            -468.0
                         ],
                         "Rotation": [
-                            -180.0,
-                            18.266550064086914,
-                            -180.0
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
+                            150.0,
+                            150.0,
+                            150.0
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            46
+                            14,
+                            15,
+                            61
                         ]
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "14660510349944733975",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
+                        "ComponentGUID": "11865138375784775969",
+                        "Mesh": "",
+                        "Material": "CoreOuter.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -4078,10 +4109,40 @@
                     }
                 },
                 {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "15322750612248530623",
+                        "Mass": 1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            75.0,
+                            75.0,
+                            75.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "9641662007767372877",
-                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "ComponentGUID": "16438482250874045513",
+                        "FilePath": "Core_Ambient.wav",
                         "Type": 1,
                         "State": 0,
                         "Volume": 1.0,
@@ -4090,175 +4151,155 @@
                         "Mute": false,
                         "ReverbProperties": 1.0,
                         "Is3D": true,
-                        "MinDistance": 5.5960001945495605,
-                        "MaxDistance": 153.1840057373047,
+                        "MinDistance": 52.55500030517578,
+                        "MaxDistance": 502.072998046875,
                         "RolloffMode": 0,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11863986098428055233",
+                        "ScriptClassName": "Game.HealthCore"
                     }
                 }
             ]
         },
         {
-            "ID": 46,
+            "ID": 68,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "2324236199922517193",
-                        "PrefabAssetGuid": "11615830734240563797",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Gunship",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":1048617,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
+                        "Tag": "nextlevelbutton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970506833",
+                        "ComponentGUID": "13802257990996788065",
                         "Position": [
-                            -0.0009765625,
-                            0.0,
+                            855.0,
+                            518.0,
                             0.0
                         ],
                         "Rotation": [
-                            -4.071109497693487e-13,
-                            0.0000017075473124350538,
-                            -3.0533325976085657e-13
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0000001192092896,
+                            100.0,
+                            40.0,
                             1.0
                         ],
-                        "Parent": 1048617,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
+                        "ComponentGUID": "3425964449535591267",
+                        "ScriptClassName": ""
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_ResumeButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
         },
         {
-            "ID": 1048625,
+            "ID": 15,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Gunship"
+                        "Tag": "InnermostCore"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "10394686732171101397",
-                        "PrefabAssetGuid": "11615830734240563797",
-                        "isPrefabRoot": true,
+                        "ComponentGUID": "15964082569002189681",
+                        "PrefabAssetGuid": "11352396550574604511",
+                        "isPrefabRoot": false,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "Gunship",
+                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
                         "prefabVersion": 1,
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2145728289022197969\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.10546875,-0.0,0.0],\"Scale\":[0.19999995827674866,0.19999994337558746,0.19999994337558746],\"Parent\":13,\"Children\":[]}}"
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
                             },
                             {
                                 "componentType": 2,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6180953555146293461\",\"Mesh\":\"\",\"Material\":\"Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
                             },
                             {
-                                "componentType": 9,
-                                "isAddedComponent": true,
+                                "componentType": 11,
+                                "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6182897493947257935\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"playing\":true,\"respectClipLoop\":true,\"controller\":0,\"currentClipIndex\":0,\"currentTime\":0.0029296875,\"playbackSpeed\":1.0}}"
                             }
-                        ],
-                        "childEntityIDs": [
-                            50
                         ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "4860677560785862851",
+                        "ComponentGUID": "2145728289022197969",
                         "Position": [
-                            648.1566162109375,
-                            -68.8310775756836,
-                            -390.9233703613281
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
-                            -180.0,
-                            18.266550064086914,
-                            -180.0
+                            0.10546875,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
+                            0.19999995827674866,
+                            0.19999994337558746,
+                            0.19999994337558746
                         ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            50
-                        ]
+                        "Parent": 13,
+                        "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "14660510349944733975",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
+                        "ComponentGUID": "6180953555146293461",
+                        "Mesh": "",
+                        "Material": "Core.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -4271,20 +4312,66 @@
                     }
                 },
                 {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0029296875,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 62,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Audio_WeaponReload"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18404285898377724773",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "6182897493947257935",
-                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "ComponentGUID": "2839845586185503591",
+                        "FilePath": "Primary_Reload.wav",
                         "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
+                        "State": 2,
+                        "Volume": 0.7039999961853027,
                         "Pitch": 1.0,
-                        "Loop": true,
+                        "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 5.353000164031982,
-                        "MaxDistance": 145.7169952392578,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
                         "RolloffMode": 0,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
@@ -4293,74 +4380,58 @@
             ]
         },
         {
-            "ID": 50,
+            "ID": 67,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5206539961440290013",
-                        "PrefabAssetGuid": "11615830734240563797",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Gunship",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":1048625,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
+                        "Tag": "mainmenubutton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970506833",
+                        "ComponentGUID": "5731807458746188633",
                         "Position": [
-                            -0.0009765625,
-                            0.0,
+                            376.0,
+                            518.0,
                             0.0
                         ],
                         "Rotation": [
-                            -4.071109497693487e-13,
-                            0.0000017075473124350538,
-                            -3.0533325976085657e-13
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0000001192092896,
+                            100.0,
+                            40.0,
                             1.0
                         ],
-                        "Parent": 1048625,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
+                        "ComponentGUID": "13225797238690857819",
+                        "ScriptClassName": "Game.MainMenuButton"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Paused_MainMenuButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5050,7 +5121,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5220,794 +5291,6 @@
             ]
         },
         {
-            "ID": 17,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Gunship"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5043759469380977433",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Gunship.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[-180.0,18.266550064086914,-180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8488740503167356413\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.353000164031982,\"MaxDistance\":150.5570068359375,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
-                            }
-                        ],
-                        "childEntityIDs": [
-                            18
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4860677560785862851",
-                        "Position": [
-                            -688.1275634765625,
-                            -345.65130615234375,
-                            -695.7079467773438
-                        ],
-                        "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
-                        ],
-                        "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            18
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "14660510349944733975",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "8488740503167356413",
-                        "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 5.353000164031982,
-                        "MaxDistance": 150.5570068359375,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 18,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "1008534203257013025",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":17,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970506833",
-                        "Position": [
-                            -0.0009765625,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            -4.071109497693487e-13,
-                            0.0000017075473124350538,
-                            -3.0533325976085657e-13
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0000001192092896,
-                            1.0
-                        ],
-                        "Parent": 17,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 22,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Gunship"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "15996513763147596587",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Gunship.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[-180.0,18.266550064086914,-180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8488740503167356413\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.353000164031982,\"MaxDistance\":150.5570068359375,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
-                            }
-                        ],
-                        "childEntityIDs": [
-                            23
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4860677560785862851",
-                        "Position": [
-                            -182.0192413330078,
-                            -496.03472900390625,
-                            888.9649658203125
-                        ],
-                        "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
-                        ],
-                        "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            23
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "14660510349944733975",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "8488740503167356413",
-                        "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 5.353000164031982,
-                        "MaxDistance": 150.5570068359375,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 23,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "2737916460168856371",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":22,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970506833",
-                        "Position": [
-                            -0.0009765625,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            -4.071109497693487e-13,
-                            0.0000017075473124350538,
-                            -3.0533325976085657e-13
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0000001192092896,
-                            1.0
-                        ],
-                        "Parent": 22,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 24,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Gunship"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "4467298717081781053",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Gunship.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[-180.0,18.266550064086914,-180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8488740503167356413\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.353000164031982,\"MaxDistance\":150.5570068359375,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
-                            }
-                        ],
-                        "childEntityIDs": [
-                            55
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4860677560785862851",
-                        "Position": [
-                            166.57730102539063,
-                            -173.92425537109375,
-                            406.1313171386719
-                        ],
-                        "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
-                        ],
-                        "Scale": [
-                            0.03999999910593033,
-                            0.03999999910593033,
-                            0.03999999910593033
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            55
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "14660510349944733975",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "Gunship_Allies.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "8488740503167356413",
-                        "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 5.353000164031982,
-                        "MaxDistance": 150.5570068359375,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 55,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "GunshipHelper"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5620220221688628037",
-                        "PrefabAssetGuid": "2724132980133514753",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970506833\",\"Position\":[-0.0009765625,0.0,0.0],\"Rotation\":[-4.071109497693487e-13,0.0000017075473124350538,-3.0533325976085657e-13],\"Scale\":[1.0,1.0000001192092896,1.0],\"Parent\":24,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16803977504970768979\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970506833",
-                        "Position": [
-                            -0.0009765625,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            -4.071109497693487e-13,
-                            0.0000017075473124350538,
-                            -3.0533325976085657e-13
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0000001192092896,
-                            1.0
-                        ],
-                        "Parent": 24,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "16803977504970768979",
-                        "ScriptClassName": "Game.GunshipScript"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 62,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Audio_WeaponReload"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "18404285898377724773",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "2839845586185503591",
-                        "FilePath": "Primary_Reload.wav",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 13,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "SEMICONDUCTOR"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "2129024513720025951",
-                        "PrefabAssetGuid": "11352396550574604511",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-293.97662353515625,-200.0,-224.11676025390625],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11865138375784775969\",\"Mesh\":\"\",\"Material\":\"CoreOuter.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16438482250874045513\",\"FilePath\":\"Core_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":52.55500030517578,\"MaxDistance\":502.072998046875,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11863986098428055233\",\"ScriptClassName\":\"Game.HealthCore\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ],
-                        "childEntityIDs": [
-                            14,
-                            15,
-                            61
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15900363641908576543",
-                        "Position": [
-                            -389.0,
-                            -200.0,
-                            -468.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            150.0,
-                            150.0,
-                            150.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            14,
-                            15,
-                            61
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "11865138375784775969",
-                        "Mesh": "",
-                        "Material": "CoreOuter.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "15322750612248530623",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": true,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            75.0,
-                            75.0,
-                            75.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "16438482250874045513",
-                        "FilePath": "Core_Ambient.wav",
-                        "Type": 1,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 52.55500030517578,
-                        "MaxDistance": 502.072998046875,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11863986098428055233",
-                        "ScriptClassName": "Game.HealthCore"
-                    }
-                }
-            ]
-        },
-        {
             "ID": 14,
             "Components": [
                 {
@@ -6117,81 +5400,84 @@
             ]
         },
         {
-            "ID": 15,
+            "ID": 1048588,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "InnermostCore"
+                        "Tag": "Gunship"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "15964082569002189681",
-                        "PrefabAssetGuid": "11352396550574604511",
-                        "isPrefabRoot": false,
+                        "ComponentGUID": "1613476706184270481",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": true,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
+                        "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2145728289022197969\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.10546875,-0.0,0.0],\"Scale\":[0.19999995827674866,0.19999994337558746,0.19999994337558746],\"Parent\":13,\"Children\":[]}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
                             },
                             {
                                 "componentType": 2,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6180953555146293461\",\"Mesh\":\"\",\"Material\":\"Core.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 11,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"playing\":true,\"respectClipLoop\":true,\"controller\":0,\"currentClipIndex\":0,\"currentTime\":0.0029296875,\"playbackSpeed\":1.0}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
                             }
+                        ],
+                        "childEntityIDs": [
+                            1048578
                         ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "2145728289022197969",
+                        "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            798.0,
+                            -376.24957275390625,
+                            -952.4028930664063
                         ],
                         "Rotation": [
-                            0.10546875,
-                            -0.0,
-                            0.0
+                            -180.0,
+                            18.266550064086914,
+                            -180.0
                         ],
                         "Scale": [
-                            0.19999995827674866,
-                            0.19999994337558746,
-                            0.19999994337558746
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
                         ],
-                        "Parent": 13,
-                        "Children": []
+                        "Parent": 4294967295,
+                        "Children": [
+                            1048578
+                        ]
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "6180953555146293461",
-                        "Mesh": "",
-                        "Material": "Core.mat",
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -6202,46 +5488,170 @@
                         "SubmeshIndex": 0,
                         "CastType": 0
                     }
-                },
-                {
-                    "Type": "AnimatorComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "playing": true,
-                        "respectClipLoop": true,
-                        "controller": 0,
-                        "currentClipIndex": 0,
-                        "currentTime": 0.0029296875,
-                        "playbackSpeed": 1.0
-                    }
                 }
             ]
         },
         {
-            "ID": 61,
+            "ID": 1048578,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Particles"
+                        "Tag": "GunshipHelper"
                     }
                 },
                 {
                     "Type": "PrefabComponent",
                     "Properties": {
-                        "ComponentGUID": "14811161064395342711",
-                        "PrefabAssetGuid": "11352396550574604511",
+                        "ComponentGUID": "3919319715397964445",
+                        "PrefabAssetGuid": "14295613256857522137",
                         "isPrefabRoot": false,
                         "isNestedPrefab": false,
                         "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: SEMICONDUCTOR.prefab",
+                        "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14827864839706771731\",\"Position\":[-300.0,-210.0,-220.0],\"Rotation\":[90.0,-0.0,90.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":13,\"Children\":[]}}",
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048588,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18330838522979176399\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":0.5109999775886536,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.291999816894531,\"MaxDistance\":150.4429931640625,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14895357253018403235",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048588,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18330838522979176399",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 0.5109999775886536,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.291999816894531,
+                        "MaxDistance": 150.4429931640625,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8554288977682104741",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048622,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11989770247646401189",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
@@ -6250,13 +5660,113 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5604492802851995921\",\"Tag\":\"Particles\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
                             },
                             {
-                                "componentType": 5,
+                                "componentType": 2,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            2097193
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            166.57699584960938,
+                            -173.9239959716797,
+                            406.1310119628906
+                        ],
+                        "Rotation": [
+                            -180.0,
+                            18.266550064086914,
+                            -180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            2097193
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097193,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "10836848743039554225",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048622,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18330838522979176399\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":0.5109999775886536,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.291999816894531,\"MaxDistance\":150.4429931640625,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
                             }
                         ]
                     }
@@ -6264,110 +5774,10 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "14827864839706771731",
+                        "ComponentGUID": "14895357253018403235",
                         "Position": [
-                            -389.0,
-                            -210.0,
-                            -468.0
-                        ],
-                        "Rotation": [
-                            90.0,
-                            -1.0177775099486433e-13,
-                            90.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 13,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "Particle Type Advanced": "",
-                        "Material Type": "Core.mat",
-                        "Initial Velocity": [
-                            0.0,
-                            1.5,
-                            0.0
-                        ],
-                        "Start Size": [
                             0.0,
                             0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            15.0,
-                            10.0,
-                            15.0
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Max": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Emitter Shape": 1,
-                        "Max Particles": 50,
-                        "Particle Type": 0,
-                        "Emission Rate": 10.0,
-                        "Particle Lifetime": 4.0,
-                        "Emission Accumulator": 0.7705078125,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.699999988079071,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 180.0,
-                        "Min Speed": 10.0,
-                        "Max Speed": 25.0,
-                        "Rotation Speed": 0.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": true,
-                        "Loop": false,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 67,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "mainmenubutton"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5731807458746188633",
-                        "Position": [
-                            376.0,
-                            518.0,
                             0.0
                         ],
                         "Rotation": [
@@ -6376,55 +5786,225 @@
                             0.0
                         ],
                         "Scale": [
-                            100.0,
-                            40.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 1048622,
                         "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18330838522979176399",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 0.5109999775886536,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.291999816894531,
+                        "MaxDistance": 150.4429931640625,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "13225797238690857819",
-                        "ScriptClassName": "Game.MainMenuButton"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_MainMenuButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "ComponentGUID": "8554288977682104741",
+                        "ScriptClassName": "Game.GunshipScript"
                     }
                 }
             ]
         },
         {
-            "ID": 68,
+            "ID": 2097202,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "nextlevelbutton"
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4495780467702698685",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            2097201
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13802257990996788065",
+                        "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            855.0,
-                            518.0,
+                            -799.8250122070313,
+                            -402.77099609375,
+                            -136.4810028076172
+                        ],
+                        "Rotation": [
+                            -180.0,
+                            18.266550064086914,
+                            -180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            2097201
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097201,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "7378084229219816137",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097202,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18330838522979176399\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":0.5109999775886536,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.291999816894531,\"MaxDistance\":150.4429931640625,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14895357253018403235",
+                        "Position": [
+                            0.0,
+                            0.0,
                             0.0
                         ],
                         "Rotation": [
@@ -6433,35 +6013,769 @@
                             0.0
                         ],
                         "Scale": [
-                            100.0,
-                            40.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 2097202,
                         "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18330838522979176399",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 0.5109999775886536,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.291999816894531,
+                        "MaxDistance": 150.4429931640625,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "3425964449535591267",
-                        "ScriptClassName": ""
+                        "ComponentGUID": "8554288977682104741",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048594,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "PrefabComponent",
                     "Properties": {
-                        "Texture": "Paused_ResumeButton.png",
-                        "Color": [
-                            1.0,
+                        "ComponentGUID": "17754377770682389201",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-389.0,-200.0,-468.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11865138375784775969\",\"Mesh\":\"\",\"Material\":\"CoreOuter.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16438482250874045513\",\"FilePath\":\"Core_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":52.55500030517578,\"MaxDistance\":502.072998046875,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11863986098428055233\",\"ScriptClassName\":\"Game.HealthCore\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1048593
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            -182.0189971923828,
+                            -496.0350036621094,
+                            888.905029296875
+                        ],
+                        "Rotation": [
+                            -180.0,
+                            18.266550064086914,
+                            -180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1048593
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048593,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "3342858963096802013",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048594,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18330838522979176399\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":0.5109999775886536,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.291999816894531,\"MaxDistance\":150.4429931640625,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14895357253018403235",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
                             1.0,
                             1.0,
                             1.0
                         ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "Parent": 1048594,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18330838522979176399",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 0.5109999775886536,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.291999816894531,
+                        "MaxDistance": 150.4429931640625,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8554288977682104741",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048599,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "16024995513772708581",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1048598
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            -688.1279907226563,
+                            -345.6510009765625,
+                            -695.7080078125
+                        ],
+                        "Rotation": [
+                            -180.0,
+                            18.266550064086914,
+                            -180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1048598
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048598,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1613476706187121393",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048599,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18330838522979176399\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":0.5109999775886536,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.291999816894531,\"MaxDistance\":150.4429931640625,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14895357253018403235",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048599,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18330838522979176399",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 0.5109999775886536,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.291999816894531,
+                        "MaxDistance": 150.4429931640625,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8554288977682104741",
+                        "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048631,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "460555201581355769",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14660510349944733975\",\"Mesh\":\"A9005_gunship_v001.fbx\",\"Material\":\"Gunship_Allies.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1048600
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4860677560785862851",
+                        "Position": [
+                            648.156982421875,
+                            -68.83100128173828,
+                            390.9230041503906
+                        ],
+                        "Rotation": [
+                            -180.0,
+                            18.266550064086914,
+                            -180.0
+                        ],
+                        "Scale": [
+                            0.03999999910593033,
+                            0.03999999910593033,
+                            0.03999999910593033
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1048600
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "14660510349944733975",
+                        "Mesh": "A9005_gunship_v001.fbx",
+                        "Material": "Gunship_Allies.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048600,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "GunshipHelper"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "7378084229222437637",
+                        "PrefabAssetGuid": "14295613256857522137",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Gunship.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"14895357253018403235\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048631,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3017456296697774503\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18330838522979176399\",\"FilePath\":\"Flotilla_Gunship_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":0.5109999775886536,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":5.291999816894531,\"MaxDistance\":150.4429931640625,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8554288977682104741\",\"ScriptClassName\":\"Game.GunshipScript\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14895357253018403235",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 1048631,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017456296697774503",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18330838522979176399",
+                        "FilePath": "Flotilla_Gunship_Ambient.wav",
+                        "Type": 1,
+                        "State": 0,
+                        "Volume": 0.5109999775886536,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 5.291999816894531,
+                        "MaxDistance": 150.4429931640625,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8554288977682104741",
+                        "ScriptClassName": "Game.GunshipScript"
                     }
                 }
             ]

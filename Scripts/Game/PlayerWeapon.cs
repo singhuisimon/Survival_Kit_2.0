@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Camera;
 using static Engine.Event;
 using static Engine.Audio;
+using static Engine.AudioManager;
 
 namespace Game
 {
@@ -28,7 +29,7 @@ namespace Game
         [SerializeField] private int primaryAmmo = 0;
         [SerializeField] private int primaryAmmoMax = 100;
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
-        [SerializeField] private float primaryShootRate = 0.05f;
+        [SerializeField] private float primaryShootRate = 0.1f;
         [SerializeField] private float primaryShootNext = 0.0f;
         [SerializeField] private float primarybulletSpeed = 10000.0f;
 
@@ -249,6 +250,9 @@ namespace Game
             wasTKeyPressed = tKeyPressed;
             if (tKeyJustPressed)
             {
+                AudioManager.StopGroup(AudioType.BGM);
+                AudioManager.StopGroup(AudioType.SFX);
+                Input.SetCursorVisible(false);
                 Event.Publish("LoadScene", "Resources/Sources/Scenes/level2_player.json");
             }
 

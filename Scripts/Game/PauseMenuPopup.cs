@@ -70,7 +70,7 @@ namespace Game
 
         // Scene paths for navigation
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_Player.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
 
         // Pause events - other scripts subscribe to these
         private const string EVENT_GAME_PAUSED = "GamePaused";
