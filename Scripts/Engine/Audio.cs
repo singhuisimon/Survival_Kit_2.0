@@ -9,6 +9,8 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Stop(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_Pause(uint entityID);
 
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool Audio_IsPlaying(uint entityID);
+
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern float Audio_GetVolume(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Audio_SetVolume(uint entityID, float volume);
 
@@ -47,6 +49,8 @@ namespace Engine
         public static void AudioPlay(uint entityID) => Audio_Play(entityID);
         public static void AudioStop(uint entityID) => Audio_Stop(entityID);
         public static void AudioPause(uint entityID) => Audio_Pause(entityID);
+
+        public static bool AudioIsPlaying(uint entityID) => Audio_IsPlaying(entityID);
 
         public static void AudioSetFile(uint entityID, string path) => Audio_SetFile(entityID, path ?? string.Empty);
         public static void AudioSetLoop(uint entityID, bool loop) => Audio_SetLoop(entityID, loop);

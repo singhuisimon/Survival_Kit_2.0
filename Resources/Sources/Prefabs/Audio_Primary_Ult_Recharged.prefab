@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_Primary_Ult_Recharged",
-    "Prefab GUID": 2839845586191860599,
+    "Prefab Name": "Prefab: Audio_Primary_Ult_Recharged.prefab",
+    "Prefab GUID": 806901363636386105,
     "version": 1,
     "entities": [
         {
@@ -53,7 +53,7 @@
                             "FilePath": "Player_Secondary_Reload.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 1.2009999752044678,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -75,7 +75,7 @@
                             "ComponentGUID": "12639678375349846899",
                             "ScriptClassName": "Game.GameDelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 227
+                            "GCHandle": 7347
                         }
                     }
                 }
