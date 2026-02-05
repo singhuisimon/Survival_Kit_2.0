@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 12177514048596476487,
+    "Prefab GUID": 16570608366664106185,
     "version": 1,
     "entities": [
         {
@@ -15,8 +15,8 @@
                         "Properties": {
                             "ComponentGUID": "16742114490130125945",
                             "Position": [
-                                0.0,
-                                -2.9802322387695313e-8,
+                                -9.5367431640625e-7,
+                                -9.5367431640625e-7,
                                 0.0
                             ],
                             "Rotation": [
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                5.0,
-                                5.0,
-                                5.0
+                                30.0,
+                                20.0,
+                                20.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -127,7 +127,7 @@
                         "Properties": {
                             "ComponentGUID": "11007352189747626285",
                             "ScriptClassName": "Game.Botnet",
-                            "Started": true,
+                            "Started": false,
                             "GCHandle": 19
                         }
                     }

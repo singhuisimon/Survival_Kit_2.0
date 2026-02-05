@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryUltExplosion.prefab",
-    "Prefab GUID": 1892418406707446607,
+    "Prefab GUID": 14796867413070711117,
     "version": 1,
     "entities": [
         {
@@ -53,7 +53,7 @@
                             "Mesh": "",
                             "Material": "",
                             "Texture": "",
-                            "Visible": true,
+                            "Visible": false,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
                             "MeshType": 0,
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                5.0,
-                                5.0,
-                                5.0
+                                150.0,
+                                150.0,
+                                150.0
                             ],
                             "SphereRadius": 2.5
                         }
@@ -112,8 +112,8 @@
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 1.0,
-                            "MaxDistance": 100.0,
+                            "MinDistance": 51.00699996948242,
+                            "MaxDistance": 307.89300537109375,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
@@ -128,7 +128,7 @@
                             "ComponentGUID": "14304022309015339259",
                             "ScriptClassName": "Game.PrimaryUltAOEDamage",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 907
                         }
                     }
                 }

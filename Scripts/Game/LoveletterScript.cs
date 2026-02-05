@@ -225,15 +225,18 @@ namespace Game
                 return;
             float damage = DamageSystem.ParseAmount(payload);
             currentHealth -= damage;
-            
+
             if (currentHealth < 0.0f){
                 currentHealth = 0.0f;
             }
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
+            LogMessage("[LoveLetterScript] Attacker ID is: " + attackerId.ToString());
             if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
+                LogMessage("[LoveLetterScript] attacker is: " + attackerTag);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
+                    LogMessage("[LoveLetterScript] Instantiating the hitmarker");
                     //instantiate the hitmarker audio
                     Vector3 spawnPos = GetPosition((uint)EntityID);
                     Quat spawnRot = GetRotation((uint)EntityID);
