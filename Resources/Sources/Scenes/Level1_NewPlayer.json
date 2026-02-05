@@ -4042,7 +4042,7 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
                             },
                             {
                                 "componentType": 9,
@@ -4113,7 +4113,7 @@
                     "Properties": {
                         "ComponentGUID": "15322750612248530623",
                         "Mass": 1.0,
-                        "IsKinematic": false,
+                        "IsKinematic": true,
                         "IsTrigger": true,
                         "UseGravity": false,
                         "Velocity": [
