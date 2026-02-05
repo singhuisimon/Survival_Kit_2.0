@@ -1389,6 +1389,9 @@ namespace Engine {
 		BindInternalCall("Engine.Audio::Audio_Pause",
 						 reinterpret_cast<void *>(InternalCalls::Audio_Pause));
 
+		BindInternalCall("Engine.Audio::Audio_IsPlaying",
+						 reinterpret_cast<void*>(InternalCalls::Audio_IsPlaying));
+
 		BindInternalCall("Engine.Audio::Audio_GetVolume",
 						 reinterpret_cast<void *>(InternalCalls::Audio_GetVolume));
 		BindInternalCall("Engine.Audio::Audio_SetVolume",
