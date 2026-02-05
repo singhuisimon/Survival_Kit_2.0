@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryUltExplosion.prefab",
-    "Prefab GUID": 15136176701390536905,
+    "Prefab GUID": 14796867413070711117,
     "version": 1,
     "entities": [
         {
@@ -89,9 +89,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                10.0,
-                                10.0,
-                                10.0
+                                150.0,
+                                150.0,
+                                150.0
                             ],
                             "SphereRadius": 2.5
                         }
@@ -128,7 +128,7 @@
                             "ComponentGUID": "14304022309015339259",
                             "ScriptClassName": "Game.PrimaryUltAOEDamage",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 907
                         }
                     }
                 }
