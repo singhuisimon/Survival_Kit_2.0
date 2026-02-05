@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryBullet.prefab",
-    "Prefab GUID": 14641959418918254891,
+    "Prefab GUID": 14295613256872451863,
     "version": 1,
     "entities": [
         {
@@ -106,7 +106,7 @@
                             "FilePath": "Player_Primary_Fire.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.12800000607967377,
+                            "Volume": 0.15399999916553497,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -128,7 +128,7 @@
                             "ComponentGUID": "14829703208479391955",
                             "ScriptClassName": "Game.PrimaryBullet",
                             "Started": false,
-                            "GCHandle": 7347
+                            "GCHandle": 3275
                         }
                     }
                 },
