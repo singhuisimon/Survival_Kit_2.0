@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "WormHost",
-    "Prefab GUID": 17707045991215513801,
+    "Prefab Name": "Prefab: WormHost.prefab",
+    "Prefab GUID": 8883641102356323969,
     "version": 1,
     "entities": [
         {
@@ -106,13 +106,13 @@
                             "FilePath": "Worm_Host_Ambient.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8040000200271606,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 30.19700050354004,
+                            "MinDistance": 51.62200164794922,
                             "MaxDistance": 403.0169982910156,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.0,
@@ -128,7 +128,7 @@
                             "ComponentGUID": "3289510651551910173",
                             "ScriptClassName": "Game.WormHost",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 3635
                         }
                     }
                 }

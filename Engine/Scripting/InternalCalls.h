@@ -778,6 +778,14 @@ namespace Engine {
 		***************************************************************************/
 		void  Audio_Pause(uint64_t entityID);
 
+		/**
+		 * @brief
+		 * Checks if the entity's audio component is currently playing.
+		 * @param entityID
+		 * Entity
+		*/
+		bool Audio_IsPlaying(uint64_t entityID);
+
 		/**************************************************************************
 		 * @brief
 		 * Gets an audio property for the entity's audio component.

@@ -51,6 +51,7 @@ namespace Game
         //[SerializeField] 
         private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
+        private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
         // Botnet Health
         [SerializeField] private float HP = 3.0f;
@@ -92,6 +93,7 @@ namespace Game
         private const string EVENT_SPAWN_DISABLE = "DisablingSpawn";
         private const string EVENT_GAME_OVER = "GameOver";
         private const string EVENT_GAME_WIN = "GameWin";
+        private string DAMAGEPLAYERAUDIOPREFAB = "Sources/Prefabs/Audio_EmemyDamage.prefab";
 
         // Pause state
         private Vector3 savedVelocity = Vector3.Zero;
@@ -234,15 +236,12 @@ namespace Game
             HP -= damage;
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY){
+            if(attackerId != INVALID_ENTITY && HP > 0.0f){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
                     //instantiate the hitmarker audio
-                    Vector3 spawnPos = GetPosition((uint)EntityID);
-                    Quat spawnRot = GetRotation((uint)EntityID);
-                    Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
                     uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
                     if(hitmarkerID == 0){
                         LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
                     }
@@ -256,6 +255,12 @@ namespace Game
 
             if (HP <= 0.0f)
             {
+                uint playerkillID = 0;
+                playerkillID = PrefabInstantiate(playerKillPrefab);
+                if(playerkillID == 0){
+                    LogMessage("[Botnet] Player Kill Botnet! But playerkillID fail to instantiate");
+                }
+
                 Publish("BotnetDeath", 1.ToString());
                 Explode();
             }
@@ -548,6 +553,7 @@ namespace Game
                 {
                     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
                     Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    PrefabInstantiate(DAMAGEPLAYERAUDIOPREFAB);
                 }
                 
                 // Check if hit target

@@ -7,6 +7,7 @@ using static Engine.Physics;
 using static Engine.Rigidbody;
 using static Engine.Tag;
 using static Engine.Event;
+using static Engine.Prefab;
 
 namespace Game
 {
@@ -29,6 +30,8 @@ namespace Game
         private float elapsedTime = 0.0f;
         private Vector3 savedVelocity = Vector3.Zero;
         private bool wasPaused = false;
+
+        private string DAMAGEPLAYERAUDIOPREFAB = "Sources/Prefabs/Audio_EmemyDamage.prefab";
 
         // DEBUG: Toggle debug messages on/off
         [SerializeField]
@@ -176,10 +179,21 @@ namespace Game
 
         private void OnBulletHitTarget(uint bulletEntityID, uint targetEntityID)
         {
+            // Get the target's tag to determine what we hit
+            string targetTag = TagGetTag(targetEntityID);
+
             // Always log the hit (even if debug is off)
             LogMessage("===== WORM BULLET HIT PLAYER! =====");
             LogMessage("Bullet EntityID: " + bulletEntityID + " hit Player EntityID: " + targetEntityID);
             LogMessage("Damage dealt: " + Damage);
+
+            // Play damage audio if we hit the player
+            if (targetTag == "Player")
+            {
+                PrefabInstantiate(DAMAGEPLAYERAUDIOPREFAB);
+                if (enableDebug)
+                    LogMessage("Playing player damage audio");
+            }
 
             //Publish(EVENT_PLAYER_HEALTHCHAGE, playerHP.ToString());
             DamageSystem.DealDamage(targetEntityID, Damage, bulletEntityID);
