@@ -1419,7 +1419,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	}
 
 	// Reload current game scene
-	if (input.IsKeyJustPressed(GLFW_KEY_R) && !editorCamToggle)
+	if (input.IsKeyJustPressed(GLFW_KEY_U) && !editorCamToggle)
 	{
 		LOG_INFO("=== RELOADING GAME SCENE ===");
 		if (!m_CurrentScenePath.empty())
