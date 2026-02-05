@@ -8,6 +8,7 @@ using static Engine.Input;
 using static Engine.Rigidbody;
 using static Engine.Camera;
 using static Engine.Event;
+using static Engine.Audio;
 
 namespace Game
 {
@@ -117,9 +118,15 @@ namespace Game
         #region others
 
         [SerializeField] private float muzzleDistance = 5.0f;
+        [SerializeField] private bool spawnedCharge = false;
+        [SerializeField] private bool spawnedChargelastframe = false;
+        private string PrimaryUltChargedPrefab = "Sources/Prefabs/Audio_Primary_Ult_Recharged.prefab";
+        private string AudioWeaponReloadName = "Audio_WeaponReload";
+
 
         #endregion
 
+        private uint reloadID = 0;
         private uint firingPointEntityID = 0;
         private uint playerEntityID = 0;
         private bool isKeyRPressedPreviously = false;
@@ -146,14 +153,19 @@ namespace Game
 
             firingPointEntityID = SceneFindEntityByName(firingPointName);
             playerEntityID = SceneFindEntityByName(playerName);
+            reloadID = SceneFindEntityByName(AudioWeaponReloadName);
 
             if (firingPointEntityID == 0)
             {
-                LogMessage("[CamControl] firing point entity cannot be found");
+                LogMessage("[PlayerWeapon] firing point entity cannot be found");
             }
             if (playerEntityID == 0)
             {
-                LogMessage("[CamControl] player entity cannot be found");
+                LogMessage("[PlayerWeapon] player entity cannot be found");
+            }
+            if (reloadID == 0)
+            {
+                LogMessage("[PlayerWeapon] reload entity cannot be found");
             }
 
             // Init velocity tracker
@@ -358,6 +370,10 @@ namespace Game
                 PrimaryReload(primaryReloadDelay);
 
                 //SFX
+                if(reloadID != 0){
+                    LogMessage("[PlayerWeapon] Playing audio right now");
+                    AudioPlay(reloadID);
+                }
             }
         }
 
@@ -377,7 +393,8 @@ namespace Game
             if (primaryAltCharge >= primaryAltChargeMax)
             {
                 //play sfx -> notify player ult is ready
-                //publish event here
+                //spawn the prefab here
+                PrefabInstantiate(PrimaryUltChargedPrefab);
 
                 primaryAltReady = true;
 
@@ -476,6 +493,7 @@ namespace Game
             }
             else
             {
+                PrefabInstantiate(PrimaryUltChargedPrefab);
                 primaryAltReady = true;
                 LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
             }
