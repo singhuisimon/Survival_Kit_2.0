@@ -5,6 +5,7 @@
 using Engine;
 using System;
 using static Engine.Scene;
+using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Transform;
 
@@ -62,6 +63,11 @@ namespace Game
         private Vector3 volumeFill2VisiblePos = new Vector3(353.0f, 307.0f, -0.6f);
         private Vector3 volumeFill3VisiblePos = new Vector3(353.0f, 377.0f, -0.6f);
 
+        // Event names for popup coordination
+        private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
+        private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
+        private const string POPUP_ID = "Settings";
+
         // State
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
@@ -99,6 +105,9 @@ namespace Game
             entitiesFound = true;
             isPopupVisible = false;
             wasMousePressed = false;
+
+            // Subscribe to popup coordination events
+            Event.Subscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
 
             // Hide all popup elements initially
             HidePopup();
@@ -152,12 +161,22 @@ namespace Game
             }
         }
 
+        private void OnOtherPopupOpened(string eventName, string payload)
+        {
+            if (payload != POPUP_ID && isPopupVisible)
+            {
+                LogMessage("SettingsPopup: Another popup opened (" + payload + ") - closing settings");
+                HidePopup();
+            }
+        }
+
         private void ShowPopup()
         {
             if (isPopupVisible)
                 return;
 
             isPopupVisible = true;
+            Event.Publish(EVENT_POPUP_OPENED, POPUP_ID);
 
             // Show all popup elements at their visible positions
             if (settingsPopupId != 0) SetPosition(settingsPopupId, ref popupVisiblePos);
@@ -177,7 +196,10 @@ namespace Game
 
         private void HidePopup()
         {
+            bool wasVisible = isPopupVisible;
             isPopupVisible = false;
+            if (wasVisible)
+                Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
 
             // Move all popup elements off-screen
             Vector3 hidePos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
@@ -200,6 +222,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            Event.Unsubscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
             LogMessage("SettingsPopup: Destroyed");
         }
     }

@@ -69,6 +69,7 @@ namespace Game
             // Entities
             { "player", CollisionCategory.PLAYER },
             { "gunshiphelper", CollisionCategory.ALLY },
+            { "gunship", CollisionCategory.ALLY },
             { "sentry", CollisionCategory.ALLY },
             
             // Enemies
@@ -79,7 +80,6 @@ namespace Game
             { "wormchild", CollisionCategory.ENEMY },
             { "enemy_core", CollisionCategory.ENEMY },
             { "enemyturret", CollisionCategory.ENEMY },
-            { "gunship", CollisionCategory.ENEMY },
             
             // Objectives
             { "semiconductor", CollisionCategory.CORE },
