@@ -27,6 +27,7 @@ namespace Game
         // ===== PREFAB =====
         [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
+        [SerializeField] private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
         // ===== CORE DIMENSIONS =====
         [SerializeField] private float coreHalfSizeX = 37.5f;
@@ -225,29 +226,34 @@ namespace Game
                 return;
             float damage = DamageSystem.ParseAmount(payload);
             currentHealth -= damage;
-            
+
             if (currentHealth < 0.0f){
                 currentHealth = 0.0f;
             }
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
+            LogMessage("[LoveLetterScript] Attacker ID is: " + attackerId.ToString());
             if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
-                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
-                    //instantiate the hitmarker audio
-                    Vector3 spawnPos = GetPosition((uint)EntityID);
-                    Quat spawnRot = GetRotation((uint)EntityID);
-                    Vector3 scale = new Vector3(0.1f,0.1f,0.1f);
+                LogMessage("[LoveLetterScript] attacker is: " + attackerTag);
+                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET && currentHealth > 0.0f){
+                    LogMessage("[LoveLetterScript] Instantiating the hitmarker");
                     uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiateWithTransform(hitmarkerAudioPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
                     if(hitmarkerID == 0){
-                        LogMessage("[LoveletterScript] Player Hit! But hitmarkerID fail to instantiate");
+                        LogMessage("[LoveLetterScript] Player Hit! But hitmarkerID fail to instantiate");
                     }
                 }
             }
 
             if (currentHealth <= 0.0f)
             {
+                uint playerkillID = 0;
+                playerkillID = PrefabInstantiate(playerKillPrefab);
+                if(playerkillID == 0){
+                    LogMessage("[LoveLetterScript] Player Kill LoveLetter! But playerkillID fail to instantiate");
+                }
+
                 Publish("LoveLetterDeath", 1.ToString());
                 DestroyLoveLetter();
             }
