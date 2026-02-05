@@ -5,6 +5,7 @@ using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Rigidbody;
+using static Engine.Audio;
 
 namespace Game
 {
@@ -27,8 +28,14 @@ namespace Game
         private Vector3 savedVelocity = Vector3.Zero;
         private bool wasPaused = false;
 
+        private float lifetime = 0.0f;
+        private bool hit = false;
+
+        private bool audioplayed = false;
+
         public override void OnStart()
         {
+            
         }
 
         public override void OnUpdate(float deltaTime)
@@ -53,10 +60,18 @@ namespace Game
                 wasPaused = false;
             }
 
+            if(!audioplayed){
+                AudioPlay((uint)EntityID);
+                audioplayed = true;
+            }
+
             // Lifetime check
             elapsedTime += deltaTime;
-            if (elapsedTime >= ProjectileLifetime)
+            if (elapsedTime >= ProjectileLifetime && !hit)
             {
+                SceneDestroyEntity((uint)EntityID);
+                return;
+            } else if (hit && elapsedTime >= lifetime){
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
@@ -69,7 +84,9 @@ namespace Game
                 return;
 
             // Check collisions using CollisionManager
-            CheckCollisions();
+            if(!hit){
+                CheckCollisions();
+            }
         }
 
         // ========================================================================
@@ -110,8 +127,13 @@ namespace Game
             
             LogMessage("BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID + " damage=" + Damage);
 
+            AudioStop((uint)EntityID);
+
+            hit = true;
+            lifetime += 0.5f;
+
             // Destroy the bullet
-            SceneDestroyEntity(bulletEntityID);
+            // SceneDestroyEntity(bulletEntityID);
         }
 
         public override void OnDestroy()

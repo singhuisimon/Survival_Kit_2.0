@@ -5,6 +5,7 @@ using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Transform;
 using static Engine.Rigidbody;
+using static Engine.Audio;
 using static Engine.Prefab;
 
 namespace Game
@@ -22,6 +23,15 @@ namespace Game
         private string ultExplosionPrefab = "Sources/Prefabs/PrimaryUltExplosion.prefab";
 
         private float elapsedTime = 0.0f;
+        private Vector3 savedVelocity = Vector3.Zero;
+        private bool wasPaused = false;
+
+        private float lifetime = 0.0f;
+        private bool hit = false;
+
+        private bool audioplayed = false;
+
+        private bool instantiated = false;
 
         public override void OnStart()
         {
@@ -30,13 +40,42 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+
+            // Handle pause - save/restore velocity
+            if (GameState.IsPaused)
+            {
+                if (!wasPaused)
+                {
+                    // Just paused - save velocity and stop
+                    savedVelocity = RigidbodyGetVelocity((uint)EntityID);
+                    Vector3 zero = Vector3.Zero;
+                    RigidbodySetVelocity((uint)EntityID, ref zero);
+                    wasPaused = true;
+                }
+                return;
+            }
+            else if (wasPaused)
+            {
+                // Just unpaused - restore velocity
+                RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
+                wasPaused = false;
+            }
+
+            if(!audioplayed){
+                AudioPlay((uint)EntityID);
+                audioplayed = true;
+            }
+
             // Just update elapsed time in Update
             elapsedTime += deltaTime;
 
             // Lifetime check
-            if (elapsedTime >= projectileLifetime)
+            if (elapsedTime >= projectileLifetime && !hit)
             {
                 LogMessage("[PrimaryUltFire] Lifetime expired, destroying: " + EntityID);
+                SceneDestroyEntity((uint)EntityID);
+                return;
+            } else if (hit && elapsedTime >= lifetime){
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
@@ -44,6 +83,11 @@ namespace Game
 
         public override void OnFixedUpdate(float deltaTime)
         {
+
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
+            
             // Check collisions using CollisionManager (efficient!)
             CheckCollisions();
         }
@@ -83,25 +127,32 @@ namespace Game
             DamageSystem.DealDamage(targetEntityID, damage, bulletEntityID);
             LogMessage("[PrimaryUltFire] Direct hit! Bullet " + bulletEntityID + " dealt " + damage + " damage to " + targetEntityID);
             
-            // Get impact position for AOE spawn
-            Vector3 Position = GetPosition(bulletEntityID);
-            Quat Rot = GetRotation(bulletEntityID);
-            Vector3 Scale = new Vector3(aoeRadius, aoeRadius, aoeRadius);
-            
-            // Instantiate AOE explosion at impact point
-            uint aoeID = PrefabInstantiateWithTransform(ultExplosionPrefab, ref Position, ref Rot, ref Scale, false);
-            
-            if (aoeID == 0)
-            {
-                LogMessage("[PrimaryUltFire] ERROR: Failed to instantiate AOE explosion!");
-            }
-            else
-            {
-                LogMessage("[PrimaryUltFire] AOE explosion spawned! ID: " + aoeID + " at impact point");
+            if(!instantiated){
+                // Get impact position for AOE spawn
+                Vector3 Position = GetPosition(bulletEntityID);
+                Quat Rot = GetRotation(bulletEntityID);
+                Vector3 Scale = new Vector3(0.1f, 0.1f, 0.1f);
+                
+                // Instantiate AOE explosion at impact point
+                uint aoeID = PrefabInstantiateWithTransform(ultExplosionPrefab, ref Position, ref Rot, ref Scale, false);
+                
+                if (aoeID == 0)
+                {
+                    LogMessage("[PrimaryUltFire] ERROR: Failed to instantiate AOE explosion!");
+                }
+                else
+                {
+                    LogMessage("[PrimaryUltFire] AOE explosion spawned! ID: " + aoeID + " at impact point");
+                }
             }
 
+            AudioStop((uint)EntityID);
+
+            hit = true;
+            lifetime += 0.5f;
+
             // Destroy the ult bullet
-            SceneDestroyEntity(bulletEntityID);
+            //SceneDestroyEntity(bulletEntityID);
         }
     }
 }

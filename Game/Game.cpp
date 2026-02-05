@@ -260,6 +260,7 @@ void Game::OnInit()
 		if (loadedFromFile)
 		{
 			LOG_INFO("  -> Scene loaded from file successfully");
+			m_CurrentScenePath = "Resources/Sources/Scenes/ExampeScene.json";
 
 			// Update settings from loaded scene
 			m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
@@ -1417,6 +1418,20 @@ void Game::OnUpdate(Engine::Timestep ts)
 		}
 	}
 
+	// Reload current game scene
+	if (input.IsKeyJustPressed(GLFW_KEY_R) && !editorCamToggle)
+	{
+		LOG_INFO("=== RELOADING GAME SCENE ===");
+		if (!m_CurrentScenePath.empty())
+		{
+			LoadSceneFromEvent(m_CurrentScenePath);
+		}
+		else
+		{
+			LoadSceneFromEvent("Resources/Sources/Scenes/Level1_NewPlayer.json");
+		}
+	}
+
 	// UNCOMMENT IF YOU NEED TO SPAWN A FIRST TIME INSTANCE OF A ENTITY THAT HAS SUBMESH HERE - AMANDA
 	// ADJUST THE SUBMESH COUNT ACCORDINGLY ARIGATO
 	// SAME FOR THE NAME!
@@ -1605,6 +1620,7 @@ void Game::LoadSceneFromEvent(const std::string& scenePath)
 		}
 
 		LOG_INFO("  -> Scene loaded successfully");
+		m_CurrentScenePath = scenePath;
 
 		// Step 4: Update renderer settings from loaded scene
 		LOG_INFO("Step 4: Updating renderer settings...");

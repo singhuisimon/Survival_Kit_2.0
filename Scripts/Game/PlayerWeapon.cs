@@ -8,13 +8,16 @@ using static Engine.Input;
 using static Engine.Rigidbody;
 using static Engine.Camera;
 using static Engine.Event;
+using static Engine.Audio;
 
-namespace Game{
+namespace Game
+{
 
     /// <Summary>
     /// This script manages the weapon player uses
     /// </Summary>
-    public class PlayerWeapon : ScriptBehaviour{
+    public class PlayerWeapon : ScriptBehaviour
+    {
 
         [SerializeField] private bool shootAllowed;
         [SerializeField] private bool gameEnd;
@@ -25,17 +28,36 @@ namespace Game{
         [SerializeField] private int primaryAmmo = 0;
         [SerializeField] private int primaryAmmoMax = 100;
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
-        [SerializeField] private float primaryShootRate = 0.05f; 
+        [SerializeField] private float primaryShootRate = 0.05f;
         [SerializeField] private float primaryShootNext = 0.0f;
         [SerializeField] private float primarybulletSpeed = 10000.0f;
 
-        //[SerializeField] 
+        // ===== Bullet velocity inheritance =====
+        // Player is moved kinematically (SetPosition in SpaceshipController), so we estimate velocity from position delta.
+        [SerializeField] private bool inheritPlayerVelocity = true;
+
+        // If true, inherit only the component along the bullet direction (keeps shots straight).
+        [SerializeField] private bool inheritAlongBulletDirectionOnly = true;
+
+        // 1.0 = full inheritance, 0.0 = none.
+        [SerializeField] private float inheritVelocityFactor = 1.0f;
+
+        // Safety clamp for spikes (teleport / hitch / pause-unpause).
+        [SerializeField] private float maxInheritedSpeed = 250.0f;
+
+        // Guarantee bullet forward speed is at least this much faster than player forward speed.
+        [SerializeField] private float minBulletOverPlayerSpeed = 100.0f;
+
+        // Absolute minimum forward speed for the bullet (world space).
+        [SerializeField] private float minWorldBulletSpeed = 300.0f;
+
+        //[SerializeField]
         private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
         //audio
         //vfx -> trail
 
         #endregion
-        
+
         #region alt charge
         [SerializeField] private float chargeDelayRate = 0.5f;
         [SerializeField] private float chargeDelayNext = 0.0f;
@@ -49,7 +71,7 @@ namespace Game{
         [SerializeField] private float primaryAltFireAOERange = 30f;
         [SerializeField] private float primaryUltSpeed = 5000.0f;
 
-        //[SerializeField] 
+        //[SerializeField]
         private string PrimaryUltBulletPrefab = "Sources/Prefabs/PrimaryUltBullet.prefab";
 
         private string ULTGAINEVENT = "GainUlt";
@@ -86,19 +108,25 @@ namespace Game{
 
         #region entity
 
-        //[SerializeField] 
+        //[SerializeField]
         private string firingPointName = "PlayerCam";
-        //[SerializeField] 
+        //[SerializeField]
         private string playerName = "Player";
 
         #endregion
 
         #region others
-        
+
         [SerializeField] private float muzzleDistance = 5.0f;
+        [SerializeField] private bool spawnedCharge = false;
+        [SerializeField] private bool spawnedChargelastframe = false;
+        private string PrimaryUltChargedPrefab = "Sources/Prefabs/Audio_Primary_Ult_Recharged.prefab";
+        private string AudioWeaponReloadName = "Audio_WeaponReload";
+
 
         #endregion
 
+        private uint reloadID = 0;
         private uint firingPointEntityID = 0;
         private uint playerEntityID = 0;
         private bool isKeyRPressedPreviously = false;
@@ -108,7 +136,14 @@ namespace Game{
         private Vector3 bulletDirection;
         private string EVENT_AMMO_CHANGE = "AmmoChange";
 
-        public override void OnStart(){
+        // ===== Estimated player velocity (for bullet inheritance) =====
+        private Vector3 estimatedPlayerVelocity = Vector3.Zero;
+        private Vector3 lastPlayerPos = Vector3.Zero;
+        private bool hasLastPlayerPos = false;
+        private bool velocityTrackerWasPaused = false;
+
+        public override void OnStart()
+        {
 
             //Initialize Values
             shootAllowed = true;
@@ -118,12 +153,27 @@ namespace Game{
 
             firingPointEntityID = SceneFindEntityByName(firingPointName);
             playerEntityID = SceneFindEntityByName(playerName);
+            reloadID = SceneFindEntityByName(AudioWeaponReloadName);
 
-            if(firingPointEntityID == 0){
-                LogMessage("[CamControl] firing point entity cannot be found");
+            if (firingPointEntityID == 0)
+            {
+                LogMessage("[PlayerWeapon] firing point entity cannot be found");
             }
-            if(playerEntityID == 0){
-                LogMessage("[CamControl] player entity cannot be found");
+            if (playerEntityID == 0)
+            {
+                LogMessage("[PlayerWeapon] player entity cannot be found");
+            }
+            if (reloadID == 0)
+            {
+                LogMessage("[PlayerWeapon] reload entity cannot be found");
+            }
+
+            // Init velocity tracker
+            if (playerEntityID != 0)
+            {
+                lastPlayerPos = GetPosition(playerEntityID);
+                hasLastPlayerPos = true;
+                estimatedPlayerVelocity = Vector3.Zero;
             }
 
             Subscribe(ULTGAINEVENT, UltCharging);
@@ -131,18 +181,64 @@ namespace Game{
             Subscribe(GAMEWIN, OnGameStateChange);
         }
 
-        public override void OnUpdate(float deltaTime){
+        public override void OnFixedUpdate(float deltaTime)
+        {
+            if (playerEntityID == 0)
+                return;
+
+            if (GameState.IsPaused)
+            {
+                estimatedPlayerVelocity = Vector3.Zero;
+                hasLastPlayerPos = false;
+                velocityTrackerWasPaused = true;
+                return;
+            }
+
+            if (velocityTrackerWasPaused)
+            {
+                // Avoid a big spike right after unpausing.
+                velocityTrackerWasPaused = false;
+                hasLastPlayerPos = false;
+            }
+
+            Vector3 pos = GetPosition(playerEntityID);
+
+            if (hasLastPlayerPos && deltaTime > 1e-6f)
+            {
+                float invDt = 1.0f / deltaTime;
+                estimatedPlayerVelocity = (pos - lastPlayerPos) * invDt;
+
+                // Clamp inherited speed to avoid teleports/hitches producing crazy bullets.
+                float spd = estimatedPlayerVelocity.Magnitude;
+                if (spd > maxInheritedSpeed && spd > 1e-6f)
+                {
+                    estimatedPlayerVelocity = estimatedPlayerVelocity * (maxInheritedSpeed / spd);
+                }
+            }
+            else
+            {
+                estimatedPlayerVelocity = Vector3.Zero;
+            }
+
+            lastPlayerPos = pos;
+            hasLastPlayerPos = true;
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
 
             elapsedTime += deltaTime;
             //primaryAltReady = true;
 
-            if(gameEnd){
+            if (gameEnd)
+            {
                 LogMessage("[CamControl] player isnt allow to shoot as game ended!");
                 return;
             }
 
             //Cheatcode
-            if(Input.IsKeyPressed(KeyCode.O)){
+            if (Input.IsKeyPressed(KeyCode.O))
+            {
                 PrimaryAltCharge_Reward();
             }
             // Don't update when game is paused
@@ -165,7 +261,8 @@ namespace Game{
                 LogMessage("[PlayerWeapon] Reload complete!");
             }
 
-            if(!shootAllowed){
+            if (!shootAllowed)
+            {
                 LogMessage("[CamControl] player isnt allow to shoot!");
                 return;
             }
@@ -175,35 +272,38 @@ namespace Game{
             PrimaryShoot();
 
             //Spawn botnet
-            if(Input.IsKeyReleased(KeyCode.J)){
-                uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
-                LogMessage("Spawning botnet");
-            }
+            // if (Input.IsKeyReleased(KeyCode.J))
+            // {
+            //     uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
+            //     LogMessage("Spawning botnet");
+            // }
 
         }
 
-        public override void OnDestroy(){
+        public override void OnDestroy()
+        {
             Unsubscribe(ULTGAINEVENT, UltCharging);
             Unsubscribe(GAMEWIN, OnGameStateChange);
             Unsubscribe(GAMEOVER, OnGameStateChange);
         }
 
-        private void PrimaryShoot(){
-            if(Input.IsMouseButtonPressed(MouseButton.Left) && primaryAmmo > 0)
+        private void PrimaryShoot()
+        {
+            if (Input.IsMouseButtonPressed(MouseButton.Left) && primaryAmmo > 0)
             {
                 primaryShooting = true;
-            } 
-            else 
+            }
+            else
             {
                 primaryShooting = false;
             }
 
-            if(primaryShooting)
+            if (primaryShooting)
             {
                 PrimaryFire();
             }
 
-            if(Input.IsMouseButtonPressed(MouseButton.Right) && primaryAltReady)
+            if (Input.IsMouseButtonPressed(MouseButton.Right) && primaryAltReady)
             {
                 PrimaryAltFire();
             }
@@ -225,32 +325,34 @@ namespace Game{
         #region PRIMARY
         private void Primary_ReloadingAndCharging()
         {
-            if((Input.IsKeyPressed(KeyCode.R) && !primaryShooting) && !isKeyRPressedPreviously)
+            if ((Input.IsKeyPressed(KeyCode.R) && !primaryShooting) && !isKeyRPressedPreviously)
             {
                 isKeyRPressedPreviously = true;
                 chargeDelayNext = elapsedTime + chargeDelayRate;
-            } 
-            else if(Input.IsKeyPressed(KeyCode.R) && isKeyRPressedPreviously)
+            }
+            else if (Input.IsKeyPressed(KeyCode.R) && isKeyRPressedPreviously)
             {
                 //this is the charge delay function in unity
-                if(elapsedTime > chargeDelayNext){
+                if (elapsedTime > chargeDelayNext)
+                {
                     primaryAltCharging = true;
                 }
-            } 
-            else if(Input.IsKeyReleased(KeyCode.R)){
+            }
+            else if (Input.IsKeyReleased(KeyCode.R))
+            {
                 isKeyRPressedPreviously = false;
-                if(!primaryAltCharging && !reloadingPrimary && primaryAmmo < primaryAmmoMax)
+                if (!primaryAltCharging && !reloadingPrimary && primaryAmmo < primaryAmmoMax)
                 {
                     //update UI here
 
                     //reload
                     PrimaryReload(primaryReloadDelay);
-                    
+
 
                     //play sound effects here
                 }
-            } 
-            else 
+            }
+            else
             {
                 primaryAltCharging = false;
             }
@@ -260,7 +362,7 @@ namespace Game{
 
         private void Primary_AutoReload()
         {
-            if(!primaryAltCharging && !reloadingPrimary && primaryAmmo <= 0)
+            if (!primaryAltCharging && !reloadingPrimary && primaryAmmo <= 0)
             {
                 //update UI
 
@@ -268,45 +370,35 @@ namespace Game{
                 PrimaryReload(primaryReloadDelay);
 
                 //SFX
+                if(reloadID != 0){
+                    LogMessage("[PlayerWeapon] Playing audio right now");
+                    AudioPlay(reloadID);
+                }
             }
         }
 
-        // private void Primary_AltCharging()
-        // {
-        //     if(primaryAltCharging && !primaryShooting)
-        //     {
-        //         if(primaryAltCharge < primaryAltChargeMax)
-        //         {
-        //             PrimaryCharge();
-        //         }
-        //         else {
-        //             LogMessage("[PlayerWeapon] Alt Charge Full");
-        //             primaryAltReady = true;
-
-        //             //play SFX ->notify player ult is ready?
-        //         }
-        //     } 
-        //     else if(primaryAltCharge >= primaryAltChargeMax)
-        //     {
-        //         primaryAltReady = true;
-        //     }
-        // }
-
         private void UltCharging(string eventName, string payload)
         {
-            if (primaryAltReady || eventName != ULTGAINEVENT)
+            if (primaryAltReady || eventName != ULTGAINEVENT){
+                LogMessage("AltCharge is ready returning from charging");
                 return;
+            }
 
             if (!int.TryParse(payload, out int gainAmount))
                 return;
 
-            if(primaryAltCharge < primaryAltChargeMax){
+            if (primaryAltCharge < primaryAltChargeMax)
+            {
                 primaryAltCharge += gainAmount;
             }
 
-            if(primaryAltCharge >= primaryAltChargeMax){
+            if (primaryAltCharge >= primaryAltChargeMax)
+            {
                 //play sfx -> notify player ult is ready
-                //publish event here
+                //spawn the prefab here
+                if(!primaryAltReady){
+                    PrefabInstantiate(PrimaryUltChargedPrefab);
+                }
 
                 primaryAltReady = true;
 
@@ -316,181 +408,115 @@ namespace Game{
             //add in bullet hit audio here i guess - Amanda
         }
 
-        private void PrimaryFire(){
-           
-            if(elapsedTime > primaryShootNext)
+        private void PrimaryFire()
+        {
+
+            if (elapsedTime > primaryShootNext)
             {
-                
-                //testing claude theory for now so commenting - Amanda 26/1 4.37pm
-                //put the below under the calculate function (TODO for claude)
-                //  if(firingPointEntityID == 0 || playerEntityID == 0){
-                //     LogMessage("[PlayerWeapon] returning at PrimaryFire");
-                //     return;
-                // }
-
-                // //Instantiate at the firing position & rotation);
-                // Vector3 firingPoint = GetPosition(firingPointEntityID);
-                // Vector3 firingTarget = GetTarget(firingPointEntityID);
-                // Vector3 bulletDirection = (firingTarget - firingPoint).Normalized;
-
-                // Vector3 playerPos = GetPosition(playerEntityID);
-                // Quat playerRot = GetRotation(playerEntityID);
-
-                // Vector3 playerForward = playerRot.Forward;
-                // //Vector3 bulletSpawnPos = playerPos + (playerForward * muzzleDistance);
-
-                // //NEW
-                // Vector3 offset = playerRot.Right * 5.0f;
-                // Vector3 bulletSpawnPos = playerPos + offset;
-
-                // //DEBUGGING
-                // Vector3 forward = playerRot.Forward;
-                // Vector3 right = playerRot.Right;
-                // Vector3 up = playerRot.Up;
-
-                // LogMessage("PlayerForward: X:" + forward.X + ", Y: " + forward.Y + ", Z: " + forward.Z);
-                // LogMessage("PlayerRight: X:" + right.X + ", Y: " + right.Y + ", Z: " + right.Z);
-                // LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
-
-
-                // Quat bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
-
-                // FIX #1: Use the separated calculation function
-                if(!CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot))
+                if (!CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot))
                 {
                     LogMessage("[PlayerWeapon] Failed to calculate firing position");
                     return;
                 }
 
-                //End of where the calculate firing pos 
-                
                 Vector3 scale = new Vector3(0.025f, 0.025f, 0.025f);
 
                 uint bulletID = 0;
                 bulletID = PrefabInstantiateWithTransform(PrimaryBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
-                if(bulletID == 0){
+                if (bulletID == 0)
+                {
                     LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
-                    //return; //comment this for debugging temp
                 }
 
-
-                Vector3 bulletVel = bulletDirection * primarybulletSpeed;
+                // NEW: bullet velocity inherits (estimated) player velocity
+                Vector3 bulletVel = ComputeBulletVelocity(bulletDirection, primarybulletSpeed);
                 RigidbodySetVelocity(bulletID, ref bulletVel);
 
                 primaryAmmo -= 1;
                 Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());
 
-
-                //vfx
-
                 primaryShootNext = elapsedTime + primaryShootRate;
 
-                //cameraShake
-                //add function to adjust the target of the camera or the position whichever looks more real
-
-                if(primaryAmmo <= 0){
+                if (primaryAmmo <= 0)
+                {
                     //change the ui to run out of ammo here
                 }
-                
             }
         }
 
         //this by right not void but rather IEnumerator
         //return things like how long till this script resume.
-        private void PrimaryReload(float delay){
+        private void PrimaryReload(float delay)
+        {
             reloadingPrimary = true;
             shootAllowed = false;
 
-            //yield return new Delay primaryReloadDelay - TODO
             reloadFinishTime = elapsedTime + delay;
 
             LogMessage("[PlayerWeapon] Reloading... will finish in " + delay + " seconds");
 
             primaryAltCharging = false;
-
-            //delay for 0.5f - TODO
-
-            // testing claude theory so commenting these out for now
-            //primaryAmmo = primaryAmmoMax;
-            //reloadingPrimary = false;
-            //primaryAltCharging = false;
-            //shootAllowed = true;
         }
 
-        private void PrimaryAltFire(){
-            //TODO:
-            //Check with LiXiang on how does this work by tonight 21/1/26
+        private void PrimaryAltFire()
+        {
             // Calculate firing position
-            if(!CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot))
+            if (!CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot))
             {
                 LogMessage("[PlayerWeapon] Failed to calculate firing position for Primary Alt Fire");
                 return;
             }
-            
+
             // Scale for ult bullet (might want to make it bigger than regular bullets)
             Vector3 scale = new Vector3(5.0f, 5.0f, 5.0f);
 
             // Spawn the ult bullet
             uint ultBulletID = PrefabInstantiateWithTransform(PrimaryUltBulletPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
-            if(ultBulletID == 0){
+            if (ultBulletID == 0)
+            {
                 LogMessage("[PlayerWeapon] Primary Alt Fire bulletID fail to instantiate");
                 return;
             }
 
-            // Set velocity for the ult bullet
-            Vector3 bulletVel = bulletDirection * primaryUltSpeed;
+            // NEW: ult bullet velocity inherits (estimated) player velocity
+            Vector3 bulletVel = ComputeBulletVelocity(bulletDirection, primaryUltSpeed);
             RigidbodySetVelocity(ultBulletID, ref bulletVel);
 
             LogMessage("[PlayerWeapon] Primary Alt Fire launched!");
 
-            // TODO: Camera shake for ult fire (use CAMSHAKE_primaryAltFire)
-            // TODO: SFX for ult fire
-            // TODO: VFX for ult fire
-            
             //reset the values here
             primaryAltCharge = 0;
             primaryAltReady = false;
         }
 
-        // private void PrimaryCharge()
-        // {
-        //     if(elapsedTime > primaryChargeNext)
-        //     {
-        //         if(primaryAmmo > 0)
-        //         {
-        //             primaryAmmo -= 1;
-        //             primaryAltCharge += 1;
-
-        //             //SFX for altcharge
-
-        //             primaryChargeNext = elapsedTime + primaryChargeRate;
-
-        //             LogMessage("[PlayerWeapon] Charging... " + primaryAltCharge + "/" + primaryAltChargeMax);
-        //         }
-        //     }
-        // }
-
         private void PrimaryAltCharge_Reward()
         {
-            if(primaryAltCharge < primaryAltChargeMax)
+            if (primaryAltCharge < primaryAltChargeMax)
             {
                 ++primaryAltCharge;
-            } 
-            else 
+            }
+            else
             {
+                if (!primaryAltReady)
+                {
+                    PrefabInstantiate(PrimaryUltChargedPrefab);
+                    LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
+                }
                 primaryAltReady = true;
-                LogMessage("[PlayerWeapon] AltCharge full from reward!!!");
             }
         }
 
-        private void OnGameStateChange(string eventName, string payload){
+        private void OnGameStateChange(string eventName, string payload)
+        {
             LogMessage("[PlayerWeapon] Game State change detected. State is currently: " + eventName);
             gameEnd = false;
             shootAllowed = false;
         }
 
-        private bool CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot){
-            if(firingPointEntityID == 0 || playerEntityID == 0){
+        private bool CalculateFiringPos(out Vector3 bulletSpawnPos, out Vector3 bulletDirection, out Quat bulletRot)
+        {
+            if (firingPointEntityID == 0 || playerEntityID == 0)
+            {
                 LogMessage("[PlayerWeapon] CalculateFiringPos - entities not found");
                 bulletSpawnPos = Vector3.Zero;
                 bulletDirection = Vector3.Zero;
@@ -507,16 +533,15 @@ namespace Game{
             Vector3 playerPos = GetPosition(playerEntityID);
             Quat playerRot = GetRotation(playerEntityID);
 
-            // Calculate spawn position at gun tips (forward and slightly to the right/left)
-                // Adjust these values based on your mesh's gun positions
-                float forwardOffset = 4.0f;  // Distance in front of player
-                float sideOffset = -0.1f;     // Distance to the side (for gun position)
-                float heightOffset = 0.0f;   // Vertical adjustment if needed
-                
-                Vector3 offset = (playerRot.Forward * forwardOffset) + 
-                                (playerRot.Right * sideOffset) +
-                                (playerRot.Up * heightOffset);
-                bulletSpawnPos = playerPos + offset;
+            // Calculate spawn position at gun tips
+            float forwardOffset = 4.0f;
+            float sideOffset = -0.1f;
+            float heightOffset = 0.0f;
+
+            Vector3 offset = (playerRot.Forward * forwardOffset) +
+                             (playerRot.Right * sideOffset) +
+                             (playerRot.Up * heightOffset);
+            bulletSpawnPos = playerPos + offset;
 
             // Calculate bullet rotation (pointing in firing direction)
             bulletRot = SimpleMath.LookRotation(bulletDirection, Vector3.Up);
@@ -531,6 +556,51 @@ namespace Game{
             LogMessage("PlayerUp: X:" + up.X + ", Y: " + up.Y + ", Z: " + up.Z);
 
             return true;
+        }
+
+        // Build projectile velocity as: muzzleSpeed along bulletDirection + inherited player velocity.
+        // Guarantee: bullet forward speed always exceeds player forward speed by minBulletOverPlayerSpeed.
+        private Vector3 ComputeBulletVelocity(Vector3 bulletDirection, float muzzleSpeed)
+        {
+            Vector3 dir = bulletDirection;
+
+            if (dir.SqrMagnitude < 1e-8f)
+                dir = Vector3.Forward;
+            else
+                dir = dir.Normalized;
+
+            Vector3 inherit = Vector3.Zero;
+
+            if (inheritPlayerVelocity && inheritVelocityFactor != 0.0f)
+            {
+                if (inheritAlongBulletDirectionOnly)
+                {
+                    float along = Vector3.Dot(estimatedPlayerVelocity, dir);
+                    inherit = dir * along;
+                }
+                else
+                {
+                    inherit = estimatedPlayerVelocity;
+                }
+
+                inherit = inherit * inheritVelocityFactor;
+            }
+
+            Vector3 vel = (dir * muzzleSpeed) + inherit;
+
+            float playerForwardSpeed = Vector3.Dot(estimatedPlayerVelocity, dir);
+            float requiredForward = playerForwardSpeed + minBulletOverPlayerSpeed;
+
+            if (requiredForward < minWorldBulletSpeed)
+                requiredForward = minWorldBulletSpeed;
+
+            float currentForward = Vector3.Dot(vel, dir);
+            if (currentForward < requiredForward)
+            {
+                vel = vel + (dir * (requiredForward - currentForward));
+            }
+
+            return vel;
         }
 
     }

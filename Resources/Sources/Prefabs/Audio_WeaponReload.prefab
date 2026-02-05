@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: audio_hitmarker.prefab",
-    "Prefab GUID": 4097299860260455975,
+    "Prefab Name": "Audio_WeaponReload",
+    "Prefab GUID": 14369060632254956395,
     "version": 1,
     "entities": [
         {
-            "Name": "audio_hitmarker",
+            "Name": "Audio_WeaponReload",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "49927187906053511",
+                            "ComponentGUID": "18404285898377724773",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,8 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9849759977066599205",
-                            "Tag": "audio_hitmarker"
+                            "ComponentGUID": "6298610100005831523",
+                            "Tag": "Audio_WeaponReload"
                         }
                     }
                 },
@@ -49,11 +49,11 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "6967456215547659657",
-                            "FilePath": "Player_Hitmarker.wav",
+                            "ComponentGUID": "2839845586185503591",
+                            "FilePath": "Primary_Reload.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.9919999837875366,
+                            "Volume": 1.0,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -64,18 +64,6 @@
                             "RolloffMode": 0,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
-                        }
-                    }
-                },
-                {
-                    "type": 8,
-                    "typeName": "ScriptComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "4661613206334752139",
-                            "ScriptClassName": "Game.GameDelaySoundPrefab",
-                            "Started": false,
-                            "GCHandle": 467
                         }
                     }
                 }

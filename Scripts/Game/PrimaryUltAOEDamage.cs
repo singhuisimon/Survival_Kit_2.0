@@ -33,7 +33,7 @@ namespace Game {
                 return;
             }
 
-            //CheckCollisions();
+            CheckCollisions();
         }
 
         public override void OnDestroy(){
