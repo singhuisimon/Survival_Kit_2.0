@@ -128,7 +128,7 @@ namespace Game
             LogMessage("CoreMotherboard " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
             // Handle damage audio
-            if (!AudioIsPlaying((uint)EntityID))
+            if (!AudioIsPlaying(innercoreID))
             {
                 // Start playing audio with loop
                 StartDamageAudio();
@@ -147,7 +147,7 @@ namespace Game
         private void StartDamageAudio()
         {
             if(innercoreID == 0){
-                LogMessage("[HealthCore] Invalid ID for innercore")
+                LogMessage("[HealthCore] Invalid ID for innercore");
                 return;
             }
 
@@ -162,7 +162,7 @@ namespace Game
         private void StopDamageAudio()
         {
             if(innercoreID == 0){
-                LogMessage("[HealthCore] Invalid ID for innercore")
+                LogMessage("[HealthCore] Invalid ID for innercore");
                 return;
             }
             AudioStop(innercoreID);
