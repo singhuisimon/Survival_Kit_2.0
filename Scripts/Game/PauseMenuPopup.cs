@@ -6,6 +6,7 @@ using static Engine.Transform;
 using static Engine.AudioManager;
 using static Engine.SpriteRenderer;
 using static Engine.Text;
+using static Game.AudioSettings;
 
 namespace Game
 {
@@ -141,6 +142,15 @@ namespace Game
         private bool wasMousePressed = false;
         private bool gameEnded = false;
 
+        //visual bar
+        // Add these fields to store initial widths at the top of your class
+        private float mixerFill1InitialWidth;
+        private float mixerFill2InitialWidth;
+        private float mixerFill3InitialWidth;
+        private Vector3 mixerFill1InitialPosition;
+        private Vector3 mixerFill2InitialPosition;
+        private Vector3 mixerFill3InitialPosition;
+
         public override void OnStart()
         {
             LogMessage("PauseMenuPopup: Initializing...");
@@ -189,6 +199,29 @@ namespace Game
                     hudElementOriginalPositions[i] = GetPosition(hudElementIds[i]);
                 }
             }
+            if (mixerFillId != 0)
+            {
+                Vector3 scale1 = GetScale(mixerFillId);
+                mixerFill1InitialWidth = scale1.Y;  // Changed from scale1.X to scale1.Y
+                mixerFill1InitialPosition = GetPosition(mixerFillId);
+                LogMessage("PauseMenuPopup: Mixer 1 initial height = " + mixerFill1InitialWidth);
+            }
+
+            if (mixerFillId2 != 0)
+            {
+                Vector3 scale2 = GetScale(mixerFillId2);
+                mixerFill2InitialWidth = scale2.Y;  // Changed from scale2.X to scale2.Y
+                mixerFill2InitialPosition = GetPosition(mixerFillId2);
+                LogMessage("PauseMenuPopup: Mixer 2 initial height = " + mixerFill2InitialWidth);
+            }
+
+            if (mixerFillId3 != 0)
+            {
+                Vector3 scale3 = GetScale(mixerFillId3);
+                mixerFill3InitialWidth = scale3.Y;  // Changed from scale3.X to scale3.Y
+                mixerFill3InitialPosition = GetPosition(mixerFillId3);
+                LogMessage("PauseMenuPopup: Mixer 3 initial height = " + mixerFill3InitialWidth);
+            }
 
             // Log found entities
             LogMessage("PauseMenuPopup: bgId=" + bgId);
@@ -212,6 +245,46 @@ namespace Game
             HidePauseMenu();
 
             LogMessage("PauseMenuPopup: Ready!");
+        }
+
+        /// <summary>
+        /// Updates the mixer fill bar visual height based on volume (0.0 to 1.0)
+        /// Similar to HealthBar - adjusts height and position to keep bottom edge fixed
+        /// </summary>
+        private void UpdateMixerFillVisual(uint mixerFillId, float volume, float initialWidth, Vector3 initialPosition)
+        {
+            if (mixerFillId == 0) return;
+
+            // Clamp volume to 0-1 range
+            if (volume < 0.0f) volume = 0.0f;
+            if (volume > 1.0f) volume = 1.0f;
+
+            // Calculate new height based on volume (volume 1.0 = full height, 0.0 = zero height)
+            float newHeight = initialWidth * volume;  // initialWidth is actually initialHeight now
+
+            // Get current scale
+            Vector3 currentScale = GetScale(mixerFillId);
+
+            // Update scale with new height
+            Vector3 newScale = new Vector3(
+                currentScale.X,     // Keep width
+                newHeight,          // Height based on volume
+                currentScale.Z      // Keep depth
+            );
+            SetScale(mixerFillId, ref newScale);
+
+            // Adjust position to keep BOTTOM edge fixed (move UP as height decreases)
+            float heightDifference = initialWidth - newHeight;
+            Vector3 newPosition = new Vector3(
+                initialPosition.X,
+                initialPosition.Y + heightDifference,  // Changed from - to + (move UP instead of DOWN)
+                initialPosition.Z
+            );
+            SetPosition(mixerFillId, ref newPosition);
+
+            LogMessage("UpdateMixerFill: Volume=" + volume.ToString("F2") +
+                       " Height=" + newHeight.ToString("F1") +
+                       " Offset=" + heightDifference.ToString("F1"));
         }
 
         public override void OnUpdate(float deltaTime)
@@ -355,38 +428,64 @@ namespace Game
             // Check Plus button
             if (IsButtonClicked(plusButtonId, plusButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Plus clicked");
+
+                float currentVolume = Instance.GetMasterVolume();
+                Instance.SetMasterVolume(currentVolume + 0.1f);
+                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                           mixerFill1InitialWidth, mixerFill1InitialPosition);
                 return;
             }
 
             // Check Minus button
             if (IsButtonClicked(minusButtonId, minusButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Minus clicked");
+                float currentVolume = Instance.GetMasterVolume();
+                Instance.SetMasterVolume(currentVolume - 0.1f);
+                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                           mixerFill1InitialWidth, mixerFill1InitialPosition); 
                 return;
             }
 
             // Mixer Set 2 buttons
             if (IsButtonClicked(plusButtonId2, plusButtonHoveredId2))
             {
-                LogMessage("PauseMenuPopup: Plus 2 clicked");
+                float currentVolume = Instance.GetBGMVolume();
+                Instance.SetBGMVolume(currentVolume +0.1f);
+                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                            mixerFill2InitialWidth, mixerFill2InitialPosition);
                 return;
             }
             if (IsButtonClicked(minusButtonId2, minusButtonHoveredId2))
             {
+                float currentVolume = Instance.GetBGMVolume();
+                Instance.SetBGMVolume(currentVolume - 0.1f);
+                LogMessage("PauseMenuPopup: BGM Volume - (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
                 LogMessage("PauseMenuPopup: Minus 2 clicked");
+                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                            mixerFill2InitialWidth, mixerFill2InitialPosition);
                 return;
             }
 
             // Mixer Set 3 buttons
             if (IsButtonClicked(plusButtonId3, plusButtonHoveredId3))
             {
-                LogMessage("PauseMenuPopup: Plus 3 clicked");
+                float currentVolume = Instance.GetSFXVolume();
+                Instance.SetSFXVolume(currentVolume + 0.1f);
+                LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                          mixerFill3InitialWidth, mixerFill3InitialPosition);
                 return;
             }
             if (IsButtonClicked(minusButtonId3, minusButtonHoveredId3))
             {
-                LogMessage("PauseMenuPopup: Minus 3 clicked");
+                float currentVolume = Instance.GetSFXVolume();
+                Instance.SetSFXVolume(currentVolume  -0.1f);
+                LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                          mixerFill3InitialWidth, mixerFill3InitialPosition);
                 return;
             }
         }
@@ -421,6 +520,15 @@ namespace Game
             SetPosition(mixerFillId3, ref mixerVisiblePos3);
             SetPosition(plusButtonId3, ref plusVisiblePos3);
             SetPosition(minusButtonId3, ref minusVisiblePos3);
+
+  
+                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                                     mixerFill1InitialWidth, mixerFill1InitialPosition);
+                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                                     mixerFill2InitialWidth, mixerFill2InitialPosition);
+                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                                     mixerFill3InitialWidth, mixerFill3InitialPosition);
+            
 
             // Hide all hovered versions initially
             Vector3 hidePos = new Vector3(CENTER_X, HIDDEN_Y, 0.0f);
