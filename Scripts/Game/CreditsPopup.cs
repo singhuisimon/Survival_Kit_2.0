@@ -36,6 +36,11 @@ namespace Game
         private uint closeButtonId;
         private uint closeButton2Id;
 
+        // Event names for popup coordination
+        private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
+        private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
+        private const string POPUP_ID = "Credits";
+
         // State
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
@@ -74,6 +79,9 @@ namespace Game
             entitiesFound = true;
             isPopupVisible = false;
             wasMousePressed = false;
+
+            // Subscribe to popup coordination events
+            Event.Subscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
 
             LogMessage("CreditsPopup: All entities found, ready!");
         }
@@ -118,9 +126,19 @@ namespace Game
             }
         }
 
+        private void OnOtherPopupOpened(string eventName, string payload)
+        {
+            if (payload != POPUP_ID && isPopupVisible)
+            {
+                LogMessage("CreditsPopup: Another popup opened (" + payload + ") - closing credits");
+                HidePopup();
+            }
+        }
+
         private void ShowPopup()
         {
             isPopupVisible = true;
+            Event.Publish(EVENT_POPUP_OPENED, POPUP_ID);
 
             Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
             SetPosition(popupId, ref popupPos);
@@ -136,7 +154,10 @@ namespace Game
 
         private void HidePopup()
         {
+            bool wasVisible = isPopupVisible;
             isPopupVisible = false;
+            if (wasVisible)
+                Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
 
             Vector3 popupPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
             SetPosition(popupId, ref popupPos);
@@ -152,6 +173,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            Event.Unsubscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
             LogMessage("CreditsPopup: Destroyed");
         }
     }

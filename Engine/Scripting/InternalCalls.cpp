@@ -1812,6 +1812,31 @@ namespace Engine
 		}
 
 		/**************************************************************************
+		* @brief
+		* Checks if the entity's audio component is currently playing.
+		* @param entityID
+		* Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		***************************************************************************/
+		bool Audio_IsPlaying(uint64_t entityID) {
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<AudioComponent>()) return false;
+
+			auto& audio = e.GetComponent<AudioComponent>();
+
+			// Check if channel exists and is valid
+			if (!audio.Channel) return false;
+
+			// Check FMOD channel playing state
+			bool isPlaying = false;
+			FMOD_RESULT result = audio.Channel->isPlaying(&isPlaying);
+
+			// If the call failed or not playing, return false
+			if (result != FMOD_OK) return false;
+
+			return isPlaying;
+		}
+
+		/**************************************************************************
 		 * @brief
 		 * Gets an audio property for the entity's audio component.
 		 * @param entityID

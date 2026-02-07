@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: SEMICONDUCTOR.prefab",
-    "Prefab GUID": 3179884947895714893,
+    "Prefab GUID": 13081778807484874977,
     "version": 1,
     "entities": [
         {
@@ -15,9 +15,9 @@
                         "Properties": {
                             "ComponentGUID": "15900363641908576543",
                             "Position": [
-                                -293.97662353515625,
+                                -389.0,
                                 -200.0,
-                                -224.11676025390625
+                                -468.0
                             ],
                             "Rotation": [
                                 0.0,
@@ -71,7 +71,7 @@
                         "Properties": {
                             "ComponentGUID": "15322750612248530623",
                             "Mass": 1.0,
-                            "IsKinematic": false,
+                            "IsKinematic": true,
                             "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
@@ -128,7 +128,7 @@
                             "ComponentGUID": "11863986098428055233",
                             "ScriptClassName": "Game.HealthCore",
                             "Started": false,
-                            "GCHandle": 235
+                            "GCHandle": 19
                         }
                     }
                 }
@@ -192,6 +192,29 @@
                             "TextureIdx": 0,
                             "SubmeshIndex": 0,
                             "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15387621816698290397",
+                            "FilePath": "Core_Health_Damage_Alert.wav",
+                            "Type": 1,
+                            "State": 2,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
                         }
                     }
                 }
@@ -287,9 +310,9 @@
                         "Properties": {
                             "ComponentGUID": "14827864839706771731",
                             "Position": [
-                                -300.0,
+                                -389.0,
                                 -210.0,
-                                -220.0
+                                -468.0
                             ],
                             "Rotation": [
                                 90.0,

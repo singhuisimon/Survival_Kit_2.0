@@ -6,6 +6,7 @@ using static Engine.Transform;
 using static Engine.AudioManager;
 using static Engine.SpriteRenderer;
 using static Engine.Text;
+using static Game.AudioSettings;
 
 namespace Game
 {
@@ -44,6 +45,17 @@ namespace Game
         private const string MINUS_BUTTON_3_NAME = "Paused_MinusButton_3";
         private const string MINUS_BUTTON_3_HOVERED_NAME = "Paused_MinusButton_3_Hovered";
 
+        // Checkbox entity names - Code Added by Rio
+        // Master Checkbox
+        private const string CHECKBOX_MASTER_UNTICKED_NAME = "Paused_Checkbox_Master_Unticked";
+        private const string CHECKBOX_MASTER_TICKED_NAME = "Paused_Checkbox_Master_Ticked";
+        // BGM Checkbox
+        private const string CHECKBOX_BGM_UNTICKED_NAME = "Paused_Checkbox_BGM_Unticked";
+        private const string CHECKBOX_BGM_TICKED_NAME = "Paused_Checkbox_BGM_Ticked";
+        // SFX Checkbox 
+        private const string CHECKBOX_SFX_UNTICKED_NAME = "Paused_Checkbox_SFX_Unticked";
+        private const string CHECKBOX_SFX_TICKED_NAME = "Paused_Checkbox_SFX_Ticked";
+
         // HUD elements to hide when paused
         private static readonly string[] HUD_ELEMENT_NAMES = {
             "TImer",
@@ -70,7 +82,7 @@ namespace Game
 
         // Scene paths for navigation
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_Player.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
 
         // Pause events - other scripts subscribe to these
         private const string EVENT_GAME_PAUSED = "GamePaused";
@@ -100,6 +112,11 @@ namespace Game
         private Vector3 mixerVisiblePos3 = new Vector3(1150.0f, 415.0f, 0.0f);
         private Vector3 plusVisiblePos3 = new Vector3(1200.0f, 526.0f, 0.0f);
         private Vector3 minusVisiblePos3 = new Vector3(1200.0f, 559.0f, 0.0f);
+        // Checkbox Set positions - added by Rio
+        private Vector3 checkboxMasterVisiblePos = new Vector3(833.8f, 620.0f, 0.0f);  
+        private Vector3 checkboxBGMVisiblePos = new Vector3(987.1f, 620.0f, 0.0f);     
+        private Vector3 checkboxSFXVisiblePos = new Vector3(1143.5f, 620.0f, 0.0f);     
+
 
         // Entity IDs
         private uint bgId;
@@ -128,6 +145,13 @@ namespace Game
         private uint plusButtonHoveredId3;
         private uint minusButtonId3;
         private uint minusButtonHoveredId3;
+        // Checkbox IDs - added by Rio
+        private uint checkboxMasterUntickedId;
+        private uint checkboxMasterTickedId;
+        private uint checkboxBGMUntickedId;
+        private uint checkboxBGMTickedId;
+        private uint checkboxSFXUntickedId;
+        private uint checkboxSFXTickedId;
 
         // HUD element IDs (to hide when paused)
         private uint[] hudElementIds;
@@ -140,6 +164,15 @@ namespace Game
         private bool wasPauseKeyPressed = false;
         private bool wasMousePressed = false;
         private bool gameEnded = false;
+
+        //visual bar
+        // Add these fields to store initial widths at the top of your class
+        private float mixerFill1InitialWidth;
+        private float mixerFill2InitialWidth;
+        private float mixerFill3InitialWidth;
+        private Vector3 mixerFill1InitialPosition;
+        private Vector3 mixerFill2InitialPosition;
+        private Vector3 mixerFill3InitialPosition;
 
         public override void OnStart()
         {
@@ -172,6 +205,14 @@ namespace Game
             plusButtonHoveredId3 = SceneFindEntityByName(PLUS_BUTTON_3_HOVERED_NAME);
             minusButtonId3 = SceneFindEntityByName(MINUS_BUTTON_3_NAME);
             minusButtonHoveredId3 = SceneFindEntityByName(MINUS_BUTTON_3_HOVERED_NAME);
+            // Find checkboxes - Added by Rio
+            checkboxMasterUntickedId = SceneFindEntityByName(CHECKBOX_MASTER_UNTICKED_NAME);
+            checkboxMasterTickedId = SceneFindEntityByName(CHECKBOX_MASTER_TICKED_NAME);
+            checkboxBGMUntickedId = SceneFindEntityByName(CHECKBOX_BGM_UNTICKED_NAME);
+            checkboxBGMTickedId = SceneFindEntityByName(CHECKBOX_BGM_TICKED_NAME);
+            checkboxSFXUntickedId = SceneFindEntityByName(CHECKBOX_SFX_UNTICKED_NAME);
+            checkboxSFXTickedId = SceneFindEntityByName(CHECKBOX_SFX_TICKED_NAME);
+             
 
             // Find HUD elements to hide when paused and store their original positions
             hudElementIds = new uint[HUD_ELEMENT_NAMES.Length];
@@ -188,6 +229,29 @@ namespace Game
                     // Store original position so we can restore it later
                     hudElementOriginalPositions[i] = GetPosition(hudElementIds[i]);
                 }
+            }
+            if (mixerFillId != 0)
+            {
+                Vector3 scale1 = GetScale(mixerFillId);
+                mixerFill1InitialWidth = scale1.Y;  // Changed from scale1.X to scale1.Y
+                mixerFill1InitialPosition = GetPosition(mixerFillId);
+                LogMessage("PauseMenuPopup: Mixer 1 initial height = " + mixerFill1InitialWidth);
+            }
+
+            if (mixerFillId2 != 0)
+            {
+                Vector3 scale2 = GetScale(mixerFillId2);
+                mixerFill2InitialWidth = scale2.Y;  // Changed from scale2.X to scale2.Y
+                mixerFill2InitialPosition = GetPosition(mixerFillId2);
+                LogMessage("PauseMenuPopup: Mixer 2 initial height = " + mixerFill2InitialWidth);
+            }
+
+            if (mixerFillId3 != 0)
+            {
+                Vector3 scale3 = GetScale(mixerFillId3);
+                mixerFill3InitialWidth = scale3.Y;  // Changed from scale3.X to scale3.Y
+                mixerFill3InitialPosition = GetPosition(mixerFillId3);
+                LogMessage("PauseMenuPopup: Mixer 3 initial height = " + mixerFill3InitialWidth);
             }
 
             // Log found entities
@@ -212,6 +276,46 @@ namespace Game
             HidePauseMenu();
 
             LogMessage("PauseMenuPopup: Ready!");
+        }
+
+        /// <summary>
+        /// Updates the mixer fill bar visual height based on volume (0.0 to 1.0)
+        /// Similar to HealthBar - adjusts height and position to keep bottom edge fixed
+        /// </summary>
+        private void UpdateMixerFillVisual(uint mixerFillId, float volume, float initialWidth, Vector3 initialPosition)
+        {
+            if (mixerFillId == 0) return;
+
+            // Clamp volume to 0-1 range
+            if (volume < 0.0f) volume = 0.0f;
+            if (volume > 1.0f) volume = 1.0f;
+
+            // Calculate new height based on volume (volume 1.0 = full height, 0.0 = zero height)
+            float newHeight = initialWidth * volume;  // initialWidth is actually initialHeight now
+
+            // Get current scale
+            Vector3 currentScale = GetScale(mixerFillId);
+
+            // Update scale with new height
+            Vector3 newScale = new Vector3(
+                currentScale.X,     // Keep width
+                newHeight,          // Height based on volume
+                currentScale.Z      // Keep depth
+            );
+            SetScale(mixerFillId, ref newScale);
+
+            // Adjust position to keep BOTTOM edge fixed (move UP as height decreases)
+            float heightDifference = initialWidth - newHeight;
+            Vector3 newPosition = new Vector3(
+                initialPosition.X,
+                initialPosition.Y + heightDifference,  // Changed from - to + (move UP instead of DOWN)
+                initialPosition.Z
+            );
+            SetPosition(mixerFillId, ref newPosition);
+
+            LogMessage("UpdateMixerFill: Volume=" + volume.ToString("F2") +
+                       " Height=" + newHeight.ToString("F1") +
+                       " Offset=" + heightDifference.ToString("F1"));
         }
 
         public override void OnUpdate(float deltaTime)
@@ -355,46 +459,160 @@ namespace Game
             // Check Plus button
             if (IsButtonClicked(plusButtonId, plusButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Plus clicked");
+
+                float currentVolume = Instance.GetMasterVolume();
+                Instance.SetMasterVolume(currentVolume + 0.1f);
+                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                           mixerFill1InitialWidth, mixerFill1InitialPosition);
                 return;
             }
 
             // Check Minus button
             if (IsButtonClicked(minusButtonId, minusButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Minus clicked");
+                float currentVolume = Instance.GetMasterVolume();
+                Instance.SetMasterVolume(currentVolume - 0.1f);
+                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                           mixerFill1InitialWidth, mixerFill1InitialPosition); 
                 return;
             }
 
             // Mixer Set 2 buttons
             if (IsButtonClicked(plusButtonId2, plusButtonHoveredId2))
             {
-                LogMessage("PauseMenuPopup: Plus 2 clicked");
+                float currentVolume = Instance.GetBGMVolume();
+                Instance.SetBGMVolume(currentVolume +0.1f);
+                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                            mixerFill2InitialWidth, mixerFill2InitialPosition);
                 return;
             }
             if (IsButtonClicked(minusButtonId2, minusButtonHoveredId2))
             {
+                float currentVolume = Instance.GetBGMVolume();
+                Instance.SetBGMVolume(currentVolume - 0.1f);
+                LogMessage("PauseMenuPopup: BGM Volume - (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
                 LogMessage("PauseMenuPopup: Minus 2 clicked");
+                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                            mixerFill2InitialWidth, mixerFill2InitialPosition);
                 return;
             }
 
             // Mixer Set 3 buttons
             if (IsButtonClicked(plusButtonId3, plusButtonHoveredId3))
             {
-                LogMessage("PauseMenuPopup: Plus 3 clicked");
+                float currentVolume = Instance.GetSFXVolume();
+                Instance.SetSFXVolume(currentVolume + 0.1f);
+                LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                          mixerFill3InitialWidth, mixerFill3InitialPosition);
                 return;
             }
             if (IsButtonClicked(minusButtonId3, minusButtonHoveredId3))
             {
-                LogMessage("PauseMenuPopup: Minus 3 clicked");
+                float currentVolume = Instance.GetSFXVolume();
+                Instance.SetSFXVolume(currentVolume  -0.1f);
+                LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
+                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                          mixerFill3InitialWidth, mixerFill3InitialPosition);
                 return;
             }
+
+            // Checkbox Handling - Added by Rio
+            // Master checkbox
+            if (IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId))
+            {
+                Instance.ToggleMasterMute();
+                bool isMuted = Instance.IsMasterMuted();
+                LogMessage("PauseMenuPopup: Master Mute toggled to: " + isMuted);
+                UpdateCheckboxVisuals();
+                return;
+            }
+
+            // BGM checkbox
+            if (IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId))
+            {
+                Instance.ToggleBGMMute();
+                bool isMuted = Instance.IsBGMMuted();
+                LogMessage("PauseMenuPopup: BGM Mute toggled to: " + isMuted);
+                UpdateCheckboxVisuals();
+                return;
+            }
+
+            // SFX checkbox
+            if (IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId))
+            {
+                Instance.ToggleSFXMute();
+                bool isMuted = Instance.IsSFXMuted();
+                LogMessage("PauseMenuPopup: SFX Mute toggled to: " + isMuted);
+                UpdateCheckboxVisuals();
+                return;
+            }
+
         }
 
         private bool IsButtonClicked(uint normalId, uint hoveredId)
         {
             return (normalId != 0 && Collision2D.IsMouseCollidingWithEntity(normalId)) ||
                    (hoveredId != 0 && Collision2D.IsMouseCollidingWithEntity(hoveredId));
+        }
+
+        // Checking for it Checkbox is clicked - Added by Rio
+        private bool IsCheckboxClicked(uint untickedId, uint tickedId)
+        {
+            return (untickedId != 0 && Collision2D.IsMouseCollidingWithEntity(untickedId)) ||
+                   (tickedId != 0 && Collision2D.IsMouseCollidingWithEntity(tickedId));
+        }
+
+        // Updating checkbox visual based on AudioSettings mute state - Added by Rio
+        private void UpdateCheckboxVisuals()
+        {
+            if (Instance == null) return;
+
+            Vector3 hidePos = new Vector3(CENTER_X, HIDDEN_Y, 0.0f);
+
+            // Master checkbox
+            bool masterMuted = Instance.IsMasterMuted();
+            if (masterMuted)
+            {
+                // Show ticked, hide unticked
+                SetPosition(checkboxMasterTickedId, ref checkboxMasterVisiblePos);
+                SetPosition(checkboxMasterUntickedId, ref hidePos);
+            }
+            else
+            {
+                // Show unticked, hide ticked
+                SetPosition(checkboxMasterUntickedId, ref checkboxMasterVisiblePos);
+                SetPosition(checkboxMasterTickedId, ref hidePos);
+            }
+
+            // BGM checkbox
+            bool bgmMuted = Instance.IsBGMMuted();
+            if (bgmMuted)
+            {
+                SetPosition(checkboxBGMTickedId, ref checkboxBGMVisiblePos);
+                SetPosition(checkboxBGMUntickedId, ref hidePos);
+            }
+            else
+            {
+                SetPosition(checkboxBGMUntickedId, ref checkboxBGMVisiblePos);
+                SetPosition(checkboxBGMTickedId, ref hidePos);
+            }
+
+            // SFX checkbox
+            bool sfxMuted = Instance.IsSFXMuted();
+            if (sfxMuted)
+            {
+                SetPosition(checkboxSFXTickedId, ref checkboxSFXVisiblePos);
+                SetPosition(checkboxSFXUntickedId, ref hidePos);
+            }
+            else
+            {
+                SetPosition(checkboxSFXUntickedId, ref checkboxSFXVisiblePos);
+                SetPosition(checkboxSFXTickedId, ref hidePos);
+            }
         }
 
         private void ShowPauseMenu()
@@ -421,6 +639,15 @@ namespace Game
             SetPosition(mixerFillId3, ref mixerVisiblePos3);
             SetPosition(plusButtonId3, ref plusVisiblePos3);
             SetPosition(minusButtonId3, ref minusVisiblePos3);
+
+  
+                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                                     mixerFill1InitialWidth, mixerFill1InitialPosition);
+                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                                     mixerFill2InitialWidth, mixerFill2InitialPosition);
+                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                                     mixerFill3InitialWidth, mixerFill3InitialPosition);
+            
 
             // Hide all hovered versions initially
             Vector3 hidePos = new Vector3(CENTER_X, HIDDEN_Y, 0.0f);
@@ -455,6 +682,9 @@ namespace Game
 
             // Notify other scripts that game is paused (for scripts that use events)
             Event.Publish(EVENT_GAME_PAUSED, "");
+
+            UpdateCheckboxVisuals(); // added by Rio
+
             LogMessage("PauseMenuPopup: Menu shown at screen center");
         }
 
@@ -493,6 +723,14 @@ namespace Game
             SetPosition(plusButtonHoveredId3, ref hidePos2);
             SetPosition(minusButtonId3, ref hidePos2);
             SetPosition(minusButtonHoveredId3, ref hidePos2);
+
+            // Hide checkboxes - added by Rio
+            SetPosition(checkboxMasterUntickedId, ref hidePos2);
+            SetPosition(checkboxMasterTickedId, ref hidePos2);
+            SetPosition(checkboxBGMUntickedId, ref hidePos2);
+            SetPosition(checkboxBGMTickedId, ref hidePos2);
+            SetPosition(checkboxSFXUntickedId, ref hidePos2);
+            SetPosition(checkboxSFXTickedId, ref hidePos2);
 
             // Show HUD elements again by restoring their original positions
             for (int i = 0; i < hudElementIds.Length; i++)
