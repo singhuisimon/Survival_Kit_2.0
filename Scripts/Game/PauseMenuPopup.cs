@@ -434,12 +434,25 @@ namespace Game
                 return;
             }
 
-            // Check Restart button - reload current scene
+            // Check Restart button - reload current scene (same logic as win screen)
             if (IsButtonClicked(restartButtonId, restartButtonHoveredId))
             {
                 LogMessage("PauseMenuPopup: Restart clicked - reloading scene");
                 LogMessage("Scene path: " + currentGameScenePath);
-                HidePauseMenu();
+
+                // Stop all audio before reloading
+                StopGroup(AudioType.BGM);
+                StopGroup(AudioType.SFX);
+
+                // Hide cursor for gameplay
+                Input.SetCursorVisible(false);
+
+                // Reset pause state before scene change
+                isPaused = false;
+                GameState.IsPaused = false;
+
+                // Set current scene path and reload
+                GameState.CurrentScenePath = currentGameScenePath;
                 Event.Publish("LoadScene", currentGameScenePath);
                 return;
             }
