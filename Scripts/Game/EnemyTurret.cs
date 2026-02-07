@@ -61,6 +61,9 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (GameState.IsPaused)
+                return;
+
             if (playerID == INVALID_ENTITY)
                 return;
             

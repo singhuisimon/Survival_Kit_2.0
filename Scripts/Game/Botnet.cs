@@ -99,6 +99,9 @@ namespace Game
         private Vector3 savedVelocity = Vector3.Zero;
         private bool wasPaused = false;
 
+        // Damage
+        private bool deliveredDamage = false;
+
         // ===== Lifecycle =====
 
         public override void OnStart()
@@ -552,22 +555,54 @@ namespace Game
                 if (other == playerID)
                 {
                     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
-                    Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    if(!deliveredDamage){
+                        Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    }
                     PrefabInstantiate(DAMAGEPLAYERAUDIOPREFAB);
+                }
+
+                // Get the tag of what we collided with
+                string otherTag = TagGetTag(other);
+                
+                // Check if this is ANY valid target (not just our tracked targetID)
+                bool isValidTarget = (otherTag == TAG_PLAYER || 
+                                     otherTag == TAG_SEMICONDUCTOR || 
+                                     otherTag == TAG_EMPLACEMENT || 
+                                     otherTag == TAG_CORE_BARRIER ||
+                                     otherTag == TAG_ALLIES);
+                
+                if (isValidTarget)
+                {
+                    LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with valid target " + other + " (tag: " + otherTag + ")");
+                    
+                    if(!deliveredDamage){
+                        // Deal damage to any valid target we hit
+                        DamageSystem.DealDamage(other, blastDamage, (uint)EntityID);
+                    }
+
+                    isExploding = true;
+                    
+                    // Only explode if we hit our TRACKED target
+                    if (other == targetID)
+                    {
+                        LogMessage("[Botnet] Hit tracked target - exploding!");
+                    }
+
+                    break;
                 }
                 
                 // Check if hit target
-                if (other == targetID)
-                {
+                // if (other == targetID)
+                // {
 
 
-                    LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
+                //     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     
-                    //Temporary measure
-                    DamageSystem.DealDamage(targetID, blastDamage, (uint)EntityID);
-                    isExploding = true;
-                    break;
-                }
+                //     //Temporary measure
+                //     DamageSystem.DealDamage(targetID, blastDamage, (uint)EntityID);
+                //     isExploding = true;
+                //     break;
+                // }
             }
         }
 
@@ -624,7 +659,7 @@ namespace Game
                 if (distSq <= radiusSq)
                 {
                     LogMessage("HI FROM BOTNET WE ARE FUKED");
-                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    //DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }
