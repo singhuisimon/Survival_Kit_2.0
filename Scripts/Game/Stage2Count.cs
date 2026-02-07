@@ -12,7 +12,7 @@ namespace Game
     /// Static display - does not change during gameplay
     /// Hides on win or lose
     /// </summary>
-    public class StageCount : ScriptBehaviour
+    public class Stage2Count : ScriptBehaviour
     {
         // ===== Game Over Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
@@ -24,7 +24,7 @@ namespace Game
 
         // ===== Settings =====
         [SerializeField("Stage Number")]
-        private int stageNumber = 1;
+        private int stageNumber = 2;
 
         public override void OnStart()
         {
@@ -35,9 +35,10 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
-            Event.Subscribe(GAMEWIN, OnGameOver);
 
             Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
+
 
 
             // Set stage text

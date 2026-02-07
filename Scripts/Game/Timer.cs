@@ -21,6 +21,10 @@ namespace Game
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
 
+        private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string GAMEWIN = "GameWin";
+
         // ===== State =====
         private bool initialized = false;
         private bool gameOver = false;
@@ -34,6 +38,10 @@ namespace Game
             // Subscribe to lose conditions
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
+
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
+            Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
 
             // Initialize with starting time
             remainingTime = startingTime;

@@ -31,6 +31,8 @@ namespace Game
 
             // Subscribe to bullet hits
             Subscribe(EVENT_ENEMYCORE_HIT, OnDamageReceived);
+            //Vector3 newpos = new Vector3(-5504.39f, -438.72f, 643.28f);
+            //Engine.Transform.SetPosition(EntityID, ref newpos);
 
             LogMessage("EnemyCore " + EntityID + " Health initialized");
         }
