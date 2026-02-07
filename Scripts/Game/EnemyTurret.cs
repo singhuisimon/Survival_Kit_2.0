@@ -43,7 +43,9 @@ namespace Game
         public override void OnStart()
         {
             LogMessage("======= EnemyTurret started (EntityID = " + EntityID + ") =======");
-
+            Vector3 newpos = Engine.Transform.GetPosition(EntityID);
+            Engine.Transform.SetPosition(EntityID, ref newpos);
+            LogMessage("====AAAAAAAAAEnemyTurret: " + "x" + newpos.X + "y:" + newpos.Y + "z:" + newpos.Z);
             TagSetTag(EntityID, "EnemyTurret");
             
             playerID = SceneFindEntityByName(TAG_PLAYER);
@@ -57,6 +59,11 @@ namespace Game
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
+            
+            //Vector3 newpos = Engine.Transform.GetPosition(EntityID);
+            Engine.Transform.SetPosition(EntityID, ref newpos);
+            LogMessage("====EnemyTurret: " + "x" + newpos.X + "y:" + newpos.Y + "z:" + newpos.Z);
+         
         }
 
         public override void OnUpdate(float deltaTime)

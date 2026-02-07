@@ -6,6 +6,7 @@ using static Engine.Event;
 using static Engine.Scene;
 using static Engine.Audio;
 using static Engine.AudioManager;
+using static Engine.Transform;
 
 namespace Game
 {
@@ -21,9 +22,11 @@ namespace Game
         private const string GAMEOVER = "GameOver";
         private const string PlayerDeadName = "PlayerDeath";
         private const string CoreDestructionName = "CoreDestruction";
+        private const string core = "SEMICONDUCTOR";
 
         private uint playerdeadID = 0;
         private uint coredestructionID = 0;
+        private uint coreID = 0;
 
         private bool initialized = false;
         private bool playaudio = false;
@@ -37,13 +40,19 @@ namespace Game
 
             playerdeadID = SceneFindEntityByName(PlayerDeadName);
             coredestructionID = SceneFindEntityByName(CoreDestructionName);
+            coreID = SceneFindEntityByName(core);
 
-            if(playerdeadID == 0){
+            if (playerdeadID == 0){
                 LogMessage("[GameOverScreen] playerdead entity cannot be found");
             }
-            
-            if(coredestructionID == 0){
+
+            if (coredestructionID == 0)
+            {
                 LogMessage("[GameOverScreen] coredestruction entity cannot be found");
+            }
+            if (coreID == 0)
+            {
+                LogMessage("[GameOverScreen] core entity cannot be found");
             }
 
             // Subscribe to both lose conditions
@@ -55,6 +64,9 @@ namespace Game
 
             initialized = true;
             LogMessage("[GameOverScreen] Initialized - waiting for lose condition");
+
+            Vector3 corepos = GetPosition(coreID);
+            LogMessage("SEMICONDUCTOR IS AT x: " + corepos.X.ToString() + ", y: " + corepos.Y.ToString() + ", z: " + corepos.Z.ToString());
         }
 
         public override void OnUpdate(float deltaTime){
@@ -83,6 +95,7 @@ namespace Game
             StopGroup(AudioType.SFX);
 
             SetIsVisible((uint)EntityID, true);
+            Input.SetCursorVisible(true);
             currEvent = eventName;
             playaudio = true;
             Publish(GAMEOVER, "");

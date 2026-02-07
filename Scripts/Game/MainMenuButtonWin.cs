@@ -12,7 +12,7 @@ namespace Game
     /// Uses exact same collision logic as pause menu
     /// Set "Is Win Button" to true for win screen, false for lose screen
     /// </summary>
-    public class MainMenuButton : ScriptBehaviour
+    public class MainMenuButtonWin : ScriptBehaviour
     {
         // Scene path
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
@@ -21,6 +21,7 @@ namespace Game
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
         private const string GAMEWIN = "GameWin";
 
         // Configuration
@@ -37,16 +38,21 @@ namespace Game
             LogMessage("MainMenuButton_WinLose EntityID: " + EntityID);
             LogMessage("Is Win Button: " + isWinButton);
 
-            if (isWinButton)
-            {
-                Event.Subscribe(EVENT_TIMER_FINISHED, OnShowCondition);
-                Event.Subscribe(GAMEWIN, OnShowCondition);
-            }
-            else
-            {
-                Event.Subscribe(EVENT_PLAYER_DEAD, OnShowCondition);
-                Event.Subscribe(EVENT_CORE_DESTROYED, OnShowCondition);
-            }
+            /*            if (isWinButton)
+                        {
+                            Event.Subscribe(EVENT_TIMER_FINISHED, OnShowCondition);
+                            Event.Subscribe(GAMEWIN, OnShowCondition);
+                        }
+                        else
+                        {
+                            Event.Subscribe(EVENT_PLAYER_DEAD, OnShowCondition);
+                            Event.Subscribe(EVENT_CORE_DESTROYED, OnShowCondition);
+                        }*/
+
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnShowCondition);
+            Event.Subscribe(GAMEWIN, OnShowCondition);
+            Event.Subscribe(ENEMY_CORE_DEATH, OnShowCondition);
+            Event.Subscribe(GAMEWIN, OnShowCondition);
 
             // Start invisible and inactive
             SetIsVisible((uint)EntityID, false);
