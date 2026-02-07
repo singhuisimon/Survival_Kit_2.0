@@ -82,7 +82,9 @@ namespace Game
 
         // Scene paths for navigation
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
+        private const string LEVEL1_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
+        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
+        private string currentGameScenePath = LEVEL1_SCENE_PATH;
 
         // Pause events - other scripts subscribe to these
         private const string EVENT_GAME_PAUSED = "GamePaused";
@@ -163,6 +165,7 @@ namespace Game
         private bool entitiesFound = false;
         private bool wasPauseKeyPressed = false;
         private bool wasMousePressed = false;
+        private bool wasF1Pressed = false;
         private bool gameEnded = false;
 
         //visual bar
@@ -267,6 +270,19 @@ namespace Game
             isPaused = false;
             gameEnded = false;
 
+            // Detect which level we are in by looking for level-specific entities
+            uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
+            if (turrets != null && turrets.Length > 0)
+            {
+                currentGameScenePath = LEVEL2_SCENE_PATH;
+                LogMessage("PauseMenuPopup: Detected Level 2");
+            }
+            else
+            {
+                currentGameScenePath = LEVEL1_SCENE_PATH;
+                LogMessage("PauseMenuPopup: Detected Level 1");
+            }
+
             // Subscribe to win/lose events to block pause menu
             Event.Subscribe("GameOver", OnGameEnded);
             Event.Subscribe("GameWin", OnGameEnded);
@@ -275,7 +291,7 @@ namespace Game
             // Hide all initially
             HidePauseMenu();
 
-            LogMessage("PauseMenuPopup: Ready!");
+            LogMessage("PauseMenuPopup: Ready! Restart path: " + currentGameScenePath);
         }
 
         /// <summary>
@@ -404,7 +420,11 @@ namespace Game
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
 
-            if (!mouseJustPressed) return;
+            bool isF1Pressed = Input.IsKeyPressed(KeyCode.F1);
+            bool f1JustPressed = isF1Pressed && !wasF1Pressed;
+            wasF1Pressed = isF1Pressed;
+
+            if (!mouseJustPressed && !f1JustPressed) return;
 
             // Check Resume button
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
@@ -418,9 +438,9 @@ namespace Game
             if (IsButtonClicked(restartButtonId, restartButtonHoveredId))
             {
                 LogMessage("PauseMenuPopup: Restart clicked - reloading scene");
-                LogMessage("Scene path: " + GAME_SCENE_PATH);
+                LogMessage("Scene path: " + currentGameScenePath);
                 HidePauseMenu();
-                Event.Publish("LoadScene", GAME_SCENE_PATH);
+                Event.Publish("LoadScene", currentGameScenePath);
                 return;
             }
 
