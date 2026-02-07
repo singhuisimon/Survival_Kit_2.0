@@ -479,64 +479,80 @@ namespace Game
             // Check Plus button
             if (IsButtonClicked(plusButtonId, plusButtonHoveredId))
             {
-
-                float currentVolume = Instance.GetMasterVolume();
-                Instance.SetMasterVolume(currentVolume + 0.1f);
-                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
-                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
-                           mixerFill1InitialWidth, mixerFill1InitialPosition);
+                if (Instance != null)
+                {
+                    float currentVolume = Instance.GetMasterVolume();
+                    Instance.SetMasterVolume(currentVolume + 0.1f);
+                    LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
+                    UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                               mixerFill1InitialWidth, mixerFill1InitialPosition);
+                }
                 return;
             }
 
             // Check Minus button
             if (IsButtonClicked(minusButtonId, minusButtonHoveredId))
             {
-                float currentVolume = Instance.GetMasterVolume();
-                Instance.SetMasterVolume(currentVolume - 0.1f);
-                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
-                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
-                           mixerFill1InitialWidth, mixerFill1InitialPosition); 
+                if (Instance != null)
+                {
+                    float currentVolume = Instance.GetMasterVolume();
+                    Instance.SetMasterVolume(currentVolume - 0.1f);
+                    LogMessage("PauseMenuPopup: Master Volume - (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
+                    UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
+                               mixerFill1InitialWidth, mixerFill1InitialPosition);
+                }
                 return;
             }
 
             // Mixer Set 2 buttons
             if (IsButtonClicked(plusButtonId2, plusButtonHoveredId2))
             {
-                float currentVolume = Instance.GetBGMVolume();
-                Instance.SetBGMVolume(currentVolume +0.1f);
-                LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
-                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
-                            mixerFill2InitialWidth, mixerFill2InitialPosition);
+                if (Instance != null)
+                {
+                    float currentVolume = Instance.GetBGMVolume();
+                    Instance.SetBGMVolume(currentVolume + 0.1f);
+                    LogMessage("PauseMenuPopup: BGM Volume + (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
+                    UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                                mixerFill2InitialWidth, mixerFill2InitialPosition);
+                }
                 return;
             }
             if (IsButtonClicked(minusButtonId2, minusButtonHoveredId2))
             {
-                float currentVolume = Instance.GetBGMVolume();
-                Instance.SetBGMVolume(currentVolume - 0.1f);
-                LogMessage("PauseMenuPopup: BGM Volume - (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
-                LogMessage("PauseMenuPopup: Minus 2 clicked");
-                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
-                            mixerFill2InitialWidth, mixerFill2InitialPosition);
+                if (Instance != null)
+                {
+                    float currentVolume = Instance.GetBGMVolume();
+                    Instance.SetBGMVolume(currentVolume - 0.1f);
+                    LogMessage("PauseMenuPopup: BGM Volume - (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
+                    UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
+                                mixerFill2InitialWidth, mixerFill2InitialPosition);
+                }
                 return;
             }
 
             // Mixer Set 3 buttons
             if (IsButtonClicked(plusButtonId3, plusButtonHoveredId3))
             {
-                float currentVolume = Instance.GetSFXVolume();
-                Instance.SetSFXVolume(currentVolume + 0.1f);
-                LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
-                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
-                          mixerFill3InitialWidth, mixerFill3InitialPosition);
+                if (Instance != null)
+                {
+                    float currentVolume = Instance.GetSFXVolume();
+                    Instance.SetSFXVolume(currentVolume + 0.1f);
+                    LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
+                    UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                              mixerFill3InitialWidth, mixerFill3InitialPosition);
+                }
                 return;
             }
             if (IsButtonClicked(minusButtonId3, minusButtonHoveredId3))
             {
-                float currentVolume = Instance.GetSFXVolume();
-                Instance.SetSFXVolume(currentVolume  -0.1f);
-                LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
-                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
-                          mixerFill3InitialWidth, mixerFill3InitialPosition);
+                if (Instance != null)
+                {
+                    float currentVolume = Instance.GetSFXVolume();
+                    Instance.SetSFXVolume(currentVolume - 0.1f);
+                    LogMessage("PauseMenuPopup: SFX Volume - (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
+                    UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
+                              mixerFill3InitialWidth, mixerFill3InitialPosition);
+                }
                 return;
             }
 
@@ -544,30 +560,39 @@ namespace Game
             // Master checkbox
             if (IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId))
             {
-                Instance.ToggleMasterMute();
-                bool isMuted = Instance.IsMasterMuted();
-                LogMessage("PauseMenuPopup: Master Mute toggled to: " + isMuted);
-                UpdateCheckboxVisuals();
+                if (Instance != null)
+                {
+                    Instance.ToggleMasterMute();
+                    bool isMuted = Instance.IsMasterMuted();
+                    LogMessage("PauseMenuPopup: Master Mute toggled to: " + isMuted);
+                    UpdateCheckboxVisuals();
+                }
                 return;
             }
 
             // BGM checkbox
             if (IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId))
             {
-                Instance.ToggleBGMMute();
-                bool isMuted = Instance.IsBGMMuted();
-                LogMessage("PauseMenuPopup: BGM Mute toggled to: " + isMuted);
-                UpdateCheckboxVisuals();
+                if (Instance != null)
+                {
+                    Instance.ToggleBGMMute();
+                    bool isMuted = Instance.IsBGMMuted();
+                    LogMessage("PauseMenuPopup: BGM Mute toggled to: " + isMuted);
+                    UpdateCheckboxVisuals();
+                }
                 return;
             }
 
             // SFX checkbox
             if (IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId))
             {
-                Instance.ToggleSFXMute();
-                bool isMuted = Instance.IsSFXMuted();
-                LogMessage("PauseMenuPopup: SFX Mute toggled to: " + isMuted);
-                UpdateCheckboxVisuals();
+                if (Instance != null)
+                {
+                    Instance.ToggleSFXMute();
+                    bool isMuted = Instance.IsSFXMuted();
+                    LogMessage("PauseMenuPopup: SFX Mute toggled to: " + isMuted);
+                    UpdateCheckboxVisuals();
+                }
                 return;
             }
 
@@ -642,6 +667,15 @@ namespace Game
             isPaused = true;
             LogMessage("PauseMenuPopup: Showing pause menu");
 
+            // Set global pause state FIRST so all scripts stop immediately
+            GameState.IsPaused = true;
+
+            // Show cursor for menu interaction
+            Input.SetCursorVisible(true);
+
+            // Notify other scripts that game is paused (for scripts that use events)
+            Event.Publish(EVENT_GAME_PAUSED, "");
+
             // Position all elements at their visible screen positions
             SetPosition(bgId, ref bgVisiblePos);
             SetPosition(resumeButtonId, ref resumeVisiblePos);
@@ -660,14 +694,16 @@ namespace Game
             SetPosition(plusButtonId3, ref plusVisiblePos3);
             SetPosition(minusButtonId3, ref minusVisiblePos3);
 
-  
+            // Update mixer fill visuals if AudioSettings is available
+            if (Instance != null)
+            {
                 UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
                                      mixerFill1InitialWidth, mixerFill1InitialPosition);
                 UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
                                      mixerFill2InitialWidth, mixerFill2InitialPosition);
                 UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
                                      mixerFill3InitialWidth, mixerFill3InitialPosition);
-            
+            }
 
             // Hide all hovered versions initially
             Vector3 hidePos = new Vector3(CENTER_X, HIDDEN_Y, 0.0f);
@@ -693,15 +729,6 @@ namespace Game
                     SetPosition(hudElementIds[i], ref hudHidePos);
                 }
             }
-
-            // Show cursor for menu interaction
-            Input.SetCursorVisible(true);
-
-            // Set global pause state
-            GameState.IsPaused = true;
-
-            // Notify other scripts that game is paused (for scripts that use events)
-            Event.Publish(EVENT_GAME_PAUSED, "");
 
             UpdateCheckboxVisuals(); // added by Rio
 
