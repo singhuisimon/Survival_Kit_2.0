@@ -8,24 +8,17 @@ using static Engine.Event;
 namespace Game
 {
     /// <summary>
-    /// MainMenuButton_WinLose - Main menu button for win/lose screens
+    /// RestartButton_Lose - Restart button on lose screen
     /// Uses exact same collision logic as pause menu
-    /// Set "Is Win Button" to true for win screen, false for lose screen
     /// </summary>
-    public class MainMenuButton : ScriptBehaviour
+    public class RestartButton2 : ScriptBehaviour
     {
         // Scene path
-        private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
 
-        // Win/Lose events
+        // Lose events
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
-        private const string EVENT_TIMER_FINISHED = "TimerFinished";
-        private const string GAMEWIN = "GameWin";
-
-        // Configuration
-        [SerializeField("Is Win Button")]
-        private bool isWinButton = false;
 
         // State
         private bool isButtonActive = false;
@@ -33,25 +26,23 @@ namespace Game
 
         public override void OnStart()
         {
-            LogMessage("=== MainMenuButton_WinLose OnStart ===");
-            LogMessage("MainMenuButton_WinLose EntityID: " + EntityID);
-            LogMessage("Is Win Button: " + isWinButton);
+            LogMessage("=== RestartButton_Lose OnStart ===");
+            LogMessage("RestartButton_Lose EntityID: " + EntityID);
 
-
-                Event.Subscribe(EVENT_PLAYER_DEAD, OnShowCondition);
-                Event.Subscribe(EVENT_CORE_DESTROYED, OnShowCondition);
-            
+            // Subscribe to lose events
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnLoseCondition);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnLoseCondition);
 
             // Start invisible and inactive
             SetIsVisible((uint)EntityID, false);
             isButtonActive = false;
 
-            LogMessage("[MainMenuButton_WinLose] Initialized");
+            LogMessage("[RestartButton_Lose] Initialized");
         }
 
-        private void OnShowCondition(string eventName, string payload)
+        private void OnLoseCondition(string eventName, string payload)
         {
-            LogMessage("[MainMenuButton_WinLose] Show condition triggered - showing button (isWin=" + isWinButton + ")");
+            LogMessage("[RestartButton_Lose] Lose condition triggered - showing button");
 
             // Make button visible and active
             SetIsVisible((uint)EntityID, true);
@@ -79,20 +70,17 @@ namespace Game
             // Check if button clicked (exact same as pause menu)
             if (IsButtonClicked((uint)EntityID))
             {
-                LogMessage("[MainMenuButton_WinLose] Button clicked - returning to main menu");
+                LogMessage("[RestartButton_Lose] Button clicked - reloading game scene");
 
                 // Stop all audio
                 AudioManager.StopGroup(AudioType.BGM);
                 AudioManager.StopGroup(AudioType.SFX);
 
-                // Show cursor for main menu
-                Input.SetCursorVisible(true);
+                // Hide cursor for gameplay
+                Input.SetCursorVisible(false);
 
-                // Clear pause state
-                GameState.IsPaused = false;
-
-                // Load main menu scene
-                Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                // Load game scene
+                Event.Publish("LoadScene", GAME_SCENE_PATH);
             }
         }
 
@@ -103,17 +91,9 @@ namespace Game
 
         public override void OnDestroy()
         {
-            if (isWinButton)
-            {
-                Event.Unsubscribe(EVENT_TIMER_FINISHED, OnShowCondition);
-                Event.Unsubscribe(GAMEWIN, OnShowCondition);
-            }
-            else
-            {
-                Event.Unsubscribe(EVENT_PLAYER_DEAD, OnShowCondition);
-                Event.Unsubscribe(EVENT_CORE_DESTROYED, OnShowCondition);
-            }
-            LogMessage("=== MainMenuButton_WinLose Destroyed ===");
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnLoseCondition);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnLoseCondition);
+            LogMessage("=== RestartButton_Lose Destroyed ===");
         }
     }
 }
