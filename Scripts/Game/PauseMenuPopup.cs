@@ -495,7 +495,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetMasterVolume();
-                    Instance.SetMasterVolume(currentVolume + 0.1f);
+                    Instance.SetMasterVolume(currentVolume + 0.111f);
                     LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
                                mixerFill1InitialWidth, mixerFill1InitialPosition);
@@ -509,7 +509,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetMasterVolume();
-                    Instance.SetMasterVolume(currentVolume - 0.1f);
+                    Instance.SetMasterVolume(currentVolume - 0.111f);
                     LogMessage("PauseMenuPopup: Master Volume - (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
                                mixerFill1InitialWidth, mixerFill1InitialPosition);
@@ -523,7 +523,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetBGMVolume();
-                    Instance.SetBGMVolume(currentVolume + 0.1f);
+                    Instance.SetBGMVolume(currentVolume + 0.111f);
                     LogMessage("PauseMenuPopup: BGM Volume + (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
                                 mixerFill2InitialWidth, mixerFill2InitialPosition);
@@ -535,7 +535,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetBGMVolume();
-                    Instance.SetBGMVolume(currentVolume - 0.1f);
+                    Instance.SetBGMVolume(currentVolume - 0.111f);
                     LogMessage("PauseMenuPopup: BGM Volume - (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
                                 mixerFill2InitialWidth, mixerFill2InitialPosition);
@@ -549,7 +549,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetSFXVolume();
-                    Instance.SetSFXVolume(currentVolume + 0.1f);
+                    Instance.SetSFXVolume(currentVolume + 0.111f);
                     LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
                               mixerFill3InitialWidth, mixerFill3InitialPosition);
@@ -561,7 +561,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetSFXVolume();
-                    Instance.SetSFXVolume(currentVolume - 0.1f);
+                    Instance.SetSFXVolume(currentVolume - 0.111f);
                     LogMessage("PauseMenuPopup: SFX Volume - (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
                               mixerFill3InitialWidth, mixerFill3InitialPosition);
