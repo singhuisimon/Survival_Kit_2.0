@@ -111,6 +111,13 @@ namespace Engine {
 		for(auto entity : view) {
 			auto &script = view.get<ScriptComponent>(entity);
 			if(script.GCHandle != 0) {
+				// Call OnDestroy before destroying handle so scripts can unsubscribe events
+				if(script.Started) {
+					MonoObject *inst = se.GetObjectFromGCHandle(script.GCHandle);
+					if(inst) {
+						se.CallMethod(inst, "OnDestroy");
+					}
+				}
 				se.DestroyScriptHandle(script.GCHandle);
 				script.GCHandle = 0;
 			}

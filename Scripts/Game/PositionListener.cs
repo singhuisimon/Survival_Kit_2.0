@@ -16,6 +16,11 @@ namespace Game
             Subscribe("PlayerPosition", OnPlayerPosition);
         }
 
+        public void OnDestroy()
+        {
+            Unsubscribe("PlayerPosition", OnPlayerPosition);
+        }
+
         private void OnPlayerPosition(string name, string payload)
         {
             // Expected payload format: "entityId|x|y|z"
