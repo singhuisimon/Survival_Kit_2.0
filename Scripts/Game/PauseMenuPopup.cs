@@ -82,9 +82,8 @@ namespace Game
 
         // Scene paths for navigation
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string LEVEL1_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
         private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
-        private string currentGameScenePath = LEVEL1_SCENE_PATH;
 
         // Pause events - other scripts subscribe to these
         private const string EVENT_GAME_PAUSED = "GamePaused";
@@ -165,8 +164,8 @@ namespace Game
         private bool entitiesFound = false;
         private bool wasPauseKeyPressed = false;
         private bool wasMousePressed = false;
-        private bool wasF1Pressed = false;
         private bool gameEnded = false;
+        private string currentGameScenePath = GAME_SCENE_PATH;
 
         //visual bar
         // Add these fields to store initial widths at the top of your class
@@ -270,7 +269,7 @@ namespace Game
             isPaused = false;
             gameEnded = false;
 
-            // Detect which level we are in by looking for level-specific entities
+            // Detect which level we're in
             uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
             if (turrets != null && turrets.Length > 0)
             {
@@ -279,7 +278,7 @@ namespace Game
             }
             else
             {
-                currentGameScenePath = LEVEL1_SCENE_PATH;
+                currentGameScenePath = GAME_SCENE_PATH;
                 LogMessage("PauseMenuPopup: Detected Level 1");
             }
 
@@ -291,7 +290,7 @@ namespace Game
             // Hide all initially
             HidePauseMenu();
 
-            LogMessage("PauseMenuPopup: Ready! Restart path: " + currentGameScenePath);
+            LogMessage("PauseMenuPopup: Ready!");
         }
 
         /// <summary>
@@ -420,11 +419,7 @@ namespace Game
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
 
-            bool isF1Pressed = Input.IsKeyPressed(KeyCode.F1);
-            bool f1JustPressed = isF1Pressed && !wasF1Pressed;
-            wasF1Pressed = isF1Pressed;
-
-            if (!mouseJustPressed && !f1JustPressed) return;
+            if (!mouseJustPressed) return;
 
             // Check Resume button
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
@@ -434,25 +429,24 @@ namespace Game
                 return;
             }
 
-            // Check Restart button - reload current scene (same logic as win screen)
+            // Check Restart button - reload current scene
             if (IsButtonClicked(restartButtonId, restartButtonHoveredId))
             {
                 LogMessage("PauseMenuPopup: Restart clicked - reloading scene");
                 LogMessage("Scene path: " + currentGameScenePath);
 
-                // Stop all audio before reloading
+                // Stop all audio before scene reload
                 StopGroup(AudioType.BGM);
                 StopGroup(AudioType.SFX);
 
                 // Hide cursor for gameplay
                 Input.SetCursorVisible(false);
 
-                // Reset pause state before scene change
+                // Reset pause state
                 isPaused = false;
                 GameState.IsPaused = false;
 
-                // Set current scene path and reload
-                GameState.CurrentScenePath = currentGameScenePath;
+                // Load correct level scene
                 Event.Publish("LoadScene", currentGameScenePath);
                 return;
             }
@@ -495,7 +489,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetMasterVolume();
-                    Instance.SetMasterVolume(currentVolume + 0.1f);
+                    Instance.SetMasterVolume(currentVolume + 0.111f);
                     LogMessage("PauseMenuPopup: Master Volume + (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
                                mixerFill1InitialWidth, mixerFill1InitialPosition);
@@ -509,7 +503,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetMasterVolume();
-                    Instance.SetMasterVolume(currentVolume - 0.1f);
+                    Instance.SetMasterVolume(currentVolume - 0.111f);
                     LogMessage("PauseMenuPopup: Master Volume - (Now: " + Instance.GetMasterVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
                                mixerFill1InitialWidth, mixerFill1InitialPosition);
@@ -523,7 +517,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetBGMVolume();
-                    Instance.SetBGMVolume(currentVolume + 0.1f);
+                    Instance.SetBGMVolume(currentVolume + 0.111f);
                     LogMessage("PauseMenuPopup: BGM Volume + (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
                                 mixerFill2InitialWidth, mixerFill2InitialPosition);
@@ -535,7 +529,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetBGMVolume();
-                    Instance.SetBGMVolume(currentVolume - 0.1f);
+                    Instance.SetBGMVolume(currentVolume - 0.111f);
                     LogMessage("PauseMenuPopup: BGM Volume - (Now: " + Instance.GetBGMVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
                                 mixerFill2InitialWidth, mixerFill2InitialPosition);
@@ -549,7 +543,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetSFXVolume();
-                    Instance.SetSFXVolume(currentVolume + 0.1f);
+                    Instance.SetSFXVolume(currentVolume + 0.111f);
                     LogMessage("PauseMenuPopup: SFX Volume + (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
                               mixerFill3InitialWidth, mixerFill3InitialPosition);
@@ -561,7 +555,7 @@ namespace Game
                 if (Instance != null)
                 {
                     float currentVolume = Instance.GetSFXVolume();
-                    Instance.SetSFXVolume(currentVolume - 0.1f);
+                    Instance.SetSFXVolume(currentVolume - 0.111f);
                     LogMessage("PauseMenuPopup: SFX Volume - (Now: " + Instance.GetSFXVolume().ToString("F2") + ")");
                     UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
                               mixerFill3InitialWidth, mixerFill3InitialPosition);
@@ -569,7 +563,7 @@ namespace Game
                 return;
             }
 
-            // Checkbox Handling - Added by Rio
+            // Checkbox Handling
             // Master checkbox
             if (IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId))
             {
@@ -680,13 +674,9 @@ namespace Game
             isPaused = true;
             LogMessage("PauseMenuPopup: Showing pause menu");
 
-            // Set global pause state FIRST so all scripts stop immediately
+            // CRITICAL: Set game state FIRST, before anything that could fail
             GameState.IsPaused = true;
-
-            // Show cursor for menu interaction
             Input.SetCursorVisible(true);
-
-            // Notify other scripts that game is paused (for scripts that use events)
             Event.Publish(EVENT_GAME_PAUSED, "");
 
             // Position all elements at their visible screen positions
@@ -707,7 +697,6 @@ namespace Game
             SetPosition(plusButtonId3, ref plusVisiblePos3);
             SetPosition(minusButtonId3, ref minusVisiblePos3);
 
-            // Update mixer fill visuals if AudioSettings is available
             if (Instance != null)
             {
                 UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
@@ -743,7 +732,7 @@ namespace Game
                 }
             }
 
-            UpdateCheckboxVisuals(); // added by Rio
+            UpdateCheckboxVisuals();
 
             LogMessage("PauseMenuPopup: Menu shown at screen center");
         }

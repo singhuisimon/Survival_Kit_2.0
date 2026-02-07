@@ -88,7 +88,6 @@ namespace Game
                 LogMessage("Loading scene: " + nextScenePath);
 
                 // Load next level
-                GameState.CurrentScenePath = nextScenePath;
                 Event.Publish("LoadScene", nextScenePath);
             }
         }

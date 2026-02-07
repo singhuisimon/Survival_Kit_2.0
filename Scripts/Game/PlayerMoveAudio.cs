@@ -49,9 +49,6 @@ namespace Game{
         }
 
         public override void OnUpdate(float deltaTime){
-            if (GameState.IsPaused)
-                return;
-
             if (playerEntityID == 0 || audioEntityID == 0)
                 return;
                 

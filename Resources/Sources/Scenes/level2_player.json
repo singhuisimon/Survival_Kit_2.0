@@ -7781,9 +7781,9 @@
                     }
                 }
             ]
-        },
+        },
         {
-            "ID": 69,
+            "ID": 50000001,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -7794,10 +7794,22 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "10083648095363581495",
-                        "Position": [0.0, 0.0, 0.0],
-                        "Rotation": [0.0, -0.0, 0.0],
-                        "Scale": [1.0, 1.0, 1.0],
+                        "ComponentGUID": "200000000000000001",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -7805,41 +7817,8 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "860276058509461051",
+                        "ComponentGUID": "200000000000000002",
                         "ScriptClassName": "Game.AudioSettings"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 50000001,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_PlusButton_3_Hovered"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "300000000000000001",
-                        "Position": [1200, 526, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_PlusButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
                     }
                 }
             ]
@@ -7850,27 +7829,51 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_PlusButton_3"
+                        "Tag": "PauseMenu_EngineBG"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000002",
-                        "Position": [1200, 526, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000003",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            630.0,
+                            350.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "200000000000000004",
+                        "ScriptClassName": "Game.PauseMenuPopup"
+                    }
+                },
+                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_PlusButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "PauseMenu_EngineBG.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
-                        "Sprite Layer": 4,
+                        "Sprite Layer": 3,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -7883,16 +7886,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MinusButton_3_Hovered"
+                        "Tag": "Paused_ResumeButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000003",
-                        "Position": [1200, 559, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000005",
+                        "Position": [
+                            640.0,
+                            235.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -7900,8 +7915,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MinusButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_ResumeButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -7916,16 +7936,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MinusButton_3"
+                        "Tag": "Paused_ResumeButton_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000004",
-                        "Position": [1200, 559, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000006",
+                        "Position": [
+                            640.0,
+                            235.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -7933,8 +7965,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MinusButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_ResumeButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -7949,16 +7986,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MixerFill_3"
+                        "Tag": "Paused_RestartButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000005",
-                        "Position": [1150, 415, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [5, 155, 1],
+                        "ComponentGUID": "200000000000000007",
+                        "Position": [
+                            640.0,
+                            310.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -7966,8 +8015,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MixerFill.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_RestartButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -7982,16 +8036,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_PlusButton_2_Hovered"
+                        "Tag": "Paused_RestartButton_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000006",
-                        "Position": [1044, 525, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000008",
+                        "Position": [
+                            640.0,
+                            310.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -7999,8 +8065,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_PlusButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_RestartButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8015,16 +8086,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_PlusButton_2"
+                        "Tag": "Paused_PlusButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000007",
-                        "Position": [1044, 525, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000009",
+                        "Position": [
+                            890.0,
+                            525.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8033,7 +8116,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Paused_PlusButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8048,16 +8136,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MinusButton_2_Hovered"
+                        "Tag": "Paused_PlusButton_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000008",
-                        "Position": [1044, 559, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000010",
+                        "Position": [
+                            890.0,
+                            525.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8065,8 +8165,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MinusButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_PlusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8081,16 +8186,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MinusButton_2"
+                        "Tag": "Paused_MixerFill"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000009",
-                        "Position": [1044, 559, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000011",
+                        "Position": [
+                            844.0,
+                            415.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            5.0,
+                            155.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8098,8 +8215,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MinusButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8114,16 +8236,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MixerFill_2"
+                        "Tag": "Paused_MinusButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000010",
-                        "Position": [998, 415, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [5, 155, 1],
+                        "ComponentGUID": "200000000000000012",
+                        "Position": [
+                            890.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8131,8 +8265,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MixerFill.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8147,16 +8286,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_HowToPlayButton_Hovered"
+                        "Tag": "Paused_MinusButton_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000011",
-                        "Position": [640, 380, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000013",
+                        "Position": [
+                            890.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8164,8 +8315,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_HowToPlayButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8180,16 +8336,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_HowToPlayButton"
+                        "Tag": "Paused_MainMenuButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000012",
-                        "Position": [640, 380, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000014",
+                        "Position": [
+                            640.0,
+                            455.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8197,8 +8365,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_HowToPlayButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MainMenuButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8219,10 +8392,22 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000013",
-                        "Position": [640, 455, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000015",
+                        "Position": [
+                            640.0,
+                            455.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8231,7 +8416,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Paused_MainMenuButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8246,16 +8436,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MainMenuButton"
+                        "Tag": "Paused_HowToPlayButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000014",
-                        "Position": [640, 455, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000016",
+                        "Position": [
+                            640.0,
+                            380.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8263,8 +8465,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MainMenuButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_HowToPlayButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8279,16 +8486,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MinusButton_Hovered"
+                        "Tag": "Paused_HowToPlayButton_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000015",
-                        "Position": [890, 559, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000017",
+                        "Position": [
+                            640.0,
+                            380.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            116.0,
+                            26.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8296,8 +8515,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MinusButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_HowToPlayButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8312,16 +8536,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MinusButton"
+                        "Tag": "Paused_MixerFill_2"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000016",
-                        "Position": [890, 559, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000018",
+                        "Position": [
+                            998.0,
+                            415.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            5.0,
+                            155.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8329,8 +8565,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MinusButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8345,16 +8586,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_MixerFill"
+                        "Tag": "Paused_PlusButton_2"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000017",
-                        "Position": [844, 415, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [5, 155, 1],
+                        "ComponentGUID": "200000000000000019",
+                        "Position": [
+                            1044.0,
+                            525.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8362,8 +8615,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MixerFill.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8378,16 +8636,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_PlusButton_Hovered"
+                        "Tag": "Paused_PlusButton_2_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000018",
-                        "Position": [890, 525, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000020",
+                        "Position": [
+                            1044.0,
+                            525.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8396,7 +8666,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Paused_PlusButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8411,16 +8686,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_PlusButton"
+                        "Tag": "Paused_MinusButton_2"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000019",
-                        "Position": [890, 525, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [12, 12, 1],
+                        "ComponentGUID": "200000000000000021",
+                        "Position": [
+                            1044.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8428,8 +8715,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_PlusButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8444,16 +8736,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_RestartButton_Hovered"
+                        "Tag": "Paused_MinusButton_2_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000020",
-                        "Position": [640, 310, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000022",
+                        "Position": [
+                            1044.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8461,8 +8765,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_RestartButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8477,16 +8786,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_RestartButton"
+                        "Tag": "Paused_MixerFill_3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000021",
-                        "Position": [640, 310, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000023",
+                        "Position": [
+                            1150.0,
+                            415.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            5.0,
+                            155.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8494,8 +8815,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_RestartButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8510,16 +8836,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_ResumeButton_Hovered"
+                        "Tag": "Paused_PlusButton_3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000022",
-                        "Position": [640, 235, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000024",
+                        "Position": [
+                            1200.0,
+                            526.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8527,8 +8865,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_ResumeButton_Hovered.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8543,16 +8886,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_ResumeButton"
+                        "Tag": "Paused_PlusButton_3_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000023",
-                        "Position": [640, 235, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [116, 26, 1],
+                        "ComponentGUID": "200000000000000025",
+                        "Position": [
+                            1200.0,
+                            526.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8560,8 +8915,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_ResumeButton.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_PlusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8576,34 +8936,44 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "PauseMenu_EngineBG"
+                        "Tag": "Paused_MinusButton_3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000024",
-                        "Position": [640, 360, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [630, 350, 1],
+                        "ComponentGUID": "200000000000000026",
+                        "Position": [
+                            1200.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "300000000000000025",
-                        "ScriptClassName": "Game.PauseMenuPopup"
-                    }
-                },
-                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "PauseMenu_EngineBG.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
-                        "Sprite Layer": 3,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -8616,16 +8986,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_SFX_Ticked"
+                        "Tag": "Paused_MinusButton_3_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000026",
-                        "Position": [1143.5, 620, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [13, 13, 1],
+                        "ComponentGUID": "200000000000000027",
+                        "Position": [
+                            1200.0,
+                            559.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8633,8 +9015,13 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Checkbox_Ticked.png",
-                        "Color": [1, 1, 1, 1],
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8649,16 +9036,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_SFX_Unticked"
+                        "Tag": "Paused_Checkbox_Master_Unticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000027",
-                        "Position": [1143.5, 620, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [13, 13, 1],
+                        "ComponentGUID": "200000000000000028",
+                        "Position": [
+                            833.7999877929688,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8667,7 +9066,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Checkbox_Unticked.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8682,16 +9086,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_BGM_Ticked"
+                        "Tag": "Paused_Checkbox_Master_Ticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000028",
-                        "Position": [987.0999755859375, 620, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [13, 13, 1],
+                        "ComponentGUID": "200000000000000029",
+                        "Position": [
+                            833.7999877929688,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8700,7 +9116,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Checkbox_Ticked.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8721,10 +9142,22 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000029",
-                        "Position": [987.0999755859375, 620, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [13, 13, 1],
+                        "ComponentGUID": "200000000000000030",
+                        "Position": [
+                            987.0999755859375,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8733,7 +9166,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Checkbox_Unticked.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8748,16 +9186,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_Master_Ticked"
+                        "Tag": "Paused_Checkbox_BGM_Ticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000030",
-                        "Position": [833.7999877929688, 620, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [13, 13, 1],
+                        "ComponentGUID": "200000000000000031",
+                        "Position": [
+                            987.0999755859375,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8766,7 +9216,12 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Checkbox_Ticked.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
@@ -8781,16 +9236,28 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_Master_Unticked"
+                        "Tag": "Paused_Checkbox_SFX_Unticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "300000000000000031",
-                        "Position": [833.7999877929688, 620, 0],
-                        "Rotation": [0, 0, 0],
-                        "Scale": [13, 13, 1],
+                        "ComponentGUID": "200000000000000032",
+                        "Position": [
+                            1143.5,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8799,7 +9266,62 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Checkbox_Unticked.png",
-                        "Color": [1, 1, 1, 1],
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 50000031,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_Checkbox_SFX_Ticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "200000000000000033",
+                        "Position": [
+                            1143.5,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Ticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
