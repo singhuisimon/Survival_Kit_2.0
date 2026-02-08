@@ -728,7 +728,9 @@ namespace Game
             {
                 if (hudElementIds[i] != 0)
                 {
-                    SetPosition(hudElementIds[i], ref hudHidePos);
+                    SpriteRenderer.SetIsVisible((uint)hudElementIds[i], false);
+                    Text.SetIsVisible((uint)hudElementIds[i], false);
+
                 }
             }
 
@@ -786,7 +788,9 @@ namespace Game
             {
                 if (hudElementIds[i] != 0)
                 {
-                    SetPosition(hudElementIds[i], ref hudElementOriginalPositions[i]);
+                    SpriteRenderer.SetIsVisible((uint)hudElementIds[i], true);
+                    Text.SetIsVisible((uint)hudElementIds[i], true);
+
                 }
             }
 
