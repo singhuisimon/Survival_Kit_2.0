@@ -24,7 +24,7 @@ public:
 
     Engine::Scene* CreateScene(const std::string& name);
 
-    void RequestNewSceneFromEditor(const std::string& name);
+    //void RequestNewSceneFromEditor(const std::string& name);
 protected:
     /**
      * @brief Initialize your game
@@ -48,7 +48,7 @@ private:
     Engine::Scene* m_ActiveScene = nullptr;
     // Editor 
 #ifndef DISABLE_EDITOR
-    std::unique_ptr<Engine::Editor> m_Editor; 
+    std::unique_ptr<Engine::Editor> m_Editor;
     bool m_EditorEnable = true;
 #endif
     std::shared_ptr<Engine::TracyProfiler> m_TracyProfiler;
@@ -56,10 +56,10 @@ private:
     bool m_EditorJustPaused = false;
     bool m_IsFirstPausedFrame = true;
 
-	std::unique_ptr<Engine::AudioManager> m_AudioManager;
-	std::string m_CurrentScenePath;
+    std::unique_ptr<Engine::AudioManager> m_AudioManager;
+    std::string m_CurrentScenePath;
 
-    void AddAllSystems();
+    //void AddAllSystems();
     void AddAllSystemsToScene(Engine::Scene* scene);
 
     /**
@@ -68,7 +68,7 @@ private:
     void CreateDefaultScene();
 
     /**
-	* @brief Load a scene from the given file path
+    * @brief Load a scene from the given file path
     */
-    void LoadSceneFromEvent(const std::string& scenePath);
+    //void LoadSceneFromEvent(const std::string& scenePath);
 };
