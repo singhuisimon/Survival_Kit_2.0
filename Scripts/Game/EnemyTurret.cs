@@ -213,9 +213,9 @@ namespace Game
             Transform.SetRotation(enemyTurretBulletID, ref bulletRot);
 
             // Setup rigidbody
-            EntityAddRigidBody(enemyTurretBulletID);
-            RigidbodySetIsKinematic(enemyTurretBulletID, false);
-            RigidbodySetUseGravity(enemyTurretBulletID, false);
+            // EntityAddRigidBody(enemyTurretBulletID);
+            // RigidbodySetIsKinematic(enemyTurretBulletID, false);
+            // RigidbodySetUseGravity(enemyTurretBulletID, false);
             
             // Set tag
             TagSetTag(enemyTurretBulletID, "EnemyTurretBullet");
