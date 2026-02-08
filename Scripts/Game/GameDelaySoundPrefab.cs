@@ -2,6 +2,7 @@ using Engine;
 using System;
 using static Engine.Scene;
 using static Engine.Audio;
+using static Engine.Event;
 
 namespace Game
 {
@@ -22,8 +23,14 @@ namespace Game
 
         private bool played = false;
 
+        // Game lose / win condition
+        private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
+
         public override void OnStart()
         {
+            Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(GAMEWIN, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -65,6 +72,13 @@ namespace Game
 
         public override void OnDestroy()
         {
+            Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(GAMEWIN, OnGameOver);
+        }
+
+        private void OnGameOver(string eventName, string payload)
+        {
+            SceneDestroyEntity(EntityID);
         }
     }
 }
