@@ -37,16 +37,10 @@ namespace Game
             LogMessage("MainMenuButton_WinLose EntityID: " + EntityID);
             LogMessage("Is Win Button: " + isWinButton);
 
-            if (isWinButton)
-            {
-                Event.Subscribe(EVENT_TIMER_FINISHED, OnShowCondition);
-                Event.Subscribe(GAMEWIN, OnShowCondition);
-            }
-            else
-            {
+
                 Event.Subscribe(EVENT_PLAYER_DEAD, OnShowCondition);
                 Event.Subscribe(EVENT_CORE_DESTROYED, OnShowCondition);
-            }
+            
 
             // Start invisible and inactive
             SetIsVisible((uint)EntityID, false);
