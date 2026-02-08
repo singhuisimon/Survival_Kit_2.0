@@ -6,7 +6,8 @@
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\build\\Debug",
       "installRoot": "${projectDir}\\build\\install\\Debug",
-      "inheritEnvironments": [ "msvc_x64_x64" ]
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "cmakeCommandArgs": "-DBUILD_INSTALLER=ON"
     },
     {
       "name": "Release",

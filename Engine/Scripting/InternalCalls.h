@@ -30,6 +30,7 @@ namespace Engine {
 	class Input;
 	class AudioManager;
 	class Renderer;
+	//class Game;
 
 	namespace InternalCalls {
 		// ===== Scripting context (set by ScriptSystem / MonoScriptEngine) =====
@@ -57,6 +58,8 @@ namespace Engine {
 		AudioManager *GetAudioManager();
 
 		void SetRenderer(Renderer* renderer);
+
+		//void SetGameInstance(Game* gameInstance);
 
 		// ===== Scene / Entity lifecycle =====
 		/**************************************************************************
@@ -1369,6 +1372,7 @@ namespace Engine {
 		static Input *s_InputSystem = nullptr;
 		static AudioManager *s_AudioManager = nullptr;
 		static Renderer* s_Renderer = nullptr;
+		//static Game* s_GameInstance = nullptr;
 
 
 		// ========================================

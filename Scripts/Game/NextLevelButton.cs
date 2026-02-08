@@ -14,8 +14,8 @@ namespace Game
     public class NextLevelButton : ScriptBehaviour
     {
         // Scene paths
-        private const string LEVEL_2_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
-        private const string FALLBACK_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
+        private const string LEVEL_2_SCENE_PATH = "Sources/Scenes/level2_player.json";
+        private const string FALLBACK_SCENE_PATH = "Sources/Scenes/MainMenu.json";
 
         // Win event
         private const string EVENT_TIMER_FINISHED = "TimerFinished";

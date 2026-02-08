@@ -452,7 +452,14 @@ namespace Engine
 				return false;
 			}
 			LOG_INFO("[InternalCall] Scene_LoadFromFile: attempting to load '", path, "'");
-			bool result = s_CurrentScene->LoadFromFile(path);
+
+#ifndef DISABLE_EDITOR
+			std::string fullPath = path;
+#else 
+			std::string fullPath = Engine::getAssetFilePath(path);
+#endif
+
+			bool result = s_CurrentScene->LoadFromFile(fullPath);
 			if (result)
 			{
 				

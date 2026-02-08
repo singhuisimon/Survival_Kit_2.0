@@ -1174,6 +1174,11 @@ namespace Engine {
 		InternalCalls::SetRenderer(renderer);
 	}
 
+	/*void SetScriptingGameInstance(Game* gameInstance)
+	{
+		InternalCalls::SetGameInstance(gameInstance);
+	}*/
+
 	static void BindInternalCall(const char *managedName, void *fn) {
 		mono_add_internal_call(managedName, fn);
 	}

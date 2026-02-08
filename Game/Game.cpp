@@ -226,6 +226,8 @@ void Game::OnInit()
 		return;
 	}
 #endif
+
+	
 	// Step 5: Load or Create Initial Scene
 	LOG_INFO("Step 5: Creating initial scene...");
 	try {
@@ -243,7 +245,7 @@ void Game::OnInit()
 		}
 #endif
 		LOG_INFO("  -> Scene created: ", mainScene->GetName());
-
+		SetScriptingCurrentScene(mainScene);
 	}
 	catch (const std::exception& e) {
 		LOG_CRITICAL("Failed to create scene: ", e.what());
@@ -310,101 +312,7 @@ void Game::OnInit()
 		return;
 	}
 
-	// Step 8: Add systems to the scene
-	//LOG_INFO("Step 5: Adding systems to scene...");
-	//try
-	//{
-	//	if (m_ActiveScene) 
-	//	{
-	//		AddAllSystems();  
-	//	}
 
-	//	LOG_INFO("  -> Systems added successfully");
-	//}
-	//catch (const std::exception &e)
-	//{
-	//	LOG_ERROR("  -> Exception while adding systems: ", e.what());
-	//}
-
-	//// Step 6: Initialize all systems
-	//LOG_INFO("Step 6: Initializing systems...");
-	//try
-	//{
-	//	if (m_ActiveScene)  
-	//	{
-	//		m_ActiveScene->InitializeSystems();
-	//		LOG_INFO("  -> Systems initialized successfully");
-	//	}
-	//	//LOG_INFO("  -> Systems initialized successfully");
-	//}
-	//catch (const std::exception &e)
-	//{
-	//	LOG_ERROR("  -> Exception while initializing systems: ", e.what());
-	//}
-
-	//// Step 7: Load scene from file or create default
-	//LOG_INFO("Step 7: Loading scene content...");
-	//bool loadedFromFile = false;
-
-	//try
-	//{
-	//	if (m_ActiveScene)
-	//	{
-
-	//		loadedFromFile = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/EpilepsyWarning.json");
-	//	}
-
-	//	if (loadedFromFile)
-	//	{
-	//		LOG_INFO("  -> Scene loaded from file successfully");
-	//		m_CurrentScenePath = "Resources/Sources/Scenes/EpilepsyWarning.json";
-
-	//		// Update settings from loaded scene
-	//		m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
-	//		m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
-	//		m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
-	//		m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
-	//		m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
-	//	}
-	//	else
-	//	{
-	//		LOG_WARNING("  -> Could not load scene file (file may not exist)");
-	//	}
-	//}
-	//catch (const std::exception &e)
-	//{
-	//	LOG_ERROR("  -> Exception while loading: ", e.what());
-	//	loadedFromFile = false;
-	//}
-
-	//if (!loadedFromFile)
-	//{
-	//	LOG_INFO("Step 7: Creating default scene...");
-	//	try
-	//	{
-	//		if (m_ActiveScene)  // Use m_ActiveScene instead of m_Scene
-	//		{
-	//			CreateDefaultScene();  // Update CreateDefaultScene to take a parameter
-	//			LOG_INFO("  -> Default scene created successfully");
-	//		}
-	//		else
-	//		{
-	//			LOG_ERROR("  -> No active scene to create default content in!");
-	//		}
-	//	}
-	//	catch (const std::exception &e)
-	//	{
-	//		LOG_CRITICAL("  -> Failed to create default scene: ", e.what());
-	//		return;
-	//	}
-	//}
-
-	//// Final verification
-	//if (!m_ActiveScene)
-	//{
-	//	LOG_CRITICAL("CRITICAL: Scene is null at end of OnInit()!");
-	//	return;
-	//}
 
 	// Step 8: Initialize Tracy Profiler
 #ifndef DISABLE_EDITOR
@@ -434,24 +342,7 @@ void Game::OnInit()
 #endif
 }
 
-//void Game::AddAllSystems()
-//{
-//	if (!m_ActiveScene) return;
-//
-//	m_ActiveScene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
-//	m_ActiveScene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-//	m_ActiveScene->AddSystem<Engine::PhysicsSystem>();
-//	m_ActiveScene->AddSystem<Engine::TransformSystem>();
-//	m_ActiveScene->AddSystem<Engine::CameraSystem>();
-//	m_ActiveScene->AddSystem<Engine::ScriptSystem>();
-//
-//	m_ActiveScene->AddSystem<Engine::RenderSystem>(*m_Renderer);
-//	m_ActiveScene->AddSystem<Engine::BehaviourTreeSystem>();
-//	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
-//	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
-//	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
-//	m_ActiveScene->AddSystem<Engine::TrailSystem>();
-//}
+
 
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
 {
@@ -765,11 +656,6 @@ void Game::CreateDefaultScene()
 	sunlightLight.IndirectMultiplier = 1.0f;
 	sunlightLight.Mode = Engine::LightMode::Realtime;
 
-	//// Shadows setting for sunlight
-	//sunlightLight.TypeShadow = Engine::ShadowType::Hard;
-	//sunlightLight.Resolution = 1024;
-	//sunlightLight.Strength = 1.0;
-	//sunlightLight.Bias = 0.005;
 
 	LOG_TRACE("  -> Sunlight created");
 
@@ -868,30 +754,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
 #endif
-	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
-	//{
-	//	LOG_INFO("[Game] Hot-reload requested, clearing script instances...");
-
-	//	if (m_Scene)
-	//	{
-	//		auto& registry = m_Scene->GetRegistry();
-	//		auto view = registry.view<Engine::ScriptComponent>();
-
-	//		for (auto entity : view)
-	//		{
-	//			auto& script = registry.get<Engine::ScriptComponent>(entity);
-	//			script.ScriptInstance = nullptr;  //  NULL the pointer
-	//		}
-
-	//		LOG_INFO("[Game] Cleared all script instances");
-	//	}
-
-	//	// NOW reload safely - no stale pointers exist
-	//	Engine::MonoScriptEngine::GetInstance().ReloadAssembly();
-	//	Engine::ScriptReloader::GetInstance().ClearReloadFlag();
-	//	LOG_INFO("[Game] Hot-reload complete!");
-	//}
-
+	
 	// When Editor is turned OFF OR Editor is ON but gameplay is PLAYING: Update Everything
 #ifdef DISABLE_EDITOR
 	if (true)
@@ -942,6 +805,34 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 		m_AudioManager->PauseAll(true);
 
+	}
+	// ====== HANDLE QUEUED SCENE LOAD (at the very end, after all systems finish) ======
+	if (m_IsLoadingScene && !m_PendingSceneLoadPath.empty()) {
+		LOG_INFO("Game: Processing queued scene load: ", m_PendingSceneLoadPath);
+
+		if (m_ActiveScene) {
+			// Now it's safe to load because all system updates are done
+			bool success = m_ActiveScene->LoadFromFile(m_PendingSceneLoadPath);
+
+			if (success) {
+				LOG_INFO("Game: Scene loaded successfully");
+
+				// Apply renderer settings
+				if (m_Renderer) {
+					m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
+					m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
+					m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
+					m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
+					m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+				}
+			}
+			else {
+				LOG_ERROR("Game: Failed to load queued scene");
+			}
+		}
+
+		m_PendingSceneLoadPath.clear();
+		m_IsLoadingScene = false;
 	}
 
 	/*if (input.IsKeyJustPressed(GLFW_KEY_P))
@@ -1473,19 +1364,8 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//	}
 	//}
 
-	// Reload current game scene
-	/*if (input.IsKeyJustPressed(GLFW_KEY_U) && !editorCamToggle)
-	{
-		LOG_INFO("=== RELOADING GAME SCENE ===");
-		if (!m_CurrentScenePath.empty())
-		{
-			LoadSceneFromEvent(m_CurrentScenePath);
-		}
-		else
-		{
-			LoadSceneFromEvent("Resources/Sources/Scenes/Level1_NewPlayer.json");
-		}
-	}*/
+
+
 
 	// UNCOMMENT IF YOU NEED TO SPAWN A FIRST TIME INSTANCE OF A ENTITY THAT HAS SUBMESH HERE - AMANDA
 	// ADJUST THE SUBMESH COUNT ACCORDINGLY ARIGATO
@@ -1610,6 +1490,12 @@ void Game::OnShutdown()
 	m_TracyProfiler.reset();
 
 	LOG_INFO("Game shutdown complete");
+}
+
+void Game::QueueSceneLoad(const std::string& scenePath) {
+	m_PendingSceneLoadPath = scenePath;
+	m_IsLoadingScene = true;
+	LOG_INFO("Game: Queued scene load: ", scenePath);
 }
 
 Engine::Scene* Game::CreateScene(const std::string& name)

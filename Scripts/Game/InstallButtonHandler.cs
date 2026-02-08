@@ -29,7 +29,7 @@ namespace Game
         private const string BGM_ROOM_AMBIENCE_NAME = "BGM Room Ambience";
         private const string BSOD_ERROR_SOUND_NAME = "UI BSOD Error Sound";
 
-        private const string MAIN_GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
+        private const string MAIN_GAME_SCENE_PATH = "Sources/Scenes/Level1_NewPlayer.json";
         private const int NUM_ERROR_POPUPS = 8;
 
         private const float HIDDEN_Y = -500.0f;

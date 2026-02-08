@@ -18,7 +18,7 @@ namespace Game
     {
         // Configurable fields
         [SerializeField]
-        private string mainMenuScenePath = "Resources/Sources/Scenes/MainMenu.json";
+        private string mainMenuScenePath = "Sources/Scenes/MainMenu.json";
 
         [SerializeField]
         private float minimumDisplayTime = 1.0f;  // Minimum time to display warning (seconds)

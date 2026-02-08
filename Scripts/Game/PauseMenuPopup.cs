@@ -81,9 +81,9 @@ namespace Game
         };
 
         // Scene paths for navigation
-        private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
-        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
+        private const string MAIN_MENU_SCENE_PATH = "Sources/Scenes/MainMenu.json";
+        private const string GAME_SCENE_PATH = "Sources/Scenes/Level1_NewPlayer.json";
+        private const string LEVEL2_SCENE_PATH = "Sources/Scenes/level2_player.json";
 
         // Pause events - other scripts subscribe to these
         private const string EVENT_GAME_PAUSED = "GamePaused";

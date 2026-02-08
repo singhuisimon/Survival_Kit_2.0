@@ -254,7 +254,7 @@ namespace Game
                 AudioManager.StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
                 //Event.Publish("LoadScene", "Resources/Sources/Scenes/level2_player.json");
-                bool loadSuccess = Scene.SceneLoadFromFile("Resources/Sources/Scenes/level2_player.json");
+                bool loadSuccess = Scene.SceneLoadFromFile("Sources/Scenes/level2_player.json");
             }
 
             // Don't update when game is paused

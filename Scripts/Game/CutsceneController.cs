@@ -13,7 +13,7 @@ namespace Game
     public class CutsceneController : ScriptBehaviour
     {
         [SerializeField]
-        private string mainMenuScenePath = "Resources/Sources/Scenes/MainMenu.json";
+        private string mainMenuScenePath = "Sources/Scenes/MainMenu.json";
 
         [SerializeField]
         private float minimumDisplayTime = 1.0f;
@@ -123,12 +123,29 @@ namespace Game
             if (cutsceneTime > 5.81f && !hasLoadedMenu)
             {
                 hasLoadedMenu = true;
+                // === COMPREHENSIVE DEBUG LOGGING ===
+                LogMessage("=== CutsceneController: SCENE TRANSITION DEBUG ===");
+                LogMessage("CutsceneController: Current time = " + cutsceneTime.ToString("F2") + "s");
+                LogMessage("CutsceneController: Attempting to load scene...");
+                LogMessage("CutsceneController: Scene path = '" + mainMenuScenePath + "'");
+                LogMessage("CutsceneController: Path length = " + mainMenuScenePath.Length);
                 LogMessage("CutsceneController: Loading main menu during pg3");
+
+                if (string.IsNullOrEmpty(mainMenuScenePath))
+                {
+                    LogError("CutsceneController: ERROR - Scene path is null or empty!");
+                    return;
+                }
+                LogMessage("CutsceneController: Calling Scene.SceneLoadFromFile()...");
                 //Publish("LoadScene", mainMenuScenePath);
                 bool success = Scene.SceneLoadFromFile(mainMenuScenePath);
                 if (success)
                 {
                     LogMessage("Main menu loaded successfully!");
+                }
+                else
+                {
+                    LogMessage("=== CutsceneController: SCENE NOT LOAD SUCCESS ===");
                 }
 
 

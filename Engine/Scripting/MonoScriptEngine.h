@@ -22,6 +22,7 @@ namespace Engine {
 	class Input;
 	class AudioManager;
 	class Renderer;
+	class Game;
 
 	struct ManagedFieldSnapshot {
 		// entity id -> (class name -> (field name -> serialized bytes/string))
@@ -36,6 +37,7 @@ namespace Engine {
 	void SetScriptingInputSystem(Input *input);
 	void SetScriptingAudioManager(AudioManager *audiomManager);
 	void SetScriptingRenderer(Renderer* renderer);
+	void SetScriptingGameInstance(Game* gameInstance);
 
 	class MonoScriptEngine {
 	public:

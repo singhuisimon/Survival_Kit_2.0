@@ -15,7 +15,7 @@ namespace Game
     public class MainMenuButtonWin : ScriptBehaviour
     {
         // Scene path
-        private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
+        private const string MAIN_MENU_SCENE_PATH = "Sources/Scenes/MainMenu.json";
 
         // Win/Lose events
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
