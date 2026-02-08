@@ -410,24 +410,24 @@ void Game::OnInit()
 	}
 }
 
-void Game::AddAllSystems()
-{
-	if (!m_ActiveScene) return;
-
-	m_ActiveScene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
-	m_ActiveScene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
-	m_ActiveScene->AddSystem<Engine::PhysicsSystem>();
-	m_ActiveScene->AddSystem<Engine::TransformSystem>();
-	m_ActiveScene->AddSystem<Engine::CameraSystem>();
-	m_ActiveScene->AddSystem<Engine::ScriptSystem>();
-
-	m_ActiveScene->AddSystem<Engine::RenderSystem>(*m_Renderer);
-	m_ActiveScene->AddSystem<Engine::BehaviourTreeSystem>();
-	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
-	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
-	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
-	m_ActiveScene->AddSystem<Engine::TrailSystem>();
-}
+//void Game::AddAllSystems()
+//{
+//	if (!m_ActiveScene) return;
+//
+//	m_ActiveScene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
+//	m_ActiveScene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
+//	m_ActiveScene->AddSystem<Engine::PhysicsSystem>();
+//	m_ActiveScene->AddSystem<Engine::TransformSystem>();
+//	m_ActiveScene->AddSystem<Engine::CameraSystem>();
+//	m_ActiveScene->AddSystem<Engine::ScriptSystem>();
+//
+//	m_ActiveScene->AddSystem<Engine::RenderSystem>(*m_Renderer);
+//	m_ActiveScene->AddSystem<Engine::BehaviourTreeSystem>();
+//	m_ActiveScene->AddSystem<Engine::ParticleSystem>();
+//	m_ActiveScene->AddSystem<Engine::AnimationSystem>();
+//	m_ActiveScene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
+//	m_ActiveScene->AddSystem<Engine::TrailSystem>();
+//}
 
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
 {
@@ -1598,6 +1598,13 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 	m_Scenes.push_back(std::move(newScene));
 	m_ActiveScene = scenePtr;
 	m_CurrentScenePath.clear();
+
+	m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
+	m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
+	m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
+	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
+	m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+
 	LOG_INFO("Scene created successfully");
 	return m_ActiveScene;
 }

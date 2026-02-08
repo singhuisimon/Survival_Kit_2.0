@@ -58,7 +58,7 @@ private:
 	std::unique_ptr<Engine::AudioManager> m_AudioManager;
 	std::string m_CurrentScenePath;
 
-    void AddAllSystems();
+    //void AddAllSystems();
     void AddAllSystemsToScene(Engine::Scene* scene);
 
     /**

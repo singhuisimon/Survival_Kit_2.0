@@ -37,6 +37,7 @@
 #include "../Physics/PhysicsAPI.h"
 
 #include "../Physics/CollisionSystem2D.h"
+#include "../Core/Application.h"
 
 // Mono
 #include <mono/jit/jit.h>
@@ -150,6 +151,10 @@ namespace Engine
 		void SetAudioManager(AudioManager *audioManager)
 		{
 			s_AudioManager = audioManager;
+		}
+		void SetRenderer(Renderer* renderer)
+		{
+			s_Renderer = renderer;
 		}
 
 		/**************************************************************************
@@ -450,7 +455,18 @@ namespace Engine
 			bool result = s_CurrentScene->LoadFromFile(path);
 			if (result)
 			{
+				
 				LOG_INFO("[InternalCall] Scene_LoadFromFile: successfully loaded scene");
+				if (s_Renderer)
+				{
+					LOG_INFO("[InternalCall] Scene_LoadFromFile: applying scene settings to renderer");
+					s_Renderer->getBloomToggle() = s_CurrentScene->GetSceneSetting().s_BloomToggle;
+					s_Renderer->getBloomStrength() = s_CurrentScene->GetSceneSetting().s_BloomStrength;
+					s_Renderer->getBloomFilterRadius() = s_CurrentScene->GetSceneSetting().s_BloomFilterRadius;
+					s_Renderer->getExposure() = s_CurrentScene->GetSceneSetting().s_Exposure;
+					s_Renderer->getGlobalBias() = s_CurrentScene->GetSceneSetting().s_GlobalBias;
+				}
+				
 			}
 			else
 			{

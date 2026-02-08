@@ -98,6 +98,7 @@ namespace Engine
 		//Engine::SetScriptingCurrentScene(m_Scene.get());
 
 		Engine::SetScriptingInputSystem(&GetInput());
+		Engine::SetScriptingRenderer(m_Renderer.get());
 
 		// Initialize Mono scripting
 #if defined(_DEBUG) || defined(DEBUG)
