@@ -98,7 +98,12 @@ namespace Game
                 GameState.IsPaused = false;
 
                 // Load main menu scene
-                Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                //Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                bool success = Scene.SceneLoadFromFile(MAIN_MENU_SCENE_PATH);
+                if (success)
+                {
+                    LogMessage("Main Menu Scene loaded successfully!");
+                }
             }
         }
 

@@ -72,6 +72,16 @@ namespace Engine {
 		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
 		***************************************************************************/
 		void     Scene_DestroyEntity(uint64_t entityID);
+
+		/**************************************************************************
+		 * @brief
+		 * Load scene from file.
+		 * @param filepath
+		 * Managed string provided by the scripting runtime (MonoString*).
+		 * @return
+		 * True if scene load successfully, else return false
+		***************************************************************************/
+		bool Scene_LoadFromFile(MonoString* filepath);
 		/**************************************************************************
 		 * @brief
 		 * Attaches a managed script class to the specified entity.
@@ -115,6 +125,7 @@ namespace Engine {
 		 * Entity identifier (0 if not found / invalid).
 		***************************************************************************/
 		uint64_t Scene_FindEntityByName(MonoString *nameString);
+
 		/**************************************************************************
 		 * @brief
 		 * Returns the native entity ID associated with a managed Entity wrapper.
@@ -1357,13 +1368,13 @@ namespace Engine {
 
 
 		// ========================================
-// File I/O
-// ========================================
+		// File I/O
+		// ========================================
 
-/**
- * @brief Checks if a file exists at the given path.
- * @param pathStr Managed string provided by the scripting runtime (MonoString*).
- * @return True if the file exists, otherwise false.
+		/**
+		 * @brief Checks if a file exists at the given path.
+		 * @param pathStr Managed string provided by the scripting runtime (MonoString*).
+		 * @return True if the file exists, otherwise false.
  */
 		bool FileExists(MonoString *pathStr);
 

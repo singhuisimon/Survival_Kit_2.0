@@ -80,7 +80,8 @@ namespace Game
                 Input.SetCursorVisible(false);
 
                 // Load game scene
-                Event.Publish("LoadScene", GAME_SCENE_PATH);
+                //Event.Publish("LoadScene", GAME_SCENE_PATH);
+                bool LoadSuccess = Scene.SceneLoadFromFile(GAME_SCENE_PATH);
             }
         }
 

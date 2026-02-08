@@ -447,7 +447,12 @@ namespace Game
                 GameState.IsPaused = false;
 
                 // Load correct level scene
-                Event.Publish("LoadScene", currentGameScenePath);
+                //Event.Publish("LoadScene", currentGameScenePath);
+                bool success = Scene.SceneLoadFromFile(currentGameScenePath);
+                if (success)
+                {
+                    LogMessage("LoadScene current game scene path success.");
+                }
                 return;
             }
 
@@ -472,7 +477,12 @@ namespace Game
                 Event.Publish(EVENT_GAME_RESUMED, "");
 
                 // Load main menu scene
-                Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                //Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                bool success = Scene.SceneLoadFromFile(MAIN_MENU_SCENE_PATH);
+                if (success)
+                {
+                    LogMessage("MAIN_MENU_SCENE_PATH load Successfully");
+                }
                 return;
             }
 

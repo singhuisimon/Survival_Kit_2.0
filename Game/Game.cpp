@@ -170,8 +170,8 @@ void Game::OnInit()
 		return;
 	}
 
-	// Step 4: Create scene
-	LOG_INFO("Step 4: Creating scene object...");
+	// Step 4:  Initialize Editor BEFORE creating scene
+	LOG_INFO("Step 4: Initializing Editor...");
 	try
 	{
 		//m_Scenes.push_back(std::make_unique<Engine::Scene>("Main Scene"));
@@ -186,128 +186,203 @@ void Game::OnInit()
 			LOG_INFO("Editor initialized successfully.");
 
 		}
-		// Create initial scenes
-		try
-		{
-			Engine::Scene* mainScene = CreateScene("Main Scene");
-			if (!mainScene)
-			{
-				LOG_CRITICAL("Failed to create initial scene!");
-				return;
-			}
-			m_Editor->SetActiveScene(mainScene);
-			LOG_INFO("  -> Scene created at address: ", (void*)mainScene);
+		
+		//// Create initial scenes
+		//try
+		//{
+		//	Engine::Scene* mainScene = CreateScene("Main Scene");
+		//	if (!mainScene)
+		//	{
+		//		LOG_CRITICAL("Failed to create initial scene!");
+		//		return;
+		//	}
+		//	if (mainScene) {
+		//		m_Editor->SetActiveScene(mainScene);
+		//	}
+		//	LOG_INFO("  -> Scene created at address: ", (void*)mainScene);
 
-		}
-		catch (const std::exception& e)
-		{
-			LOG_CRITICAL("Failed to create scenes: ", e.what());
-			return;
-		}
+		//}
+		//catch (const std::exception& e)
+		//{
+		//	LOG_CRITICAL("Failed to create scenes: ", e.what());
+		//	return;
+		//}
 
 		//LOG_INFO("  -> Scene created at address: ", (void *)m_Scene.get());
 	}
 	catch (const std::exception &e)
 	{
-		LOG_CRITICAL("  -> Exception while creating scene: ", e.what());
+		LOG_CRITICAL("  -> Exception while initializing Audio Manager: ", e.what());
 		return;
 	}
 
-	// Step 5: Add systems to the scene
-	LOG_INFO("Step 5: Adding systems to scene...");
-	try
-	{
-		if (m_ActiveScene)  // Use m_ActiveScene instead of m_Scene
-		{
-			AddAllSystems();  // CHANGED: Replace all manual AddSystem calls with helper function
+	// Step 5: Load or Create Initial Scene
+	LOG_INFO("Step 5: Creating initial scene...");
+	try {
+		Engine::Scene* mainScene = CreateScene("Main Scene");
+
+		if (!mainScene) {
+			LOG_CRITICAL("Failed to create initial scene!");
+			return;
 		}
 
-		LOG_INFO("  -> Systems added successfully");
-	}
-	catch (const std::exception &e)
-	{
-		LOG_ERROR("  -> Exception while adding systems: ", e.what());
-	}
-
-	// Step 6: Initialize all systems
-	LOG_INFO("Step 6: Initializing systems...");
-	try
-	{
-		if (m_ActiveScene)  // Use m_ActiveScene instead of m_Scene
-		{
-			m_ActiveScene->InitializeSystems();
-			LOG_INFO("  -> Systems initialized successfully");
+		// Notify editor of the scene
+		if (m_Editor) {
+			m_Editor->SetActiveScene(mainScene);
 		}
-		//LOG_INFO("  -> Systems initialized successfully");
+
+		LOG_INFO("  -> Scene created: ", mainScene->GetName());
 	}
-	catch (const std::exception &e)
-	{
-		LOG_ERROR("  -> Exception while initializing systems: ", e.what());
+	catch (const std::exception& e) {
+		LOG_CRITICAL("Failed to create scene: ", e.what());
+		return;
 	}
 
-	// Step 7: Load scene from file or create default
-	LOG_INFO("Step 7: Loading scene content...");
+	// Step 6: Load scene from file
+	LOG_INFO("Step 6: Loading scene content from file...");
 	bool loadedFromFile = false;
 
-	try
-	{
-		if (m_ActiveScene)
-		{
+	try {
+		std::string initialScenePath = "Resources/Sources/Scenes/EpilepsyWarning.json";
 
-			loadedFromFile = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampeScene.json");
+		if (m_ActiveScene) {
+			loadedFromFile = m_ActiveScene->LoadFromFile(initialScenePath);
 		}
 
-		if (loadedFromFile)
-		{
-			LOG_INFO("  -> Scene loaded from file successfully");
-			m_CurrentScenePath = "Resources/Sources/Scenes/ExampeScene.json";
+		if (loadedFromFile) {
+			LOG_INFO("  -> Scene content loaded from file successfully");
+			m_CurrentScenePath = initialScenePath;
 
-			// Update settings from loaded scene
+			// Update renderer settings from loaded scene
 			m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
 			m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
 			m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 			m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 			m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
 		}
-		else
-		{
-			LOG_WARNING("  -> Could not load scene file (file may not exist)");
+		else {
+			LOG_WARNING("  -> Could not load scene file, will create default content");
 		}
 	}
-	catch (const std::exception &e)
-	{
-		LOG_ERROR("  -> Exception while loading: ", e.what());
+	catch (const std::exception& e) {
+		LOG_ERROR("  -> Exception while loading scene file: ", e.what());
 		loadedFromFile = false;
 	}
 
-	if (!loadedFromFile)
-	{
-		LOG_INFO("Step 7: Creating default scene...");
-		try
-		{
-			if (m_ActiveScene)  // Use m_ActiveScene instead of m_Scene
-			{
-				CreateDefaultScene();  // Update CreateDefaultScene to take a parameter
-				LOG_INFO("  -> Default scene created successfully");
-			}
-			else
-			{
-				LOG_ERROR("  -> No active scene to create default content in!");
-			}
+	// Step 7: Create default Scene if no content
+	if (!loadedFromFile) {
+		LOG_INFO("Step 7: Creating default scene content...");
+		try {
+			CreateDefaultScene();
+			LOG_INFO("  -> Default scene content created successfully");
 		}
-		catch (const std::exception &e)
-		{
+		catch (const std::exception& e) {
 			LOG_CRITICAL("  -> Failed to create default scene: ", e.what());
 			return;
 		}
 	}
 
-	// Final verification
-	if (!m_ActiveScene)
-	{
-		LOG_CRITICAL("CRITICAL: Scene is null at end of OnInit()!");
+	// Verify scene exists
+	if (!m_ActiveScene) {
+		LOG_CRITICAL("CRITICAL: No active scene at end of OnInit()!");
 		return;
 	}
+
+	// Step 8: Add systems to the scene
+	//LOG_INFO("Step 5: Adding systems to scene...");
+	//try
+	//{
+	//	if (m_ActiveScene) 
+	//	{
+	//		AddAllSystems();  
+	//	}
+
+	//	LOG_INFO("  -> Systems added successfully");
+	//}
+	//catch (const std::exception &e)
+	//{
+	//	LOG_ERROR("  -> Exception while adding systems: ", e.what());
+	//}
+
+	//// Step 6: Initialize all systems
+	//LOG_INFO("Step 6: Initializing systems...");
+	//try
+	//{
+	//	if (m_ActiveScene)  
+	//	{
+	//		m_ActiveScene->InitializeSystems();
+	//		LOG_INFO("  -> Systems initialized successfully");
+	//	}
+	//	//LOG_INFO("  -> Systems initialized successfully");
+	//}
+	//catch (const std::exception &e)
+	//{
+	//	LOG_ERROR("  -> Exception while initializing systems: ", e.what());
+	//}
+
+	//// Step 7: Load scene from file or create default
+	//LOG_INFO("Step 7: Loading scene content...");
+	//bool loadedFromFile = false;
+
+	//try
+	//{
+	//	if (m_ActiveScene)
+	//	{
+
+	//		loadedFromFile = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/EpilepsyWarning.json");
+	//	}
+
+	//	if (loadedFromFile)
+	//	{
+	//		LOG_INFO("  -> Scene loaded from file successfully");
+	//		m_CurrentScenePath = "Resources/Sources/Scenes/EpilepsyWarning.json";
+
+	//		// Update settings from loaded scene
+	//		m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;
+	//		m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
+	//		m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
+	//		m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
+	//		m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+	//	}
+	//	else
+	//	{
+	//		LOG_WARNING("  -> Could not load scene file (file may not exist)");
+	//	}
+	//}
+	//catch (const std::exception &e)
+	//{
+	//	LOG_ERROR("  -> Exception while loading: ", e.what());
+	//	loadedFromFile = false;
+	//}
+
+	//if (!loadedFromFile)
+	//{
+	//	LOG_INFO("Step 7: Creating default scene...");
+	//	try
+	//	{
+	//		if (m_ActiveScene)  // Use m_ActiveScene instead of m_Scene
+	//		{
+	//			CreateDefaultScene();  // Update CreateDefaultScene to take a parameter
+	//			LOG_INFO("  -> Default scene created successfully");
+	//		}
+	//		else
+	//		{
+	//			LOG_ERROR("  -> No active scene to create default content in!");
+	//		}
+	//	}
+	//	catch (const std::exception &e)
+	//	{
+	//		LOG_CRITICAL("  -> Failed to create default scene: ", e.what());
+	//		return;
+	//	}
+	//}
+
+	//// Final verification
+	//if (!m_ActiveScene)
+	//{
+	//	LOG_CRITICAL("CRITICAL: Scene is null at end of OnInit()!");
+	//	return;
+	//}
 
 	// Step 8: Initialize Tracy Profiler
 	LOG_INFO("Step 8: Initializing Tracy Profiler...");
@@ -333,58 +408,6 @@ void Game::OnInit()
 	{
 		LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
 	}
-
-  // ====================================
-  // Step 8: Initialize Mono Scripting Engine
-  // ====================================
-	LOG_INFO("Step 8: Initializing Mono Scripting Engine...");
-	try
-	{
-		std::string assemblyPath = "GameScripts.dll";
-
-		if (std::filesystem::exists(assemblyPath))
-		{
-			Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
-			LOG_INFO("  -> Mono Scripting Engine initialized successfully");
-		}
-	}
-	catch (const std::exception &e)
-	{
-		LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
-	}
-
-
-	// Step 9: Register scene transition event handler
-	Engine::EventSystem::Instance().Subscribe<Engine::ScriptEvent>(
-		[this](const Engine::ScriptEvent& event) {
-			if (event.name == "LoadScene") {
-				LoadSceneFromEvent(event.payload);
-			}
-			else if (event.name == "QuitGame") {
-				LOG_INFO("QuitGame event received - closing application");
-				glfwSetWindowShouldClose(GetWindow(), GLFW_TRUE);
-			}
-		});
-	LOG_INFO("Scene transition event handler registered");
-
-	LOG_INFO("=== Game::OnInit() COMPLETED SUCCESSFULLY ===");
-	LOG_INFO("Scene status: VALID at ", (void *)m_ActiveScene);
-	LOG_INFO("");
-	LOG_INFO("=== CONTROLS ===");
-	LOG_INFO("  WASD: Test movement (hold to move continuously)");
-	LOG_INFO("  Space: Test action input");
-	LOG_INFO("  Mouse: Click to test mouse input");
-	LOG_INFO("  Scroll: Test scroll wheel");
-	LOG_INFO("  F1: Toggle cursor visibility");
-	LOG_INFO("  F2: Create test entity with velocity");
-	LOG_INFO("  F5: Save scene to file");
-	LOG_INFO("  F9: Load scene from file");
-	//LOG_INFO("  P: Play Audio");
-	//LOG_INFO("  O: Pause Audio");
-	//LOG_INFO("  L: Stop Audio");
-	LOG_INFO("  ESC: Exit");
-	LOG_INFO("================");
-	LOG_INFO("");
 }
 
 void Game::AddAllSystems()
@@ -409,7 +432,7 @@ void Game::AddAllSystems()
 void Game::AddAllSystemsToScene(Engine::Scene* scene)
 {
 	if (!scene) return;
-
+	LOG_INFO("Adding systems to scene: ", scene->GetName());
 	scene->AddSystem<Engine::AudioSystem>(m_AudioManager.get());
 	scene->AddSystem<Engine::AudioEffectSystem>(m_AudioManager.get());
 	scene->AddSystem<Engine::PhysicsSystem>();
@@ -807,16 +830,16 @@ void Game::OnUpdate(Engine::Timestep ts)
 	{
 		editorCamToggle = !editorCamToggle;
 
-		if (!editorCamToggle)
-		{
-			// Lock & hide cursor (free-look mode)
-			//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		}
-		else
-		{
-			// Restore normal cursor
-			//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
+		//if (!editorCamToggle)
+		//{
+		//	// Lock & hide cursor (free-look mode)
+		//	//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//}
+		//else
+		//{
+		//	// Restore normal cursor
+		//	//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		//}
 
 		LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
@@ -942,75 +965,75 @@ void Game::OnUpdate(Engine::Timestep ts)
 	// Audio Testing if Attentuation works
 	//LOG_INFO("[TEST] Searching for entity named 'Player'...");
 
-	auto &registry = m_ActiveScene->GetRegistry();
+	//auto &registry = m_ActiveScene->GetRegistry();
 
-	Engine::Entity foundEntity;
-	bool found = false;
+	//Engine::Entity foundEntity;
+	//bool found = false;
 
-	auto view = registry.view<Engine::TagComponent>();
-	for (auto entityHandle : view)
-	{
-		auto &tag = view.get<Engine::TagComponent>(entityHandle);
-		if (tag.Tag == "Player")
-		{ // change to whatever name you want
-			foundEntity = Engine::Entity(entityHandle, &registry);
-			found = true;
-			break;
-		}
-	}
+	//auto view = registry.view<Engine::TagComponent>();
+	//for (auto entityHandle : view)
+	//{
+	//	auto &tag = view.get<Engine::TagComponent>(entityHandle);
+	//	if (tag.Tag == "Player")
+	//	{ // change to whatever name you want
+	//		foundEntity = Engine::Entity(entityHandle, &registry);
+	//		found = true;
+	//		break;
+	//	}
+	//}
 
-	// Get MainCamera to follow Player from the back
-	Engine::Entity GameCam;
-	bool GameCamFound = false;
-	for (auto entityHandle : view)
-	{
-		auto &camTag = view.get<Engine::TagComponent>(entityHandle);
-		if (camTag.Tag == "MainCamera")
-		{
-			GameCam = Engine::Entity(entityHandle, &registry);
-			GameCamFound = true;
-			break;
-		}
-	}
+	//// Get MainCamera to follow Player from the back
+	//Engine::Entity GameCam;
+	//bool GameCamFound = false;
+	//for (auto entityHandle : view)
+	//{
+	//	auto &camTag = view.get<Engine::TagComponent>(entityHandle);
+	//	if (camTag.Tag == "MainCamera")
+	//	{
+	//		GameCam = Engine::Entity(entityHandle, &registry);
+	//		GameCamFound = true;
+	//		break;
+	//	}
+	//}
 
-	Engine::Entity SecCam;
-	bool SecCamFound = false;
-	for (auto entityHandle : view)
-	{
-		auto &camTag = view.get<Engine::TagComponent>(entityHandle);
-		if (camTag.Tag == "SecondCamera")
-		{
-			SecCam = Engine::Entity(entityHandle, &registry);
-			SecCamFound = true;
-			break;
-		}
-	}
+	//Engine::Entity SecCam;
+	//bool SecCamFound = false;
+	//for (auto entityHandle : view)
+	//{
+	//	auto &camTag = view.get<Engine::TagComponent>(entityHandle);
+	//	if (camTag.Tag == "SecondCamera")
+	//	{
+	//		SecCam = Engine::Entity(entityHandle, &registry);
+	//		SecCamFound = true;
+	//		break;
+	//	}
+	//}
 
-	Engine::Entity timerBarUI;
-	bool timerBarUIFound = false;
-	for (auto entityHandle : view)
-	{
-		auto &timerBarUITag = view.get<Engine::TagComponent>(entityHandle);
-		if (timerBarUITag.Tag == "TimerBar")
-		{
-			timerBarUI = Engine::Entity(entityHandle, &registry);
-			timerBarUIFound = true;
-			break;
-		}
-	}
+	//Engine::Entity timerBarUI;
+	//bool timerBarUIFound = false;
+	//for (auto entityHandle : view)
+	//{
+	//	auto &timerBarUITag = view.get<Engine::TagComponent>(entityHandle);
+	//	if (timerBarUITag.Tag == "TimerBar")
+	//	{
+	//		timerBarUI = Engine::Entity(entityHandle, &registry);
+	//		timerBarUIFound = true;
+	//		break;
+	//	}
+	//}
 
-	Engine::Entity healthBarUI;
-	bool healthBarUIFound = false;
-	for (auto entityHandle : view)
-	{
-		auto &healthUITag = view.get<Engine::TagComponent>(entityHandle);
-		if (healthUITag.Tag == "HealthBar")
-		{
-			healthBarUI = Engine::Entity(entityHandle, &registry);
-			healthBarUIFound = true;
-			break;
-		}
-	}
+	//Engine::Entity healthBarUI;
+	//bool healthBarUIFound = false;
+	//for (auto entityHandle : view)
+	//{
+	//	auto &healthUITag = view.get<Engine::TagComponent>(entityHandle);
+	//	if (healthUITag.Tag == "HealthBar")
+	//	{
+	//		healthBarUI = Engine::Entity(entityHandle, &registry);
+	//		healthBarUIFound = true;
+	//		break;
+	//	}
+	//}
 
 	//// Editor camera toggle
 	//if (input.IsKeyJustPressed(GLFW_KEY_C))
@@ -1027,81 +1050,81 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//	}
 	//}
 
-	if (found && foundEntity.HasComponent<Engine::TransformComponent>())
-	{
+	//if (found && foundEntity.HasComponent<Engine::TransformComponent>())
+	//{
 
-		// Get player transform to control its movement
-		auto &transform = foundEntity.GetComponent<Engine::TransformComponent>();
+	//	// Get player transform to control its movement
+	//	auto &transform = foundEntity.GetComponent<Engine::TransformComponent>();
 
-		// Update main game camera on player if it exists
-		if (GameCamFound && GameCam.HasComponent<Engine::CameraComponent>()
-			&& GameCam.HasComponent<Engine::TransformComponent>()
-			&& !editorCamToggle)
-		{
+	//	// Update main game camera on player if it exists
+	//	if (GameCamFound && GameCam.HasComponent<Engine::CameraComponent>()
+	//		&& GameCam.HasComponent<Engine::TransformComponent>()
+	//		&& !editorCamToggle)
+	//	{
 
-			// Get MainCamera transform and camera component
-			auto &camTransform = GameCam.GetComponent<Engine::TransformComponent>();
-			auto &camComp = GameCam.GetComponent<Engine::CameraComponent>();
+	//		// Get MainCamera transform and camera component
+	//		auto &camTransform = GameCam.GetComponent<Engine::TransformComponent>();
+	//		auto &camComp = GameCam.GetComponent<Engine::CameraComponent>();
 
-			// Player head/aim point (slightly above)
-			const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
+	//		// Player head/aim point (slightly above)
+	//		const glm::vec3 aimTarget(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
 
-			// Persistent orbit state
-			static bool  initialized = false;
-			static float pitch = 0.25f; // alpha
-			static float yaw = 0.0f;    // betta
-			static float radius = 7.5f;
+	//		// Persistent orbit state
+	//		static bool  initialized = false;
+	//		static float pitch = 0.25f; // alpha
+	//		static float yaw = 0.0f;    // betta
+	//		static float radius = 7.5f;
 
-			// Initialize yaw/pitch from current camera placement once
-			if (!initialized)
-			{
-				const glm::vec3 rel = camTransform.Position - aimTarget;
-				const float r = glm::length(rel);
-				if (r > 1e-6f)
-				{
-					pitch = glm::asin(glm::clamp(rel.y / r, -1.0f, 1.0f));
-					yaw = std::atan2(rel.x, rel.z);
-					/* Radius is constant thru out the gameplay */
-				}
-				else
-				{
-					// fallback if camera starts at target: put it behind player
-					pitch = 0.25f;
-					yaw = 0.0f;
-					radius = 7.5f;
-				}
-				initialized = true;
-			}
+	//		// Initialize yaw/pitch from current camera placement once
+	//		if (!initialized)
+	//		{
+	//			const glm::vec3 rel = camTransform.Position - aimTarget;
+	//			const float r = glm::length(rel);
+	//			if (r > 1e-6f)
+	//			{
+	//				pitch = glm::asin(glm::clamp(rel.y / r, -1.0f, 1.0f));
+	//				yaw = std::atan2(rel.x, rel.z);
+	//				/* Radius is constant thru out the gameplay */
+	//			}
+	//			else
+	//			{
+	//				// fallback if camera starts at target: put it behind player
+	//				pitch = 0.25f;
+	//				yaw = 0.0f;
+	//				radius = 7.5f;
+	//			}
+	//			initialized = true;
+	//		}
 
-			// Mouse deltas
-			const float xOffset = input.GetMouseDelta().x;
-			const float yOffset = input.GetMouseDelta().y;
+	//		// Mouse deltas
+	//		const float xOffset = input.GetMouseDelta().x;
+	//		const float yOffset = input.GetMouseDelta().y;
 
-			// Update orbit angles only when mouse moves
-			if (xOffset != 0.0f || yOffset != 0.0f)
-			{
+	//		// Update orbit angles only when mouse moves
+	//		if (xOffset != 0.0f || yOffset != 0.0f)
+	//		{
 
-				// Adjust angles based on cursor offset
-				yaw += (xOffset < 0.0f) ? 0.05f : (xOffset > 0.0f ? -0.05f : 0.0f);
-				pitch += (yOffset > 0.0f) ? 0.02f : (yOffset < 0.0f ? -0.02f : 0.0f);
+	//			// Adjust angles based on cursor offset
+	//			yaw += (xOffset < 0.0f) ? 0.05f : (xOffset > 0.0f ? -0.05f : 0.0f);
+	//			pitch += (yOffset > 0.0f) ? 0.02f : (yOffset < 0.0f ? -0.02f : 0.0f);
 
-				// Clamp pitch to avoid flipping
-				pitch = glm::clamp(pitch, -Engine::MathUtils::HALF_PI + 0.01f, Engine::MathUtils::HALF_PI - 0.01f);
-			}
+	//			// Clamp pitch to avoid flipping
+	//			pitch = glm::clamp(pitch, -Engine::MathUtils::HALF_PI + 0.01f, Engine::MathUtils::HALF_PI - 0.01f);
+	//		}
 
-			// Rebuild direction from yaw/pitch EVERY FRAME
-			glm::vec3 dir;
-			dir.x = glm::cos(pitch) * glm::sin(yaw);
-			dir.y = glm::sin(pitch);
-			dir.z = glm::cos(pitch) * glm::cos(yaw);
-			dir = glm::normalize(dir);
+	//		// Rebuild direction from yaw/pitch EVERY FRAME
+	//		glm::vec3 dir;
+	//		dir.x = glm::cos(pitch) * glm::sin(yaw);
+	//		dir.y = glm::sin(pitch);
+	//		dir.z = glm::cos(pitch) * glm::cos(yaw);
+	//		dir = glm::normalize(dir);
 
-			// Keep constant distance from the player (orbit)
-			const glm::vec3 camPos = aimTarget + dir * radius;
-			camTransform.SetPosition(camPos);
+	//		// Keep constant distance from the player (orbit)
+	//		const glm::vec3 camPos = aimTarget + dir * radius;
+	//		camTransform.SetPosition(camPos);
 
-			// Always update camera target to the player's head/aim point
-			camComp.SetTarget(aimTarget);
+	//		// Always update camera target to the player's head/aim point
+	//		camComp.SetTarget(aimTarget);
 
 			///* Camera and Player rotations if all meshes face Z- as forward */
 			//// Player face same horizontal direction as the camera (camera behind player)
@@ -1118,107 +1141,107 @@ void Game::OnUpdate(Engine::Timestep ts)
 			///* Camera and Player rotations if all meshes face Z- as forward */
 
 			/* Temporary adjustments to Camera and Player rotations */
-			glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
-			glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camFwd));
-			glm::vec3 camUp = glm::normalize(glm::cross(camFwd, camRight));
+			//glm::vec3 camFwd = glm::normalize(aimTarget - camPos);
+			//glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camFwd));
+			//glm::vec3 camUp = glm::normalize(glm::cross(camFwd, camRight));
 
-			// Build rotation from camera basis to match player orientation
-			glm::mat3 camBasis(camRight, camUp, camFwd);
+			//// Build rotation from camera basis to match player orientation
+			//glm::mat3 camBasis(camRight, camUp, camFwd);
 
-			// Your model’s forward = X+, so rotate 90° around Y to map +Z → +X
-			glm::quat modelOffset = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0, 1, 0));
+			//// Your model’s forward = X+, so rotate 90° around Y to map +Z → +X
+			//glm::quat modelOffset = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0, 1, 0));
 
-			// Convert basis to quaternion and apply offset
-			glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
+			//// Convert basis to quaternion and apply offset
+			//glm::quat q = glm::normalize(glm::quat_cast(camBasis) * modelOffset);
 
-			transform.Rotation = q;
-			transform.IsDirty = true;
+			//transform.Rotation = q;
+			//transform.IsDirty = true;
 
 			/* Temporary adjustments to Camera and Player rotations */
 
 			/* Player controls begin here */
 			// Movement speed 
-			const float moveSpeed = 0.1f;
+	//		const float moveSpeed = 0.1f;
 
-			// Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
-			//glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
-			glm::vec3 forward = glm::normalize(transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f)); // forward in local space (For botnet)
+	//		// Get player's facing direction (derived from rotation quaternion) (For now adjust according to mesh's front)
+	//		//glm::vec3 forward = transform.Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // forward in local space (For cube) 
+	//		glm::vec3 forward = glm::normalize(transform.Rotation * glm::vec3(1.0f, 0.0f, 0.0f)); // forward in local space (For botnet)
 
-			// Compute right vector of player from forward and world up
-			glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+	//		// Compute right vector of player from forward and world up
+	//		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-			// TimerBar entity exists and has a TransformComponent
-			if (timerBarUIFound && timerBarUI.HasComponent<Engine::TransformComponent>())
-			{
+	//		// TimerBar entity exists and has a TransformComponent
+	//		if (timerBarUIFound && timerBarUI.HasComponent<Engine::TransformComponent>())
+	//		{
 
-				// Timerbar UI transform
-				auto &timerBarTrans = timerBarUI.GetComponent<Engine::TransformComponent>();
+	//			// Timerbar UI transform
+	//			auto &timerBarTrans = timerBarUI.GetComponent<Engine::TransformComponent>();
 
-				// Place timer bar above the player's local up
-				const float timerBarDist = 3.0f; // How high above the player
-				const float angleRad = glm::radians(20.0f);	// Diagonal angle to "fit" into the camera screen
-				glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
-					camUp * std::sin(angleRad));
-				timerBarTrans.Position = camPos + angledDir * timerBarDist;
+	//			// Place timer bar above the player's local up
+	//			const float timerBarDist = 3.0f; // How high above the player
+	//			const float angleRad = glm::radians(20.0f);	// Diagonal angle to "fit" into the camera screen
+	//			glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
+	//				camUp * std::sin(angleRad));
+	//			timerBarTrans.Position = camPos + angledDir * timerBarDist;
 
-				// Make timer bar "follow" camera rotation
-				// Use only pitch and yaw so the timer bar stays upright 
-				const float timerBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
-				const float timerBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
-				timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
-			}
+	//			// Make timer bar "follow" camera rotation
+	//			// Use only pitch and yaw so the timer bar stays upright 
+	//			const float timerBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+	//			const float timerBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+	//			timerBarTrans.SetRotation(glm::vec3(timerBarPitchDeg, timerBarYawDeg, 0.0f));
+	//		}
 
-			if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>())
-			{
+	//		if (healthBarUIFound && healthBarUI.HasComponent<Engine::TransformComponent>())
+	//		{
 
-				// Healthbar UI transform
-				auto &healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
+	//			// Healthbar UI transform
+	//			auto &healthBarTrans = healthBarUI.GetComponent<Engine::TransformComponent>();
 
-				// Place timer bar above the player's local up
-				const float healthBarDist = 3.0f;      // How far from camera/player
-				const float angleRad = glm::radians(20.0f);
-				glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
-					camUp * std::sin(angleRad));
+	//			// Place timer bar above the player's local up
+	//			const float healthBarDist = 3.0f;      // How far from camera/player
+	//			const float angleRad = glm::radians(20.0f);
+	//			glm::vec3 angledDir = glm::normalize(camFwd * std::cos(angleRad) +
+	//				camUp * std::sin(angleRad));
 
-				// Offset downward in camera's local up direction
-				const float yOffset = -3.5f; // negative = lower
-				glm::vec3 offset = camUp * yOffset;
+	//			// Offset downward in camera's local up direction
+	//			const float yOffset = -3.5f; // negative = lower
+	//			glm::vec3 offset = camUp * yOffset;
 
-				// Final position
-				healthBarTrans.Position = camPos + angledDir * healthBarDist + offset;
+	//			// Final position
+	//			healthBarTrans.Position = camPos + angledDir * healthBarDist + offset;
 
-				// Make timer bar "follow" camera rotation
-				const float healthBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
-				const float healthBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
-				healthBarTrans.SetRotation(glm::vec3(healthBarPitchDeg, healthBarYawDeg, 0.0f));
-			}
+	//			// Make timer bar "follow" camera rotation
+	//			const float healthBarPitchDeg = glm::degrees(std::asin(glm::clamp(-camFwd.y, -1.0f, 1.0f)));
+	//			const float healthBarYawDeg = glm::degrees(std::atan2(camFwd.x, camFwd.z));
+	//			healthBarTrans.SetRotation(glm::vec3(healthBarPitchDeg, healthBarYawDeg, 0.0f));
+	//		}
 
 
-			// Movement accumulator
-			glm::vec3 moveDir(0.0f);
+	//		// Movement accumulator
+	//		glm::vec3 moveDir(0.0f);
 
-			if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
-			if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
-			if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
-			if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
+	//		if (input.IsKeyPressed(GLFW_KEY_W)) moveDir += forward;  // move forward
+	//		if (input.IsKeyPressed(GLFW_KEY_S)) moveDir -= forward;  // move backward
+	//		if (input.IsKeyPressed(GLFW_KEY_A)) moveDir -= right;    // move left
+	//		if (input.IsKeyPressed(GLFW_KEY_D)) moveDir += right;    // move right
 
-			// Normalize to prevent faster diagonal movement
-			if (glm::dot(moveDir, moveDir) > 0.0f)
-				moveDir = glm::normalize(moveDir);
+	//		// Normalize to prevent faster diagonal movement
+	//		if (glm::dot(moveDir, moveDir) > 0.0f)
+	//			moveDir = glm::normalize(moveDir);
 
-			// Apply movement to player
-			transform.Position += moveDir * moveSpeed;
+	//		// Apply movement to player
+	//		transform.Position += moveDir * moveSpeed;
 
-		}
-		else
-		{
-			// Default player movement w/o MainCamera
-			//if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
-			//if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
-			//if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
-			//if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
-		}
-	}
+	//	}
+	//	else
+	//	{
+	//		// Default player movement w/o MainCamera
+	//		//if (input.IsKeyPressed(GLFW_KEY_W)) transform.Position.z -= 0.1f; // move forward
+	//		//if (input.IsKeyPressed(GLFW_KEY_S)) transform.Position.z += 0.1f; // move backward
+	//		//if (input.IsKeyPressed(GLFW_KEY_A)) transform.Position.x -= 0.1f; // move left
+	//		//if (input.IsKeyPressed(GLFW_KEY_D)) transform.Position.x += 0.1f; // move right
+	//	}
+	//}
 
 
 	////sphereTrans.Position = glm::vec3(transform.Position.x, transform.Position.y + 2.0f, transform.Position.z);
@@ -1275,15 +1298,15 @@ void Game::OnUpdate(Engine::Timestep ts)
 
 	// Test the DSP Global Effects
 
-	FMOD::DSP *dsp = nullptr;
-	if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
-	{
-		dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
-		m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
-			FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
-	}
+	//FMOD::DSP *dsp = nullptr;
+	//if (input.IsKeyJustPressed(GLFW_KEY_ENTER))
+	//{
+	//	dsp = m_AudioManager->CreateDSP(Engine::DSPEffectType::LowPass, Engine::AudioType::SFX);
+	//	m_AudioManager->SetDSPParameter(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass,
+	//		FMOD_DSP_LOWPASS_CUTOFF, 1000.0); //1kHz = muffled
+	//}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
+	/*if (input.IsKeyJustPressed(GLFW_KEY_LEFT_BRACKET))
 	{
 		m_AudioManager->EnableDSP(Engine::AudioType::SFX, Engine::DSPEffectType::LowPass, true);
 	}
@@ -1297,7 +1320,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		float cutoff;
 		dsp->getParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, &cutoff, nullptr, 0);
 		LOG_INFO("LowPass cutoff currently: ", cutoff);
-	}
+	}*/
 
 	// Move player in/out of the reverb radius with QE to feel falloff
 	/*if (found && foundEntity.HasComponent<Engine::TransformComponent>()) {
@@ -1323,10 +1346,10 @@ void Game::OnUpdate(Engine::Timestep ts)
 	//}
 
 	// Action keys - one-time press
-	if (input.IsKeyJustPressed(GLFW_KEY_SPACE))
-	{
-		LOG_DEBUG("Space pressed - Jump action!");
-	}
+	//if (input.IsKeyJustPressed(GLFW_KEY_SPACE))
+	//{
+	//	LOG_DEBUG("Space pressed - Jump action!");
+	//}
 
 	// Mouse buttons
 	if (input.IsMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT))
@@ -1358,68 +1381,68 @@ void Game::OnUpdate(Engine::Timestep ts)
 		LOG_INFO("Cursor visibility toggled: ", newVisibility ? "VISIBLE" : "HIDDEN");
 	}
 
-	if (input.IsKeyJustPressed(GLFW_KEY_F2))
-	{
-		LOG_INFO("F2 pressed - Creating test entity with velocity...");
-		static int entityCounter = 0;
+	//if (input.IsKeyJustPressed(GLFW_KEY_F2))
+	//{
+	//	LOG_INFO("F2 pressed - Creating test entity with velocity...");
+	//	static int entityCounter = 0;
 
-		auto newEntity = m_ActiveScene->CreateEntity("DynamicEntity_" + std::to_string(entityCounter));
-		newEntity.AddComponent<Engine::TagComponent>("DynamicEntity_" + std::to_string(entityCounter));
+	//	auto newEntity = m_ActiveScene->CreateEntity("DynamicEntity_" + std::to_string(entityCounter));
+	//	newEntity.AddComponent<Engine::TagComponent>("DynamicEntity_" + std::to_string(entityCounter));
 
-		auto &transform = newEntity.AddComponent<Engine::TransformComponent>();
-		transform.Position = glm::vec3(entityCounter * 2.0f, 10.0f, 0);
-		transform.Rotation = glm::vec3(0, 0, 0);
-		transform.Scale = glm::vec3(1, 1, 1);
+	//	auto &transform = newEntity.AddComponent<Engine::TransformComponent>();
+	//	transform.Position = glm::vec3(entityCounter * 2.0f, 10.0f, 0);
+	//	transform.Rotation = glm::vec3(0, 0, 0);
+	//	transform.Scale = glm::vec3(1, 1, 1);
 
-		// Add rigidbody with random velocity to demonstrate MovementSystem
-		auto &rb = newEntity.AddComponent<Engine::RigidbodyComponent>();
-		rb.Mass = 1.0f;
-		rb.UseGravity = true;
-		rb.IsKinematic = false;
-		rb.Velocity = glm::vec3(
-			(entityCounter % 2 == 0 ? 1.0f : -1.0f),
-			0.0f,
-			0.0f
-		);
+	//	// Add rigidbody with random velocity to demonstrate MovementSystem
+	//	auto &rb = newEntity.AddComponent<Engine::RigidbodyComponent>();
+	//	rb.Mass = 1.0f;
+	//	rb.UseGravity = true;
+	//	rb.IsKinematic = false;
+	//	rb.Velocity = glm::vec3(
+	//		(entityCounter % 2 == 0 ? 1.0f : -1.0f),
+	//		0.0f,
+	//		0.0f
+	//	);
 
-		newEntity.AddComponent<Engine::MeshRendererComponent>();
+	//	newEntity.AddComponent<Engine::MeshRendererComponent>();
 
-		entityCounter++;
-		LOG_INFO("Created falling entity ID: ", (uint32_t)newEntity, " with velocity (will demonstrate MovementSystem)");
-	}
+	//	entityCounter++;
+	//	LOG_INFO("Created falling entity ID: ", (uint32_t)newEntity, " with velocity (will demonstrate MovementSystem)");
+	//}
 
 	// Serialization controls
-	if (input.IsKeyJustPressed(GLFW_KEY_F5))
+	/*if (input.IsKeyJustPressed(GLFW_KEY_F5))
 	{
 		LOG_INFO("=== SAVING SCENE ===");
 		bool success = m_ActiveScene->SaveToFile("Resources/Sources/Scenes/SavedScene.json");
 		LOG_INFO(success ? "Scene saved!" : "Save failed!");
-	}
+	}*/
 
-	if (input.IsKeyJustPressed(GLFW_KEY_F9))
-	{
-		LOG_INFO("=== LOADING SCENE ===");
+	//if (input.IsKeyJustPressed(GLFW_KEY_F9))
+	//{
+	//	LOG_INFO("=== LOADING SCENE ===");
 
-		// Shutdown systems before loading new scene
-		m_ActiveScene->ShutdownSystems();
+	//	// Shutdown systems before loading new scene
+	//	m_ActiveScene->ShutdownSystems();
 
-		bool success = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
+	//	bool success = m_ActiveScene->LoadFromFile("Resources/Sources/Scenes/ExampleScene.json");
 
-		// Reinitialize systems after loading
-		if (success)
-		{
-			AddAllSystems();
-			m_ActiveScene->InitializeSystems();
-			LOG_INFO("Scene loaded and systems reinitialized!");
-		}
-		else
-		{
-			LOG_ERROR("Load failed!");
-		}
-	}
+	//	// Reinitialize systems after loading
+	//	if (success)
+	//	{
+	//		AddAllSystems();
+	//		m_ActiveScene->InitializeSystems();
+	//		LOG_INFO("Scene loaded and systems reinitialized!");
+	//	}
+	//	else
+	//	{
+	//		LOG_ERROR("Load failed!");
+	//	}
+	//}
 
 	// Reload current game scene
-	if (input.IsKeyJustPressed(GLFW_KEY_U) && !editorCamToggle)
+	/*if (input.IsKeyJustPressed(GLFW_KEY_U) && !editorCamToggle)
 	{
 		LOG_INFO("=== RELOADING GAME SCENE ===");
 		if (!m_CurrentScenePath.empty())
@@ -1430,7 +1453,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		{
 			LoadSceneFromEvent("Resources/Sources/Scenes/Level1_NewPlayer.json");
 		}
-	}
+	}*/
 
 	// UNCOMMENT IF YOU NEED TO SPAWN A FIRST TIME INSTANCE OF A ENTITY THAT HAS SUBMESH HERE - AMANDA
 	// ADJUST THE SUBMESH COUNT ACCORDINGLY ARIGATO
@@ -1557,108 +1580,33 @@ void Game::OnShutdown()
 
 Engine::Scene* Game::CreateScene(const std::string& name)
 {
+	LOG_INFO("=== CreateScene: ", name, " ===");
 	if (m_ActiveScene)
 	{
+		//m_ActiveScene = nullptr;
 		m_ActiveScene->ShutdownSystems();
 		m_ActiveScene->GetRegistry().clear();
+		m_ActiveScene = nullptr;
 	}
 
 	// ===== Create NEW scene =====
 	auto newScene = std::make_unique<Engine::Scene>(name);
 	Engine::Scene* scenePtr = newScene.get();
+
 	AddAllSystemsToScene(scenePtr);
 	scenePtr->InitializeSystems();
 	m_Scenes.push_back(std::move(newScene));
 	m_ActiveScene = scenePtr;
-	return scenePtr;
+	m_CurrentScenePath.clear();
+	LOG_INFO("Scene created successfully");
+	return m_ActiveScene;
 }
 
-void Game::RequestNewSceneFromEditor(const std::string& name)
-{
-	Engine::Scene* newScene = CreateScene(name);
-	m_Editor->SetActiveScene(newScene);
-	LOG_INFO("New scene created and set as active: ", name);
-}
+//void Game::RequestNewSceneFromEditor(const std::string& name)
+//{
+//	Engine::Scene* newScene = CreateScene(name);
+//	m_Editor->SetActiveScene(newScene);
+//	LOG_INFO("New scene created and set as active: ", name);
+//}
 
-void Game::LoadSceneFromEvent(const std::string& scenePath)
-{
-	LOG_INFO("===========================================");
-	LOG_INFO("LOADING SCENE FROM EVENT");
-	LOG_INFO("Scene path: ", scenePath);
-	LOG_INFO("===========================================");
-
-	if (!m_ActiveScene)  // CHANGED: Was m_Scene, now m_ActiveScene
-	{
-		LOG_ERROR("Cannot load scene - m_ActiveScene is null!");
-		return;
-	}
-
-	try
-	{
-		// Step 1: Shutdown current scene systems
-		LOG_INFO("Step 1: Shutting down current scene systems...");
-		m_ActiveScene->ShutdownSystems();  // CHANGED: Was m_Scene
-		LOG_INFO("  -> Systems shut down successfully");
-
-		// Step 2: Clear current scene
-		LOG_INFO("Step 2: Clearing current scene...");
-		m_ActiveScene->GetRegistry().clear();  // CHANGED: Was m_Scene
-		LOG_INFO("  -> Scene cleared");
-
-		// Step 3: Load new scene from file
-		LOG_INFO("Step 3: Loading scene from file: ", scenePath);
-		bool success = m_ActiveScene->LoadFromFile(scenePath);  // CHANGED: Was m_Scene
-
-		if (!success)
-		{
-			LOG_ERROR("  -> Failed to load scene from file!");
-			LOG_WARNING("  -> Attempting to create default scene as fallback...");
-			CreateDefaultScene();
-			AddAllSystems();
-			m_ActiveScene->InitializeSystems();  // CHANGED: Was m_Scene
-			return;
-		}
-
-		LOG_INFO("  -> Scene loaded successfully");
-		m_CurrentScenePath = scenePath;
-
-		// Step 4: Update renderer settings from loaded scene
-		LOG_INFO("Step 4: Updating renderer settings...");
-		m_Renderer->getBloomToggle() = m_ActiveScene->GetSceneSetting().s_BloomToggle;  // CHANGED: Was m_Scene
-		m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;  // CHANGED: Was m_Scene
-		m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;  // CHANGED: Was m_Scene
-		m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;  // CHANGED: Was m_Scene
-		LOG_INFO("  -> Renderer settings updated");
-
-		// Step 5: Re-add all systems
-		LOG_INFO("Step 5: Re-adding systems to new scene...");
-		AddAllSystems();
-		LOG_INFO("  -> Systems added");
-
-		// Step 6: Initialize systems
-		LOG_INFO("Step 6: Initializing systems...");
-		m_ActiveScene->InitializeSystems();  // CHANGED: Was m_Scene
-		LOG_INFO("  -> Systems initialized");
-
-		LOG_INFO("===========================================");
-		LOG_INFO("SCENE TRANSITION COMPLETE");
-		LOG_INFO("===========================================");
-	}
-	catch (const std::exception& e)
-	{
-		LOG_CRITICAL("Exception during scene transition: ", e.what());
-		LOG_WARNING("Attempting recovery with default scene...");
-
-		try
-		{
-			CreateDefaultScene();
-			AddAllSystems();
-			m_ActiveScene->InitializeSystems();  // CHANGED: Was m_Scene
-			LOG_INFO("Recovery successful - default scene loaded");
-		}
-		catch (const std::exception& recoveryError)
-		{
-			LOG_CRITICAL("Recovery failed: ", recoveryError.what());
-		}
-	}
-}
+//}

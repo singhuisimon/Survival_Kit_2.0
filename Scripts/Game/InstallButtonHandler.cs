@@ -419,7 +419,14 @@ namespace Game
                 sceneLoadTriggered = true;
                 LogMessage("InstallButtonHandler: Loading main game scene at " + bsodElapsedTime + "s");
                 LogMessage("Scene path: " + MAIN_GAME_SCENE_PATH);
-                Publish("LoadScene", MAIN_GAME_SCENE_PATH);
+                //Publish("LoadScene", MAIN_GAME_SCENE_PATH);
+
+                bool success = Scene.SceneLoadFromFile(MAIN_GAME_SCENE_PATH);
+                if (success)
+                {
+                    LogMessage("Main Game Level 1 loaded successfully!");
+                }
+
             }
         }
 

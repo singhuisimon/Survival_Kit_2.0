@@ -88,7 +88,8 @@ namespace Game
                 LogMessage("Loading scene: " + nextScenePath);
 
                 // Load next level
-                Event.Publish("LoadScene", nextScenePath);
+                //Event.Publish("LoadScene", nextScenePath);
+                bool success = Scene.SceneLoadFromFile(nextScenePath);
             }
         }
 

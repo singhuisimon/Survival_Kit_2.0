@@ -58,8 +58,8 @@ namespace Game
             Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Subscribe(EVENT_GAME_WIN, OnGameEnd);
             Publish(EVENT_CORE_HEALTHCHANGE, CurrentHealth.ToString());  // ADD THIS
-            Vector3 newpos = new Vector3(-389, -200, -468);
-            Engine.Transform.SetPosition(EntityID,ref newpos);
+            //Vector3 newpos = new Vector3(-389, -200, -468);
+            //Engine.Transform.SetPosition(EntityID,ref newpos);
             LogMessage("CoreMotherboard " + EntityID + " Health initialized");
         }
 

@@ -419,6 +419,47 @@ namespace Engine
 			}
 		}
 
+		bool Scene_LoadFromFile(MonoString* filepath)
+		{
+			if (!s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: current scene is null");
+				return false;
+			}
+
+			if (!filepath)
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: filepath is null");
+				return false;
+			}
+
+			char* cstr = mono_string_to_utf8(filepath);
+			if (!cstr)
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: failed to convert string");
+				return false;
+			}
+			std::string path = cstr;
+			mono_free(cstr);
+			if (path.empty())
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: empty filepath");
+				return false;
+			}
+			LOG_INFO("[InternalCall] Scene_LoadFromFile: attempting to load '", path, "'");
+			bool result = s_CurrentScene->LoadFromFile(path);
+			if (result)
+			{
+				LOG_INFO("[InternalCall] Scene_LoadFromFile: successfully loaded scene");
+			}
+			else
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: LoadFromFile returned false");
+			}
+
+			return result;
+		}
+
 		/**************************************************************************
 		 * @brief
 		 * Finds an entity by name in the current scene.
