@@ -11,10 +11,10 @@ namespace Game
     /// RestartButton_Lose - Restart button on lose screen
     /// Uses exact same collision logic as pause menu
     /// </summary>
-    public class RestartButton : ScriptBehaviour
+    public class RestartButton2 : ScriptBehaviour
     {
         // Scene path
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
 
         // Lose events
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
@@ -80,8 +80,7 @@ namespace Game
                 Input.SetCursorVisible(false);
 
                 // Load game scene
-                //Event.Publish("LoadScene", GAME_SCENE_PATH);
-                bool LoadSuccess = Scene.SceneLoadFromFile(GAME_SCENE_PATH);
+                Event.Publish("LoadScene", GAME_SCENE_PATH);
             }
         }
 

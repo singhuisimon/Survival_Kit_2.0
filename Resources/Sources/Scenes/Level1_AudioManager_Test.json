@@ -1,5 +1,5 @@
 {
-    "Scene": "Level1_NewPlayer",
+    "Scene": "Level1_AudioManager_Test",
     "Version": "1.0",
     "Entities": [
         {
@@ -26,8 +26,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            100.0,
+                            40.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -44,7 +44,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_RestartButton.png",
+                        "Texture": "Paused_ResumeButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -1400,7 +1400,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1461,7 +1461,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1544,7 +1544,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2155,7 +2155,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2300,7 +2300,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2422,7 +2422,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -1.0177775099486433e-13,
+                            -0.0,
                             90.0
                         ],
                         "Scale": [
@@ -2521,7 +2521,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "player",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/player.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2777,9 +2777,9 @@
                             "shootAllowed": false,
                             "primaryShooting": false,
                             "reloadingPrimary": false,
-                            "primaryAmmo": 0,
                             "CAMSHAKE_primaryFire": 0.05000000074505806,
                             "primaryAmmoMax": 100,
+                            "primaryAmmo": 0,
                             "primaryUltSpeed": 500.0,
                             "primaryReloadDelay": 1.5,
                             "primaryShootRate": 0.05000000074505806,
@@ -2788,8 +2788,8 @@
                             "chargeDelayRate": 0.5,
                             "chargeDelayNext": 0.0,
                             "primaryAltCharging": false,
-                            "primaryChargeRate": 0.10000000149011612,
                             "muzzleDistance": 5.0,
+                            "primaryChargeRate": 0.10000000149011612,
                             "primaryChargeNext": 0.0,
                             "primaryAltCharge": 0,
                             "primaryAltChargeMax": 30,
@@ -3530,8 +3530,8 @@
                         "ScriptClassName": "Game.BotnetSpawning",
                         "Fields": {
                             "interval": 2.0,
-                            "maxBotnets": 20,
                             "timer": 0.0,
+                            "maxBotnets": 20,
                             "spawnDistance": 1.5,
                             "currentBotnetCount": 0
                         }
@@ -3640,7 +3640,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -3933,7 +3933,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4191,8 +4191,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            100.0,
+                            40.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4203,13 +4203,13 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "3425964449535591267",
-                        "ScriptClassName": "Game.NextLevelButton"
+                        "ScriptClassName": ""
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess_Level2Button.png",
+                        "Texture": "Paused_ResumeButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4217,9 +4217,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -4403,8 +4403,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            100.0,
+                            40.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4421,7 +4421,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_MainMenuButton.png",
+                        "Texture": "Paused_MainMenuButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4572,7 +4572,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_Background.png",
+                        "Texture": "DefenceFailed.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4602,7 +4602,7 @@
                         "ComponentGUID": "130006815191499605",
                         "Position": [
                             640.0,
-                            320.0,
+                            300.0,
                             0.0
                         ],
                         "Rotation": [
@@ -4629,7 +4629,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess_Background.png",
+                        "Texture": "DefenceSuccess.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4819,7 +4819,7 @@
                     "Properties": {
                         "ComponentGUID": "10315724205064143441",
                         "Position": [
-                            1136.5999755859375,
+                            1123.4000244140625,
                             682.9000244140625,
                             0.0
                         ],
@@ -4829,7 +4829,7 @@
                             0.0
                         ],
                         "Scale": [
-                            120.0,
+                            106.80000305175781,
                             6.0,
                             1.0
                         ],
@@ -5023,7 +5023,7 @@
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "10565374915375432199",
-                        "text": "100/100\n",
+                        "text": "89/100",
                         "fontName": "Quantico-Regular",
                         "fontSize": 12.0,
                         "color": [
@@ -5121,7 +5121,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6785,7 +6785,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "10083648095363581495",
+                        "ComponentGUID": "10063390693004149625",
                         "Position": [
                             0.0,
                             0.0,
@@ -6808,7 +6808,7 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "860276058509461051",
+                        "ComponentGUID": "9486929940700922747",
                         "ScriptClassName": "Game.AudioSettings"
                     }
                 }
@@ -6820,15 +6820,15 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_SFX_Ticked"
+                        "Tag": "Paused_Checkbox_Master_Unticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "17001177123005449791",
+                        "ComponentGUID": "1288434682385875839",
                         "Position": [
-                            1143.5,
+                            833.7999877929688,
                             620.0,
                             0.0
                         ],
@@ -6849,7 +6849,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Checkbox_Ticked.png",
+                        "Texture": "Checkbox_Unticked.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -6870,13 +6870,163 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Tag": "Paused_Checkbox_Master_Ticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3017816939296965509",
+                        "Position": [
+                            833.7999877929688,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            14.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Ticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 72,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_Checkbox_BGM_Unticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1288434682387334027",
+                        "Position": [
+                            987.0999755859375,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Unticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 73,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Tag": "Paused_Checkbox_BGM_Ticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1288434682387841937",
+                        "Position": [
+                            987.0999755859375,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Ticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 74,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
                         "Tag": "Paused_Checkbox_SFX_Unticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11813030352277194309",
+                        "ComponentGUID": "9358885214636393367",
                         "Position": [
                             1143.5,
                             620.0,
@@ -6915,170 +7065,20 @@
             ]
         },
         {
-            "ID": 72,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_Checkbox_BGM_Ticked"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "1436736810816407115",
-                        "Position": [
-                            987.0999755859375,
-                            620.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            13.0,
-                            13.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Checkbox_Ticked.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 73,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_Checkbox_BGM_Unticked"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "13542412609189185105",
-                        "Position": [
-                            987.0999755859375,
-                            620.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            13.0,
-                            13.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Checkbox_Unticked.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 74,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_Checkbox_Master_Ticked"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6048422829245597271",
-                        "Position": [
-                            833.7999877929688,
-                            620.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            13.0,
-                            13.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Checkbox_Ticked.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
             "ID": 75,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Paused_Checkbox_Master_Unticked"
+                        "Tag": "Paused_Checkbox_SFX_Ticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "8930726590763664989",
+                        "ComponentGUID": "3017816939299799965",
                         "Position": [
-                            833.7999877929688,
+                            1143.5,
                             620.0,
                             0.0
                         ],
@@ -7099,7 +7099,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Checkbox_Unticked.png",
+                        "Texture": "Checkbox_Ticked.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -7110,63 +7110,6 @@
                         "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 76,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "mainmenubuttonWin"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15427608859292877731",
-                        "Position": [
-                            376.0,
-                            518.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            150.0,
-                            50.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4474854565527929765",
-                        "ScriptClassName": "Game.MainMenuButtonWin"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "DefenceSuccess_MainMenuButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
                     }
                 }
             ]

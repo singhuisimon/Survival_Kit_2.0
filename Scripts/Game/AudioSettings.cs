@@ -35,7 +35,7 @@ namespace Game
         private bool uiMuted = false;
 
         // File paths
-        private const string SAVE_FILE = "SaveData/UserAudioSettings.json";
+        private const string SAVE_FILE = "Resources/Sources/SaveData/UserAudioSettings.json";
         private const string DEFAULT_FILE = "Config/DefaultAudioSettings.json";
 
         // Debug logging

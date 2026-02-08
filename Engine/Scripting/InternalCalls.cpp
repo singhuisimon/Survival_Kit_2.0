@@ -37,6 +37,7 @@
 #include "../Physics/PhysicsAPI.h"
 
 #include "../Physics/CollisionSystem2D.h"
+#include "../Core/Application.h"
 
 // Mono
 #include <mono/jit/jit.h>
@@ -150,6 +151,10 @@ namespace Engine
 		void SetAudioManager(AudioManager *audioManager)
 		{
 			s_AudioManager = audioManager;
+		}
+		void SetRenderer(Renderer* renderer)
+		{
+			s_Renderer = renderer;
 		}
 
 		/**************************************************************************
@@ -417,6 +422,58 @@ namespace Engine
 				sc.ScriptInstance = instance; // cache
 				sc.Started = false;
 			}
+		}
+
+		bool Scene_LoadFromFile(MonoString* filepath)
+		{
+			if (!s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: current scene is null");
+				return false;
+			}
+
+			if (!filepath)
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: filepath is null");
+				return false;
+			}
+
+			char* cstr = mono_string_to_utf8(filepath);
+			if (!cstr)
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: failed to convert string");
+				return false;
+			}
+			std::string path = cstr;
+			mono_free(cstr);
+			if (path.empty())
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: empty filepath");
+				return false;
+			}
+			LOG_INFO("[InternalCall] Scene_LoadFromFile: attempting to load '", path, "'");
+			bool result = s_CurrentScene->LoadFromFile(path);
+			if (result)
+			{
+				
+				LOG_INFO("[InternalCall] Scene_LoadFromFile: successfully loaded scene");
+				if (s_Renderer)
+				{
+					LOG_INFO("[InternalCall] Scene_LoadFromFile: applying scene settings to renderer");
+					s_Renderer->getBloomToggle() = s_CurrentScene->GetSceneSetting().s_BloomToggle;
+					s_Renderer->getBloomStrength() = s_CurrentScene->GetSceneSetting().s_BloomStrength;
+					s_Renderer->getBloomFilterRadius() = s_CurrentScene->GetSceneSetting().s_BloomFilterRadius;
+					s_Renderer->getExposure() = s_CurrentScene->GetSceneSetting().s_Exposure;
+					s_Renderer->getGlobalBias() = s_CurrentScene->GetSceneSetting().s_GlobalBias;
+				}
+				
+			}
+			else
+			{
+				LOG_ERROR("[InternalCall] Scene_LoadFromFile: LoadFromFile returned false");
+			}
+
+			return result;
 		}
 
 		/**************************************************************************

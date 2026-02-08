@@ -1169,6 +1169,11 @@ namespace Engine {
 		InternalCalls::SetAudioManager(audioManager);
 	}
 
+	void SetScriptingRenderer(Renderer* renderer)
+	{
+		InternalCalls::SetRenderer(renderer);
+	}
+
 	static void BindInternalCall(const char *managedName, void *fn) {
 		mono_add_internal_call(managedName, fn);
 	}
@@ -1204,6 +1209,8 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::Entity_AddMeshRenderer));
 		BindInternalCall("Engine.Scene::Entity_AddTag",
 						 reinterpret_cast<void *>(InternalCalls::Entity_AddTag));
+		BindInternalCall("Engine.Scene::Scene_LoadFromFile",
+						reinterpret_cast<void*>(InternalCalls::Scene_LoadFromFile));
 
 		// =====================================================================
 		// Transform

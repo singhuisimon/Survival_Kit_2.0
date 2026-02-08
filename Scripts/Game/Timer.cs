@@ -15,11 +15,15 @@ namespace Game
     {
         // ===== Settings =====
         [SerializeField("Starting Time (seconds)")]
-        private float startingTime = 180.0f;  // 3 minutes = 180 seconds
+        private float startingTime = 120.0f;  // 2 minutes = 120 seconds
 
         // ===== Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+
+        private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string GAMEWIN = "GameWin";
 
         // ===== State =====
         private bool initialized = false;
@@ -34,6 +38,10 @@ namespace Game
             // Subscribe to lose conditions
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
+
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
+            Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
 
             // Initialize with starting time
             remainingTime = startingTime;
