@@ -88,7 +88,7 @@ namespace Engine {
          * @return True if successful
          */
         bool LoadFromFile(const std::string& filepath);
-        void SetPendingSceneLoad(const std::string& path);
+       
         // ===== PREFAB SYSTEM =====
 
         /**
@@ -195,13 +195,13 @@ namespace Engine {
   * @return The entity with matching tag, or invalid entity if not found
   */
         Entity FindEntityByName(const std::string& name);
-        void Clear();
+       
     private:
         std::string m_Name;
         entt::registry m_Registry;
         SystemRegistry m_SystemRegistry;
         SceneSettings m_Settings;
-        std::string m_PendingSceneLoadPath;
+  
         friend class SceneSerializer;
 
 

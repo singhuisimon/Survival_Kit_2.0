@@ -23,8 +23,7 @@ public:
     Engine::AudioManager* GetAudioManager() { return m_AudioManager.get(); }
 
     Engine::Scene* CreateScene(const std::string& name);
-    void QueueSceneLoad(const std::string& scenePath);
-    //void RequestNewSceneFromEditor(const std::string& name);
+    
 protected:
     /**
      * @brief Initialize your game
@@ -58,7 +57,7 @@ private:
 
     std::unique_ptr<Engine::AudioManager> m_AudioManager;
     std::string m_CurrentScenePath;
-
+    bool m_SceneNeedsLoading = false;
     //void AddAllSystems();
     void AddAllSystemsToScene(Engine::Scene* scene);
 
@@ -66,12 +65,4 @@ private:
      * @brief Create a default scene if loading from file fails
      */
     void CreateDefaultScene();
-
-    std::string m_PendingSceneLoadPath;  // Add this
-    bool m_IsLoadingScene = false;       // Add this
-
-    /**
-    * @brief Load a scene from the given file path
-    */
-    //void LoadSceneFromEvent(const std::string& scenePath);
 };

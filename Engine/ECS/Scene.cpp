@@ -34,13 +34,7 @@ namespace Engine {
     }
 
     void Scene::OnUpdate(float deltaTime) {
-        if (!m_PendingSceneLoadPath.empty()) {
-            LOG_INFO("Scene: Processing pending scene load: ", m_PendingSceneLoadPath);
-            std::string pathToLoad = m_PendingSceneLoadPath;
-            m_PendingSceneLoadPath.clear();
-            LoadFromFile(pathToLoad);
-            return;  // Skip normal update this frame
-        }
+       
         m_SystemRegistry.OnUpdate(this, deltaTime);
     }
 
@@ -56,17 +50,7 @@ namespace Engine {
         return serializer.Deserialize(filepath);
 #else
         LOG_INFO("Scene::LoadFromFile: Loading scene from '", filepath, "'");
-        //i//f (m_Registry. > 0) {
-            //LOG_INFO("Scene::LoadFromFile: Clearing existing entities");
-        //Clear();
-            //m_Settings = SceneSettings();
-       // }
-
-        //Clear();
-        m_Registry.clear();
-        
-        //ShutdownSystems();
-        m_Settings = SceneSettings();
+       
         SceneSerializer serializer(this);
         bool success = serializer.Deserialize(filepath);
 
@@ -75,19 +59,11 @@ namespace Engine {
             LOG_ERROR("Scene::LoadFromFile: Failed to deserialize '", filepath, "'");
             return false;
         }
-
-        //InitializeSystems();
-
         LOG_INFO("Scene::LoadFromFile: Successfully loaded '", filepath, "'");
         return true;
 #endif
     }
-    void Scene::SetPendingSceneLoad(const std::string& path) {
-        m_PendingSceneLoadPath = path;
-        LOG_INFO("Scene: Queued scene load for next frame: ", path);
-    }
-    
-
+ 
     Entity Scene::GetEntity(entt::entity entityId) {
         if (!m_Registry.valid(entityId)) {
             LOG_WARNING("Scene: Attempted to get invalid entity ID: ", (uint32_t)entityId);
@@ -115,35 +91,5 @@ namespace Engine {
         return Entity(); // Invalid entity
     }
 
- 
-    //Entity Scene::InstantiateScenePrefab(xresource::instance_guid prefabGUID) {
-    //    return PrefabInstantiator::InstantiateScenePrefab(this, prefabGUID);
-    //}
 
-    //void Scene::UnpackPrefabInstance(Entity entity) {
-    //    if (!entity.HasComponent<PrefabComponent>()) {
-    //        LOG_WARNING("Scene: Entity is not a prefab instance");
-    //        return;
-    //    }
-
-    //    // Remove the PrefabComponent to break the prefab link
-    //    entity.RemoveComponent<PrefabComponent>();
-
-    //    LOG_INFO("Scene: Unpacked prefab instance (Entity ID: ", static_cast<uint32_t>(entity), ")");
-    //}
-    void Scene::Clear()
-    {
-        LOG_INFO("Scene::Clear: Clearing scene '", m_Name, "'");
-
-        // Step 1: Shutdown all systems (calls OnDestroy on scripts, etc.)
-        ShutdownSystems();
-
-        // Step 2: Destroy all entities
-        m_Registry.clear();
-
-        // Step 3: Reset scene settings to defaults
-        m_Settings = SceneSettings();
-
-        LOG_INFO("Scene::Clear: Scene cleared successfully");
-    }
 } // namespace Engine
