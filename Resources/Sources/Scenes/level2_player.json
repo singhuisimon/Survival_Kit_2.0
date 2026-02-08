@@ -3,332 +3,6 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048579,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "loserestart"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16298061428645381225",
-                        "Position": [
-                            855.0,
-                            517.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            150.0,
-                            50.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11686375410218124395",
-                        "ScriptClassName": "Game.RestartButton2"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "DefenceFailed_RestartButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097228,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "EnemyTurret"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "11501261626516063941",
-                        "PrefabAssetGuid": "11756445080107174727",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: EnemyTurret.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4745571910229393945\",\"Tag\":\"EnemyTurret\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "1286807396408853019",
-                        "Position": [
-                            -663.5013427734375,
-                            -35.43246841430664,
-                            46.797908782958984
-                        ],
-                        "Rotation": [
-                            0.000014323965842777397,
-                            -1.80215963041519e-7,
-                            9.037994459504262e-7
-                        ],
-                        "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "15121865451691328031",
-                        "Mesh": "",
-                        "Material": "EnemyTurret.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "710346644105593373",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4169111157926363681",
-                        "ScriptClassName": "Game.EnemyTurret"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097227,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "EnemyTurret"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5160193351179519697",
-                        "PrefabAssetGuid": "11756445080107174727",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: EnemyTurret.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4745571910229393945\",\"Tag\":\"EnemyTurret\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "1286807396408853019",
-                        "Position": [
-                            -614.228759765625,
-                            -35.43199920654297,
-                            46.79800033569336
-                        ],
-                        "Rotation": [
-                            0.000014324052244774066,
-                            -1.6996486351672502e-7,
-                            8.92126763574197e-7
-                        ],
-                        "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "15121865451691328031",
-                        "Mesh": "",
-                        "Material": "EnemyTurret.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "710346644105593373",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4169111157926363681",
-                        "ScriptClassName": "Game.EnemyTurret"
-                    }
-                }
-            ]
-        },
-        {
             "ID": 1048650,
             "Components": [
                 {
@@ -347,7 +21,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -483,7 +157,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -531,7 +205,7 @@
                             -61.23538589477539
                         ],
                         "Rotation": [
-                            0.00009846458851825446,
+                            0.00009846458124229684,
                             -0.11598959565162659,
                             -0.2334386110305786
                         ],
@@ -619,7 +293,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -668,8 +342,8 @@
                         ],
                         "Rotation": [
                             0.00009085051715373993,
-                            -0.05936049297451973,
-                            -0.11039090901613235
+                            -0.05936050787568092,
+                            -0.11039092391729355
                         ],
                         "Scale": [
                             5.0,
@@ -755,7 +429,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -804,7 +478,7 @@
                         ],
                         "Rotation": [
                             -0.2059386968612671,
-                            -0.22188767790794373,
+                            -0.2218877077102661,
                             0.0005506805027835071
                         ],
                         "Scale": [
@@ -891,7 +565,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1027,7 +701,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1163,7 +837,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1299,7 +973,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1435,7 +1109,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1615,9 +1289,9 @@
                             -42.60850524902344
                         ],
                         "Rotation": [
-                            -0.00006013271922711283,
+                            -0.000060132726503070444,
                             0.4257443845272064,
-                            -0.10387768596410751
+                            -0.1038777157664299
                         ],
                         "Scale": [
                             5.0,
@@ -1747,9 +1421,9 @@
                             -43.40431594848633
                         ],
                         "Rotation": [
-                            -0.00010636401566443965,
+                            -0.00010636402294039726,
                             0.42574286460876465,
-                            -0.10387762635946274
+                            -0.10387764126062393
                         ],
                         "Scale": [
                             5.0,
@@ -1894,7 +1568,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2015,9 +1689,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -0.000010018549801316112,
+                            -0.000010020362424256746,
                             -89.98021697998047,
-                            -7.11760694827035e-9
+                            -5.895718135917605e-9
                         ],
                         "Scale": [
                             1.5,
@@ -2381,51 +2055,137 @@
             ]
         },
         {
-            "ID": 4194404,
+            "ID": 2097227,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "CoreHealthBarFrame"
+                        "Tag": "EnemyTurret"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5160193351179519697",
+                        "PrefabAssetGuid": "11756445080107174727",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyTurret.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4745571910229393945\",\"Tag\":\"EnemyTurret\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "15253921196586768131",
+                        "ComponentGUID": "1286807396408853019",
                         "Position": [
-                            640.0,
-                            92.30000305175781,
-                            0.0
+                            -614.228759765625,
+                            -35.43199920654297,
+                            46.79800033569336
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            0.000014324052244774066,
+                            -1.6996486351672502e-7,
+                            8.92126763574197e-7
                         ],
                         "Scale": [
-                            207.60000610351563,
-                            7.0,
-                            1.0
+                            5.0,
+                            5.0,
+                            5.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Texture": "M4TempCoreHP_Frame.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
+                        "ComponentGUID": "15121865451691328031",
+                        "Mesh": "",
+                        "Material": "EnemyTurret.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "710346644105593373",
+                        "Mass": 1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
                         ],
-                        "Quad": 3,
-                        "Sprite Layer": 0,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            30.0,
+                            30.0,
+                            30.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4169111157926363681",
+                        "ScriptClassName": "Game.EnemyTurret"
                     }
                 }
             ]
@@ -2510,7 +2270,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2556,7 +2316,7 @@
                         ],
                         "Rotation": [
                             0.07365221530199051,
-                            0.17050999402999878,
+                            0.17051002383232117,
                             -0.05848817899823189
                         ],
                         "Scale": [
@@ -2732,21 +2492,21 @@
             ]
         },
         {
-            "ID": 1048602,
+            "ID": 1048645,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "PlayerHealth"
+                        "Tag": "mainmenWin"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "790813281478640227",
+                        "ComponentGUID": "7117350442963443851",
                         "Position": [
-                            640.0,
-                            330.0,
+                            620.0,
+                            500.0,
                             0.0
                         ],
                         "Rotation": [
@@ -2755,18 +2515,25 @@
                             0.0
                         ],
                         "Scale": [
-                            700.0,
-                            400.0,
-                            203.60000610351563
+                            150.0,
+                            50.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8270271947570503823",
+                        "ScriptClassName": "Game.MainMenuButtonWin"
+                    }
+                },
+                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Example_PlayerHPDefault.png",
+                        "Texture": "DefenceSuccess_MainMenuButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -2774,9 +2541,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 6,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2852,7 +2619,7 @@
                         "Rotation": [
                             180.0,
                             -89.98021697998047,
-                            -1.4719772067905978e-9
+                            -1.7687153963663604e-9
                         ],
                         "Scale": [
                             1.0,
@@ -2899,16 +2666,16 @@
                         "ComponentGUID": "9026023440309814373",
                         "ScriptClassName": "Game.SpaceshipController",
                         "Fields": {
-                            "mouseSensitivity": 15.0,
                             "backwardSpeed": 200.0,
-                            "strafeAcceleration": 15.0,
-                            "mouseSmoothing": 0.15000000596046448,
+                            "mouseSensitivity": 15.0,
                             "cameraFollowSpeed": 15.0,
                             "verticalSpeed": 200.0,
+                            "strafeAcceleration": 15.0,
+                            "mouseSmoothing": 0.15000000596046448,
                             "strafeDeceleration": 12.0,
                             "strafeSpeed": 250.0,
-                            "pitchLimitDegrees": 80.0,
                             "playerRotationSpeed": 3.0,
+                            "pitchLimitDegrees": 80.0,
                             "maxTurnSpeed": 3.0,
                             "forwardSpeed": 333.0,
                             "cameraDistanceBack": 10.0,
@@ -2931,51 +2698,134 @@
             ]
         },
         {
-            "ID": 9437240,
+            "ID": 2097228,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "CoreHealthBarRefill"
+                        "Tag": "EnemyTurret"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11501261626516063941",
+                        "PrefabAssetGuid": "11756445080107174727",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyTurret.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4745571910229393945\",\"Tag\":\"EnemyTurret\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "14100999691982395151",
+                        "ComponentGUID": "1286807396408853019",
                         "Position": [
-                            660.7999877929688,
-                            62.5,
-                            0.0
+                            -663.5013427734375,
+                            -35.43246841430664,
+                            46.797908782958984
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            0.000014323965842777397,
+                            -1.80215963041519e-7,
+                            9.037994459504262e-7
                         ],
                         "Scale": [
-                            205.0,
-                            7.0,
-                            1.0
+                            5.0,
+                            5.0,
+                            5.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "MeshRendererComponent",
                     "Properties": {
-                        "Texture": "M4TempCoreHP_Fill.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
+                        "ComponentGUID": "15121865451691328031",
+                        "Mesh": "",
+                        "Material": "EnemyTurret.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "710346644105593373",
+                        "Mass": 1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
                         ],
-                        "Quad": 3,
-                        "Sprite Layer": 2,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            30.0,
+                            30.0,
+                            30.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4169111157926363681",
+                        "ScriptClassName": "Game.EnemyTurret"
                     }
                 }
             ]
@@ -2999,7 +2849,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3085,7 +2935,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3221,7 +3071,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3271,7 +3121,7 @@
                         "Rotation": [
                             0.07450363039970398,
                             0.14448124170303345,
-                            -0.053272657096385956
+                            -0.05327266454696655
                         ],
                         "Scale": [
                             5.0,
@@ -3357,7 +3207,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3406,7 +3256,7 @@
                         ],
                         "Rotation": [
                             -0.0755261480808258,
-                            0.14385302364826202,
+                            0.14385297894477844,
                             0.03982983157038689
                         ],
                         "Scale": [
@@ -3493,7 +3343,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3629,7 +3479,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3765,7 +3615,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3901,7 +3751,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4037,7 +3887,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4085,7 +3935,7 @@
                             -27.22275161743164
                         ],
                         "Rotation": [
-                            -0.06328372657299042,
+                            -0.06328374147415161,
                             -0.20213618874549866,
                             0.0006744418642483652
                         ],
@@ -4173,7 +4023,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4343,7 +4193,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4464,7 +4314,7 @@
                             0.0
                         ],
                         "Rotation": [
-                            -4.861003398895264,
+                            -4.861003875732422,
                             -32.99995803833008,
                             89.0831527709961
                         ],
@@ -4520,7 +4370,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4603,7 +4453,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4664,7 +4514,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4869,21 +4719,21 @@
             ]
         },
         {
-            "ID": 5242974,
+            "ID": 1048579,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "CoreHealthBarWindow"
+                        "Tag": "loserestart"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "17559764205801641737",
+                        "ComponentGUID": "16298061428645381225",
                         "Position": [
-                            640.0,
-                            466.3999938964844,
+                            855.0,
+                            517.0,
                             0.0
                         ],
                         "Rotation": [
@@ -4892,8 +4742,8 @@
                             0.0
                         ],
                         "Scale": [
-                            750.0,
-                            500.0,
+                            150.0,
+                            50.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4901,9 +4751,16 @@
                     }
                 },
                 {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11686375410218124395",
+                        "ScriptClassName": "Game.RestartButton2"
+                    }
+                },
+                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "M4TempCoreHP_Window.png",
+                        "Texture": "DefenceFailed_RestartButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4911,7 +4768,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -4998,7 +4855,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5513,7 +5370,7 @@
                         "Rotation": [
                             43.99998092651367,
                             52.999996185302734,
-                            -0.000001888245378722786
+                            -0.000002837329020621837
                         ],
                         "Scale": [
                             0.30000001192092896,
@@ -5596,7 +5453,7 @@
                         "Rotation": [
                             46.0000114440918,
                             -6.000002384185791,
-                            0.000012886559488833882
+                            0.000012877147128165234
                         ],
                         "Scale": [
                             0.09999998658895493,
@@ -5761,7 +5618,7 @@
                         ],
                         "Rotation": [
                             -130.0,
-                            -15.000005722045898,
+                            -15.000007629394531,
                             71.0
                         ],
                         "Scale": [
@@ -5985,9 +5842,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000065803527832,
+                            -12.000053405761719,
                             85.9989013671875,
-                            -0.9997864365577698
+                            -0.9997804760932922
                         ],
                         "Scale": [
                             1.0,
@@ -6262,7 +6119,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6395,7 +6252,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6528,7 +6385,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6661,7 +6518,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6794,7 +6651,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6927,7 +6784,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7064,7 +6921,7 @@
                         ],
                         "Rotation": [
                             -23.12496566772461,
-                            0.11861413717269897,
+                            0.11861410737037659,
                             0.0169663242995739
                         ],
                         "Scale": [
@@ -7731,7 +7588,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Audio_PlayerMove",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Audio_PlayerMove.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Audio_PlayerMove.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -9413,63 +9270,6 @@
                         "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048645,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "mainmenWin"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "7117350442963443851",
-                        "Position": [
-                            620.0,
-                            500.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            150.0,
-                            50.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "8270271947570503823",
-                        "ScriptClassName": "Game.MainMenuButtonWin"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "DefenceSuccess_MainMenuButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 6,
-                        "IsActive": true,
-                        "IsVisible": true
                     }
                 }
             ]
