@@ -3,248 +3,228 @@
 #include "../Utility/Timestep.h"
 namespace Engine
 {
-	void EditorPerformancePanel::PerformanceProfilePanel(Timestep ts)
-	{
-		if (!m_Editor->GetPerformanceProfileWindowRef()) return;
-		std::weak_ptr<TracyProfiler> profilerWeak = m_Editor->GetProfiler();
-		ImGui::SetNextWindowSize(ImVec2(500, 420), ImGuiCond_FirstUseEver);
+    void EditorPerformancePanel::PerformanceProfilePanel(Timestep ts)
+    {
+        if (!m_Editor->GetPerformanceProfileWindowRef()) return;
 
-		if (ImGui::Begin("Performance Profile", &m_Editor->GetPerformanceProfileWindowRef(), ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
-		{
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Text("Editor Settings:");
+        std::weak_ptr<TracyProfiler> profilerWeak = m_Editor->GetProfiler();
+        ImGui::SetNextWindowSize(ImVec2(500, 420), ImGuiCond_FirstUseEver);
 
-			float currentScale = m_Editor->GetFontScale();
-			if (ImGui::SliderFloat("UI Scale", &currentScale, 0.5f, 2.0f, "%.2f"))
-			{
-				m_Editor->SetFontScale(currentScale);
+        // Begin MUST be called, and End MUST be called regardless of the return value
+        bool isOpen = ImGui::Begin("Performance Profile", &m_Editor->GetPerformanceProfileWindowRef(), ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 
-				// Update Font scale (this is fine as it's an absolute set)
-				ImGui::GetIO().FontGlobalScale = currentScale;
+        if (isOpen) // Only render content if window is not collapsed
+        {
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Text("Editor Settings:");
 
-				// Fix: Start from the 1.0 base style every time
-				ImGui::GetStyle() = m_Editor->GetBaseStyle();
+            float currentScale = m_Editor->GetFontScale();
+            if (ImGui::SliderFloat("UI Scale", &currentScale, 0.5f, 2.0f, "%.2f"))
+            {
+                m_Editor->SetFontScale(currentScale);
+                ImGui::GetIO().FontGlobalScale = currentScale;
+                ImGui::GetStyle() = m_Editor->GetBaseStyle();
+                ImGui::GetStyle().ScaleAllSizes(currentScale);
+            }
 
-				// Scale the fresh style by the absolute currentScale
-				ImGui::GetStyle().ScaleAllSizes(currentScale);
-			}
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Adjusts the size of all text and UI elements.");
 
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Adjusts the size of all text and UI elements.");
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
 
+            // Theme Editor
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Text("Theme Settings:");
 
-			// Theme Editor
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Text("Theme Settings:");
+            static int currentTheme = 0;
+            const char* themes[] = { "Dark", "Light", "Classic" };
 
-			static int currentTheme = 0; // 0: Dark, 1: Light, 2: Classic
-			const char* themes[] = { "Dark", "Light", "Classic"};
+            if (ImGui::Combo("Editor Theme", &currentTheme, themes, IM_ARRAYSIZE(themes)))
+            {
+                switch (currentTheme)
+                {
+                case 0: ImGui::StyleColorsDark(); break;
+                case 1: ImGui::StyleColorsLight(); break;
+                case 2: ImGui::StyleColorsClassic(); break;
+                }
 
-			if (ImGui::Combo("Editor Theme", &currentTheme, themes, IM_ARRAYSIZE(themes)))
-			{
-				switch (currentTheme)
-				{
-				case 0: ImGui::StyleColorsDark(); break;
-				case 1: ImGui::StyleColorsLight(); break;
-				case 2: ImGui::StyleColorsClassic(); break;
-				}
+                float currentScale = m_Editor->GetFontScale();
+                ImGui::GetStyle().ScaleAllSizes(currentScale);
+            }
 
-				// IMPORTANT: Re-apply your current UI Scale after switching themes
-				// Switching themes resets all padding/sizes to 1.0f scale defaults.
-				float currentScale = m_Editor->GetFontScale();
-				ImGui::GetStyle().ScaleAllSizes(currentScale);
-			}
-
-			ImGui::Text("Tracy Window:");
-			// Launches Tracy.exe when copied to correct folder
-			if (ImGui::Button("Launch Tracy Window"))
-			{
+            ImGui::Text("Tracy Window:");
+            if (ImGui::Button("Launch Tracy Window"))
+            {
 #ifdef TRACY_ENABLE
-				if (auto profiler = profilerWeak.lock())
-				{
-					profiler->LaunchTracy();
-					LOG_INFO("  -> Tracy profiler launched successfully");
-				}
-				else
-				{
-					LOG_WARNING("  -> Tracy profiler reference expired.");
-				}
+                if (auto profiler = profilerWeak.lock())
+                {
+                    profiler->LaunchTracy();
+                    LOG_INFO("  -> Tracy profiler launched successfully");
+                }
+                else
+                {
+                    LOG_WARNING("  -> Tracy profiler reference expired.");
+                }
 #else
-				LOG_WARNING("  -> TRACY_ENABLE not defined. Skipping profiler launch.");
+                LOG_WARNING("  -> TRACY_ENABLE not defined. Skipping profiler launch.");
 #endif
-			}
+            }
 
-			ImGui::Separator();
-			// ========================= ImGui Graph Section =============================
-			float deltaTime = ts.GetSeconds();
-			float currFPS = (deltaTime > 0.0f) ? 1.0f / deltaTime : 0.0f;
-			float currFrameTime = ts.GetMilliseconds();
-			
-			// ======================= history statistics variables ============================
-			static const int FPS_HISTORY_SIZE = 90;  //store up to 90 frames
-			static float fpsHistory[FPS_HISTORY_SIZE] = {};
-			static float frameTimeHistory[FPS_HISTORY_SIZE] = {}; //for frame time
-			static int fpsHistoryOffset = 0;
-			static int frameCount = 0;
+            ImGui::Separator();
 
-			fpsHistory[fpsHistoryOffset] = currFPS;
-			frameTimeHistory[fpsHistoryOffset] = currFrameTime;
-			fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
-			frameCount = std::min(frameCount + 1, FPS_HISTORY_SIZE);
+            // Frame statistics
+            float deltaTime = ts.GetSeconds();
+            float currFPS = (deltaTime > 0.0f) ? 1.0f / deltaTime : 0.0f;
+            float currFrameTime = ts.GetMilliseconds();
 
-			//========================== update min/max statistics =============================
-			static float minFPS = FLT_MAX;
-			static float maxFPS = 0.0f;
-			static float minFrameTime = FLT_MAX;
-			static float maxFrameTime = 0.0f;
+            static const int FPS_HISTORY_SIZE = 90;
+            static float fpsHistory[FPS_HISTORY_SIZE] = {};
+            static float frameTimeHistory[FPS_HISTORY_SIZE] = {};
+            static int fpsHistoryOffset = 0;
+            static int frameCount = 0;
 
-			minFPS = std::min(minFPS, currFPS);
-			maxFPS = std::max(maxFPS, currFPS);
-			minFrameTime = std::min(minFrameTime, currFrameTime);
-			maxFrameTime = std::max(maxFrameTime, currFrameTime);
+            fpsHistory[fpsHistoryOffset] = currFPS;
+            frameTimeHistory[fpsHistoryOffset] = currFrameTime;
+            fpsHistoryOffset = (fpsHistoryOffset + 1) % FPS_HISTORY_SIZE;
+            frameCount = std::min(frameCount + 1, FPS_HISTORY_SIZE);
 
-			// ======================== Cal average ===================================
-			float avgFPS = 0.0f;
-			float avgFrameTime = 0.0f;
+            static float minFPS = FLT_MAX;
+            static float maxFPS = 0.0f;
+            static float minFrameTime = FLT_MAX;
+            static float maxFrameTime = 0.0f;
 
-			for (int i = 0; i < FPS_HISTORY_SIZE; i++)
-			{
-				avgFPS += fpsHistory[i];
-				avgFrameTime += frameTimeHistory[i];
-			}
+            minFPS = std::min(minFPS, currFPS);
+            maxFPS = std::max(maxFPS, currFPS);
+            minFrameTime = std::min(minFrameTime, currFrameTime);
+            maxFrameTime = std::max(maxFrameTime, currFrameTime);
 
-			avgFPS /= frameCount;
-			avgFrameTime /= frameCount;
+            float avgFPS = 0.0f;
+            float avgFrameTime = 0.0f;
 
-			// ======================= Showcase statistics ==============================
-			ImGui::Text("Frame Statistics:");
-			ImGui::Spacing();
-			//create a table to display statistics better
-			if (ImGui::BeginTable("StatsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
-			{
-				ImGui::TableSetupColumn("Metric", ImGuiTableColumnFlags_WidthFixed, 120.0f);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("Unit", ImGuiTableColumnFlags_WidthFixed, 40.0f);
-				ImGui::TableHeadersRow();
+            for (int i = 0; i < frameCount; i++)
+            {
+                avgFPS += fpsHistory[i];
+                avgFrameTime += frameTimeHistory[i];
+            }
 
-				// Average FPS
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("Average FPS:");
-				ImGui::TableNextColumn();
-				ImGui::Text("%.1f", avgFPS);
-				ImGui::TableNextColumn();
-				ImGui::Text("fps");
+            avgFPS /= frameCount;
+            avgFrameTime /= frameCount;
 
-				// Average Frame Time
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("Avg Frame Time:");
-				ImGui::TableNextColumn();
-				ImGui::Text("%.2f", avgFrameTime);
-				ImGui::TableNextColumn();
-				ImGui::Text("ms");
+            ImGui::Text("Frame Statistics:");
+            ImGui::Spacing();
 
-				// Min Frame Time
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("Min Frame Time:");
-				ImGui::TableNextColumn();
-				ImGui::Text("%.2f", minFrameTime);
-				ImGui::TableNextColumn();
-				ImGui::Text("ms");
+            if (ImGui::BeginTable("StatsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+            {
+                ImGui::TableSetupColumn("Metric", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+                ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Unit", ImGuiTableColumnFlags_WidthFixed, 40.0f);
+                ImGui::TableHeadersRow();
 
-				// Max Frame Time
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text("Max Frame Time:");
-				ImGui::TableNextColumn();
-				ImGui::Text("%.2f", maxFrameTime);
-				ImGui::TableNextColumn();
-				ImGui::Text("ms");
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Average FPS:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%.1f", avgFPS);
+                ImGui::TableNextColumn();
+                ImGui::Text("fps");
 
-				ImGui::EndTable();
-			}
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Avg Frame Time:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%.2f", avgFrameTime);
+                ImGui::TableNextColumn();
+                ImGui::Text("ms");
 
-			// ============================= showcase performance graphs section ======================
-			ImGui::Text("Performance Graphs:");
-			ImGui::Spacing();
-			float graphWidth = ImGui::GetContentRegionAvail().x;
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Min Frame Time:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%.2f", minFrameTime);
+                ImGui::TableNextColumn();
+                ImGui::Text("ms");
 
-			//----------------- FPS graph ---------------------
-			char fpsOverlay[64];
-			sprintf_s(fpsOverlay, sizeof(fpsOverlay), "FPS - avg %.1f", avgFPS);
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Max Frame Time:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%.2f", maxFrameTime);
+                ImGui::TableNextColumn();
+                ImGui::Text("ms");
 
-			float fpsMinScale = (avgFPS - 30.0f > 0.0f) ? (avgFPS - 30.0f) : 0.0f;
-			float fpsMaxScale = avgFPS + 30.0f;
+                ImGui::EndTable();
+            }
 
-			ImGui::PlotLines(
-				"##FPS",
-				fpsHistory,
-				FPS_HISTORY_SIZE,
-				fpsHistoryOffset,
-				fpsOverlay,
-				fpsMinScale,
-				fpsMaxScale,
-				ImVec2(graphWidth, 100.0f),
-				sizeof(float)
-			);
-			// ----------- frame time graph -------------
-			char frameTimeOverlay[64];
-			sprintf_s(frameTimeOverlay, sizeof(frameTimeOverlay), "Frame Time (ms) - avg %.2f", avgFrameTime);
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
 
-			// ---------- dynamic scaling ------------  
-			float ftMinScale = std::max(avgFrameTime - 5.0f, 0.0f);
-			float ftMaxScale = avgFrameTime + 5.0f;
+            ImGui::Text("Performance Graphs:");
+            ImGui::Spacing();
+            float graphWidth = ImGui::GetContentRegionAvail().x;
 
-			ImGui::PlotLines(
-				"##FrameTime",
-				frameTimeHistory,
-				FPS_HISTORY_SIZE,
-				fpsHistoryOffset,
-				frameTimeOverlay,
-				ftMinScale,
-				ftMaxScale,
-				ImVec2(graphWidth, 100.0f),
-				sizeof(float)
-			);
+            char fpsOverlay[64];
+            sprintf_s(fpsOverlay, sizeof(fpsOverlay), "FPS - avg %.1f", avgFPS);
 
-			ImGui::Spacing();
-			ImGui::Separator();
+            float fpsMinScale = (avgFPS - 30.0f > 0.0f) ? (avgFPS - 30.0f) : 0.0f;
+            float fpsMaxScale = avgFPS + 30.0f;
 
-			// ========= different coloring to indicate performance status ======= 
-			ImGui::Spacing();
-			if (currFPS >= 60.0f)
-			{
-				ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Performance: Excellent");
-			}
-			else if (currFPS >= 30.0f)
-			{
-				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Performance: Good");
-			}
-			else
-			{
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Performance: Poor");
-			}
+            ImGui::PlotLines(
+                "##FPS",
+                fpsHistory,
+                FPS_HISTORY_SIZE,
+                fpsHistoryOffset,
+                fpsOverlay,
+                fpsMinScale,
+                fpsMaxScale,
+                ImVec2(graphWidth, 100.0f),
+                sizeof(float)
+            );
 
-			ImGui::Spacing();
+            char frameTimeOverlay[64];
+            sprintf_s(frameTimeOverlay, sizeof(frameTimeOverlay), "Frame Time (ms) - avg %.2f", avgFrameTime);
 
-			if (ImGui::Begin("Performance Profile", &m_Editor->GetPerformanceProfileWindowRef()))
-			{
-				ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-				ImGui::Text("Frame Time: %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
-			}
+            float ftMinScale = std::max(avgFrameTime - 5.0f, 0.0f);
+            float ftMaxScale = avgFrameTime + 5.0f;
 
-			ImGui::End();
-		}
-		ImGui::End();
-	}
+            ImGui::PlotLines(
+                "##FrameTime",
+                frameTimeHistory,
+                FPS_HISTORY_SIZE,
+                fpsHistoryOffset,
+                frameTimeOverlay,
+                ftMinScale,
+                ftMaxScale,
+                ImVec2(graphWidth, 100.0f),
+                sizeof(float)
+            );
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (currFPS >= 60.0f)
+            {
+                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Performance: Excellent");
+            }
+            else if (currFPS >= 30.0f)
+            {
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Performance: Good");
+            }
+            else
+            {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Performance: Poor");
+            }
+
+            ImGui::Spacing();
+            ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+            ImGui::Text("Frame Time: %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
+        }
+
+        ImGui::End(); 
+    }
 }

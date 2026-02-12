@@ -461,8 +461,8 @@ namespace Engine
 	void EditorAssetBrowserPanel::DisplayAssetsBrowser()
 	{
 		ImGui::SetNextWindowSize(ImVec2(600, 400));
-
-		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
+		bool isOpen = ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		if (isOpen)
 		{
 			// ===== SEARCH BAR =====
 			ImGui::Text("Search:");
@@ -686,8 +686,8 @@ namespace Engine
 			ImGui::EndChild();
 			ImGui::Columns(1);
 
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
 #endif
@@ -1295,6 +1295,7 @@ namespace Engine
 			}
 			ImGui::EndTable();
 		}
+		//ImGui::EndChild();
 	}
 
 	void EditorAssetBrowserPanel::HandleAssetSelection(const DisplayableAsset& asset)
