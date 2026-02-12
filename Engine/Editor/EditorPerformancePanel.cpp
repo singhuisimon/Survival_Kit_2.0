@@ -37,7 +37,7 @@ namespace Engine
 
             // Theme Editor
             ImGui::Spacing();
-            ImGui::Separator();
+       
             ImGui::Text("Theme Settings:");
 
             static int currentTheme = 0;
@@ -56,6 +56,8 @@ namespace Engine
                 float currentScale = m_Editor->GetFontScale();
                 ImGui::GetStyle().ScaleAllSizes(currentScale);
             }
+            ImGui::Spacing();
+            ImGui::Separator();
 
             ImGui::Text("Tracy Window:");
             if (ImGui::Button("Launch Tracy Window"))

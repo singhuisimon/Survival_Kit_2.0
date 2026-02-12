@@ -162,7 +162,7 @@ namespace Engine
 
 					if (!newName.empty())
 					{
-						tag.Tag = newName;
+						tag.Name = newName;
 						MarkComponentOverridden(ComponentTypeID::Tag, "Name");
 
 					}
