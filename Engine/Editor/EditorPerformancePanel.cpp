@@ -41,7 +41,7 @@ namespace Engine
             ImGui::Text("Theme Settings:");
 
             static int currentTheme = 0;
-            const char* themes[] = { "Dark", "Light", "Classic" };
+            const char* themes[] = { "Dark", "Light", "Classic", "Red"};
 
             if (ImGui::Combo("Editor Theme", &currentTheme, themes, IM_ARRAYSIZE(themes)))
             {
@@ -50,6 +50,7 @@ namespace Engine
                 case 0: ImGui::StyleColorsDark(); break;
                 case 1: ImGui::StyleColorsLight(); break;
                 case 2: ImGui::StyleColorsClassic(); break;
+                case 3: ApplyCustomTheme(); break;
                 }
 
                 float currentScale = m_Editor->GetFontScale();
@@ -226,5 +227,56 @@ namespace Engine
         }
 
         ImGui::End(); 
+    }
+
+
+    void EditorPerformancePanel::ApplyCustomTheme()
+    {
+        ImGuiStyle& style = ImGui::GetStyle();
+        auto& colors = style.Colors;
+
+      
+        // --- Window & Background ---
+        colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.08f, 0.08f, 1.00f); // Deep Charcoal-Red
+        colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_PopupBg] = ImVec4(0.14f, 0.10f, 0.10f, 0.94f);
+        colors[ImGuiCol_Border] = ImVec4(0.35f, 0.20f, 0.20f, 0.50f); // Muted Red-Brown Border
+
+        // --- Headers (The blue bars you wanted to align) ---
+        colors[ImGuiCol_Header] = ImVec4(0.65f, 0.10f, 0.10f, 0.70f); // Crimson Header
+        colors[ImGuiCol_HeaderHovered] = ImVec4(0.85f, 0.15f, 0.15f, 0.80f); // Brighter Red on Hover
+        colors[ImGuiCol_HeaderActive] = ImVec4(0.95f, 0.20f, 0.20f, 1.00f);
+
+        // --- Buttons ---
+        colors[ImGuiCol_Button] = ImVec4(0.45f, 0.10f, 0.10f, 0.60f);
+        colors[ImGuiCol_ButtonHovered] = ImVec4(0.70f, 0.15f, 0.15f, 1.00f);
+        colors[ImGuiCol_ButtonActive] = ImVec4(0.90f, 0.10f, 0.10f, 1.00f);
+
+        // --- Tabs ---
+        colors[ImGuiCol_Tab] = ImVec4(0.20f, 0.10f, 0.10f, 0.80f);
+        colors[ImGuiCol_TabHovered] = ImVec4(0.75f, 0.15f, 0.15f, 0.80f);
+        colors[ImGuiCol_TabActive] = ImVec4(0.55f, 0.10f, 0.10f, 1.00f);
+        colors[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.08f, 0.08f, 1.00f);
+        colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.30f, 0.12f, 0.12f, 1.00f);
+
+        // --- Frame & Widgets (Inputs, Checkboxes) ---
+        colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.12f, 0.12f, 0.54f);
+        colors[ImGuiCol_FrameBgHovered] = ImVec4(0.45f, 0.15f, 0.15f, 0.40f);
+        colors[ImGuiCol_FrameBgActive] = ImVec4(0.60f, 0.15f, 0.15f, 0.67f);
+        colors[ImGuiCol_CheckMark] = ImVec4(0.95f, 0.20f, 0.20f, 1.00f);
+        colors[ImGuiCol_SliderGrab] = ImVec4(0.80f, 0.15f, 0.15f, 1.00f);
+        colors[ImGuiCol_SliderGrabActive] = ImVec4(1.00f, 0.25f, 0.25f, 1.00f);
+
+        // --- Title ---
+        colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.05f, 0.05f, 1.00f);
+        colors[ImGuiCol_TitleBgActive] = ImVec4(0.35f, 0.10f, 0.10f, 1.00f);
+
+        // --- Styling ---
+        style.WindowRounding = 4.0f;
+        style.FrameRounding = 3.0f;
+        style.PopupRounding = 4.0f;
+        style.GrabRounding = 3.0f;
+        style.TabRounding = 4.0f;
+        style.ScrollbarRounding = 9.0f;
     }
 }
