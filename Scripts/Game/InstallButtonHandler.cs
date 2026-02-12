@@ -82,6 +82,11 @@ namespace Game
         private uint bsodErrorSoundId;
         private uint[] errorPopupSoundIds = new uint[NUM_ERROR_POPUPS];
 
+        // Event names for popup coordination
+        private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
+        private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
+        private bool isPopupOpen = false;
+
         // State
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
@@ -237,11 +242,28 @@ namespace Game
 
             entitiesFound = true;
             wasMousePressed = false;
+            isPopupOpen = false;
+
+            // Subscribe to popup events to block input when popups are open
+            Event.Subscribe(EVENT_POPUP_OPENED, OnPopupOpened);
+            Event.Subscribe(EVENT_POPUP_CLOSED, OnPopupClosed);
 
             // Hide all elements initially (move off-screen)
             HideAllElements();
 
             LogMessage("InstallButtonHandler: Ready! All entities found.");
+        }
+
+        private void OnPopupOpened(string eventName, string payload)
+        {
+            isPopupOpen = true;
+            LogMessage("InstallButtonHandler: Popup opened (" + payload + ") - blocking input");
+        }
+
+        private void OnPopupClosed(string eventName, string payload)
+        {
+            isPopupOpen = false;
+            LogMessage("InstallButtonHandler: Popup closed (" + payload + ") - unblocking input");
         }
 
         private void HideAllElements()
@@ -289,8 +311,8 @@ namespace Game
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
 
-            // If sequence not started, check for install button click
-            if (!sequenceStarted && mouseJustPressed)
+            // If sequence not started, check for install button click (blocked when popup is open)
+            if (!sequenceStarted && mouseJustPressed && !isPopupOpen)
             {
                 if (Collision2D.IsMouseCollidingWithEntity(installButtonId))
                 {
@@ -397,7 +419,14 @@ namespace Game
                 sceneLoadTriggered = true;
                 LogMessage("InstallButtonHandler: Loading main game scene at " + bsodElapsedTime + "s");
                 LogMessage("Scene path: " + MAIN_GAME_SCENE_PATH);
-                Publish("LoadScene", MAIN_GAME_SCENE_PATH);
+                //Publish("LoadScene", MAIN_GAME_SCENE_PATH);
+
+                bool success = Scene.SceneLoadFromFile(MAIN_GAME_SCENE_PATH);
+                if (success)
+                {
+                    LogMessage("Main Game Level 1 loaded successfully!");
+                }
+
             }
         }
 
@@ -481,6 +510,8 @@ namespace Game
 
         public override void OnDestroy()
         {
+            Event.Unsubscribe(EVENT_POPUP_OPENED, OnPopupOpened);
+            Event.Unsubscribe(EVENT_POPUP_CLOSED, OnPopupClosed);
             LogMessage("InstallButtonHandler: Destroyed");
         }
     }

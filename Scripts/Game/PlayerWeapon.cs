@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Camera;
 using static Engine.Event;
 using static Engine.Audio;
+using static Engine.AudioManager;
 
 namespace Game
 {
@@ -28,7 +29,7 @@ namespace Game
         [SerializeField] private int primaryAmmo = 0;
         [SerializeField] private int primaryAmmoMax = 100;
         [SerializeField] private float primaryReloadDelay = 1.5f; //reloading time
-        [SerializeField] private float primaryShootRate = 0.05f;
+        [SerializeField] private float primaryShootRate = 0.1f;
         [SerializeField] private float primaryShootNext = 0.0f;
         [SerializeField] private float primarybulletSpeed = 10000.0f;
 
@@ -130,6 +131,7 @@ namespace Game
         private uint firingPointEntityID = 0;
         private uint playerEntityID = 0;
         private bool isKeyRPressedPreviously = false;
+        private bool wasTKeyPressed = false;
         private float elapsedTime = 0.0f;
 
         private float reloadFinishTime = 0.0f;
@@ -241,6 +243,20 @@ namespace Game
             {
                 PrimaryAltCharge_Reward();
             }
+
+            //Cheatcode - Skip to Level 2
+            bool tKeyPressed = Input.IsKeyPressed(KeyCode.T);
+            bool tKeyJustPressed = tKeyPressed && !wasTKeyPressed;
+            wasTKeyPressed = tKeyPressed;
+            if (tKeyJustPressed)
+            {
+                AudioManager.StopGroup(AudioType.BGM);
+                AudioManager.StopGroup(AudioType.SFX);
+                Input.SetCursorVisible(false);
+                //Event.Publish("LoadScene", "Resources/Sources/Scenes/level2_player.json");
+                bool loadSuccess = Scene.SceneLoadFromFile("Resources/Sources/Scenes/level2_player.json");
+            }
+
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;

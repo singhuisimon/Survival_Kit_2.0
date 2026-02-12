@@ -4,8 +4,12 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <type_traits>
+#include <cstdint>
+#include <cstdlib>
 
-namespace Engine {
+namespace Engine
+{
 
     // Forward declaration to avoid circular dependency
     class Scene;
@@ -14,14 +18,15 @@ namespace Engine {
      * @brief Registry for managing all systems in a scene
      * @details Handles system creation, destruction, and execution order
      */
-    class SystemRegistry {
+    class SystemRegistry
+    {
     public:
         SystemRegistry() = default;
         ~SystemRegistry() = default;
 
         // Delete copy operations
-        SystemRegistry(const SystemRegistry&) = delete;
-        SystemRegistry& operator=(const SystemRegistry&) = delete;
+        SystemRegistry(const SystemRegistry &) = delete;
+        SystemRegistry &operator=(const SystemRegistry &) = delete;
 
         /**
          * @brief Add a new system to the registry
@@ -31,12 +36,13 @@ namespace Engine {
          * @return Pointer to the created system
          */
         template<typename T, typename... Args>
-        T* AddSystem(Args&&... args) {
+        T *AddSystem(Args&&... args)
+        {
             static_assert(std::is_base_of<System, T>::value,
                 "T must inherit from System");
 
             auto system = std::make_unique<T>(std::forward<Args>(args)...);
-            T* ptr = system.get();
+            T *ptr = system.get();
 
             LOG_INFO("Adding system: ", system->GetName(),
                 " (Priority: ", system->GetPriority(), ")");
@@ -53,12 +59,15 @@ namespace Engine {
          * @return True if system was found and removed
          */
         template<typename T>
-        bool RemoveSystem() {
+        bool RemoveSystem()
+        {
             static_assert(std::is_base_of<System, T>::value,
                 "T must inherit from System");
 
-            for (auto it = m_Systems.begin(); it != m_Systems.end(); ++it) {
-                if (dynamic_cast<T*>(it->get())) {
+            for (auto it = m_Systems.begin(); it != m_Systems.end(); ++it)
+            {
+                if (dynamic_cast<T *>(it->get()))
+                {
                     LOG_INFO("Removing system: ", (*it)->GetName());
                     m_Systems.erase(it);
                     return true;
@@ -75,12 +84,15 @@ namespace Engine {
          * @return Pointer to system, or nullptr if not found
          */
         template<typename T>
-        T* GetSystem() {
+        T *GetSystem()
+        {
             static_assert(std::is_base_of<System, T>::value,
                 "T must inherit from System");
 
-            for (auto& system : m_Systems) {
-                if (T* ptr = dynamic_cast<T*>(system.get())) {
+            for (auto &system : m_Systems)
+            {
+                if (T *ptr = dynamic_cast<T *>(system.get()))
+                {
                     return ptr;
                 }
             }
@@ -93,12 +105,15 @@ namespace Engine {
          * @return True if system exists
          */
         template<typename T>
-        bool HasSystem() const {
+        bool HasSystem() const
+        {
             static_assert(std::is_base_of<System, T>::value,
                 "T must inherit from System");
 
-            for (const auto& system : m_Systems) {
-                if (dynamic_cast<T*>(system.get())) {
+            for (const auto &system : m_Systems)
+            {
+                if (dynamic_cast<T *>(system.get()))
+                {
                     return true;
                 }
             }
@@ -109,10 +124,18 @@ namespace Engine {
          * @brief Initialize all systems
          * @param scene The scene to initialize systems with
          */
-        void OnInit(Scene* scene) {
+        void OnInit(Scene *scene)
+        {
+            AssertOrAbort(scene != nullptr, "OnInit called with null Scene*");
+            AssertOrAbort(m_State == RegistryState::Uninitialized,
+                "OnInit called more than once (or after OnShutdown)");
+
+            m_State = RegistryState::Initialized;
+
             LOG_INFO("Initializing ", m_Systems.size(), " systems...");
 
-            for (auto& system : m_Systems) {
+            for (auto &system : m_Systems)
+            {
                 LOG_TRACE("  Initializing: ", system->GetName());
                 system->OnInit(scene);
             }
@@ -125,9 +148,16 @@ namespace Engine {
          * @param scene The scene to update
          * @param ts Time elapsed since last frame
          */
-        void OnUpdate(Scene* scene, Timestep ts) {
-            for (auto& system : m_Systems) {
-                if (system->IsEnabled()) {
+        void OnUpdate(Scene *scene, Timestep ts)
+        {
+            AssertOrAbort(scene != nullptr, "OnUpdate called with null Scene*");
+            AssertOrAbort(m_State == RegistryState::Initialized,
+                "OnUpdate called before OnInit (or after OnShutdown)");
+
+            for (auto &system : m_Systems)
+            {
+                if (system->IsEnabled())
+                {
                     system->OnUpdate(scene, ts);
                 }
             }
@@ -137,11 +167,19 @@ namespace Engine {
          * @brief Shutdown all systems
          * @param scene The scene being shut down
          */
-        void OnShutdown(Scene* scene) {
+        void OnShutdown(Scene *scene)
+        {
+            AssertOrAbort(scene != nullptr, "OnShutdown called with null Scene*");
+            AssertOrAbort(m_State == RegistryState::Initialized,
+                "OnShutdown called before OnInit (or called more than once)");
+
+            m_State = RegistryState::Shutdown;
+
             LOG_INFO("Shutting down ", m_Systems.size(), " systems...");
 
             // Shutdown in reverse order
-            for (auto it = m_Systems.rbegin(); it != m_Systems.rend(); ++it) {
+            for (auto it = m_Systems.rbegin(); it != m_Systems.rend(); ++it)
+            {
                 LOG_TRACE("  Shutting down: ", (*it)->GetName());
                 (*it)->OnShutdown(scene);
             }
@@ -153,34 +191,59 @@ namespace Engine {
         /**
          * @brief Get number of systems
          */
-        size_t GetSystemCount() const {
+        size_t GetSystemCount() const
+        {
             return m_Systems.size();
         }
 
         /**
          * @brief Get all systems (const)
          */
-        const std::vector<std::unique_ptr<System>>& GetSystems() const {
+        const std::vector<std::unique_ptr<System>> &GetSystems() const
+        {
             return m_Systems;
         }
 
     private:
+        enum class RegistryState : std::uint8_t
+        {
+            Uninitialized = 0,
+            Initialized = 1,
+            Shutdown = 2,
+        };
+
+        static void AssertOrAbort(bool condition, const char *message)
+        {
+            if (condition)
+            {
+                return;
+            }
+
+            // Always-on assertion: not compiled out in release builds.
+            LOG_ERROR("SystemRegistry assertion failed: ", message);
+            std::abort();
+        }
+
         /**
          * @brief Sort systems by priority (lower = earlier execution)
          */
-        void SortSystems() {
+        void SortSystems()
+        {
             std::sort(m_Systems.begin(), m_Systems.end(),
-                [](const std::unique_ptr<System>& a, const std::unique_ptr<System>& b) {
+                [](const std::unique_ptr<System> &a, const std::unique_ptr<System> &b)
+                {
                     return a->GetPriority() < b->GetPriority();
                 });
 
             // Log system order
             LOG_TRACE("System execution order:");
-            for (const auto& system : m_Systems) {
+            for (const auto &system : m_Systems)
+            {
                 LOG_TRACE("  [", system->GetPriority(), "] ", system->GetName());
             }
         }
 
+        RegistryState m_State = RegistryState::Uninitialized;
         std::vector<std::unique_ptr<System>> m_Systems;
     };
 

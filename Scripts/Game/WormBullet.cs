@@ -20,7 +20,9 @@ namespace Game
         public float Damage = 1.0f;
 
         // Target tags - entities this bullet can damage
-        private string[] TargetTags = { "Player", "Gunship" };
+        //private string[] TargetTags = { "Player", "Gunship" };
+        // Rio - Even though technically, Gunship is sufficient, adding GunshipHelper is extra caution
+        private string[] TargetTags = { "Player", "Gunship", "GunshipHelper" };
 
         // This bullet's own tag
         private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
@@ -35,6 +37,10 @@ namespace Game
         [SerializeField]
         private bool enableDebug = true;
 
+        // Game lose / win condition
+        private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
+
         public override void OnStart()
         {
             TagSetTag((uint)EntityID, "WormBullet");
@@ -44,6 +50,9 @@ namespace Game
                 LogMessage("WormBullet EntityID: " + EntityID);
                 LogMessage("Checking WormBullet components...");
             }
+
+            Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(GAMEWIN, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -242,6 +251,13 @@ namespace Game
         {
             if (enableDebug)
                 LogMessage("WormBullet " + EntityID + " destroyed");
+            Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(GAMEWIN, OnGameOver);
+        }
+
+        private void OnGameOver(string eventName, string payload)
+        {
+            SceneDestroyEntity(EntityID);
         }
     }
 }

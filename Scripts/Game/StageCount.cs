@@ -19,6 +19,9 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
 
+        private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string GAMEWIN = "GameWin";
+
         // ===== Settings =====
         [SerializeField("Stage Number")]
         private int stageNumber = 1;
@@ -32,6 +35,10 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
+
+            Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
+
 
             // Set stage text
             SetText((uint)EntityID, "STAGE " + stageNumber);

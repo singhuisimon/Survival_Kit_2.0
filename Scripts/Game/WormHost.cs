@@ -18,7 +18,7 @@ namespace Game
         [SerializeField] private bool isStationary = false;
         [SerializeField] private bool hasSplit = false;
 
-        [SerializeField] private float speed = 50f;
+        [SerializeField] private float speed = 100f;
         [SerializeField] private float stationaryTimer = 10.0f;
         private float timer = 0.0f;
 
@@ -118,8 +118,7 @@ namespace Game
                 direction.Z * invMag
             );
 
-            // Use the same method as Botnet - create rotation from forward to target
-            Vector3 forward = Vector3.Forward; // This should be (0, 0, -1) based on your engine
+            Vector3 forward = Vector3.Forward;
             Quat targetRot = QuaternionFromTo(forward, toTarget);
             SetRotation(EntityID, ref targetRot);
 

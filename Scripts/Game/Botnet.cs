@@ -24,8 +24,8 @@ namespace Game
         // ===== Serialized Fields (Editable in Inspector) =====
 
         // Movement
-        [SerializeField] private float acceleration = 200.0f;
-        [SerializeField] private float topSpeed = 300.0f;
+        [SerializeField] private float acceleration = 100.0f;
+        [SerializeField] private float topSpeed = 150.0f;
 
         // Rotation speed (how fast bot turns towards target)
         [SerializeField] private float rotateSpeed = 5.0f;
@@ -84,8 +84,8 @@ namespace Game
         private const string TAG_SEMICONDUCTOR = "SEMICONDUCTOR";
         private const string TAG_EMPLACEMENT = "EMPLACEMENT";
         private const string TAG_CORE_BARRIER = "CORE_BARRIER";
-        private const string TAG_ALLIES = "ALLIES";
-        //private const string TAG_ALLIES = "Gunship";
+        //private const string TAG_ALLIES = "ALLIES";
+        private const string TAG_ALLIES = "GunshipHelper";
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
         //private const string EVENT_BULLET_HIT = "BulletHit";
@@ -98,6 +98,9 @@ namespace Game
         // Pause state
         private Vector3 savedVelocity = Vector3.Zero;
         private bool wasPaused = false;
+
+        // Damage
+        private bool deliveredDamage = false;
 
         // ===== Lifecycle =====
 
@@ -366,6 +369,7 @@ namespace Game
                 return;
 
             int choice = RandomRangeInt(0, 4);
+            //int choice = 3; // detect Gunship only for testing
             LogMessage("[Botnet] CHOICE IS: " + choice.ToString() + "for entity: " + EntityID.ToString());
 
             uint chosen = INVALID_ENTITY;
@@ -551,20 +555,54 @@ namespace Game
                 if (other == playerID)
                 {
                     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") ATTACKED the Player!");
-                    Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    if(!deliveredDamage){
+                        Publish("BotnetAttackedPlayer", EntityID.ToString());
+                    }
                     PrefabInstantiate(DAMAGEPLAYERAUDIOPREFAB);
+                }
+
+                // Get the tag of what we collided with
+                string otherTag = TagGetTag(other);
+                
+                // Check if this is ANY valid target (not just our tracked targetID)
+                bool isValidTarget = (otherTag == TAG_PLAYER || 
+                                     otherTag == TAG_SEMICONDUCTOR || 
+                                     otherTag == TAG_EMPLACEMENT || 
+                                     otherTag == TAG_CORE_BARRIER ||
+                                     otherTag == TAG_ALLIES);
+                
+                if (isValidTarget)
+                {
+                    LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with valid target " + other + " (tag: " + otherTag + ")");
+                    
+                    if(!deliveredDamage){
+                        // Deal damage to any valid target we hit
+                        DamageSystem.DealDamage(other, blastDamage, (uint)EntityID);
+                    }
+
+                    isExploding = true;
+                    
+                    // Only explode if we hit our TRACKED target
+                    if (other == targetID)
+                    {
+                        LogMessage("[Botnet] Hit tracked target - exploding!");
+                    }
+
+                    break;
                 }
                 
                 // Check if hit target
-                if (other == targetID)
-                {
-                    LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
+                // if (other == targetID)
+                // {
+
+
+                //     LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") collided with target " + targetID);
                     
-                    //Temporary measure
-                    DamageSystem.DealDamage(targetID, blastDamage, (uint)EntityID);
-                    isExploding = true;
-                    break;
-                }
+                //     //Temporary measure
+                //     DamageSystem.DealDamage(targetID, blastDamage, (uint)EntityID);
+                //     isExploding = true;
+                //     break;
+                // }
             }
         }
 
@@ -621,7 +659,7 @@ namespace Game
                 if (distSq <= radiusSq)
                 {
                     LogMessage("HI FROM BOTNET WE ARE FUKED");
-                    DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
+                    //DamageSystem.DealDamage(id, blastDamage, (uint)EntityID);
                 }
             }
         }

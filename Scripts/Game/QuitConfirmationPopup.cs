@@ -72,6 +72,11 @@ namespace Game
         private uint yesButtonId;
         private uint noButtonId;
 
+        // Event names for popup coordination
+        private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
+        private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
+        private const string POPUP_ID_QUIT = "Quit";
+
         // State
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
@@ -116,6 +121,9 @@ namespace Game
             entitiesFound = true;
             isPopupVisible = false;
             wasMousePressed = false;
+
+            // Subscribe to popup coordination events
+            Event.Subscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
 
             LogMessage("QuitConfirmationPopup: All entities found, ready!");
             LogMessage("QuitConfirmationPopup: Shutdown Button ID: " + shutdownButtonId);
@@ -206,6 +214,15 @@ namespace Game
                    mousePos.Y >= minY && mousePos.Y <= maxY;
         }
 
+        private void OnOtherPopupOpened(string eventName, string payload)
+        {
+            if (payload != POPUP_ID_QUIT && isPopupVisible)
+            {
+                LogMessage("QuitConfirmationPopup: Another popup opened (" + payload + ") - closing quit popup");
+                HidePopup();
+            }
+        }
+
         private void ShowPopup()
         {
             if (isPopupVisible)
@@ -214,6 +231,7 @@ namespace Game
             isPopupVisible = true;
             isAnimating = true;
             animationTimer = 0.0f;
+            Event.Publish(EVENT_POPUP_OPENED, POPUP_ID_QUIT);
 
             // Move popup to center of screen
             Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
@@ -232,8 +250,11 @@ namespace Game
 
         private void HidePopup()
         {
+            bool wasVisible = isPopupVisible;
             isPopupVisible = false;
             isAnimating = false;
+            if (wasVisible)
+                Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID_QUIT);
 
             // Move entities off-screen
             Vector3 hidePos = hiddenPosition;
@@ -269,6 +290,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            Event.Unsubscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
             LogMessage("QuitConfirmationPopup: Destroyed");
         }
     }
