@@ -133,7 +133,11 @@ namespace Engine
 			
 			float scale = m_Editor->GetFontScale();
 			auto& tag = m_SelectedEntity.GetComponent<TagComponent>();
-		
+			/*if (tag.Name.empty() || tag.Name == "Entity")
+			{
+				tag.Name = tag.Tag;
+				MarkComponentOverridden(ComponentTypeID::Tag, "Name");
+			}*/
 			
 			bool isComponentOverridden = IsComponentOverridden(ComponentTypeID::Tag);
 			if (isComponentOverridden)
@@ -146,7 +150,7 @@ namespace Engine
 			
 			if (openTagComponent)
 			{
-				ImGui::PushItemWidth(200.0f * scale);
+				ImGui::PushItemWidth(500.0f * scale);
 				char buffer[256];
 				strncpy_s(buffer, sizeof(buffer), tag.Name.c_str(), _TRUNCATE);
 				if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
@@ -158,7 +162,7 @@ namespace Engine
 
 					if (!newName.empty())
 					{
-						tag.Name = newName;
+						tag.Tag = newName;
 						MarkComponentOverridden(ComponentTypeID::Tag, "Name");
 
 					}
@@ -6439,4 +6443,6 @@ namespace Engine
 
 		ImGui::PopID();
     }
+
+
 }

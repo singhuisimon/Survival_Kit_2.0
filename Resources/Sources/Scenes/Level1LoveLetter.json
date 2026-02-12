@@ -8,6 +8,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Level",
                         "Tag": "Level"
                     }
                 },
@@ -59,6 +60,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_7",
                         "Tag": "player_7"
                     }
                 },
@@ -83,7 +85,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -142,6 +147,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_6",
                         "Tag": "player_6"
                     }
                 },
@@ -166,7 +172,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -225,6 +234,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_5",
                         "Tag": "player_5"
                     }
                 },
@@ -249,7 +259,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -308,6 +321,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_4",
                         "Tag": "player_4"
                     }
                 },
@@ -332,7 +346,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -391,6 +408,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_3",
                         "Tag": "player_3"
                     }
                 },
@@ -415,7 +433,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -474,6 +495,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_2",
                         "Tag": "player_2"
                     }
                 },
@@ -498,7 +520,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -557,6 +582,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_1",
                         "Tag": "player_1"
                     }
                 },
@@ -581,7 +607,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -640,6 +669,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_0",
                         "Tag": "player_0"
                     }
                 },
@@ -664,7 +694,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -723,6 +756,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Player",
                         "Tag": "Player"
                     }
                 },
@@ -736,7 +770,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "player",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit2/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -751,7 +784,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Tag\":\"Player\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Tag\":\"Player\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 3,
@@ -795,7 +831,7 @@
                         ],
                         "Rotation": [
                             0.6036109328269958,
-                            0.3833671808242798,
+                            0.383367121219635,
                             -0.4662128686904907
                         ],
                         "Scale": [
@@ -828,7 +864,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.7135207653045654,
                         "FOV": 60.0,
                         "NearPlane": 0.10000000149011612,
                         "FarPlane": 1000.0,
@@ -894,6 +930,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -945,6 +982,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Trojan",
                         "Tag": "Trojan"
                     }
                 },
@@ -996,6 +1034,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Light",
                         "Tag": "Light"
                     }
                 },
@@ -1011,7 +1050,7 @@
                         "Rotation": [
                             -116.99600219726563,
                             -32.97199249267578,
-                            5.995058059692383
+                            5.995060443878174
                         ],
                         "Scale": [
                             1.0,
@@ -1052,6 +1091,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Core_1",
                         "Tag": "Core_1"
                     }
                 },
@@ -1103,6 +1143,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Core_2",
                         "Tag": "Core_2"
                     }
                 },
@@ -1154,6 +1195,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Core_3",
                         "Tag": "Core_3"
                     }
                 },
@@ -1205,6 +1247,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CorePad_1",
                         "Tag": "CorePad_1"
                     }
                 },
@@ -1256,6 +1299,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CorePad_2",
                         "Tag": "CorePad_2"
                     }
                 },
@@ -1307,6 +1351,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CorePad_3",
                         "Tag": "CorePad_3"
                     }
                 },
@@ -1358,6 +1403,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall1",
                         "Tag": "Wall1"
                     }
                 },
@@ -1409,6 +1455,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall2",
                         "Tag": "Wall2"
                     }
                 },
@@ -1460,6 +1507,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall3",
                         "Tag": "Wall3"
                     }
                 },
@@ -1511,6 +1559,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Level_Texture",
                         "Tag": "Level_Texture"
                     }
                 },
@@ -1541,7 +1590,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "6100530852782408029",
-                        "Mesh": "lvl1_level_design_v001.fbx",
+                        "Mesh": "",
                         "Material": "LevelDesign_GroundTexture.mat",
                         "Texture": "",
                         "Visible": true,
@@ -1562,6 +1611,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Dreadnought",
                         "Tag": "Dreadnought"
                     }
                 },
@@ -1613,6 +1663,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Cruiser",
                         "Tag": "Cruiser"
                     }
                 },
@@ -1664,6 +1715,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "BotNet",
                         "Tag": "BotNet"
                     }
                 },
@@ -1716,7 +1768,7 @@
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
             "Exposure": 1.0,
-            "GlobalBias": 1.0759999752044678
+            "GlobalBias": 0.004999999888241291
         }
     ]
 }

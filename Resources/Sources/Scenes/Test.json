@@ -3,113 +3,12 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 5242880,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "ToBeChildEntity"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14050492528244720899",
-                        "Position": [
-                            -59.62321472167969,
-                            2.7997546195983887,
-                            -30.642210006713867
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            5.900000095367432,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "11744649519031207173",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097156,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "ParentEntity"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15203414032847258773",
-                        "Position": [
-                            -48.670753479003906,
-                            15.452503204345703,
-                            -15.577117919921875
-                        ],
-                        "Rotation": [
-                            54.86376953125,
-                            35.1785774230957,
-                            178.12158203125
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "791895225262015639",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
             "ID": 2097155,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "lightsource",
                         "Tag": "lightsource"
                     }
                 },
@@ -156,6 +55,110 @@
                         "Strength": 1.0,
                         "Bias": 0.004999999888241291,
                         "NearPlane": 0.20000000298023224
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097156,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "ParentEntity",
+                        "Tag": "ParentEntity"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15203414032847258773",
+                        "Position": [
+                            -48.670753479003906,
+                            15.452503204345703,
+                            -15.577117919921875
+                        ],
+                        "Rotation": [
+                            54.863765716552734,
+                            35.17858123779297,
+                            178.12158203125
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "791895225262015639",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5242880,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "ToBeChildEntity",
+                        "Tag": "ToBeChildEntity"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14050492528244720899",
+                        "Position": [
+                            -59.62321472167969,
+                            2.7997546195983887,
+                            -30.642210006713867
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            5.900000095367432,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "11744649519031207173",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
                     }
                 }
             ]
