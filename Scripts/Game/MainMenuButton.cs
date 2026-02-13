@@ -21,6 +21,7 @@ namespace Game
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string GAMEWIN = "GameWin";
 
         // Configuration
         [SerializeField("Is Win Button")]
@@ -36,15 +37,10 @@ namespace Game
             LogMessage("MainMenuButton_WinLose EntityID: " + EntityID);
             LogMessage("Is Win Button: " + isWinButton);
 
-            if (isWinButton)
-            {
-                Event.Subscribe(EVENT_TIMER_FINISHED, OnShowCondition);
-            }
-            else
-            {
+
                 Event.Subscribe(EVENT_PLAYER_DEAD, OnShowCondition);
                 Event.Subscribe(EVENT_CORE_DESTROYED, OnShowCondition);
-            }
+            
 
             // Start invisible and inactive
             SetIsVisible((uint)EntityID, false);
@@ -96,7 +92,12 @@ namespace Game
                 GameState.IsPaused = false;
 
                 // Load main menu scene
-                Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                //Event.Publish("LoadScene", MAIN_MENU_SCENE_PATH);
+                bool success = Scene.SceneLoadFromFile(MAIN_MENU_SCENE_PATH);
+                if (success)
+                {
+                    LogMessage("Main Menu Scene loaded successfully!");
+                }
             }
         }
 
@@ -110,6 +111,7 @@ namespace Game
             if (isWinButton)
             {
                 Event.Unsubscribe(EVENT_TIMER_FINISHED, OnShowCondition);
+                Event.Unsubscribe(GAMEWIN, OnShowCondition);
             }
             else
             {

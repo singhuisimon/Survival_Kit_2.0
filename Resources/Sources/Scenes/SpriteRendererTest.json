@@ -8,6 +8,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SpriteRendererEntity",
                         "Tag": "SpriteRendererEntity"
                     }
                 },

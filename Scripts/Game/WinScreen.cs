@@ -41,6 +41,7 @@ namespace Game
             LogMessage("[WinScreen] Win! Timer finished!");
             StopGroup(AudioType.BGM);
             StopGroup(AudioType.SFX);
+            Input.SetCursorVisible(true);
             SetIsVisible((uint)EntityID, true);
             Publish(GAMEWIN, "");
         }

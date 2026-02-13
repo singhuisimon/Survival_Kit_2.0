@@ -37,11 +37,10 @@ namespace Engine
 		bool isPrefabScene = false;
 		if (ImGui::Begin("Hierarchy", &m_Editor->GetHierarchyWindowRef()))
 		{
-			if (m_Scene) {
+			if (!m_Editor->GetPrefabPath().empty()) {
 				std::string sceneName = m_Scene->GetName();
 				// Check if scene name indicates it's a prefab
-				isPrefabScene = (sceneName.find("Prefab:") == 0) ||
-					(sceneName.find("prefab") != std::string::npos);
+				isPrefabScene = true;
 			}
 			ImGui::BeginDisabled(isPrefabScene);
 			if (ImGui::Button("Create Entity"))
@@ -134,7 +133,7 @@ namespace Engine
 			ImGui::SetWindowSize(ImVec2(500, 400), ImGuiCond_Once);
 			if (entityToAttach && entityToAttach.HasComponent<TagComponent>())
 			{
-				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Tag.c_str());
+				ImGui::Text("Select a main entity to attach :", entityToAttach.GetComponent<TagComponent>().Name.c_str());
 			}
 			ImGui::Separator();
 			ImGui::BeginChild("##EntityListAttach", ImVec2(0, 300), true);
@@ -151,7 +150,7 @@ namespace Engine
 				// Only show main entities (no parent) that aren't the entity itself
 				if (transform.Parent == u32_max && entity != entityToAttach)
 				{
-					std::string entityName = entity.GetComponent<TagComponent>().Tag;
+					std::string entityName = entity.GetComponent<TagComponent>().Name;
 
 					// Make them selectable - user must CLICK to attach
 					if (ImGui::Selectable(entityName.c_str()))
@@ -163,7 +162,7 @@ namespace Engine
 						auto& childTransform = entityToAttach.GetComponent<TransformComponent>();
 						childTransform.SetParent(entity);
 
-						LOG_INFO("Attached '", entityToAttach.GetComponent<TagComponent>().Tag.c_str(),
+						LOG_INFO("Attached '", entityToAttach.GetComponent<TagComponent>().Name.c_str(),
 							"' as child of '", entityName.c_str(), "'");
 
 						entityToAttach = Entity{};  // Clear after successful attach
@@ -232,7 +231,7 @@ namespace Engine
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
 
-		bool openedTree = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Tag.c_str());
+		bool openedTree = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Name.c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -242,7 +241,7 @@ namespace Engine
 			m_Editor->SetCurrSelectedEntity(entity);
 			m_Editor->RetrievePickedID(static_cast<u32>(entity.GetHandle()));
 
-			LOG_DEBUG("Selected entity: ", tag.Tag.c_str());
+			LOG_DEBUG("Selected entity: ", tag.Name.c_str());
 			LOG_DEBUG("new currSelectedEntity: ", static_cast<uint32_t>(m_Editor->GetSelectedEntity().GetHandle()));
 			//LOG_DEBUG("NEW m_PickedID: ", m_PickedID);
 			LOG_DEBUG("Editor's picked ID: ", m_Editor->GetPickedID());
@@ -268,7 +267,7 @@ namespace Engine
 						// Only track if it has a valid prefabLocalID
 						if (entityPrefabComp.prefabLocalID != 0) {
 							std::string entityName = entity.HasComponent<TagComponent>()
-								? entity.GetComponent<TagComponent>().Tag : "Unknown";
+								? entity.GetComponent<TagComponent>().Name : "Unknown";
 
 							// Serialize entity data BEFORE deletion
 							std::string entityData = SerializeEntityForRevert(entity);
@@ -340,7 +339,7 @@ namespace Engine
 
 								if (childPrefabComp.prefabLocalID != 0) {
 									std::string childName = childEntity.HasComponent<TagComponent>()
-										? childEntity.GetComponent<TagComponent>().Tag : "Unknown";
+										? childEntity.GetComponent<TagComponent>().Name : "Unknown";
 
 									std::string childData = SerializeEntityForRevert(childEntity);
 
@@ -382,7 +381,7 @@ namespace Engine
 						if (currentSelectedEntity)
 						{
 							LOG_DEBUG(" ========== Start Create Prefab =========");
-							std::string entityName = currentSelectedEntity.GetComponent<TagComponent>().Tag;
+							std::string entityName = currentSelectedEntity.GetComponent<TagComponent>().Name;
 							//LOG_DEBUG(" entityName: ", entityName);
 							auto prefabPath = getAssetFilePath("Sources/Prefabs/") + entityName + ".prefab";
 							
@@ -542,10 +541,50 @@ namespace Engine
 
 	void EditorHierarchyPanel::DeleteEntityTree(Scene* scene) 
 	{
+		if (!scene || entitiesToDelete.empty()) return;
+		auto& registry = scene->GetRegistry();
+
+		// Calculate depth for each entity
+		std::vector<std::pair<Entity, int>> entitiesWithDepth;
+
 		for (auto& entity : entitiesToDelete) {
+			if (!registry.valid(entity.GetHandle())) continue;
+
+			// Calculate hierarchy depth
+			int depth = 0;
+			Entity current = entity;
+			while (current && current.HasComponent<TransformComponent>()) {
+				auto& transform = current.GetComponent<TransformComponent>();
+				if (transform.Parent == u32_max) break;
+
+				Entity parent(static_cast<entt::entity>(transform.Parent), &registry);
+				if (!registry.valid(parent.GetHandle())) break;
+
+				current = parent;
+				depth++;
+			}
+
+			entitiesWithDepth.push_back({ entity, depth });
+		}
+
+		// Sort by depth (highest = deepest = delete first)
+		std::sort(entitiesWithDepth.begin(), entitiesWithDepth.end(),
+			[](const auto& a, const auto& b) {
+				return a.second > b.second;
+			});
+
+		// Delete in order (children before parents)
+		for (auto& [entity, depth] : entitiesWithDepth) {
+			if (registry.valid(entity.GetHandle())) {
+				scene->DestroyEntity(entity);
+			}
+		}
+
+		entitiesToDelete.clear();
+		/*for (auto& entity : entitiesToDelete) {
 			scene->DestroyEntity(entity);
 		}
-		entitiesToDelete.clear();
+		entitiesToDelete.clear();*/
 	}
 
 	void EditorHierarchyPanel::CheckParentlessChildren(Scene* scene)
@@ -672,7 +711,7 @@ namespace Engine
 			// Add parent info display
 			if (parentOfPrefabEntity)
 			{
-				std::string parentName = parentOfPrefabEntity.GetComponent<TagComponent>().Tag;
+				std::string parentName = parentOfPrefabEntity.GetComponent<TagComponent>().Name;
 				ImGui::Text("Will attach to: %s", parentName.c_str());
 				ImGui::Separator();
 			}
@@ -696,6 +735,12 @@ namespace Engine
 						}
 						else
 						{
+							LOG_INFO("=== Instantiating prefab as sub-entity ===");
+							LOG_INFO("Prefab file: ", file.name);
+							if (parentOfPrefabEntity) {
+								LOG_INFO("Parent: ", parentOfPrefabEntity.GetComponent<TagComponent>().Name);
+							}
+
 							Entity prefabInstance = PrefabInstantiator::InstantiatePrefabFromFile(
 								scene,
 								file.fullPath,
@@ -704,9 +749,56 @@ namespace Engine
 
 							if (prefabInstance)
 							{
+								LOG_INFO("Prefab instantiated successfully");
+
+								// === CRITICAL: Ensure parent-child relationship ===
+								if (parentOfPrefabEntity &&
+									prefabInstance.HasComponent<TransformComponent>() &&
+									parentOfPrefabEntity.HasComponent<TransformComponent>())
+								{
+									auto& childTransform = prefabInstance.GetComponent<TransformComponent>();
+
+									// Double-check parent is set
+									if (childTransform.Parent != static_cast<u32>(parentOfPrefabEntity.GetHandle()))
+									{
+										LOG_WARNING("Parent not set by InstantiatePrefabFromFile, setting manually");
+										TransformSystem::SetParent(scene, prefabInstance.GetHandle(), parentOfPrefabEntity.GetHandle());
+									}
+
+									// === Add to parent's PrefabComponent childEntityIDs ===
+									if (parentOfPrefabEntity.HasComponent<PrefabComponent>())
+									{
+										auto& parentPrefabComp = parentOfPrefabEntity.GetComponent<PrefabComponent>();
+										u32 newEntityHandle = static_cast<u32>(prefabInstance.GetHandle());
+
+										// Check if not already in the list
+										auto it = std::find(parentPrefabComp.childEntityIDs.begin(),
+											parentPrefabComp.childEntityIDs.end(),
+											newEntityHandle);
+
+										if (it == parentPrefabComp.childEntityIDs.end())
+										{
+											parentPrefabComp.childEntityIDs.push_back(newEntityHandle);
+											LOG_INFO("Added entity ", newEntityHandle, " to parent's childEntityIDs");
+										}
+
+										// === Track as added entity in prefab root ===
+										Entity parentPrefabRoot = FindPrefabRoot(parentOfPrefabEntity);
+										if (parentPrefabRoot && parentPrefabRoot.HasComponent<PrefabComponent>())
+										{
+											auto& rootPrefabComp = parentPrefabRoot.GetComponent<PrefabComponent>();
+											rootPrefabComp.MarkEntityAdded(newEntityHandle);
+											LOG_INFO("Tracked addition of prefab sub-entity in root prefab");
+										}
+									}
+
+									LOG_INFO("Parent-child relationship confirmed");
+								}
+
 								// Select the newly created entity
 								m_Editor->SetCurrSelectedEntity(prefabInstance);
 								m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabInstance.GetHandle()));
+
 							}
 							else {
 								LOG_ERROR("Failed to instantiate prefab: ", file.fullPath);
@@ -758,7 +850,7 @@ namespace Engine
 				return;
 			}
 
-			std::string entityName = entityToReplace.GetComponent<TagComponent>().Tag;
+			std::string entityName = entityToReplace.GetComponent<TagComponent>().Name;
 			ImGui::Text("Replace entity '%s' with prefab:", entityName.c_str());
 			ImGui::Separator();
 
@@ -911,7 +1003,7 @@ namespace Engine
 	}
 
 	std::string EditorHierarchyPanel::SerializeEntityForRevert(Entity entity) {
-		// This is a simplified version - you can expand it to serialize full entity state
+		
 		if (!entity) {
 			return "";
 		}
@@ -923,9 +1015,13 @@ namespace Engine
 		// Add entity name
 		if (entity.HasComponent<TagComponent>()) {
 			auto& tag = entity.GetComponent<TagComponent>();
+			doc.AddMember("Name",
+				rapidjson::Value(tag.Name.c_str(), allocator), allocator);
 			doc.AddMember("Tag",
 				rapidjson::Value(tag.Tag.c_str(), allocator), allocator);
 		}
+
+
 
 		// Serialize ALL components
 		rapidjson::Value componentsArray(rapidjson::kArrayType);

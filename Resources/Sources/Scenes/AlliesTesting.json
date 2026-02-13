@@ -3,256 +3,12 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048583,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "ALLIES"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6979445261110608225",
-                        "Position": [
-                            -25.5,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.07999999821186066,
-                            0.07999999821186066,
-                            0.07999999821186066
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "9861749022628577637",
-                        "Mesh": "A9005_gunship_v001.fbx",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "15626356545662796131",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ScriptClassName": "Game.GunshipScript",
-                        "Fields": {
-                            "gunshipEntity": "GUNSHIP1",
-                            "maxHealth": 75.0,
-                            "fireRate": 0.10000000149011612,
-                            "turretRange": 600.0,
-                            "turretRotationSpeed": 5.0,
-                            "bulletSpeed": 3000.0,
-                            "bulletPrefabPath": "Sources/Prefabs/NormalTurretBullet.prefab"
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048576,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Gunship"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3179234006367487033",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "5485077015581180987",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 2,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "9520302281705145405",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048577,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Dreadnought"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3179234006367487029",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048578,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Cruiser"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "11826145290918839345",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                }
-            ]
-        },
-        {
             "ID": 1048584,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "adware",
                         "Tag": "adware"
                     }
                 },
@@ -266,7 +22,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Adware",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Adware.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Adware.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -281,7 +37,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10401046214794616929\",\"Tag\":\"Enemy_Adware\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10401046214794616929\",\"Tag\":\"Enemy_Adware\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -371,11 +130,164 @@
             ]
         },
         {
+            "ID": 1048578,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Cruiser",
+                        "Tag": "Cruiser"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11826145290918839345",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048577,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Dreadnought",
+                        "Tag": "Dreadnought"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3179234006367487029",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048576,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Gunship",
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3179234006367487033",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "5485077015581180987",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 2,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "9520302281705145405",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
             "ID": 1048580,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Enemy",
                         "Tag": "Enemy"
                     }
                 },

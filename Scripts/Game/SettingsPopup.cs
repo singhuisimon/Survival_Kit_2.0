@@ -8,6 +8,8 @@ using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Transform;
+using static Game.AudioSettings;  // ADD THIS LINE
+
 
 namespace Game
 {
@@ -73,6 +75,13 @@ namespace Game
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
 
+        private float volumeFill1InitialWidth;
+        private float volumeFill2InitialWidth;
+        private float volumeFill3InitialWidth;
+        private Vector3 volumeFill1InitialPosition;
+        private Vector3 volumeFill2InitialPosition;
+        private Vector3 volumeFill3InitialPosition;
+
         public override void OnStart()
         {
             LogMessage("SettingsPopup: Initializing...");
@@ -102,6 +111,31 @@ namespace Game
             if (settingsPopupId == 0) LogError("SettingsPopup: Could not find: " + SETTINGS_POPUP_NAME);
             if (closeButtonId == 0) LogError("SettingsPopup: Could not find: " + CLOSE_BUTTON_NAME);
 
+            // Store initial widths and positions for volume fills (horizontal bars)
+            if (volumeFill1Id != 0)
+            {
+                Vector3 scale1 = GetScale(volumeFill1Id);
+                volumeFill1InitialWidth = scale1.X;
+                volumeFill1InitialPosition = volumeFill1VisiblePos;  // USE THE VISIBLE POSITION, NOT GetPosition!
+                LogMessage("SettingsPopup: Volume Fill 1 initial width = " + volumeFill1InitialWidth);
+            }
+
+            if (volumeFill2Id != 0)
+            {
+                Vector3 scale2 = GetScale(volumeFill2Id);
+                volumeFill2InitialWidth = scale2.X;
+                volumeFill2InitialPosition = volumeFill2VisiblePos;  // USE THE VISIBLE POSITION, NOT GetPosition!
+                LogMessage("SettingsPopup: Volume Fill 2 initial width = " + volumeFill2InitialWidth);
+            }
+
+            if (volumeFill3Id != 0)
+            {
+                Vector3 scale3 = GetScale(volumeFill3Id);
+                volumeFill3InitialWidth = scale3.X;
+                volumeFill3InitialPosition = volumeFill3VisiblePos;  // USE THE VISIBLE POSITION, NOT GetPosition!
+                LogMessage("SettingsPopup: Volume Fill 3 initial width = " + volumeFill3InitialWidth);
+            }
+
             entitiesFound = true;
             isPopupVisible = false;
             wasMousePressed = false;
@@ -111,6 +145,8 @@ namespace Game
 
             // Hide all popup elements initially
             HidePopup();
+
+
 
             LogMessage("SettingsPopup: Ready!");
         }
@@ -141,6 +177,73 @@ namespace Game
                     LogMessage("SettingsPopup: Close button clicked");
                     HidePopup();
                     return;
+                }
+
+                // Check volume buttons
+                if (AudioSettings.Instance != null)
+                {
+                    // Volume Fill 1 - Master Volume
+                    if (plusButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(plusButton1Id))
+                    {
+                        float currentVolume = AudioSettings.Instance.GetMasterVolume();
+                        AudioSettings.Instance.SetMasterVolume(currentVolume + 0.1f);
+                        LogMessage("SettingsPopup: Master Volume + (Now: " + AudioSettings.Instance.GetMasterVolume().ToString("F2") + ")");
+                        UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(),
+                                             volumeFill1InitialWidth, volumeFill1InitialPosition);
+                        return;
+                    }
+
+                    if (minusButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(minusButton1Id))
+                    {
+                        float currentVolume = AudioSettings.Instance.GetMasterVolume();
+                        AudioSettings.Instance.SetMasterVolume(currentVolume - 0.1f);
+                        LogMessage("SettingsPopup: Master Volume - (Now: " + AudioSettings.Instance.GetMasterVolume().ToString("F2") + ")");
+                        UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(),
+                                             volumeFill1InitialWidth, volumeFill1InitialPosition);
+                        return;
+                    }
+
+                    // Volume Fill 2 - BGM Volume
+                    if (plusButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(plusButton2Id))
+                    {
+                        float currentVolume = AudioSettings.Instance.GetBGMVolume();
+                        AudioSettings.Instance.SetBGMVolume(currentVolume + 0.1f);
+                        LogMessage("SettingsPopup: BGM Volume + (Now: " + AudioSettings.Instance.GetBGMVolume().ToString("F2") + ")");
+                        UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(),
+                                             volumeFill2InitialWidth, volumeFill2InitialPosition);
+                        return;
+                    }
+
+                    if (minusButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(minusButton2Id))
+                    {
+                        float currentVolume = AudioSettings.Instance.GetBGMVolume();
+                        AudioSettings.Instance.SetBGMVolume(currentVolume - 0.1f);
+                        LogMessage("SettingsPopup: BGM Volume - (Now: " + AudioSettings.Instance.GetBGMVolume().ToString("F2") + ")");
+                        UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(),
+                                             volumeFill2InitialWidth, volumeFill2InitialPosition);
+                        return;
+                    }
+
+                    // Volume Fill 3 - SFX Volume
+                    if (plusButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(plusButton3Id))
+                    {
+                        float currentVolume = AudioSettings.Instance.GetSFXVolume();
+                        AudioSettings.Instance.SetSFXVolume(currentVolume + 0.1f);
+                        LogMessage("SettingsPopup: SFX Volume + (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
+                        UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(),
+                                             volumeFill3InitialWidth, volumeFill3InitialPosition);
+                        return;
+                    }
+
+                    if (minusButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(minusButton3Id))
+                    {
+                        float currentVolume = AudioSettings.Instance.GetSFXVolume();
+                        AudioSettings.Instance.SetSFXVolume(currentVolume - 0.1f);
+                        LogMessage("SettingsPopup: SFX Volume - (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
+                        UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(),
+                                             volumeFill3InitialWidth, volumeFill3InitialPosition);
+                        return;
+                    }
                 }
 
                 // Check if clicked outside popup to close
@@ -191,6 +294,14 @@ namespace Game
             if (volumeFill2Id != 0) SetPosition(volumeFill2Id, ref volumeFill2VisiblePos);
             if (volumeFill3Id != 0) SetPosition(volumeFill3Id, ref volumeFill3VisiblePos);
 
+            
+                UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(),
+                                     volumeFill1InitialWidth, volumeFill1InitialPosition);
+                UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(),
+                                     volumeFill2InitialWidth, volumeFill2InitialPosition);
+                UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(),
+                                     volumeFill3InitialWidth, volumeFill3InitialPosition);
+            
             LogMessage("SettingsPopup: Popup shown");
         }
 
@@ -218,6 +329,53 @@ namespace Game
             if (volumeFill3Id != 0) SetPosition(volumeFill3Id, ref hidePos2);
 
             LogMessage("SettingsPopup: Popup hidden");
+        }
+
+        // ADD THIS METHOD:
+        /// <summary>
+        /// Updates the volume fill bar visual width based on volume (0.0 to 1.0)
+        /// Horizontal bar - adjusts width and position to keep left edge fixed
+        /// </summary>
+        private void UpdateVolumeFillVisual(uint volumeFillId, float volume, float initialWidth, Vector3 initialPosition)
+        {
+            LogMessage("UpdateVolumeFillVisual called: volumeFillId=" + volumeFillId + " volume=" + volume + " initialWidth=" + initialWidth);
+
+            if (volumeFillId == 0)
+            {
+                LogMessage("UpdateVolumeFillVisual: volumeFillId is 0, returning");
+                return;
+            }
+
+            // Clamp volume to 0-1 range
+            if (volume < 0.0f) volume = 0.0f;
+            if (volume > 1.0f) volume = 1.0f;
+
+            // Calculate new width based on volume
+            float newWidth = initialWidth * volume;
+            LogMessage("UpdateVolumeFillVisual: newWidth calculated = " + newWidth);
+
+            // Get current scale
+            Vector3 currentScale = GetScale(volumeFillId);
+            LogMessage("UpdateVolumeFillVisual: current scale = " + currentScale.X + ", " + currentScale.Y);
+
+            // Update scale with new width
+            Vector3 newScale = new Vector3(
+                newWidth,           // Width based on volume
+                currentScale.Y,     // Keep height
+                currentScale.Z      // Keep depth
+            );
+            SetScale(volumeFillId, ref newScale);
+            LogMessage("UpdateVolumeFillVisual: new scale set = " + newWidth + ", " + currentScale.Y);
+
+            // Adjust position to keep LEFT edge fixed
+            float widthDifference = initialWidth - newWidth;
+            Vector3 newPosition = new Vector3(
+                initialPosition.X - widthDifference,
+                initialPosition.Y,
+                initialPosition.Z
+            );
+            SetPosition(volumeFillId, ref newPosition);
+            LogMessage("UpdateVolumeFillVisual: new position set = " + newPosition.X + ", " + newPosition.Y);
         }
 
         public override void OnDestroy()

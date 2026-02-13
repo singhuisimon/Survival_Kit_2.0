@@ -88,6 +88,61 @@ namespace Engine
             return Entity{};
         }
         RebuildPrefabHierarchy(prefab, localIDToEntity, scene);
+        if (parent && parent.HasComponent<TransformComponent>() &&
+            rootEntity.HasComponent<TransformComponent>()) {
+
+            LOG_INFO("=== Setting up scene parent relationship ===");
+
+            auto& rootTransform = rootEntity.GetComponent<TransformComponent>();
+            auto& parentTransform = parent.GetComponent<TransformComponent>();
+
+            // Set the parent
+            rootTransform.Parent = static_cast<u32>(parent.GetHandle());
+
+            // Add to parent's children
+            u32 rootHandle = static_cast<u32>(rootEntity.GetHandle());
+            auto it = std::find(parentTransform.Children.begin(),
+                parentTransform.Children.end(),
+                rootHandle);
+            if (it == parentTransform.Children.end()) {
+                parentTransform.Children.push_back(rootHandle);
+                LOG_INFO("Added prefab root to parent's children list");
+            }
+            //if (parent.HasComponent<PrefabComponent>()) {
+            //    auto& parentPrefabComp = parent.GetComponent<PrefabComponent>();
+
+            //    // Add root entity to parent's child tracking
+            //    if (std::find(parentPrefabComp.childEntityIDs.begin(),
+            //        parentPrefabComp.childEntityIDs.end(),
+            //        rootHandle) == parentPrefabComp.childEntityIDs.end()) {
+            //        parentPrefabComp.childEntityIDs.push_back(rootHandle);
+            //        LOG_INFO("Added prefab root to parent's PrefabComponent childEntityIDs");
+            //    }
+            //}
+            if (parent.HasComponent<PrefabComponent>()) {
+                auto& parentPrefabComp = parent.GetComponent<PrefabComponent>();
+
+                LOG_INFO("Adding all ", localIDToEntity.size(), " prefab entities to scene parent tracking");
+
+                // Add ALL entities from the prefab to parent's child tracking
+                for (const auto& [localID, entity] : localIDToEntity) {
+                    u32 entityHandle = static_cast<u32>(entity.GetHandle());
+
+                    // Check if not already in the list
+                    auto childIt = std::find(parentPrefabComp.childEntityIDs.begin(),
+                        parentPrefabComp.childEntityIDs.end(),
+                        entityHandle);
+
+                    if (childIt == parentPrefabComp.childEntityIDs.end()) {
+                        parentPrefabComp.childEntityIDs.push_back(entityHandle);
+                        LOG_DEBUG("  Added entity ", entityHandle, " to scene parent's childEntityIDs");
+                    }
+                }
+            }
+
+            LOG_INFO("=== Scene parent relationship established ===");
+        }
+
         PrefabComponent* prefabComp = nullptr;
         if (rootEntity.HasComponent<PrefabComponent>()) {
             prefabComp = &rootEntity.GetComponent<PrefabComponent>();
@@ -124,7 +179,7 @@ namespace Engine
         }
 
         std::string rootEntityName = rootEntity.HasComponent<TagComponent>()
-            ? rootEntity.GetComponent<TagComponent>().Tag
+            ? rootEntity.GetComponent<TagComponent>().Name
             : "Unknown";
 
         LOG_INFO("Successfully instantiated prefab '", prefab.name,
@@ -289,7 +344,7 @@ namespace Engine
             Entity addedEntity(static_cast<entt::entity>(addedHandle), &scene->GetRegistry());
             if (addedEntity) {
                 std::string entityName = addedEntity.HasComponent<TagComponent>()
-                    ? addedEntity.GetComponent<TagComponent>().Tag : "Unknown";
+                    ? addedEntity.GetComponent<TagComponent>().Name : "Unknown";
                 LOG_INFO("Removing added entity: ", entityName);
                 scene->DestroyEntity(addedEntity);
 
@@ -727,9 +782,9 @@ namespace Engine
         }
 
         // ========================================================================
-        // STEP 1: Apply component overrides to existing entities
+        // Apply component overrides to existing entities
         // ========================================================================
-        LOG_INFO("Step 1: Applying component overrides to existing entities");
+      
         ApplyEntityOverrides(entity, scene, &prefab.entities[0]);
 
         for (u32 childID : prefabComp.childEntityIDs) {
@@ -739,7 +794,7 @@ namespace Engine
             PrefabEntityData* childPrefabData = nullptr;
 
             if (childEntity.HasComponent<TagComponent>()) {
-                std::string childName = childEntity.GetComponent<TagComponent>().Tag;
+                std::string childName = childEntity.GetComponent<TagComponent>().Name;
                 for (auto& prefabEntity : prefab.entities) {
                     if (prefabEntity.name == childName && prefabEntity.parentLocalID == prefab.entities[0].localID) {
                         childPrefabData = &prefabEntity;
@@ -760,10 +815,8 @@ namespace Engine
         }
 
         // ========================================================================
-        // STEP 2: Remove deleted entities from prefab
+        // Remove deleted entities from prefab
         // ========================================================================
-        LOG_INFO("Step 2: Removing deleted entities from prefab");
-
         std::set<u32> existingSceneHandles;
         existingSceneHandles.insert(static_cast<u32>(entity.GetHandle()));
         for (u32 childID : prefabComp.childEntityIDs) {
@@ -788,9 +841,9 @@ namespace Engine
         }
 
         // ========================================================================
-        // STEP 3: Add new entities to prefab (ADDED components - not full entities)
+        //  Add new entities to prefab (ADDED components - not full entities)
         // ========================================================================
-        LOG_INFO("Step 3: Applying added/removed components to prefab");
+    
         u32 nextLocalID = 1;
         for (const auto& prefabEntity : prefab.entities) {
             if (prefabEntity.localID >= nextLocalID) {
@@ -814,7 +867,7 @@ namespace Engine
                 if (!childEntity) continue;
 
                 std::string childName = childEntity.HasComponent<TagComponent>()
-                    ? childEntity.GetComponent<TagComponent>().Tag
+                    ? childEntity.GetComponent<TagComponent>().Name
                     : "Unknown";
 
                 LOG_INFO("Adding new entity: ", childName);
@@ -923,6 +976,7 @@ namespace Engine
 
         // Save the modified prefab back to disk
         std::string prefabPath = PrefabRegistry::Get().GetPrefabPath(prefabComp.PrefabAssetGuid);
+
         if (prefabPath.empty()) {
             LOG_ERROR("Could not find prefab path for GUID: ", prefabComp.PrefabAssetGuid.m_Value);
             return false;
@@ -932,6 +986,11 @@ namespace Engine
 
         if (!PrefabSerializer::SerializePrefab(prefab, prefabPath)) {
             LOG_ERROR("Failed to save prefab to: ", prefabPath);
+            return false;
+        }
+        std::string resourcesPath = convertAssetPathToRootResources(prefabPath);
+        if (!PrefabSerializer::SerializePrefab(prefab, resourcesPath)) {
+            LOG_ERROR("Failed to save prefab to: ", resourcesPath);
             return false;
         }
 
@@ -1164,7 +1223,7 @@ namespace Engine
         }
 
         LOG_INFO("Reverting entity: ", entity.HasComponent<TagComponent>() ?
-            entity.GetComponent<TagComponent>().Tag : "Unknown");
+            entity.GetComponent<TagComponent>().Name : "Unknown");
 
         // Restore removed components
         auto removedComponents = prefabComp.GetRemovedComponents();
@@ -1230,7 +1289,7 @@ namespace Engine
         auto& prefabComp = entity.GetComponent<PrefabComponent>();
 
         LOG_INFO("Applying overrides for entity: ",
-            entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().Tag : "Unknown");
+            entity.HasComponent<TagComponent>() ? entity.GetComponent<TagComponent>().Name : "Unknown");
 
         // Handle removed components
         auto removedComponents = prefabComp.GetRemovedComponents();
@@ -1365,7 +1424,10 @@ namespace Engine
             }
 
             Entity sceneEntity = it->second;
-
+            if (!sceneEntity || !scene->GetRegistry().valid(sceneEntity.GetHandle())) {
+                LOG_WARNING("Invalid entity for: ", prefabEntity.name);
+                continue;
+            }
             if (!sceneEntity.HasComponent<TransformComponent>()) {
                 LOG_WARNING("Entity missing TransformComponent: ", prefabEntity.name);
                 continue;
@@ -1379,7 +1441,10 @@ namespace Engine
                 auto parentIt = localIDToEntity.find(prefabEntity.parentLocalID);
                 if (parentIt != localIDToEntity.end()) {
                     Entity parentEntity = parentIt->second;
-
+                    if (!parentEntity || !scene->GetRegistry().valid(parentEntity.GetHandle())) {
+                        LOG_WARNING("Invalid parent entity for: ", prefabEntity.name);
+                        continue;
+                    }
                     if (parentEntity && parentEntity.HasComponent<TransformComponent>()) {
                         auto& parentTransform = parentEntity.GetComponent<TransformComponent>();
                         u32 childHandle = static_cast<u32>(sceneEntity.GetHandle());
@@ -1423,7 +1488,7 @@ namespace Engine
 
             // Find this entity in the prefab by name
             if (current.HasComponent<TagComponent>()) {
-                std::string name = current.GetComponent<TagComponent>().Tag;
+                std::string name = current.GetComponent<TagComponent>().Name;
 
                 for (const auto& prefabEntity : prefab.entities) {
                     if (prefabEntity.name == name) {

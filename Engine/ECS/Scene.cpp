@@ -81,12 +81,28 @@ namespace Engine {
             Entity entity(entityHandle, &m_Registry);
             const auto& tag = entity.GetComponent<TagComponent>();
 
-            if (tag.Tag == name) {
+            if (tag.Name == name) {
                 return entity;
             }
         }
 
         LOG_WARNING("Scene: Entity with name '", name, "' not found");
+        return Entity(); // Invalid entity
+    }
+
+    Entity Scene::FindEntityByTag(const std::string& tag) {
+        auto view = m_Registry.view<TagComponent>();
+
+        for (auto entityHandle : view) {
+            Entity entity(entityHandle, &m_Registry);
+            const auto& tagComponent = entity.GetComponent<TagComponent>();
+
+            if (tagComponent.Tag == tag) {
+                return entity;
+            }
+        }
+
+        LOG_WARNING("Scene: Entity with name '", tag, "' not found");
         return Entity(); // Invalid entity
     }
 

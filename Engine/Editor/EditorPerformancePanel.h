@@ -21,6 +21,7 @@ namespace Engine
 		~EditorPerformancePanel() = default;
 
 		void PerformanceProfilePanel(Timestep ts);
+		void ApplyCustomTheme();
 	};
 }
 

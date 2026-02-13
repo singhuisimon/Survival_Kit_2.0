@@ -1,2034 +1,2981 @@
 {
-  "Scene": "MainMenu",
-  "Version": "1.0",
-  "Entities": [
-    {
-      "ID": 0,
-      "Name": "Main Menu Camera",
-      "Components": [
+    "Scene": "MainMenu",
+    "Version": "1.0",
+    "Entities": [
         {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Main Menu Camera",
-            "Active": true
-          }
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Main Menu Camera",
+                        "Tag": "Main Menu Camera"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2589658315428144855",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            10.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": true,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.7135207653045654,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ]
+                    }
+                }
+            ]
         },
         {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, 360.0, 10.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Main Menu Background",
+                        "Tag": "Main Menu Background"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9507187343069226717",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "WindowsBG.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
         },
         {
-          "Type": "CameraComponent",
-          "Properties": {
-            "Enabled": true,
-            "Primary": true,
-            "Projection": true,
-            "autoAspect": true,
-            "Size": [0.0, 20.0],
-            "Depth": 0,
-            "Aspect": 1.7777777910232544,
-            "FOV": 45.0,
-            "NearPlane": 0.5,
-            "FarPlane": 1000.0,
-            "Target": [640.0, 360.0, 0.0]
-          }
+            "ID": 2,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shutdown Button",
+                        "Tag": "Shutdown Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191139",
+                        "Position": [
+                            65.0,
+                            695.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15848255618406885095",
+                        "ScriptClassName": "Game.QuitConfirmationPopup"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ShutdownButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Button",
+                        "Tag": "Settings Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6048422829248685803",
+                        "Position": [
+                            1200.0,
+                            80.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            55.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "SettingsButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlay Button",
+                        "Tag": "HowToPlay Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1436736810821297905",
+                        "Position": [
+                            1200.0,
+                            190.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            55.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlayButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Credits Button",
+                        "Tag": "Credits Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17001177123013732087",
+                        "Position": [
+                            1200.0,
+                            300.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            55.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "CreditsButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 6,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Install Button",
+                        "Tag": "Install Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7777805086158956285",
+                        "Position": [
+                            810.0,
+                            450.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "InstallButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 7,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Highscore Button",
+                        "Tag": "Highscore Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4895501324641838851",
+                        "Position": [
+                            1200.0,
+                            410.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            55.0,
+                            60.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HighscoreButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 8,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Quit Confirmation Popup",
+                        "Tag": "Quit Confirmation Popup"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191177",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.5
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            650.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_QuitConfirmation.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 9,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Quit Yes Button",
+                        "Tag": "Quit Yes Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7201344333855532815",
+                        "Position": [
+                            568.0,
+                            -560.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            65.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_YesButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 10,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Quit No Button",
+                        "Tag": "Quit No Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415381",
+                        "Position": [
+                            712.0,
+                            -560.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            65.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_NoButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 11,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Quit Popup Controller",
+                        "Tag": "Quit Popup Controller"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8354265838462379803",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415389",
+                        "ScriptClassName": "Game.QuitConfirmationPopup"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 12,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Install Button Controller",
+                        "Tag": "Install Button Controller"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12389491104586344225",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191203",
+                        "ScriptClassName": "Game.InstallButtonHandler"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 13,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Credits Popup",
+                        "Tag": "Credits Popup"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "283815306214450983",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.5
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            650.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_CreditsAlternative.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 14,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Credits Close Button",
+                        "Tag": "Credits Close Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7201344333855532845",
+                        "Position": [
+                            725.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "XButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 16,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Credits Close Button 2",
+                        "Tag": "Credits Close Button 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10083648095372650291",
+                        "Position": [
+                            555.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "XButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 15,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Credits Popup Controller",
+                        "Tag": "Credits Popup Controller"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3742579820034991929",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415419",
+                        "ScriptClassName": "Game.CreditsPopup"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 17,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 1",
+                        "Tag": "Error Popup 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7777805086158956351",
+                        "Position": [
+                            750.0,
+                            450.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 18,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 2",
+                        "Tag": "Error Popup 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12389491104586344261",
+                        "Position": [
+                            850.0,
+                            250.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 19,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 3",
+                        "Tag": "Error Popup 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2013197563124721483",
+                        "Position": [
+                            600.0,
+                            500.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 20,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 4",
+                        "Tag": "Error Popup 4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2013197563124721489",
+                        "Position": [
+                            450.0,
+                            400.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 21,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 5",
+                        "Tag": "Error Popup 5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8930726590765803351",
+                        "Position": [
+                            400.0,
+                            300.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 22,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 6",
+                        "Tag": "Error Popup 6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6048422829248685917",
+                        "Position": [
+                            350.0,
+                            250.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 23,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 7",
+                        "Tag": "Error Popup 7"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191267",
+                        "Position": [
+                            300.0,
+                            200.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 24,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Error Popup 8",
+                        "Tag": "Error Popup 8"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415465",
+                        "Position": [
+                            250.0,
+                            150.0,
+                            -0.699999988079071
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            200.0,
+                            100.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ErrorPopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 12,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 25,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Glitch Overlay",
+                        "Tag": "Glitch Overlay"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16424716370710308719",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            -0.8999999761581421
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "GlitchTextureRedTransparent.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 15,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 26,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Start Game Popup",
+                        "Tag": "Start Game Popup"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18154098627620579189",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            -1.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            650.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_StartGamePopUp.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 16,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 27,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Start Game Yes Button",
+                        "Tag": "Start Game Yes Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191291",
+                        "Position": [
+                            568.0,
+                            437.0,
+                            -0.20000000298023224
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            65.0,
+                            21.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_YesButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 17,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 28,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "BSOD Screen 1",
+                        "Tag": "BSOD Screen 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6048422829248685953",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.20000000298023224
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_BSOD_001.jpg",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 18,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 29,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "BSOD Screen 2",
+                        "Tag": "BSOD Screen 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12389491104586344327",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.25
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_BSOD_002.jpg",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 19,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 30,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "BSOD Screen 3",
+                        "Tag": "BSOD Screen 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5471962076945262477",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.30000001192092896
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_BSOD_003.jpg",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 20,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 31,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Black Screen",
+                        "Tag": "Black Screen"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12389491104586344339",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.3499999940395355
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Blackscreen.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 21,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 32,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "BGM Office Ambience",
+                        "Tag": "BGM Office Ambience"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2013197563124721561",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "17577637875317155739",
+                        "FilePath": "office_ambience.wav",
+                        "Type": 2,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 33,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "BGM Room Ambience",
+                        "Tag": "BGM Room Ambience"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7777805086158956447",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "6624883581552109473",
+                        "FilePath": "RoomAmbience.wav",
+                        "Type": 2,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 34,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Click Sound",
+                        "Tag": "UI Click Sound"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6624883581552109477",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "10660108847676073895",
+                        "FilePath": "MouseClick1.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 35,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 1",
+                        "Tag": "UI Error Popup Sound 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2013197563124721579",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191341",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 36,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 2",
+                        "Tag": "UI Error Popup Sound 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15271794866103461809",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191347",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 37,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 3",
+                        "Tag": "UI Error Popup Sound 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7201344333855532983",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "9507187343069226937",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 38,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 4",
+                        "Tag": "UI Error Popup Sound 4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10083648095372650429",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "2013197563124721599",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 39,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 5",
+                        "Tag": "UI Error Popup Sound 5"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7777805086158956483",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "8354265838462379973",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 40,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 6",
+                        "Tag": "UI Error Popup Sound 6"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15271794866103461833",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "17001177123013732299",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 41,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 7",
+                        "Tag": "UI Error Popup Sound 7"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609193191375",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "15271794866103461841",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 42,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Error Popup Sound 8",
+                        "Tag": "UI Error Popup Sound 8"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1436736810821298133",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "1436736810821298135",
+                        "FilePath": "ErrorPopUp2.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 43,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI BSOD Error Sound",
+                        "Tag": "UI BSOD Error Sound"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15848255618406885339",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "17577637875317155805",
+                        "FilePath": "UI Main Menu BSOD Error.wav",
+                        "Type": 3,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 44,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Button Sounds Controller",
+                        "Tag": "Button Sounds Controller"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415585",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15271794866103461859",
+                        "ScriptClassName": "Game.MainMenuButtonSounds"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 45,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Popup",
+                        "Tag": "Settings Popup"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11236569599979497447",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.5
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            650.0,
+                            400.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_Settings.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 46,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Close Button",
+                        "Tag": "Settings Close Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8354265838462380013",
+                        "Position": [
+                            707.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "XButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 47,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Plus Button 1",
+                        "Tag": "Settings Plus Button 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4895501324641839091",
+                        "Position": [
+                            591.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 48,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Plus Button 2",
+                        "Tag": "Settings Plus Button 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415609",
+                        "Position": [
+                            591.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 49,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Plus Button 3",
+                        "Tag": "Settings Plus Button 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17577637875317155839",
+                        "Position": [
+                            591.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 50,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Minus Button 1",
+                        "Tag": "Settings Minus Button 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4319040572338415621",
+                        "Position": [
+                            559.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 51,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Minus Button 2",
+                        "Tag": "Settings Minus Button 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8930726590765803531",
+                        "Position": [
+                            559.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 52,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Minus Button 3",
+                        "Tag": "Settings Minus Button 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2589658315428145169",
+                        "Position": [
+                            559.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 53,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Volume Fill 1",
+                        "Tag": "Settings Volume Fill 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4895501324641839127",
+                        "Position": [
+                            353.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            181.0,
+                            14.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_VolumeFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 54,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Volume Fill 2",
+                        "Tag": "Settings Volume Fill 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3166119067731568669",
+                        "Position": [
+                            353.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            181.0,
+                            14.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_VolumeFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 55,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Volume Fill 3",
+                        "Tag": "Settings Volume Fill 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8930726590765803555",
+                        "Position": [
+                            353.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            181.0,
+                            14.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_VolumeFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 56,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Settings Popup Controller",
+                        "Tag": "Settings Popup Controller"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7777805086158956585",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "6624883581552109611",
+                        "ScriptClassName": "Game.SettingsPopup"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 57,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "AudioSettings",
+                        "Tag": "AudioSettings"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5471962076945360943",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "283815306214778929",
+                        "ScriptClassName": "Game.AudioSettings"
+                    }
+                }
+            ]
         }
-      ]
-    },
-    {
-      "ID": 1,
-      "Name": "Main Menu Background",
-      "Components": [
+    ],
+    "Settings": [
         {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Main Menu Background",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, 360.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [640.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "WindowsBG.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 0,
-            "IsActive": true,
-            "IsVisible": true
-          }
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0,
+            "GlobalBias": 0.004999999888241291
         }
-      ]
-    },
-    {
-      "ID": 2,
-      "Name": "Shutdown Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Shutdown Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [65.0, 695.0, -0.1],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [60.0, 20.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ShutdownButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 1,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        },
-        {
-          "Type": "ScriptComponent",
-          "Properties": {
-            "ScriptClassName": "Game.QuitConfirmationPopup"
-          }
-        }
-      ]
-    },
-    {
-      "ID": 3,
-      "Name": "Settings Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [1200.0, 80.0, -0.1],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [55.0, 60.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "SettingsButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 1,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 4,
-      "Name": "HowToPlay Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "HowToPlay Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [1200.0, 190.0, -0.1],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [55.0, 60.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "HowToPlayButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 1,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 5,
-      "Name": "Credits Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Credits Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [1200.0, 300.0, -0.1],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [55.0, 60.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "CreditsButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 1,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 6,
-      "Name": "Install Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Install Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [810.0, 450.0, -0.1],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [60.0, 20.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "InstallButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 1,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 7,
-      "Name": "Highscore Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Highscore Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [1200.0, 410.0, -0.1],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [55.0, 60.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "HighscoreButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 1,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 8,
-      "Name": "Quit Confirmation Popup",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Quit Confirmation Popup",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.5],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [650.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_QuitConfirmation.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 10,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 9,
-      "Name": "Quit Yes Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Quit Yes Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [568.0, -560.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [65.0, 20.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_YesButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 10,
-      "Name": "Quit No Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Quit No Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [712.0, -560.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [65.0, 20.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_NoButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 11,
-      "Name": "Quit Popup Controller",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Quit Popup Controller",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "ScriptComponent",
-          "Properties": {
-            "ScriptClassName": "Game.QuitConfirmationPopup"
-          }
-        }
-      ]
-    },
-    {
-      "ID": 12,
-      "Name": "Install Button Controller",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Install Button Controller",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "ScriptComponent",
-          "Properties": {
-            "ScriptClassName": "Game.InstallButtonHandler"
-          }
-        }
-      ]
-    },
-    {
-      "ID": 13,
-      "Name": "Credits Popup",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Credits Popup",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.5],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [650.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_CreditsAlternative.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 10,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 14,
-      "Name": "Credits Close Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Credits Close Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [725.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [13.0, 13.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "XButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 16,
-      "Name": "Credits Close Button 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Credits Close Button 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [555.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [13.0, 13.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "XButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 15,
-      "Name": "Credits Popup Controller",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Credits Popup Controller",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "ScriptComponent",
-          "Properties": {
-            "ScriptClassName": "Game.CreditsPopup"
-          }
-        }
-      ]
-    },
-    {
-      "ID": 17,
-      "Name": "Error Popup 1",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 1",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [750.0, 450.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 18,
-      "Name": "Error Popup 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [850.0, 250.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 19,
-      "Name": "Error Popup 3",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 3",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [600.0, 500.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 20,
-      "Name": "Error Popup 4",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 4",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [450.0, 400.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 21,
-      "Name": "Error Popup 5",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 5",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [400.0, 300.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 22,
-      "Name": "Error Popup 6",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 6",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [350.0, 250.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 23,
-      "Name": "Error Popup 7",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 7",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [300.0, 200.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 24,
-      "Name": "Error Popup 8",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Error Popup 8",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [250.0, 150.0, -0.7],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [200.0, 100.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "ErrorPopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 12,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 25,
-      "Name": "Glitch Overlay",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Glitch Overlay",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, 360.0, -0.9],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [640.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "GlitchTextureRedTransparent.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 15,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 26,
-      "Name": "Start Game Popup",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Start Game Popup",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, 360.0, -1.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [650.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_StartGamePopUp.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 16,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 27,
-      "Name": "Start Game Yes Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Start Game Yes Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [568.0, 437.0, -0.2],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [65.0, 21.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_YesButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 17,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 28,
-      "Name": "BSOD Screen 1",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "BSOD Screen 1",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.2],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [640.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_BSOD_001.jpg",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 18,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 29,
-      "Name": "BSOD Screen 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "BSOD Screen 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.25],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [640.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_BSOD_002.jpg",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 19,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 30,
-      "Name": "BSOD Screen 3",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "BSOD Screen 3",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.3],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [640.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_BSOD_003.jpg",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 20,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 31,
-      "Name": "Black Screen",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Black Screen",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.35],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [640.0, 360.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "Blackscreen.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 21,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 32,
-      "Name": "BGM Office Ambience",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "BGM Office Ambience",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "office_ambience.wav",
-            "Type": 2,
-            "State": 0,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": true,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 33,
-      "Name": "BGM Room Ambience",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "BGM Room Ambience",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "RoomAmbience.wav",
-            "Type": 2,
-            "State": 0,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": true,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 34,
-      "Name": "UI Click Sound",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Click Sound",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "MouseClick1.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 35,
-      "Name": "UI Error Popup Sound 1",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 1",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 36,
-      "Name": "UI Error Popup Sound 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 37,
-      "Name": "UI Error Popup Sound 3",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 3",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 38,
-      "Name": "UI Error Popup Sound 4",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 4",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 39,
-      "Name": "UI Error Popup Sound 5",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 5",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 40,
-      "Name": "UI Error Popup Sound 6",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 6",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 41,
-      "Name": "UI Error Popup Sound 7",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 7",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 42,
-      "Name": "UI Error Popup Sound 8",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI Error Popup Sound 8",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "ErrorPopUp2.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 43,
-      "Name": "UI BSOD Error Sound",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "UI BSOD Error Sound",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "AudioComponent",
-          "Properties": {
-            "FilePath": "UI Main Menu BSOD Error.wav",
-            "Type": 3,
-            "State": 2,
-            "Volume": 1.0,
-            "Pitch": 1.0,
-            "Loop": false,
-            "Mute": false,
-            "ReverbProperties": 1.0,
-            "Is3D": false,
-            "MinDistance": 1.0,
-            "MaxDistance": 100.0,
-            "Pan2D": 0.0,
-            "DopplerLevel": 0.0,
-            "RolloffMode": 0
-          }
-        }
-      ]
-    },
-    {
-      "ID": 44,
-      "Name": "Button Sounds Controller",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Button Sounds Controller",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "ScriptComponent",
-          "Properties": {
-            "ScriptClassName": "Game.MainMenuButtonSounds"
-          }
-        }
-      ]
-    },
-    {
-      "ID": 45,
-      "Name": "Settings Popup",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Popup",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [640.0, -500.0, -0.5],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [650.0, 400.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_Settings.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 10,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 46,
-      "Name": "Settings Close Button",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Close Button",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [707.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [13.0, 13.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "XButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 47,
-      "Name": "Settings Plus Button 1",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Plus Button 1",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [591.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [12.0, 12.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_PlusButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 48,
-      "Name": "Settings Plus Button 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Plus Button 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [591.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [12.0, 12.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_PlusButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 49,
-      "Name": "Settings Plus Button 3",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Plus Button 3",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [591.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [12.0, 12.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_PlusButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 50,
-      "Name": "Settings Minus Button 1",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Minus Button 1",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [559.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [12.0, 12.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_MinusButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 51,
-      "Name": "Settings Minus Button 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Minus Button 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [559.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [12.0, 12.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_MinusButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 52,
-      "Name": "Settings Minus Button 3",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Minus Button 3",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [559.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [12.0, 12.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_MinusButton.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 53,
-      "Name": "Settings Volume Fill 1",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Volume Fill 1",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [353.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [181.0, 14.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_VolumeFill.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 54,
-      "Name": "Settings Volume Fill 2",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Volume Fill 2",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [353.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [181.0, 14.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_VolumeFill.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 55,
-      "Name": "Settings Volume Fill 3",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Volume Fill 3",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [353.0, -500.0, -0.6],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [181.0, 14.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "SpriteRendererComponent",
-          "Properties": {
-            "Texture": "MainMenu_VolumeFill.png",
-            "Color": [1.0, 1.0, 1.0, 1.0],
-            "Quad": 3,
-            "Sprite Layer": 11,
-            "IsActive": true,
-            "IsVisible": true
-          }
-        }
-      ]
-    },
-    {
-      "ID": 56,
-      "Name": "Settings Popup Controller",
-      "Components": [
-        {
-          "Type": "TagComponent",
-          "Properties": {
-            "Tag": "Settings Popup Controller",
-            "Active": true
-          }
-        },
-        {
-          "Type": "TransformComponent",
-          "Properties": {
-            "Position": [0.0, 0.0, 0.0],
-            "Rotation": [0.0, 0.0, 0.0],
-            "Scale": [1.0, 1.0, 1.0],
-            "Parent": 4294967295,
-            "Children": []
-          }
-        },
-        {
-          "Type": "ScriptComponent",
-          "Properties": {
-            "ScriptClassName": "Game.SettingsPopup"
-          }
-        }
-      ]
-    }
-  ],
-  "Settings": [
-    {
-      "BloomToggle": false,
-      "BloomStrength": 0.009999999776482582,
-      "BloomFilterRadius": 0.0024999999441206455,
-      "Exposure": 1.0
-    }
-  ]
+    ]
 }

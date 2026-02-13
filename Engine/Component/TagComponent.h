@@ -25,6 +25,7 @@ namespace Engine {
         xresource::instance_guid ComponentGUID;
 
         /// Human-readable name/tag for the entity
+        std::string Name;
         std::string Tag;
 
         /**
@@ -32,6 +33,7 @@ namespace Engine {
          */
         TagComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Name("Entity")
             , Tag("Entity") {
         }
 
@@ -39,8 +41,9 @@ namespace Engine {
          * @brief Constructor with custom tag
          * @param tag Initial tag/name for the entity
          */
-        explicit TagComponent(const std::string& tag)
+        explicit TagComponent(const std::string& name, const std::string& tag = "Default")
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
+            , Name(name)
             , Tag(tag) {
         }
 

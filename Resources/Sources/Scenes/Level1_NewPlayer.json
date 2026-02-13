@@ -3,22 +3,58 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 66,
+            "ID": 2097155,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "RestartButton"
+                        "Name": "FiringPosition",
+                        "Tag": "FiringPosition"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1770486974774102607",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4652790736277767943\",\"Tag\":\"FiringPosition\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11271982647296459961\",\"Position\":[1000.0,400.0,-125.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[10.0,10.0,10.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17613050922634446013\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":false,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "9710535419386708817",
+                        "ComponentGUID": "11271982647296459961",
                         "Position": [
-                            855.0,
-                            517.0,
-                            0.0
+                            1000.0,
+                            400.0,
+                            -125.0
                         ],
                         "Rotation": [
                             0.0,
@@ -26,52 +62,82 @@
                             0.0
                         ],
                         "Scale": [
-                            100.0,
-                            40.0,
-                            1.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 2097180,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "15475142942421287763",
-                        "ScriptClassName": "Game.RestartButton"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_ResumeButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "ComponentGUID": "17613050922634446013",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": false,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
                     }
                 }
             ]
         },
         {
-            "ID": 65,
+            "ID": 1048580,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Audio_PlayerMove"
+                        "Name": "player_7",
+                        "Tag": "player_7"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "10993859011628878407",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":7,\"CastType\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5550792659551191879",
+                        "ComponentGUID": "12641507867300348863",
                         "Position": [
                             0.0,
                             0.0,
@@ -87,20 +153,817 @@
                             1.0,
                             1.0
                         ],
-                        "Parent": 4294967295,
+                        "Parent": 2097180,
                         "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 7,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048581,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_6",
+                        "Tag": "player_6"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "12723241268539148863",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":6,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1112292821231879101",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 6,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048582,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_5",
+                        "Tag": "player_5"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4076329983987796535",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":5,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1688753573535302587",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 5,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048583,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_4",
+                        "Tag": "player_4"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5229251488594643503",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":4,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16100272381120889785",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 4,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048584,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_3",
+                        "Tag": "player_3"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "12146780516235725351",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":3,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13217968619603772343",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 3,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048585,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_2",
+                        "Tag": "player_2"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1770486974774102559",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":2,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9759204105783231413",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 2,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048586,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_1",
+                        "Tag": "player_1"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11570319763932301847",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2_1.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":1,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13217968619603772339",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2_1.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 1,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048587,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "player_0",
+                        "Tag": "player_0"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1194026222470679055",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"playerv2.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9759204105783231409",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "playerv2.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097180,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Player",
+                        "Tag": "Player"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "10993859011628878343",
+                        "PrefabAssetGuid": "3994596582752568257",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "player",
+                        "prefabVersion": 6,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,6.225637889656355e-7,0.0],\"Scale\":[0.029999999329447746,0.029999999329447746,0.029999999329447746],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6958633745491461771\",\"Tag\":\"Player\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerBackWings.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9026023440310174993\",\"ScriptClassName\":\"Game.PlayerWeapon\",\"Started\":false,\"GCHandle\":0}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"PlayerParticleTrail.mat\",\"Initial Velocity\":[-0.0,-0.0,-0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.20000000298023224,0.20000000298023224,0.699999988079071],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[0.4117647111415863,1.0,0.0],\"Color Max\":[0.3843137323856354,1.0,0.0],\"Emitter Shape\":0,\"Max Particles\":1000,\"Particle Type\":1,\"Emission Rate\":0.0,\"Particle Lifetime\":0.800000011920929,\"Emission Accumulator\":0.762939453125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":3.5,\"Min Speed\":0.5,\"Max Speed\":1.5,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":false,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16187705639371801403\",\"FilePath\":\"Player_Ambience.wav\",\"Type\":1,\"State\":0,\"Volume\":1.003999948501587,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":false,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 16,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9663326796694733695\",\"Material Type\":\"\",\"Max Segments\":50,\"Segment Lifetime\":1.1399999856948853,\"Min Distance\":0.10000000149011612,\"Sample Interval\":0.01600000075995922,\"Sample Accumulator\":0.0,\"Start Color\":[0.0,1.0,0.23529411852359772,0.20392157137393951],\"End Color\":[0.08823537826538086,1.0,0.0,0.0],\"Start Width\":0.2800000011920929,\"End Width\":0.10000000149011612,\"Last Position\":[0.0,0.0,0.0],\"Local Offset\":[0.0,0.0,0.0],\"Has Last Position\":false,\"Active\":true,\"Emit Trail\":true}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1048587,
+                            1048586,
+                            1048585,
+                            1048584,
+                            1048583,
+                            1048582,
+                            1048581,
+                            1048580,
+                            2097155
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16100272381120889775",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            6.225637889656355e-7,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.10000000149011612,
+                            0.10000000149011612,
+                            0.10000000149011612
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1048587,
+                            1048586,
+                            1048585,
+                            1048584,
+                            1048583,
+                            1048582,
+                            1048581,
+                            1048580,
+                            2097155
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Mesh": "PlayerModel_v002.fbx",
+                        "Material": "PlayerBackWings.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "16732350830320074971",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
                     }
                 },
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "2092028145730782025",
-                        "FilePath": "Player_Move.wav",
+                        "ComponentGUID": "16187705639371801403",
+                        "FilePath": "Player_Ambience.wav",
                         "Type": 1,
-                        "State": 2,
-                        "Volume": 1.0,
+                        "State": 0,
+                        "Volume": 1.003999948501587,
                         "Pitch": 1.0,
-                        "Loop": false,
+                        "Loop": true,
                         "Mute": false,
                         "ReverbProperties": 1.0,
                         "Is3D": false,
@@ -112,410 +975,115 @@
                     }
                 },
                 {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "PlayerParticleTrail.mat",
+                        "Initial Velocity": [
+                            -0.0,
+                            -0.0,
+                            -0.0
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            0.20000000298023224,
+                            0.20000000298023224,
+                            0.699999988079071
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            0.4117647111415863,
+                            1.0,
+                            0.0
+                        ],
+                        "Color Max": [
+                            0.3843137323856354,
+                            1.0,
+                            0.0
+                        ],
+                        "Emitter Shape": 0,
+                        "Max Particles": 1000,
+                        "Particle Type": 1,
+                        "Emission Rate": 0.0,
+                        "Particle Lifetime": 0.800000011920929,
+                        "Emission Accumulator": 0.762939453125,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 3.5,
+                        "Min Speed": 0.5,
+                        "Max Speed": 1.5,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": false,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": true,
+                        "Burst Mode": false
+                    }
+                },
+                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "4974331907248390987",
-                        "ScriptClassName": "Game.PlayerMoveAudio"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 123,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_PlusButton_3_Hovered"
+                        "ComponentGUID": "9026023440310174993",
+                        "ScriptClassName": "Game.PlayerWeapon"
                     }
                 },
                 {
-                    "Type": "TransformComponent",
+                    "Type": "TrailComponent",
                     "Properties": {
-                        "ComponentGUID": "100000000000000024",
-                        "Position": [
-                            1200.0,
-                            526.0,
-                            0.0
-                        ],
-                        "Rotation": [
+                        "ComponentGUID": "9663326796694733695",
+                        "Material Type": "",
+                        "Max Segments": 50,
+                        "Segment Lifetime": 1.1399999856948853,
+                        "Min Distance": 0.10000000149011612,
+                        "Sample Interval": 0.01600000075995922,
+                        "Sample Accumulator": 0.0,
+                        "Start Color": [
                             0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_PlusButton_Hovered.png",
-                        "Color": [
                             1.0,
-                            1.0,
-                            1.0,
-                            1.0
+                            0.23529411852359772,
+                            0.20392157137393951
                         ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 122,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_PlusButton_3"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000023",
-                        "Position": [
-                            1200.0,
-                            526.0,
-                            0.0
-                        ],
-                        "Rotation": [
+                        "End Color": [
+                            0.08823537826538086,
+                            1.0,
                             0.0,
-                            -0.0,
                             0.0
                         ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_PlusButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 121,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_MinusButton_3_Hovered"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000022",
-                        "Position": [
-                            1200.0,
-                            559.0,
-                            0.0
-                        ],
-                        "Rotation": [
+                        "Start Width": 0.2800000011920929,
+                        "End Width": 0.10000000149011612,
+                        "Last Position": [
                             0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_MinusButton_Hovered.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 120,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_MinusButton_3"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000021",
-                        "Position": [
-                            1200.0,
-                            559.0,
-                            0.0
-                        ],
-                        "Rotation": [
                             0.0,
-                            -0.0,
                             0.0
                         ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_MinusButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 119,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_MixerFill_3"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000020",
-                        "Position": [
-                            1150.0,
-                            415.0,
-                            0.0
-                        ],
-                        "Rotation": [
+                        "Local Offset": [
                             0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            5.0,
-                            155.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_MixerFill.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 118,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_PlusButton_2_Hovered"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000019",
-                        "Position": [
-                            1044.0,
-                            525.0,
-                            0.0
-                        ],
-                        "Rotation": [
                             0.0,
-                            -0.0,
                             0.0
                         ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_PlusButton_Hovered.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 117,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_PlusButton_2"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000018",
-                        "Position": [
-                            1044.0,
-                            525.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_PlusButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 116,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "Paused_MinusButton_2_Hovered"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "100000000000000017",
-                        "Position": [
-                            1044.0,
-                            559.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            12.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_MinusButton_Hovered.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": true
+                        "Has Last Position": false,
+                        "Active": true,
+                        "Emit Trail": true
                     }
                 }
             ]
@@ -526,6 +1094,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_2",
                         "Tag": "Paused_MinusButton_2"
                     }
                 },
@@ -576,6 +1145,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MixerFill_2",
                         "Tag": "Paused_MixerFill_2"
                     }
                 },
@@ -626,6 +1196,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_HowToPlayButton_Hovered",
                         "Tag": "Paused_HowToPlayButton_Hovered"
                     }
                 },
@@ -676,6 +1247,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_HowToPlayButton",
                         "Tag": "Paused_HowToPlayButton"
                     }
                 },
@@ -726,6 +1298,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MainMenuButton_Hovered",
                         "Tag": "Paused_MainMenuButton_Hovered"
                     }
                 },
@@ -776,6 +1349,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MainMenuButton",
                         "Tag": "Paused_MainMenuButton"
                     }
                 },
@@ -826,6 +1400,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_Hovered",
                         "Tag": "Paused_MinusButton_Hovered"
                     }
                 },
@@ -876,6 +1451,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton",
                         "Tag": "Paused_MinusButton"
                     }
                 },
@@ -926,6 +1502,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MixerFill",
                         "Tag": "Paused_MixerFill"
                     }
                 },
@@ -976,6 +1553,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton_Hovered",
                         "Tag": "Paused_PlusButton_Hovered"
                     }
                 },
@@ -1026,6 +1604,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton",
                         "Tag": "Paused_PlusButton"
                     }
                 },
@@ -1076,6 +1655,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_RestartButton_Hovered",
                         "Tag": "Paused_RestartButton_Hovered"
                     }
                 },
@@ -1126,6 +1706,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_RestartButton",
                         "Tag": "Paused_RestartButton"
                     }
                 },
@@ -1176,6 +1757,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_ResumeButton_Hovered",
                         "Tag": "Paused_ResumeButton_Hovered"
                     }
                 },
@@ -1226,6 +1808,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_ResumeButton",
                         "Tag": "Paused_ResumeButton"
                     }
                 },
@@ -1276,6 +1859,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PauseMenu_EngineBG",
                         "Tag": "PauseMenu_EngineBG"
                     }
                 },
@@ -1333,6 +1917,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreDestruction",
                         "Tag": "CoreDestruction"
                     }
                 },
@@ -1387,6 +1972,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "ICESentryText",
                         "Tag": "ICESentryText"
                     }
                 },
@@ -1400,7 +1986,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1412,7 +1998,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6021110949939003837\",\"Tag\":\"ICESentryText\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6021110949939003837\",\"Tag\":\"ICESentryText\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             }
                         ]
                     }
@@ -1448,6 +2037,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "HealthBarWindow",
                         "Tag": "HealthBarWindow"
                     }
                 },
@@ -1461,7 +2051,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1473,7 +2063,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462943\",\"Tag\":\"HealthBarWindow\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462943\",\"Tag\":\"HealthBarWindow\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -1531,6 +2124,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "AltFireIcon",
                         "Tag": "AltFireIcon"
                     }
                 },
@@ -1544,7 +2138,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1556,7 +2150,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -1614,6 +2211,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CollisionManager",
                         "Tag": "CollisionManager"
                     }
                 },
@@ -1655,6 +2253,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "OOB",
                         "Tag": "OOB"
                     }
                 },
@@ -1718,6 +2317,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "ENVIRONMENT_Level1_LevelDesign2",
                         "Tag": "ENVIRONMENT_Level1_LevelDesign2"
                     }
                 },
@@ -1769,6 +2369,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall3",
                         "Tag": "Wall3"
                     }
                 },
@@ -1820,6 +2421,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall2",
                         "Tag": "Wall2"
                     }
                 },
@@ -1871,6 +2473,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall1",
                         "Tag": "Wall1"
                     }
                 },
@@ -1922,6 +2525,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "TImer",
                         "Tag": "TImer"
                     }
                 },
@@ -1983,6 +2587,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "BGM",
                         "Tag": "BGM"
                     }
                 },
@@ -2037,6 +2642,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "corepad",
                         "Tag": "corepad"
                     }
                 },
@@ -2088,6 +2694,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PlayerDeath",
                         "Tag": "PlayerDeath"
                     }
                 },
@@ -2142,6 +2749,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PrimaryWeaponFrame",
                         "Tag": "PrimaryWeaponFrame"
                     }
                 },
@@ -2155,7 +2763,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2170,7 +2778,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18126786748310897079\",\"Tag\":\"PrimaryWeaponFrame\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18126786748310897079\",\"Tag\":\"PrimaryWeaponFrame\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -2231,6 +2842,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Light",
                         "Tag": "Light"
                     }
                 },
@@ -2287,6 +2899,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PrimaryWeaponWindow",
                         "Tag": "PrimaryWeaponWindow"
                     }
                 },
@@ -2300,7 +2913,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2315,7 +2928,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462933\",\"Tag\":\"PrimaryWeaponWindow\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462933\",\"Tag\":\"PrimaryWeaponWindow\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -2373,6 +2989,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Particles",
                         "Tag": "Particles"
                     }
                 },
@@ -2400,7 +3017,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5604492802851995921\",\"Tag\":\"Particles\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5604492802851995921\",\"Tag\":\"Particles\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 5,
@@ -2503,195 +3123,106 @@
             ]
         },
         {
-            "ID": 1048579,
+            "ID": 66,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "Player"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "2554834551572381907",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Position\":[-42.65132141113281,-137.7088623046875,-105.93164825439453],\"Rotation\":[0.6036109328269958,0.38336724042892456,-0.4662128686904907],\"Scale\":[0.15000000596046448,0.15000000596046448,0.15000000596046448],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Tag\":\"Player\"}}",
-                                "modifiedPropertyNames": [
-                                    "Tag"
-                                ]
-                            },
-                            {
-                                "componentType": 3,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": true,
-                                "originalComponentJSON": "{\"Properties\":{}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerBackWings.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 5,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"\",\"Initial Velocity\":[0.0,1.0,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[0.0,0.0,0.699999988079071],\"Color Max\":[0.30000001192092896,0.30000001192092896,1.0],\"Emitter Shape\":0,\"Max Particles\":1000,\"Particle Type\":0,\"Emission Rate\":5.0,\"Particle Lifetime\":2.0,\"Emission Accumulator\":0.0,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":15.0,\"Min Speed\":0.5,\"Max Speed\":1.5,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16187705639371801403\",\"FilePath\":\"\",\"Type\":1,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ],
-                        "childEntityIDs": [
-                            4,
-                            5,
-                            6,
-                            7,
-                            8,
-                            9,
-                            10,
-                            11,
-                            1048604
-                        ]
+                        "Name": "RestartButton",
+                        "Tag": "RestartButton"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16100272381120889775",
+                        "ComponentGUID": "9710535419386708817",
                         "Position": [
-                            767.7905883789063,
-                            190.38815307617188,
-                            -82.42496490478516
+                            855.0,
+                            517.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
-                            6.225637889656355e-7,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
-                            0.10000000149011612,
-                            0.10000000149011612,
-                            0.10000000149011612
+                            150.0,
+                            50.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            4,
-                            5,
-                            6,
-                            7,
-                            8,
-                            9,
-                            10,
-                            11,
-                            1048604
-                        ]
+                        "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "PlayerBackWings.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "ComponentGUID": "15475142942421287763",
+                        "ScriptClassName": "Game.RestartButton"
                     }
                 },
                 {
-                    "Type": "RigidbodyComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "16732350830320074971",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": true,
-                        "UseGravity": false,
-                        "Velocity": [
+                        "Texture": "DefenceFailed_RestartButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 65,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_PlayerMove",
+                        "Tag": "Audio_PlayerMove"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5550792659551191879",
+                        "Position": [
                             0.0,
                             0.0,
                             0.0
                         ],
-                        "AngularVelocity": [
+                        "Rotation": [
                             0.0,
-                            0.0,
+                            -0.0,
                             0.0
                         ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "SphereRadius": 0.5
+                        "Parent": 4294967295,
+                        "Children": []
                     }
                 },
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "16187705639371801403",
-                        "FilePath": "Player_Ambience.wav",
+                        "ComponentGUID": "2092028145730782025",
+                        "FilePath": "Player_Move.wav",
                         "Type": 1,
-                        "State": 0,
-                        "Volume": 1.003999948501587,
+                        "State": 2,
+                        "Volume": 1.0,
                         "Pitch": 1.0,
-                        "Loop": true,
+                        "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
                         "Is3D": false,
@@ -2703,157 +3234,31 @@
                     }
                 },
                 {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "Particle Type Advanced": "",
-                        "Material Type": "PlayerParticleTrail.mat",
-                        "Initial Velocity": [
-                            -0.0,
-                            -0.0,
-                            -0.0
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            1.5,
-                            1.5,
-                            1.5
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Max": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Emitter Shape": 0,
-                        "Max Particles": 1000,
-                        "Particle Type": 1,
-                        "Emission Rate": 0.0,
-                        "Particle Lifetime": 1.2000000476837158,
-                        "Emission Accumulator": 0.762939453125,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.699999988079071,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 10.0,
-                        "Min Speed": 0.5,
-                        "Max Speed": 1.5,
-                        "Rotation Speed": 0.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": false,
-                        "Loop": false,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
-                    }
-                },
-                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "9026023440310174993",
-                        "ScriptClassName": "Game.PlayerWeapon",
-                        "Fields": {
-                            "shootAllowed": false,
-                            "primaryShooting": false,
-                            "reloadingPrimary": false,
-                            "primaryAmmo": 0,
-                            "CAMSHAKE_primaryFire": 0.05000000074505806,
-                            "primaryAmmoMax": 100,
-                            "primaryUltSpeed": 500.0,
-                            "primaryReloadDelay": 1.5,
-                            "primaryShootRate": 0.05000000074505806,
-                            "primaryShootNext": 0.0,
-                            "primarybulletSpeed": 1000.0,
-                            "chargeDelayRate": 0.5,
-                            "chargeDelayNext": 0.0,
-                            "primaryAltCharging": false,
-                            "primaryChargeRate": 0.10000000149011612,
-                            "muzzleDistance": 5.0,
-                            "primaryChargeNext": 0.0,
-                            "primaryAltCharge": 0,
-                            "primaryAltChargeMax": 30,
-                            "primaryAltReady": false,
-                            "primaryAltFireAOERange": 30.0,
-                            "CAMSHAKE_primaryFireDuration": 0.5,
-                            "CAMSHAKE_primaryAltFire": 0.1599999964237213,
-                            "CAMSHAKE_primaryAltFireDuration": 0.5
-                        }
+                        "ComponentGUID": "4974331907248390987",
+                        "ScriptClassName": "Game.PlayerMoveAudio"
                     }
                 }
             ]
         },
         {
-            "ID": 4,
+            "ID": 123,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_0"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "15813431854551122139",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerBackWings.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_PlusButton_3_Hovered",
+                        "Tag": "Paused_PlusButton_3_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "9759204105783231409",
+                        "ComponentGUID": "100000000000000024",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1200.0,
+                            526.0,
                             0.0
                         ],
                         "Rotation": [
@@ -2862,84 +3267,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "Texture": "Paused_PlusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
         },
         {
-            "ID": 5,
+            "ID": 122,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_1"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "15813431854551122147",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":1}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_PlusButton_3",
+                        "Tag": "Paused_PlusButton_3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13217968619603772339",
+                        "ComponentGUID": "100000000000000023",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1200.0,
+                            526.0,
                             0.0
                         ],
                         "Rotation": [
@@ -2948,84 +3318,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 1,
-                        "CastType": 0
+                        "Texture": "Paused_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
         },
         {
-            "ID": 6,
+            "ID": 121,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_2"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "11201745836123734251",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":2}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_MinusButton_3_Hovered",
+                        "Tag": "Paused_MinusButton_3_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "9759204105783231413",
+                        "ComponentGUID": "100000000000000022",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1200.0,
+                            559.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3034,84 +3369,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 2,
-                        "CastType": 0
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
         },
         {
-            "ID": 7,
+            "ID": 120,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_3"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "4860677560786075891",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":3}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_MinusButton_3",
+                        "Tag": "Paused_MinusButton_3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13217968619603772343",
+                        "ComponentGUID": "100000000000000021",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1200.0,
+                            559.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3120,84 +3420,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 3,
-                        "CastType": 0
+                        "Texture": "Paused_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
         },
         {
-            "ID": 8,
+            "ID": 119,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_4"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "6590059817696346363",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":4}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_MixerFill_3",
+                        "Tag": "Paused_MixerFill_3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16100272381120889785",
+                        "ComponentGUID": "100000000000000020",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1150.0,
+                            415.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3206,84 +3471,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            5.0,
+                            155.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 4,
-                        "CastType": 0
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
         },
         {
-            "ID": 9,
+            "ID": 118,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_5"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "1978373799268958467",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":5}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_PlusButton_2_Hovered",
+                        "Tag": "Paused_PlusButton_2_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "1688753573535302587",
+                        "ComponentGUID": "100000000000000019",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1044.0,
+                            525.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3292,84 +3522,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 5,
-                        "CastType": 0
+                        "Texture": "Paused_PlusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
         },
         {
-            "ID": 10,
+            "ID": 117,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "player_6"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "13507588845337428235",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":6}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_PlusButton_2",
+                        "Tag": "Paused_PlusButton_2"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "1112292821231879101",
+                        "ComponentGUID": "100000000000000018",
                         "Position": [
-                            0.0,
-                            0.0,
+                            1044.0,
+                            525.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3378,115 +3573,28 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 6,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 11,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Tag": "player_7"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "5437138313089499411",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":1048579,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Mesh\":\"PlayerModel_v002.fbx\",\"Material\":\"PlayerMaterial.mat\",\"Texture\":\"\",\"Visible\":true,\"ShadowCast\":false,\"ShadowReceive\":false,\"GlobalIlluminate\":true,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":7}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "12641507867300348863",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
+                        "Texture": "Paused_PlusButton.png",
+                        "Color": [
+                            1.0,
                             1.0,
                             1.0,
                             1.0
                         ],
-                        "Parent": 1048579,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "Mesh": "PlayerModel_v002.fbx",
-                        "Material": "playerv2_1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 7,
-                        "CastType": 0
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3497,6 +3605,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "BotnetSpawner",
                         "Tag": "BotnetSpawner"
                     }
                 },
@@ -3545,6 +3654,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthBarRefill",
                         "Tag": "CoreHealthBarRefill"
                     }
                 },
@@ -3602,6 +3712,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PlayerCam",
                         "Tag": "PlayerCam"
                     }
                 },
@@ -3640,7 +3751,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.7135207653045654,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -3668,21 +3779,22 @@
             ]
         },
         {
-            "ID": 1048602,
+            "ID": 75,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "PlayerHealth"
+                        "Name": "Paused_Checkbox_Master_Unticked",
+                        "Tag": "Paused_Checkbox_Master_Unticked"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "790813281478640227",
+                        "ComponentGUID": "8930726590763664989",
                         "Position": [
-                            640.0,
-                            330.0,
+                            833.7999877929688,
+                            620.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3691,9 +3803,9 @@
                             0.0
                         ],
                         "Scale": [
-                            700.0,
-                            400.0,
-                            203.60000610351563
+                            13.0,
+                            13.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -3702,7 +3814,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Example_PlayerHPDefault.png",
+                        "Texture": "Checkbox_Unticked.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -3710,9 +3822,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3723,6 +3835,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Crosshair",
                         "Tag": "Crosshair"
                     }
                 },
@@ -3780,6 +3893,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Crosshair2",
                         "Tag": "Crosshair2"
                     }
                 },
@@ -3825,61 +3939,23 @@
             ]
         },
         {
-            "ID": 1048604,
+            "ID": 116,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "FiringPosition"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "17036590170330694843",
-                        "PrefabAssetGuid": "3994596582752568257",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "player",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Tag"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17613050922634446013\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
+                        "Name": "Paused_MinusButton_2_Hovered",
+                        "Tag": "Paused_MinusButton_2_Hovered"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11271982647296459961",
+                        "ComponentGUID": "100000000000000017",
                         "Position": [
-                            1000.0,
-                            400.0,
-                            -125.0
+                            1044.0,
+                            559.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -3887,29 +3963,28 @@
                             0.0
                         ],
                         "Scale": [
-                            10.0,
-                            10.0,
-                            10.0
+                            12.0,
+                            12.0,
+                            1.0
                         ],
-                        "Parent": 1048579,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "17613050922634446013",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": false,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "Texture": "Paused_MinusButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3920,6 +3995,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SecondayWeaponUI",
                         "Tag": "SecondayWeaponUI"
                     }
                 },
@@ -3933,7 +4009,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3945,7 +4021,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -4003,6 +4082,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SEMICONDUCTOR",
                         "Tag": "SEMICONDUCTOR"
                     }
                 },
@@ -4030,7 +4110,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -4173,6 +4256,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "nextlevelbutton",
                         "Tag": "nextlevelbutton"
                     }
                 },
@@ -4191,8 +4275,8 @@
                             0.0
                         ],
                         "Scale": [
-                            100.0,
-                            40.0,
+                            150.0,
+                            50.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4203,13 +4287,13 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "3425964449535591267",
-                        "ScriptClassName": ""
+                        "ScriptClassName": "Game.NextLevelButton"
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_ResumeButton.png",
+                        "Texture": "DefenceSuccess_Level2Button.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4217,9 +4301,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 4,
+                        "Sprite Layer": 5,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4230,6 +4314,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "InnermostCore",
                         "Tag": "InnermostCore"
                     }
                 },
@@ -4254,7 +4339,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6757414307449585871\",\"Tag\":\"InnermostCore\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -4331,6 +4419,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Audio_WeaponReload",
                         "Tag": "Audio_WeaponReload"
                     }
                 },
@@ -4385,6 +4474,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "mainmenubutton",
                         "Tag": "mainmenubutton"
                     }
                 },
@@ -4403,8 +4493,8 @@
                             0.0
                         ],
                         "Scale": [
-                            100.0,
-                            40.0,
+                            150.0,
+                            50.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4421,7 +4511,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Paused_MainMenuButton.png",
+                        "Texture": "DefenceFailed_MainMenuButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4442,6 +4532,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WormSpawner",
                         "Tag": "WormSpawner"
                     }
                 },
@@ -4483,6 +4574,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Firewall_activevoidscreen",
                         "Tag": "Firewall_activevoidscreen"
                     }
                 },
@@ -4533,6 +4625,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "LooseScreen",
                         "Tag": "LooseScreen"
                     }
                 },
@@ -4572,7 +4665,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed.png",
+                        "Texture": "DefenceFailed_Background.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4593,6 +4686,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WinScreen",
                         "Tag": "WinScreen"
                     }
                 },
@@ -4602,7 +4696,7 @@
                         "ComponentGUID": "130006815191499605",
                         "Position": [
                             640.0,
-                            300.0,
+                            320.0,
                             0.0
                         ],
                         "Rotation": [
@@ -4629,7 +4723,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess.png",
+                        "Texture": "DefenceSuccess_Background.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4650,6 +4744,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthBarWindow",
                         "Tag": "CoreHealthBarWindow"
                     }
                 },
@@ -4695,21 +4790,22 @@
             ]
         },
         {
-            "ID": 4194404,
+            "ID": 76,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Tag": "CoreHealthBarFrame"
+                        "Name": "mainmenubuttonWin",
+                        "Tag": "mainmenubuttonWin"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "15253921196586768131",
+                        "ComponentGUID": "15427608859292877731",
                         "Position": [
-                            640.0,
-                            92.30000305175781,
+                            376.0,
+                            518.0,
                             0.0
                         ],
                         "Rotation": [
@@ -4718,8 +4814,8 @@
                             0.0
                         ],
                         "Scale": [
-                            207.60000610351563,
-                            7.0,
+                            150.0,
+                            50.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -4727,9 +4823,16 @@
                     }
                 },
                 {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4474854565527929765",
+                        "ScriptClassName": "Game.MainMenuButtonWin"
+                    }
+                },
+                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "M4TempCoreHP_Frame.png",
+                        "Texture": "DefenceSuccess_MainMenuButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4737,7 +4840,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -4750,6 +4853,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthCount",
                         "Tag": "CoreHealthCount"
                     }
                 },
@@ -4811,6 +4915,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WeaponBarReload",
                         "Tag": "WeaponBarReload"
                     }
                 },
@@ -4868,6 +4973,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "HealthCount",
                         "Tag": "HealthCount"
                     }
                 },
@@ -4929,6 +5035,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "HealthBarFill",
                         "Tag": "HealthBarFill"
                     }
                 },
@@ -4986,6 +5093,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WeaponAmmoCount",
                         "Tag": "WeaponAmmoCount"
                     }
                 },
@@ -5047,6 +5155,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "scoreboard",
                         "Tag": "scoreboard"
                     }
                 },
@@ -5108,6 +5217,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SentryWindow",
                         "Tag": "SentryWindow"
                     }
                 },
@@ -5121,7 +5231,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5133,7 +5243,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17550325996007473573\",\"Tag\":\"SentryWindow\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17550325996007473573\",\"Tag\":\"SentryWindow\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -5194,6 +5307,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "loveletterspawm",
                         "Tag": "loveletterspawm"
                     }
                 },
@@ -5235,6 +5349,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "StageCount",
                         "Tag": "StageCount"
                     }
                 },
@@ -5296,6 +5411,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "InnerCore",
                         "Tag": "InnerCore"
                     }
                 },
@@ -5320,7 +5436,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12522021830468845765\",\"Tag\":\"InnerCore\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12522021830468845765\",\"Tag\":\"InnerCore\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -5405,6 +5524,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -5418,7 +5538,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5433,7 +5552,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -5497,6 +5619,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -5521,7 +5644,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 6,
@@ -5632,6 +5758,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -5645,7 +5772,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5660,7 +5786,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -5724,6 +5853,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -5748,7 +5878,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 6,
@@ -5859,6 +5992,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -5872,7 +6006,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5887,7 +6020,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -5951,6 +6087,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -5975,7 +6112,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 6,
@@ -6086,6 +6226,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -6099,14 +6240,12 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
                                 "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4860677560785862851\",\"Position\":[798.6957397460938,-376.24957275390625,-952.4028930664063],\"Rotation\":[180.0,18.266550064086914,180.0],\"Scale\":[0.03999999910593033,0.03999999910593033,0.03999999910593033],\"Parent\":4294967295,\"Children\":[]}}",
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15900363641908576543\",\"Position\":[-389.0,-200.0,-468.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[150.0,150.0,150.0],\"Parent\":4294967295,\"Children\":[]}}",
                                 "modifiedPropertyNames": [
                                     "modified"
                                 ]
@@ -6115,7 +6254,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -6197,6 +6339,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -6221,7 +6364,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 6,
@@ -6332,6 +6478,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -6345,7 +6492,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6360,7 +6506,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -6424,6 +6573,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -6448,7 +6598,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 6,
@@ -6559,6 +6712,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -6572,7 +6726,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Gunship.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Gunship.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6587,7 +6740,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9358524572035318079\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -6651,6 +6807,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -6675,7 +6832,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16276053599676400033\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 6,
@@ -6776,6 +6936,303 @@
                     "Properties": {
                         "ComponentGUID": "8554288977682104741",
                         "ScriptClassName": "Game.GunshipScript"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 69,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "AudioSettings",
+                        "Tag": "AudioSettings"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10083648095363581495",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "860276058509461051",
+                        "ScriptClassName": "Game.AudioSettings"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 70,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Paused_Checkbox_SFX_Ticked",
+                        "Tag": "Paused_Checkbox_SFX_Ticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17001177123005449791",
+                        "Position": [
+                            1143.5,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Ticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 71,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Paused_Checkbox_SFX_Unticked",
+                        "Tag": "Paused_Checkbox_SFX_Unticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11813030352277194309",
+                        "Position": [
+                            1143.5,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Unticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 72,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Paused_Checkbox_BGM_Ticked",
+                        "Tag": "Paused_Checkbox_BGM_Ticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1436736810816407115",
+                        "Position": [
+                            987.0999755859375,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Ticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 73,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Paused_Checkbox_BGM_Unticked",
+                        "Tag": "Paused_Checkbox_BGM_Unticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13542412609189185105",
+                        "Position": [
+                            987.0999755859375,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Unticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 74,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Paused_Checkbox_Master_Ticked",
+                        "Tag": "Paused_Checkbox_Master_Ticked"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6048422829245597271",
+                        "Position": [
+                            833.7999877929688,
+                            620.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            13.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Checkbox_Ticked.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]

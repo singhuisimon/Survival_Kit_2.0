@@ -176,10 +176,20 @@ namespace Game
             LogMessage("TRANSITIONING TO MAIN MENU");
             LogMessage("Scene path: " + mainMenuScenePath);
             LogMessage("===========================================");
+            bool success = Scene.SceneLoadFromFile(mainMenuScenePath);
 
+            if (success)
+            {
+                LogMessage("Scene loaded successfully!");
+            }
+            else
+            {
+                LogMessage("ERROR: Failed to load scene!");
+                // Optionally, you could retry or show an error message
+            }
             // Publish event to trigger scene transition
             // The Game.cpp or a scene manager should listen to this event
-            Publish("LoadScene", mainMenuScenePath);
+            //Publish("LoadScene", mainMenuScenePath);
         }
 
         public override void OnDestroy()

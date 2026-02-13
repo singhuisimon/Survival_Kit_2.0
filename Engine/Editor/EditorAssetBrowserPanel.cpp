@@ -24,7 +24,7 @@ namespace Engine
 		DisplayAssetsBrowser();
 		DisplayDescriptorEditorPanel();
 	}
-
+#if 0
 	void EditorAssetBrowserPanel::DisplayAssetsBrowser()
 	{
 		ImGui::SetNextWindowSize(ImVec2(600, 400));
@@ -32,7 +32,9 @@ namespace Engine
 		// Begin properties dockable window
 		if (ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize))
 		{
+			//float leftColumnWidth = 200.0f * m_Editor->GetFontScale();
 			ImGui::Columns(2, nullptr, true);
+			//ImGui::SetColumnWidth(0, leftColumnWidth);
 			//static std::string selectedFolder = "";
 			//static ResourceType selectedType = ResourceType::UNKNOWN;
 
@@ -149,9 +151,12 @@ namespace Engine
 				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
 				ImGui::Separator();
 
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
+			
+				const float baseThumbnailSize = 150.0f;
+				const float thumbnailSize = baseThumbnailSize * m_Editor->GetFontScale(); // Scale the box
+				const float padding = 10.0f * m_Editor->GetFontScale();
 				const float cellSize = thumbnailSize + padding;
+			
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 				int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
 
@@ -283,8 +288,9 @@ namespace Engine
 
 				ImGui::Separator();
 
-				const float padding = 10.0f;
-				const float thumbnailSize = 64.0f;
+				const float baseThumbnailSize = 150.0f;
+				const float thumbnailSize = baseThumbnailSize * m_Editor->GetFontScale(); // Scale the box
+				const float padding = 10.0f * m_Editor->GetFontScale();
 				const float cellSize = thumbnailSize + padding;
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 				int itemsPerRow = std::max(1, (int)(panelWidth / cellSize));
@@ -449,6 +455,243 @@ namespace Engine
 
 		ImGui::End();
 	}
+#endif
+
+#if 1
+	void EditorAssetBrowserPanel::DisplayAssetsBrowser()
+	{
+		ImGui::SetNextWindowSize(ImVec2(600, 400));
+		bool isOpen = ImGui::Begin("Assets Browser", &assetsWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		if (isOpen)
+		{
+			// ===== SEARCH BAR =====
+			ImGui::Text("Search:");
+			ImGui::SameLine();
+			ImGui::PushItemWidth(500.0f);
+			if (ImGui::InputText("##AssetSearch", m_SearchBuffer, sizeof(m_SearchBuffer)))
+			{
+				m_SearchQuery = std::string(m_SearchBuffer);
+				FilterAssetsBySearchQuery();
+			}
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			ImGui::PushItemWidth(150.0f);
+			if (ImGui::BeginCombo("##TypeFilter", resourceTypeToString(m_FilterType).c_str()))
+			{
+				if (ImGui::Selectable("All Types", m_FilterType == ResourceType::UNKNOWN))
+				{
+					m_FilterType = ResourceType::UNKNOWN;
+					FilterAssetsBySearchQuery(); // Refresh search
+				}
+
+				for (int i = 1; i < (int)ResourceType::UNKNOWN; i++)
+				{
+					ResourceType t = static_cast<ResourceType>(i);
+					if (ImGui::Selectable(resourceTypeToString(t).c_str(), m_FilterType == t))
+					{
+						m_FilterType = t;
+						FilterAssetsBySearchQuery(); // Refresh search
+					}
+				}
+				ImGui::EndCombo();
+			}
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			if (ImGui::Button("Clear"))
+			{
+				m_SearchBuffer[0] = '\0';
+				m_SearchQuery = "";
+				m_FilterType = ResourceType::UNKNOWN;
+				m_FilteredAssets.clear();
+				selectedResourcesIndex = -1;
+			}
+
+			ImGui::Separator();
+
+			bool isSearching = !m_SearchQuery.empty() || m_FilterType != ResourceType::UNKNOWN;
+
+			ImGui::Columns(2, nullptr, true);
+
+			// ===== LEFT COLUMN: Folder Selection =====
+			ImGui::BeginChild("Project List", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+			ImGui::Text("Projects:");
+
+			if (ImGui::CollapsingHeader("Raw Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				std::set<ResourceType> availableTypes;
+				for (const auto* record : allAssets)
+				{
+					if (record && record->valid && record->type != ResourceType::UNKNOWN)
+					{
+						availableTypes.insert(record->type);
+					}
+				}
+
+				for (const auto& type : availableTypes)
+				{
+					std::string typeName = resourceTypeToString(type);
+					bool isSelected = (selectedType == type);
+
+					if (ImGui::Selectable(typeName.c_str(), isSelected))
+					{
+						raw_asset = true;
+						selectedType = type;
+						selectedFolder = typeName;
+						selectedResourcesIndex = -1;
+					}
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Composed Resources", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto folders = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/"));
+
+				for (auto& folder : folders)
+				{
+					if (folder.name != "Audio" && folder.name != "Meshes" && folder.name != "Shaders" &&
+						folder.name != "Textures" && folder.name != "Material")
+					{
+						bool isSelected = (selectedFolder == folder.fullPath);
+						if (ImGui::Selectable(folder.name.c_str(), isSelected))
+						{
+							selectedType = ResourceType::UNKNOWN;
+							raw_asset = false;
+							selectedFolder = folder.fullPath;
+							selectedResourcesIndex = -1;
+						}
+					}
+				}
+			}
+
+			ImGui::EndChild();
+
+			// ===== RIGHT COLUMN: Asset Display =====
+			ImGui::NextColumn();
+			ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
+
+			// Build the list of assets to display
+			std::vector<DisplayableAsset> assetsToDisplay;
+
+			if (isSearching)
+			{
+				// Use search results - convert FilteredAssetInfo to DisplayableAsset
+				ImGui::Text("Search Results (%zu found)", m_FilteredAssets.size());
+				ImGui::Separator();
+
+				// Get database once for efficiency
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+
+				for (const auto& filteredInfo : m_FilteredAssets)
+				{
+					DisplayableAsset displayAsset;
+					displayAsset.fileName = filteredInfo.fileName;
+					displayAsset.fullPath = filteredInfo.fullPath;
+					displayAsset.displayFolder = filteredInfo.folderPath;
+					displayAsset.isRawAsset = false;
+					displayAsset.record = nullptr;
+					displayAsset.guid = xresource::instance_guid{};
+
+					// Try to find the record in asset manager
+					for (const auto* record : allAssets)
+					{
+						if (!record || !record->valid) continue;
+
+						// Try exact path match first
+						if (record->sourcePath == filteredInfo.fullPath)
+						{
+							displayAsset.record = const_cast<AssetRecord*>(record);
+							displayAsset.guid = record->guid;
+							displayAsset.isRawAsset = true;
+							break;
+						}
+
+						// Try filename match as fallback for filesystem-based assets
+						std::filesystem::path recordFile(record->sourcePath);
+						std::filesystem::path searchFile(filteredInfo.fullPath);
+						if (recordFile.filename() == searchFile.filename() &&
+							record->type != ResourceType::UNKNOWN)
+						{
+							displayAsset.record = const_cast<AssetRecord*>(record);
+							displayAsset.guid = record->guid;
+							displayAsset.isRawAsset = true;
+							break;
+						}
+					}
+
+					assetsToDisplay.push_back(displayAsset);
+				}
+			}
+			else if (!selectedFolder.empty() && raw_asset)
+			{
+				// Display raw assets
+				ImGui::Text(("Resources > " + resourceTypeToString(selectedType)).c_str());
+				ImGui::Separator();
+
+				auto& db = AM.db();
+				auto allAssets = db.AllMutable();
+				std::vector<const AssetRecord*> filteredAssets;
+
+				for (const auto* record : allAssets)
+				{
+					if (!record || !record->valid) continue;
+					if (record->type == selectedType)
+					{
+						filteredAssets.push_back(record);
+					}
+				}
+
+				assetsToDisplay = BuildDisplayAssets(filteredAssets, resourceTypeToString(selectedType), true);
+			}
+			else if (!selectedFolder.empty() && !raw_asset)
+			{
+				// Display filesystem-based assets
+				std::filesystem::path folderPath(selectedFolder);
+				std::string folderName = folderPath.filename().string();
+				ImGui::Text(("Resources > " + folderName).c_str());
+				ImGui::Separator();
+
+				auto assetsList = m_Editor->getAssetsInFolder(selectedFolder);
+
+				for (const auto& asset : assetsList)
+				{
+					// Skip subdirectories, only show files
+					if (asset.name.find('.') == std::string::npos) continue;
+
+					DisplayableAsset displayAsset;
+					displayAsset.fileName = asset.name;
+					displayAsset.fullPath = asset.fullPath;
+					std::filesystem::path p(asset.fullPath);
+					displayAsset.displayFolder = p.parent_path().filename().string();
+					displayAsset.isRawAsset = false;
+					displayAsset.record = nullptr;
+
+					assetsToDisplay.push_back(displayAsset);
+				}
+			}
+
+			// ===== UNIFIED RENDERING =====
+			if (!assetsToDisplay.empty())
+			{
+				RenderAssetGrid(assetsToDisplay);
+			}
+			else if (!isSearching)
+			{
+				ImGui::TextDisabled("No assets found");
+			}
+
+			ImGui::EndChild();
+			ImGui::Columns(1);
+
+		}
+		ImGui::End();
+	}
+
+#endif
+
 
 	void EditorAssetBrowserPanel::DisplayDescriptorEditorPanel()
 	{
@@ -804,5 +1047,375 @@ namespace Engine
 			ImGui::End();
 		}
 	}
+	void EditorAssetBrowserPanel::FilterAssetsBySearchQuery()
+	{
+		m_FilteredAssets.clear();
 
+		if (m_SearchQuery.empty())
+		{
+			return;
+		}
+
+		// Convert search query to lowercase for case-insensitive search
+		std::string lowerQuery = m_SearchQuery;
+		std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
+
+		// First, search the asset database for raw assets
+		auto& db = AM.db();
+		auto allAssets = db.AllMutable();
+
+		for (const auto* record : allAssets)
+		{
+			if (!record || !record->valid) continue;
+
+			// Extract filename from sourcePath
+			std::filesystem::path assetPath(record->sourcePath);
+			std::string fileName = assetPath.filename().string();
+
+			// Convert asset name to lowercase
+			std::string lowerFileName = fileName;
+			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
+			bool matchesText = lowerFileName.find(m_SearchQuery) != std::string::npos;
+			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (record->type == m_FilterType);
+			if (matchesText && matchesType)
+			{
+				FilteredAssetInfo info;
+				info.fileName = fileName;
+				info.folderPath = resourceTypeToString(record->type);
+				info.fullPath = record->sourcePath;
+
+				// Check if we already added this (avoid duplicates)
+				bool alreadyAdded = false;
+				for (const auto& existing : m_FilteredAssets)
+				{
+					if (existing.fullPath == info.fullPath)
+					{
+						alreadyAdded = true;
+						break;
+					}
+				}
+
+				if (!alreadyAdded)
+				{
+					m_FilteredAssets.push_back(info);
+				}
+			}
+		}
+
+		// Then search filesystem folders for other asset types
+		std::vector<std::string> foldersToSearch = {
+		"Sources/",
+		"Textures/",
+		"Scenes/",
+		"Shaders/",
+		"Material/",
+		"Meshes/",
+		"Prefabs/",
+		"AnimationClips/",
+		"Audio/",
+		"AudioSetting/",
+		"BT/",
+		"Fonts/"
+		};
+		// Search through filesystem folders
+		for (const auto& folder : foldersToSearch)
+		{
+			SearchFolderRecursive(getAssetFilePath(folder), folder, lowerQuery);
+		}
+	}
+	void EditorAssetBrowserPanel::SearchFolderRecursive(const std::string& folderPath, const std::string& displayFolder, const std::string& lowerQuery)
+	{
+		auto assets = m_Editor->getAssetsInFolder(folderPath);
+
+		for (const auto& asset : assets)
+		{
+
+			bool isFile = asset.name.find('.') != std::string::npos;
+
+			if (!isFile)
+			{
+
+				SearchFolderRecursive(folderPath + asset.name + "/", displayFolder, lowerQuery);
+				continue;
+			}
+			ResourceType assetType = detectResourceTypeFromPath(asset.fullPath);
+			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (assetType == m_FilterType);
+			// Convert asset name to lowercase
+			std::string lowerFileName = asset.name;
+			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
+			bool matchesText = lowerQuery.empty() || lowerFileName.find(lowerQuery) != std::string::npos;
+			
+			if (m_FilterType != ResourceType::UNKNOWN) {
+				std::string ext = std::filesystem::path(asset.name).extension().string();
+				// Map your extensions to ResourceTypes
+				if (m_FilterType == ResourceType::ENTITY_PREFAB && ext != ".prefab") matchesType = false;
+				else if (m_FilterType == ResourceType::SCENE_PREFAB && ext != ".json") matchesType = false;
+				else if (m_FilterType == ResourceType::MESH && ext != ".fbx") matchesType = false;
+			}
+
+			//bool matchesText = lowerQuery.empty() || lowerFileName.find(lowerQuery) != std::string::npos;
+
+			if (matchesText && matchesType)
+			{
+				FilteredAssetInfo info;
+				info.fileName = asset.name;
+
+				// Re-use path logic for consistent tooltips
+				std::filesystem::path p(asset.fullPath);
+				info.folderPath = p.parent_path().filename().string();
+
+				info.fullPath = asset.fullPath;
+				m_FilteredAssets.push_back(info);
+			}
+		}
+	}
+
+	void EditorAssetBrowserPanel::RenderAssetGrid(const std::vector<DisplayableAsset>& displayAssets)
+	{
+		const float baseThumbnailSize = 150.0f;
+		const float thumbnailSize = baseThumbnailSize * m_Editor->GetFontScale();
+		const float padding = 10.0f * m_Editor->GetFontScale();
+		const float cellSize = thumbnailSize + padding;
+
+		float panelWidth = ImGui::GetContentRegionAvail().x;
+		int itemsPerRow = std::max(1, static_cast<int>(panelWidth / cellSize));
+
+		if (ImGui::BeginTable("AssetGridTable", itemsPerRow))
+		{
+			for (size_t i = 0; i < displayAssets.size(); ++i)
+			{
+				const auto& asset = displayAssets[i];
+				ImGui::TableNextColumn();
+
+				bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+
+				// ===== STYLING =====
+				int styleColorsPushed = 0;
+				if (isSelected)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.95f, 0.65f, 0.20f, 1.0f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.75f, 0.30f, 1.0f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.55f, 0.15f, 1.0f));
+					styleColorsPushed = 3;
+				}
+
+				ImGui::PushID(static_cast<int>(i));
+
+				// ===== BUTTON =====
+				if (ImGui::Button(asset.fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
+				{
+					selectedResourcesIndex = static_cast<int>(i);
+
+					// Handle different asset types on click
+					HandleAssetSelection(asset);
+				}
+
+				// Pop style colors IMMEDIATELY
+				if (styleColorsPushed > 0)
+				{
+					ImGui::PopStyleColor(styleColorsPushed);
+				}
+
+				// ===== DRAG AND DROP =====
+				if (asset.isRawAsset && asset.record)
+				{
+					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+					{
+						xresource::instance_guid draggedGuid = asset.guid;
+						ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", &draggedGuid, sizeof(xresource::instance_guid));
+
+						ImGui::Text("Dragging: %s", asset.fileName.c_str());
+						ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+
+						ImGui::EndDragDropSource();
+					}
+				}
+
+				// ===== CONTEXT MENU =====
+				if (ImGui::BeginPopupContextItem("AssetContextMenu"))
+				{
+					ImGui::Text("%s", asset.fileName.c_str());
+
+					if (asset.isRawAsset && asset.record)
+					{
+						if (asset.record->type == ResourceType::TEXTURE || asset.record->type == ResourceType::MESH)
+						{
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Edit"))
+							{
+								LOG_INFO("Edit asset: ", asset.fileName);
+								showDescriptorEditorPanel = true;
+								currentEditingGuid = asset.guid;
+								editedAsset = asset.fileName;
+							}
+						}
+					}
+					ImGui::EndPopup();
+				}
+
+				// ===== TOOLTIP =====
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+
+					ImGui::Text("Name: %s", asset.fileName.c_str());
+					//ImGui::Text("Path: %s", asset.displayFolder.c_str());
+
+					if (asset.isRawAsset && asset.record)
+					{
+						ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+						ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
+
+						char timeBuf[64];
+						std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
+						std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+						ImGui::Text("Last Write Time: %s", timeBuf);
+					}
+					ImGui::EndTooltip();
+				}
+
+				// ===== CENTER TEXT UNDER THUMBNAIL =====
+				ImVec2 textSize = ImGui::CalcTextSize(asset.fileName.c_str());
+				float textX = (thumbnailSize - textSize.x) * 0.5f;
+				if (textX < 0) textX = 0;
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + textX);
+				ImGui::TextWrapped("%s", asset.fileName.c_str());
+
+				// Show folder path below
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+				ImVec2 folderSize = ImGui::CalcTextSize(asset.displayFolder.c_str());
+				float folderX = (thumbnailSize - folderSize.x) * 0.5f;
+				if (folderX < 0) folderX = 0;
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + folderX);
+				ImGui::TextWrapped("%s", asset.displayFolder.c_str());
+				ImGui::PopStyleColor();
+
+				ImGui::PopID();
+			}
+			ImGui::EndTable();
+		}
+		//ImGui::EndChild();
+	}
+
+	void EditorAssetBrowserPanel::HandleAssetSelection(const DisplayableAsset& asset)
+	{
+		std::string extension = asset.fullPath.substr(asset.fullPath.find_last_of('.'));
+
+		// Handle scene files
+		if (extension == ".json")
+		{
+			LOG_DEBUG("==== Start Loading Scene ====: ", asset.fileName);
+			m_Editor->SetScenePath(asset.fullPath);
+			m_Editor->ClearPrefabPath();
+
+			if (m_Editor->GetActiveScene())
+			{
+				m_Editor->SetCurrSelectedEntity(Entity{});
+				m_Editor->GetActiveScene()->GetRegistry().clear();
+				m_Editor->GetActiveScene()->LoadFromFile(asset.fullPath);
+
+				m_Editor->RetrievePickedID(0xFFFFFFFFu);
+				m_Editor->SetOperation(static_cast<ImGuizmo::OPERATION>(-1));
+
+				// Update settings
+				m_Editor->GetRenderer()->getBloomToggle() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomToggle;
+				m_Editor->GetRenderer()->getBloomStrength() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomStrength;
+				m_Editor->GetRenderer()->getBloomFilterRadius() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomFilterRadius;
+				m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
+			}
+
+			// Register prefabs
+			auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs"));
+			for (auto& prefabAsset : prefabFiles)
+			{
+				if (prefabAsset.name.find(".prefab") == std::string::npos) continue;
+
+				Prefab prefab;
+				if (PrefabSerializer::DeserializePrefab(prefabAsset.fullPath, prefab))
+				{
+					if (prefab.guid.m_Value != 0 && !PrefabRegistry::Get().IsPrefabRegistered(prefab.guid))
+					{
+						PrefabRegistry::Get().RegisterPrefab(prefab.guid, prefabAsset.fullPath, prefab.name);
+						LOG_INFO("Registered prefab: ", prefab.name.c_str());
+					}
+				}
+			}
+
+			LOG_DEBUG("==== End Loading Scene ====: ", asset.fileName);
+		}
+		// Handle prefab files
+		else if (extension == ".prefab")
+		{
+			LOG_DEBUG("===== Start Load Prefab File =========");
+			m_Editor->SetPrefabPath(asset.fullPath);
+			m_Editor->ClearScenePath();
+
+			std::string prefabName = "Prefab: " + asset.fileName;
+			Scene* newScene = m_Editor->CreateNewScene(prefabName);
+			if (!newScene)
+			{
+				LOG_ERROR("Failed to create new scene");
+				return;
+			}
+
+			Prefab loadedPrefab;
+			if (PrefabRegistry::Get().LoadPrefabFromFile(asset.fullPath, loadedPrefab))
+			{
+				LOG_INFO("Successfully loaded prefab: ", loadedPrefab.name);
+				LOG_INFO("Prefab has ", loadedPrefab.entities.size(), " entities");
+
+				Entity prefabRoot = PrefabInstantiator::InstantiatePrefab(
+					newScene,
+					loadedPrefab,
+					Entity{}
+				);
+
+				if (prefabRoot)
+				{
+					m_Editor->SetCurrSelectedEntity(prefabRoot);
+					m_Editor->RetrievePickedID(static_cast<uint32_t>(prefabRoot.GetHandle()));
+					LOG_INFO("Prefab instantiated successfully");
+				}
+				else
+				{
+					LOG_ERROR("Failed to instantiate prefab");
+				}
+			}
+
+			LOG_DEBUG("===== End Load Prefab File =========");
+		}
+	}
+
+	std::vector<DisplayableAsset> EditorAssetBrowserPanel::BuildDisplayAssets(
+		const std::vector<const AssetRecord*>& records,
+		const std::string& displayFolder,
+		bool isRawAssets)
+	{
+		std::vector<DisplayableAsset> result;
+
+		for (size_t i = 0; i < records.size(); ++i)
+		{
+			if (isRawAssets && !records[i])
+				continue;
+
+			DisplayableAsset displayAsset;
+			displayAsset.isRawAsset = isRawAssets;
+			displayAsset.displayFolder = displayFolder;
+
+			if (isRawAssets)
+			{
+				displayAsset.record = const_cast<AssetRecord*>(records[i]);
+				displayAsset.guid = records[i]->guid;
+				displayAsset.fullPath = records[i]->sourcePath;
+
+				std::filesystem::path assetPath(records[i]->sourcePath);
+				displayAsset.fileName = assetPath.filename().string();
+			}
+
+			result.push_back(displayAsset);
+		}
+
+		return result;
+	}
 }

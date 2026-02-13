@@ -196,6 +196,8 @@ namespace Engine {
   */
         Entity FindEntityByName(const std::string& name);
 
+        Entity FindEntityByTag(const std::string& tag);
+
     private:
         std::string m_Name;
         entt::registry m_Registry;

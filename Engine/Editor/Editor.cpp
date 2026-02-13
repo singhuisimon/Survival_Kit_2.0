@@ -36,22 +36,31 @@ namespace Engine
         ImGui::CreateContext();
         io = &ImGui::GetIO(); (void)io;
 
+        float fontSize = 18.0f;
+        std::string fontPath = getAssetFilePath("Sources/Fonts/Quantico-Regular.ttf");
+        io->Fonts->AddFontFromFileTTF(fontPath.c_str(), 32.0f);
+        //ImGui::GetStyle().ScaleAllSizes(m_FontScale);
+ /*       ImFontConfig config;
+        config.SizePixels = 18.0f;
+        io->Fonts->AddFontDefault(&config);*/
+
         io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-        io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+        io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        //io->FontGlobalScale = 1.5f;// Enable Multi-Viewport / Platform Windows
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
 
         // Setup scaling
-        ImGuiStyle& style = ImGui::GetStyle();
+        m_BaseStyle = ImGui::GetStyle();
 
         // Set WindowRounding and ImGuiCol_WindowBg when viewport is enabled
         if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+            m_BaseStyle.WindowRounding = 0.0f;
+            m_BaseStyle.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
         // Setup Platform/Renderer backends

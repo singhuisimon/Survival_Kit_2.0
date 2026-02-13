@@ -30,6 +30,7 @@ namespace Engine
 
 		bool m_AnimatorWindow = false;			// Animator/dopesheet window toggle
 		bool m_FocusAnimatorNextFrame = false;	// Request Animator window focus next frame
+		float headerWidth = 350.0f;
 
 		// --- Animator / dopesheet editor state ---
 		enum class DopesheetTrackType

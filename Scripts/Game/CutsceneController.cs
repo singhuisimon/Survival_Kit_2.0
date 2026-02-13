@@ -124,7 +124,14 @@ namespace Game
             {
                 hasLoadedMenu = true;
                 LogMessage("CutsceneController: Loading main menu during pg3");
-                Publish("LoadScene", mainMenuScenePath);
+                //Publish("LoadScene", mainMenuScenePath);
+                bool success = Scene.SceneLoadFromFile(mainMenuScenePath);
+                if (success)
+                {
+                    LogMessage("Main menu loaded successfully!");
+                }
+
+
             }
         }
 

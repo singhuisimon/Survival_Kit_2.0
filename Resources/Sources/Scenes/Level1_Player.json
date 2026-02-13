@@ -8,6 +8,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PlayerDeath",
                         "Tag": "PlayerDeath"
                     }
                 },
@@ -62,6 +63,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Entity",
                         "Tag": "Particles"
                     }
                 },
@@ -194,6 +196,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Entity",
                         "Tag": "InnermostCore"
                     }
                 },
@@ -295,6 +298,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Entity",
                         "Tag": "InnerCore"
                     }
                 },
@@ -378,6 +382,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton_3_Hovered",
                         "Tag": "Paused_PlusButton_3_Hovered"
                     }
                 },
@@ -428,6 +433,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton_3",
                         "Tag": "Paused_PlusButton_3"
                     }
                 },
@@ -478,6 +484,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_3_Hovered",
                         "Tag": "Paused_MinusButton_3_Hovered"
                     }
                 },
@@ -528,6 +535,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_3",
                         "Tag": "Paused_MinusButton_3"
                     }
                 },
@@ -578,6 +586,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MixerFill_3",
                         "Tag": "Paused_MixerFill_3"
                     }
                 },
@@ -628,6 +637,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton_2_Hovered",
                         "Tag": "Paused_PlusButton_2_Hovered"
                     }
                 },
@@ -678,6 +688,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton_2",
                         "Tag": "Paused_PlusButton_2"
                     }
                 },
@@ -728,6 +739,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_2_Hovered",
                         "Tag": "Paused_MinusButton_2_Hovered"
                     }
                 },
@@ -778,6 +790,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_2",
                         "Tag": "Paused_MinusButton_2"
                     }
                 },
@@ -828,6 +841,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MixerFill_2",
                         "Tag": "Paused_MixerFill_2"
                     }
                 },
@@ -878,6 +892,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_HowToPlayButton_Hovered",
                         "Tag": "Paused_HowToPlayButton_Hovered"
                     }
                 },
@@ -928,6 +943,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_HowToPlayButton",
                         "Tag": "Paused_HowToPlayButton"
                     }
                 },
@@ -978,6 +994,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MainMenuButton_Hovered",
                         "Tag": "Paused_MainMenuButton_Hovered"
                     }
                 },
@@ -1028,6 +1045,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MainMenuButton",
                         "Tag": "Paused_MainMenuButton"
                     }
                 },
@@ -1078,6 +1096,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton_Hovered",
                         "Tag": "Paused_MinusButton_Hovered"
                     }
                 },
@@ -1128,6 +1147,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MinusButton",
                         "Tag": "Paused_MinusButton"
                     }
                 },
@@ -1178,6 +1198,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_MixerFill",
                         "Tag": "Paused_MixerFill"
                     }
                 },
@@ -1228,6 +1249,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton_Hovered",
                         "Tag": "Paused_PlusButton_Hovered"
                     }
                 },
@@ -1278,6 +1300,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_PlusButton",
                         "Tag": "Paused_PlusButton"
                     }
                 },
@@ -1328,6 +1351,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_RestartButton_Hovered",
                         "Tag": "Paused_RestartButton_Hovered"
                     }
                 },
@@ -1378,6 +1402,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_RestartButton",
                         "Tag": "Paused_RestartButton"
                     }
                 },
@@ -1428,6 +1453,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_ResumeButton_Hovered",
                         "Tag": "Paused_ResumeButton_Hovered"
                     }
                 },
@@ -1478,6 +1504,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Paused_ResumeButton",
                         "Tag": "Paused_ResumeButton"
                     }
                 },
@@ -1528,6 +1555,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PauseMenu_EngineBG",
                         "Tag": "PauseMenu_EngineBG"
                     }
                 },
@@ -1585,6 +1613,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreDestruction",
                         "Tag": "CoreDestruction"
                     }
                 },
@@ -1639,6 +1668,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SEMICONDUCTOR",
                         "Tag": "SEMICONDUCTOR"
                     }
                 },
@@ -1663,7 +1693,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2653605903852225151\",\"Tag\":\"SEMICONDUCTOR\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -1809,6 +1842,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "ICESentryText",
                         "Tag": "ICESentryText"
                     }
                 },
@@ -1822,7 +1856,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1834,7 +1868,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6021110949939003837\",\"Tag\":\"ICESentryText\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6021110949939003837\",\"Tag\":\"ICESentryText\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             }
                         ]
                     }
@@ -1870,6 +1907,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "HealthBarWindow",
                         "Tag": "HealthBarWindow"
                     }
                 },
@@ -1883,7 +1921,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1895,7 +1933,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462943\",\"Tag\":\"HealthBarWindow\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462943\",\"Tag\":\"HealthBarWindow\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -1953,6 +1994,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "AltFireIcon",
                         "Tag": "AltFireIcon"
                     }
                 },
@@ -1966,7 +2008,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1978,7 +2020,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12938639977580085681\",\"Tag\":\"AltFireIcon\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -2036,6 +2081,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CollisionManager",
                         "Tag": "CollisionManager"
                     }
                 },
@@ -2077,6 +2123,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "OOB",
                         "Tag": "OOB"
                     }
                 },
@@ -2140,6 +2187,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Level_Texture",
                         "Tag": "Level_Texture"
                     }
                 },
@@ -2191,6 +2239,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall3",
                         "Tag": "Wall3"
                     }
                 },
@@ -2242,6 +2291,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall2",
                         "Tag": "Wall2"
                     }
                 },
@@ -2293,6 +2343,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Wall1",
                         "Tag": "Wall1"
                     }
                 },
@@ -2344,6 +2395,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "corepad",
                         "Tag": "corepad"
                     }
                 },
@@ -2395,6 +2447,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "corepad",
                         "Tag": "corepad"
                     }
                 },
@@ -2446,6 +2499,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "corepad",
                         "Tag": "corepad"
                     }
                 },
@@ -2497,6 +2551,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SEMICONDUCTOR1",
                         "Tag": "SEMICONDUCTOR1"
                     }
                 },
@@ -2589,6 +2644,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SEMICONDUCTOR1",
                         "Tag": "SEMICONDUCTOR1"
                     }
                 },
@@ -2681,6 +2737,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PrimaryWeaponFrame",
                         "Tag": "PrimaryWeaponFrame"
                     }
                 },
@@ -2694,7 +2751,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2709,7 +2766,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18126786748310897079\",\"Tag\":\"PrimaryWeaponFrame\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18126786748310897079\",\"Tag\":\"PrimaryWeaponFrame\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -2770,6 +2830,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Light",
                         "Tag": "Light"
                     }
                 },
@@ -2826,6 +2887,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PrimaryWeaponWindow",
                         "Tag": "PrimaryWeaponWindow"
                     }
                 },
@@ -2839,7 +2901,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2854,7 +2916,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462933\",\"Tag\":\"PrimaryWeaponWindow\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2562346436118462933\",\"Tag\":\"PrimaryWeaponWindow\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -2912,6 +2977,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -2985,6 +3051,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Player",
                         "Tag": "Player"
                     }
                 },
@@ -2998,7 +3065,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "player",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/player.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3013,7 +3079,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Tag\":\"Player\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889775\",\"Tag\":\"Player\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 3,
@@ -3283,6 +3352,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_0",
                         "Tag": "player_0"
                     }
                 },
@@ -3307,7 +3377,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231409\",\"Tag\":\"player_0\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3366,6 +3439,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_1",
                         "Tag": "player_1"
                     }
                 },
@@ -3390,7 +3464,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772339\",\"Tag\":\"player_1\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3449,6 +3526,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_2",
                         "Tag": "player_2"
                     }
                 },
@@ -3473,7 +3551,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9759204105783231413\",\"Tag\":\"player_2\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3532,6 +3613,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_3",
                         "Tag": "player_3"
                     }
                 },
@@ -3556,7 +3638,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13217968619603772343\",\"Tag\":\"player_3\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3615,6 +3700,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_4",
                         "Tag": "player_4"
                     }
                 },
@@ -3639,7 +3725,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16100272381120889785\",\"Tag\":\"player_4\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3698,6 +3787,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_5",
                         "Tag": "player_5"
                     }
                 },
@@ -3722,7 +3812,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1688753573535302587\",\"Tag\":\"player_5\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3781,6 +3874,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_6",
                         "Tag": "player_6"
                     }
                 },
@@ -3805,7 +3899,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1112292821231879101\",\"Tag\":\"player_6\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3864,6 +3961,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "player_7",
                         "Tag": "player_7"
                     }
                 },
@@ -3888,7 +3986,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12641507867300348863\",\"Tag\":\"player_7\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -3947,6 +4048,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "BotnetSpawner",
                         "Tag": "BotnetSpawner"
                     }
                 },
@@ -3995,6 +4097,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthBarRefill",
                         "Tag": "CoreHealthBarRefill"
                     }
                 },
@@ -4052,6 +4155,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PlayerCam",
                         "Tag": "PlayerCam"
                     }
                 },
@@ -4090,7 +4194,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.7135207653045654,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -4123,6 +4227,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Cruiser",
                         "Tag": "Cruiser"
                     }
                 },
@@ -4174,6 +4279,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "PlayerHealth",
                         "Tag": "PlayerHealth"
                     }
                 },
@@ -4224,6 +4330,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Crosshair",
                         "Tag": "Crosshair"
                     }
                 },
@@ -4281,6 +4388,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Crosshair2",
                         "Tag": "Crosshair2"
                     }
                 },
@@ -4331,6 +4439,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "FiringPosition",
                         "Tag": "FiringPosition"
                     }
                 },
@@ -4350,7 +4459,8 @@
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
                                 "modifiedPropertyNames": [
-                                    "Tag"
+                                    "Tag",
+                                    "Name"
                                 ]
                             },
                             {
@@ -4421,6 +4531,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Dreadnought",
                         "Tag": "Dreadnought"
                     }
                 },
@@ -4472,6 +4583,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -4513,6 +4625,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -4540,7 +4653,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -4636,6 +4752,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -4660,7 +4777,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -4709,6 +4829,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -4736,7 +4857,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12768752238844838337\",\"Tag\":\"Gunship\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 2,
@@ -4829,6 +4953,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "GunshipHelper",
                         "Tag": "GunshipHelper"
                     }
                 },
@@ -4853,7 +4978,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6427683963508884047\",\"Tag\":\"GunshipHelper\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -4902,6 +5030,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WormSpawner",
                         "Tag": "WormSpawner"
                     }
                 },
@@ -4943,6 +5072,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "Firewall_activevoidscreen",
                         "Tag": "Firewall_activevoidscreen"
                     }
                 },
@@ -4993,6 +5123,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "LooseScreen",
                         "Tag": "LooseScreen"
                     }
                 },
@@ -5053,6 +5184,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WinScreen",
                         "Tag": "WinScreen"
                     }
                 },
@@ -5110,6 +5242,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthBarWindow",
                         "Tag": "CoreHealthBarWindow"
                     }
                 },
@@ -5160,6 +5293,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthBarFrame",
                         "Tag": "CoreHealthBarFrame"
                     }
                 },
@@ -5210,6 +5344,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "CoreHealthCount",
                         "Tag": "CoreHealthCount"
                     }
                 },
@@ -5271,6 +5406,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WeaponBarReload",
                         "Tag": "WeaponBarReload"
                     }
                 },
@@ -5328,6 +5464,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "HealthCount",
                         "Tag": "HealthCount"
                     }
                 },
@@ -5389,6 +5526,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "HealthBarFill",
                         "Tag": "HealthBarFill"
                     }
                 },
@@ -5446,6 +5584,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "WeaponAmmoCount",
                         "Tag": "WeaponAmmoCount"
                     }
                 },
@@ -5507,6 +5646,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "scoreboard",
                         "Tag": "scoreboard"
                     }
                 },
@@ -5568,6 +5708,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SentryWindow",
                         "Tag": "SentryWindow"
                     }
                 },
@@ -5581,7 +5722,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5593,7 +5734,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17550325996007473573\",\"Tag\":\"SentryWindow\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17550325996007473573\",\"Tag\":\"SentryWindow\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -5654,6 +5798,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "loveletterspawm",
                         "Tag": "loveletterspawm"
                     }
                 },
@@ -5695,6 +5840,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "StageCount",
                         "Tag": "StageCount"
                     }
                 },
@@ -5756,6 +5902,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "SecondayWeaponUI",
                         "Tag": "SecondayWeaponUI"
                     }
                 },
@@ -5769,7 +5916,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5781,7 +5928,10 @@
                                 "componentType": 101,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5444650197635580331\",\"Tag\":\"SecondayWeaponUI\"}}",
+                                "modifiedPropertyNames": [
+                                    "Name"
+                                ]
                             },
                             {
                                 "componentType": 14,
@@ -5839,6 +5989,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "TImer",
                         "Tag": "TImer"
                     }
                 },
@@ -5900,6 +6051,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "BGM",
                         "Tag": "BGM"
                     }
                 },

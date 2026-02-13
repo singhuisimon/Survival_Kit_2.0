@@ -141,7 +141,7 @@ namespace Engine {
             return false;
         }
 
-        std::string entityName = rootEntity.GetComponent<TagComponent>().Tag;
+        std::string entityName = rootEntity.GetComponent<TagComponent>().Name;
 
         outPrefab.Clear();
         outPrefab.name = prefabName;
@@ -162,7 +162,7 @@ namespace Engine {
         PrefabEntityData entityData;
 
         if (entity.HasComponent<TagComponent>()) {
-            entityData.name = entity.GetComponent<TagComponent>().Tag;
+            entityData.name = entity.GetComponent<TagComponent>().Name;
         }
         else {
             entityData.name = std::to_string(static_cast<u32>(entity));
@@ -304,7 +304,7 @@ namespace Engine {
                     Entity childEntity(childHandle, registry);
 
                     std::string childName = childEntity.HasComponent<TagComponent>()
-                        ? childEntity.GetComponent<TagComponent>().Tag
+                        ? childEntity.GetComponent<TagComponent>().Name
                         : "Unknown";
 
                     LOG_INFO("    -> Serializing child: '", childName, "' (handle=", childID, ")");

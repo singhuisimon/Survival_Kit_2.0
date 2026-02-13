@@ -21,6 +21,7 @@ namespace Game
         [SerializeField] private float damage = 20.0f;  // Damage dealt by direct hit
         //[SerializeField] 
         private string ultExplosionPrefab = "Sources/Prefabs/PrimaryUltExplosion.prefab";
+        string MainExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";
 
         private float elapsedTime = 0.0f;
         private Vector3 savedVelocity = Vector3.Zero;
@@ -144,12 +145,28 @@ namespace Game
                 {
                     LogMessage("[PrimaryUltFire] AOE explosion spawned! ID: " + aoeID + " at impact point");
                 }
+
+                Vector3 myPos = Transform.GetPosition(EntityID);
+                uint vfxID = PrefabInstantiate(MainExplosionPrefabPath);
+                Transform.SetPosition(vfxID, ref myPos);
+
+                Vector3 newScale = new Vector3(20.0f, 20.0f, 20.0f);
+                Transform.SetScale(vfxID, ref newScale);
+                
+                if (vfxID == 0)
+                {
+                    LogMessage("[PrimaryUltFire] ERROR: Failed to instantiate AOE explosion!");
+                }
+                else
+                {
+                    LogMessage("[PrimaryUltFire] AOE explosion spawned! ID: " + vfxID + " at impact point");
+                }
             }
 
             AudioStop((uint)EntityID);
 
             hit = true;
-            lifetime += 0.5f;
+            lifetime += 0.01f;
 
             // Destroy the ult bullet
             //SceneDestroyEntity(bulletEntityID);

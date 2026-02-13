@@ -8,6 +8,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "New Entity",
                         "Tag": "New Entity"
                     }
                 },
@@ -39,6 +40,7 @@
                     "Properties": {
                         "ComponentGUID": "6169976022613295301",
                         "text": "Hello This is the test for text rendering :_ ",
+                        "fontName": "Quantico-Regular",
                         "fontSize": 56.0,
                         "color": [
                             1.0,
@@ -46,6 +48,7 @@
                             1.0,
                             1.0
                         ],
+                        "isVisible": true,
                         "align": 2,
                         "lineSpacing": 1.0,
                         "letterSpacing": 5.0,

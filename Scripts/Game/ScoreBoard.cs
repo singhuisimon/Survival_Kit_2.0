@@ -29,6 +29,11 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
 
+
+
+        private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string GAMEWIN = "GameWin";
+
         // ===== Points =====
         private const int POINTS_BOTNET = 10;
         private const int POINTS_WORMHOST = 100;
@@ -51,6 +56,11 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
+
+            Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
+            Event.Subscribe(GAMEWIN, OnGameOver);
+
+
 
             // Initialize score
             score = 0;

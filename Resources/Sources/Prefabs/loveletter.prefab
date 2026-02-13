@@ -1,0 +1,455 @@
+{
+    "Prefab Name": "loveletter",
+    "Prefab GUID": 16633861071367094525,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "loveletter",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5104646025297084621",
+                            "Position": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.009999999776482582,
+                                0.009999999776482582,
+                                0.009999999776482582
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7986949786814202059",
+                            "Name": "loveletter",
+                            "Tag": "loveletter"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13175096557545013455",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "loveletter_1",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7410489034510778585",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11445714300634742999",
+                            "Name": "loveletter_1",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14328018062151860443",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 1,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "loveletter_2",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11445714300634743007",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11445714300634743005",
+                            "Name": "loveletter_2",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16633861071365554401",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 2,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "loveletter_3",
+            "LocalID": 4,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16057400319062130917",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13751557309848436963",
+                            "Name": "loveletter_3",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12598635805241589991",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 3,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "loveletter_4",
+            "LocalID": 5,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15480939566758707435",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18363243328275824873",
+                            "Name": "loveletter_4",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "492960006869696749",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 4,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "loveletter_5",
+            "LocalID": 6,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2798803016083390705",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5104646025297084655",
+                            "Name": "loveletter_5",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4528185272993661171",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 5,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "loveletter_6",
+            "LocalID": 7,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6257567529903931639",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9139871291421049077",
+                            "Name": "loveletter_6",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15480939566758707449",
+                            "Mesh": "E005_loveletter_separated_v004.fbx",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 6,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

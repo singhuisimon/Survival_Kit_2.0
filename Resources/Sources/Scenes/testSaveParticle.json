@@ -8,6 +8,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
+                        "Name": "New Entity",
                         "Tag": "New Entity"
                     }
                 },
@@ -92,7 +93,7 @@
                         "Max Speed": 1.5,
                         "Rotation Speed": 0.0,
                         "Play Delay": 11.5,
-                        "Delay Accumulator": 25.61688995361328,
+                        "Delay Accumulator": 0.0,
                         "Randomize Rotation": true,
                         "Loop": false,
                         "Active": true,

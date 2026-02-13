@@ -43,7 +43,7 @@ namespace Game
         [SerializeField("Spaceship Speed")] private float spaceshipSpeed = 100.0f;
 
         // ===== Player Rotation =====
-        [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 1.25f;
+        [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 3.5f;
         [SerializeField("Model X Rotation Offset")] private float modelXRotationOffset = -90.0f;
 
         // ===== Cursor Control =====
