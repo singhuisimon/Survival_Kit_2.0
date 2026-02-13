@@ -17,7 +17,8 @@
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
 #include "../Component/TrailComponent.h"
-
+#include "../Prefab/PrefabHelpers.h"
+#include "../Component/TextComponent.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
 
@@ -346,9 +347,10 @@ namespace Engine
                 std::string entityName = addedEntity.HasComponent<TagComponent>()
                     ? addedEntity.GetComponent<TagComponent>().Name : "Unknown";
                 LOG_INFO("Removing added entity: ", entityName);
+                PrefabHelpers::CleanupEntityForDeletion(addedEntity, scene);
                 scene->DestroyEntity(addedEntity);
 
-                // ADD THIS: Also remove from childEntityIDs
+                // Also remove from childEntityIDs
                 auto it = std::find(prefabComp.childEntityIDs.begin(),
                     prefabComp.childEntityIDs.end(),
                     addedHandle);
@@ -493,8 +495,9 @@ namespace Engine
             ComponentTypeID::ParticleSystem,
             ComponentTypeID::Script,
             ComponentTypeID::BehaviourTree,
-			ComponentTypeID::SpriteRenderer,
-            ComponentTypeID::Trail
+            ComponentTypeID::SpriteRenderer,
+            ComponentTypeID::Trail,
+            ComponentTypeID::Text
         };
 
         for (const auto& prefabEntity : prefab.entities) {
@@ -575,6 +578,9 @@ namespace Engine
 					break;
                 case ComponentTypeID::Trail:
                     existsOnEntity = sceneEntity.HasComponent<TrailComponent>();
+                    break;
+                case ComponentTypeID::Text:
+                    existsOnEntity = sceneEntity.HasComponent<TextComponent>();
                     break;
                 default:
                     break;
@@ -962,6 +968,10 @@ namespace Engine
                     newEntityData.components.push_back(
                         PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Trail));
                 }
+                if (childEntity.HasComponent<TextComponent>()) {
+                    newEntityData.components.push_back(
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Text));
+                }
                 prefab.entities.push_back(newEntityData);
                 sceneHandleToPrefabLocalID[childID] = newEntityData.localID;
 
@@ -1079,52 +1089,14 @@ namespace Engine
             if (entity.HasComponent<TrailComponent>())
                 entity.RemoveComponent<TrailComponent>();
             break;
+        case ComponentTypeID::Text:
+            if (entity.HasComponent<TextComponent>())
+                entity.RemoveComponent<TextComponent>();
+            break;
         default:
             LOG_WARNING("Unknown component type for removal: ", static_cast<u32>(type));
             break;
         }
-
-       /* else if (componentType == "SpriteRendererComponent") {
-            auto& spriterenderer = entity.AddComponent<SpriteRendererComponent>();
-
-            if (properties.HasMember("Texture") && properties["Texture"].IsString())
-            {
-                std::string texName = properties["Texture"].GetString();
-                spriterenderer.TextureGuid = AM.getGuidFromName(texName);
-            }
-
-            if (properties.HasMember("Color") && properties["Color"].IsArray())
-            {
-                const auto& colorArr = properties["Color"].GetArray();
-                if (colorArr.Size() >= 4)
-                {
-                    spriterenderer.Color.r = colorArr[0].GetFloat();
-                    spriterenderer.Color.g = colorArr[1].GetFloat();
-                    spriterenderer.Color.b = colorArr[2].GetFloat();
-                    spriterenderer.Color.a = colorArr[3].GetFloat();
-                }
-            }
-
-            if (properties.HasMember("Quad"))
-            {
-                spriterenderer.Quad = properties["Quad"].GetUint();
-            }
-
-            if (properties.HasMember("Sprite Layer"))
-            {
-                spriterenderer.SpriteLayer = properties["Sprite Layer"].GetUint();
-            }
-
-            if (properties.HasMember("IsActive"))
-            {
-                spriterenderer.IsActive = properties["IsActive"].GetBool();
-            }
-
-            if (properties.HasMember("IsVisible"))
-            {
-                spriterenderer.IsVisible = properties["IsVisible"].GetBool();
-			}
-        }*/
     }
 
    

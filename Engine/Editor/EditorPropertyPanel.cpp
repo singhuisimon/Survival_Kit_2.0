@@ -16,6 +16,7 @@
 #include "../Serialization/ComponentSerializer.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../Serialization/PrefabSerializer.h"
+#include "../Prefab/PrefabHelpers.h"
 
 namespace Engine
 {
@@ -320,6 +321,9 @@ namespace Engine
 				}
 			}
 			if (removePrefabComp) {
+				if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+					PrefabHelpers::ClearPrefabComponentData(m_SelectedEntity);
+				}
 				m_SelectedEntity.RemoveComponent<PrefabComponent>();
 			}
 		}
@@ -436,7 +440,7 @@ namespace Engine
 					removeRigidBody = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::RigidBody);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::RigidBody);
@@ -640,7 +644,7 @@ namespace Engine
 					removeMesh = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::MeshRenderer);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::MeshRenderer);
@@ -967,7 +971,7 @@ namespace Engine
 					removeAudio = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::Audio);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Audio);
@@ -1293,8 +1297,9 @@ namespace Engine
 					removeReverb = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::ReverbZone);
 						// Store original state BEFORE removal
+
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::ReverbZone);
 
@@ -1431,6 +1436,7 @@ namespace Engine
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
+						prefabComp.ClearComponentOverride(ComponentTypeID::Listerner);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Listerner);
@@ -1812,6 +1818,7 @@ namespace Engine
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
+						prefabComp.ClearComponentOverride(ComponentTypeID::ParticleSystem);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::ParticleSystem);
@@ -2365,7 +2372,7 @@ namespace Engine
 					removeScriptComp = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::Script);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Script);
@@ -2518,6 +2525,7 @@ namespace Engine
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 
+						prefabComp.ClearComponentOverride(ComponentTypeID::Light);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Light);
@@ -2712,7 +2720,7 @@ namespace Engine
 					removeCameraComp = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::Camera);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Camera);
@@ -2883,7 +2891,7 @@ namespace Engine
 					removeAnimator = true;
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::Animator);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Animator);
@@ -3061,7 +3069,7 @@ namespace Engine
 					if (m_SelectedEntity.HasComponent<PrefabComponent>())
 					{
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
-
+						prefabComp.ClearComponentOverride(ComponentTypeID::SpriteRenderer);
 						// Store original state BEFORE removal
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::SpriteRenderer);
@@ -3292,8 +3300,14 @@ namespace Engine
 				// Handle component removal
 				if (removeTextComp) {
 					m_SelectedEntity.RemoveComponent<TextComponent>();
+
 					if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						prefabComp.ClearComponentOverride(ComponentTypeID::Text);
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Text);
+
 						prefabComp.MarkComponentRemoved(ComponentTypeID::Text);
 					}
 				}
@@ -3336,6 +3350,7 @@ namespace Engine
 					{
 						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
 						// Store original state BEFORE removal
+						prefabComp.ClearComponentOverride(ComponentTypeID::Trail);
 						std::string originalJSON = ComponentSerializer::SerializeComponent(
 							m_SelectedEntity, ComponentTypeID::Trail);
 						// Mark as removed

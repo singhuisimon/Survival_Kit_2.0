@@ -19,6 +19,7 @@
 #include "../Component/ScriptComponent.h"
 #include "../Component/TrailComponent.h"
 #include "../Scripting/ScriptSerializer.h"
+#include "../Component/TextComponent.h"
 
 #include "../Utility/Logger.h"
 
@@ -576,6 +577,51 @@ namespace Engine {
 				propertiesObj.AddMember("Has Last Position", trail.HasLastPosition, allocator);
 				propertiesObj.AddMember("Active", trail.Active, allocator);
 				propertiesObj.AddMember("Emit Trail", trail.EmitTrail, allocator);
+
+				break;
+			}
+			case ComponentTypeID::Text:
+			{
+				if (!entity.HasComponent<TextComponent>()) {
+					return "{}";
+				}
+				auto& textComp = entity.GetComponent<TextComponent>();
+				propertiesObj.AddMember(
+					"ComponentGUID",
+					Value(std::to_string(textComp.ComponentGUID.m_Value).c_str(), allocator),
+					allocator
+				);
+				//text content
+				propertiesObj.AddMember("text",
+					Value(textComp.text.c_str(), allocator), allocator);
+
+				//font name
+				propertiesObj.AddMember("fontName",
+					Value(textComp.fontName.c_str(), allocator), allocator);
+
+				//font size
+				propertiesObj.AddMember("fontSize", textComp.fontSize, allocator);
+
+				//color
+				Value colorArr(kArrayType);
+				colorArr.PushBack(textComp.color[0], allocator);
+				colorArr.PushBack(textComp.color[1], allocator);
+				colorArr.PushBack(textComp.color[2], allocator);
+				colorArr.PushBack(textComp.color[3], allocator);
+				propertiesObj.AddMember("color", colorArr, allocator);
+
+				//isVisible
+				propertiesObj.AddMember("isVisible",
+					textComp.isVisible, allocator);
+
+
+				// Alignment (store as int)
+				propertiesObj.AddMember("align", static_cast<int>(textComp.align), allocator);
+
+				// Layout properties
+				propertiesObj.AddMember("lineSpacing", textComp.lineSpacing, allocator);
+				propertiesObj.AddMember("letterSpacing", textComp.letterSpacing, allocator);
+				propertiesObj.AddMember("maxWidth", textComp.maxWidth, allocator);
 
 				break;
 			}
@@ -1389,6 +1435,74 @@ namespace Engine {
 
 				return true;
 			}
+			case ComponentTypeID::Text:
+			{ 
+				if (!entity.HasComponent<TextComponent>()) {
+					entity.AddComponent<TextComponent>();
+				}
+				auto& textComp = entity.GetComponent<TextComponent>();
+				if (properties.HasMember("ComponentGUID")) {
+					textComp.ComponentGUID = xresource::instance_guid(
+						std::stoull(properties["ComponentGUID"].GetString())
+					);
+				}
+
+				// Text content
+				if (properties.HasMember("text") && properties["text"].IsString()) {
+					textComp.text = properties["text"].GetString();
+				}
+
+				//font name
+				if (properties.HasMember("fontName") && properties["fontName"].IsString()) {
+					textComp.fontName = properties["fontName"].GetString();
+				}
+
+				// Font size
+				if (properties.HasMember("fontSize") && properties["fontSize"].IsFloat()) {
+					textComp.fontSize = properties["fontSize"].GetFloat();
+				}
+
+				// Color
+				if (properties.HasMember("color") && properties["color"].IsArray()) {
+					const auto& colorArr = properties["color"].GetArray();
+					if (colorArr.Size() >= 4) {
+						textComp.color[0] = colorArr[0].GetFloat();
+						textComp.color[1] = colorArr[1].GetFloat();
+						textComp.color[2] = colorArr[2].GetFloat();
+						textComp.color[3] = colorArr[3].GetFloat();
+					}
+				}
+
+				//isVisible
+				if (properties.HasMember("isVisible") && properties["isVisible"].IsBool()) {
+					textComp.setVisible(properties["isVisible"].GetBool());
+				}
+
+				// Alignment
+				if (properties.HasMember("align") && properties["align"].IsInt()) {
+					textComp.align = static_cast<TextAlignment>(properties["align"].GetInt());
+				}
+
+				// Line spacing
+				if (properties.HasMember("lineSpacing") && properties["lineSpacing"].IsFloat()) {
+					textComp.lineSpacing = properties["lineSpacing"].GetFloat();
+				}
+
+				// Letter spacing
+				if (properties.HasMember("letterSpacing") && properties["letterSpacing"].IsFloat()) {
+					textComp.letterSpacing = properties["letterSpacing"].GetFloat();
+				}
+
+				// Max width
+				if (properties.HasMember("maxWidth") && properties["maxWidth"].IsFloat()) {
+					textComp.maxWidth = properties["maxWidth"].GetFloat();
+				}
+
+				// Mark as dirty since layout needs to be recalculated
+				textComp.isDirty = true;
+
+				return true;
+			}
 			default:
 				LOG_WARNING("Unknown component type: ", static_cast<u32>(type));
 				return false;
@@ -1414,6 +1528,7 @@ namespace Engine {
 			case ComponentTypeID::Tag: return "TagComponent";
 			case ComponentTypeID::SpriteRenderer: return "SpriteRendererComponent";
 			case ComponentTypeID::Trail: return "TrailComponent";
+			case ComponentTypeID::Text: return "TextComponent";
 			default: return "UnknownComponent";
 		}
 	}
