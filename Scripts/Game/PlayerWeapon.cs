@@ -78,6 +78,8 @@ namespace Game
         private string ULTGAINEVENT = "GainUlt";
         private string GAMEWIN = "GameWin";
         private string GAMEOVER = "GameOver";
+        private string EVENT_RELOAD_START = "ReloadStart";
+        private string EVENT_RELOAD_END = "ReloadEnd";
 
         //2 audio for primary alt fire
         //not sure what is layermask
@@ -273,6 +275,8 @@ namespace Game
                 reloadingPrimary = false;
                 shootAllowed = true;
                 Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());  // ADD THIS
+                Publish(EVENT_RELOAD_END, "");
+
 
                 LogMessage("[PlayerWeapon] Reload complete!");
             }
@@ -468,6 +472,8 @@ namespace Game
             shootAllowed = false;
 
             reloadFinishTime = elapsedTime + delay;
+            Publish(EVENT_RELOAD_START, "");
+
 
             LogMessage("[PlayerWeapon] Reloading... will finish in " + delay + " seconds");
 
