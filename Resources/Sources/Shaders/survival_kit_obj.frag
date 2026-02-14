@@ -90,9 +90,17 @@ uniform bool uBlacksAsTransparent;
 uniform vec3 CamPos;       
 uniform bool isTexture;
 uniform bool useNormalMap;
+uniform bool hasMetallicMap;
+uniform bool hasRoughnessMap;
+uniform bool hasEmissionMap;
+uniform bool hasOcclusionMap;
 
 layout(binding = 0) uniform sampler2D Texture2D;
 layout(binding = 1) uniform sampler2D NormalMap;
+layout(binding = 11) uniform sampler2D metallicMap;
+layout(binding = 12) uniform sampler2D roughnessMap;
+layout(binding = 13) uniform sampler2D emissionMap;
+layout(binding = 14) uniform sampler2D occlusionMap;
 
 // ===== PBR constants =====
 const float PI = 3.14159265358979323846;
@@ -251,9 +259,19 @@ void main()
     }
     
     float roughness = material_.roughness;
+    if(hasRoughnessMap){
+        roughness = texture(roughnessMap, TexCoord * tiling + offset).r;
+    }
     float metallic = material_.metallic;
-    float ao = material_.ao;
+    if(hasMetallicMap){
+        metallic = texture(metallicMap, TexCoord * tiling + offset).r;
+    }
 
+    float ao = material_.ao;
+    if(hasOcclusionMap){
+        ao = texture(occlusionMap, TexCoord * tiling + offset).r;
+    }
+    
     // ===== F0 for Fresnel =====
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
@@ -349,7 +367,11 @@ void main()
 
     vec3 color = ambient + Lo;
     if(uEmissive){
-        color += (material_.emissionColor * material_.emissionStrength);
+        if(hasEmissionMap){
+            color += (texture(emissionMap, TexCoord * tiling + offset).rgb) * material_.emissionStrength;
+        }else{
+            color += (material_.emissionColor * material_.emissionStrength);
+        }
     }
 
     //vec3 color = ambient + Lo + (material_.emissionColor * material_.emissionStrength);
