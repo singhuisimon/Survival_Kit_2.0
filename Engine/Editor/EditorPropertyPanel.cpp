@@ -191,6 +191,7 @@ namespace Engine
 #if 1
 	void EditorPropertyPanel::DisplayPrefabComponent(ImVec2& buttonSize) {
 		if (m_SelectedEntity.HasComponent<PrefabComponent>()) {
+			float scale = m_Editor->GetFontScale();
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, headerWidth);
@@ -289,7 +290,7 @@ namespace Engine
 				if (prefabComp.isPrefabRoot)
 				{
 					ImGui::Separator();
-					if (ImGui::Button("Revert All Overrides", ImVec2(200, 0))) {
+					if (ImGui::Button("Revert All Overrides", ImVec2(400 * scale, 0))) {
 						if (PrefabInstantiator::RevertToPrefab(m_SelectedEntity, m_Scene)) {
 							LOG_INFO("Reverted all overrides successfully");
 						}
@@ -298,7 +299,7 @@ namespace Engine
 						}
 					}
 					ImGui::Spacing();
-					if (ImGui::Button("Apply Overrides to Prefab", ImVec2(200, 0))) {
+					if (ImGui::Button("Apply Overrides to Prefab", ImVec2(400 * scale, 0))) {
 						if (PrefabInstantiator::ApplyOverridesToPrefab(m_SelectedEntity, m_Scene)) {
 							LOG_INFO("Applied overrides to prefab successfully");
 						}
@@ -353,7 +354,7 @@ namespace Engine
 				glm::vec3 position = transform.Position;
 				if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
 					transform.SetPosition(position);
-					MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
+					//MarkComponentOverridden(ComponentTypeID::Transform);  // REQUIRED!
 				}
 
 				// Rotation (in degrees)

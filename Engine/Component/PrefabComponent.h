@@ -324,6 +324,8 @@ namespace Engine {
 				if (override.componentType == type) {
 					override.isRemovedComponent = false;
 					override.modifiedPropertyNames.clear();
+					override.currentComponentJSON.clear();
+					override.originalComponentJSON.clear();
 					break;
 				}
 			}
@@ -336,12 +338,23 @@ namespace Engine {
 					override.isAddedComponent = false;
 					override.modifiedPropertyNames.clear();
 					override.currentComponentJSON.clear();
+					override.originalComponentJSON.clear();
 					break;
 				}
 			}
 		}
 
 		void MarkEntityDeleted(u64 prefabLocalID, const std::string& entityName, const std::string& entityData) {
+
+			for (auto& deleted : deletedEntities) {
+				if (deleted.prefabLocalID == prefabLocalID) {
+					// Update existing entry instead of duplicating
+					deleted.entityName = entityName;
+					deleted.serializedEntityData = entityData;
+					return;
+				}
+			}
+
 			DeletedEntityData deleted;
 			deleted.prefabLocalID = prefabLocalID;
 			deleted.entityName = entityName;

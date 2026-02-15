@@ -51,9 +51,7 @@ namespace Engine {
 
             rapidjson::Value compObj(rapidjson::kObjectType);
             compObj.AddMember("type", static_cast<int>(type), allocator);
-            compObj.AddMember("typeName",
-                rapidjson::Value(typeName.c_str(), allocator),
-                allocator);
+            compObj.AddMember("typeName", rapidjson::Value(typeName.c_str(), allocator), allocator);
             compObj.AddMember("data", rapidjson::Value(compJSON.c_str(), allocator), allocator);
 
             componentsArray.PushBack(compObj, allocator);
