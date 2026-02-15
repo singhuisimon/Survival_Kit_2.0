@@ -368,6 +368,23 @@ namespace Engine
 				return;
 			}
 
+			// ----------------- Duplicate Entity ----------------------- //
+			if (ImGui::MenuItem("Duplicate Entity"))
+			{
+				// Pass m_Scene as parameter
+				Entity duplicate = DuplicateEntityRecursive(entity, Entity(), m_Scene);
+
+				if (duplicate) {
+					m_Editor->SetCurrSelectedEntity(duplicate);
+					m_Editor->RetrievePickedID(static_cast<uint32_t>(duplicate.GetHandle()));
+
+					std::string entityName = entity.HasComponent<TagComponent>()
+						? entity.GetComponent<TagComponent>().Name : "Entity";
+					LOG_INFO("Duplicated entity hierarchy: ", entityName);
+				}
+			}
+
+			
 			ImGui::Separator();
 			if (!hasParent) // for main entities
 			{
@@ -856,21 +873,7 @@ namespace Engine
 
 						if (prefabInstance)
 						{
-							//// Change the name to match the old entity
-							//if (prefabInstance.HasComponent<TagComponent>())
-							//{
-							//	auto& tag = prefabInstance.GetComponent<TagComponent>();
-							//	tag.Tag = oldEntityName;
-							//}
-
-							//// Apply position ONLY - keep rotation and scale from prefab
-							//if (prefabInstance.HasComponent<TransformComponent>())
-							//{
-							//	auto& newTransform = prefabInstance.GetComponent<TransformComponent>();
-							//	newTransform.SetPosition(position);
-
-							//	LOG_DEBUG("Applied position - Pos: ", position.x, ",", position.y, ",", position.z);
-							//}
+							
 
 							// Restore selection if it was selected
 							if (wasSelected)
@@ -913,5 +916,122 @@ namespace Engine
 	std::string EditorHierarchyPanel::SerializeEntityForRevert(Entity entity)
 	{
 		return PrefabHelpers::SerializeEntityToJSON(entity);
+	}
+
+	// In EditorHierarchyPanel.cpp - Add this helper function first (at the top with other functions)
+
+	Entity EditorHierarchyPanel::DuplicateEntityRecursive(Entity source, Entity newParent, Scene* scene) {
+		if (!source || !scene) return Entity();
+
+		// Create new entity
+		entt::entity newHandle = scene->GetRegistry().create();
+		Entity duplicate(newHandle, &scene->GetRegistry());
+
+		// Copy TagComponent
+		if (source.HasComponent<TagComponent>()) {
+			auto& srcTag = source.GetComponent<TagComponent>();
+			auto& dstTag = duplicate.AddComponent<TagComponent>();
+			dstTag.Name = srcTag.Name + (newParent ? "" : " (Copy)");
+			dstTag.Tag = srcTag.Tag;
+			dstTag.ComponentGUID.GenerateGUID();
+		}
+
+		// Copy TransformComponent
+		if (source.HasComponent<TransformComponent>()) {
+			auto& srcTransform = source.GetComponent<TransformComponent>();
+			auto& dstTransform = duplicate.AddComponent<TransformComponent>();
+			dstTransform.Position = srcTransform.Position;
+			dstTransform.Rotation = srcTransform.Rotation;
+			dstTransform.Scale = srcTransform.Scale;
+			dstTransform.IsDirty = true;
+			dstTransform.ComponentGUID.GenerateGUID();
+
+			// Set parent if provided
+			if (newParent && newParent.HasComponent<TransformComponent>()) {
+				dstTransform.Parent = static_cast<u32>(newParent.GetHandle());
+				auto& parentTransform = newParent.GetComponent<TransformComponent>();
+				parentTransform.Children.push_back(static_cast<u32>(duplicate.GetHandle()));
+			}
+		}
+
+		// Copy all other components (same as before)
+		if (source.HasComponent<MeshRendererComponent>()) {
+			duplicate.AddComponent<MeshRendererComponent>() = source.GetComponent<MeshRendererComponent>();
+			duplicate.GetComponent<MeshRendererComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<CameraComponent>()) {
+			duplicate.AddComponent<CameraComponent>() = source.GetComponent<CameraComponent>();
+			duplicate.GetComponent<CameraComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<LightComponent>()) {
+			duplicate.AddComponent<LightComponent>() = source.GetComponent<LightComponent>();
+			duplicate.GetComponent<LightComponent>().ComponentGUID.GenerateGUID();
+		}
+		if (source.HasComponent<ListenerComponent>()) {
+			duplicate.AddComponent<ListenerComponent>() = source.GetComponent<ListenerComponent>();
+			duplicate.GetComponent<ListenerComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<RigidbodyComponent>()) {
+			duplicate.AddComponent<RigidbodyComponent>() = source.GetComponent<RigidbodyComponent>();
+			duplicate.GetComponent<RigidbodyComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<AudioComponent>()) {
+			duplicate.AddComponent<AudioComponent>() = source.GetComponent<AudioComponent>();
+			duplicate.GetComponent<AudioComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<ScriptComponent>()) {
+			duplicate.AddComponent<ScriptComponent>() = source.GetComponent<ScriptComponent>();
+			duplicate.GetComponent<ScriptComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<ParticleComponent>()) {
+			duplicate.AddComponent<ParticleComponent>() = source.GetComponent<ParticleComponent>();
+			duplicate.GetComponent<ParticleComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<AnimatorComponent>()) {
+			duplicate.AddComponent<AnimatorComponent>() = source.GetComponent<AnimatorComponent>();
+			duplicate.GetComponent<AnimatorComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<SpriteRendererComponent>()) {
+			duplicate.AddComponent<SpriteRendererComponent>() = source.GetComponent<SpriteRendererComponent>();
+			duplicate.GetComponent<SpriteRendererComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<ReverbZoneComponent>()) {
+			duplicate.AddComponent<ReverbZoneComponent>() = source.GetComponent<ReverbZoneComponent>();
+			duplicate.GetComponent<ReverbZoneComponent>().ComponentGUID.GenerateGUID();
+		}
+
+
+		if (source.HasComponent<TrailComponent>()) {
+			duplicate.AddComponent<TrailComponent>() = source.GetComponent<TrailComponent>();
+			duplicate.GetComponent<TrailComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		if (source.HasComponent<TextComponent>()) {
+			duplicate.AddComponent<TextComponent>() = source.GetComponent<TextComponent>();
+			duplicate.GetComponent<TextComponent>().ComponentGUID.GenerateGUID();
+		}
+
+		// RECURSIVELY DUPLICATE CHILDREN
+		if (source.HasComponent<TransformComponent>()) {
+			auto& srcTransform = source.GetComponent<TransformComponent>();
+			for (u32 childHandle : srcTransform.Children) {
+				Entity child(static_cast<entt::entity>(childHandle), &scene->GetRegistry());
+				if (child) {
+					
+					DuplicateEntityRecursive(child, duplicate, scene);
+				}
+			}
+		}
+
+		return duplicate;
 	}
 }

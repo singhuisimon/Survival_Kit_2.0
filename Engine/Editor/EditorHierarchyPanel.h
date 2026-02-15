@@ -56,6 +56,7 @@ namespace Engine
 		void ClearParentlessChildren(Scene* scene);
 		void CreateEntityFromPrefabPanel();
 		void OpenReplacePefabPanel();
+		Entity DuplicateEntityRecursive(Entity source, Entity newParent, Scene* scene);
 
 		Entity FindPrefabRoot(Entity entity);
 		std::string SerializeEntityForRevert(Entity entity);
