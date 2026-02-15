@@ -447,6 +447,11 @@ namespace Engine {
 
 				prog.setUniform("isTexture", false);
 				prog.setUniform("useNormalMap", false);
+				prog.setUniform("hasMetallicMap", false);
+				prog.setUniform("hasRoughnessMap", false);
+				prog.setUniform("hasEmissionMap", false);
+				prog.setUniform("hasOcclusionMap", false);
+
 #pragma endregion
 
 				if (item.m_drawitem_type == DrawItemType::Particle) {
@@ -495,6 +500,30 @@ namespace Engine {
 				{
 					glBindTextureUnit(1, static_cast<GLuint>(nm_texture_resource->textureID));
 					prog.setUniform("useNormalMap", true);
+				}
+
+				if (TextureResource* mm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->metallicMap)))
+				{
+					glBindTextureUnit(11, static_cast<GLuint>(mm_texture_resource->textureID));
+					prog.setUniform("hasMetallicMap", true);
+				}
+
+				if (TextureResource* rm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->roughnessMap)))
+				{
+					glBindTextureUnit(12, static_cast<GLuint>(rm_texture_resource->textureID));
+					prog.setUniform("hasRoughnessMap", true);
+				}
+
+				if (TextureResource* em_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->emissionMap)))
+				{
+					glBindTextureUnit(13, static_cast<GLuint>(em_texture_resource->textureID));
+					prog.setUniform("hasEmissionMap", true);
+				}
+
+				if (TextureResource* ao_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->occlusionMap)))
+				{
+					glBindTextureUnit(14, static_cast<GLuint>(ao_texture_resource->textureID));
+					prog.setUniform("hasOcclusionMap", true);
 				}
 			 }
 			 else

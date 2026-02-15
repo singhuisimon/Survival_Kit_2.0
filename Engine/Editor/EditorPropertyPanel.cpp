@@ -838,10 +838,10 @@ namespace Engine
 					if (ImGui::CollapsingHeader("Texture Maps")) {
 						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
 						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
-						DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
-						DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
-						DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
-						DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Metallic Map", material->metallicMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Roughness Map", material->roughnessMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Emission Map", material->emissionMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
+						DisplayAssetField("Occlusion Map", material->occlusionMap, ResourceType::TEXTURE, showWrongType, ComponentTypeID::MeshRenderer);
 					}
 
 					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -2209,10 +2209,10 @@ namespace Engine
 						if (ImGui::CollapsingHeader("Texture Maps")) {
 							DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
 							DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
-							DisplayAssetField("Metallic Map [NOT AVAILABLE]", material->metallicMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
-							DisplayAssetField("Roughness Map [NOT AVAILABLE]", material->roughnessMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
-							DisplayAssetField("Emission Map [NOT AVAILABLE]", material->emissionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
-							DisplayAssetField("Occlusion Map [NOT AVAILABLE]", material->occlusionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Metallic Map", material->metallicMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Roughness Map", material->roughnessMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Emission Map", material->emissionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
+							DisplayAssetField("Occlusion Map", material->occlusionMap, ResourceType::TEXTURE, showWrongTypeParticle, ComponentTypeID::ParticleSystem);
 						}
 
 						if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen)) {
