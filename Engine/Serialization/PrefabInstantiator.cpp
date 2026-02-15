@@ -231,6 +231,21 @@ namespace Engine
                     auto& transform = entity.GetComponent<TransformComponent>();
                     transform.Children.clear();
                     transform.Parent = u32_max;
+
+                    bool isRootEntity = (entityData.parentLocalID == 0);
+
+                    if (isRootEntity) {
+                        // Reset root entity to world origin
+                        transform.Position = glm::vec3(0.0f, 0.0f, 0.0f);
+                        LOG_DEBUG("  RESET ROOT entity position to (0,0,0)");
+                    }
+                    else {
+                        // Child entity - keep local position from deserialization
+                        LOG_DEBUG("  PRESERVED CHILD entity '", entityData.name, "' local position: (",
+                            transform.Position.x, ", ",
+                            transform.Position.y, ", ",
+                            transform.Position.z, ")");
+                    }
                     LOG_DEBUG("  Cleared Transform relationships (will rebuild from prefab hierarchy)");
                 }
             }
@@ -1442,6 +1457,19 @@ namespace Engine
         }
 
         LOG_INFO("===== FINISHED REBUILDING HIERARCHY =====");
+       /* LOG_INFO("===== MARKING TRANSFORMS DIRTY =====");
+        for (auto it = localIDToEntity.begin(); it != localIDToEntity.end(); ++it) {
+            Entity entity = it->second;
+            if (entity && entity.HasComponent<TransformComponent>()) {
+                auto& transform = entity.GetComponent<TransformComponent>();
+                transform.IsDirty = true;
+
+                std::string entityName = entity.HasComponent<TagComponent>()
+                    ? entity.GetComponent<TagComponent>().Name : "Unknown";
+                LOG_DEBUG("Marked transform dirty for: ", entityName);
+            }
+        }
+        LOG_INFO("===== FINISHED MARKING TRANSFORMS DIRTY =====");*/
     }
 
     void  PrefabInstantiator::UpdateExistingEntitiesPrefabLocalID(Entity root, Scene* scene, const Prefab& prefab) {

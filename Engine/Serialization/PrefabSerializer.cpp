@@ -306,17 +306,16 @@ namespace Engine {
             std::vector<u32> originalChildren = transform.Children;
             u32 originalParent = transform.Parent;
             glm::vec3 originalPosition = transform.Position;
-
-
+            
             transform.Children.clear();
             transform.Parent = u32_max;
-            transform.Position = glm::vec3(0.0f, 0.0f, 0.0f);
+            //transform.Position = glm::vec3(0.0f, 0.0f, 0.0f);
             jsonStr = ComponentSerializer::SerializeComponent(entity, type);
 
             // Restore children
             transform.Children = originalChildren;
             transform.Parent = originalParent;
-            transform.Position = originalPosition;
+            //transform.Position = originalPosition;
         }
         else {
             jsonStr = ComponentSerializer::SerializeComponent(entity, type);
