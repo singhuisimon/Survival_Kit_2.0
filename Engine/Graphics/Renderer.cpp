@@ -499,30 +499,50 @@ namespace Engine {
 				if (TextureResource* nm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->normalMap)))
 				{
 					glBindTextureUnit(1, static_cast<GLuint>(nm_texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 					prog.setUniform("useNormalMap", true);
 				}
 
 				if (TextureResource* mm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->metallicMap)))
 				{
 					glBindTextureUnit(11, static_cast<GLuint>(mm_texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 					prog.setUniform("hasMetallicMap", true);
 				}
 
 				if (TextureResource* rm_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->roughnessMap)))
 				{
 					glBindTextureUnit(12, static_cast<GLuint>(rm_texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 					prog.setUniform("hasRoughnessMap", true);
 				}
 
 				if (TextureResource* em_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->emissionMap)))
 				{
 					glBindTextureUnit(13, static_cast<GLuint>(em_texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 					prog.setUniform("hasEmissionMap", true);
 				}
 
 				if (TextureResource* ao_texture_resource = RM.loadResource<TextureResource>(convertToTextureGuid(material_resource->occlusionMap)))
 				{
 					glBindTextureUnit(14, static_cast<GLuint>(ao_texture_resource->textureID));
+					prog.setUniform("material_.textureOffsetX", material_resource->offset[0]);
+					prog.setUniform("material_.textureOffsetY", material_resource->offset[1]);
+					prog.setUniform("material_.textureTileX", material_resource->tiling[0]);
+					prog.setUniform("material_.textureTileY", material_resource->tiling[1]);
 					prog.setUniform("hasOcclusionMap", true);
 				}
 			 }
