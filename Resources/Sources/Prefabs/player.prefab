@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: player.prefab",
-    "Prefab GUID": 2923408479389739909,
+    "Prefab GUID": 5390923687983055089,
     "version": 1,
     "entities": [
         {
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                0.029999999329447743,
-                                0.029999999329447743,
-                                0.029999999329447743
+                                1.0,
+                                1.0,
+                                1.0
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6958633745491461771",
+                            "Name": "Player",
                             "Tag": "Player"
                         }
                     }
@@ -50,8 +51,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "PlayerBackWings.mat",
+                            "Mesh": "PlayerModel_v003.fbx",
+                            "Material": "playerv2.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -197,7 +198,7 @@
                             "ComponentGUID": "9026023440310174993",
                             "ScriptClassName": "Game.PlayerWeapon",
                             "Started": false,
-                            "GCHandle": 44115
+                            "GCHandle": 19
                         }
                     }
                 },
@@ -282,27 +283,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "9759204105783231409",
+                            "Name": "player_0",
                             "Tag": "player_0"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 0,
-                            "CastType": 0
                         }
                     }
                 }
@@ -345,27 +327,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13217968619603772339",
+                            "Name": "player_1",
                             "Tag": "player_1"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 1,
-                            "CastType": 0
                         }
                     }
                 }
@@ -408,27 +371,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "9759204105783231413",
+                            "Name": "player_2",
                             "Tag": "player_2"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 2,
-                            "CastType": 0
                         }
                     }
                 }
@@ -471,27 +415,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13217968619603772343",
+                            "Name": "player_3",
                             "Tag": "player_3"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 3,
-                            "CastType": 0
                         }
                     }
                 }
@@ -534,27 +459,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16100272381120889785",
+                            "Name": "player_4",
                             "Tag": "player_4"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 4,
-                            "CastType": 0
                         }
                     }
                 }
@@ -597,27 +503,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1688753573535302587",
+                            "Name": "player_5",
                             "Tag": "player_5"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 5,
-                            "CastType": 0
                         }
                     }
                 }
@@ -660,27 +547,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1112292821231879101",
+                            "Name": "player_6",
                             "Tag": "player_6"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 6,
-                            "CastType": 0
                         }
                     }
                 }
@@ -723,27 +591,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12641507867300348863",
+                            "Name": "player_7",
                             "Tag": "player_7"
-                        }
-                    }
-                },
-                {
-                    "type": 2,
-                    "typeName": "MeshRendererComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "0",
-                            "Mesh": "PlayerModel_v002.fbx",
-                            "Material": "playerv2_1.mat",
-                            "Texture": "",
-                            "Visible": true,
-                            "GlobalIlluminate": true,
-                            "ShadowReceive": false,
-                            "MeshType": 0,
-                            "MaterialIdx": 0,
-                            "TextureIdx": 0,
-                            "SubmeshIndex": 7,
-                            "CastType": 0
                         }
                     }
                 }
@@ -786,6 +635,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4652790736277767943",
+                            "Name": "FiringPosition",
                             "Tag": "FiringPosition"
                         }
                     }

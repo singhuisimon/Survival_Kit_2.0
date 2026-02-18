@@ -1,10 +1,10 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "",
+    "baseMap": "PlayerModel_v003_BaseColor.png",
     "normalMap": "",
-    "metallicMap": "",
-    "roughnessMap": "",
-    "emissionMap": "",
+    "metallicMap": "PlayerModel_v003_Metallic.png",
+    "roughnessMap": "PlayerModel_v003_Roughness.png",
+    "emissionMap": "PlayerModel_v003_Emissive_Bright.png",
     "occlusionMap": "",
     "baseColor": [
         0.8578431606292725,
@@ -19,8 +19,8 @@
     "metallic": 0.0,
     "roughness": 0.0,
     "opacity": 1.0,
-    "emissionStrength": 100.0,
-    "alphaThreshold": 0.6650000214576721,
+    "emissionStrength": 1.1299999952316284,
+    "alphaThreshold": 0.5,
     "ambientOcclusion": 1.0,
     "tiling": [
         1.0,
@@ -33,7 +33,7 @@
     "enableEmission": true,
     "alphaTest": false,
     "doubleSided": false,
-    "receiveShadows": true,
-    "castShadows": true,
-    "treatBlacksAsTransparent": true
+    "receiveShadows": false,
+    "castShadows": false,
+    "treatBlacksAsTransparent": false
 }

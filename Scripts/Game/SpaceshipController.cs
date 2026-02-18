@@ -44,7 +44,7 @@ namespace Game
 
         // ===== Player Rotation =====
         [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 3.5f;
-        [SerializeField("Model X Rotation Offset")] private float modelXRotationOffset = -90.0f;
+        [SerializeField("Model X Rotation Offset")] private float modelXRotationOffset = 0.0f;
 
         // ===== Cursor Control =====
         [SerializeField("Toggle Cursor Key")] private KeyCode toggleCursorKey = KeyCode.F3;
@@ -122,6 +122,9 @@ namespace Game
             {
                 SetCursorVisible(false);
             }
+
+            Quat initialCamRot = GetRotation(cameraEntityID);
+            SetRotation(playerEntityID, ref initialCamRot);
 
             // Set up event subscription for player damage and OOB
             EVENT_PLAYER_DAMAGE += playerEntityID.ToString();

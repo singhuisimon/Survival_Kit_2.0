@@ -6448,9 +6448,13 @@ namespace Engine
 			ImGui::EndDragDropTarget();
 		}
 
+		// Unique widget ID for menu item so ImGui does not mix mesh and material together
+		std::string clearRef = label;
+		clearRef.insert(0, "Clear Reference###");
+
 		// Context menu to clear the reference
 		if (ImGui::BeginPopupContextItem()) {
-			if (ImGui::MenuItem("Clear Reference")) {
+			if (ImGui::MenuItem(clearRef.c_str())) {
 				guid = xresource::instance_guid();
 				MarkComponentOverridden(type);  // MARK AS OVERRIDDEN
 			}

@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "",
+    "baseMap": "E001_worm_host_v004_BaseColor.png",
     "normalMap": "",
     "metallicMap": "E001_worm_host_v004_Metallic.png",
     "roughnessMap": "E001_worm_host_v004_Roughness.png",
@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": true,
     "castShadows": true,
-    "treatBlacksAsTransparent": true
+    "treatBlacksAsTransparent": false
 }
