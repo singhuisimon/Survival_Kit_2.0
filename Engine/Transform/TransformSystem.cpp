@@ -37,6 +37,10 @@ namespace Engine {
 
 			if (transform.IsDirty) {
 
+				transform.WorldPosition = transform.Position;
+				transform.WorldRotation = transform.Rotation;
+				transform.WorldScale	= transform.Scale;
+
 				// Compute transformation for roots -> since roots have no parents, local transform == world transform
 				glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), transform.Position);
 				glm::mat4 rotation_matrix = glm::toMat4(transform.Rotation);
@@ -105,7 +109,70 @@ namespace Engine {
 		SetParent(scene, child, entt::null);
 	}
 
-	void TransformSystem::propagate(Scene* scene, entt::entity entity) {
+	void TransformSystem::SetWorldPosition(Scene* scene, entt::entity const entity, glm::vec3 const& position) {
+		auto view = scene->GetRegistry().view<TransformComponent>();
+		TransformComponent& transform = view.get<TransformComponent>(entity);
+
+		if (transform.HasParent()) {
+			TransformComponent& parent_transform = view.get<TransformComponent>(static_cast<entt::entity>(transform.GetParentEntity()));
+			glm::mat4 inverse_world = glm::inverse(parent_transform.WorldTransform);
+			glm::vec4 local_position = inverse_world * glm::vec4(position, 1.f);
+			transform.Position = glm::vec3(local_position);
+		}
+		else {
+			// Since this is a root transformation, it's Position is considered the world transform
+			transform.Position = position;
+		}
+	
+		transform.IsDirty = true;
+	}
+
+	void TransformSystem::SetWorldRotation(Scene* scene, entt::entity const entity, glm::quat const& rotation) {
+		auto view = scene->GetRegistry().view<TransformComponent>();
+		TransformComponent& transform = view.get<TransformComponent>(entity);
+
+		if (transform.HasParent()) {
+			TransformComponent& parent_transform = view.get<TransformComponent>(static_cast<entt::entity>(transform.GetParentEntity()));
+
+			// Extract the parent's world rotation from its world matrix
+			glm::quat parent_world_rotation = glm::quat_cast(parent_transform.WorldTransform);
+
+			// Un-rotate by the parent's rotation to find the local rotation
+			transform.Rotation = glm::inverse(parent_world_rotation) * rotation;
+		}
+		else {
+			// Since this is a root transformation, its Rotation is considered the world rotation
+			transform.Rotation = rotation;
+		}
+
+		transform.IsDirty = true;
+	}
+
+	void TransformSystem::SetWorldScale(Scene* scene, entt::entity const entity, glm::vec3 const& scale) {
+		auto view = scene->GetRegistry().view<TransformComponent>();
+		TransformComponent& transform = view.get<TransformComponent>(entity);
+
+		if (transform.HasParent()) {
+			TransformComponent& parent_transform = view.get<TransformComponent>(static_cast<entt::entity>(transform.GetParentEntity()));
+
+			// Extract the parent's world scale from the column vectors of its world matrix
+			glm::vec3 parent_world_scale;
+			parent_world_scale.x = glm::length(glm::vec3(parent_transform.WorldTransform[0]));
+			parent_world_scale.y = glm::length(glm::vec3(parent_transform.WorldTransform[1]));
+			parent_world_scale.z = glm::length(glm::vec3(parent_transform.WorldTransform[2]));
+
+			// Divide the desired world scale by the parent's world scale to get the local scale
+			transform.Scale = scale / parent_world_scale;
+		}
+		else {
+			// Since this is a root transformation, its Scale is considered the world scale
+			transform.Scale = scale;
+		}
+
+		transform.IsDirty = true;
+	}
+
+	void TransformSystem::propagate(Scene* scene, entt::entity const entity) {
 
 		auto& registry = scene->GetRegistry();
 
@@ -143,6 +210,12 @@ namespace Engine {
 				// Computes the world transformation using the transformation matrix of the parent
 				child.WorldTransform = current_transform.WorldTransform * transformation_matrix;
 				child.LocalTransform = transformation_matrix;
+
+				child.WorldPosition = glm::vec3(child.WorldTransform[3]);
+				child.WorldRotation = glm::quat_cast(child.WorldTransform);
+				child.WorldScale.x = glm::length(glm::vec3(child.WorldTransform[0]));
+				child.WorldScale.y = glm::length(glm::vec3(child.WorldTransform[1]));
+				child.WorldScale.z = glm::length(glm::vec3(child.WorldTransform[2]));
 
 				// Add child for propagation
 				process_stack.push(static_cast<entt::entity>(ce));
