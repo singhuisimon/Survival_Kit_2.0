@@ -216,6 +216,12 @@ namespace Engine
 		// Cleanup Input system
 		m_Input.reset();
 
+		// IMPORTANT: Destroy renderer while the OpenGL context is still alive.
+		// The physics debug draw owns GL buffers/VAOs and will delete them in destructors.
+		if (m_Window)
+			glfwMakeContextCurrent(m_Window);
+		m_Renderer.reset();
+
 		if (m_Window)
 		{
 			glfwDestroyWindow(m_Window);

@@ -20,7 +20,10 @@
 #include "../Asset/ResourceManager.h"
 #include "../Physics/Collision2D.h"
 
-// TESTING
+// Jolt debug draw
+#include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Physics/PhysicsSystem.h>
+
 #include "../Graphics/stb_image.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -128,6 +131,31 @@ namespace Engine {
 
 		LOG_TRACE("Renderer::setup() - Renderer started successfully!");
 	}
+
+	void Renderer::SetJoltPhysicsSystem(JPH::PhysicsSystem* system)
+	{
+		m_joltPhysicsSystem = system;
+		if (system != nullptr)
+		{
+			if (!m_joltDebugDraw)
+				m_joltDebugDraw = std::make_unique<JoltDebugDraw>();
+			if (m_joltDebugDraw)
+				m_joltDebugDraw->InitializeGL();
+		}
+	}
+
+	JoltDebugDraw& Renderer::GetJoltDebugDraw()
+	{
+		if (!m_joltDebugDraw)
+			m_joltDebugDraw = std::make_unique<JoltDebugDraw>();
+		return *m_joltDebugDraw;
+	}
+
+	const JoltDebugDraw& Renderer::GetJoltDebugDraw() const
+	{
+		return *m_joltDebugDraw;
+	}
+
 
 	void Renderer::beginFrame(RenderPass const& pass) {
 
@@ -242,7 +270,7 @@ namespace Engine {
 	 		for (auto& pass : m_passes) {
 
 				// Skip debugging pass
-				if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+				if (!m_physicsDebug.enabled && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
 				// Update pass viewport if allowed
 				if (pass.auto_aspect) {
@@ -335,7 +363,7 @@ namespace Engine {
 
 				for (auto& pass : m_passes) {
 
-					if (!isDebug && (pass.passtype == PassType::DEBUGGING)) { continue; }
+					if (!m_physicsDebug.enabled && (pass.passtype == PassType::DEBUGGING)) { continue; }
 
 					// Skip GPU-ID pass in fullscreen game mode for efficiency
 					if (pass.shdpgm_handle == 2) { continue; }
@@ -396,6 +424,37 @@ namespace Engine {
 		// Upload camera related information
 		prog.setUniform("CamPos", cam_pos);
 		prog.setUniform("u_ViewProjection", projection_view);
+
+
+		// Use the existing debug render pass, but draw Jolt collision geometry instead of draw_items
+		if (pass.passtype == PassType::DEBUGGING)
+		{
+			if (!m_physicsDebug.enabled || m_joltPhysicsSystem == nullptr || m_joltDebugDraw == nullptr)
+				return;
+
+			m_joltDebugDraw->BeginFrame(cam_pos);
+
+			JPH::BodyManager::DrawSettings ds{};
+			ds.mDrawShape = m_physicsDebug.drawShape;
+			ds.mDrawShapeWireframe = m_physicsDebug.wireframe;
+			ds.mDrawBoundingBox = m_physicsDebug.drawBoundingBox;
+			ds.mDrawCenterOfMassTransform = m_physicsDebug.drawCenterOfMass;
+			ds.mDrawWorldTransform = m_physicsDebug.drawWorldTransform;
+			ds.mDrawVelocity = m_physicsDebug.drawVelocity;
+
+			m_joltPhysicsSystem->DrawBodies(ds, m_joltDebugDraw.get());
+
+			if (m_physicsDebug.drawConstraints)
+				m_joltPhysicsSystem->DrawConstraints(m_joltDebugDraw.get());
+
+			if (m_physicsDebug.drawConstraintLimits)
+				m_joltPhysicsSystem->DrawConstraintLimits(m_joltDebugDraw.get());
+
+			m_joltDebugDraw->Flush(prog.getShaderProgramHandle(), projection_view);
+			m_joltDebugDraw->EndFrame();
+			return;
+		}
+
 
 		// Bind shadow map + sampler uniform only for the main lit object shader
 		if (pass.shdpgm_handle == static_cast<size_t>(ShaderIndex::MAIN)) {
@@ -684,12 +743,16 @@ namespace Engine {
 			.pass_name = "Debug Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::SCENE),
 			.shdpgm_handle = static_cast<size_t>(ShaderIndex::DEBUG_DRAW),
+			.auto_aspect = true,
 			.clear_color = false,
 			.clear_depth = false,
+			.depth_test = true,
 			.depth_write = false,
 			.culling = false,
 			.passtype = PassType::DEBUGGING
 		};
+
+		m_passes.push_back(debug_pass);
 
 		m_finalpass = {
 			.pass_name = "Final Pass",
