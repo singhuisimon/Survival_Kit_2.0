@@ -10,28 +10,20 @@ using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.Text;
+using static Engine.SpriteRenderer;
 
 namespace Game
 {
     public class HighScorePopup : ScriptBehaviour
     {
         // Entity names to find
-        private const string HIGHSCORE_BUTTON_NAME = "HighScore Button";
+        private const string HIGHSCORE_BUTTON_NAME = "Highscore Button";
         private const string POPUP_NAME = "HighScore Popup";
         private const string CLOSE_BUTTON_NAME = "HighScore Close Button";
-        
+
         // Text entity names for displaying scores
         private const string LEVEL1_TEXT_PREFIX = "Level1_Score_"; // Level1_Score_1, Level1_Score_2, etc.
         private const string LEVEL2_TEXT_PREFIX = "Level2_Score_"; // Level2_Score_1, Level2_Score_2, etc.
-
-        // Positions
-        private const float HIDDEN_Y = -500.0f;
-        private const float VISIBLE_Y = 360.0f;
-        private const float CENTER_X = 640.0f;
-
-        // Absolute button position when visible
-        private const float CLOSE_BUTTON_X = 1196.0f;
-        private const float CLOSE_BUTTON_Y = 239.0f;
 
         // Score data files
         private const string SCORE_FILE_1 = "Resources/Sources/SaveData/ScoreData1.json";
@@ -87,6 +79,13 @@ namespace Game
             entitiesFound = true;
             isPopupVisible = false;
             wasMousePressed = false;
+
+            // Hide popup and close button initially
+            SpriteRenderer.SetIsVisible(popupId, false);
+            SpriteRenderer.SetIsVisible(closeButtonId, false);
+
+            // Hide all score text entities initially
+            HideAllScoreText();
 
             // Subscribe to popup coordination events
             Event.Subscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
@@ -168,11 +167,12 @@ namespace Game
             isPopupVisible = true;
             Event.Publish(EVENT_POPUP_OPENED, POPUP_ID);
 
-            Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
-            SetPosition(popupId, ref popupPos);
+            // Show popup and close button
+            SpriteRenderer.SetIsVisible(popupId, true);
+            SpriteRenderer.SetIsVisible(closeButtonId, true);
 
-            Vector3 closePos = new Vector3(CLOSE_BUTTON_X, CLOSE_BUTTON_Y, -0.6f);
-            SetPosition(closeButtonId, ref closePos);
+            // Show all score text entities
+            ShowAllScoreText();
 
             // Load and display scores
             LoadAndDisplayScores();
@@ -187,31 +187,64 @@ namespace Game
             if (wasVisible)
                 Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
 
-            Vector3 popupPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
-            SetPosition(popupId, ref popupPos);
+            // Hide popup and close button
+            SpriteRenderer.SetIsVisible(popupId, false);
+            SpriteRenderer.SetIsVisible(closeButtonId, false);
 
-            Vector3 closePos = new Vector3(CLOSE_BUTTON_X, HIDDEN_Y, -0.6f);
-            SetPosition(closeButtonId, ref closePos);
+            // Hide all score text entities
+            HideAllScoreText();
 
             LogMessage("HighScorePopup: Popup hidden");
+        }
+
+        // ===== VISIBILITY HELPERS =====
+
+        private void ShowAllScoreText()
+        {
+            for (int i = 0; i < MAX_SCORES_DISPLAY; i++)
+            {
+                if (level1TextIds[i] != 0)
+                    Text.SetIsVisible(level1TextIds[i], true);
+                if (level2TextIds[i] != 0)
+                    Text.SetIsVisible(level2TextIds[i], true);
+            }
+        }
+
+        private void HideAllScoreText()
+        {
+            for (int i = 0; i < MAX_SCORES_DISPLAY; i++)
+            {
+                if (level1TextIds[i] != 0)
+                    Text.SetIsVisible(level1TextIds[i], false);
+                if (level2TextIds[i] != 0)
+                    Text.SetIsVisible(level2TextIds[i], false);
+            }
         }
 
         // ===== SCORE LOADING AND DISPLAY =====
 
         private void LoadAndDisplayScores()
         {
+            LogMessage("=== LoadAndDisplayScores START ===");
+
             // Load Level 1 scores
-            List<int> level1Scores = LoadScoresFromFile(SCORE_FILE_1, "Level1");
+            LogMessage("Loading Level 1 scores from: " + SCORE_FILE_1);
+            List<ScoreEntry> level1Scores = LoadScoresFromFile(SCORE_FILE_1, "Level1");
+            LogMessage("Level 1 scores loaded: " + level1Scores.Count);
             DisplayScores(level1Scores, level1TextIds, "Level 1");
 
             // Load Level 2 scores
-            List<int> level2Scores = LoadScoresFromFile(SCORE_FILE_2, "Level2");
+            LogMessage("Loading Level 2 scores from: " + SCORE_FILE_2);
+            List<ScoreEntry> level2Scores = LoadScoresFromFile(SCORE_FILE_2, "Level2");
+            LogMessage("Level 2 scores loaded: " + level2Scores.Count);
             DisplayScores(level2Scores, level2TextIds, "Level 2");
+
+            LogMessage("=== LoadAndDisplayScores END ===");
         }
 
-        private List<int> LoadScoresFromFile(string filePath, string levelKey)
+        private List<ScoreEntry> LoadScoresFromFile(string filePath, string levelKey)
         {
-            var scores = new List<int>();
+            var scores = new List<ScoreEntry>();
 
             try
             {
@@ -222,7 +255,7 @@ namespace Game
                 }
 
                 string json = FileIO.ReadAllText(filePath);
-                Dictionary<string, List<int>> allScores = ParseScoreJson(json);
+                Dictionary<string, List<ScoreEntry>> allScores = ParseScoreJson(json);
 
                 if (allScores.ContainsKey(levelKey))
                 {
@@ -242,35 +275,110 @@ namespace Game
             return scores;
         }
 
-        private Dictionary<string, List<int>> ParseScoreJson(string json)
+        private Dictionary<string, List<ScoreEntry>> ParseScoreJson(string json)
         {
-            var result = new Dictionary<string, List<int>>();
+            var result = new Dictionary<string, List<ScoreEntry>>();
 
             try
             {
-                json = json.Trim().TrimStart('{').TrimEnd('}');
+                LogMessage("=== ParseScoreJson START ===");
 
-                // Split on "]," to separate level entries
-                string[] entries = json.Split(new string[] { "]," }, StringSplitOptions.RemoveEmptyEntries);
+                // Remove all newlines and extra whitespace for easier parsing
+                json = json.Replace("\n", "").Replace("\r", "").Replace("  ", " ");
+                LogMessage("Cleaned JSON: " + json);
 
-                foreach (string entry in entries)
+                json = json.Trim().TrimStart('{').TrimEnd('}').Trim();
+
+                // Find the level key
+                int levelKeyStart = json.IndexOf('"');
+                int levelKeyEnd = json.IndexOf('"', levelKeyStart + 1);
+                if (levelKeyStart == -1 || levelKeyEnd == -1)
                 {
-                    string cleaned = entry.Trim().TrimEnd(']');
-                    string[] parts = cleaned.Split(':');
-                    if (parts.Length != 2) continue;
+                    LogError("Could not find level key");
+                    return result;
+                }
 
-                    string key = parts[0].Trim().Trim('"');
-                    string valuesRaw = parts[1].Trim().TrimStart('[');
+                string levelKey = json.Substring(levelKeyStart + 1, levelKeyEnd - levelKeyStart - 1);
+                LogMessage("Found level: " + levelKey);
 
-                    var scores = new List<int>();
-                    foreach (string v in valuesRaw.Split(','))
+                // Find the array start and end
+                int arrayStart = json.IndexOf('[', levelKeyEnd);
+                int arrayEnd = json.LastIndexOf(']');
+
+                if (arrayStart == -1 || arrayEnd == -1)
+                {
+                    LogError("Could not find array boundaries");
+                    return result;
+                }
+
+                string arrayContent = json.Substring(arrayStart + 1, arrayEnd - arrayStart - 1).Trim();
+                LogMessage("Array content: " + arrayContent);
+
+                var scores = new List<ScoreEntry>();
+
+                // Parse objects one by one
+                int pos = 0;
+                int objectCount = 0;
+
+                while (pos < arrayContent.Length)
+                {
+                    // Find next object start
+                    int objStart = arrayContent.IndexOf('{', pos);
+                    if (objStart == -1) break;
+
+                    // Find matching closing brace
+                    int objEnd = arrayContent.IndexOf('}', objStart);
+                    if (objEnd == -1) break;
+
+                    objectCount++;
+                    string objContent = arrayContent.Substring(objStart + 1, objEnd - objStart - 1);
+                    LogMessage("Object " + objectCount + ": " + objContent);
+
+                    // Parse score
+                    int scoreVal = 0;
+                    int scoreKeyPos = objContent.IndexOf("\"score\"");
+                    if (scoreKeyPos >= 0)
                     {
-                        if (int.TryParse(v.Trim(), out int parsed))
-                            scores.Add(parsed);
+                        int colonPos = objContent.IndexOf(':', scoreKeyPos);
+                        int commaPos = objContent.IndexOf(',', colonPos);
+                        if (commaPos == -1) commaPos = objContent.Length;
+
+                        string scoreStr = objContent.Substring(colonPos + 1, commaPos - colonPos - 1).Trim();
+                        if (int.TryParse(scoreStr, out scoreVal))
+                        {
+                            LogMessage("  Score: " + scoreVal);
+                        }
                     }
 
-                    result[key] = scores;
+                    // Parse date
+                    string dateVal = "";
+                    int dateKeyPos = objContent.IndexOf("\"date\"");
+                    if (dateKeyPos >= 0)
+                    {
+                        int colonPos = objContent.IndexOf(':', dateKeyPos);
+                        int quoteStart = objContent.IndexOf('"', colonPos);
+                        int quoteEnd = objContent.IndexOf('"', quoteStart + 1);
+
+                        if (quoteStart >= 0 && quoteEnd >= 0)
+                        {
+                            dateVal = objContent.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+                            LogMessage("  Date: " + dateVal);
+                        }
+                    }
+
+                    if (scoreVal > 0)
+                    {
+                        scores.Add(new ScoreEntry { score = scoreVal, date = dateVal });
+                        LogMessage("  Added to list!");
+                    }
+
+                    // Move past this object
+                    pos = objEnd + 1;
                 }
+
+                result[levelKey] = scores;
+                LogMessage("Total parsed: " + scores.Count + " scores");
+                LogMessage("=== ParseScoreJson END ===");
             }
             catch (Exception e)
             {
@@ -280,35 +388,55 @@ namespace Game
             return result;
         }
 
-        private void DisplayScores(List<int> scores, uint[] textEntityIds, string levelName)
+        private void DisplayScores(List<ScoreEntry> scores, uint[] textEntityIds, string levelName)
         {
+            LogMessage("=== DisplayScores for " + levelName + " ===");
+            LogMessage("Scores count: " + scores.Count);
+
+            // Safety: ensure we only display top 10
+            int maxToDisplay = scores.Count > MAX_SCORES_DISPLAY ? MAX_SCORES_DISPLAY : scores.Count;
+
             for (int i = 0; i < MAX_SCORES_DISPLAY; i++)
             {
                 if (textEntityIds[i] == 0)
+                {
+                    LogMessage("Text entity " + i + " is null, skipping");
                     continue;
+                }
 
                 string displayText;
-                if (i < scores.Count)
+                if (i < maxToDisplay)
                 {
-                    // Format: "1. 0005000" (rank + 7-digit zero-padded score)
-                    displayText = (i + 1).ToString() + ". " + scores[i].ToString("D7");
+                    // Format: "1. 0005000    2025-02-23 14:30:45"
+                    displayText = (i + 1).ToString() + ". " +
+                                  scores[i].score.ToString("D7") +
+                                  "    " +
+                                  scores[i].date;
+                    LogMessage("Setting text " + i + ": " + displayText);
                 }
                 else
                 {
                     // No score at this rank - show empty
-                    displayText = (i + 1).ToString() + ". -------";
+                    displayText = (i + 1).ToString() + ". -------    ----/--/-- --:--:--";
                 }
 
                 SetText(textEntityIds[i], displayText);
             }
 
-            LogMessage("HighScorePopup: Displayed " + scores.Count + " scores for " + levelName);
+            LogMessage("HighScorePopup: Displayed " + maxToDisplay + " scores for " + levelName);
         }
 
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
             LogMessage("HighScorePopup: Destroyed");
+        }
+
+        // ===== HELPER CLASS =====
+        private class ScoreEntry
+        {
+            public int score;
+            public string date;
         }
     }
 }
