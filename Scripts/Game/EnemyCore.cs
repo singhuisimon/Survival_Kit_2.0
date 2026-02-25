@@ -10,8 +10,8 @@ namespace Game
 {
     public class EnemyCore : ScriptBehaviour
     {
-        [SerializeField] private const float MaxHealth = 500.0f;
-        [SerializeField] private float CurrentHealth = 500.0f;
+        [SerializeField] private const float MaxHealth = 150.0f;
+        [SerializeField] private float CurrentHealth = 150.0f;
         [SerializeField] private bool isDead = false;
 
         //private const float SPAWN_GRACE_TIME = 0.5f;
