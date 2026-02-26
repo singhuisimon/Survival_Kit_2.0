@@ -3,7 +3,7 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.Event;
-
+using static Engine.SpriteRenderer;
 namespace Game
 {
     /// <summary>
@@ -16,6 +16,8 @@ namespace Game
     {
         // ===== Event Names =====
         private const string EVENT_AMMO_CHANGE = "AmmoChange";
+        private const string EVENT_RELOAD_START = "ReloadStart";
+        private const string EVENT_RELOAD_END = "ReloadEnd";
 
         // ===== Visual Settings =====
         private float barMaxWidth;  // Maximum width at full ammo (set from scene)
@@ -33,6 +35,8 @@ namespace Game
 
             // Subscribe to ammo update events from PlayerWeapon
             Event.Subscribe(EVENT_AMMO_CHANGE, OnAmmoChange);
+            Event.Subscribe(EVENT_RELOAD_START, OnReloadStart);
+            Event.Subscribe(EVENT_RELOAD_END, OnReloadEnd);
             LogMessage("AmmoBar: Subscribed to event '" + EVENT_AMMO_CHANGE + "'");
 
             // Store initial position and width
@@ -110,11 +114,30 @@ namespace Game
             LogMessage("=== OnAmmoChange COMPLETE ===");
         }
 
+
+        private void OnReloadStart(string eventName, string payload)
+        {
+            LogMessage("=== AmmoBar: Reload Started - Hiding Bar ===");
+
+            // Hide the ammo bar sprite
+            SpriteRenderer.SetIsVisible((uint)EntityID, false);
+        }
+
+        private void OnReloadEnd(string eventName, string payload)
+        {
+            LogMessage("=== AmmoBar: Reload Complete - Showing Bar ===");
+
+            // Show the ammo bar sprite
+            SpriteRenderer.SetIsVisible((uint)EntityID, true);
+
+            // OnAmmoChange will be called right after and update the bar width
+        }
         public override void OnDestroy()
         {
             // Clean up event subscriptions
             Event.Unsubscribe(EVENT_AMMO_CHANGE, OnAmmoChange);
-
+            Event.Unsubscribe(EVENT_RELOAD_START, OnReloadStart);
+            Event.Unsubscribe(EVENT_RELOAD_END, OnReloadEnd);
             LogMessage("=== AmmoBar Destroyed ===");
         }
     }

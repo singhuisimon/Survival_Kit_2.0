@@ -57,6 +57,7 @@
 #include "Prefab/PrefabRegistry.h"
 
 #include "Utility/AssetPath.h"
+#include "Physics/PhysicsBridge.h"
 
 #ifndef DEBUG
 //this is for release
@@ -1595,6 +1596,13 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 
 	AddAllSystemsToScene(scenePtr);
 	scenePtr->InitializeSystems();
+
+	// Hook Jolt physics debug draw into the renderer
+	// (PhysicsSystem is stored globally in PhysicsBridge.h as Engine::mPhysics)
+	if (m_Renderer) {
+		m_Renderer->SetJoltPhysicsSystem(&Engine::mPhysics);
+		m_Renderer->GetPhysicsDebugSettings().enabled = true;
+	}
 	m_Scenes.push_back(std::move(newScene));
 	m_ActiveScene = scenePtr;
 	m_CurrentScenePath.clear();
