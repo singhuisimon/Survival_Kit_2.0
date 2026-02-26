@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Event;
+using static Engine.Prefab;
+using static Engine.Transform;
+using static Engine.Audio;
 
 namespace Game {
 
-    public class IndestructableColliderCube : ScriptBehaviour{
+    public class DestructableWallOfDeath : ScriptBehaviour{
 
         [SerializeField] bool DamagePlayer = false;
         [SerializeField] float Damage = 9999.0f;
@@ -16,7 +19,10 @@ namespace Game {
         [SerializeField] private float maxHP = 25.0f;
         [SerializeField] private bool isDead = false;
 
-        private float EVENT_DESTRUCTABLE_WALL_OF_DEATH_HIT = "Damage:";
+        private string EVENT_DESTRUCTABLE_WALL_OF_DEATH_HIT = "Damage:";
+
+        private string ExplosionAudioPrefabPath = "Sources/Prefabs/EnemyTurretExplosion.prefab";
+        //private string ExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";
 
         private string playerName = "Player";
         private uint playerID = 0;
@@ -26,18 +32,18 @@ namespace Game {
             playerID = SceneFindEntityByName(playerName);
 
             if(playerID == 0){
-                LogMessage("[IndestructableColliderCube] WARNING: Player entity not found in scene!");
+                LogMessage("[DestructableWallOfDeath] WARNING: Player entity not found in scene!");
                 return;
             }
 
             isDead = false;
-            currentHP = maxHP
-            EVENT_DESTRUCTABLE_WALL_OF_DEATH_HIT += EntityID.ToString()
+            currentHP = maxHP;
+            EVENT_DESTRUCTABLE_WALL_OF_DEATH_HIT += EntityID.ToString();
 
             Subscribe(EVENT_DESTRUCTABLE_WALL_OF_DEATH_HIT, OnDamageReceived);
 
-            LogMessage("[IndestructableColliderCube] Initialized - EntityID: " + EntityID.ToString() + ", PlayerID: " + playerID.ToString());
-            LogMessage("[IndestructableColliderCube] Lethal wall active - Damage: " + Damage.ToString());
+            LogMessage("[DestructableWallOfDeath] Initialized - EntityID: " + EntityID.ToString() + ", PlayerID: " + playerID.ToString());
+            LogMessage("[DestructableWallOfDeath] Lethal wall active - Damage: " + Damage.ToString());
         }
 
         public override void OnFixedUpdate(float deltaTime){
@@ -61,15 +67,15 @@ namespace Game {
         public override void OnDestroy(){
             Unsubscribe(EVENT_DESTRUCTABLE_WALL_OF_DEATH_HIT, OnDamageReceived);
 
-            LogMessage("Indestructable wall of death is destroyed");
+            LogMessage("Destructable wall of death is destroyed");
         }
 
-        private void OnDamageReceived(string EventName, float payload){
+        private void OnDamageReceived(string EventName, string payload){
             float damage = DamageSystem.ParseAmount(payload);
 
             currentHP -= damage;
 
-            LogMessage("Destructable wall of death: " EntityID.ToString() + " is hit!. Health is currently: " currentHP.ToString() + "/" + maxHP.ToString());
+            LogMessage("Destructable wall of death: " + EntityID.ToString() + " is hit!. Health is currently: " + currentHP.ToString() + "/" + maxHP.ToString());
 
             if(currentHP <= 0.0f){
                 isDead = true;
@@ -80,6 +86,24 @@ namespace Game {
 
         private void Die(){
             if(!isDead) return;
+
+            Vector3 spawnPos = GetPosition((uint)EntityID);
+            //Quat spawnRot = GetRotation((uint)EntityID);
+            Vector3 scale = new Vector3(20.0f, 20.0f, 20.0f);
+
+            uint explosionID = PrefabInstantiate(ExplosionAudioPrefabPath);
+            SetPosition(explosionID, ref spawnPos);
+            AudioPlay(explosionID);
+
+            // uint explosionID = 0;
+            // //explosionID = PrefabInstantiateWithTransform(ExplosionPrefabPath, ref spawnPos, ref spawnRot, ref scale, false);
+            // explosionID = PrefabInstantiate(ExplosionPrefabPath);
+            // SetPosition(explosionID, ref spawnPos);
+            // SetScale(explosionID, ref scale);
+            
+            if(explosionID == 0){
+                LogMessage("[DestructableWallOfDeath] explosionID fail to instantiate");
+            }
 
             SceneDestroyEntity((uint)EntityID);
         }
@@ -97,7 +121,7 @@ namespace Game {
                         DamagePlayer = true;
                         DamageSystem.DealDamage(playerID, Damage, (uint)EntityID);
 
-                        LogMessage("[IndestructableColliderCube] Player contacted lethal wall - dealing " + Damage + " damage");
+                        LogMessage("[DestructableWallOfDeath] Player contacted lethal wall - dealing " + Damage + " damage");
                         
                         // Only deal damage once per frame even if multiple collision points
                         return;
