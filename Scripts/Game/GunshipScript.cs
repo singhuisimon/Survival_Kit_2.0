@@ -28,6 +28,7 @@ namespace Game
         [SerializeField] private float turretRotationSpeed = 5f;
         [SerializeField] private float bulletSpeed = 3000f;
         [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
+        [SerializeField] private string gunshipDeathPath = "Sources/Prefabs/GunshipDeath.prefab";
 
         // === PRIVATE STATES ===
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -475,10 +476,17 @@ namespace Game
             
             isDead = true;
             LogMessage("Gunship destroyed!");
+
+            uint deathID = 0;
+
+            Vector3 spawnPos = GetPosition((uint)EntityID);
+            Quat spawnRot = GetRotation((uint)EntityID);
+            Vector3 scale = new Vector3(0.0f, 0.0f, 0.0f); 
+
+            deathID = PrefabInstantiate(gunshipDeathPath);
             
             // Publish death event 
             Publish("GunshipDeath", gunshipID.ToString());
-            
             
             // Destroy the gunship
             SceneDestroyEntity(gunshipID);
