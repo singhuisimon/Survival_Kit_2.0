@@ -92,6 +92,8 @@ namespace Engine
 
         m_EditorAsset->AssetBrowserPanel();
 
+        m_EditorLogger->LogPanel();
+
         RenderViewport(texhandle);
 
         CompleteFrame();
