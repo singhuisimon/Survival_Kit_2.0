@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <mutex>
+#include <functional>
 
 namespace Engine {
 
@@ -34,24 +35,26 @@ namespace Engine {
         template<typename... Args>
         void Log(LogLevel level, Args&&... args)
         {
-#ifdef DEBUG
             if (level < m_MinLevel) return;
             std::lock_guard<std::mutex> lock(m_Mutex);
             std::ostringstream oss;
             oss << "[" << GetLevelString(level) << "] ";
             (oss << ... << args);
             std::string message = oss.str();
+
+#ifdef DEBUG
             std::cout << message << std::endl;
             if (m_FileLoggingEnabled && m_FileStream.is_open())
             {
                 m_FileStream << message << std::endl;
                 m_FileStream.flush();
             }
-#else
-            // Suppress unused parameter warnings in release builds
-            (void)level;
-            ((void)args, ...);
 #endif
+            // Suppress unused parameter warnings in release builds
+
+            if (m_Callback) {
+                m_Callback(level, message);
+            }
         }
 
         // Convenience methods
@@ -73,6 +76,17 @@ namespace Engine {
         template<typename... Args>
         void Critical(Args&&... args) { Log(LogLevel::Critical, std::forward<Args>(args)...); }
 
+        using LogCallback = std::function<void(LogLevel, const std::string&)>;
+        void SetCallback(LogCallback callback) {
+            std::lock_guard<std::mutex> lock(m_Mutex);
+            m_Callback = callback;
+        }
+
+        void ClearCallback() {
+            std::lock_guard<std::mutex> lock(m_Mutex);
+            m_Callback = nullptr;
+        }
+
     private:
         Logger() = default;
         ~Logger() {
@@ -87,6 +101,8 @@ namespace Engine {
         std::ofstream m_FileStream;
         bool m_FileLoggingEnabled = false;
         std::mutex m_Mutex;  // Thread-safe logging
+
+        LogCallback m_Callback = nullptr;
     };
 
     // Convenience macros
