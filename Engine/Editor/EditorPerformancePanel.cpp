@@ -24,8 +24,21 @@ namespace Engine
             {
                 m_Editor->SetFontScale(currentScale);
                 ImGui::GetIO().FontGlobalScale = currentScale;
+
                 ImGui::GetStyle() = m_Editor->GetBaseStyle();
-                ImGui::GetStyle().ScaleAllSizes(currentScale);
+
+                switch (m_CurrentTheme)
+                {
+                    case 0: ImGui::StyleColorsDark();    break;
+                    case 1: ImGui::StyleColorsLight();   break;
+                    case 2: ImGui::StyleColorsClassic(); break;
+                    case 3: ApplyCustomTheme();          break;
+                }
+
+                float currentScale = m_Editor->GetFontScale();
+                if (currentScale != 1.0f) {
+                    ImGui::GetStyle().ScaleAllSizes(currentScale);
+                }
             }
 
             if (ImGui::IsItemHovered())
@@ -40,20 +53,19 @@ namespace Engine
        
             ImGui::Text("Theme Settings:");
 
-            static int currentTheme = 0;
             const char* themes[] = { "Dark", "Light", "Classic", "Red"};
 
-            if (ImGui::Combo("Editor Theme", &currentTheme, themes, IM_ARRAYSIZE(themes)))
+            if (ImGui::Combo("Editor Theme", &m_CurrentTheme, themes, IM_ARRAYSIZE(themes)))
             {
                 // Start from unscaled snapshot
                 ImGui::GetStyle() = m_Editor->GetBaseStyle();
 
-                switch (currentTheme)
+                switch (m_CurrentTheme)
                 {
-                case 0: ImGui::StyleColorsDark(); break;
-                case 1: ImGui::StyleColorsLight(); break;
-                case 2: ImGui::StyleColorsClassic(); break;
-                case 3: ApplyCustomTheme(); break;
+                    case 0: ImGui::StyleColorsDark(); break;
+                    case 1: ImGui::StyleColorsLight(); break;
+                    case 2: ImGui::StyleColorsClassic(); break;
+                    case 3: ApplyCustomTheme(); break;
                 }
 
                 float currentScale = m_Editor->GetFontScale();
