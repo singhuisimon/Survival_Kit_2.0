@@ -46,9 +46,11 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 
-#include "ECS/Components.h"
-#include "ECS/Entity.h"
-#include "ECS/Scene.h"
+#include "../ECS/Components.h"
+#include "../ECS/Entity.h"
+#include "../ECS/Scene.h"
+
+#include "../Graphics/Renderer.h"
 
 namespace Engine
 {
@@ -64,6 +66,15 @@ namespace Engine
 		static constexpr JPH::ObjectLayer NON_MOVING{ 0 };
 		static constexpr JPH::ObjectLayer MOVING{ 1 };
 		static constexpr JPH::ObjectLayer NUM_LAYERS{ 2 };
+	}
+	namespace PhysicsRenderer
+	{
+		static Renderer *p_Renderer = nullptr;
+	}
+
+	static void SetPhysicsRenderer(Renderer *r)
+	{
+		PhysicsRenderer::p_Renderer = r;
 	}
 
 	/*****************************************************************************/

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iomanip>
 #include"../Scripting/MonoScriptEngine.h"
+#include "../Physics/PhysicsBridge.h"
 #include "../ECS/Scene.h"  // <-- ADD THIS to get the full Scene definition
 
 
@@ -99,6 +100,7 @@ namespace Engine
 
 		Engine::SetScriptingInputSystem(&GetInput());
 		Engine::SetScriptingRenderer(m_Renderer.get());
+		Engine::SetPhysicsRenderer(m_Renderer.get());
 
 		// Initialize Mono scripting
 #if defined(_DEBUG) || defined(DEBUG)
