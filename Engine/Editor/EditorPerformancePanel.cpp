@@ -45,6 +45,9 @@ namespace Engine
 
             if (ImGui::Combo("Editor Theme", &currentTheme, themes, IM_ARRAYSIZE(themes)))
             {
+                // Start from unscaled snapshot
+                ImGui::GetStyle() = m_Editor->GetBaseStyle();
+
                 switch (currentTheme)
                 {
                 case 0: ImGui::StyleColorsDark(); break;
@@ -54,7 +57,9 @@ namespace Engine
                 }
 
                 float currentScale = m_Editor->GetFontScale();
-                ImGui::GetStyle().ScaleAllSizes(currentScale);
+                if (currentScale != 1.0f) {
+                    ImGui::GetStyle().ScaleAllSizes(currentScale);
+                }
             }
             ImGui::Spacing();
             ImGui::Separator();
@@ -234,6 +239,7 @@ namespace Engine
 
     void EditorPerformancePanel::ApplyCustomTheme()
     {
+        ImGui::StyleColorsDark();
         ImGuiStyle& style = ImGui::GetStyle();
         auto& colors = style.Colors;
 
@@ -274,8 +280,8 @@ namespace Engine
         colors[ImGuiCol_TitleBgActive] = ImVec4(0.35f, 0.10f, 0.10f, 1.00f);
 
         // --- Styling ---
-        style.WindowRounding = 4.0f;
-        style.FrameRounding = 3.0f;
+        //style.WindowRounding = 4.0f;
+        //style.FrameRounding = 3.0f;
         style.PopupRounding = 4.0f;
         style.GrabRounding = 3.0f;
         style.TabRounding = 4.0f;

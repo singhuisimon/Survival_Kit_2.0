@@ -104,6 +104,7 @@ namespace Engine
 
 		float m_FontScale = 0.70f;
 		ImGuiStyle m_BaseStyle;
+		bool m_BaseStyleCaptured = false;
 	
 	public:
 		
