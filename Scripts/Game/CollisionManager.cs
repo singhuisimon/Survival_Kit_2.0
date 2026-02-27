@@ -133,6 +133,7 @@ namespace Game
         {
             // Player projectiles can hit:
             new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENEMY),
+            new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENVIRONMENT),
             
             // Enemy projectiles can hit:
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.PLAYER),
@@ -175,6 +176,7 @@ namespace Game
 
         public override void OnFixedUpdate(float deltaTime)
         {
+       
             // Clear all collision storage
             ClearAllCollisions();
 
@@ -188,6 +190,8 @@ namespace Game
                 // Get tags and categories
                 string tagA = TagGetTag(entityA);
                 string tagB = TagGetTag(entityB);
+
+                LogMessage("[CM] Pair: " + tagA + " vs " + tagB); // UNCOMMENT THIS IF U WANT TO SEE WHAT IS COLLIDING
 
                 CollisionCategory categoryA = GetCategory(tagA);
                 CollisionCategory categoryB = GetCategory(tagB);
