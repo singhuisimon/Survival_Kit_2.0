@@ -104,6 +104,7 @@ namespace Engine
 
 		float m_FontScale = 0.70f;
 		ImGuiStyle m_BaseStyle;
+		bool m_BaseStyleCaptured = false;
 	
 	public:
 		
@@ -184,12 +185,12 @@ namespace Engine
 		std::weak_ptr<TracyProfiler> GetProfiler() const { return m_Profiler; }
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; }
-		u32 GetPickedID() { return m_PickedID; }
+		u32 GetPickedID() const { return m_PickedID; }
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
 
-		float GetFontScale() { return m_FontScale; }
-		ImGuiStyle GetBaseStyle() { return m_BaseStyle; }
+		float GetFontScale() const { return m_FontScale; }
+		ImGuiStyle GetBaseStyle() const { return m_BaseStyle; }
 		
 		void SetFontScale(float fontScale)
 		{
@@ -197,6 +198,7 @@ namespace Engine
 		}
 		void ViewportClickAndTeleport();
 		bool GetEditorIsPlaying();
+		void ApplyUIScale(float scale);
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 

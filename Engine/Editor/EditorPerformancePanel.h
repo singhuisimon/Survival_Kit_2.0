@@ -16,6 +16,8 @@ namespace Engine
 	{
 	private:
 		Editor* m_Editor = nullptr;
+		int m_CurrentTheme = 0;
+
 	public:
 		EditorPerformancePanel(Editor* editor) : m_Editor(editor) {};
 		~EditorPerformancePanel() = default;

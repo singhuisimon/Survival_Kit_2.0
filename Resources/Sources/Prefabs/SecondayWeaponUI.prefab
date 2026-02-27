@@ -1,7 +1,7 @@
 {
     "Prefab Name": "SecondayWeaponUI",
     "Prefab GUID": 14091561482188407303,
-    "version": 1,
+    "version": 2,
     "entities": [
         {
             "Name": "SecondayWeaponUI",
@@ -39,7 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "5444650197635580331",
+                            "ComponentGUID": "15404765433473368627",
+                            "Name": "SecondayWeaponUI",
                             "Tag": "SecondayWeaponUI"
                         }
                     }
@@ -49,7 +50,7 @@
                     "typeName": "SpriteRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "11785718472973238703",
+                            "ComponentGUID": "13675383176563098169",
                             "Texture": "AlternateFire_Window.png",
                             "Color": [
                                 1.0,
