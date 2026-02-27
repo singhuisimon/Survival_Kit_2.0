@@ -1,7 +1,7 @@
 {
     "Prefab Name": "AltFireIcon",
     "Prefab GUID": 15244482986795221507,
-    "version": 1,
+    "version": 2,
     "entities": [
         {
             "Name": "AltFireIcon",
@@ -25,7 +25,7 @@
                                 0.0
                             ],
                             "Scale": [
-                                500.0,
+                                600.0,
                                 500.0,
                                 1.0
                             ],
@@ -39,7 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "12938639977580085681",
+                            "ComponentGUID": "1163565374962525983",
+                            "Name": "AltFireIcon",
                             "Tag": "AltFireIcon"
                         }
                     }
@@ -49,7 +50,7 @@
                     "typeName": "SpriteRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "11209257720669815221",
+                            "ComponentGUID": "10643870355679013",
                             "Texture": "AlternateFire_Icon.png",
                             "Color": [
                                 1.0,
@@ -58,7 +59,7 @@
                                 1.0
                             ],
                             "Quad": 3,
-                            "Sprite Layer": 1,
+                            "Sprite Layer": 50,
                             "IsActive": true,
                             "IsVisible": true
                         }
