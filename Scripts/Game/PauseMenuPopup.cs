@@ -12,10 +12,10 @@ namespace Game
 {
     /// <summary>
     /// Handles the pause menu popup during gameplay.
-    /// Uses SetIsVisible to show/hide — positions are defined in the scene JSON and never change.
+    /// Uses SetIsVisible to show/hide positions are defined in the scene JSON and never change.
     /// Press P to toggle pause menu.
     /// </summary>
-    public class PauseMenuScene : ScriptBehaviour
+    public class PauseMenuPopup : ScriptBehaviour
     {
         // Entity names - must match names in scene JSON
         private const string BG_NAME = "PauseMenu_EngineBG";
@@ -143,7 +143,7 @@ namespace Game
         private Vector3 mixerFill3InitialPosition;
 
         // =====================================================================
-        // HELPER: Safe visibility setter — skips if ID is 0
+        // HELPER: Safe visibility setter ï¿½ skips if ID is 0
         // =====================================================================
         private static void SafeSetVisible(uint id, bool visible)
         {
@@ -289,7 +289,7 @@ namespace Game
 
         // =====================================================================
         // SHOW PAUSE MENU
-        // Positions are already correct in the scene JSON — just make visible.
+        // Positions are already correct in the scene JSON ï¿½ just make visible.
         // =====================================================================
         private void ShowPauseMenu()
         {
@@ -302,7 +302,7 @@ namespace Game
             Input.SetCursorVisible(true);
             Event.Publish(EVENT_GAME_PAUSED, "");
 
-            // Show all main buttons (not hovered — HandleHoverStates manages those)
+            // Show all main buttons (not hovered ï¿½ HandleHoverStates manages those)
             SafeSetVisible(bgId, true);
             SafeSetVisible(resumeButtonId, true);
             SafeSetVisible(restartButtonId, true);
@@ -320,7 +320,7 @@ namespace Game
             SafeSetVisible(plusButtonId3, true);
             SafeSetVisible(minusButtonId3, true);
 
-            // Hovered versions start hidden — HandleHoverStates will show them on mouse-over
+            // Hovered versions start hidden ï¿½ HandleHoverStates will show them on mouse-over
             SafeSetVisible(resumeButtonHoveredId, false);
             SafeSetVisible(restartButtonHoveredId, false);
             SafeSetVisible(plusButtonHoveredId, false);
@@ -398,7 +398,7 @@ namespace Game
             SafeSetVisible(checkboxSFXUntickedId, false);
             SafeSetVisible(checkboxSFXTickedId, false);
 
-            // Restore HUD — only if array is initialized (safe during OnStart early call)
+            // Restore HUD ï¿½ only if array is initialized (safe during OnStart early call)
             if (hudElementIds != null)
             {
                 for (int i = 0; i < hudElementIds.Length; i++)
@@ -417,7 +417,7 @@ namespace Game
 
         // =====================================================================
         // HOVER STATES
-        // Uses SetIsVisible instead of SetPosition — no position changes needed.
+        // Uses SetIsVisible instead of SetPosition ï¿½ no position changes needed.
         // =====================================================================
         private void HandleHoverStates()
         {
@@ -609,7 +609,7 @@ namespace Game
         }
 
         // =====================================================================
-        // CHECKBOX VISUALS — show ticked or unticked based on mute state
+        // CHECKBOX VISUALS ï¿½ show ticked or unticked based on mute state
         // =====================================================================
         private void UpdateCheckboxVisuals()
         {
@@ -629,7 +629,7 @@ namespace Game
         }
 
         // =====================================================================
-        // MIXER BAR VISUAL — adjusts height based on volume
+        // MIXER BAR VISUAL ï¿½ adjusts height based on volume
         // =====================================================================
         private void UpdateMixerFillVisual(uint fillId, float volume, float initialHeight, Vector3 initialPosition)
         {
