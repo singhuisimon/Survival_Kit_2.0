@@ -1,20 +1,16 @@
-#version 420 core
+#version 460 core
 
-layout (location=0) in vec3 VertexPosition;
-layout (location=1) in vec3 VertexNormal;
-layout (location=2) in vec3 VertexColor;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor; // normalized from RGBA8
 
-out vec3 Position;
-out vec3 Normal;
-out vec3 Color;
+uniform mat4 u_ViewProjection;
+uniform mat4 u_Model;
+uniform vec4 u_ModelColor;
 
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
+out vec4 vColor;
 
-void main(){
-
-    mat4 MV = V * M; 
-    vec4 VertexPositionInView = MV * vec4(VertexPosition, 1.0);
-    gl_Position = P * VertexPositionInView;
+void main()
+{
+    vColor = aColor * u_ModelColor;
+    gl_Position = u_ViewProjection * u_Model * vec4(aPos, 1.0);
 }

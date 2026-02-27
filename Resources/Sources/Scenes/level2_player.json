@@ -80,7 +80,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -220,7 +220,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -271,9 +271,9 @@
                             -61.23538589477539
                         ],
                         "Rotation": [
-                            0.0000984646103461273,
+                            0.00009846465400187299,
                             -0.11598959565162659,
-                            -0.2334386259317398
+                            -0.23343868553638458
                         ],
                         "Scale": [
                             5.0,
@@ -360,7 +360,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -412,8 +412,8 @@
                         ],
                         "Rotation": [
                             0.00009085051715373993,
-                            -0.05936061590909958,
-                            -0.1103910431265831
+                            -0.059360627084970474,
+                            -0.1103910580277443
                         ],
                         "Scale": [
                             5.0,
@@ -500,7 +500,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -552,7 +552,7 @@
                         ],
                         "Rotation": [
                             -0.2059386968612671,
-                            -0.22188794612884521,
+                            -0.2218879759311676,
                             0.0005506805027835071
                         ],
                         "Scale": [
@@ -640,7 +640,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -780,7 +780,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -920,7 +920,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1060,7 +1060,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1200,7 +1200,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1387,9 +1387,9 @@
                             -42.60850524902344
                         ],
                         "Rotation": [
-                            -0.00006013280290062539,
+                            -0.000060132850194349885,
                             0.4257443845272064,
-                            -0.10387793183326721
+                            -0.1038779467344284
                         ],
                         "Scale": [
                             5.0,
@@ -1523,9 +1523,9 @@
                             -43.40431594848633
                         ],
                         "Rotation": [
-                            -0.00010636420483933762,
+                            -0.00010636419756338,
                             0.42574286460876465,
-                            -0.10387776046991348
+                            -0.10387777537107468
                         ],
                         "Scale": [
                             5.0,
@@ -1672,7 +1672,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1800,9 +1800,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -0.000010022720744018443,
+                            -0.000010021391062764451,
                             -89.98021697998047,
-                            -4.716574242280558e-9
+                            -5.932470070746376e-9
                         ],
                         "Scale": [
                             1.5,
@@ -1946,7 +1946,7 @@
                     "Properties": {
                         "ComponentGUID": "8835992658460180989",
                         "Position": [
-                            525.5855712890625,
+                            639.7999877929688,
                             683.0,
                             0.0
                         ],
@@ -1956,7 +1956,7 @@
                             0.0
                         ],
                         "Scale": [
-                            111.58560180664063,
+                            225.0,
                             6.199999809265137,
                             1.0
                         ],
@@ -2191,7 +2191,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2348,7 +2348,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "18059364695356834353",
-                        "ScriptClassName": "Game.ScoreBoard"
+                        "ScriptClassName": "Game.ScoreBoard2"
                     }
                 },
                 {
@@ -2393,7 +2393,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2442,7 +2442,7 @@
                         ],
                         "Rotation": [
                             0.07365221530199051,
-                            0.17051026225090027,
+                            0.17051029205322266,
                             -0.05848817899823189
                         ],
                         "Scale": [
@@ -2750,7 +2750,7 @@
                         "Rotation": [
                             180.0,
                             -89.98021697998047,
-                            -1.7687153963663604e-9
+                            -1.4890438881920431e-9
                         ],
                         "Scale": [
                             1.0,
@@ -2773,7 +2773,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.8699780702590942,
+                        "Aspect": 1.9028741121292114,
                         "FOV": 110.0,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -2848,7 +2848,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2985,7 +2985,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3075,7 +3075,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3128,7 +3128,7 @@
                         "Rotation": [
                             -0.07467912882566452,
                             0.1698884814977646,
-                            0.04496494680643082
+                            0.044964954257011414
                         ],
                         "Scale": [
                             5.0,
@@ -3215,7 +3215,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3355,7 +3355,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3407,8 +3407,8 @@
                         ],
                         "Rotation": [
                             -0.0755261480808258,
-                            0.14385251700878143,
-                            0.03982986882328987
+                            0.14385247230529785,
+                            0.03982987627387047
                         ],
                         "Scale": [
                             5.0,
@@ -3495,7 +3495,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3635,7 +3635,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3775,7 +3775,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3826,7 +3826,7 @@
                             -81.72562408447266
                         ],
                         "Rotation": [
-                            -0.24687977135181427,
+                            -0.24687983095645905,
                             -0.32872509956359863,
                             0.0009048919891938567
                         ],
@@ -3915,7 +3915,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4055,7 +4055,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4195,7 +4195,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4370,7 +4370,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4498,7 +4498,7 @@
                             0.0
                         ],
                         "Rotation": [
-                            -4.861003875732422,
+                            -4.861003398895264,
                             -32.99995803833008,
                             89.0831527709961
                         ],
@@ -4555,7 +4555,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4642,7 +4642,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4707,7 +4707,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5056,7 +5056,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5589,7 +5589,7 @@
                         "Rotation": [
                             43.99998092651367,
                             52.999996185302734,
-                            -0.000002837329020621837
+                            -0.000001888245378722786
                         ],
                         "Scale": [
                             0.30000001192092896,
@@ -5676,7 +5676,7 @@
                         "Rotation": [
                             46.0000114440918,
                             -6.000002384185791,
-                            0.000012877147128165234
+                            0.000012886559488833882
                         ],
                         "Scale": [
                             0.09999998658895493,
@@ -5849,7 +5849,7 @@
                         ],
                         "Rotation": [
                             -130.0,
-                            -15.000007629394531,
+                            -15.000005722045898,
                             71.0
                         ],
                         "Scale": [
@@ -6082,9 +6082,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000057220458984,
+                            -12.000062942504883,
                             85.9989013671875,
-                            -0.9997866749763489
+                            -0.9997903108596802
                         ],
                         "Scale": [
                             1.0,
@@ -6368,7 +6368,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6505,7 +6505,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6642,7 +6642,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6779,7 +6779,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6916,7 +6916,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7053,7 +7053,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7895,7 +7895,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Audio_PlayerMove",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Audio_PlayerMove.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Audio_PlayerMove.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,

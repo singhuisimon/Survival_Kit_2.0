@@ -552,6 +552,45 @@ namespace Engine
 			ImGui::SetTooltip("Reset bloom strength (0.01) and filter radius (0.0025) to default values");
 		}
 
+		ImGui::SeparatorText("Debug Drawing");
+
+		auto& dbg = m_Editor->GetRenderer()->GetPhysicsDebugSettings();
+
+		// Master toggle
+		ImGui::Checkbox("Enable Debug Draw", &dbg.enabled);
+
+		// Disable the rest when off (nice UX)
+		ImGui::BeginDisabled(!dbg.enabled);
+
+		ImGui::Checkbox("Draw Shapes", &dbg.drawShape);
+		ImGui::Checkbox("Wireframe", &dbg.wireframe);
+
+		ImGui::Checkbox("Draw Bounding Box (AABB)", &dbg.drawBoundingBox);
+		ImGui::Checkbox("Draw Center Of Mass", &dbg.drawCenterOfMass);
+		ImGui::Checkbox("Draw World Transform", &dbg.drawWorldTransform);
+		ImGui::Checkbox("Draw Velocity", &dbg.drawVelocity);
+
+		ImGui::Separator();
+
+		ImGui::Checkbox("Draw Constraints", &dbg.drawConstraints);
+		ImGui::Checkbox("Draw Constraint Limits", &dbg.drawConstraintLimits);
+
+		// Reset button
+		if (ImGui::Button("Reset##PhysicsDebug"))
+		{
+			dbg.enabled = true;
+			dbg.drawShape = true;
+			dbg.wireframe = true;
+			dbg.drawBoundingBox = false;
+			dbg.drawCenterOfMass = false;
+			dbg.drawWorldTransform = false;
+			dbg.drawVelocity = false;
+			dbg.drawConstraints = true;
+			dbg.drawConstraintLimits = false;
+		}
+
+		ImGui::EndDisabled();
+
 		ImGui::End();
 	}
 

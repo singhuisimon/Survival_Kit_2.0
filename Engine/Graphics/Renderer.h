@@ -31,6 +31,11 @@
 // For Font
 #include "Font.h"
 
+// Jolt physics debug draw
+namespace JPH { class PhysicsSystem; }
+#include "Graphics/JoltDebugDraw.h"
+#include <memory>
+
 namespace Engine {
 
 	// Material UBO layout mirrored from GLSL std140
@@ -86,6 +91,26 @@ namespace Engine {
 		glm::vec4 ambient_indirect; // rgb ambient, a = global indirect multiplier
 		glm::uvec4 count;            // x = lightCount; yzw unused
 		LightGPUStd140 lights[MAX_LIGHTS];
+	};
+
+	struct PhysicsDebugSettings
+	{
+		// Toggles
+		bool enabled = false;	// Enable or Disable debug settings
+		
+		// Debug visualization 
+		bool drawShape = true;				// Draw collider shapes
+		bool wireframe = true;				// True = wireframe, false = solid
+		bool drawBoundingBox = false;		// AABB around object
+		bool drawCenterOfMass = false;		// Draw COM axes to look at rotation
+		bool drawWorldTransform = false;	// Draw body world transform axes
+		
+		// Movement
+		bool drawVelocity = false;			// Draw velocity vectors
+		//bool drawMassAndInertia = false;	// Help to debug inertia issues
+
+		bool drawConstraints = true;		
+		bool drawConstraintLimits = false;
 	};
 
 	/**
@@ -212,6 +237,37 @@ namespace Engine {
 		 * @return Reference to projection.
 		 */
 		inline glm::mat4 const& GetUIProjection() { return m_ui_projection; }
+
+		// -------- Debug Draw (Jolt) --------
+		/**
+		 * @brief Set a physics system, so Debug Pass can render Jolt collision shapes/constraints
+		 * @param system Jolt physics system to be used
+		 */
+		void SetJoltPhysicsSystem(JPH::PhysicsSystem* system);
+
+		/**
+		 * @brief Return a reference to debug draw settings
+		 * @return Reference to the debug settings that is mapped to Jolt's debug settings
+		 */
+		PhysicsDebugSettings& GetPhysicsDebugSettings() { return m_physicsDebug; }
+
+		/**
+		 * @brief Return a const reference to debug draw settings
+		 * @return Read-only reference to the debug settings that is mapped to Jolt's debug settings
+		 */
+		const PhysicsDebugSettings& GetPhysicsDebugSettings() const { return m_physicsDebug; }
+
+		/**
+		 * @brief Return a reference to Jolt's debug renderer
+		 * @return Reference to the Jolt's debug renderer that handles the debug draw
+		 */
+		JoltDebugDraw& GetJoltDebugDraw();
+
+		/**
+		 * @brief Return a const reference to Jolt's debug renderer
+		 * @return Read-only reference to the Jolt's debug renderer that handles the debug draw
+		 */
+		const JoltDebugDraw& GetJoltDebugDraw() const;
 
 	private:
 
@@ -462,6 +518,11 @@ namespace Engine {
 		void InitTrailResources();
 		void RenderTrails(std::span<const DrawItem> trailItems, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camPos);
 		void BuildTrailGeometry(const TrailComponent& trail, std::vector<TrailVertex>& vertices, std::vector<u32>& indices);
+
+		// -------- Jolt Debug Draw state --------
+		JPH::PhysicsSystem* m_joltPhysicsSystem = nullptr;
+		std::unique_ptr<JoltDebugDraw> m_joltDebugDraw;
+		PhysicsDebugSettings m_physicsDebug{};
 	};
 
 }
