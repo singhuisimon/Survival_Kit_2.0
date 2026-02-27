@@ -26,25 +26,45 @@ if not exist "%DOTNET_ROOT%\dotnet.exe" (
     exit /b 1
 )
 
-REM Clean stale DLLs
-if exist "Scripts\bin\Debug\net8.0\GameScripts.dll" del /Q "Scripts\bin\Debug\net8.0\GameScripts.dll"
-if exist "Scripts\bin\Release\net8.0\GameScripts.dll" del /Q "Scripts\bin\Release\net8.0\GameScripts.dll"
+REM Ensure output directories exist
+if not exist "build\bin\Debug" mkdir "build\bin\Debug"
+if not exist "build\bin\Release" mkdir "build\bin\Release"
 
+REM Build Debug - output directly to build\bin\Debug\
 echo.
 echo --- [CI] Building Debug (GameScripts.dll) ---
-"%DOTNET_ROOT%\dotnet.exe" build Scripts\GameScripts.csproj -c Debug --ignore-failed-sources -nologo -v:m
+"%DOTNET_ROOT%\dotnet.exe" build Scripts\GameScripts.csproj -c Debug --ignore-failed-sources -nologo -v:m -o "build\bin\Debug"
 if %ERRORLEVEL% NEQ 0 (
     echo [CI ERROR] Debug GameScripts build failed!
     exit /b %ERRORLEVEL%
 )
 
+REM Verify Debug DLL was produced
+if not exist "build\bin\Debug\GameScripts.dll" (
+    echo [CI ERROR] Debug GameScripts.dll was not produced!
+    echo [CI] Searching for it...
+    dir /s /b GameScripts.dll 2>nul
+    exit /b 1
+)
+echo [CI] Debug GameScripts.dll OK
+
+REM Build Release - output directly to build\bin\Release\
 echo.
 echo --- [CI] Building Release (GameScripts.dll) ---
-"%DOTNET_ROOT%\dotnet.exe" build Scripts\GameScripts.csproj -c Release --ignore-failed-sources -nologo -v:m
+"%DOTNET_ROOT%\dotnet.exe" build Scripts\GameScripts.csproj -c Release --ignore-failed-sources -nologo -v:m -o "build\bin\Release"
 if %ERRORLEVEL% NEQ 0 (
     echo [CI ERROR] Release GameScripts build failed!
     exit /b %ERRORLEVEL%
 )
+
+REM Verify Release DLL was produced
+if not exist "build\bin\Release\GameScripts.dll" (
+    echo [CI ERROR] Release GameScripts.dll was not produced!
+    echo [CI] Searching for it...
+    dir /s /b GameScripts.dll 2>nul
+    exit /b 1
+)
+echo [CI] Release GameScripts.dll OK
 
 REM ===========================================
 REM Build C++ Game Engine (CMake/MSBuild)
@@ -85,16 +105,10 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b %ERRORLEVEL%
 )
 
-REM ===========================================
-REM Copy GameScripts.dll to output directories
-REM ===========================================
 cd ..
 
-copy /Y "Scripts\bin\Debug\net8.0\GameScripts.dll" "build\bin\Debug\GameScripts.dll"
-copy /Y "Scripts\bin\Release\net8.0\GameScripts.dll" "build\bin\Release\GameScripts.dll"
-
 REM ===========================================
-REM Verify outputs exist
+REM Verify all outputs exist
 REM ===========================================
 echo.
 echo [CI] Verifying build outputs...
