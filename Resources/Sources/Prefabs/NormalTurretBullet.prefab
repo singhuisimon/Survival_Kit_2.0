@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: NormalTurretBullet.prefab",
-    "Prefab GUID": 12161355632987439315,
+    "Prefab GUID": 2192796219654386431,
     "version": 1,
     "entities": [
         {
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "18004565042558964655",
+                            "Name": "NormalTurretBullet",
                             "Tag": "NormalTurretBullet"
                         }
                     }
@@ -128,7 +129,7 @@
                             "ComponentGUID": "15122261281046205391",
                             "ScriptClassName": "Game.NormalTurretBullet",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 93643
                         }
                     }
                 },
@@ -148,12 +149,12 @@
                                 1.0,
                                 1.0,
                                 1.0,
-                                1.0
+                                0.5882353186607361
                             ],
                             "End Color": [
+                                0.5714285373687744,
                                 1.0,
-                                1.0,
-                                1.0,
+                                0.6357661485671997,
                                 0.0
                             ],
                             "Start Width": 0.10000000149011612,
