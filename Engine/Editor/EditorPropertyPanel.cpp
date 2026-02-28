@@ -691,6 +691,12 @@ namespace Engine
 					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
+				bool billboard = mesh.Billboarding;
+				if (ImGui::Checkbox("Enable Billboard", &billboard)) {
+					mesh.Billboarding = billboard;
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);
+				}
+
 				ImGui::Spacing();
 
 				ImGui::SeparatorText("Lighting Properties");
@@ -923,12 +929,11 @@ namespace Engine
 				ImGui::SeparatorText("Values for Debugging:");
 				ImGui::Text("Material: %u", mesh.Material);
 
-				ImU32 meshType = mesh.MeshType;
-				if (ImGui::InputScalar("Mesh Type", ImGuiDataType_U32, &meshType)) {
-					if (meshType == 0 || meshType == 1 || meshType == 2) {
-						mesh.MeshType = meshType;
-						MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
-					}
+				const char* meshTypeNames[] = { "Cube", "Plane", "Sphere" };
+				int meshTypeIndex = static_cast<int>(mesh.MeshType);
+				if (ImGui::Combo("Mesh Type", &meshTypeIndex, meshTypeNames, IM_ARRAYSIZE(meshTypeNames))) {
+					mesh.MeshType = static_cast<ImU32>(meshTypeIndex);
+					MarkComponentOverridden(ComponentTypeID::MeshRenderer);  // MARK AS OVERRIDDEN
 				}
 
 				ImGui::Text("Submesh Index: %u", mesh.SubmeshIndex);

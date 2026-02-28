@@ -44,6 +44,7 @@ namespace Engine {
         bool Visible;               // Determine if sent to draw call
         bool GlobalIlluminate;      // Require further expansion; for now true means it receives light from a light object
         bool ShadowReceive;         // Allow object to receive shadows if true
+        bool Billboarding;          // Allow object to constantly face camera, typically used in case of world space UI, otherwise do not enable
 
         // Defaults
         u32 MeshType;          // Fallback to default mesh if custom mesh not found
@@ -66,6 +67,7 @@ namespace Engine {
             Visible(true),
             GlobalIlluminate(true),
             ShadowReceive(false),
+            Billboarding(false),
             CastType(ShadowCastType::Off),
             MeshType(0),
             Material(0),

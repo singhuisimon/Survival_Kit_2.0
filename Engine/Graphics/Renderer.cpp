@@ -639,14 +639,37 @@ namespace Engine {
 			GLsizei draw_count = m_gl.m_mesh_storage[mesh_handle].draw_count;
 			GLenum  index_type = m_gl.m_mesh_storage[mesh_handle].index_type;
 
+			glm::mat4 worldTransform = item.m_model_to_world_transform;
 
-			// Upload model to world transform
-			prog.setUniform("u_World", item.m_model_to_world_transform); 
+			if (item.m_billboard) {
+				glm::vec3 worldPos = glm::vec3(item.m_model_to_world_transform[3]);
+				glm::vec3 scale = glm::vec3(
+					glm::length(glm::vec3(item.m_model_to_world_transform[0])),
+					glm::length(glm::vec3(item.m_model_to_world_transform[1])),
+					glm::length(glm::vec3(item.m_model_to_world_transform[2]))
+				);
 
-			// Compute the normal matrix and upload it
-			glm::mat4 normal_matrix = glm::transpose(glm::inverse(item.m_model_to_world_transform));
-			prog.setUniform("u_NormalMatrix", normal_matrix); // Normal matrix
+				glm::vec3 right = glm::vec3(v[0][0], v[1][0], v[2][0]);
+				glm::vec3 up = glm::vec3(v[0][1], v[1][1], v[2][1]);
+				glm::vec3 forward = glm::cross(right, up);
 
+				worldTransform[0] = glm::vec4(right * scale.x, 0.f); // X = camera right
+				worldTransform[1] = glm::vec4(up * scale.y, 0.f); // Y = camera up
+				worldTransform[2] = glm::vec4(forward * scale.z, 0.f); // Z = depth (normal)
+				worldTransform[3] = glm::vec4(worldPos, 1.f);
+
+				// Correct for plane's default face-down orientation
+				glm::quat correction = glm::angleAxis(glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
+
+				worldTransform = worldTransform * glm::mat4_cast(correction);
+			}
+
+			prog.setUniform("u_World", worldTransform);
+
+			// Normal matrix must use the same worldTransform that was uploaded
+			glm::mat4 normal_matrix = glm::transpose(glm::inverse(worldTransform));
+			prog.setUniform("u_NormalMatrix", normal_matrix);
+		
 			// Get the underlying mesh resource using its guid
 			if (MeshResource* mesh_resource = RM.loadResource<MeshResource>(convertToMeshGuid(item.m_mesh_guid))) {
 				glBindVertexArray(mesh_resource->VAO);
