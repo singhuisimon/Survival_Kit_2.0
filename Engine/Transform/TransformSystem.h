@@ -25,6 +25,8 @@ namespace Engine {
 		 * @param root is the root transformation to propagate from.
 		 */
 		void propagate(Scene* scene, entt::entity root);
+
+		static void FlushEntity(Scene* scene, entt::entity entity);
 	};
 
 }

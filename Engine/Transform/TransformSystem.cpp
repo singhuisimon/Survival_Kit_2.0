@@ -131,17 +131,19 @@ namespace Engine {
 		auto view = scene->GetRegistry().view<TransformComponent>();
 		TransformComponent& transform = view.get<TransformComponent>(entity);
 
-		if (transform.HasParent()) {
-			TransformComponent& parent_transform = view.get<TransformComponent>(static_cast<entt::entity>(transform.GetParentEntity()));
+		if (transform.HasParent())
+		{
+			entt::entity parentEnt = static_cast<entt::entity>(transform.GetParentEntity());
 
-			// Extract the parent's world rotation from its world matrix
-			glm::quat parent_world_rotation = glm::quat_cast(parent_transform.WorldTransform);
+			// Ensure parent WorldTransform is up to date before inverting
+			FlushEntity(scene, parentEnt);
 
-			// Un-rotate by the parent's rotation to find the local rotation
+			TransformComponent& parent_transform = view.get<TransformComponent>(parentEnt);
+			glm::quat parent_world_rotation = parent_transform.WorldRotation;
 			transform.Rotation = glm::inverse(parent_world_rotation) * rotation;
 		}
-		else {
-			// Since this is a root transformation, its Rotation is considered the world rotation
+		else
+		{
 			transform.Rotation = rotation;
 		}
 
@@ -212,7 +214,7 @@ namespace Engine {
 				child.LocalTransform = transformation_matrix;
 
 				child.WorldPosition = glm::vec3(child.WorldTransform[3]);
-				child.WorldRotation = glm::quat_cast(child.WorldTransform);
+				child.WorldRotation = current_transform.WorldRotation * child.Rotation;
 				child.WorldScale.x = glm::length(glm::vec3(child.WorldTransform[0]));
 				child.WorldScale.y = glm::length(glm::vec3(child.WorldTransform[1]));
 				child.WorldScale.z = glm::length(glm::vec3(child.WorldTransform[2]));
@@ -221,6 +223,47 @@ namespace Engine {
 				process_stack.push(static_cast<entt::entity>(ce));
 			}
 		}
+	}
+
+	void TransformSystem::FlushEntity(Scene* scene, entt::entity entity)
+	{
+		auto view = scene->GetRegistry().view<TransformComponent>();
+		TransformComponent& t = view.get<TransformComponent>(entity);
+
+		if (!t.IsDirty) return;
+
+		if (t.HasParent())
+		{
+			// Recursively flush parent first
+			FlushEntity(scene, static_cast<entt::entity>(t.GetParentEntity()));
+
+			TransformComponent& parent = view.get<TransformComponent>(static_cast<entt::entity>(t.GetParentEntity()));
+
+			glm::mat4 local = glm::translate(glm::mat4(1.f), t.Position)
+				* glm::toMat4(t.Rotation)
+				* glm::scale(glm::mat4(1.f), t.Scale);
+
+			t.WorldTransform = parent.WorldTransform * local;
+			t.LocalTransform = local;
+			t.WorldPosition = glm::vec3(t.WorldTransform[3]);
+			t.WorldRotation = parent.WorldRotation * t.Rotation;
+			t.WorldScale.x = glm::length(glm::vec3(t.WorldTransform[0]));
+			t.WorldScale.y = glm::length(glm::vec3(t.WorldTransform[1]));
+			t.WorldScale.z = glm::length(glm::vec3(t.WorldTransform[2]));
+		}
+		else
+		{
+			glm::mat4 local = glm::translate(glm::mat4(1.f), t.Position)
+				* glm::toMat4(t.Rotation)
+				* glm::scale(glm::mat4(1.f), t.Scale);
+
+			t.WorldTransform = t.LocalTransform = local;
+			t.WorldPosition = t.Position;
+			t.WorldRotation = t.Rotation;
+			t.WorldScale = t.Scale;
+		}
+
+		t.IsDirty = false;
 	}
 
 	int TransformSystem::GetPriority() const { return 51; }
