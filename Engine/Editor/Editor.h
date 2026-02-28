@@ -36,6 +36,7 @@
 #include "../Editor/EditorPerformancePanel.h"
 #include "../Editor/EditorViewportPanel.h"
 #include "../Editor/EditorAssetBrowserPanel.h"
+#include "../Editor/EditorLoggerPanel.h"
 #include "../Utility/Timestep.h"
 #include "../Profiler/Profiler.h"
 #include "Graphics/GraphicsLoader.h"
@@ -54,6 +55,7 @@ namespace Engine
 	class EditorPerformancePanel;
 	class EditorViewportPanel;
 	class EditorAssetBrowserPanel;
+	class EditorLogPanel;
 
 	/**
 	* @class Editor
@@ -77,6 +79,7 @@ namespace Engine
 		std::unique_ptr<EditorPerformancePanel> m_EditorPerformance;
 		std::unique_ptr<EditorViewportPanel> m_EditorViewport;
 		std::unique_ptr<EditorAssetBrowserPanel> m_EditorAsset;
+		std::unique_ptr<EditorLogPanel> m_EditorLogger;
 		// gizmo
 		Entity m_SelectedEntity{};
 		u32 m_PickedID = 0xFFFFFFFFu;
@@ -91,6 +94,7 @@ namespace Engine
 		bool m_PropertyWindow = true;
 		bool m_AnimatorWindow = true;
 		bool m_PerformanceProfileWindow = true;
+		bool m_LoggerWindow = true;
 
 		std::string m_CurrentScenePath;
 		std::string m_CurrentSceneName;
@@ -100,6 +104,7 @@ namespace Engine
 
 		float m_FontScale = 0.70f;
 		ImGuiStyle m_BaseStyle;
+		bool m_BaseStyleCaptured = false;
 	
 	public:
 		
@@ -127,6 +132,7 @@ namespace Engine
 			m_EditorPerformance = std::make_unique<EditorPerformancePanel>(this);
 			m_EditorViewport = std::make_unique<EditorViewportPanel>(this);
 			m_EditorAsset = std::make_unique<EditorAssetBrowserPanel>(this);
+			m_EditorLogger = std::make_unique<EditorLogPanel>(this);
 		};
 
 		~Editor() = default;
@@ -179,12 +185,12 @@ namespace Engine
 		std::weak_ptr<TracyProfiler> GetProfiler() const { return m_Profiler; }
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; }
-		u32 GetPickedID() { return m_PickedID; }
+		u32 GetPickedID() const { return m_PickedID; }
 		void SetEditorViewport(EditorViewport& vp) const { vp = editorViewportData; }
 
 
-		float GetFontScale() { return m_FontScale; }
-		ImGuiStyle GetBaseStyle() { return m_BaseStyle; }
+		float GetFontScale() const { return m_FontScale; }
+		ImGuiStyle GetBaseStyle() const { return m_BaseStyle; }
 		
 		void SetFontScale(float fontScale)
 		{
@@ -192,6 +198,7 @@ namespace Engine
 		}
 		void ViewportClickAndTeleport();
 		bool GetEditorIsPlaying();
+		void ApplyUIScale(float scale);
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 
@@ -199,6 +206,7 @@ namespace Engine
 		bool& GetPropertyWindowRef() { return m_PropertyWindow; }
 		bool& GetAnimatorWindowRef() { return m_AnimatorWindow; }
 		bool& GetPerformanceProfileWindowRef() { return m_PerformanceProfileWindow; }
+		bool& GetLoggerWindowRef() { return m_LoggerWindow; }
 	};
 }
 

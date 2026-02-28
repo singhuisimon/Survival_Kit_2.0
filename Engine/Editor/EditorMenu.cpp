@@ -138,6 +138,7 @@ namespace Engine
 				ImGui::MenuItem("Hierarchy", nullptr, &m_Editor->GetHierarchyWindowRef());
 				ImGui::MenuItem("Property", nullptr, &m_Editor->GetPropertyWindowRef());
 				ImGui::MenuItem("Performance", nullptr, &m_Editor->GetPerformanceProfileWindowRef());
+				ImGui::MenuItem("Logger", nullptr, &m_Editor->GetLoggerWindowRef());
 
 				ImGui::Separator();
 

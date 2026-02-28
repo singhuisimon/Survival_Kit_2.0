@@ -88,7 +88,7 @@ namespace Engine {
 		{
 		}
 		struct DeletedEntityData {
-			u64 prefabLocalID;
+			u64 prefabLocalID = 0;
 			std::string entityName;
 			std::string serializedEntityData;  // Store full entity JSON for restoration
 

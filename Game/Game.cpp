@@ -56,7 +56,7 @@
 #include "Serialization/PrefabInstantiator.h"
 #include "Prefab/PrefabRegistry.h"
 
-#include "Utility/AssetPath.h"
+
 #include "Physics/PhysicsBridge.h"
 
 #ifndef DEBUG
