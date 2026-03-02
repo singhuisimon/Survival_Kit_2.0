@@ -665,7 +665,8 @@ namespace Engine
 					displayAsset.fileName = asset.name;
 					displayAsset.fullPath = asset.fullPath;
 					std::filesystem::path p(asset.fullPath);
-					displayAsset.displayFolder = p.parent_path().filename().string();
+					ResourceType detectedType = detectResourceTypeFromPath(asset.fullPath);
+					displayAsset.displayFolder = resourceTypeToString(detectedType);
 					displayAsset.isRawAsset = false;
 					displayAsset.record = nullptr;
 
@@ -1102,26 +1103,28 @@ namespace Engine
 			}
 		}
 
-		// Then search filesystem folders for other asset types
-		std::vector<std::string> foldersToSearch = {
-		"Sources/",
-		"Textures/",
-		"Scenes/",
-		"Shaders/",
-		"Material/",
-		"Meshes/",
-		"Prefabs/",
-		"AnimationClips/",
-		"Audio/",
-		"AudioSetting/",
-		"BT/",
-		"Fonts/"
-		};
-		// Search through filesystem folders
-		for (const auto& folder : foldersToSearch)
-		{
-			SearchFolderRecursive(getAssetFilePath(folder), folder, lowerQuery);
-		}
+		//// Then search filesystem folders for other asset types
+		//std::vector<std::string> foldersToSearch = {
+		//"Sources/",
+		//"Texture/",
+		//"Scenes/",
+		//"Shaders/",
+		//"Material/",
+		//"Mesh/",
+		//"Prefabs/",
+		//"AnimationClips/",
+		//"Audio/",
+		//"AudioSetting/",
+		//"BT/",
+		//"Fonts/"
+		//};
+		//// Search through filesystem folders
+		//for (const auto& folder : foldersToSearch)
+		//{
+		//	SearchFolderRecursive(getAssetFilePath(folder), folder, lowerQuery);
+		//}
+		// Replace the entire foldersToSearch vector + loop with this:
+		SearchFolderRecursive(getAssetFilePath("Sources/"), "Sources/", lowerQuery);
 	}
 	void EditorAssetBrowserPanel::SearchFolderRecursive(const std::string& folderPath, const std::string& displayFolder, const std::string& lowerQuery)
 	{
@@ -1138,34 +1141,49 @@ namespace Engine
 				SearchFolderRecursive(folderPath + asset.name + "/", displayFolder, lowerQuery);
 				continue;
 			}
-			ResourceType assetType = detectResourceTypeFromPath(asset.fullPath);
-			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (assetType == m_FilterType);
-			// Convert asset name to lowercase
 			std::string lowerFileName = asset.name;
 			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
+			//bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (detectedType == m_FilterType);
+			// Convert asset name to lowercase
 			bool matchesText = lowerQuery.empty() || lowerFileName.find(lowerQuery) != std::string::npos;
-			
-			if (m_FilterType != ResourceType::UNKNOWN) {
-				std::string ext = std::filesystem::path(asset.name).extension().string();
-				// Map your extensions to ResourceTypes
-				if (m_FilterType == ResourceType::ENTITY_PREFAB && ext != ".prefab") matchesType = false;
-				else if (m_FilterType == ResourceType::SCENE_PREFAB && ext != ".json") matchesType = false;
-				else if (m_FilterType == ResourceType::MESH && ext != ".fbx") matchesType = false;
-			}
+
+			ResourceType detectedType = detectResourceTypeFromPath(asset.fullPath);
+			std::string actualDisplayFolder = resourceTypeToString(detectedType);
+
+			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (detectedType == m_FilterType);
+			//if (m_FilterType != ResourceType::UNKNOWN) {
+			//	std::string ext = std::filesystem::path(asset.name).extension().string();
+			//	// Map your extensions to ResourceTypes
+			//	if (m_FilterType == ResourceType::ENTITY_PREFAB && ext != ".prefab") matchesType = false;
+			//	else if (m_FilterType == ResourceType::SCENE_PREFAB && ext != ".json") matchesType = false;
+			//	else if (m_FilterType == ResourceType::MESH && ext != ".fbx") matchesType = false;
+			//}
 
 			//bool matchesText = lowerQuery.empty() || lowerFileName.find(lowerQuery) != std::string::npos;
 
 			if (matchesText && matchesType)
 			{
-				FilteredAssetInfo info;
-				info.fileName = asset.name;
+				// Skip if already added from asset DB
+				bool alreadyAdded = false;
+				for (const auto& existing : m_FilteredAssets)
+				{
+					if (existing.fullPath == asset.fullPath ||
+						existing.fileName == asset.name) // fallback check
+					{
+						alreadyAdded = true;
+						break;
+					}
+				}
 
-				// Re-use path logic for consistent tooltips
-				std::filesystem::path p(asset.fullPath);
-				info.folderPath = p.parent_path().filename().string();
-
-				info.fullPath = asset.fullPath;
-				m_FilteredAssets.push_back(info);
+				if (!alreadyAdded)
+				{
+					FilteredAssetInfo info;
+					info.fileName = asset.name;
+					std::filesystem::path p(asset.fullPath);
+					info.folderPath = actualDisplayFolder;
+					info.fullPath = asset.fullPath;
+					m_FilteredAssets.push_back(info);
+				}
 			}
 		}
 	}
