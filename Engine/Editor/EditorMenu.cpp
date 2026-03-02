@@ -139,6 +139,7 @@ namespace Engine
 				ImGui::MenuItem("Property", nullptr, &m_Editor->GetPropertyWindowRef());
 				ImGui::MenuItem("Performance", nullptr, &m_Editor->GetPerformanceProfileWindowRef());
 				ImGui::MenuItem("Logger", nullptr, &m_Editor->GetLoggerWindowRef());
+				ImGui::MenuItem("AudioFileTracker", nullptr, &m_Editor->GetAudioTrackerWindowRef());
 
 				ImGui::Separator();
 
