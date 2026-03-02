@@ -34,15 +34,19 @@ namespace Engine
 		bool openPrefabListAtRoot = false;
 		bool openPrefabListAsChild = false;
 		bool openReplacePrefabPanel = false;
-		
+		bool searchMode = false;
 
 		std::vector<Entity> entitiesToDelete;
 		std::vector<Entity> parentlessChildren;
 
-	
 		Entity entityToAttach = Entity();
 		Entity parentOfPrefabEntity = Entity();
 		Entity entityToReplace = Entity();
+
+		const char* m_SearchOptions[2] = { "Name", "Tag" };
+		int searchOption = 0;
+		char m_SearchBuffer[256] = "";
+		std::string m_SearchQuery;
 
 	public:
 		EditorHierarchyPanel(Editor* editor) : m_Editor(editor) {};
