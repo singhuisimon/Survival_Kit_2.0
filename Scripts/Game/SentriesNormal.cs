@@ -26,9 +26,9 @@ namespace Game
         [SerializeField] private float fireRate = 0.1f;
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
-        [SerializeField] private float bulletSpeed = 3000f;
+        [SerializeField] private float bulletSpeed = 6000f;
         [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
-        [SerializeField] private string sentryDespawn = "Sources/Prefabs/SentriesDespawn.prefab";
+        [SerializeField] private string sentryDespawn = "Sources/Prefabs/SentryDespawn.prefab";
 
         // === PRIVATE STATES ===
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -84,19 +84,23 @@ namespace Game
                 initialized = true;
             }
 
-            if(disableshooting){
-                return;
-            }
-
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
 
-            //DebugFireOnKey();
+            countdown -= deltaTime;
+
+            if(countdown < 0){
+                Despawn();
+            }
 
             // does not do anything is Sentry is dead
             if (timeUp)
                 return;
+
+            if(disableshooting){
+                return;
+            }
             
             // Update fire cooldown
             if (fireCooldown > 0f) 
@@ -210,76 +214,6 @@ namespace Game
             return nearestEnemy;
         }
 
-        // Press K to force the Sentry to fire one bullet (This is used for Debugging)
-        private void DebugFireOnKey() 
-        {
-            if (!Input.IsKeyReleased(KeyCode.K)) 
-                return;
-
-            // Must be initalized
-            if (sentryID == 0 || sentryID == INVALID_ENTITY)
-            {
-                LogWarning("[SentryDebug] Can't fire yet: sentryID not ready.");
-                return;
-            }
-
-            fireCooldown = 0.0f;
-
-            Vector3 gunPos = GetPosition(sentryID);
-            Vector3 helperPos = GetPosition((uint)EntityID);
-
-            Vector3 dir;
-            if (currentTarget != INVALID_ENTITY)
-            {
-                Vector3 targetPos = GetPosition(currentTarget);
-                dir = new Vector3(targetPos.X - gunPos.X, targetPos.Y - gunPos.Y, targetPos.Z - gunPos.Z);
-            }
-            else
-            {
-                Quat gunRot = GetRotation(sentryID);
-                dir = gunRot.Forward;
-            }
-
-            float lenSq = dir.X * dir.X + dir.Y * dir.Y + dir.Z * dir.Z;
-            if (lenSq < 0.0001f)
-            {
-                LogWarning("[SentryDebug] Direction too small, not firing.");
-                return;
-            }
-            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-            dir.X *= invLen; dir.Y *= invLen; dir.Z *= invLen;
-
-            float muzzleDist = 1.0f;
-            Vector3 spawnPos = new Vector3 (
-                gunPos.X + dir.X * muzzleDist,
-                gunPos.Y + dir.Y * muzzleDist,
-                gunPos.Z + dir.Z * muzzleDist
-            );
-
-            Quat bulletRot = SimpleMath.LookRotation(dir, Vector3.Up);
-            Vector3 bulletScale = new Vector3(0.3f, 0.2f, 0.15f);
-
-            uint bulletID = PrefabInstantiateWithTransform (
-                bulletPrefabPath,
-                ref spawnPos,
-                ref bulletRot,
-                ref bulletScale,
-                false
-            );
-
-            if (bulletID == 0 || bulletID == INVALID_ENTITY) 
-            {
-                LogError("[SentryDebug] Failed to spawn bullet.");
-                return;
-            }
-
-            Vector3 vel = new Vector3(dir.X * bulletSpeed, dir.Y * bulletSpeed, dir.Z * bulletSpeed);
-            RigidbodySetVelocity(bulletID, ref vel);
-
-            // LogMessage($"[SentryDebug] gunPos=({gunPos.X},{gunPos.Y},{gunPos.Z}) helperPos=({helperPos.X},{helperPos.Y},{helperPos.Z})");
-            // LogMessage($"[SentryDebug] spawnPos=({spawnPos.X},{spawnPos.Y},{spawnPos.Z}) dir=({dir.X},{dir.Y},{dir.Z}) bulletID={bulletID}");
-        }
-
         // Turret Rotation
 
         // Rotates the PARENT (sentryID). Script lives on the child helper.
@@ -366,7 +300,7 @@ namespace Game
             dir.Z *= invLen;
 
             //Spawn infront of helper so it dosen't collide instantly
-            float muzzleDist = 2.0f;
+            float muzzleDist = 5.0f;
             Vector3 spawnPos = new Vector3 (
                 myPos.X + dir.X * muzzleDist,
                 myPos.Y + dir.Y * muzzleDist,
