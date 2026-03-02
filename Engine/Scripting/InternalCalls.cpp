@@ -39,6 +39,8 @@
 #include "../Physics/CollisionSystem2D.h"
 #include "../Core/Application.h"
 
+#include "../Transform/TransformSystem.h"
+
 // Mono
 #include <mono/jit/jit.h>
 #include <mono/metadata/class.h>
@@ -694,6 +696,20 @@ namespace Engine
 			*outPosition = SafeVec3OrZero(t.Position);
 		}
 
+		void Transform_GetWorldPosition(uint64_t entityID, glm::vec3* outPosition)
+		{
+			if (!outPosition) return;
+			*outPosition = glm::vec3(0.f); // deterministic default
+
+			// RequireMainThread();
+
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TransformComponent>()) return;
+
+			const auto& t = e.GetComponent<TransformComponent>();
+			*outPosition = SafeVec3OrZero(t.WorldPosition);
+		}
+
 		void Transform_SetPosition(uint64_t entityID, glm::vec3 *position)
 		{
 			if (!position) return;
@@ -709,6 +725,18 @@ namespace Engine
 			t.Position = p;
 			t.IsDirty = true;
 		}
+
+		void Transform_SetWorldPosition(uint64_t entityID, glm::vec3* position) 
+		{
+			if (!position) return;
+
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TransformComponent>()) return;
+
+			glm::vec3 p = SafeVec3OrZero(*position);
+			TransformSystem::SetWorldPosition(s_CurrentScene, e.GetHandle(), p);
+		}
+
 
 		// ---- Rotation -----------------------------------------------------------
 
@@ -727,6 +755,21 @@ namespace Engine
 			*outRotation = SafeNormalizeQuat(t.Rotation);
 		}
 
+		void Transform_GetWorldRotation(uint64_t entityID, glm::quat* outRotation)
+		{
+			if (!outRotation) return;
+			*outRotation = glm::quat(1.f, 0.f, 0.f, 0.f); // identity default
+
+			// RequireMainThread();
+
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TransformComponent>()) return;
+
+			const auto& t = e.GetComponent<TransformComponent>();
+			// Optionally normalize on get to keep scripts safe even if native code set bad values
+			*outRotation = SafeNormalizeQuat(t.WorldRotation);
+		}
+
 		void Transform_SetRotation(uint64_t entityID, glm::quat *rotation)
 		{
 			if (!rotation) return;
@@ -741,6 +784,19 @@ namespace Engine
 			auto &t = e.GetComponent<TransformComponent>();
 			t.Rotation = r;
 			t.IsDirty = true;
+		}
+
+		void Transform_SetWorldRotation(uint64_t entityID, glm::quat* rotation)
+		{
+			if (!rotation) return;
+
+			// RequireMainThread();
+
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TransformComponent>()) return;
+
+			glm::quat r = SafeNormalizeQuat(*rotation);
+			TransformSystem::SetWorldRotation(s_CurrentScene, e.GetHandle(), r);
 		}
 
 		// ---- Scale --------------------------------------------------------------
@@ -759,6 +815,20 @@ namespace Engine
 			*outScale = SafeScale(t.Scale);
 		}
 
+		void Transform_GetWorldScale(uint64_t entityID, glm::vec3* outScale)
+		{
+			if (!outScale) return;
+			*outScale = glm::vec3(1.f); // deterministic default
+
+			// RequireMainThread();
+
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TransformComponent>()) return;
+
+			const auto& t = e.GetComponent<TransformComponent>();
+			*outScale = SafeScale(t.WorldScale);
+		}
+
 		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale)
 		{
 			if (!scale) return;
@@ -773,6 +843,19 @@ namespace Engine
 			auto &t = e.GetComponent<TransformComponent>();
 			t.Scale = s;
 			t.IsDirty = true;
+		}
+
+		void Transform_SetWorldScale(uint64_t entityID, glm::vec3* scale)
+		{
+			if (!scale) return;
+
+			// RequireMainThread();
+
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TransformComponent>()) return;
+
+			glm::vec3 s = SafeScale(*scale);
+			TransformSystem::SetWorldScale(s_CurrentScene, e.GetHandle(), s);
 		}
 
 		/**************************************************************************

@@ -353,6 +353,7 @@ namespace Engine {
 				propertiesObj.AddMember("Visible", mesh.Visible, allocator);
 				propertiesObj.AddMember("GlobalIlluminate", mesh.GlobalIlluminate, allocator);
 				propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
+				propertiesObj.AddMember("Billboarding", mesh.Billboarding, allocator);
 				propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
 				propertiesObj.AddMember("MaterialIdx", mesh.Material, allocator);
 				propertiesObj.AddMember("TextureIdx", mesh.Texture, allocator);
@@ -1300,6 +1301,7 @@ namespace Engine {
 						// Handle other properties
 						if(properties.HasMember("Visible")) mesh.Visible = properties["Visible"].GetBool();
 						if(properties.HasMember("ShadowReceive")) mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
+						if (properties.HasMember("Billboarding")) mesh.Billboarding = properties["Billboarding"].GetBool();
 						if(properties.HasMember("GlobalIlluminate")) mesh.GlobalIlluminate = properties["GlobalIlluminate"].GetBool();
 						if(properties.HasMember("MeshType")) mesh.MeshType = properties["MeshType"].GetUint();
 

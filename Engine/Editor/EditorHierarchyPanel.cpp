@@ -44,6 +44,35 @@ namespace Engine
 				isPrefabScene = true;
 			}
 			ImGui::BeginDisabled(isPrefabScene);
+
+			ImGui::Text("Search:");
+			ImGui::SameLine();
+			ImGui::PushItemWidth(110.0f);
+			ImGui::Combo("##SearchOption", &searchOption, m_SearchOptions, IM_ARRAYSIZE(m_SearchOptions));
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			float buttonWidth = ImGui::CalcTextSize("Clear").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float inputWidth = ImGui::GetContentRegionAvail().x - buttonWidth - ImGui::GetStyle().ItemSpacing.x;
+			ImGui::PushItemWidth(inputWidth > 50.0f ? inputWidth : 50.0f);
+			if (ImGui::InputText("##EntitySearch", m_SearchBuffer, sizeof(m_SearchBuffer)))
+			{
+				searchMode = true;
+				m_SearchQuery = std::string(m_SearchBuffer);
+			}
+			if (m_SearchQuery.empty()) {
+				searchMode = false;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Clear"))
+			{
+				m_SearchBuffer[0] = '\0';
+				m_SearchQuery = "";
+				searchMode = false;
+			}
+			ImGui::PopItemWidth();
+
+			ImGui::Separator();
+
 			if (ImGui::Button("Create Entity"))
 			{
 				ImGui::OpenPopup("CreateEntityPopup");
@@ -84,7 +113,6 @@ namespace Engine
 			ImGui::EndPopup(); // end pop up of CreateEntityPopup
 		}
 
-		ImGui::Separator();
 		if (m_Scene)
 		{
 			// List all entities
@@ -111,6 +139,31 @@ namespace Engine
 				auto& transform = entity.GetComponent<TransformComponent>();
 				if (transform.Parent == u32_max)
 				{
+					if (searchMode)
+					{
+						if (searchOption == 0) { // Name
+
+							std::string name = entity.GetComponent<TagComponent>().Name;
+							std::string query = m_SearchQuery;
+							std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+							std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+							if (name.find(query) == std::string::npos) {
+								continue;
+							}
+						}
+						else if (searchOption == 1) { // Tag
+
+							std::string tag = entity.GetComponent<TagComponent>().Tag;
+							std::string query = m_SearchQuery;
+							std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
+							std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+							if (tag.find(query) == std::string::npos) {
+								continue;
+							}
+						}
+						
+					}
+
 					DrawEntityTree(entity);
 				}
 			}

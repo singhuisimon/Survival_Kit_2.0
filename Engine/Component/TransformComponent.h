@@ -23,6 +23,10 @@ namespace Engine {
         glm::quat Rotation; // Rotation stored as a quaternion instead of euler angles -> to avoid gimbal lock
         glm::vec3 Scale;
 
+        glm::vec3 WorldPosition;
+        glm::quat WorldRotation;
+        glm::vec3 WorldScale;
+
         // Cache the matrices
         glm::mat4 LocalTransform;
         glm::mat4 WorldTransform;
@@ -88,7 +92,7 @@ namespace Engine {
             SetParent(entt::null);
         }
 
-        int GetParentEntity() const {
+        u32 GetParentEntity() const {
             return Parent;
         }
 

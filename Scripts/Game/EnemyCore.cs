@@ -23,6 +23,8 @@ namespace Game
 
         private string EVENT_ENEMYCORE_HIT = "Damage:";
 
+        private const string EVENT_ENEMYCORE_HEALTHCHANGE = "EnemyCore Health Change";
+
         public override void OnStart()
         {
             CurrentHealth = MaxHealth;
@@ -33,6 +35,9 @@ namespace Game
 
             // Subscribe to bullet hits
             Subscribe(EVENT_ENEMYCORE_HIT, OnDamageReceived);
+
+            //publish healthcore change
+            Publish(EVENT_ENEMYCORE_HEALTHCHANGE, CurrentHealth.ToString());
             //Vector3 newpos = new Vector3(-5504.39f, -438.72f, 643.28f);
             //Engine.Transform.SetPosition(EntityID, ref newpos);
 
@@ -79,6 +84,8 @@ namespace Game
             CurrentHealth -= damage;
             LogMessage("EnemyCore is being damaged by: " + damage.ToString() );
             LogMessage("EnemyCore " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
+
+            Publish(EVENT_ENEMYCORE_HEALTHCHANGE, CurrentHealth.ToString());
 
             if(CurrentHealth <= 0.0f){
                 isDead = true;

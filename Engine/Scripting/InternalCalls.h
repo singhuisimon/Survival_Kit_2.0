@@ -169,6 +169,19 @@ namespace Engine {
 		 * Output parameter that receives the requested value.
 		***************************************************************************/
 		void Transform_GetPosition(uint64_t entityID, glm::vec3 *outPosition);
+
+		/**************************************************************************
+		 * @brief
+		 * Retrieves the world-space position of an entity.
+		 * Returns a cached value representing the entity's absolute position
+		 * in the world, calculated during the last transform propagation pass.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outPosition
+		 * Pointer to a vector to be populated with the world-space coordinates.
+		***************************************************************************/
+		void Transform_GetWorldPosition(uint64_t entityID, glm::vec3* outPosition);
+
 		/**************************************************************************
 		 * @brief
 		 * Sets a transform property on the entity.
@@ -181,6 +194,18 @@ namespace Engine {
 
 		/**************************************************************************
 		 * @brief
+		 * Sets the world-space position of an entity.
+		 * Internally converts the world position to a local-space offset
+		 * relative to the entity's parent before updating the transform.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param position
+		 * Pointer to the target world-space coordinate vector.
+		***************************************************************************/
+		void Transform_SetWorldPosition(uint64_t entityID, glm::vec3* position);
+
+		/**************************************************************************
+		 * @brief
 		 * Retrieves a transform property from the entity.
 		 * @param entityID
 		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
@@ -188,6 +213,19 @@ namespace Engine {
 		 * Output parameter that receives the requested value.
 		***************************************************************************/
 		void Transform_GetRotation(uint64_t entityID, glm::quat *outRotation);
+
+		/**************************************************************************
+		 * @brief
+		 * Retrieves the world-space rotation of an entity.
+		 * Returns a cached quaternion representing the entity's absolute
+		 * orientation in the world, extracted during the last propagation pass.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outRotation
+		 * Pointer to a quaternion to be populated with the world-space orientation.
+		***************************************************************************/
+		void Transform_GetWorldRotation(uint64_t entityID, glm::quat* outRotation);
+
 		/**************************************************************************
 		 * @brief
 		 * Sets a transform property on the entity.
@@ -200,6 +238,18 @@ namespace Engine {
 
 		/**************************************************************************
 		 * @brief
+		 * Sets the world-space rotation of an entity.
+		 * Internally converts the target orientation to a local-space quaternion
+		 * relative to the entity's parent before updating the transform.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param rotation
+		 * Pointer to a quaternion representing the target world-space orientation.
+		***************************************************************************/
+		void Transform_SetWorldRotation(uint64_t entityID, glm::quat* rotation);
+
+		/**************************************************************************
+		 * @brief
 		 * Retrieves a transform property from the entity.
 		 * @param entityID
 		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
@@ -207,6 +257,19 @@ namespace Engine {
 		 * Output parameter that receives the requested value.
 		***************************************************************************/
 		void Transform_GetScale(uint64_t entityID, glm::vec3 *outScale);
+
+		/**************************************************************************
+		 * @brief
+		 * Retrieves the world-space scale of an entity.
+		 * Returns a cached value representing the entity's absolute scale
+		 * in the world, extracted from the world transformation matrix.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param outScale
+		 * Pointer to a vector to be populated with the world-space scale values.
+		***************************************************************************/
+		void Transform_GetWorldScale(uint64_t entityID, glm::vec3* outScale);
+
 		/**************************************************************************
 		 * @brief
 		 * Sets a transform property on the entity.
@@ -216,6 +279,18 @@ namespace Engine {
 		 * Pointer/reference to a vector value.
 		***************************************************************************/
 		void Transform_SetScale(uint64_t entityID, glm::vec3 *scale);
+
+		/**************************************************************************
+		 * @brief
+		 * Sets the world-space scale of an entity.
+		 * Internally calculates the necessary local-space scale multiplier
+		 * relative to the entity's parent to achieve the target world-space size.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param scale
+		 * Pointer to a vector representing the target world-space scale.
+		***************************************************************************/
+		void Transform_SetWorldScale(uint64_t entityID, glm::vec3* scale);
 
 		/**************************************************************************
 		 * @brief
