@@ -1,0 +1,94 @@
+{
+    "Scene": "New Scene",
+    "Version": "1.0",
+    "Entities": [
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "New Entity",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10598879274731552921",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "TestEntity",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12328261531641839773",
+                        "Position": [
+                            60.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15000.0,
+                            21155.0,
+                            555.0
+                        ],
+                        "Parent": 0,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "7729514566051823775",
+                        "ScriptClassName": "Game.TransformTest"
+                    }
+                }
+            ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0,
+            "GlobalBias": 0.004999999888241291
+        }
+    ]
+}

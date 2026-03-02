@@ -10,8 +10,9 @@ namespace Game
 {
     public class EnemyCore : ScriptBehaviour
     {
-        [SerializeField] private const float MaxHealth = 500.0f;
-        [SerializeField] private float CurrentHealth = 500.0f;
+        [SerializeField] private const float MaxHealth = 150.0f;
+        [SerializeField] private float CurrentHealth = 150.0f;
+        [SerializeField] private float prevHealth = 0.0f;
         [SerializeField] private bool isDead = false;
 
         //private const float SPAWN_GRACE_TIME = 0.5f;
@@ -25,6 +26,7 @@ namespace Game
         public override void OnStart()
         {
             CurrentHealth = MaxHealth;
+            prevHealth = CurrentHealth;
             isDead = false;
             //spawnTimer = SPAWN_GRACE_TIME;
             EVENT_ENEMYCORE_HIT += EntityID.ToString();
@@ -35,6 +37,7 @@ namespace Game
             //Engine.Transform.SetPosition(EntityID, ref newpos);
 
             LogMessage("EnemyCore " + EntityID + " Health initialized");
+            LogMessage("EnemyCore " + EntityID + " Health is: " + CurrentHealth.ToString() + "/" + MaxHealth.ToString());
         }
 
         public override void OnUpdate(float deltaTime)
@@ -42,6 +45,11 @@ namespace Game
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
+
+            if(prevHealth != CurrentHealth){
+                LogMessage("EnemyCore detect health change!!!");
+                prevHealth = CurrentHealth;
+            }
 
             //if (!isDead) return;
 
@@ -69,6 +77,7 @@ namespace Game
             float damage = DamageSystem.ParseAmount(payload);
 
             CurrentHealth -= damage;
+            LogMessage("EnemyCore is being damaged by: " + damage.ToString() );
             LogMessage("EnemyCore " + EntityID + " hit! Health: " + CurrentHealth + "/" + MaxHealth);
 
             if(CurrentHealth <= 0.0f){

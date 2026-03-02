@@ -80,6 +80,7 @@ namespace Game
         private string GAMEOVER = "GameOver";
         private string EVENT_RELOAD_START = "ReloadStart";
         private string EVENT_RELOAD_END = "ReloadEnd";
+        private string EVENT_ALT_FIRED = "AltFired";
 
         //2 audio for primary alt fire
         //not sure what is layermask
@@ -509,6 +510,10 @@ namespace Game
             //reset the values here
             primaryAltCharge = 0;
             primaryAltReady = false;
+
+
+            // Publish alt fire event for UI
+            Publish(EVENT_ALT_FIRED, "");
         }
 
         private void PrimaryAltCharge_Reward()

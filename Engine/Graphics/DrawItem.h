@@ -75,6 +75,7 @@ namespace Engine{
 		// Shadow settings
 		bool     m_render_main_pass = true;		// false for CastType::ShadowsOnly
 		bool     m_receive_shadows = false;		// MeshRendererComponent::ShadowReceive
+		bool     m_billboard = false; // MeshRendererComponent::Billboarding
 		u32		 m_cast_shadow_type = 0u;		// MeshRendererComponent::CastType: 0 = Off,1 = On,2 = TwoSided,3 = ShadowsOnly
 
 		// text data

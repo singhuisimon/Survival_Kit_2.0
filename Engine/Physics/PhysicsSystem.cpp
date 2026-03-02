@@ -36,9 +36,158 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "PhysicsSystem.h"
 #include "PhysicsAPI.h"
 
+// Runtime mesh extraction for physics colliders
+#include "Asset/ResourceData.h"
+#include "Asset/ResourceManager.h"
+#include "Asset/ResourceTypes.h"
+
 namespace Engine
 {
 	static constexpr float DEFAULT_HALF_EXT = 0.5f;
+	static constexpr float WORLD_SCALE_EPS = 1e-6f;
+
+	/*****************************************************************************/
+	/*!
+	\brief      Extracts world-space scale from a 4x4 transform matrix.
+	\param      m   World transform matrix.
+	\return     Per-axis scale (absolute), with near-zero axes clamped to 1.
+	*/
+	/*****************************************************************************/
+	static inline glm::vec3 ExtractWorldScale(glm::mat4 const &m)
+	{
+		glm::vec3 sx = glm::vec3(m[0]);
+		glm::vec3 sy = glm::vec3(m[1]);
+		glm::vec3 sz = glm::vec3(m[2]);
+		float lx = glm::length(sx);
+		float ly = glm::length(sy);
+		float lz = glm::length(sz);
+		if (lx < WORLD_SCALE_EPS) lx = 1.0f;
+		if (ly < WORLD_SCALE_EPS) ly = 1.0f;
+		if (lz < WORLD_SCALE_EPS) lz = 1.0f;
+		return glm::vec3(std::fabs(lx), std::fabs(ly), std::fabs(lz));
+	}
+
+	/*****************************************************************************/
+	/*!
+	\brief      Extracts a pure rotation quaternion from a world transform matrix.
+	\details    Normalizes the basis vectors to remove scale before casting.
+	\param      m   World transform matrix.
+	\return     Rotation quaternion.
+	*/
+	/*****************************************************************************/
+	static inline glm::quat ExtractWorldRotation(glm::mat4 const &m)
+	{
+		glm::vec3 x = glm::vec3(m[0]);
+		glm::vec3 y = glm::vec3(m[1]);
+		glm::vec3 z = glm::vec3(m[2]);
+
+		float lx = glm::length(x);
+		float ly = glm::length(y);
+		float lz = glm::length(z);
+		if (lx >= WORLD_SCALE_EPS) x /= lx;
+		if (ly >= WORLD_SCALE_EPS) y /= ly;
+		if (lz >= WORLD_SCALE_EPS) z /= lz;
+
+		glm::mat3 r(1.0f);
+		r[0] = x;
+		r[1] = y;
+		r[2] = z;
+		return glm::quat_cast(r);
+	}
+
+	/*****************************************************************************/
+	/*!
+	\brief      Builds a stable cache key for a mesh instance + submesh.
+	\param      meshGuid     xresource instance GUID.
+	\param      submeshIndex Optional submesh index.
+	\return     64-bit key suitable for PhysicsBridge::CacheKey.
+	*/
+	/*****************************************************************************/
+	static inline std::uint64_t MakeMeshKey(xresource::instance_guid const &meshGuid, std::uint32_t submeshIndex)
+	{
+		// instance_guid is a thin wrapper around a 64-bit value (xresource_guid)
+		std::uint64_t h = static_cast<std::uint64_t>(meshGuid.m_Value);
+		// mix in submesh index so different submeshes don't collide in the cache
+		h ^= (static_cast<std::uint64_t>(submeshIndex) + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
+		return h;
+	}
+
+	/*****************************************************************************/
+	/*!
+	\brief      Populates MeshBuildInfo from engine resources for an entity.
+	\details    When needGeometry is false, only key/scale/doubleSided are filled.
+	\param      scene        Scene pointer.
+	\param      e            Entity id.
+	\param      out          Output mesh build info.
+	\param      needGeometry True to also populate vertices/indices.
+	\return     True if mesh reference (and geometry, if requested) was found.
+	*/
+	/*****************************************************************************/
+	static bool TryBuildMeshInfoFromEntity(Scene *scene, EntityID e, MeshBuildInfo &out, bool needGeometry)
+	{
+		auto &reg = scene->GetRegistry();
+		if (!reg.all_of<MeshRendererComponent, TransformComponent>(e))
+			return false;
+
+		auto const &mrc = reg.get<MeshRendererComponent>(e);
+		auto const &tc = reg.get<TransformComponent>(e);
+
+		if (mrc.MeshGuid.m_Value == 0)
+			return false;
+
+		out.scale = ExtractWorldScale(tc.WorldTransform);
+		out.doubleSided = (mrc.CastType == ShadowCastType::TwoSided);
+		out.key = MakeMeshKey(mrc.MeshGuid, mrc.SubmeshIndex);
+
+		if (!needGeometry)
+			return true;
+
+		xresource::full_guid meshFull{ mrc.MeshGuid, Engine::ResourceGUID::mesh_type_guid_v };
+		MeshResource *mesh = RM.loadResource<MeshResource>(meshFull);
+		if (mesh == nullptr)
+			return false;
+
+		constexpr std::size_t STRIDE = 11; // pos3 + nrm3 + col3 + uv2
+		if (mesh->vertices.size() < STRIDE)
+		{
+			xresource::full_guid tmp = meshFull;
+			RM.releaseResource<MeshResource>(tmp);
+			return false;
+		}
+
+		std::size_t vcount = mesh->vertices.size() / STRIDE;
+		out.vertices.clear();
+		out.vertices.reserve(vcount);
+		for (std::size_t i = 0; i < vcount; ++i)
+		{
+			std::size_t off = i * STRIDE;
+			out.vertices.emplace_back(
+				mesh->vertices[off + 0],
+				mesh->vertices[off + 1],
+				mesh->vertices[off + 2]
+			);
+		}
+
+		out.indices.clear();
+		if (!mesh->subMeshes.empty() && mrc.SubmeshIndex < mesh->subMeshes.size())
+		{
+			SubMeshDescriptor const &sm = mesh->subMeshes[mrc.SubmeshIndex];
+			std::uint32_t start = sm.startIndex;
+			std::uint32_t count = sm.indexCount;
+			if (count >= 3 && start < mesh->indices.size() && (static_cast<std::size_t>(start) + count) <= mesh->indices.size())
+				out.indices.assign(mesh->indices.begin() + start, mesh->indices.begin() + start + count);
+			else
+				out.indices = mesh->indices;
+		}
+		else
+		{
+			out.indices = mesh->indices;
+		}
+
+		xresource::full_guid tmp = meshFull;
+		RM.releaseResource<MeshResource>(tmp);
+		return !out.vertices.empty() && out.indices.size() >= 3;
+	}
 
 	/*****************************************************************************/
 	/*!
@@ -273,20 +422,23 @@ namespace Engine
 				}
 
 				// Mesh / shape changes for mesh-backed colliders
-				if (mFetchMeshInfo &&
-					(rb.Shape == ColliderType::AABB ||
-						rb.Shape == ColliderType::SPHERE ||
-						rb.Shape == ColliderType::MESH))
+				if (rb.Shape == ColliderType::AABB ||
+					rb.Shape == ColliderType::SPHERE ||
+					rb.Shape == ColliderType::MESH)
 				{
 					MeshBuildInfo info;
-					if (mFetchMeshInfo(scene, e, info))
+					bool ok = false;
+					if (mFetchMeshInfo)
+						ok = mFetchMeshInfo(scene, e, info);
+					else
+						ok = TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/false);
+
+					if (ok)
 					{
 						std::uint8_t ds = info.doubleSided ? 1u : 0u;
 						bool         scaleDiff = !NearlyEqualVec3(info.scale, ap.shapeScale);
 
-						if (info.key != ap.meshKey ||
-							ds != ap.shapeDS ||
-							scaleDiff)
+						if (info.key != ap.meshKey || ds != ap.shapeDS || scaleDiff)
 						{
 							DestroyBodyFor(e);
 							CreateBodyFor(scene, e);
@@ -379,7 +531,7 @@ namespace Engine
 				FromJPHRotation(q, tc.Rotation);
 				tc.IsDirty = true;
 
-				AppliedProps& ap = mApplied[e];
+				AppliedProps &ap = mApplied[e];
 				ap.lastPos = tc.Position;
 				ap.lastRot = AsQuat(tc.Rotation);
 
@@ -455,13 +607,18 @@ namespace Engine
 				return s;
 		}
 
-		// 2) Try to fetch mesh info once
+		// 2) Gather mesh info once. If engine didn't register a callback,
+		//    we pull it directly from ResourceManager + MeshRendererComponent.
 		MeshBuildInfo info{};
 		bool hasMesh = false;
 		if (mFetchMeshInfo)
 		{
-			if (mFetchMeshInfo(scene, e, info) && !info.vertices.empty())
-				hasMesh = true;
+			hasMesh = mFetchMeshInfo(scene, e, info) && !info.vertices.empty();
+		}
+		else
+		{
+			bool wantGeom = (rb.Shape == ColliderType::AABB || rb.Shape == ColliderType::SPHERE || rb.Shape == ColliderType::MESH);
+			hasMesh = wantGeom && TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/true);
 		}
 
 		switch (rb.Shape)
@@ -493,8 +650,10 @@ namespace Engine
 				if (he.x <= 0.0f || he.y <= 0.0f || he.z <= 0.0f)
 					he = glm::vec3(DEFAULT_HALF_EXT);
 
-				return JPH::Ref<JPH::Shape>(
-					new JPH::BoxShape(JPH::Vec3(he.x, he.y, he.z)));
+				JPH::Ref<JPH::Shape> base(new JPH::BoxShape(JPH::Vec3(he.x, he.y, he.z)));
+				if (!NearlyEqualVec3(info.scale, glm::vec3(1.0f)))
+					return JPH::Ref<JPH::Shape>(new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
+				return base;
 			}
 			// No mesh? fall through to BOX behaviour using BoxHalfExtents.
 			[[fallthrough]];
@@ -558,13 +717,15 @@ namespace Engine
 				}
 
 				JPH::Array<JPH::IndexedTriangle> tris;
-				tris.reserve(info.indices.size() / 3);
+				tris.reserve(info.indices.size() / 3 * (info.doubleSided ? 2 : 1));
 				for (size_t i = 0; i + 2 < info.indices.size(); i += 3)
 				{
-					tris.push_back(JPH::IndexedTriangle(
-						(JPH::uint32)info.indices[i + 0],
-						(JPH::uint32)info.indices[i + 1],
-						(JPH::uint32)info.indices[i + 2]));
+					JPH::uint32 i0 = (JPH::uint32)info.indices[i + 0];
+					JPH::uint32 i1 = (JPH::uint32)info.indices[i + 1];
+					JPH::uint32 i2 = (JPH::uint32)info.indices[i + 2];
+					tris.push_back(JPH::IndexedTriangle(i0, i1, i2));
+					if (info.doubleSided)
+						tris.push_back(JPH::IndexedTriangle(i0, i2, i1));
 				}
 
 				JPH::MeshShapeSettings mss(verts, tris);
@@ -603,8 +764,7 @@ namespace Engine
 
 		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
 		glm::vec3 worldPos = glm::vec3(tc.WorldTransform[3]);
-		glm::mat3 worldRotMat = glm::mat3(tc.WorldTransform);
-		glm::quat worldRot = glm::quat_cast(worldRotMat);
+		glm::quat worldRot = ExtractWorldRotation(tc.WorldTransform);
 		JPH::BodyCreationSettings settings(
 			shape,
 			ToJPHRVec3(worldPos),
@@ -652,10 +812,14 @@ namespace Engine
 		ap.lastRot = AsQuat(tc.Rotation);
 		ap.shapeKind = static_cast<std::uint8_t>(rb.Shape);
 
-		if (mFetchMeshInfo)
 		{
 			MeshBuildInfo info;
-			if (mFetchMeshInfo(scene, e, info))
+			bool ok = false;
+			if (mFetchMeshInfo)
+				ok = mFetchMeshInfo(scene, e, info);
+			else
+				ok = TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/false);
+			if (ok)
 			{
 				ap.meshKey = info.key;
 				ap.shapeDS = info.doubleSided ? 1u : 0u;

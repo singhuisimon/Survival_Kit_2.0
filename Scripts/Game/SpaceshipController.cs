@@ -262,10 +262,12 @@ namespace Game
 
             Vector3 moveDir = Vector3.Zero;
 
-            if (IsKeyPressed(KeyCode.W)) moveDir += camFwdFlat;     // forward
-            if (IsKeyPressed(KeyCode.S)) moveDir -= camFwdFlat;     // backward
-            if (IsKeyPressed(KeyCode.D)) moveDir += camRightFlat;   // right
-            if (IsKeyPressed(KeyCode.A)) moveDir -= camRightFlat;   // left
+            if (IsKeyPressed(KeyCode.W)) moveDir += camFwdFlat;         // forward
+            if (IsKeyPressed(KeyCode.S)) moveDir -= camFwdFlat;         // backward
+            if (IsKeyPressed(KeyCode.D)) moveDir += camRightFlat;       // right
+            if (IsKeyPressed(KeyCode.A)) moveDir -= camRightFlat;       // left
+            if (IsKeyPressed(KeyCode.Space)) moveDir += camUpFlat;      // up
+            if (IsKeyPressed(KeyCode.LeftShift)) moveDir -= camUpFlat;  // down
 
             if (moveDir.SqrMagnitude > 1e-8f)
                 moveDir = moveDir.Normalized;

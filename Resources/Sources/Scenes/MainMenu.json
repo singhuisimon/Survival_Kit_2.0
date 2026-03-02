@@ -3,6 +3,217 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 2097226,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "LevelSelectionPopUp_Level1",
+                        "Tag": "LevelSelectionPopUp_Level1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16788760301931528815",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            361.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "LevelSelectionPopup_Level1.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 75,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "LevelSelectionPopUp_Level2",
+                        "Tag": "LevelSelectionPopUp_Level2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8718309769689186937",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            361.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "LevelSelectionPopup_Level2.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Main Menu Camera",
+                        "Tag": "Main Menu Camera"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2589658315428144855",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            10.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": true,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.9374369382858276,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048647,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Level1_Button",
+                        "Tag": "Level1_Button"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1803560307337888769",
+                        "Position": [
+                            176.0,
+                            696.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            39.0,
+                            21.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Level1Button.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
             "ID": 70,
             "Components": [
                 {
@@ -46,9 +257,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -101,9 +312,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -156,9 +367,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -211,9 +422,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -266,9 +477,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -321,9 +532,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -376,9 +587,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -431,9 +642,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -486,9 +697,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -541,9 +752,9 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -598,7 +809,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -649,7 +860,7 @@
                         "Quad": 3,
                         "Sprite Layer": 10,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2344,7 +2555,7 @@
                         "Quad": 3,
                         "Sprite Layer": 16,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2395,7 +2606,7 @@
                         "Quad": 3,
                         "Sprite Layer": 15,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2446,7 +2657,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2497,7 +2708,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2548,7 +2759,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2599,7 +2810,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2650,7 +2861,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2701,7 +2912,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2752,7 +2963,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2803,7 +3014,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -3306,8 +3517,8 @@
                     "Properties": {
                         "ComponentGUID": "7777805086158956285",
                         "Position": [
-                            810.0,
-                            450.0,
+                            805.5,
+                            445.0,
                             -0.10000000149011612
                         ],
                         "Rotation": [
@@ -3316,7 +3527,7 @@
                             0.0
                         ],
                         "Scale": [
-                            60.0,
+                            63.0,
                             20.0,
                             1.0
                         ],
@@ -3510,7 +3721,7 @@
                     "Properties": {
                         "ComponentGUID": "13542412609193191139",
                         "Position": [
-                            65.0,
+                            68.0,
                             695.0,
                             -0.10000000149011612
                         ],
@@ -3520,7 +3731,7 @@
                             0.0
                         ],
                         "Scale": [
-                            60.0,
+                            63.0,
                             20.0,
                             1.0
                         ],
@@ -3605,23 +3816,23 @@
             ]
         },
         {
-            "ID": 0,
+            "ID": 2097224,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Main Menu Camera",
-                        "Tag": "Main Menu Camera"
+                        "Name": "Level2_Button",
+                        "Tag": "Level2_Button"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "2589658315428144855",
+                        "ComponentGUID": "17708717282824487509",
                         "Position": [
-                            640.0,
-                            360.0,
-                            10.0
+                            259.1000061035156,
+                            696.0,
+                            -0.10000000149011612
                         ],
                         "Rotation": [
                             0.0,
@@ -3629,8 +3840,8 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            39.0,
+                            21.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3638,26 +3849,19 @@
                     }
                 },
                 {
-                    "Type": "CameraComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Enabled": true,
-                        "Primary": true,
-                        "Projection": true,
-                        "autoAspect": true,
-                        "Size": [
-                            0.0,
-                            20.0
+                        "Texture": "Level2Button.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "Depth": 0,
-                        "Aspect": 1.9028741121292114,
-                        "FOV": 45.0,
-                        "NearPlane": 0.5,
-                        "FarPlane": 1000.0,
-                        "Target": [
-                            640.0,
-                            360.0,
-                            0.0
-                        ]
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
                     }
                 }
             ]

@@ -24,6 +24,16 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_GetScale(uint entityID, out Vector3 scale);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_SetScale(uint entityID, ref Vector3 scale);
 
+        // World
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_GetWorldPosition(uint entityID, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_SetWorldPosition(uint entityID, ref Vector3 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_GetWorldRotation(uint entityID, out Quat rotation);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_SetWorldRotation(uint entityID, ref Quat rotation);
+
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_GetWorldScale(uint entityID, out Vector3 scale);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void Transform_SetWorldScale(uint entityID, ref Vector3 scale);
+
         // =========================
         // Public static wrappers
         // (so scripts can: using static Engine.Transform;)
@@ -88,12 +98,60 @@ namespace Engine
         }
 
         // ------------------------------------------------------------
+        // TRS (World)
+        // ------------------------------------------------------------
+
+        public Vector3 WorldPosition
+        {
+            get
+            {
+                Transform_GetWorldPosition(_entityID, out var p);
+                return p;
+            }
+            set
+            {
+                Transform_SetWorldPosition(_entityID, ref value);
+            }
+        }
+
+        public Quat WorldRotation
+        {
+            get
+            {
+                Transform_GetWorldRotation(_entityID, out var r);
+                return r;
+            }
+            set
+            {
+                Transform_SetWorldRotation(_entityID, ref value);
+            }
+        }
+
+        public Vector3 WorldScale
+        {
+            get
+            {
+                Transform_GetWorldScale(_entityID, out var s);
+                return s;
+            }
+            set
+            {
+                Transform_SetWorldScale(_entityID, ref value);
+            }
+        }
+
+        // ------------------------------------------------------------
         // Convenience (derived from Rotation)
         // ------------------------------------------------------------
 
         public Vector3 Forward => Rotation.Forward;
         public Vector3 Right => Rotation.Right;
         public Vector3 Up => Rotation.Up;
+
+        // World space convenience vectors
+        public Vector3 WorldForward => WorldRotation.Forward;
+        public Vector3 WorldRight => WorldRotation.Right;
+        public Vector3 WorldUp => WorldRotation.Up;
 
         public static uint TransformGetParent(uint entityID) => Transform_GetParent(entityID);
 
@@ -120,6 +178,31 @@ namespace Engine
         }
 
         public static void SetScale(uint entityID, ref Vector3 scale) => Transform_SetScale(entityID, ref scale);
+
+        // --- World Static Wrappers ---
+        public static Vector3 GetWorldPosition(uint entityID)
+        {
+            Transform_GetWorldPosition(entityID, out var p);
+            return p;
+        }
+
+        public static void SetWorldPosition(uint entityID, ref Vector3 position) => Transform_SetWorldPosition(entityID, ref position);
+
+        public static Quat GetWorldRotation(uint entityID)
+        {
+            Transform_GetWorldRotation(entityID, out var r);
+            return r;
+        }
+
+        public static void SetWorldRotation(uint entityID, ref Quat rotation) => Transform_SetWorldRotation(entityID, ref rotation);
+
+        public static Vector3 GetWorldScale(uint entityID)
+        {
+            Transform_GetWorldScale(entityID, out var s);
+            return s;
+        }
+
+        public static void SetWorldScale(uint entityID, ref Vector3 scale) => Transform_SetWorldScale(entityID, ref scale);
 
         // ------------------------------------------------------------
         // Transform helpers

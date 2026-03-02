@@ -51,6 +51,7 @@ namespace Engine {
 					.m_texture_guid = renderable.TextureGuid,
 					.m_render_main_pass = renderMainPass,
 					.m_receive_shadows = renderable.ShadowReceive,
+					.m_billboard = renderable.Billboarding,
 					.m_cast_shadow_type = castType
 				});
 
