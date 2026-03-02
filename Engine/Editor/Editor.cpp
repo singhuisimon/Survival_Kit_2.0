@@ -96,6 +96,8 @@ namespace Engine
 
         m_EditorLogger->LogPanel();
 
+        m_EditorAudioTracker->AudioTrackerPanel();
+
         RenderViewport(texhandle);
 
         CompleteFrame();
