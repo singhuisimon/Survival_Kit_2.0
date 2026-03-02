@@ -36,7 +36,7 @@ namespace Game
         private float fireCooldown = 5.0f;               
         private Quat turretRotation;  
 
-        private uint sentryID = INVALID_ENTITY; // getting the ID of the read gunship entity
+        private uint sentryID = INVALID_ENTITY; // getting the ID of the read sentry entity
         private bool initialized = false;
 
         // List of enemies to verify and target
@@ -57,7 +57,7 @@ namespace Game
             Subscribe(GAMEOVEREVENT, OnGameEnd);
             Subscribe(GAMEWINEVENT, OnGameEnd);
 
-            // not detecting Gunship here (might not be ready on frame 0)
+            // not detecting Sentry here (might not be ready on frame 0)
             initialized = false;
             timeUp = false;
             disableshooting = false;
@@ -94,7 +94,7 @@ namespace Game
 
             //DebugFireOnKey();
 
-            // does not do anything is Gunship is dead
+            // does not do anything is Sentry is dead
             if (timeUp)
                 return;
             
@@ -111,6 +111,7 @@ namespace Game
             // if there is a target, rotate towards it to shoot
             if (currentTarget != INVALID_ENTITY)
             {
+                RotateTowardsTarget(deltaTime);
                 TryShoot();
             }
         }
@@ -124,7 +125,7 @@ namespace Game
         }
 
         private void OnGameEnd(string eventName, string payload){
-            LogMessage("[Gunship] detect game over disabling shooting");
+            LogMessage("[SentriesNormal] detect game over disabling shooting");
             disableshooting = true;
         }
 
@@ -165,7 +166,7 @@ namespace Game
             
             if (currentTarget != INVALID_ENTITY)
             {
-                LogMessage("Gunship locked onto target: " + currentTarget);
+                LogMessage("Sentry locked onto target: " + currentTarget);
             }
         }
 
@@ -209,7 +210,7 @@ namespace Game
             return nearestEnemy;
         }
 
-        // Press K to force the gunship to fire one bullet (This is used for Debugging)
+        // Press K to force the Sentry to fire one bullet (This is used for Debugging)
         private void DebugFireOnKey() 
         {
             if (!Input.IsKeyReleased(KeyCode.K)) 
@@ -218,7 +219,7 @@ namespace Game
             // Must be initalized
             if (sentryID == 0 || sentryID == INVALID_ENTITY)
             {
-                LogWarning("[GunshipDebug] Can't fire yet: sentryID not ready.");
+                LogWarning("[SentryDebug] Can't fire yet: sentryID not ready.");
                 return;
             }
 
@@ -242,7 +243,7 @@ namespace Game
             float lenSq = dir.X * dir.X + dir.Y * dir.Y + dir.Z * dir.Z;
             if (lenSq < 0.0001f)
             {
-                LogWarning("[GunshipDebug] Direction too small, not firing.");
+                LogWarning("[SentryDebug] Direction too small, not firing.");
                 return;
             }
             float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
@@ -268,58 +269,59 @@ namespace Game
 
             if (bulletID == 0 || bulletID == INVALID_ENTITY) 
             {
-                LogError("[GunshipDebug] Failed to spawn bullet.");
+                LogError("[SentryDebug] Failed to spawn bullet.");
                 return;
             }
 
             Vector3 vel = new Vector3(dir.X * bulletSpeed, dir.Y * bulletSpeed, dir.Z * bulletSpeed);
             RigidbodySetVelocity(bulletID, ref vel);
 
-            // LogMessage($"[GunshipDebug] gunPos=({gunPos.X},{gunPos.Y},{gunPos.Z}) helperPos=({helperPos.X},{helperPos.Y},{helperPos.Z})");
-            // LogMessage($"[GunshipDebug] spawnPos=({spawnPos.X},{spawnPos.Y},{spawnPos.Z}) dir=({dir.X},{dir.Y},{dir.Z}) bulletID={bulletID}");
+            // LogMessage($"[SentryDebug] gunPos=({gunPos.X},{gunPos.Y},{gunPos.Z}) helperPos=({helperPos.X},{helperPos.Y},{helperPos.Z})");
+            // LogMessage($"[SentryDebug] spawnPos=({spawnPos.X},{spawnPos.Y},{spawnPos.Z}) dir=({dir.X},{dir.Y},{dir.Z}) bulletID={bulletID}");
         }
 
         // Turret Rotation
 
-        // ===== THIS FUNCTION IS CURRENTLY NOT BEING USED AS OF RIGHT NOW ======
+        // Rotates the PARENT (sentryID). Script lives on the child helper.
         private void RotateTowardsTarget(float deltaTime)
         {
             if (currentTarget == INVALID_ENTITY)
                 return;
-            
-            // Get Positons of the Target (Enemies)
-            Vector3 myPos = GetPosition((uint)EntityID);
+
+            //1. Build a normalised direction from parent to target
+            Vector3 myPos     = GetPosition(sentryID);
             Vector3 targetPos = GetPosition(currentTarget);
-            
-            // Calculate direction to target
-            Vector3 toTarget = new Vector3(
-                targetPos.X - myPos.X,
-                targetPos.Y - myPos.Y,
-                targetPos.Z - myPos.Z
-            );
-            
-            // Normalize the direction
-            float lenSq = toTarget.X * toTarget.X + toTarget.Y * toTarget.Y + toTarget.Z * toTarget.Z;
+
+            float dx = targetPos.X - myPos.X;
+            float dy = targetPos.Y - myPos.Y;
+            float dz = targetPos.Z - myPos.Z;
+
+            float lenSq = dx * dx + dy * dy + dz * dz;
             if (lenSq <= 0.0001f)
                 return;
-            
-            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
-            toTarget.X *= invLen;
-            toTarget.Y *= invLen;
-            toTarget.Z *= invLen;
-            
-            // Calculate rotation needed to face target
-            Vector3 forward = new Vector3(0f, 0f, -1f);  // Forward Direction
-            Quat targetRotation = QuaternionFromTo(forward, toTarget);
-            
-            // Rotate towards Enemy Target
-            float t = SimpleMath.Clamp(turretRotationSpeed * deltaTime, 0f, 1f);
-            turretRotation = Nlerp(turretRotation, targetRotation, t);
-            
-            // Apply rotation to gunship entity
-            SetRotation((uint)EntityID, ref turretRotation);
-        }
 
+            float invLen = 1.0f / SimpleMath.Sqrt(lenSq);
+            Vector3 toTarget = new Vector3(dx * invLen, dy * invLen, dz * invLen);
+
+            //  2. Build target rotation via LookRotation 
+            // LookRotation(forward, worldUp) gives correct yaw AND pitch with
+            // zero roll, and is stable even when the enemy is directly above or
+            // below (no Atan2 singularity).
+            Quat targetRotation = SimpleMath.LookRotation(toTarget, Vector3.Up);
+
+            // 3. Smooth / dampen towards that rotation via Nlerp 
+            // turretRotationSpeed is your dampen knob (editor-tweakable):
+            //   ~2  = slow, tank-like tracking
+            //   ~5  = default, responsive
+            //   ~15 = near-instant snap
+            float t = SimpleMath.Clamp(turretRotationSpeed * deltaTime, 0f, 1f);
+            turretRotation = Quat.Slerp(turretRotation, targetRotation, t);
+
+            // 4. Apply to the PARENT (sentryID) only 
+            // The child helper (EntityID) is never rotated it stays fixed
+            // inside the parent so positions/muzzle offsets remain correct.
+            SetRotation(sentryID, ref turretRotation);
+        }
         // Shooting Mechanism
 
         private void TryShoot()
@@ -340,7 +342,7 @@ namespace Game
         {
            fireCooldown = fireRate;
 
-           // Shoot from helper position (hidden inside the Gunship)
+           // Shoot from helper position (hidden inside the Sentry)
            uint self = (uint)EntityID;
            Vector3 myPos = GetPosition(sentryID);
 
@@ -364,7 +366,7 @@ namespace Game
             dir.Z *= invLen;
 
             //Spawn infront of helper so it dosen't collide instantly
-            float muzzleDist = 5.0f;
+            float muzzleDist = 2.0f;
             Vector3 spawnPos = new Vector3 (
                 myPos.X + dir.X * muzzleDist,
                 myPos.Y + dir.Y * muzzleDist,
@@ -399,7 +401,7 @@ namespace Game
 
             RigidbodySetVelocity(bulletID, ref velocity);
 
-            LogMessage("Gunship fired PrimaryBullet at target " + currentTarget);
+            LogMessage("Sentry fired PrimaryBullet at target " + currentTarget);
         }
 
         // Sentry despawn due to time up
