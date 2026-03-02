@@ -1231,6 +1231,23 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::Transform_GetScale));
 		BindInternalCall("Engine.Transform::Transform_SetScale",
 						 reinterpret_cast<void *>(InternalCalls::Transform_SetScale));
+		// Position
+		BindInternalCall("Engine.Transform::Transform_GetWorldPosition",
+			reinterpret_cast<void*>(InternalCalls::Transform_GetWorldPosition));
+		BindInternalCall("Engine.Transform::Transform_SetWorldPosition",
+			reinterpret_cast<void*>(InternalCalls::Transform_SetWorldPosition));
+
+		// Rotation
+		BindInternalCall("Engine.Transform::Transform_GetWorldRotation",
+			reinterpret_cast<void*>(InternalCalls::Transform_GetWorldRotation));
+		BindInternalCall("Engine.Transform::Transform_SetWorldRotation",
+			reinterpret_cast<void*>(InternalCalls::Transform_SetWorldRotation));
+
+		// Scale
+		BindInternalCall("Engine.Transform::Transform_GetWorldScale",
+			reinterpret_cast<void*>(InternalCalls::Transform_GetWorldScale));
+		BindInternalCall("Engine.Transform::Transform_SetWorldScale",
+			reinterpret_cast<void*>(InternalCalls::Transform_SetWorldScale));
 
 		// =====================================================================
 		// Logging
