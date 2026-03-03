@@ -19,7 +19,7 @@
     "metallic": 0.0,
     "roughness": 0.0,
     "opacity": 1.0,
-    "emissionStrength": 1.100000023841858,
+    "emissionStrength": 0.2,
     "alphaThreshold": 0.4819999933242798,
     "ambientOcclusion": 0.48500001430511475,
     "tiling": [

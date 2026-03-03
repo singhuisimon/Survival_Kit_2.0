@@ -10,6 +10,8 @@ using static Engine.Camera;
 using static Engine.Event;
 using static Engine.Audio;
 using static Engine.AudioManager;
+using System.Collections.Specialized;
+using System.Security.Cryptography;
 
 namespace Game
 {
@@ -92,6 +94,12 @@ namespace Game
         #region Vfx
 
         //particle -> VFX when shooting primary
+        private const uint INVALID_ENTITY = 0xffffffffu;
+        private uint muzzleFlashID = INVALID_ENTITY;
+        private uint tempMuzzleFlashID = INVALID_ENTITY;
+        private float muzzleTimer = 0.1f;
+        private bool isMuzzleFlash = false;
+        string muzzleFlashPrefabPath = "Sources/Prefabs/MuzzleFlashBurst.prefab";
 
         #endregion
 
@@ -288,6 +296,9 @@ namespace Game
                 return;
             }
 
+            // For muzzle flash VFX
+            muzzleTimer -= deltaTime;
+
             //there is only primary and primary alt no secondary
             Primary_ReloadAndCharging();
             PrimaryShoot();
@@ -448,6 +459,24 @@ namespace Game
                 {
                     LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
                 }
+
+                // Reset muzzle timer and begin new cycle of muzzle flash
+                if(muzzleTimer < 0.0f)
+                {
+                    muzzleTimer = 0.1f;
+                    tempMuzzleFlashID = muzzleFlashID;
+                    SceneDestroyEntity(tempMuzzleFlashID);
+                    muzzleFlashID = INVALID_ENTITY;
+                    isMuzzleFlash = false;
+                }
+
+                // Muzzle flash VFX 
+                if(muzzleFlashID == INVALID_ENTITY && isMuzzleFlash == false) {
+                    muzzleFlashID = PrefabInstantiate(muzzleFlashPrefabPath);
+                    isMuzzleFlash = true;
+                }
+                Vector3 muzzlePos = bulletSpawnPos + bulletDirection * 25.0f;
+                Transform.SetPosition(muzzleFlashID, ref muzzlePos);
 
                 // NEW: bullet velocity inherits (estimated) player velocity
                 Vector3 bulletVel = ComputeBulletVelocity(bulletDirection, primarybulletSpeed);
