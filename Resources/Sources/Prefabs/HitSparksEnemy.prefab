@@ -1,0 +1,120 @@
+{
+    "Prefab Name": "HitSparksEnemy",
+    "Prefab GUID": 4777325849762234609,
+    "version": 3,
+    "entities": [
+        {
+            "Name": "HitSparksEnemy",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "742100583631880385",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14577158638914044095",
+                            "Name": "HitSparksEnemy",
+                            "Tag": "HitSparksEnemy"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "EnemyHitSparks.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                90.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.25,
+                                5.0,
+                                0.25
+                            ],
+                            "Default Size": [
+                                0.25,
+                                25.0,
+                                0.25
+                            ],
+                            "End Size": [
+                                0.25,
+                                5.0,
+                                0.25
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                1.0,
+                                0.2117647081613541,
+                                0.0
+                            ],
+                            "Color Max": [
+                                1.0,
+                                0.2117647081613541,
+                                0.0
+                            ],
+                            "Emitter Shape": 2,
+                            "Max Particles": 25,
+                            "Particle Type": 0,
+                            "Emission Rate": 5.0,
+                            "Particle Lifetime": 0.30000001192092896,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.0,
+                            "Shrink Phase Start": 0.0,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 180.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 6.47113037109375,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": true,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
