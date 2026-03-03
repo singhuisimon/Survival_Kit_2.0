@@ -404,6 +404,7 @@ namespace Game
             AudioSetIs3D(wormBulletID, true);
             AudioSetMinDistance(wormBulletID, 50.0f);
             AudioSetMaxDistance(wormBulletID, 200.0f);
+            AudioSetVolume(wormBulletID, 0.93f);
             AudioPlay(wormBulletID);
 
             // Apply force in the direction of the target

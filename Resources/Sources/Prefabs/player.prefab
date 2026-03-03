@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: player.prefab",
-    "Prefab GUID": 5390923687983055089,
+    "Prefab GUID": 752207294349381279,
     "version": 1,
     "entities": [
         {
@@ -57,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -107,7 +108,7 @@
                             "FilePath": "Player_Ambience.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.003999948501587,
+                            "Volume": 0.9290000200271606,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
@@ -198,7 +199,7 @@
                             "ComponentGUID": "9026023440310174993",
                             "ScriptClassName": "Game.PlayerWeapon",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 },
@@ -652,6 +653,7 @@
                             "Visible": false,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,

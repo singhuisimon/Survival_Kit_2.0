@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: NormalTurretBullet.prefab",
-    "Prefab GUID": 2192796219654386431,
+    "Prefab GUID": 11128500835810561619,
     "version": 1,
     "entities": [
         {
@@ -57,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -107,7 +108,7 @@
                             "FilePath": "Player_Primary_Fire.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 0.4880000054836273,
+                            "Volume": 0.9509999752044678,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -129,7 +130,7 @@
                             "ComponentGUID": "15122261281046205391",
                             "ScriptClassName": "Game.NormalTurretBullet",
                             "Started": false,
-                            "GCHandle": 93643
+                            "GCHandle": 0
                         }
                     }
                 },
