@@ -50,11 +50,13 @@ namespace Engine
         io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
         //io->FontGlobalScale = 1.5f;// Enable Multi-Viewport / Platform Windows
 
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-
-        // Setup scaling
-        m_BaseStyle = ImGui::GetStyle();
+        // In StartImGuiFrame() or wherever you do first-time ImGui setup, BEFORE SetFontScale:
+        if (!m_BaseStyleCaptured)
+        {
+            ImGui::StyleColorsDark();
+            m_BaseStyle = ImGui::GetStyle();
+            m_BaseStyleCaptured = true;
+        }
 
         // Set WindowRounding and ImGuiCol_WindowBg when viewport is enabled
         if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -93,6 +95,8 @@ namespace Engine
         m_EditorAsset->AssetBrowserPanel();
 
         m_EditorLogger->LogPanel();
+
+        m_EditorAudioTracker->AudioTrackerPanel();
 
         RenderViewport(texhandle);
 

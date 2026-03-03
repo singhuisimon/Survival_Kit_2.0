@@ -136,6 +136,7 @@ namespace Engine {
 				//propertiesObj.AddMember("ShadowCast", mesh.ShadowCast, allocator);
 				propertiesObj.AddMember("GlobalIlluminate", mesh.GlobalIlluminate, allocator);
 				propertiesObj.AddMember("ShadowReceive", mesh.ShadowReceive, allocator);
+				propertiesObj.AddMember("Billboarding", mesh.Billboarding, allocator);
 				propertiesObj.AddMember("MeshType", mesh.MeshType, allocator);
 				propertiesObj.AddMember("MaterialIdx", mesh.Material, allocator);
 				propertiesObj.AddMember("TextureIdx", mesh.Texture, allocator);
@@ -779,6 +780,11 @@ namespace Engine {
 				if(properties.HasMember("ShadowReceive")) {
 					mesh.ShadowReceive = properties["ShadowReceive"].GetBool();
 					//LOG_DEBUG("  Set ShadowReceive to: ", mesh.ShadowReceive);
+				}
+
+				if (properties.HasMember("Billboarding")) {
+					mesh.Billboarding = properties["Billboarding"].GetBool();
+					//LOG_DEBUG("  Set Billboarding to: ", mesh.Billboarding);
 				}
 
 				if(properties.HasMember("GlobalIlluminate")) {

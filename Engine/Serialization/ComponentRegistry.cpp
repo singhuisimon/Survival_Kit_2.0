@@ -208,6 +208,13 @@ namespace Engine {
                 [](MeshRendererComponent& c, const bool& v) { c.ShadowReceive = v; }
             );
 
+            meta.AddProperty<MeshRendererComponent, bool>(
+                "Billboarding",
+                PropertyType::Bool,
+                [](const MeshRendererComponent& c) { return c.Billboarding; },
+                [](MeshRendererComponent& c, const bool& v) { c.Billboarding = v; }
+            );
+
             //meta.AddProperty<MeshRendererComponent, bool>(
             //    "ShadowCast",
             //    PropertyType::Bool,
