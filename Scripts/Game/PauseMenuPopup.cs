@@ -79,8 +79,8 @@ namespace Game
 
         // Scene paths for navigation
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
-        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
+        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
 
         // Pause events
         private const string EVENT_GAME_PAUSED = "GamePaused";
