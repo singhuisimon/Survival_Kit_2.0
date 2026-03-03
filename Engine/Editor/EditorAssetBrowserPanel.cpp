@@ -1205,7 +1205,10 @@ namespace Engine
 				const auto& asset = displayAssets[i];
 				ImGui::TableNextColumn();
 
-				bool isSelected = (selectedResourcesIndex == static_cast<int>(i));
+				bool isSelected = (!asset.fullPath.empty() && (
+					(m_Editor->HasScenePath() && asset.fullPath == m_Editor->GetScenePath()) ||
+					(m_Editor->HasPrefabPath() && asset.fullPath == m_Editor->GetPrefabPath())
+					));
 
 				// ===== STYLING =====
 				int styleColorsPushed = 0;
