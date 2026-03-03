@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Prefab: loveletterV3.prefab",
-    "Prefab GUID": 15693769827823354141,
+    "Prefab Name": "Prefab: LoveLetterV3.prefab",
+    "Prefab GUID": 14010804597327253055,
     "version": 1,
     "entities": [
         {
@@ -16,7 +16,7 @@
                             "ComponentGUID": "8446413687323132093",
                             "Position": [
                                 0.0,
-                                6.464913368225098,
+                                0.0,
                                 0.0
                             ],
                             "Rotation": [
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1528884659682050235",
+                            "Name": "loveletter",
                             "Tag": "loveletter"
                         }
                     }
@@ -56,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -106,7 +108,7 @@
                             "FilePath": "Loveletter_Ambient.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 0.9509999752044678,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -171,6 +173,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14787481962660790465",
+                            "Name": "logicbomb_1",
                             "Tag": "logicbomb_1"
                         }
                     }
@@ -187,6 +190,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -246,6 +250,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "952423907378626759",
+                            "Name": "logicbomb_2",
                             "Tag": "logicbomb_2"
                         }
                     }
@@ -262,6 +267,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -321,6 +327,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16516864219571060941",
+                            "Name": "decoration_1",
                             "Tag": "decoration_1"
                         }
                     }
@@ -337,6 +344,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -384,6 +392,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4987649173502591187",
+                            "Name": "decoration_2",
                             "Tag": "decoration_2"
                         }
                     }
@@ -400,6 +409,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -447,6 +457,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "2105345411985473753",
+                            "Name": "logicbomb_3",
                             "Tag": "logicbomb_3"
                         }
                     }
@@ -463,6 +474,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -522,6 +534,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "375963155075203295",
+                            "Name": "logicbomb_4",
                             "Tag": "logicbomb_4"
                         }
                     }
@@ -538,6 +551,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -597,6 +611,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "7869952935019708645",
+                            "Name": "logicbomb_5",
                             "Tag": "logicbomb_5"
                         }
                     }
@@ -613,6 +628,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -672,6 +688,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "375963155075203307",
+                            "Name": "decoration_3",
                             "Tag": "decoration_3"
                         }
                     }
@@ -688,6 +705,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -735,6 +753,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6717031430412861681",
+                            "Name": "logicbomb_6",
                             "Tag": "logicbomb_6"
                         }
                     }
@@ -751,6 +770,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,

@@ -373,8 +373,7 @@ namespace Engine
 		auto &reg = scene->GetRegistry();
 
 		// ---------------------------------------------------------------------
-		// ECS -> Jolt: sync kinematics, mass/shape changes, damping/rest,
-		// poses and velocities.
+		// ECS -> Jolt
 		// ---------------------------------------------------------------------
 		reg.view<TransformComponent, RigidbodyComponent>().each(
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
@@ -394,21 +393,35 @@ namespace Engine
 					return;
 				}
 
-				// Kinematic flag -> motion type & layer
-				if (rb.IsKinematic != ap.isKinematic)
+				// Mass <= 0 => immovable/static: force a non-moving body and ignore drives.
+				bool const immovable = (rb.Mass <= 0.0f);
+				if (immovable)
 				{
-					mBodyInterface->SetMotionType(id, ToMotionType(rb), JPH::EActivation::Activate);
-					mBodyInterface->SetObjectLayer(id, ToObjectLayer(rb));
+					mBodyInterface->SetMotionType(id, JPH::EMotionType::Static, JPH::EActivation::DontActivate);
+					mBodyInterface->SetObjectLayer(id, Layers::NON_MOVING);
+
+					// Keep tracking the flag (but motion type stays Static while immovable)
 					ap.isKinematic = rb.IsKinematic;
 				}
+				else
+				{
+					// Kinematic flag -> motion type & layer
+					if (rb.IsKinematic != ap.isKinematic)
+					{
+						mBodyInterface->SetMotionType(id, ToMotionType(rb), JPH::EActivation::Activate);
+						mBodyInterface->SetObjectLayer(id, ToObjectLayer(rb));
+						ap.isKinematic = rb.IsKinematic;
+					}
+				}
 
-				// Gravity toggle -> gravity factor
+				// Gravity toggle -> gravity factor (static bodies have no MotionProperties, so guard it)
 				if (rb.UseGravity != ap.useGravity)
 				{
 					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
 					if (lock.Succeeded())
 					{
-						lock.GetBody().GetMotionProperties()->SetGravityFactor(rb.UseGravity ? 1.0f : 0.0f);
+						if (JPH::MotionProperties *mp = lock.GetBody().GetMotionProperties())
+							mp->SetGravityFactor(rb.UseGravity ? 1.0f : 0.0f);
 					}
 					ap.useGravity = rb.UseGravity;
 				}
@@ -467,23 +480,20 @@ namespace Engine
 						if (!NearlyEqual(body.GetRestitution(), targetRest))
 							body.SetRestitution(targetRest);
 
-						// Trigger flag -> Jolt sensor state (no collision response, still contacts)
 						bool const isSensor = body.IsSensor();
 						if (rb.IsTrigger != isSensor)
-						{
 							body.SetIsSensor(rb.IsTrigger);
-						}
 					}
 				}
 
-				// Pose push for kinematic bodies (or if transform changed)
+				// Pose push (disabled for immovable/static bodies)
 				glm::vec3 curPos = tc.Position;
 				glm::quat curRot = AsQuat(tc.Rotation);
 				float     dotq = std::abs(glm::dot(curRot, ap.lastRot));
 				bool      rotChanged = (1.0f - dotq) > 1e-4f;
 				bool      posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
 
-				if (posChanged || rotChanged)
+				if (!immovable && (posChanged || rotChanged))
 				{
 					mBodyInterface->SetPositionAndRotation(
 						id,
@@ -495,8 +505,8 @@ namespace Engine
 					ap.lastRot = curRot;
 				}
 
-				// Velocity push for dynamics
-				if (!rb.IsKinematic)
+				// Velocity push (disabled for immovable/static bodies)
+				if (!immovable && !rb.IsKinematic)
 				{
 					mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
 					mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
@@ -511,7 +521,7 @@ namespace Engine
 		mPhysics.Update(dt.GetSeconds(), 1, mTempAllocator, mJobSystem);
 
 		// ---------------------------------------------------------------------
-		// Jolt -> ECS: sync back dynamic poses and velocities
+		// Jolt -> ECS
 		// ---------------------------------------------------------------------
 		reg.view<TransformComponent, RigidbodyComponent>().each(
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
@@ -546,7 +556,6 @@ namespace Engine
 			}
 		);
 	}
-
 	/*****************************************************************************/
 	/*!
 	\brief      Mirrors ECS entities with RigidbodyComponent to Jolt bodies.
@@ -762,9 +771,12 @@ namespace Engine
 		auto &tc = reg.get<TransformComponent>(e);
 		auto &rb = reg.get<RigidbodyComponent>(e);
 
+		bool const immovable = (rb.Mass <= 0.0f);
+
 		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
 		glm::vec3 worldPos = glm::vec3(tc.WorldTransform[3]);
 		glm::quat worldRot = ExtractWorldRotation(tc.WorldTransform);
+
 		JPH::BodyCreationSettings settings(
 			shape,
 			ToJPHRVec3(worldPos),
@@ -773,32 +785,38 @@ namespace Engine
 			ToObjectLayer(rb)
 		);
 
-		settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
-		settings.mMassPropertiesOverride.mMass = std::max(0.0001f, rb.Mass);
+		// Only override mass for *movable dynamic* bodies.
+		if (!immovable && !rb.IsKinematic)
+		{
+			settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+			settings.mMassPropertiesOverride.mMass = std::max(0.0001f, rb.Mass);
+		}
+
 		settings.mFriction = 0.6f;
 		settings.mRestitution = std::clamp(rb.Restitution, 0.0f, 1.0f);
 		settings.mLinearDamping = rb.LinearDamping;
 		settings.mAngularDamping = rb.AngularDamping;
-
 		settings.mIsSensor = rb.IsTrigger;
-
 		settings.mUserData = static_cast<JPH::uint64>(static_cast<std::uint32_t>(e));
 
 		JPH::BodyID const id =
 			mBodyInterface->CreateAndAddBody(settings, JPH::EActivation::Activate);
 
-		if (!rb.IsKinematic)
+		// Only push velocity for movable dynamics
+		if (!immovable && !rb.IsKinematic)
 		{
 			mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
 			mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
 		}
 
+		// Gravity factor is only valid if MotionProperties exist (not static)
 		if (!rb.UseGravity)
 		{
 			JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
 			if (lock.Succeeded())
 			{
-				lock.GetBody().GetMotionProperties()->SetGravityFactor(0.0f);
+				if (JPH::MotionProperties *mp = lock.GetBody().GetMotionProperties())
+					mp->SetGravityFactor(0.0f);
 			}
 		}
 
@@ -819,6 +837,7 @@ namespace Engine
 				ok = mFetchMeshInfo(scene, e, info);
 			else
 				ok = TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/false);
+
 			if (ok)
 			{
 				ap.meshKey = info.key;

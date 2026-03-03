@@ -58,6 +58,8 @@ namespace Engine
         public static void AudioSetMinDistance(uint entityID, float minDist) => Audio_SetMinDistance(entityID, minDist);
         public static void AudioSetMaxDistance(uint entityID, float maxDist) => Audio_SetMaxDistance(entityID, maxDist);
 
+        public static void AudioSetVolume(uint entityID, float volume) => Audio_SetVolume(entityID, volume);
+
         // ===== Instance API (keep whatever you already had) =====
         private uint ID => Entity.EntityID;
 

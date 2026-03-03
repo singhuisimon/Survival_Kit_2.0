@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_PlayerMove",
-    "Prefab GUID": 6127253411855516495,
+    "Prefab Name": "Prefab: Audio_PlayerMove.prefab",
+    "Prefab GUID": 18046029863444269935,
     "version": 1,
     "entities": [
         {
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12468321687192273733",
+                            "Name": "Audio_PlayerMove",
                             "Tag": "Audio_PlayerMove"
                         }
                     }
@@ -53,7 +54,7 @@
                             "FilePath": "Player_Move.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 0.9319999814033508,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -75,7 +76,7 @@
                             "ComponentGUID": "4974331907248390987",
                             "ScriptClassName": "Game.PlayerMoveAudio",
                             "Started": false,
-                            "GCHandle": 227
+                            "GCHandle": 0
                         }
                     }
                 }

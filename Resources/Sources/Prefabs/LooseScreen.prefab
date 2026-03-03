@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: LooseScreen.prefab",
-    "Prefab GUID": 3970838429273948373,
+    "Prefab GUID": 7669736321989004649,
     "version": 1,
     "entities": [
         {
@@ -15,8 +15,8 @@
                         "Properties": {
                             "ComponentGUID": "14541525622778495835",
                             "Position": [
-                                640.0,
-                                340.0,
+                                0.0,
+                                0.0,
                                 0.0
                             ],
                             "Rotation": [
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "15658268800467328241",
+                            "Name": "LooseScreen",
                             "Tag": "LooseScreen"
                         }
                     }
@@ -52,7 +53,7 @@
                             "ComponentGUID": "8776918099747013473",
                             "ScriptClassName": "Game.GameOverScreen",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 },
@@ -115,6 +116,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13928886543557058295",
+                            "Name": "PlayerDeath",
                             "Tag": "PlayerDeath"
                         }
                     }
@@ -128,7 +130,7 @@
                             "FilePath": "Player Death.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.8029999732971191,
+                            "Volume": 0.9760000109672546,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -181,6 +183,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12199504286646787837",
+                            "Name": "CoreDestruction",
                             "Tag": "CoreDestruction"
                         }
                     }
@@ -194,7 +197,7 @@
                             "FilePath": "Core Destruction.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 1.2020000219345093,
+                            "Volume": 0.9819999933242798,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,

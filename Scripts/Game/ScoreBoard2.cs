@@ -48,7 +48,7 @@ namespace Game
         // ===== State =====
         private int score = 0;
         private bool scoreSaved = false;    // Guard: only save once per session
-        private string currentLevel = "level2_player";
+        private string currentLevel = "level2";
 
         public override void OnStart()
         {
@@ -111,6 +111,7 @@ namespace Game
         {
             LogMessage("[ScoreBoard2] Game win event");
             SaveScore();
+            Engine.ProgressTracker.MarkLevelWon("level2");
             Text.SetIsVisible((uint)EntityID, false);
         }
 
