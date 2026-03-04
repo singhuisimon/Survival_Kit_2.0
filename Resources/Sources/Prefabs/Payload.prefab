@@ -1,0 +1,186 @@
+{
+    "Prefab Name": "Payload",
+    "Prefab GUID": 4912425043946259255,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Payload",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2329830558890738453",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.019999999552965164,
+                                0.019999999552965164,
+                                0.019999999552965164
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9247359586531820307",
+                            "Name": "Payload",
+                            "Tag": "Payload"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17317810118780797719",
+                            "Mesh": "",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1753369806590280473",
+                            "Mass": 1.0,
+                            "IsKinematic": true,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "",
+                            "Initial Velocity": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1000,
+                            "Particle Type": 0,
+                            "Emission Rate": 5.0,
+                            "Particle Lifetime": 2.0,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 15.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": true,
+                            "Loop": true,
+                            "Active": true,
+                            "World Space": true,
+                            "Burst Mode": false
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11553202595748954907",
+                            "ScriptClassName": "",
+                            "Started": false,
+                            "GCHandle": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
