@@ -63,6 +63,9 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (GameState.IsPaused)
+                return;
+
             Vector3 currentPos = Transform.GetPosition(playerID);
             Vector3 wallPos = Transform.GetPosition(wallID);
 
