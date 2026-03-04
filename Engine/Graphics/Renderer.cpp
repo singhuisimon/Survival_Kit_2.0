@@ -1142,6 +1142,7 @@ namespace Engine {
 		prog.setUniform("exposure", m_exposure);
 		prog.setUniform("bloomStrength", m_bloomStrength); 
 		prog.setUniform("useBloom", m_bloomOn);
+		prog.setUniform("gamma", m_gamma);
 
 		m_fullscreen_quad.vao.bind();
 		glDrawElements(m_fullscreen_quad.primitive_type, m_fullscreen_quad.draw_count, m_fullscreen_quad.index_type, nullptr);
@@ -1175,7 +1176,7 @@ namespace Engine {
 
 		beginFrame(pass);
 		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
-
+		prog.setUniform("gamma", m_gamma);
 		m_ui_projection = glm::ortho(pass.view_port.x, 1280.f, 720.f, pass.view_port.y, -1.f, 1.f);
 
 		double mp_x, mp_y;

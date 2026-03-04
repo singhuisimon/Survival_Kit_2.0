@@ -219,6 +219,7 @@ namespace Engine
 							renderer->getBloomStrength() = settings.s_BloomStrength;
 							renderer->getBloomFilterRadius() = settings.s_BloomFilterRadius;
 							renderer->getExposure() = settings.s_Exposure;
+							renderer->getGamma() = settings.s_Gamma;
 						}
 						// to register entity that contain prefab
 						auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs"));
@@ -551,6 +552,20 @@ namespace Engine
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::SetTooltip("Reset bloom strength (0.01) and filter radius (0.0025) to default values");
+		}
+
+		auto& gamma = m_Editor->GetRenderer()->getGamma();
+
+		// Adjust gamma
+		if (ImGui::SliderFloat("Gamma", &gamma, 1.2f, 3.2f, "%.1f"))
+		{
+			// Gamma changed
+		}
+
+		// Reset button for gamma
+		if (ImGui::Button("Reset to Default##Gamma"))
+		{
+			gamma = 2.2f;
 		}
 
 		ImGui::SeparatorText("Debug Drawing");

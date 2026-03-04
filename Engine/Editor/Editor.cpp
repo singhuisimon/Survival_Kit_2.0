@@ -354,6 +354,7 @@ namespace Engine
         settings.s_BloomFilterRadius = renderer->getBloomFilterRadius();
         settings.s_Exposure = renderer->getExposure();
         settings.s_GlobalBias = renderer->getGlobalBias();
+        settings.s_Gamma = renderer->getGamma();
 
         scene->SaveToFile(finalPath);
         scene->SaveToFile(convertAssetPathToRootResources(finalPath));
