@@ -34,6 +34,7 @@ namespace Engine {
             float s_BloomFilterRadius = 0.0025;
             float s_Exposure = 1.0;
             float s_GlobalBias = 0.005;
+            float s_Gamma = 2.2f;
         };
 
         /**
