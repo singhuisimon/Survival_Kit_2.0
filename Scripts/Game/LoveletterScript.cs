@@ -7,6 +7,7 @@ using static Engine.Quat;
 using static Engine.SimpleMath;
 using static Engine.Tag;
 using static Engine.Prefab;
+using static Engine.Rigidbody;
 
 namespace Game
 {
@@ -28,6 +29,7 @@ namespace Game
         [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         [SerializeField] private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
+        [SerializeField] private string payloadPrefab = "Sources/Prefabs/Payload.prefab";
 
         // ===== CORE DIMENSIONS =====
         [SerializeField] private float coreHalfSizeX = 37.5f;
@@ -284,6 +286,18 @@ namespace Game
                 LogMessage("[LoveletterScript] loveletter explosion entity fail to instantiate");
                 return;
             }
+
+            // Spawn in the payload
+            Vector3 payloadScale = new Vector3(10.0f, 10.0f, 10.0f);
+            uint payload = PrefabInstantiateWithTransform(payloadPrefab, ref spawnPos, ref spawnRot, ref payloadScale, false);
+            if(payload == 0){
+                LogMessage("[LoveletterScript] loveletter payload entity fail to instantiate");
+                return;
+            }
+
+            RigidbodySetIsKinematic(payload, false);
+            Vector3 halfboxExtend = new Vector3(15f, 15f, 15f);
+            RigidbodySetBoxHalfExtents(payload, ref halfboxExtend);
 
             // Destroy the LoveLetter
             SceneDestroyEntity(loveletterEntityID);

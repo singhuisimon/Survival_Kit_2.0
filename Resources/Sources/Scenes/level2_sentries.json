@@ -13,51 +13,12 @@
                     }
                 },
                 {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "14203210338076330427",
-                        "PrefabAssetGuid": "3250456044310955691",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "SentryCount",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryCount.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16521350285278315421\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[1.0,1.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1521073787400536991\",\"Name\":\"SentryCount\",\"Tag\":\"SentryCount\"}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18250732542191272865\",\"ScriptClassName\":\"Game.SentryCount\",\"Started\":false,\"GCHandle\":0}}"
-                            },
-                            {
-                                "componentType": 15,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11909664266851140511\",\"text\":\"X9\",\"fontName\":\"Quantico-Regular\",\"fontSize\":12.0,\"color\":[1.0,1.0,1.0,1.0],\"isVisible\":true,\"align\":0,\"lineSpacing\":1.0,\"letterSpacing\":0.0,\"maxWidth\":0.0}}"
-                            }
-                        ]
-                    }
-                },
-                {
                     "Type": "TransformComponent",
                     "Properties": {
                         "ComponentGUID": "16521350285278315421",
                         "Position": [
-                            78.5,
-                            93.30000305175781,
+                            78.4000015258789,
+                            92.5,
                             0.0
                         ],
                         "Rotation": [
