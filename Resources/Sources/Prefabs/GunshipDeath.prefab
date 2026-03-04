@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "GunshipDeath",
-    "Prefab GUID": 9038487555291594925,
+    "Prefab Name": "Prefab: GunshipDeath.prefab",
+    "Prefab GUID": 12857883092718292277,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "Flotilla Gunship Death.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 1.0490000247955322,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "6156183793772691617",
                             "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
                             "Started": false,
-                            "GCHandle": 27
+                            "GCHandle": 0
                         }
                     }
                 }

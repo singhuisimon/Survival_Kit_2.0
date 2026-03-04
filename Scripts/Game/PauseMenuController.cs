@@ -7,15 +7,15 @@ using static Engine.AudioManager;
 namespace Game
 {
     /// <summary>
-    /// Attach this to an entity in your GAME SCENES (Level1_NewPlayer.json, level2_player.json)
+    /// Attach this to an entity in your GAME SCENES (trench_run.json, level2.json)
     /// Detects P key press and loads the separate pause menu scene.
     /// </summary>
     public class PauseMenuController : ScriptBehaviour
     {
         // Scene paths
         private const string PAUSE_MENU_PATH = "Resources/Sources/Scenes/PauseMenuScene.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/Level1_NewPlayer.json";
-        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
+        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
 
         // Pause events
         private const string EVENT_GAME_PAUSED = "GamePaused";

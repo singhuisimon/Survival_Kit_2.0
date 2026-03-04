@@ -397,6 +397,16 @@ namespace Game
             // Set tag
             TagSetTag(wormBulletID, "WormBullet");
 
+            // Setup Audio
+            EntityAddAudio(wormBulletID);
+            AudioSetFile(wormBulletID, "Worm Shoot.wav");
+            AudioSetLoop(wormBulletID, false);
+            AudioSetIs3D(wormBulletID, true);
+            AudioSetMinDistance(wormBulletID, 50.0f);
+            AudioSetMaxDistance(wormBulletID, 200.0f);
+            AudioSetVolume(wormBulletID, 0.93f);
+            AudioPlay(wormBulletID);
+
             // Apply force in the direction of the target
             float bulletForce = 100.0f;
             Vector3 force = new Vector3(

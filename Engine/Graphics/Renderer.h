@@ -225,6 +225,7 @@ namespace Engine {
 		inline float& getExposure() { return m_exposure; }
 
 		inline float& getGlobalBias() { return m_globalBias; }
+		inline float& getGamma() { return m_gamma; }
 
 		/**
 		 * @brief  Gets the viewport dimensions of the UI pass.
@@ -523,6 +524,9 @@ namespace Engine {
 		JPH::PhysicsSystem* m_joltPhysicsSystem = nullptr;
 		std::unique_ptr<JoltDebugDraw> m_joltDebugDraw;
 		PhysicsDebugSettings m_physicsDebug{};
+
+		// Gamma settings
+		float m_gamma = 2.2f;
 	};
 
 }

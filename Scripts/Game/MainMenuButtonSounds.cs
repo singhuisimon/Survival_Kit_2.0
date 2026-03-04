@@ -31,7 +31,9 @@ namespace Game
             "Quit No Button",
             "Credits Close Button",
             "Credits Close Button 2",
-            "Start Game Yes Button"
+            "Start Game Yes Button",
+            "Shop Button",
+            "Shop Close Button"
         };
 
         // Audio entity IDs

@@ -822,15 +822,33 @@ void Game::OnUpdate(Engine::Timestep ts)
 	{
 		m_EditorEnable = !m_EditorEnable;
 		editorModeToggle = m_EditorEnable;
-		editorCamToggle = false;
+
+		if (m_EditorEnable)
+		{
+			editorCamToggle = true;  // Force camera on when entering editor mode
+			LOG_INFO("Editor enabled - camera activated");
+		}
+		else
+		{
+			editorCamToggle = false;
+			LOG_INFO("Editor disabled - camera deactivated");
+		}
+		//editorCamToggle = false;
+
+		LOG_INFO("input.IsKeyJustPressed(GLFW_KEY_F3)");
 		LOG_INFO("Editor toggled: ", m_EditorEnable);
+		LOG_INFO("editorModeToggle: ", editorModeToggle);
+		LOG_INFO("editorCamToggle: ", editorCamToggle);
 	}
 
 	// Editor camera toggle
 	if (input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)
 	{
 		editorCamToggle = !editorCamToggle;
-
+		LOG_INFO("input.IsKeyJustPressed(GLFW_KEY_TAB) && m_EditorEnable)");
+		LOG_INFO("Editor toggled: ", m_EditorEnable);
+		LOG_INFO("editorModeToggle: ", editorModeToggle);
+		LOG_INFO("editorCamToggle: ", editorCamToggle);
 		//if (!editorCamToggle)
 		//{
 		//	// Lock & hide cursor (free-look mode)
@@ -842,7 +860,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 		//	//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		//}
 
-		LOG_INFO("Editor camera toggled: ", editorCamToggle);
+		//LOG_INFO("Editor camera toggled: ", editorCamToggle);
 	}
 
 	//if (Engine::ScriptReloader::GetInstance().IsReloadRequested())
