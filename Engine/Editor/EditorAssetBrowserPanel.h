@@ -58,6 +58,9 @@ namespace Engine
 		std::vector<FilteredAssetInfo> m_FilteredAssets;
 		ResourceType m_FilterType = ResourceType::UNKNOWN;
 
+		// Delete file
+		bool m_ShowDeleteConfirmPopUp = false;
+		DisplayableAsset m_AssetToDelete;
 
 
 		/*Scene* m_Scene = nullptr;

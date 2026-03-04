@@ -1272,6 +1272,14 @@ namespace Engine
 							}
 						}
 					}
+
+					// Delete file
+					ImGui::Separator();
+					if (ImGui::MenuItem("Delete"))
+					{
+						m_AssetToDelete = asset;
+						m_ShowDeleteConfirmPopUp = true;
+					}
 					ImGui::EndPopup();
 				}
 
@@ -1317,6 +1325,49 @@ namespace Engine
 			ImGui::EndTable();
 		}
 		//ImGui::EndChild();
+
+		if (m_ShowDeleteConfirmPopUp)
+		{
+			ImGui::OpenPopup("Confirm Delete");
+			m_ShowDeleteConfirmPopUp = false;
+		}
+
+		if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("Are you sure you want to delete:");
+			ImGui::Text("%s", m_AssetToDelete.fileName.c_str());
+			ImGui::Separator();
+
+			if (ImGui::Button("Delete", ImVec2(120, 0)))
+			{
+				if (std::filesystem::exists(m_AssetToDelete.fullPath))
+				{
+					std::string resourcesPath = convertAssetPathToRootResources(m_AssetToDelete.fullPath);
+					std::filesystem::remove(m_AssetToDelete.fullPath);
+					std::filesystem::remove(resourcesPath);
+					LOG_INFO("Deleted asset: ", m_AssetToDelete.fullPath);
+					LOG_INFO("Deleted asset from root: ", resourcesPath);
+
+					// Clear selection if the deleted asset was selected
+					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
+						m_Editor->SetScenePath("");
+					else if (m_Editor->HasPrefabPath() && m_Editor->GetPrefabPath() == m_AssetToDelete.fullPath)
+						m_Editor->ClearPrefabPath();
+
+					selectedResourcesIndex = -1;
+				}
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
 	}
 
 	void EditorAssetBrowserPanel::HandleAssetSelection(const DisplayableAsset& asset)
