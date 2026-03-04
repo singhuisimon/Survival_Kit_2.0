@@ -9,8 +9,7 @@ layout (binding = 4) uniform sampler2D hdrTexture;
 // Final bloom texture (top mip A')
 layout (binding = 5) uniform sampler2D bloomTexture;
 
-const float gamma = 2.2;
-
+uniform float gamma; 
 uniform float exposure;
 uniform float bloomStrength;  // e.g. 0.04
 uniform bool  useBloom;
