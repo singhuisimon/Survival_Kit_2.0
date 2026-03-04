@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 16570608366664106185,
+    "Prefab GUID": 8822657826591230863,
     "version": 1,
     "entities": [
         {
@@ -15,8 +15,8 @@
                         "Properties": {
                             "ComponentGUID": "16742114490130125945",
                             "Position": [
-                                -9.5367431640625e-7,
-                                -9.5367431640625e-7,
+                                0.0,
+                                0.0,
                                 0.0
                             ],
                             "Rotation": [
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16742114490130125945",
+                            "Name": "botnet",
                             "Tag": "botnet"
                         }
                     }
@@ -56,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -106,7 +108,7 @@
                             "FilePath": "Botnet_Ambient.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 1.0329999923706057,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
@@ -128,7 +130,7 @@
                             "ComponentGUID": "11007352189747626285",
                             "ScriptClassName": "Game.Botnet",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 }

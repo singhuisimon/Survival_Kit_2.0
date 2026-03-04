@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "PlayerHit",
-    "Prefab GUID": 7552642610040439493,
+    "Prefab Name": "Prefab: PlayerHit.prefab",
+    "Prefab GUID": 2481589551260307117,
     "version": 1,
     "entities": [
         {
@@ -21,7 +21,7 @@
                             ],
                             "Rotation": [
                                 0.0,
-                                0.0,
+                                -0.0,
                                 0.0
                             ],
                             "Scale": [
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4670338848521765571",
+                            "Name": "PlayerHit",
                             "Tag": "PlayerHit"
                         }
                     }
@@ -53,7 +54,7 @@
                             "FilePath": "Player_Hitmarker.wav",
                             "Type": 1,
                             "State": 2,
-                            "Volume": 0.6330000162124634,
+                            "Volume": 0.8309999704360962,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -72,7 +73,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.GameSoundPrefabLifetime"
+                            "ComponentGUID": "10552040083507678887",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }

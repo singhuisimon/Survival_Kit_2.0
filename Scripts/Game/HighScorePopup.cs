@@ -229,13 +229,13 @@ namespace Game
 
             // Load Level 1 scores
             LogMessage("Loading Level 1 scores from: " + SCORE_FILE_1);
-            List<ScoreEntry> level1Scores = LoadScoresFromFile(SCORE_FILE_1, "Level1_NewPlayer");
+            List<ScoreEntry> level1Scores = LoadScoresFromFile(SCORE_FILE_1, "trench_run");
             LogMessage("Level 1 scores loaded: " + level1Scores.Count);
             DisplayScores(level1Scores, level1TextIds, "Level 1");
 
             // Load Level 2 scores
             LogMessage("Loading Level 2 scores from: " + SCORE_FILE_2);
-            List<ScoreEntry> level2Scores = LoadScoresFromFile(SCORE_FILE_2, "Level2");
+            List<ScoreEntry> level2Scores = LoadScoresFromFile(SCORE_FILE_2, "level2");
             LogMessage("Level 2 scores loaded: " + level2Scores.Count);
             DisplayScores(level2Scores, level2TextIds, "Level 2");
 

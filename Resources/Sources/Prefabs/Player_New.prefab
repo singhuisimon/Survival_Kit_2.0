@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Player_New.prefab",
-    "Prefab GUID": 8531005733836249393,
+    "Prefab GUID": 9399118578901716743,
     "version": 1,
     "entities": [
         {
@@ -15,9 +15,9 @@
                         "Properties": {
                             "ComponentGUID": "16100272381120889775",
                             "Position": [
-                                767.7905883789063,
-                                190.38815307617188,
-                                -82.42496490478516
+                                0.0,
+                                0.0,
+                                0.0
                             ],
                             "Rotation": [
                                 0.0,
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14762562648235121599",
+                            "Name": "Player",
                             "Tag": "Player"
                         }
                     }
@@ -56,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -106,7 +108,7 @@
                             "FilePath": "Player_Ambience.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.0049999952316284,
+                            "Volume": 0.9290000200271606,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
@@ -197,7 +199,7 @@
                             "ComponentGUID": "9026023440310174993",
                             "ScriptClassName": "Game.PlayerWeapon",
                             "Started": false,
-                            "GCHandle": 2675
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -240,6 +242,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14186101895931698103",
+                            "Name": "player_0",
                             "Tag": "player_0"
                         }
                     }
@@ -256,6 +259,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -303,6 +307,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13033180391324851119",
+                            "Name": "player_1",
                             "Tag": "player_1"
                         }
                     }
@@ -319,6 +324,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -366,6 +372,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13609641143628274599",
+                            "Name": "player_2",
                             "Tag": "player_2"
                         }
                     }
@@ -382,6 +389,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -429,6 +437,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "15915484152841968543",
+                            "Name": "player_3",
                             "Tag": "player_3"
                         }
                     }
@@ -445,6 +454,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -492,6 +502,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "3809808354470075287",
+                            "Name": "player_4",
                             "Tag": "player_4"
                         }
                     }
@@ -508,6 +519,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -555,6 +567,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13609641143628274575",
+                            "Name": "player_5",
                             "Tag": "player_5"
                         }
                     }
@@ -571,6 +584,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -618,6 +632,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "15915484152841968519",
+                            "Name": "player_6",
                             "Tag": "player_6"
                         }
                     }
@@ -634,6 +649,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -681,6 +697,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14186101895931698047",
+                            "Name": "player_7",
                             "Tag": "player_7"
                         }
                     }
@@ -697,6 +714,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -744,6 +762,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12456719639021427525",
+                            "Name": "FiringPosition",
                             "Tag": "FiringPosition"
                         }
                     }
@@ -760,6 +779,7 @@
                             "Visible": false,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,

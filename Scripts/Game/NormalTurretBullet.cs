@@ -79,7 +79,7 @@ namespace Game
         private void CheckCollisions()
         {
             // Query the CollisionManager for hits
-            List<uint> hits = CollisionManager.GetPlayerProjectileHits((uint)EntityID);
+            List<uint> hits = CollisionManager.GetAllyProjectileHits((uint)EntityID);
             
             if (hits != null && hits.Count > 0)
             {

@@ -39,6 +39,13 @@ namespace Game
         string EnemyTurretBulletExplosionPrefabPath = "Sources/Prefabs/EnemyTurretExplosion.prefab";
         string MainExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";
 
+        // Enemy Hit Sparks VFX
+        string enemyHitSparksPrefabPath = "Sources/Prefabs/HitSparksEnemy.prefab";
+        private uint enemyHitSparksID = INVALID_ENTITY;
+        private uint tempEnemyHitSparksID = INVALID_ENTITY;
+        private float hitSparksTimer = 0.1f;
+        private bool isHitSparks = false;
+
         // Lifecycle
         public override void OnStart()
         {
@@ -70,7 +77,10 @@ namespace Game
         {
             if (playerID == INVALID_ENTITY)
                 return;
-            
+
+            // For hit sparks VFX
+            hitSparksTimer -= deltaTime;
+
             Vector3 ownPosition = GetPosition(EntityID);
             Vector3 targetPosition = GetPosition(playerID);
             Vector3 direction = targetPosition - ownPosition;
@@ -105,6 +115,7 @@ namespace Game
                 explosionTimer -= deltaTime;
                 if (explosionTimer <= 0.0f)
                 {
+                    SceneDestroyEntity(enemyHitSparksID);
                     SceneDestroyEntity(mainExplosionID);
                     SceneDestroyEntity(EntityID);
                 }
@@ -137,6 +148,25 @@ namespace Game
 
             health -= 1.0f;
             LogMessage("EnemyTurret hit! Health: " + health);
+
+            // Reset hit sparks timer and begin new cycle of hit sparks
+            if (hitSparksTimer <= 0.0f)
+            {
+                hitSparksTimer = 0.3f;
+                tempEnemyHitSparksID = enemyHitSparksID;
+                SceneDestroyEntity(tempEnemyHitSparksID);
+                enemyHitSparksID = INVALID_ENTITY;
+                isHitSparks = false;
+            }
+
+            // Player hit sparks VFX
+            if (enemyHitSparksID == INVALID_ENTITY && isHitSparks == false)
+            {
+                enemyHitSparksID = PrefabInstantiate(enemyHitSparksPrefabPath);
+                isHitSparks = true;
+            }
+            Vector3 turretPos = GetPosition(EntityID);
+            Transform.SetPosition(enemyHitSparksID, ref turretPos);
 
             if (health > 0)
                 return;

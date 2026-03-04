@@ -14,7 +14,7 @@ namespace Game
     public class RestartButton2 : ScriptBehaviour
     {
         // Scene path
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level2_player.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
 
         // Lose events
         private const string EVENT_PLAYER_DEAD = "PlayerDead";

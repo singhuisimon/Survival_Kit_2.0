@@ -7,19 +7,19 @@
     "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
+        0.1259080171585083,
         1.0,
-        0.0,
         0.0
     ],
     "emissionColor": [
-        0.0,
-        0.9117646217346191,
-        1.0
+        0.06053268909454346,
+        1.0,
+        0.06053268909454346
     ],
     "metallic": 0.0,
     "roughness": 0.0,
     "opacity": 1.0,
-    "emissionStrength": 100.0,
+    "emissionStrength": 15.210000038146973,
     "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [
