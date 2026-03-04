@@ -64,7 +64,8 @@ namespace Game
                 return;
 
             // Count down
-            remainingTime -= (deltaTime / 2);
+            //remainingTime -= (deltaTime / 2);
+            remainingTime -= deltaTime;
 
             // Clamp to 0 and publish win event once
             if (remainingTime <= 0.0f)
