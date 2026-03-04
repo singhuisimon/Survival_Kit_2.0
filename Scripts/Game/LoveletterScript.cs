@@ -44,8 +44,8 @@ namespace Game
         [SerializeField] private float waitTimeAtSurface = 20.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
-        [SerializeField] private float maxHealth = 100.0f;
-        [SerializeField] private float currentHealth = 100.0f;
+        [SerializeField] private float maxHealth = 150.0f;
+        [SerializeField] private float currentHealth = 150.0f;
         private bool isDead = false;
 
         // ===== MOVEMENT STATE =====

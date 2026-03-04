@@ -19,7 +19,7 @@ namespace Game
         public float ProjectileLifetime = 2.0f;
 
         [SerializeField]
-        public float Damage = 10.0f;
+        public float Damage = 5.0f;
 
         [SerializeField]
         public int UltRecharged = 1;
