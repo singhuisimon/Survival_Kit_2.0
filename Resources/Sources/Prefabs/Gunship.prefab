@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Gunship.prefab",
-    "Prefab GUID": 2766398210789052379,
+    "Prefab GUID": 16316647606538423591,
     "version": 1,
     "entities": [
         {
@@ -15,14 +15,14 @@
                         "Properties": {
                             "ComponentGUID": "4860677560785862851",
                             "Position": [
-                                798.6957397460938,
-                                -376.24957275390625,
-                                -952.4028930664064
+                                0.0,
+                                0.0,
+                                0.0
                             ],
                             "Rotation": [
-                                -180.0,
+                                180.0,
                                 18.26655006408691,
-                                -180.0
+                                180.0
                             ],
                             "Scale": [
                                 0.03999999910593033,
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "9358524572035318079",
+                            "Name": "Gunship",
                             "Tag": "Gunship"
                         }
                     }
@@ -56,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -103,6 +105,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16276053599676400033",
+                            "Name": "GunshipHelper",
                             "Tag": "GunshipHelper"
                         }
                     }
@@ -149,7 +152,7 @@
                             "FilePath": "Flotilla_Gunship_Ambient.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 0.5109999775886536,
+                            "Volume": 0.8529999852180481,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
@@ -171,7 +174,7 @@
                             "ComponentGUID": "8554288977682104741",
                             "ScriptClassName": "Game.GunshipScript",
                             "Started": false,
-                            "GCHandle": 1803
+                            "GCHandle": 0
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Logic_bomb_Explosion.prefab",
-    "Prefab GUID": 17752829655034200261,
+    "Prefab GUID": 2481589551257374019,
     "version": 1,
     "entities": [
         {
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "3446494527795790025",
+                            "Name": "Logic_bomb_Explosion",
                             "Tag": "Logic_bomb_Explosion"
                         }
                     }
@@ -53,7 +54,7 @@
                             "FilePath": "Loveletter_Logic_Bomb_Explosion.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 1.031000018119812,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -75,7 +76,7 @@
                             "ComponentGUID": "1140651518580719807",
                             "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 }

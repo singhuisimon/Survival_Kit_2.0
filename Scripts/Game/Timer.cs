@@ -15,7 +15,7 @@ namespace Game
     {
         // ===== Settings =====
         [SerializeField("Starting Time (seconds)")]
-        private float startingTime = 50.0f;  // 2 minutes = 120 seconds
+        private float startingTime = 120.0f;  // 2 minutes = 120 seconds
 
         // ===== Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";

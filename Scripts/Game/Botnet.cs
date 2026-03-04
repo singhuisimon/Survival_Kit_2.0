@@ -47,9 +47,9 @@ namespace Game
         [SerializeField] private float minRetargetDelay = 1.0f;
         [SerializeField] private float maxRetargetDelay = 1.5f;
 
-        // Death explosion prefab path
+        // Death explosion prefab path (Audio)
         //[SerializeField] 
-        private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab";
+        private string deathExplosionPrefab = "Sources/Prefabs/BotnetExplosion.prefab"; 
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
@@ -94,6 +94,18 @@ namespace Game
         private const string EVENT_GAME_OVER = "GameOver";
         private const string EVENT_GAME_WIN = "GameWin";
         private string DAMAGEPLAYERAUDIOPREFAB = "Sources/Prefabs/Audio_EmemyDamage.prefab";
+
+        // Death/Explosion VFX
+        string MainExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";
+        private uint mainExplosionID = INVALID_ENTITY;
+        private float explosionTimer = 0.0f;
+
+        // Enemy Hit Sparks VFX
+        string enemyHitSparksPrefabPath = "Sources/Prefabs/HitSparksEnemy.prefab";
+        private uint enemyHitSparksID = INVALID_ENTITY;
+        private uint tempEnemyHitSparksID = INVALID_ENTITY;
+        private float hitSparksTimer = 0.1f;
+        private bool isHitSparks = false;
 
         // Pause state
         private Vector3 savedVelocity = Vector3.Zero;
@@ -154,8 +166,23 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            if (isDead)
+            // For hit sparks VFX
+            hitSparksTimer -= deltaTime;
+
+            if (isDead && explosionTimer <= 0.0f)
                 return;
+
+            if (explosionTimer > 0.0f) {
+                explosionTimer -= deltaTime;
+
+                if (explosionTimer <= 0.0f)
+                {
+                    SceneDestroyEntity(enemyHitSparksID);
+                    SceneDestroyEntity(mainExplosionID);
+                    SceneDestroyEntity((uint)EntityID);
+                }
+                return;
+            }
 
             // Handle pause - save/restore velocity
             if (GameState.IsPaused)
@@ -198,6 +225,7 @@ namespace Game
 
             if (isExploding)
                 Explode();
+
         }
 
         public override void OnDestroy()
@@ -251,7 +279,25 @@ namespace Game
                 }
             }
 
-            
+            // Reset hit sparks timer and begin new cycle of hit sparks
+            if (hitSparksTimer <= 0.0f)
+            {
+                hitSparksTimer = 0.3f;
+                tempEnemyHitSparksID = enemyHitSparksID;
+                SceneDestroyEntity(tempEnemyHitSparksID);
+                enemyHitSparksID = INVALID_ENTITY;
+                isHitSparks = false;
+            }
+
+            // Enemy hit sparks VFX
+            if (enemyHitSparksID == INVALID_ENTITY && isHitSparks == false)
+            {
+                enemyHitSparksID = PrefabInstantiate(enemyHitSparksPrefabPath);
+                isHitSparks = true;
+            }
+            Vector3 botnetID = GetPosition(EntityID);
+            Transform.SetPosition(enemyHitSparksID, ref botnetID);
+
 
             LogMessage("[Botnet] CurrentBotnetHP is: " + HP.ToString());
             LogMessage("[Botnet] SUCCESS MATCH! REDUCING HEALTH!");
@@ -613,6 +659,7 @@ namespace Game
 
             isDead = true;
             isExploding = false;
+            explosionTimer = 0.2f;
 
             LogMessage("[Botnet] Botnet (EntityID = " + EntityID + ") exploding!");
 
@@ -621,6 +668,7 @@ namespace Game
             ApplyBlastToTag(TAG_EMPLACEMENT);
             ApplyBlastToTag(TAG_ALLIES);
 
+            // Audio and VFX Explosion
             if (!string.IsNullOrEmpty(deathExplosionPrefab))
             {
                 LogMessage("Prefab is not null");
@@ -628,9 +676,14 @@ namespace Game
                 Vector3 myPos = Transform.GetPosition((uint)EntityID);
                 Transform.SetPosition(explosionID, ref myPos);
                 AudioPlay(explosionID);
-            }
 
-            SceneDestroyEntity((uint)EntityID);
+                // For explosion VFX
+                mainExplosionID = PrefabInstantiate(MainExplosionPrefabPath);
+                Transform.SetPosition(mainExplosionID, ref myPos);
+
+                Vector3 newScale = new Vector3(10.0f, 10.0f, 10.0f);
+                Transform.SetScale(mainExplosionID, ref newScale);
+            }
         }
 
         private void ApplyBlastToTag(string tag)

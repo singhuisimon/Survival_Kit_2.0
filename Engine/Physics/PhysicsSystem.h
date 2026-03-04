@@ -131,6 +131,10 @@ namespace Engine
 		/*****************************************************************************/
 		static JPH::EMotionType ToMotionType(RigidbodyComponent const &rb)
 		{
+			// Mass <= 0 means immovable/static regardless of other flags.
+			if (rb.Mass <= 0.0f)
+				return JPH::EMotionType::Static;
+
 			return rb.IsKinematic ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic;
 		}
 
@@ -143,6 +147,10 @@ namespace Engine
 		/*****************************************************************************/
 		static JPH::ObjectLayer ToObjectLayer(RigidbodyComponent const &rb)
 		{
+			// Keep static bodies in the NON_MOVING layer.
+			if (rb.Mass <= 0.0f)
+				return Layers::NON_MOVING;
+
 			return rb.IsKinematic ? Layers::NON_MOVING : Layers::MOVING;
 		}
 

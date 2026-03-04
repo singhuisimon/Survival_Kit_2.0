@@ -7,7 +7,7 @@ namespace Game
     public class GameSoundPrefabLifetime : ScriptBehaviour
     {
         [SerializeField]
-        public float Lifetime = 2.0f;
+        public float Lifetime = 3.0f;
 
         //for debug purpose
         [SerializeField]

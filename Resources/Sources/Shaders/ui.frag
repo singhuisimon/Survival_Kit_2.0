@@ -5,8 +5,7 @@ out vec4 FragColor;
 
 layout (binding = 6) uniform sampler2D Texture2D;
 
-const float gamma = 2.2;
-
+uniform float gamma; 
 uniform vec4 uColor;
 uniform bool uHasTexture;
 

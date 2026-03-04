@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Enemy_LoveLetter",
-    "Prefab GUID": 2356852024956371221,
+    "Prefab Name": "Prefab: Enemy_LoveLetter.prefab",
+    "Prefab GUID": 15163726101930462467,
     "version": 1,
     "entities": [
         {
@@ -30,7 +30,7 @@
                                 1.0
                             ],
                             "Parent": 4294967295,
-                            "Children": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                            "Children": []
                         }
                     }
                 },
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "627469768045674699",
+                            "Name": "Enemy_LoveLetter",
                             "Tag": "loveletter"
                         }
                     }
@@ -50,17 +51,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "627469768045674699",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 6
+                            "SubmeshIndex": 6,
+                            "CastType": 0
                         }
                     }
                 },
@@ -73,7 +75,7 @@
                             "FilePath": "Loveletter_Ambient.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 0.4970000088214874,
+                            "Volume": 0.9509999752044678,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
@@ -92,7 +94,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.LoveLetter"
+                            "ComponentGUID": "7669736321985744009",
+                            "ScriptClassName": "Game.LoveLetter",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -115,16 +120,16 @@
                                 -1.4864583015441897
                             ],
                             "Rotation": [
-                                0.9806798100471495,
-                                -0.005884372163563967,
-                                0.029870906844735146
+                                0.9806797504425048,
+                                -0.0058843716979026794,
+                                0.029870904982089996
                             ],
                             "Scale": [
                                 1.0,
                                 1.0,
                                 1.0
                             ],
-                            "Parent": 1,
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -135,6 +140,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13886067071024414899",
+                            "Name": "E006_logicbomb8",
                             "Tag": "E006_logicbomb8"
                         }
                     }
@@ -145,17 +151,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "13886067071024414899",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 0
+                            "SubmeshIndex": 0,
+                            "CastType": 0
                         }
                     }
                 },
@@ -197,7 +204,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "4210971808165203093",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -220,16 +230,16 @@
                                 -1.114746332168579
                             ],
                             "Rotation": [
-                                0.9789358377456664,
-                                -0.012933905236423016,
-                                0.06564788520336151
+                                0.9789355993270874,
+                                -0.01293390430510044,
+                                0.06564789265394211
                             ],
                             "Scale": [
                                 1.0,
                                 1.0,
                                 1.0
                             ],
-                            "Parent": 1,
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -240,6 +250,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16768370832541532343",
+                            "Name": "E006_logicbomb3",
                             "Tag": "E006_logicbomb3"
                         }
                     }
@@ -250,17 +261,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16768370832541532343",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 1
+                            "SubmeshIndex": 1,
+                            "CastType": 0
                         }
                     }
                 },
@@ -302,7 +314,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "7669736321985744033",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -325,12 +340,16 @@
                                 1.4866820573806765
                             ],
                             "Rotation": [
-                                0.980680763721466,
-                                -0.005873182788491249,
+                                0.9806807041168212,
+                                -0.005873182322829962,
                                 0.029813099652528763
                             ],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -341,6 +360,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4086234281866215611",
+                            "Name": "E006_logicbomb2",
                             "Tag": "E006_logicbomb2"
                         }
                     }
@@ -351,17 +371,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4086234281866215611",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 2
+                            "SubmeshIndex": 2,
+                            "CastType": 0
                         }
                     }
                 },
@@ -375,13 +396,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -391,7 +424,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "7093275569682320557",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -408,10 +444,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12156684814114144447",
-                            "Position": [-0.000055526757932966575, 2.7189412117004395, 1.1148725748062134],
-                            "Rotation": [0.9789460301399232, -0.012902265414595604, 0.06548554450273514],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                -0.000055526757932966575,
+                                2.7189412117004395,
+                                1.1148725748062134
+                            ],
+                            "Rotation": [
+                                0.9789459705352784,
+                                -0.012902265414595604,
+                                0.06548554450273514
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -422,6 +470,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12156684814114144447",
+                            "Name": "E006_logicbomb5",
                             "Tag": "E006_logicbomb5"
                         }
                     }
@@ -432,17 +481,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "12156684814114144447",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 3
+                            "SubmeshIndex": 3,
+                            "CastType": 0
                         }
                     }
                 },
@@ -456,13 +506,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -472,7 +534,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "3058050303558356153",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -489,10 +554,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "2356852024955945155",
-                            "Position": [-0.00021579120948445052, 1.8125643730163576, 0.7432023882865906],
-                            "Rotation": [0.9760928750038148, -0.019571179524064064, 0.09933052957057951],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                -0.00021579120948445052,
+                                1.8125643730163576,
+                                0.7432023882865906
+                            ],
+                            "Rotation": [
+                                0.9760928750038148,
+                                -0.019571179524064064,
+                                0.09933052211999892
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -503,6 +580,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "2356852024955945155",
+                            "Name": "E006_logicbomb7",
                             "Tag": "E006_logicbomb7"
                         }
                     }
@@ -513,17 +591,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "2356852024955945155",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 4
+                            "SubmeshIndex": 4,
+                            "CastType": 0
                         }
                     }
                 },
@@ -537,13 +616,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -553,7 +644,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "1328668046648085701",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -570,10 +664,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "5239155786473062599",
-                            "Position": [-0.00017460875096730888, 0.9063738584518432, 0.3711634874343872],
-                            "Rotation": [0.97300523519516, -0.024832792580127716, 0.12603521347045898],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                -0.00017460875096730888,
+                                0.9063738584518432,
+                                0.3711634874343872
+                            ],
+                            "Rotation": [
+                                0.9730054140090942,
+                                -0.024832794442772865,
+                                0.1260351985692978
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -584,6 +690,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "5239155786473062599",
+                            "Name": "E006_logicbomb6",
                             "Tag": "E006_logicbomb6"
                         }
                     }
@@ -594,17 +701,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "5239155786473062599",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 5
+                            "SubmeshIndex": 5,
+                            "CastType": 0
                         }
                     }
                 },
@@ -618,13 +726,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -634,7 +754,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "11128500835806285009",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -651,10 +774,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16191910080238108877",
-                            "Position": [0.0005924081197008491, 0.00004560064917313866, -0.0001931499718921259],
-                            "Rotation": [0.9718664288520812, -0.0265081524848938, 0.13453760743141174],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                0.0005924081197008491,
+                                0.00004560064917313866,
+                                -0.0001931499718921259
+                            ],
+                            "Rotation": [
+                                0.9718663692474364,
+                                -0.026508154347538948,
+                                0.13453763723373413
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -665,6 +800,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16191910080238108877",
+                            "Name": "E006_logicbomb9",
                             "Tag": "E006_logicbomb9"
                         }
                     }
@@ -675,17 +811,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16191910080238108877",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 7
+                            "SubmeshIndex": 7,
+                            "CastType": 0
                         }
                     }
                 },
@@ -699,13 +836,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -715,7 +864,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "9399118578896014557",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -732,10 +884,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6968538043383333073",
-                            "Position": [0.0, 0.0, 0.0],
-                            "Rotation": [0.0, 0.0, 0.0],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -746,6 +910,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6968538043383333073",
+                            "Name": "Fins",
                             "Tag": "Fins"
                         }
                     }
@@ -756,17 +921,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6968538043383333073",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 8
+                            "SubmeshIndex": 8,
+                            "CastType": 0
                         }
                     }
                 }
@@ -783,10 +949,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1780391272652521683",
-                            "Position": [-0.000156535767018795, -0.9062809348106384, -0.37137994170188904],
-                            "Rotation": [0.9729479551315308, -0.024920502677559853, 0.12648026645183563],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                -0.000156535767018795,
+                                -0.9062809348106384,
+                                -0.37137994170188904
+                            ],
+                            "Rotation": [
+                                0.9729480743408204,
+                                -0.024920502677559853,
+                                0.12648026645183563
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -797,6 +975,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1780391272652521683",
+                            "Name": "E006_logicbomb4",
                             "Tag": "E006_logicbomb4"
                         }
                     }
@@ -807,17 +986,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1780391272652521683",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 9
+                            "SubmeshIndex": 9,
+                            "CastType": 0
                         }
                     }
                 },
@@ -831,13 +1011,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -847,7 +1039,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "3058050303558356209",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
@@ -864,10 +1059,22 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14462527823327854807",
-                            "Position": [-0.00010819292219821364, -1.812583565711975, -0.7431405782699585],
-                            "Rotation": [0.9761165380477904, -0.01952626183629036, 0.09910400211811066],
-                            "Scale": [1.0, 1.0, 1.0],
-                            "Parent": 1,
+                            "Position": [
+                                -0.00010819292219821364,
+                                -1.812583565711975,
+                                -0.7431405782699585
+                            ],
+                            "Rotation": [
+                                0.976116418838501,
+                                -0.01952625997364521,
+                                0.09910399466753006
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -878,6 +1085,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14462527823327854807",
+                            "Name": "E006_logicbomb1",
                             "Tag": "E006_logicbomb1"
                         }
                     }
@@ -888,17 +1096,18 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "14462527823327854807",
-                            "Mesh": "E005_loveletter_v001.fbx",
+                            "Mesh": "",
                             "Material": "",
                             "Texture": "",
                             "Visible": true,
-                            "ShadowCast": false,
-                            "ShadowReceive": false,
                             "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
-                            "SubmeshIndex": 10
+                            "SubmeshIndex": 10,
+                            "CastType": 0
                         }
                     }
                 },
@@ -912,13 +1121,25 @@
                             "IsKinematic": false,
                             "IsTrigger": false,
                             "UseGravity": false,
-                            "Velocity": [0.0, 0.0, 0.0],
-                            "AngularVelocity": [0.0, 0.0, 0.0],
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "LinearDamping": 0.05000000074505806,
                             "AngularDamping": 0.05000000074505806,
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
-                            "BoxHalfExtent": [0.0, 0.0, 0.0],
+                            "BoxHalfExtent": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "SphereRadius": 0.5
                         }
                     }
@@ -928,7 +1149,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ScriptClassName": "Game.HealthLove"
+                            "ComponentGUID": "14010804597323402493",
+                            "ScriptClassName": "Game.HealthLove",
+                            "Started": false,
+                            "GCHandle": 0
                         }
                     }
                 }
