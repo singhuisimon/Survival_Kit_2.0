@@ -3,6 +3,48 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 68,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "AudioSettings",
+                        "Tag": "AudioSettings"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "200000000000000001",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "200000000000000002",
+                        "ScriptClassName": "Game.AudioSettings"
+                    }
+                }
+            ]
+        },
+        {
             "ID": 79,
             "Components": [
                 {
@@ -464,7 +506,7 @@
                         "Quad": 3,
                         "Sprite Layer": 3,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -515,7 +557,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -566,7 +608,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -617,7 +659,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -668,7 +710,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -688,8 +730,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000006",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            524.5,
                             0.0
                         ],
                         "Rotation": [
@@ -719,7 +761,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -739,8 +781,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000007",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            524.5,
                             0.0
                         ],
                         "Rotation": [
@@ -770,7 +812,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -790,8 +832,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000008",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            844.4000244140625,
+                            414.5,
                             0.0
                         ],
                         "Rotation": [
@@ -821,7 +863,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1046,8 +1088,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000009",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            559.2999877929688,
                             0.0
                         ],
                         "Rotation": [
@@ -1077,7 +1119,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1097,8 +1139,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000010",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            559.2999877929688,
                             0.0
                         ],
                         "Rotation": [
@@ -1128,7 +1170,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1179,7 +1221,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1390,7 +1432,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1441,7 +1483,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1492,7 +1534,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1512,8 +1554,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000015",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            997.2999877929688,
+                            414.5,
                             0.0
                         ],
                         "Rotation": [
@@ -1543,7 +1585,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1563,8 +1605,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000016",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            559.7000122070313,
                             0.0
                         ],
                         "Rotation": [
@@ -1594,7 +1636,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2572,8 +2614,8 @@
                     "Properties": {
                         "ComponentGUID": "6048422829245597271",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            834.5,
+                            618.5,
                             0.0
                         ],
                         "Rotation": [
@@ -2603,7 +2645,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2623,8 +2665,8 @@
                     "Properties": {
                         "ComponentGUID": "13542412609189185105",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            987.5999755859375,
+                            618.5,
                             0.0
                         ],
                         "Rotation": [
@@ -2654,7 +2696,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2674,8 +2716,8 @@
                     "Properties": {
                         "ComponentGUID": "1436736810816407115",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            987.5999755859375,
+                            618.5,
                             0.0
                         ],
                         "Rotation": [
@@ -2705,7 +2747,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2725,8 +2767,8 @@
                     "Properties": {
                         "ComponentGUID": "11813030352277194309",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1142.699951171875,
+                            619.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -2756,7 +2798,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2776,8 +2818,8 @@
                     "Properties": {
                         "ComponentGUID": "17001177123005449791",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1142.699951171875,
+                            619.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -2807,7 +2849,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -4467,7 +4509,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "3177043809125597989",
-                        "ScriptClassName": "Game.StageCount"
+                        "ScriptClassName": "Game.Stage2Count"
                     }
                 },
                 {
@@ -5869,8 +5911,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000017",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            559.7000122070313,
                             0.0
                         ],
                         "Rotation": [
@@ -5900,7 +5942,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6029,8 +6071,8 @@
                     "Properties": {
                         "ComponentGUID": "8930726590763664989",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            834.5,
+                            618.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -6060,7 +6102,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6259,8 +6301,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000018",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            526.0999755859375,
                             0.0
                         ],
                         "Rotation": [
@@ -6290,7 +6332,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6310,8 +6352,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000019",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            526.0999755859375,
                             0.0
                         ],
                         "Rotation": [
@@ -6341,7 +6383,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6361,8 +6403,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000020",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1151.0999755859375,
+                            414.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6392,7 +6434,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6412,8 +6454,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000021",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            560.0,
                             0.0
                         ],
                         "Rotation": [
@@ -6443,7 +6485,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6463,8 +6505,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000022",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            560.0,
                             0.0
                         ],
                         "Rotation": [
@@ -6494,7 +6536,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6514,8 +6556,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000023",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            526.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6545,7 +6587,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6565,8 +6607,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000024",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            526.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6596,7 +6638,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
