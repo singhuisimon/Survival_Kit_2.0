@@ -22,7 +22,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryCount",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryCount.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2065,22 +2064,22 @@
             ]
         },
         {
-            "ID": 68,
+            "ID": 80,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "nextlevelbutton",
-                        "Tag": "nextlevelbutton"
+                        "Name": "AltFireFill",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13802257990996788065",
+                        "ComponentGUID": "9074577925281760651",
                         "Position": [
-                            855.0,
-                            518.0,
+                            1212.699951171875,
+                            568.4000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -2089,8 +2088,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            45.0,
+                            29.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -2100,14 +2099,14 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "3425964449535591267",
-                        "ScriptClassName": "Game.NextLevelButton"
+                        "ComponentGUID": "1004127393034044815",
+                        "ScriptClassName": "Game.AltFireBar"
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess_Level2Button.png",
+                        "Texture": "AlternateFire_Fill.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -2115,9 +2114,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 2,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2619,7 +2618,7 @@
                     "Properties": {
                         "ComponentGUID": "15427608859292877731",
                         "Position": [
-                            376.0,
+                            650.0,
                             518.0,
                             0.0
                         ],
@@ -3101,7 +3100,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "SentryWindows.png",
+                        "Texture": "NormalSentryWindow.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -7644,64 +7643,6 @@
                         "Sprite Layer": 2,
                         "IsActive": true,
                         "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 80,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "AltFireFill",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "9074577925281760651",
-                        "Position": [
-                            1212.699951171875,
-                            568.4000244140625,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            45.0,
-                            29.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "1004127393034044815",
-                        "ScriptClassName": "Game.AltFireBar"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "AlternateFire_Fill.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 2,
-                        "IsActive": true,
-                        "IsVisible": true
                     }
                 }
             ]
