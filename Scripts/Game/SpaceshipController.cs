@@ -98,6 +98,16 @@ namespace Game
         private bool isHitSparks = false;
         string playerHitSparksPrefabPath = "Sources/Prefabs/HitSparksPlayer.prefab";
 
+        // ===== Camera Shake =====
+        //private bool isCameraShake = false;
+        private const float camShakeTimerThreshold = 1.0f;      // Larger than the longest shake duration 
+        private float camShakeTimer = camShakeTimerThreshold;   // Default is at threshold value
+        //[SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 0.1f;
+        [SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 100.0f;
+        [SerializeField] private float CAMSHAKE_DamageTakenDuration = 0.1f;
+
+
+
         public override void OnStart()
         {
 
@@ -312,9 +322,32 @@ namespace Game
             float t = cameraFollowSmooth * deltaTime;
             t = t / (1.0f + t);
 
+            // Compute smooth camera position
             smoothCamPos = Vector3.Lerp(smoothCamPos, desiredCamPos, t);
+            
+            // Apply camera shake to smooth position if needed
+            if(camShakeTimer < camShakeTimerThreshold) {
+
+                // Update camera shake timer
+                camShakeTimer += deltaTime;
+
+                // Choose a random value * right vector (X-axis) to apply for the shake
+                Vector3 xShake = camRightFlat * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
+
+                // Choose a random value * up vector (Y-axis) to apply for the shake
+                Vector3 yShake = camUpFlat * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
+
+                // Camera shake based on primary fire shake magnitude
+                smoothCamPos = smoothCamPos + xShake + yShake;
+
+                // Resets camera shake timer when it exceeds shake duration
+                if (camShakeTimer >= CAMSHAKE_DamageTakenDuration) camShakeTimer = camShakeTimerThreshold;
+
+            } 
+            // Set camera position 
             SetPosition(cameraEntityID, ref smoothCamPos);
 
+            // Update camera target
             Vector3 camPos = GetPosition(cameraEntityID);
             Quat camRot = GetRotation(cameraEntityID);
             Vector3 camForward = camRot.Forward;   // Engine convention (-Z)
@@ -341,6 +374,9 @@ namespace Game
             float damage = DamageSystem.ParseAmount(payload);
 
             playerHP -= damage;
+
+            // Sets camera shake timer to 0 upon damage received
+            camShakeTimer = 0.0f;
 
             // Reset hit sparks timer and begin new cycle of hit sparks
             if (hitSparksTimer <= 0.0f)
