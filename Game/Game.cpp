@@ -409,6 +409,34 @@ void Game::OnInit()
 	{
 		LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
 	}
+
+	// ====================================
+	 // Step 8: Initialize Mono Scripting Engine
+	 // ====================================
+	LOG_INFO("Step 8: Initializing Mono Scripting Engine...");
+	try
+	{
+		std::string assemblyPath = "GameScripts.dll";
+
+		if (std::filesystem::exists(assemblyPath))
+		{
+			Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
+			LOG_INFO("  -> Mono Scripting Engine initialized successfully");
+		}
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
+	}
+	Engine::EventSystem::Instance().Subscribe<Engine::ScriptEvent>(
+		[this](const Engine::ScriptEvent& event) {
+			if (event.name == "QuitGame") {
+				LOG_INFO("QuitGame event received - closing application");
+				glfwSetWindowShouldClose(GetWindow(), GLFW_TRUE);
+			}
+		});
+
+	LOG_INFO("ApplicationSystem initialized");
 }
 
 //void Game::AddAllSystems()
