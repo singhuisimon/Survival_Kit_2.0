@@ -84,8 +84,16 @@ namespace Game
                 return;
 
             // Don't count down when game is paused
-            if (GameState.IsPaused)
+            if (GameState.IsPaused){
+                if(GetIsVisible((uint)EntityID)){
+                    SetIsVisible((uint)EntityID, false);
+                }
                 return;
+            }
+
+            if(!GetIsVisible((uint)EntityID)){
+                SetIsVisible((uint)EntityID, true);
+            }
 
             if(IsKeyPressed(KeyCode.D1) && spawnAndLifted){
                 countdown -= deltaTime;
