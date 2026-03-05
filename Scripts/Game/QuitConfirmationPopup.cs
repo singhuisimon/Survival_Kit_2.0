@@ -22,6 +22,7 @@ namespace Game
         private const string POPUP_NAME = "Quit Confirmation Popup";
         private const string YES_BUTTON_NAME = "Quit Yes Button";
         private const string NO_BUTTON_NAME = "Quit No Button";
+        private const string BLACK_OVERLAY = "Black Overlay";
 
         // Positions
         private const float HIDDEN_Y = -500.0f;
@@ -71,6 +72,7 @@ namespace Game
         private uint popupId;
         private uint yesButtonId;
         private uint noButtonId;
+        private uint overlayId;
 
         // Event names for popup coordination
         private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
@@ -95,6 +97,7 @@ namespace Game
             popupId = SceneFindEntityByName(POPUP_NAME);
             yesButtonId = SceneFindEntityByName(YES_BUTTON_NAME);
             noButtonId = SceneFindEntityByName(NO_BUTTON_NAME);
+            overlayId = SceneFindEntityByName(BLACK_OVERLAY);
 
             // Verify all entities were found
             if (shutdownButtonId == 0)
@@ -117,6 +120,11 @@ namespace Game
                 LogError("QuitConfirmationPopup: Could not find entity: " + NO_BUTTON_NAME);
                 return;
             }
+            if (overlayId == 0)
+            {
+                LogError("QuitConfirmationPopup: Could not find entity: " + NO_BUTTON_NAME);
+                return;
+            }
 
             entitiesFound = true;
             isPopupVisible = false;
@@ -130,6 +138,7 @@ namespace Game
             LogMessage("QuitConfirmationPopup: Popup ID: " + popupId);
             LogMessage("QuitConfirmationPopup: Yes Button ID: " + yesButtonId);
             LogMessage("QuitConfirmationPopup: No Button ID: " + noButtonId);
+            LogMessage("QuitConfirmationPopup: Black Overlay ID: " + overlayId);
             LogMessage("QuitConfirmationPopup: entitiesFound = " + entitiesFound);
         }
 
@@ -233,6 +242,10 @@ namespace Game
             animationTimer = 0.0f;
             Event.Publish(EVENT_POPUP_OPENED, POPUP_ID_QUIT);
 
+            // Move overlay to center of screen
+            Vector3 overlayPos = new Vector3(CENTER_X, VISIBLE_Y, -0.4f);
+            SetPosition(overlayId, ref overlayPos);
+
             // Move popup to center of screen
             Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
             SetPosition(popupId, ref popupPos);
@@ -260,6 +273,10 @@ namespace Game
             Vector3 hidePos = hiddenPosition;
             Vector3 yesHidePos = new Vector3(580.0f, -500.0f, -0.3f);
             Vector3 noHidePos = new Vector3(700.0f, -500.0f, -0.3f);
+
+            // Move overlay off screen
+            Vector3 overlayPos = new Vector3(CENTER_X, HIDDEN_Y, -0.4f);
+            SetPosition(overlayId, ref overlayPos);
 
             // Move popup off screen
             Vector3 popupPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);

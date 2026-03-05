@@ -30,6 +30,7 @@ namespace Game
         private bool initialized = false;
         private int initialcount = 0;
         private bool spawnAndLifted = true;
+        private bool allowedspawn = true;
 
         // ==== Timer =====
         [SerializeField] private float countdown = 0.0f;
@@ -72,6 +73,8 @@ namespace Game
 
             spawnAndLifted = true;
 
+            allowedspawn = true;
+
             // Display initial time
             UpdateCountDisplay();
 
@@ -88,6 +91,10 @@ namespace Game
                 if(GetIsVisible((uint)EntityID)){
                     SetIsVisible((uint)EntityID, false);
                 }
+                return;
+            }
+
+            if(!allowedspawn){
                 return;
             }
 
@@ -168,8 +175,10 @@ namespace Game
 
         private void OnGameOver(string eventName, string payload)
         {
-            LogMessage("[SentryCount] Game over triggered by: " + eventName + " - Timer stopped");
+            LogMessage("[SentryCount] Game over triggered by: " + eventName);
+            SetText((uint)EntityID, "");
             Text.SetIsVisible((uint)EntityID, false);
+            allowedspawn = false;
         }
 
         private void UpdateCountDisplay()
