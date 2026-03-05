@@ -15,7 +15,7 @@ namespace Game
     {
         // ===== Settings =====
         [SerializeField("Starting Time (seconds)")]
-        private float startingTime = 120.0f;  // 2 minutes = 120 seconds
+        private float startingTime = 240.0f;  // 2 minutes = 120 seconds
 
         // ===== Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
@@ -64,7 +64,8 @@ namespace Game
                 return;
 
             // Count down
-            remainingTime -= (deltaTime / 2);
+            //remainingTime -= (deltaTime / 2);
+            remainingTime -= deltaTime;
 
             // Clamp to 0 and publish win event once
             if (remainingTime <= 0.0f)

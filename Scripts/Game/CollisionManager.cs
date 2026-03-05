@@ -39,6 +39,7 @@ namespace Game
             CORE,
             CORE_BARRIER,
             ENVIRONMENT,
+            PAYLOAD,
             UNKNOWN
         }
 
@@ -89,7 +90,10 @@ namespace Game
             { "oob", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_destructable", CollisionCategory.ENVIRONMENT },
-            { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT }
+            { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT },
+
+            // Payload
+            { "payload", CollisionCategory.PAYLOAD}
         };
 
         // ============================================================
@@ -107,6 +111,7 @@ namespace Game
         private Dictionary<uint, List<uint>> enemyCollisions = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> coreCollisions = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> barrierCollisions = new Dictionary<uint, List<uint>>();
+        private Dictionary<uint, List<uint>> payloadCollisions = new Dictionary<uint, List<uint>>();
 
         // Environment collisions (everything that hit environment)
         private Dictionary<uint, List<uint>> environmentCollisions = new Dictionary<uint, List<uint>>();
@@ -147,6 +152,7 @@ namespace Game
             // Player can hit:
             new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.ENVIRONMENT),
             new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.ENEMY),
+            new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.PAYLOAD),
             
             // Enemies can hit:
             new CollisionRule(CollisionCategory.ENEMY, CollisionCategory.PLAYER),
@@ -218,6 +224,7 @@ namespace Game
             enemyCollisions.Clear();
             coreCollisions.Clear();
             barrierCollisions.Clear();
+            payloadCollisions.Clear();
             environmentCollisions.Clear();
         }
 
@@ -326,6 +333,15 @@ namespace Game
                 RecordHit(barrierCollisions, entityB, entityA);
             }
 
+            if (catA == CollisionCategory.PAYLOAD)
+            {
+                RecordHit(payloadCollisions, entityA, entityB);
+            }
+            else if (catB == CollisionCategory.PAYLOAD)
+            {
+                RecordHit(payloadCollisions, entityB, entityA);
+            }
+
             // ENVIRONMENT COLLISIONS
             if (catA == CollisionCategory.ENVIRONMENT)
             {
@@ -412,6 +428,14 @@ namespace Game
         public static List<uint> GetBarrierCollisions(uint barrierEntityId)
         {
             return GetFromDictionary(instance?.barrierCollisions, barrierEntityId);
+        }
+
+        /// <summary>
+        /// Get all entities that hit the core barrier
+        /// </summary>
+        public static List<uint> GetPayloadCollisions(uint payloadEntityId)
+        {
+            return GetFromDictionary(instance?.payloadCollisions, payloadEntityId);
         }
 
         /// <summary>

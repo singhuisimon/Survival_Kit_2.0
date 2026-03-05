@@ -3,22 +3,22 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048580,
+            "ID": 1048624,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "ReloadIndicator",
-                        "Tag": "Default"
+                        "Name": "nextlevelbuttonwin",
+                        "Tag": "nextlevelbuttonwin"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "2793411025458775131",
+                        "ComponentGUID": "16458317483679304379",
                         "Position": [
-                            1136.0,
-                            682.9000244140625,
+                            855.0,
+                            500.0,
                             0.0
                         ],
                         "Rotation": [
@@ -27,9 +27,9 @@
                             0.0
                         ],
                         "Scale": [
-                            0.0,
-                            0.0,
-                            0.0
+                            150.0,
+                            50.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -38,14 +38,14 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "11440322310010635357",
-                        "ScriptClassName": "Game.ReloadIndicator"
+                        "ComponentGUID": "4929102437611375293",
+                        "ScriptClassName": "Game.NextLevelButton"
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "PrimaryWeapBar_ReloadFill.png",
+                        "Texture": "DefenceSuccess_Level2Button.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -53,9 +53,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 2,
-                        "IsActive": false,
-                        "IsVisible": true
+                        "Sprite Layer": 6,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
@@ -413,9 +413,9 @@
                             -81.65727233886719
                         ],
                         "Rotation": [
-                            0.00009085050987778232,
-                            -0.05936064198613167,
-                            -0.11039106547832489
+                            0.0000908505026018247,
+                            -0.059360653162002563,
+                            -0.11039108037948608
                         ],
                         "Scale": [
                             5.0,
@@ -555,7 +555,7 @@
                         ],
                         "Rotation": [
                             -0.20593875646591187,
-                            -0.22188800573349,
+                            -0.22188803553581238,
                             0.0005506806191988289
                         ],
                         "Scale": [
@@ -1398,7 +1398,7 @@
                         "Rotation": [
                             -0.0000601329593337141,
                             0.4257443845272064,
-                            -0.10387798398733139
+                            -0.10387801378965378
                         ],
                         "Scale": [
                             5.0,
@@ -1533,9 +1533,9 @@
                             -43.40431594848633
                         ],
                         "Rotation": [
-                            -0.00010636430670274422,
+                            -0.00010636435763444752,
                             0.42574286460876465,
-                            -0.10387779772281647
+                            -0.10387781262397766
                         ],
                         "Scale": [
                             5.0,
@@ -2455,8 +2455,8 @@
                         ],
                         "Rotation": [
                             0.07365221530199051,
-                            0.17051032185554504,
-                            -0.05848819017410278
+                            0.17051035165786743,
+                            -0.05848820507526398
                         ],
                         "Scale": [
                             5.0,
@@ -2648,7 +2648,7 @@
                     "Properties": {
                         "ComponentGUID": "7117350442963443851",
                         "Position": [
-                            620.0,
+                            376.0,
                             500.0,
                             0.0
                         ],
@@ -2787,7 +2787,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 0.9659348726272583,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.0,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -3284,7 +3284,7 @@
                         "Rotation": [
                             0.07450363039970398,
                             0.14448124170303345,
-                            -0.053272731602191925
+                            -0.05327273905277252
                         ],
                         "Scale": [
                             5.0,
@@ -3424,8 +3424,8 @@
                         ],
                         "Rotation": [
                             -0.0755261480808258,
-                            0.14385241270065308,
-                            0.039829883724451065
+                            0.1438523679971695,
+                            0.03982989117503166
                         ],
                         "Scale": [
                             5.0,
@@ -4128,7 +4128,7 @@
                             -27.22275161743164
                         ],
                         "Rotation": [
-                            -0.06328387558460236,
+                            -0.06328389048576355,
                             -0.20213618874549866,
                             0.0006744417478330433
                         ],
@@ -4977,7 +4977,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "11686375410218124395",
-                        "ScriptClassName": "Game.RestartButton2"
+                        "ScriptClassName": "Game.RestartButton"
                     }
                 },
                 {
@@ -4999,22 +4999,22 @@
             ]
         },
         {
-            "ID": 48,
+            "ID": 1048580,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "TImer",
-                        "Tag": "TImer"
+                        "Name": "ReloadIndicator",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "8835992658497995303",
+                        "ComponentGUID": "2793411025458775131",
                         "Position": [
-                            1075.4000244140625,
-                            650.5,
+                            1136.0,
+                            682.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -5023,9 +5023,9 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -5034,28 +5034,24 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "1918463630861206067",
-                        "ScriptClassName": "Game.Timer"
+                        "ComponentGUID": "11440322310010635357",
+                        "ScriptClassName": "Game.ReloadIndicator"
                     }
                 },
                 {
-                    "Type": "TextComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "9988914163104956969",
-                        "text": "00 m : 44 s",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 24.0,
-                        "color": [
+                        "Texture": "PrimaryWeapBar_ReloadFill.png",
+                        "Color": [
                             1.0,
                             1.0,
                             1.0,
                             1.0
                         ],
-                        "isVisible": true,
-                        "align": 0,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
+                        "Quad": 3,
+                        "Sprite Layer": 2,
+                        "IsActive": false,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -5184,7 +5180,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "16449758848901917255",
-                        "ScriptClassName": "Game.Stage2Count"
+                        "ScriptClassName": "Game.StageCount"
                     }
                 },
                 {
@@ -6114,9 +6110,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000051498413086,
+                            -12.00004768371582,
                             85.9989013671875,
-                            -0.9997805953025818
+                            -0.9997681975364685
                         ],
                         "Scale": [
                             1.0,
@@ -7935,7 +7931,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Audio_PlayerMove",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Audio_PlayerMove.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,

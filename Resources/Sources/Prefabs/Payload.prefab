@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Payload",
-    "Prefab GUID": 4912425043946259255,
+    "Prefab Name": "Prefab: Payload.prefab",
+    "Prefab GUID": 13164224626333974695,
     "version": 1,
     "entities": [
         {
@@ -73,7 +73,7 @@
                         "Properties": {
                             "ComponentGUID": "1753369806590280473",
                             "Mass": 1.0,
-                            "IsKinematic": true,
+                            "IsKinematic": false,
                             "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
@@ -91,9 +91,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                0.5,
-                                0.5,
-                                0.5
+                                25.0,
+                                25.0,
+                                25.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -106,11 +106,11 @@
                         "Properties": {
                             "ComponentGUID": "0",
                             "Particle Type Advanced": "",
-                            "Material Type": "",
+                            "Material Type": "payload.mat",
                             "Initial Velocity": [
-                                0.0,
                                 1.0,
-                                0.0
+                                1.0,
+                                1.0
                             ],
                             "Start Size": [
                                 0.0,
@@ -118,9 +118,9 @@
                                 0.0
                             ],
                             "Default Size": [
-                                0.5,
-                                0.5,
-                                0.5
+                                25.0,
+                                25.0,
+                                25.0
                             ],
                             "End Size": [
                                 0.0,
@@ -133,14 +133,14 @@
                                 1.0
                             ],
                             "Color Min": [
-                                0.0,
-                                0.0,
-                                0.699999988079071
+                                0.3026282787322998,
+                                1.0,
+                                0.1138014793395996
                             ],
                             "Color Max": [
-                                0.30000001192092896,
-                                0.30000001192092896,
-                                1.0
+                                0.2235294133424759,
+                                1.0,
+                                0.0784313753247261
                             ],
                             "Emitter Shape": 0,
                             "Max Particles": 1000,
@@ -174,9 +174,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "11553202595748954907",
-                            "ScriptClassName": "",
+                            "ScriptClassName": "Game.Payload",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
                         }
                     }
                 }
