@@ -118,21 +118,26 @@ namespace Engine {
 		MeshData pd = make_plane();
 		MeshData sd = make_sphere();
 		MeshData2D qd = make_quad();
+		MeshData2D co = make_circle_outline(64, 1.0f);
 
 		md.push_back(cd);
 		md.push_back(pd);
 		md.push_back(sd);
 		md2d.push_back(qd);
+		md2d.push_back(co);
 
 		MeshGL c = upload_mesh_data(cd);
 		MeshGL p = upload_mesh_data(pd);
 		MeshGL s = upload_mesh_data(sd);
 		MeshGL q = upload_mesh_data2D(qd);
+		MeshGL c_outline = upload_mesh_data2D(co);
+		c_outline.primitive_type = GL_LINE_LOOP;
 
 		ms.push_back(std::move(c));
 		ms.push_back(std::move(p));
 		ms.push_back(std::move(s));
 		ms.push_back(std::move(q));
+		ms.push_back(std::move(c_outline));
 	}
 
 	/**

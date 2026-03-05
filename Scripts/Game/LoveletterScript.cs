@@ -106,7 +106,8 @@ namespace Game
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
             Subscribe(GAMEWIN, OnGameOver);
-            
+            EnemyRegistry.Register(EntityID);
+
             // Seed RNG if not already done
             if (!rngSeeded)
             {
@@ -535,6 +536,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            EnemyRegistry.Unregister(EntityID);
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(GAMEOVER, OnGameOver);
             Unsubscribe(GAMEWIN, OnGameOver);

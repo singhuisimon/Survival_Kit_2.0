@@ -12,6 +12,7 @@ using static Engine.Audio;
 using static Engine.Tag;
 using static Engine.Transform;
 
+
 namespace Game
 {
     /// <summary>
@@ -140,6 +141,9 @@ namespace Game
 
             hasChosenInitialTarget = false;
 
+            // Register itself into the enemy registry
+            EnemyRegistry.Register(EntityID);
+
             // Immediate attempt (no busy-wait loops)
             chooseTargetTimer = 0.0f;
             ChooseTarget();
@@ -230,6 +234,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            EnemyRegistry.Unregister(EntityID);
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(EVENT_GAME_OVER, OnGameEnd);
             Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
