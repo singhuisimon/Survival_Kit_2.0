@@ -601,84 +601,33 @@
             ]
         },
         {
-            "ID": 1048648,
+            "ID": 80,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyTurret",
-                        "Tag": "EnemyTurret"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "1701428837366105845",
-                        "PrefabAssetGuid": "11756445080107174727",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: EnemyTurret.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4745571910229393945\",\"Tag\":\"EnemyTurret\"}}",
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
+                        "Name": "IndestructibleWall",
+                        "Tag": "IndestructibleWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "1286807396408853019",
+                        "ComponentGUID": "4145432122162939057",
                         "Position": [
-                            -851.6677856445313,
-                            18.967025756835938,
-                            -81.65727233886719
+                            -843.6383056640625,
+                            -42.86625671386719,
+                            -83.85872650146484
                         ],
                         "Rotation": [
-                            0.0000908504516701214,
-                            -0.05936078727245331,
-                            -0.11039122939109802
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
+                            3.8999998569488525,
+                            153.89999389648438,
+                            147.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -687,9 +636,9 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "15121865451691328031",
+                        "ComponentGUID": "5298353626769786037",
                         "Mesh": "",
-                        "Material": "EnemyTurret.mat",
+                        "Material": "",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -705,9 +654,9 @@
                 {
                     "Type": "RigidbodyComponent",
                     "Properties": {
-                        "ComponentGUID": "710346644105593373",
+                        "ComponentGUID": "8757118140590326969",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -725,9 +674,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            2.0,
+                            7.0,
+                            6.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -735,8 +684,8 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "4169111157926363681",
-                        "ScriptClassName": "Game.EnemyTurret"
+                        "ComponentGUID": "9487528113033315507",
+                        "ScriptClassName": "Game.IndestructableWall"
                     }
                 }
             ]
@@ -813,7 +762,7 @@
                         ],
                         "Rotation": [
                             -0.20593875646591187,
-                            -0.22188833355903625,
+                            -0.22188836336135864,
                             0.0005506806191988289
                         ],
                         "Scale": [
@@ -1656,7 +1605,7 @@
                         "Rotation": [
                             -0.0000601331157668028,
                             0.4257443845272064,
-                            -0.10387829691171646
+                            -0.10387832671403885
                         ],
                         "Scale": [
                             5.0,
@@ -1791,9 +1740,9 @@
                             -43.40431594848633
                         ],
                         "Rotation": [
-                            -0.00010636459774104878,
+                            -0.00010636464867275208,
                             0.42574286460876465,
-                            -0.1038779616355896
+                            -0.1038779765367508
                         ],
                         "Scale": [
                             5.0,
@@ -2216,7 +2165,7 @@
                     "Properties": {
                         "ComponentGUID": "8835992658460180989",
                         "Position": [
-                            639.7999877929688,
+                            540.7999877929688,
                             683.0,
                             0.0
                         ],
@@ -2226,7 +2175,7 @@
                             0.0
                         ],
                         "Scale": [
-                            225.0,
+                            126.0,
                             6.199999809265137,
                             1.0
                         ],
@@ -2423,7 +2372,7 @@
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "189081373915742735",
-                        "text": "100/100",
+                        "text": "56/100",
                         "fontName": "Quantico-Regular",
                         "fontSize": 12.0,
                         "color": [
@@ -2713,8 +2662,8 @@
                         ],
                         "Rotation": [
                             0.07365221530199051,
-                            0.1705106496810913,
-                            -0.05848833918571472
+                            0.1705106794834137,
+                            -0.05848835036158562
                         ],
                         "Scale": [
                             5.0,
@@ -3542,7 +3491,7 @@
                         "Rotation": [
                             0.07450363039970398,
                             0.14448124170303345,
-                            -0.05327281355857849
+                            -0.05327282100915909
                         ],
                         "Scale": [
                             5.0,
@@ -3682,8 +3631,8 @@
                         ],
                         "Rotation": [
                             -0.0755261480808258,
-                            0.1438518613576889,
-                            0.03982996568083763
+                            0.14385180175304413,
+                            0.03982997313141823
                         ],
                         "Scale": [
                             5.0,
@@ -3817,7 +3766,7 @@
                     "Properties": {
                         "ComponentGUID": "1286807396408853019",
                         "Position": [
-                            -935.8673095703125,
+                            -959.2696533203125,
                             8.216999053955078,
                             -80.76905059814453
                         ],
@@ -3958,9 +3907,9 @@
                     "Properties": {
                         "ComponentGUID": "1286807396408853019",
                         "Position": [
-                            -935.803466796875,
+                            -959.3143310546875,
                             17.048419952392578,
-                            -80.94029235839844
+                            -80.94084167480469
                         ],
                         "Rotation": [
                             -0.0003280023520346731,
@@ -4386,7 +4335,7 @@
                             -27.22275161743164
                         ],
                         "Rotation": [
-                            -0.06328403949737549,
+                            -0.06328405439853668,
                             -0.20213618874549866,
                             0.0006744417478330433
                         ],
@@ -6372,9 +6321,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.00004768371582,
+                            -12.000059127807617,
                             85.9989013671875,
-                            -0.9997681975364685
+                            -0.9997804760932922
                         ],
                         "Scale": [
                             1.0,
@@ -6503,70 +6452,23 @@
             ]
         },
         {
-            "ID": 1048680,
+            "ID": 78,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyTurret",
-                        "Tag": "EnemyTurret"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "8874141318591993463",
-                        "PrefabAssetGuid": "15215209593927715653",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: EnemyTurret.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4745571910229393945\",\"Tag\":\"EnemyTurret\"}}",
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
+                        "Name": "TurretDestroyCounter",
+                        "Tag": "TurretDestroyCounter"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "1286807396408853019",
+                        "ComponentGUID": "6960692062283957415",
                         "Position": [
-                            -851.6463623046875,
-                            8.931140899658203,
-                            -81.67543029785156
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -6574,67 +6476,19 @@
                             0.0
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "15121865451691328031",
-                        "Mesh": "",
-                        "Material": "EnemyTurret.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "710346644105593373",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "4169111157926363681",
-                        "ScriptClassName": "Game.EnemyTurret"
+                        "ComponentGUID": "13525304245704770729",
+                        "ScriptClassName": "Game.TurretEnemyCounter"
                     }
                 }
             ]
@@ -10664,138 +10518,6 @@
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
                         "maxWidth": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 78,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "TurretDestroyCounter",
-                        "Tag": "TurretDestroyCounter"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6960692062283957415",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "13525304245704770729",
-                        "ScriptClassName": "Game.TurretEnemyCounter"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 80,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "IndestructibleWall",
-                        "Tag": "IndestructibleWall"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4145432122162939057",
-                        "Position": [
-                            -843.6383056640625,
-                            -42.86625671386719,
-                            -83.85872650146484
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            3.8999998569488525,
-                            153.89999389648438,
-                            147.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "5298353626769786037",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "8757118140590326969",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            2.0,
-                            7.0,
-                            6.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "9487528113033315507",
-                        "ScriptClassName": "Game.IndestructableWall"
                     }
                 }
             ]

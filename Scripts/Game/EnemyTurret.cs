@@ -94,7 +94,7 @@ namespace Game
                 direction.Z * direction.Z
             );
 
-            if (magnitude < 250.0f)
+            if (magnitude < 200.0f)
             {
                 inRange = true;
 
