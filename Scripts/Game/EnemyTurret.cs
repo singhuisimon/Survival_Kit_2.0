@@ -46,6 +46,8 @@ namespace Game
         private float hitSparksTimer = 0.1f;
         private bool isHitSparks = false;
 
+        private bool dead = false;
+
         // Lifecycle
         public override void OnStart()
         {
@@ -112,6 +114,10 @@ namespace Game
             }
 
             if(exploding && mainExplosionID != INVALID_ENTITY){
+                if(!dead){
+                    Publish("EnemyTurretDestroyed", EntityID.ToString());
+                    dead = true;
+                }
                 explosionTimer -= deltaTime;
                 if (explosionTimer <= 0.0f)
                 {

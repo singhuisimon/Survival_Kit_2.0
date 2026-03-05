@@ -40,6 +40,9 @@ namespace Game
         [SerializeField] private string destroyWallName = "UI_DestroyWall";
         [SerializeField] private string destroyEnemiesName = "UI_DestroyEnemies";
 
+        // Events
+        private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
+        private bool turretsDestroyed = false;
         private Vector3 startPlayerPos;
 
         public override void OnStart()
@@ -59,6 +62,8 @@ namespace Game
             ShowFlyTunnel(false);
             ShowShootUI(false);
             ShowDestroyEnemies(false);
+
+            Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -125,7 +130,10 @@ namespace Game
 
         private void HandleDestroyEnemiesState(Vector3 currentPos, Vector3 wallPos)
         {
-            ;
+            if (turretsDestroyed){
+                ShowDestroyEnemies(false);
+                currentState = TutorialState.Done;
+            }
         }
 
         // UI Functions
@@ -152,6 +160,10 @@ namespace Game
         {
             SpriteRenderer.SetIsVisible(destroyEnemiesID, value);
             Text.SetIsVisible(destroyEnemiesID, value);
+        }
+
+        private void OnFiveTurretDestroyed(string eventName, string payload){
+            turretsDestroyed = true;
         }
     }
 }
