@@ -40,8 +40,8 @@ enum class ResourceType {
 	MATERIAL,
 	AUDIO,
 	SHADER,
-	ENTITY_PREFAB,
-	SCENE_PREFAB,
+	/*ENTITY_PREFAB,
+	SCENE_PREFAB,*/
 	PREFAB,
 	SCENE,
 	ANIMATIONCLIPS,
@@ -68,10 +68,10 @@ inline std::string resourceTypeToString(ResourceType type) {
 		return "Audio";
 	case ResourceType::SHADER:
 		return "Shader";
-	case ResourceType::ENTITY_PREFAB:
+	/*case ResourceType::ENTITY_PREFAB:
 		return "EntityPrefab";
 	case ResourceType::SCENE_PREFAB:
-		return "ScenePrefab";
+		return "ScenePrefab";*/
 	case ResourceType::PREFAB:
 		return "Prefab";
 	case ResourceType::SCENE:
@@ -104,10 +104,10 @@ inline ResourceType stringToResourceType(const std::string& type_str) {
 		return ResourceType::AUDIO;
 	if (type_str == "Shader")
 		return ResourceType::SHADER;
-	if (type_str == "EntityPrefab")
+	/*if (type_str == "EntityPrefab")
 		return ResourceType::ENTITY_PREFAB;
 	if (type_str == "ScenePrefab")
-		return ResourceType::SCENE_PREFAB;
+		return ResourceType::SCENE_PREFAB;*/
 	if (type_str == "Prefab")
 		return ResourceType::PREFAB;
 	if (type_str == "Scene")
@@ -146,11 +146,11 @@ inline std::vector<std::string> getResourceTypeExtension(ResourceType type) {
 	case ResourceType::SHADER:
 		return { "glsl", "vert", "frag", "hlsl" };
 
-	case ResourceType::ENTITY_PREFAB:
+	/*case ResourceType::ENTITY_PREFAB:
 		return { "eprefab" };
 
 	case ResourceType::SCENE_PREFAB:
-		return { "sprefab" };
+		return { "sprefab" };*/
 	case ResourceType::PREFAB:
 		return { "prefab" };
 	case ResourceType::SCENE:
@@ -221,8 +221,8 @@ namespace ResourceGUID {
 		case ResourceType::MATERIAL: return material_type_guid_v;
 		case ResourceType::AUDIO:    return audio_type_guid_v;
 		case ResourceType::SHADER:   return shader_type_guid_v;
-		case ResourceType::ENTITY_PREFAB: return entity_prefab_type_guid_v;
-		case ResourceType::SCENE_PREFAB:  return scene_prefab_type_guid_v;
+		/*case ResourceType::ENTITY_PREFAB: return entity_prefab_type_guid_v;
+		case ResourceType::SCENE_PREFAB:  return scene_prefab_type_guid_v;*/
 		default:                     return xresource::type_guid{};
 		}
 	}

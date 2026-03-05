@@ -21,7 +21,7 @@
 #include "../Component/TextComponent.h"
 #include "../Utility/Logger.h"
 #include "../Utility/AssetPath.h"
-
+#include "../Animation/AnimationStorage.h"
 #include "../Asset/AssetManager.h"
 
 #include "../Serialization/ComponentSerializer.h"
@@ -41,6 +41,10 @@ namespace Engine
             LOG_ERROR("Cannot instantiate prefab into null scene");
             return Entity{};
         }
+
+        Engine::m_AnimationClipStorage.clear();
+        Engine::m_AnimatorControllerStorage.clear();
+
 
         Prefab prefab;
 

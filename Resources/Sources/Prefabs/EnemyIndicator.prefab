@@ -1,0 +1,71 @@
+{
+    "Prefab Name": "Prefab: EnemyIndicator.prefab",
+    "Prefab GUID": 16481591946068803745,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "EnemyIndicator",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5232127842281062553",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                15.0,
+                                15.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2926284833067368599",
+                            "Name": "EnemyIndicator",
+                            "Tag": "EnemyIndicator"
+                        }
+                    }
+                },
+                {
+                    "type": 14,
+                    "typeName": "SpriteRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15608421383742800027",
+                            "Texture": "Firewall-active-logo-triangle.png",
+                            "Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Quad": 3,
+                            "Sprite Layer": 10,
+                            "IsActive": false,
+                            "IsVisible": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
