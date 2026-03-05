@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "SentryCount",
+    "Prefab GUID": 11320906576558884525,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "SentryCount",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16521350285278315421",
+                            "Position": [
+                                78.4000015258789,
+                                92.5,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1521073787400536991",
+                            "Name": "SentryCount",
+                            "Tag": "SentryCount"
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18250732542191272865",
+                            "ScriptClassName": "Game.SentryCount",
+                            "Started": false,
+                            "GCHandle": 587
+                        }
+                    }
+                },
+                {
+                    "type": 15,
+                    "typeName": "TextComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11909664266851140511",
+                            "text": "X9",
+                            "fontName": "Quantico-Regular",
+                            "fontSize": 12.0,
+                            "color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "isVisible": true,
+                            "align": 0,
+                            "lineSpacing": 1.0,
+                            "letterSpacing": 0.0,
+                            "maxWidth": 0.0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

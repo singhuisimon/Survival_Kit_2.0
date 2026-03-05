@@ -265,17 +265,17 @@ namespace Game
 
             if (gameEnded)
             {
-                wasPauseKeyPressed = Input.IsKeyPressed(KeyCode.P);
+                wasPauseKeyPressed = Input.IsKeyPressed(KeyCode.Escape);
                 return;
             }
 
-            bool pauseKeyPressed = Input.IsKeyPressed(KeyCode.P);
+            bool pauseKeyPressed = Input.IsKeyPressed(KeyCode.Escape);
             bool pauseKeyJustPressed = pauseKeyPressed && !wasPauseKeyPressed;
             wasPauseKeyPressed = pauseKeyPressed;
 
             if (pauseKeyJustPressed)
             {
-                LogMessage("PauseMenuPopup: P key pressed! isPaused=" + isPaused);
+                LogMessage("PauseMenuPopup: Escape key pressed! isPaused=" + isPaused);
                 if (isPaused) HidePauseMenu();
                 else ShowPauseMenu();
             }
