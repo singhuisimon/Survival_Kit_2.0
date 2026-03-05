@@ -183,9 +183,10 @@ namespace Engine
 			}
 
 			// Check for ESC key
-			if (m_Input->IsKeyPressed(GLFW_KEY_ESCAPE))
+			if (m_Input->IsKeyPressed(GLFW_KEY_ESCAPE) && (m_Input->IsKeyJustReleased(GLFW_KEY_LEFT_SHIFT) || m_Input->IsKeyPressed(GLFW_KEY_LEFT_SHIFT) 
+				|| m_Input->IsKeyJustReleased(GLFW_KEY_RIGHT_SHIFT) || m_Input->IsKeyPressed(GLFW_KEY_RIGHT_SHIFT)))
 			{
-				LOG_INFO("ESC pressed - closing application");
+				LOG_INFO("SHIFT + ESC pressed - closing application");
 				Close();
 			}
 		}
