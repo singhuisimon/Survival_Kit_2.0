@@ -18,7 +18,7 @@ namespace Game
         private const string FALLBACK_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
 
         // Win event
-        private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string EVENT_ENEMYCORE_DEATH = "EnemyCoreDeath";
 
         // State
         private bool isButtonActive = false;
@@ -35,7 +35,7 @@ namespace Game
             LogMessage("Current Level: " + currentLevel);
 
             // Subscribe to win event
-            Event.Subscribe(EVENT_TIMER_FINISHED, OnWinCondition);
+            Event.Subscribe(EVENT_ENEMYCORE_DEATH, OnWinCondition);
 
             // Start invisible and inactive
             SetIsVisible((uint)EntityID, false);
@@ -119,7 +119,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnWinCondition);
+            Event.Unsubscribe(EVENT_ENEMYCORE_DEATH, OnWinCondition);
             LogMessage("=== NextLevelButton_Win Destroyed ===");
         }
     }
