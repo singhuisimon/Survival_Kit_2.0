@@ -24,4 +24,5 @@ namespace Engine {
 
 	MeshData2D make_quad();
 
+	MeshData2D make_circle_outline(int segments = 64, float radius = 1.0f);
 }
