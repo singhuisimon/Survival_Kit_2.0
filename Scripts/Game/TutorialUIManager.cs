@@ -97,6 +97,11 @@ namespace Game
             }
         }
 
+        public override void OnDestroy()
+        {
+            Unsubscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
+        }
+
         private void HandleMoveState(Vector3 currentPos)
         {
             if (Vector3.Distance(currentPos, startPlayerPos) > 0.1f)
