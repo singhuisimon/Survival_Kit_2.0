@@ -17,7 +17,7 @@
         1.0
     ],
     "metallic": 1.0,
-    "roughness": 1.0,
+    "roughness": 0.20000000298023224,
     "opacity": 1.0,
     "emissionStrength": 0.25999999046325684,
     "alphaThreshold": 0.5109999775886536,
