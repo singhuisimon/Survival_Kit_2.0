@@ -1,27 +1,27 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Firewall_Inactive.png",
+    "baseMap": "trench_run_v005_BaseColor.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "",
+    "emissionMap": "trench_run_v005_Emissive.png",
     "occlusionMap": "",
     "baseColor": [
-        1.0,
-        1.0,
-        1.0
-    ],
-    "emissionColor": [
         0.0,
         0.0,
         0.0
     ],
+    "emissionColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
     "metallic": 1.0,
-    "roughness": 0.9800000190734863,
+    "roughness": 1.0,
     "opacity": 1.0,
-    "emissionStrength": 0.3799999952316284,
-    "alphaThreshold": 0.8799999952316284,
-    "ambientOcclusion": 0.5,
+    "emissionStrength": 0.25999999046325684,
+    "alphaThreshold": 0.5109999775886536,
+    "ambientOcclusion": 1.0,
     "tiling": [
         1.0,
         1.0
@@ -34,6 +34,6 @@
     "alphaTest": false,
     "doubleSided": true,
     "receiveShadows": false,
-    "castShadows": true,
+    "castShadows": false,
     "treatBlacksAsTransparent": false
 }
