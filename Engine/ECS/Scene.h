@@ -108,7 +108,10 @@ namespace Engine {
          * @param prefabGUID GUID of the scene prefab
          * @return The root entity of the instantiated scene prefab
          */
-        Entity InstantiateScenePrefab(xresource::instance_guid prefabGUID);
+        Entity InstantiateScenePrefab(std::string filepath, Entity parent);
+
+
+        bool LoadPrefabSceneFromFile(std::string filepath);
 
         /**
          * @brief Convert prefab instance to regular entity (unpack/break prefab link)

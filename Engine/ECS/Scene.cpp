@@ -4,6 +4,7 @@
 #include "../Component/PrefabComponent.h"
 #include "../Serialization/PrefabInstantiator.h"
 #include "../Serialization/SceneSerializer.h"
+#include "../Prefab/PrefabRegistry.h"
 #include "../Utility/Logger.h"
 
 namespace Engine {
@@ -107,9 +108,15 @@ namespace Engine {
     }
 
  
-    //Entity Scene::InstantiateScenePrefab(xresource::instance_guid prefabGUID) {
-    //    return PrefabInstantiator::InstantiateScenePrefab(this, prefabGUID);
-    //}
+    Entity Scene::InstantiateScenePrefab(std::string filepath, Entity parent) {
+        return PrefabInstantiator::InstantiatePrefabFromFile(this, filepath, parent);
+    }
+
+    bool Scene::LoadPrefabSceneFromFile(std::string filepath)
+    {
+        Prefab loadedPrefab;
+        return PrefabRegistry::Get().LoadPrefabFromFile(filepath, loadedPrefab);
+    }
 
     //void Scene::UnpackPrefabInstance(Entity entity) {
     //    if (!entity.HasComponent<PrefabComponent>()) {

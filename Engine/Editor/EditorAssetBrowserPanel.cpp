@@ -484,7 +484,7 @@ namespace Engine
 					FilterAssetsBySearchQuery(); // Refresh search
 				}
 
-				for (int i = 1; i < (int)ResourceType::UNKNOWN; i++)
+				for (int i = 0; i < (int)ResourceType::UNKNOWN; i++)
 				{
 					ResourceType t = static_cast<ResourceType>(i);
 					if (ImGui::Selectable(resourceTypeToString(t).c_str(), m_FilterType == t))
@@ -1076,7 +1076,7 @@ namespace Engine
 			// Convert asset name to lowercase
 			std::string lowerFileName = fileName;
 			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
-			bool matchesText = lowerFileName.find(m_SearchQuery) != std::string::npos;
+			bool matchesText = lowerFileName.find(lowerQuery) != std::string::npos;
 			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (record->type == m_FilterType);
 			if (matchesText && matchesType)
 			{
