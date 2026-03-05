@@ -289,6 +289,50 @@ void Game::OnInit()
 		return;
 	}
 
+	Engine::m_AnimationClipStorage.clear();
+	Engine::m_AnimatorControllerStorage.clear();
+
+	LOG_INFO("Step 6.5: Loading animation clips...");
+	const std::string clipsDir = Engine::getAssetFilePath("Sources/AnimationClips");
+	if (std::filesystem::exists(clipsDir))
+	{
+		for (const auto& entry : std::filesystem::directory_iterator(clipsDir))
+		{
+			if (!entry.is_regular_file()) continue;
+			if (entry.path().extension() == ".animclip")
+			{
+				Engine::AnimationClip clip;
+				if (Engine::DeserializeAnimationClip(entry.path().string(), clip))
+					Engine::m_AnimationClipStorage[clip.id] = clip;
+			}
+		}
+	}
+	// ---------------------------------------------------------------------
+	// Load animator controllers
+	// ---------------------------------------------------------------------
+	const std::string ctrlDir = Engine::getAssetFilePath("Sources/AnimationControllers");
+
+	if (std::filesystem::exists(ctrlDir))
+	{
+		for (const auto& entry : std::filesystem::directory_iterator(ctrlDir))
+		{
+			if (!entry.is_regular_file())
+				continue;
+
+			if (entry.path().extension() == ".animcontroller")
+			{
+				Engine::AnimatorController ctrl;
+				if (Engine::DeserializeAnimationController(entry.path().string(), ctrl))
+				{
+					//Engine::u32 handle = static_cast<Engine::u32>(Engine::m_AnimatorControllerStorage.size());
+					//ctrl.id = handle;
+					Engine::m_AnimatorControllerStorage[ctrl.id] = ctrl;
+				}
+			}
+		}
+	}
+
+
 	// Step 8: Add systems to the scene
 	//LOG_INFO("Step 5: Adding systems to scene...");
 	//try
