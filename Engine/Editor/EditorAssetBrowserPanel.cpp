@@ -1076,7 +1076,7 @@ namespace Engine
 			// Convert asset name to lowercase
 			std::string lowerFileName = fileName;
 			std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), ::tolower);
-			bool matchesText = lowerFileName.find(lowerQuery) != std::string::npos;
+			bool matchesText = lowerFileName.find(m_SearchQuery) != std::string::npos;
 			bool matchesType = (m_FilterType == ResourceType::UNKNOWN) || (record->type == m_FilterType);
 			if (matchesText && matchesType)
 			{
