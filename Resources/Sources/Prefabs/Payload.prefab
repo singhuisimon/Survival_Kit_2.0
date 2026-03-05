@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: Payload.prefab",
-    "Prefab GUID": 13164224626333974695,
-    "version": 1,
+    "Prefab GUID": 15872629629506715867,
+    "version": 2,
     "entities": [
         {
             "Name": "Payload",
@@ -52,7 +52,7 @@
                         "Properties": {
                             "ComponentGUID": "17317810118780797719",
                             "Mesh": "",
-                            "Material": "",
+                            "Material": "payload.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,

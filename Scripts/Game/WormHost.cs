@@ -77,6 +77,7 @@ namespace Game
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
             Subscribe(GAMEWIN, OnGameOver);
+            EnemyRegistry.Register(EntityID);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -161,6 +162,7 @@ namespace Game
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(GAMEOVER, OnGameOver);
             Unsubscribe(GAMEWIN, OnGameOver);
+            EnemyRegistry.Unregister(EntityID);
         }
 
         // NEW: Update target with priority: Player first, then Gunship if player is far
