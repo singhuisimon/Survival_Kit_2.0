@@ -838,7 +838,7 @@ namespace Engine
 
 		auto &reg = scene->GetRegistry();
 		assert(reg.valid(e));
-		assert(reg.all_of<TransformComponent, RigidbodyComponent>(e));
+		assert((reg.all_of<TransformComponent, RigidbodyComponent>(e)));
 
 		auto &tc = reg.get<TransformComponent>(e);
 		auto &rb = reg.get<RigidbodyComponent>(e);
@@ -852,7 +852,7 @@ namespace Engine
 		JPH::BodyCreationSettings settings(
 			shape,
 			ToJPHRVec3(worldPos),
-			ToJPHRotation(worldRot),
+			ToJPHQuat(worldRot),
 			ToMotionType(rb),
 			ToObjectLayer(rb)
 		);
