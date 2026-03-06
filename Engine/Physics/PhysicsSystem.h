@@ -12,6 +12,7 @@
 			- Mesh-driven collider construction contract (callbacks + DTO)
 			- PhysicsSystem ECS bridge: world bootstrap, body mirroring,
 			  shape caching, kinematic/dynamic sync, and lifecycle control
+			- Internal fixed-step accumulator for deterministic simulation stepping
 
 			Units: meters, kilograms, seconds.
 
@@ -80,11 +81,11 @@ namespace Engine
 		/*****************************************************************************/
 		/*!
 		\brief      Simulation step and ECS sync.
-					1) Push kinematic poses and property changes to physics.
-					2) Step the physics world.
-					3) Pull dynamic poses/velocities back into ECS.
+					1) Push ECS-authored changes to physics.
+					2) Advance Jolt using a fixed internal timestep.
+					3) Pull latest dynamic poses/velocities back into ECS.
 		\param      scene   Scene pointer.
-		\param      dt      Fixed or variable time step.
+		\param      dt      Variable frame delta supplied by the engine.
 		*/
 		/*****************************************************************************/
 		void OnUpdate(Scene *scene, Timestep dt) override;
@@ -126,7 +127,7 @@ namespace Engine
 		/*!
 		\brief      Maps rigidbody kinematic flag to Jolt motion type.
 		\param      rb  Rigidbody component.
-		\return     JPH motion type (Kinematic or Dynamic).
+		\return     JPH motion type (Static, Kinematic, or Dynamic).
 		*/
 		/*****************************************************************************/
 		static JPH::EMotionType ToMotionType(RigidbodyComponent const &rb)
@@ -165,6 +166,24 @@ namespace Engine
 
 		/*****************************************************************************/
 		/*!
+		\brief      Pushes ECS-authored transform/property/velocity changes into
+					existing Jolt bodies before stepping.
+		\param      scene   Scene pointer.
+		*/
+		/*****************************************************************************/
+		void SyncECSBodiesToPhysics(Scene *scene);
+
+		/*****************************************************************************/
+		/*!
+		\brief      Pulls latest transform and velocity state from Jolt into ECS
+					after one or more fixed simulation steps.
+		\param      scene   Scene pointer.
+		*/
+		/*****************************************************************************/
+		void SyncPhysicsBodiesToECS(Scene *scene);
+
+		/*****************************************************************************/
+		/*!
 		\brief      Creates and registers a Jolt body for the given entity.
 		\param      scene   Scene pointer.
 		\param      e       Entity id.
@@ -192,5 +211,11 @@ namespace Engine
 		*/
 		/*****************************************************************************/
 		JPH::Ref<JPH::Shape> MakeShapeForEntity(Scene *scene, EntityID e, TransformComponent const &tc, RigidbodyComponent const &rb);
+
+	private:
+		// Fixed-step state
+		double        mAccumulatorSeconds{ 0.0 };
+		double        mFixedStepSeconds{ 1.0 / 60.0 };
+		std::uint32_t mMaxCatchUpSteps{ 8u };
 	};
 } // namespace Engine
