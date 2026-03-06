@@ -74,6 +74,8 @@ namespace Game
         private const float VAMPIRISM_BOTNET      = 2.0f;
         private const float VAMPIRISM_KEYLOGGER   = 5.0f;
 
+        private const string HEAL_VFX_ENTITY_NAME = "HealingVFX";
+
         private const string TAG_PRIMARY_BULLET   = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
 
@@ -87,6 +89,7 @@ namespace Game
         // ===== Internal State =====
         private uint cameraEntityID = 0;
         private uint playerEntityID = 0;
+        private uint healingVFXEntityID = 0;
         private Vector3 smoothCamPos = Vector3.Zero;
         private Vector3 camAimTarget = Vector3.Zero;
 
@@ -133,6 +136,7 @@ namespace Game
             // Find entities
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
+            healingVFXEntityID = SceneFindEntityByName(HEAL_VFX_ENTITY_NAME);
 
             if (cameraEntityID == 0)
             {
@@ -573,7 +577,15 @@ namespace Game
             else if (eventName == EVENT_KEYLOGGER_DEAD)  healAmount = VAMPIRISM_KEYLOGGER;
 
             if (healAmount > 0.0f)
+            { 
                 HealPlayer(healAmount);
+                SetEmissionRate(healingVFXEntityID, 15.0f);
+            }
+            else
+            {
+                SetEmissionRate(healingVFXEntityID, 0.0f);
+            }
+                
         }
 
         private void HealPlayer(float amount)
