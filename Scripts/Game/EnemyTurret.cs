@@ -28,6 +28,14 @@ namespace Game
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
         private const string GAMEOVER = "GameOver";
+        private const string EVENT_KEYLOGGER_DEATH = "KeyloggerDeath";
+
+        // Bullet tags for player kill detection
+        private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
+        private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
+        // Vampirism: track who landed the killing blow
+        private string lastKillerTag = "";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.25f;
@@ -174,9 +182,19 @@ namespace Game
             Vector3 turretPos = GetPosition(EntityID);
             Transform.SetPosition(enemyHitSparksID, ref turretPos);
 
+            //track who hit the turret for vampisirm
+            uint attackerId = DamageSystem.ParseAttackerId(payload);
+            if(attackerId != INVALID_ENTITY)
+            {
+                string attackerTag = TagGetTag(attackerId);
+               if (attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET)
+                    lastKillerTag = attackerTag;
+            }
+
             if (health > 0)
                 return;
 
+            Publish(EVENT_KEYLOGGER_DEATH, "killer=" + lastKillerTag);
             exploding = true;
 
             uint explosionID = PrefabInstantiate(EnemyTurretBulletExplosionPrefabPath);

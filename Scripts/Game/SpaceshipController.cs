@@ -62,6 +62,20 @@ namespace Game
         private string EVENT_GAMEWIN = "GameWin";
         private string EVENT_GAMEEND = "GameEnd";
 
+        //Vampirism
+        private const string EVENT_WORMHOST_DEAD   = "WormHostDead";
+        private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
+        private const string EVENT_BOTNET_DEAD     = "BotnetDeath";
+        private const string EVENT_KEYLOGGER_DEAD  = "KeyloggerDeath";
+
+        private const float VAMPIRISM_WORMHOST    = 5.0f;
+        private const float VAMPIRISM_LOVELETTER  = 25.0f;
+        private const float VAMPIRISM_BOTNET      = 2.0f;
+        private const float VAMPIRISM_KEYLOGGER   = 5.0f;
+
+        private const string TAG_PRIMARY_BULLET   = "PrimaryBullet";
+        private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
         private bool endscene = false;
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
@@ -153,6 +167,12 @@ namespace Game
             Subscribe(EVENT_GAMEEND, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
 
+            // Vampirism - heal player on player kills
+            Subscribe(EVENT_WORMHOST_DEAD,   OnVampirismKill);
+            Subscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
+            Subscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
+            Subscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
+            
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - smoothed rigidbody movement in FixedUpdate");
         }
@@ -198,6 +218,12 @@ namespace Game
             Unsubscribe(EVENT_PLAYER_OOB, OnDamageReceived);
             Unsubscribe(EVENT_GAMEEND, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+
+            //unsubscribe for vampirism
+            Unsubscribe(EVENT_WORMHOST_DEAD,   OnVampirismKill);
+            Unsubscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
+            Unsubscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
+            Unsubscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
         }
 
         private void HandleCursorToggle()
@@ -477,5 +503,37 @@ namespace Game
             float t = maxStep / angle;
             return Quat.Slerp(current, target, t).Normalized();
         }
+
+        //vampirism
+        private void OnVampirismKill(string eventName, string payload)
+        {
+            if (endscene || playerHP <= 0)
+                return;
+
+            // Only heal if the killing blow was a player bullet
+            bool isPlayerKill = payload.Contains(TAG_PRIMARY_BULLET) || payload.Contains(TAG_SECONDARY_BULLET);
+            if (!isPlayerKill)
+                return;
+
+            float healAmount = 0.0f;
+            if      (eventName == EVENT_WORMHOST_DEAD)   healAmount = VAMPIRISM_WORMHOST;
+            else if (eventName == EVENT_LOVELETTER_DEAD) healAmount = VAMPIRISM_LOVELETTER;
+            else if (eventName == EVENT_BOTNET_DEAD)     healAmount = VAMPIRISM_BOTNET;
+            else if (eventName == EVENT_KEYLOGGER_DEAD)  healAmount = VAMPIRISM_KEYLOGGER;
+
+            if (healAmount > 0.0f)
+                HealPlayer(healAmount);
+        }
+
+        private void HealPlayer(float amount)
+        {
+            playerHP += amount;
+            if (playerHP > playerOriginalHP)
+                playerHP = playerOriginalHP;
+
+            LogMessage("[SpaceshipController] Vampirism healed player +" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
+            Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+        }
+
     }
 }

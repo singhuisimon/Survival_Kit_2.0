@@ -37,6 +37,9 @@ namespace Game
         // Health
         [SerializeField] private float health = 18.0f;
 
+        // Vampirism: track who landed the killing blow
+        private string lastKillerTag = "";
+
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
         //private const string EVENT_HOST_SPLIT = "WormHostSplit";
@@ -269,15 +272,20 @@ namespace Game
             LogMessage("WormHost hit! Health: " + health);
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY && health > 0.0f){
+            if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
-                    //instantiate the hitmarker audio
-                    uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                    if(hitmarkerID == 0){
-                        LogMessage("[WormHost] Player Hit! But hitmarkerID fail to instantiate");
-                    }
+                 
+                    lastKillerTag = attackerTag;
+
+                   if( health > 0.0f) {
+                        //instantiate the hitmarker audio
+                        uint hitmarkerID = 0;
+                        hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if(hitmarkerID == 0){
+                            LogMessage("[WormHost] Player Hit! But hitmarkerID fail to instantiate");
+                        }
+                   }
                 }
             }
 
@@ -288,7 +296,7 @@ namespace Game
                 if(playerkillID == 0){
                     LogMessage("[WormHost] Player Kill WormHost! But playerkillID fail to instantiate");
                 }
-                Publish("WormHostDead", EntityID.ToString());
+                Publish("WormHostDead", "killer=" + lastKillerTag);
                 SceneDestroyEntity(EntityID);
             }
         }
