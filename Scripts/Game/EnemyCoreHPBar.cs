@@ -9,7 +9,7 @@ namespace Game
     public class EnemyCoreHPBar : ScriptBehaviour
     {
         private const string EVENT_ENEMYCORE_HEALTHCHANGE = "EnemyCore Health Change";
-        private const float MaxHealth = 150.0f;
+        private const float MaxHealth = 600.0f;
 
         private bool initialized = false;
         private Vector3 initialPosition;
