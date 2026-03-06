@@ -183,7 +183,7 @@ namespace Game
             Transform.SetPosition(enemyHitSparksID, ref turretPos);
 
             //track who hit the turret for vampisirm
-            unit attackerId = DamageSystem.ParseAttackerId(payload);
+            uint attackerId = DamageSystem.ParseAttackerId(payload);
             if(attackerId != INVALID_ENTITY)
             {
                 string attackerTag = TagGetTag(attackerId);

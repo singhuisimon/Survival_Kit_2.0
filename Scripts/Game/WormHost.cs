@@ -272,16 +272,20 @@ namespace Game
             LogMessage("WormHost hit! Health: " + health);
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY && health > 0.0f){
+            if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
-                    //instantiate the hitmarker audio
+                 
                     lastKillerTag = attackerTag;
-                    uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                    if(hitmarkerID == 0){
-                        LogMessage("[WormHost] Player Hit! But hitmarkerID fail to instantiate");
-                    }
+
+                   if( health > 0.0f) {
+                        //instantiate the hitmarker audio
+                        uint hitmarkerID = 0;
+                        hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if(hitmarkerID == 0){
+                            LogMessage("[WormHost] Player Hit! But hitmarkerID fail to instantiate");
+                        }
+                   }
                 }
             }
 

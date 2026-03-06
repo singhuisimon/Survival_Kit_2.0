@@ -275,16 +275,19 @@ namespace Game
             HP -= damage;
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY && HP > 0.0f){
+            if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
                     //add the lastKillerTag for Vampirisim
                     lastKillerTag = attackerTag;
                     //instantiate the hitmarker audio
-                    uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                    if(hitmarkerID == 0){
-                        LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+
+                    if(HP > 0.0f){
+                        uint hitmarkerID = 0;
+                        hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if(hitmarkerID == 0){
+                            LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+                        }
                     }
                 }
             }

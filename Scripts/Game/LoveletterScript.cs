@@ -242,13 +242,17 @@ namespace Game
             if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
                 LogMessage("[LoveLetterScript] attacker is: " + attackerTag);
-                if((attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET) && currentHealth > 0.0f){
+                if((attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET)){
                     lastKillerTag = attackerTag;
-                    LogMessage("[LoveLetterScript] Instantiating the hitmarker");
-                    uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                    if(hitmarkerID == 0){
-                        LogMessage("[LoveLetterScript] Player Hit! But hitmarkerID fail to instantiate");
+
+                    if(currentHealth > 0.0f){
+                        LogMessage("[LoveLetterScript] Instantiating the hitmarker");
+
+                        uint hitmarkerID = 0;
+                        hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if(hitmarkerID == 0){
+                            LogMessage("[LoveLetterScript] Player Hit! But hitmarkerID fail to instantiate");
+                        }
                     }
                 }
             }
