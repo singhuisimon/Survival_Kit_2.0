@@ -19,7 +19,7 @@ namespace Game{
         private bool initialized = false;
         private Vector3 initialPosition;  // Store initial center position
         private float initialWidth;       // Store initial width to calculate offset
-        private float enemyCoreMaxHP = 100.0f;  // EnemyCore's max HP
+        private float enemyCoreMaxHP = 600.0f;  // EnemyCore's max HP
         private float hpToWidthRatio;     // Ratio: barMaxWidth / enemyCoreMaxHP
 
         // ===== Lerp State =====
