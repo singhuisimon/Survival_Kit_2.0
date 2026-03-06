@@ -68,10 +68,10 @@ namespace Game
         private const string EVENT_BOTNET_DEAD     = "BotnetDeath";
         private const string EVENT_KEYLOGGER_DEAD  = "KeyloggerDeath";
 
-        private const float VAMPIRISM_WORMHOST    = 5.0f;
-        private const float VAMPIRISM_LOVELETTER  = 25.0f;
+        private const float VAMPIRISM_WORMHOST    = 2.0f;
+        private const float VAMPIRISM_LOVELETTER  = 2.0f;
         private const float VAMPIRISM_BOTNET      = 2.0f;
-        private const float VAMPIRISM_KEYLOGGER   = 5.0f;
+        private const float VAMPIRISM_KEYLOGGER   = 2.0f;
 
         private const string TAG_PRIMARY_BULLET   = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
