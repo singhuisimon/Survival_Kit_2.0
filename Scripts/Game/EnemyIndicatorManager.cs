@@ -34,7 +34,7 @@ namespace Game
         private string cameraName = "PlayerCam";
 
         [SerializeField("Detection Radius")]
-        private float detectionRadius = 1250.0f;
+        private float detectionRadius = 2000.0f;
 
         [SerializeField("Screen Half Width")]
         private float screenHalfWidth = 640.0f;
