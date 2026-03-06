@@ -72,6 +72,9 @@ namespace Game
         private bool isDead = false;
         private bool isExploding = false;
 
+        //Vampirisim: track who landed the killing blow
+        private string lastKillerTag = "";
+
         // Timers
         private float stunTimer = 0.0f;
         private float chooseTargetTimer = 0.0f;
@@ -275,6 +278,8 @@ namespace Game
             if(attackerId != INVALID_ENTITY && HP > 0.0f){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
+                    //add the lastKillerTag for Vampirisim
+                    lastKillerTag = attackerTag;
                     //instantiate the hitmarker audio
                     uint hitmarkerID = 0;
                     hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
@@ -315,7 +320,7 @@ namespace Game
                     LogMessage("[Botnet] Player Kill Botnet! But playerkillID fail to instantiate");
                 }
 
-                Publish("BotnetDeath", 1.ToString());
+                Publish("BotnetDeath","killer=" + lastKillerTag);
                 Explode();
             }
         }

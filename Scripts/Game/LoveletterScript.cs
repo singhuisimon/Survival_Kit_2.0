@@ -48,6 +48,9 @@ namespace Game
         [SerializeField] private float currentHealth = 150.0f;
         private bool isDead = false;
 
+        // Vampirism: track who landed the killing blow
+        private string lastKillerTag = "";
+
         // ===== MOVEMENT STATE =====
         private bool isMoving = false;
         private bool isWaitingAtSurface = false;
@@ -239,7 +242,8 @@ namespace Game
             if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
                 LogMessage("[LoveLetterScript] attacker is: " + attackerTag);
-                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET && currentHealth > 0.0f){
+                if((attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET) && currentHealth > 0.0f){
+                    lastKillerTag = attackerTag;
                     LogMessage("[LoveLetterScript] Instantiating the hitmarker");
                     uint hitmarkerID = 0;
                     hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
@@ -274,7 +278,7 @@ namespace Game
             // Stop movement
             isMoving = false;
             isWaitingAtSurface = false;
-            Publish("LoveLetterKilled", loveletterEntityID.ToString());
+            Publish("LoveLetterKilled", "killer=" + lastKillerTag);
             // Publish event for game systems
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
 

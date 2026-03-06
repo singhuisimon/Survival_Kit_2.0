@@ -37,6 +37,9 @@ namespace Game
         // Health
         [SerializeField] private float health = 18.0f;
 
+        // Vampirism: track who landed the killing blow
+        private string lastKillerTag = "";
+
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
         //private const string EVENT_HOST_SPLIT = "WormHostSplit";
@@ -273,6 +276,7 @@ namespace Game
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
                     //instantiate the hitmarker audio
+                    lastKillerTag = attackerTag;
                     uint hitmarkerID = 0;
                     hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
                     if(hitmarkerID == 0){
@@ -288,7 +292,7 @@ namespace Game
                 if(playerkillID == 0){
                     LogMessage("[WormHost] Player Kill WormHost! But playerkillID fail to instantiate");
                 }
-                Publish("WormHostDead", EntityID.ToString());
+                Publish("WormHostDead", "killer=" + lastKillerTag);
                 SceneDestroyEntity(EntityID);
             }
         }
