@@ -12,7 +12,6 @@
 			- Mesh collider support (triangle mesh / convex hull) with
 			  scaled-shape wrapping and shape caching
 			- Rotation helpers supporting glm::quat and Euler-deg vec3
-			- Internal accumulator-based fixed timestep stepping
 
 			Units: meters, kilograms, seconds.
 
@@ -47,11 +46,6 @@ namespace Engine
 {
 	static constexpr float DEFAULT_HALF_EXT = 0.5f;
 	static constexpr float WORLD_SCALE_EPS = 1e-6f;
-
-	static constexpr double DEFAULT_FIXED_STEP_SECONDS = 1.0 / 60.0;
-	static constexpr float  MAX_FRAME_DT_SECONDS = 0.25f;
-	static constexpr double ACCUMULATOR_EPS = 1e-9;
-	static constexpr std::uint32_t DEFAULT_MAX_CATCH_UP_STEPS = 8u;
 
 	/*****************************************************************************/
 	/*!
@@ -309,8 +303,8 @@ namespace Engine
 	static inline bool NearlyEqualVec3(glm::vec3 const &a, glm::vec3 const &b, float eps = 1e-4f)
 	{
 		return NearlyEqual(a.x, b.x, eps) &&
-			NearlyEqual(a.y, b.y, eps) &&
-			NearlyEqual(a.z, b.z, eps);
+			   NearlyEqual(a.y, b.y, eps) &&
+			   NearlyEqual(a.z, b.z, eps);
 	}
 
 	/*****************************************************************************/
@@ -324,23 +318,19 @@ namespace Engine
 		assert(scene != nullptr);
 		(void)scene;
 
-		mAccumulatorSeconds = 0.0;
-		mFixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS;
-		mMaxCatchUpSteps = DEFAULT_MAX_CATCH_UP_STEPS;
-
 		JPH::RegisterDefaultAllocator();
 		if (JPH::Factory::sInstance == nullptr) JPH::Factory::sInstance = new JPH::Factory();
 		JPH::RegisterTypes();
 
 		JPH::Trace = [](const char *fmt, ...)
-			{
-				char buf[1024];
-				va_list args;
-				va_start(args, fmt);
-				vsnprintf(buf, sizeof(buf), fmt, args);
-				va_end(args);
-				std::fputs(buf, stderr);
-			};
+		{
+			char buf[1024];
+			va_list args;
+			va_start(args, fmt);
+			vsnprintf(buf, sizeof(buf), fmt, args);
+			va_end(args);
+			std::fputs(buf, stderr);
+		};
 
 		JPH_IF_ENABLE_ASSERTS(
 			JPH::AssertFailed = [](char const *, char const *, char const *, JPH::uint)
@@ -350,9 +340,9 @@ namespace Engine
 		)
 
 #ifdef _DEBUG
-			mTempAllocator = new JPH::TempAllocatorMalloc();
+		mTempAllocator = new JPH::TempAllocatorMalloc();
 #else
-			mTempAllocator = new JPH::TempAllocatorImpl(64u * 1024u * 1024u);
+		mTempAllocator = new JPH::TempAllocatorImpl(64u * 1024u * 1024u);
 #endif
 
 		unsigned const hw = std::max(1u, std::thread::hardware_concurrency());
@@ -405,18 +395,15 @@ namespace Engine
 		JPH::UnregisterTypes();
 		delete JPH::Factory::sInstance;
 		JPH::Factory::sInstance = nullptr;
-
-		mAccumulatorSeconds = 0.0;
-		mFixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS;
-		mMaxCatchUpSteps = DEFAULT_MAX_CATCH_UP_STEPS;
 	}
 
 	/*****************************************************************************/
 	/*!
-	\brief      Simulation step: sync ECS -> physics, advance using a fixed
-				internal timestep accumulator, then sync physics -> ECS.
+	\brief      Simulation step: sync ECS -> physics (kinematic/props), simulate,
+				then sync physics -> ECS (dynamic pose/velocity). Also manages
+				collision frame boundaries.
 	\param      scene   Scene pointer.
-	\param      dt      Variable frame time step.
+	\param      dt      Time step.
 	*/
 	/*****************************************************************************/
 	void PhysicsSystem::OnUpdate(Scene *scene, Timestep dt)
@@ -425,95 +412,6 @@ namespace Engine
 		if (!IsEnabled()) return;
 
 		BuildOrRefreshBodies(scene);
-		SyncECSBodiesToPhysics(scene);
-
-		float frameDt = dt.GetSeconds();
-		if (frameDt < 0.0f)
-			frameDt = 0.0f;
-		if (frameDt > MAX_FRAME_DT_SECONDS)
-			frameDt = MAX_FRAME_DT_SECONDS;
-
-		mAccumulatorSeconds += static_cast<double>(frameDt);
-
-		// Clear once per engine frame, then accumulate/dedupe contacts across all
-		// fixed substeps performed in this update.
-		PhysicsAPI::BeginCollisionFrame();
-
-		std::uint32_t stepsTaken = 0u;
-		while ((mAccumulatorSeconds + ACCUMULATOR_EPS) >= mFixedStepSeconds &&
-			stepsTaken < mMaxCatchUpSteps)
-		{
-			mPhysics.Update(
-				static_cast<float>(mFixedStepSeconds),
-				1,
-				mTempAllocator,
-				mJobSystem
-			);
-
-			mAccumulatorSeconds -= mFixedStepSeconds;
-			++stepsTaken;
-		}
-
-		// Prevent unbounded backlog growth under severe hitching.
-		if (stepsTaken == mMaxCatchUpSteps && mAccumulatorSeconds > mFixedStepSeconds)
-			mAccumulatorSeconds = mFixedStepSeconds;
-
-		if (mAccumulatorSeconds < 0.0)
-			mAccumulatorSeconds = 0.0;
-
-		if (stepsTaken > 0u)
-			SyncPhysicsBodiesToECS(scene);
-	}
-
-	/*****************************************************************************/
-	/*!
-	\brief      Mirrors ECS entities with RigidbodyComponent to Jolt bodies.
-				Creates missing bodies and destroys bodies for removed entities.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
-	void PhysicsSystem::BuildOrRefreshBodies(Scene *scene)
-	{
-		assert(scene != nullptr);
-
-		auto &reg = scene->GetRegistry();
-
-		std::unordered_set<EntityID> seen;
-		seen.reserve(mBodyOf.size() + 128u);
-
-		reg.view<TransformComponent, RigidbodyComponent>().each(
-			[&](EntityID e, TransformComponent &, RigidbodyComponent &)
-			{
-				seen.insert(e);
-				if (mBodyOf.find(e) == mBodyOf.end())
-					CreateBodyFor(scene, e);
-			}
-		);
-
-		std::vector<EntityID> to_remove;
-		to_remove.reserve(mBodyOf.size());
-		for (auto const &kv : mBodyOf)
-		{
-			if (seen.find(kv.first) == seen.end())
-				to_remove.push_back(kv.first);
-		}
-
-		for (EntityID e : to_remove)
-		{
-			DestroyBodyFor(e);
-		}
-	}
-
-	/*****************************************************************************/
-	/*!
-	\brief      Pushes ECS-authored transform/property/velocity changes into
-				Jolt bodies before fixed-step simulation.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
-	void PhysicsSystem::SyncECSBodiesToPhysics(Scene *scene)
-	{
-		assert(scene != nullptr);
 
 		auto &reg = scene->GetRegistry();
 
@@ -644,20 +542,9 @@ namespace Engine
 				}
 			}
 		);
-	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Pulls latest transform and velocity state from Jolt into ECS
-				after fixed-step simulation.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
-	void PhysicsSystem::SyncPhysicsBodiesToECS(Scene *scene)
-	{
-		assert(scene != nullptr);
-
-		auto &reg = scene->GetRegistry();
+		PhysicsAPI::BeginCollisionFrame();
+		mPhysics.Update(dt.GetSeconds(), 1, mTempAllocator, mJobSystem);
 
 		reg.view<TransformComponent, RigidbodyComponent>().each(
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
@@ -700,6 +587,45 @@ namespace Engine
 
 	/*****************************************************************************/
 	/*!
+	\brief      Mirrors ECS entities with RigidbodyComponent to Jolt bodies.
+				Creates missing bodies and destroys bodies for removed entities.
+	\param      scene   Scene pointer.
+	*/
+	/*****************************************************************************/
+	void PhysicsSystem::BuildOrRefreshBodies(Scene *scene)
+	{
+		assert(scene != nullptr);
+
+		auto &reg = scene->GetRegistry();
+
+		std::unordered_set<EntityID> seen;
+		seen.reserve(mBodyOf.size() + 128u);
+
+		reg.view<TransformComponent, RigidbodyComponent>().each(
+			[&](EntityID e, TransformComponent &, RigidbodyComponent &)
+			{
+				seen.insert(e);
+				if (mBodyOf.find(e) == mBodyOf.end())
+					CreateBodyFor(scene, e);
+			}
+		);
+
+		std::vector<EntityID> to_remove;
+		to_remove.reserve(mBodyOf.size());
+		for (auto const &kv : mBodyOf)
+		{
+			if (seen.find(kv.first) == seen.end())
+				to_remove.push_back(kv.first);
+		}
+
+		for (EntityID e : to_remove)
+		{
+			DestroyBodyFor(e);
+		}
+	}
+
+	/*****************************************************************************/
+	/*!
 	\brief      Produces a shape for an entity, using hooks and mesh cache when
 				possible. Falls back to a unit box when no mesh data is available.
 	\param      scene   Scene pointer.
@@ -731,8 +657,8 @@ namespace Engine
 		else
 		{
 			bool wantGeom = (rb.Shape == ColliderType::AABB ||
-				rb.Shape == ColliderType::SPHERE ||
-				rb.Shape == ColliderType::MESH);
+							 rb.Shape == ColliderType::SPHERE ||
+							 rb.Shape == ColliderType::MESH);
 			hasMesh = wantGeom && TryBuildMeshInfoFromEntity(scene, e, info, true);
 		}
 
