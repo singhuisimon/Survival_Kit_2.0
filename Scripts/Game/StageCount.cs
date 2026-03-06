@@ -41,7 +41,7 @@ namespace Game
 
 
             // Set stage text
-            SetText((uint)EntityID, "STAGE " + stageNumber);
+            //SetText((uint)EntityID, "STAGE " + stageNumber);
 
             LogMessage("[StageCount] Initialized - displaying STAGE " + stageNumber);
         }
