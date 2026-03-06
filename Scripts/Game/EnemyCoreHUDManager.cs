@@ -9,7 +9,7 @@ namespace Game
 {
     public class EnemyCoreHUDManager : ScriptBehaviour
     {
-        [SerializeField] private float visibilityRange = 100.0f;
+        [SerializeField] private float visibilityRange = 400.0f;
         [SerializeField] private float pollInterval = 0.5f;
 
         private const string PLAYER_NAME = "Player";
