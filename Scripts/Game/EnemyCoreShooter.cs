@@ -63,7 +63,7 @@ namespace Game
                 direction.Z * direction.Z
             );
 
-            if (magnitude < 300.0f)
+            if (magnitude < 590.0f)
             {
                 inRange = true;
 
@@ -111,7 +111,7 @@ namespace Game
                 direction.Z * direction.Z
             );
 
-            if (magnitude < 0.001f)
+            if (magnitude < 0.200f)
                 return;
 
             float invMag = 1.0f / magnitude;
