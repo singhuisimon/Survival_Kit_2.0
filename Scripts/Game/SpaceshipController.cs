@@ -73,13 +73,16 @@ namespace Game
         private const float VAMPIRISM_LOVELETTER  = 25.0f;
         private const float VAMPIRISM_BOTNET      = 2.0f;
         private const float VAMPIRISM_KEYLOGGER   = 5.0f;
+        private const float HEAL_VFX_DURATION     = 2.0f;
+        private float       HEAL_VFX_ACCUMULATOR  = 0.0f;
 
         private const string HEAL_VFX_ENTITY_NAME = "HealingVFX";
 
         private const string TAG_PRIMARY_BULLET   = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
 
-        private bool endscene = false;
+        private bool endscene          = false;
+        private bool startHealVFXTimer = false;
 
         // ======= STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -177,7 +180,9 @@ namespace Game
             Subscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
             Subscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
             Subscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
-            
+
+            SetEmissionRate(healingVFXEntityID, 0.0f);
+
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - physics in FixedUpdate, visuals in Update");
         }
@@ -199,6 +204,17 @@ namespace Game
             {
                 // Update camera rotation from mouse (VISUAL ONLY)
                 UpdateCameraRotationFromMouse(deltaTime);
+            }
+
+            if (startHealVFXTimer)
+            {
+                HEAL_VFX_ACCUMULATOR += deltaTime;
+
+                if(HEAL_VFX_ACCUMULATOR >= HEAL_VFX_DURATION)
+                {
+                    HEAL_VFX_ACCUMULATOR = 0.0f;
+                    StopHealVFX();
+                }
             }
 
             // For hit sparks VFX
@@ -579,11 +595,7 @@ namespace Game
             if (healAmount > 0.0f)
             { 
                 HealPlayer(healAmount);
-                SetEmissionRate(healingVFXEntityID, 15.0f);
-            }
-            else
-            {
-                SetEmissionRate(healingVFXEntityID, 0.0f);
+                PlayHealVFX();
             }
                 
         }
@@ -596,6 +608,17 @@ namespace Game
 
             LogMessage("[SpaceshipController] Vampirism healed player +" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+        }
+
+        private void PlayHealVFX()
+        {
+            SetEmissionRate(healingVFXEntityID, 15.0f);
+            startHealVFXTimer = true;
+        }
+
+        private void StopHealVFX()
+        {
+            SetEmissionRate(healingVFXEntityID, 0.0f);
         }
 
     }
