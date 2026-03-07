@@ -4622,7 +4622,7 @@
                     "Properties": {
                         "ComponentGUID": "13478535419615511763",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "Mat_IndestructibleWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
