@@ -15,17 +15,15 @@ namespace Game
 {
     /// <summary>
     /// Clean spaceship controller with proper physics separation
-    /// - Camera rotation in Update (visual)
-    /// - Physics/movement in FixedUpdate
-    /// - Player rotates only on Y axis (no banking/rolling)
-    /// - Full 360-degree mouse rotation
+    /// - Camera rotation in Update
+    /// - Physics movement in FixedUpdate
+    /// - Player rotation applied in FixedUpdate to avoid fighting physics
+    /// - Smoothed velocity changes to reduce tunneling risk
     /// </summary>
     public class SpaceshipController : ScriptBehaviour
     {
         // ===== Entity References =====
-        //[SerializeField("Camera Entity Name")] 
         private string cameraName = "PlayerCam";
-        //[SerializeField("Player Entity Name")] 
         private string playerName = "Player";
 
         // ===== Camera Settings =====
@@ -36,12 +34,16 @@ namespace Game
         [SerializeField("Camera Distance Behind")] private float cameraDistanceBack = 30.0f;
         [SerializeField("Camera Look Distance")] private float cameraLookDistance = 1000.0f;
 
-        // ===== Camera Movement  =====
-        // Catch-up feel (bigger = snappier, smaller = more “laggy”)
+        // ===== Camera Movement =====
         [SerializeField("Camera Follow Smooth")] private float cameraFollowSmooth = 1.8f;
         [SerializeField("Yaw Speed")] private float yawSpeed = 0.05f;
         [SerializeField("Pitch Speed")] private float pitchSpeed = 0.02f;
         [SerializeField("Spaceship Speed")] private float spaceshipSpeed = 100.0f;
+
+        // ===== Movement Smoothing =====
+        [SerializeField("Acceleration")] private float acceleration = 180.0f;
+        [SerializeField("Deceleration")] private float deceleration = 240.0f;
+        [SerializeField("Reverse Brake Acceleration")] private float reverseBrakeAcceleration = 520.0f;
 
         // ===== Player Rotation =====
         [SerializeField("Player Rotation Speed")] private float playerRotationSpeed = 3.5f;
@@ -54,11 +56,8 @@ namespace Game
         [SerializeField] private float playerHP = 100.0f;
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
-        //[SerializeField] private
         string EVENT_PLAYER_DAMAGE = "Damage:";
-        //[SerializeField]
         private string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
-        //[SerializeField]
         private string EVENT_PLAYER_OOB = "Damage:";
         private string EVENT_GAMEWIN = "GameWin";
         private string EVENT_GAMEEND = "GameEnd";
@@ -69,10 +68,10 @@ namespace Game
         private const string EVENT_BOTNET_DEAD     = "BotnetDeath";
         private const string EVENT_KEYLOGGER_DEAD  = "KeyloggerDeath";
 
-        private const float VAMPIRISM_WORMHOST    = 5.0f;
-        private const float VAMPIRISM_LOVELETTER  = 25.0f;
+        private const float VAMPIRISM_WORMHOST    = 2.0f;
+        private const float VAMPIRISM_LOVELETTER  = 2.0f;
         private const float VAMPIRISM_BOTNET      = 2.0f;
-        private const float VAMPIRISM_KEYLOGGER   = 5.0f;
+        private const float VAMPIRISM_KEYLOGGER   = 2.0f;
         private const float HEAL_VFX_DURATION     = 2.0f;
         private float       HEAL_VFX_ACCUMULATOR  = 0.0f;
 
@@ -84,7 +83,7 @@ namespace Game
         private bool endscene          = false;
         private bool startHealVFXTimer = false;
 
-        // ======= STATE OF COLLISION / IN ENVIRONMENT
+        // ===== STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
         [SerializeField] private float countdownOOB = 5.0f;
         [SerializeField] private float originalCountdownOOB = 5.0f;
@@ -97,13 +96,17 @@ namespace Game
         private Vector3 camAimTarget = Vector3.Zero;
 
         // ===== Camera Direction Vectors =====
-        private Vector3 cameraForward;
-        private Vector3 cameraUp;
-        private Vector3 cameraRight;
+        private Vector3 cameraForward = Vector3.Forward;
+        private Vector3 cameraUp = Vector3.Up;
+        private Vector3 cameraRight = Vector3.Right;
 
         // ===== Camera Rotation Radians =====
         private float yawRad = 0.0f;
         private float pitchRad = 0.0f;
+
+        // ===== Physics / Rotation State =====
+        private Vector3 commandedVelocity = Vector3.Zero;
+        private Quat targetPlayerRotation;
 
         // ===== Flags =====
         private bool initialized = false;
@@ -119,24 +122,17 @@ namespace Game
         string playerHitSparksPrefabPath = "Sources/Prefabs/HitSparksPlayer.prefab";
 
         // ===== Camera Shake =====
-        //private bool isCameraShake = false;
-        private const float camShakeTimerThreshold = 1.0f;      // Larger than the longest shake duration 
-        private float camShakeTimer = camShakeTimerThreshold;   // Default is at threshold value
-        //[SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 0.1f;
+        private const float camShakeTimerThreshold = 1.0f;
+        private float camShakeTimer = camShakeTimerThreshold;
         [SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 100.0f;
         [SerializeField] private float CAMSHAKE_DamageTakenDuration = 0.1f;
 
-
-
         public override void OnStart()
         {
-
-            // Kenny: Initialize values that changes overtime (PlayerHP, Countdown OOB, Environment)
             playerHP = playerOriginalHP;
             countdownOOB = originalCountdownOOB;
             inEnvironment = true;
 
-            // Find entities
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
             healingVFXEntityID = SceneFindEntityByName(HEAL_VFX_ENTITY_NAME);
@@ -146,17 +142,20 @@ namespace Game
                 LogError("[SpaceshipController] Camera not found: " + cameraName);
                 return;
             }
+
             if (playerEntityID == 0)
             {
                 LogError("[SpaceshipController] Player not found: " + playerName);
                 return;
             }
 
-            // Setup physics, no gravity 
             RigidbodySetUseGravity(playerEntityID, false);
-            RigidbodySetIsKinematic(playerEntityID, true); // Comment this if using physics
+            RigidbodySetIsKinematic(playerEntityID, false);
 
-            // Setup cursor
+            Vector3 zero = Vector3.Zero;
+            commandedVelocity = Vector3.Zero;
+            RigidbodySetVelocity(playerEntityID, ref zero);
+
             cursorWasVisible = IsCursorVisible();
             if (startWithCursorLocked)
             {
@@ -165,8 +164,8 @@ namespace Game
 
             Quat initialCamRot = GetRotation(cameraEntityID);
             SetRotation(playerEntityID, ref initialCamRot);
+            targetPlayerRotation = initialCamRot;
 
-            // Set up event subscription for player damage and OOB
             EVENT_PLAYER_DAMAGE += playerEntityID.ToString();
             EVENT_PLAYER_OOB += playerEntityID.ToString();
 
@@ -184,7 +183,7 @@ namespace Game
             SetEmissionRate(healingVFXEntityID, 0.0f);
 
             initialized = true;
-            LogMessage("[SpaceshipController] Initialized - physics in FixedUpdate, visuals in Update");
+            LogMessage("[SpaceshipController] Initialized - smoothed rigidbody movement in FixedUpdate");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -192,17 +191,13 @@ namespace Game
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
-            // Don't process input when game is paused (check global state)
             if (GameState.IsPaused)
                 return;
 
-            // Handle cursor toggle
             HandleCursorToggle();
 
-            // Only update camera if cursor is locked
             if (!IsCursorVisible())
             {
-                // Update camera rotation from mouse (VISUAL ONLY)
                 UpdateCameraRotationFromMouse(deltaTime);
             }
 
@@ -226,22 +221,19 @@ namespace Game
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
-            // Don't update when game is paused
             if (GameState.IsPaused)
             {
-                // Stop physics movement while paused
+                commandedVelocity = Vector3.Zero;
                 Vector3 zero = Vector3.Zero;
                 RigidbodySetVelocity(playerEntityID, ref zero);
                 return;
             }
 
-            // All physics/movement happens here
             HandleMovementPhysics(deltaTime);
         }
 
         public override void OnDestroy()
         {
-            // Restore cursor state
             SetCursorVisible(cursorWasVisible);
             Unsubscribe(EVENT_PLAYER_DAMAGE, OnDamageReceived);
             Unsubscribe(EVENT_PLAYER_OOB, OnDamageReceived);
@@ -255,9 +247,6 @@ namespace Game
             Unsubscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
         }
 
-        // ========================================
-        // CURSOR CONTROL
-        // ========================================
         private void HandleCursorToggle()
         {
             if (IsKeyReleased(toggleCursorKey) || IsKeyReleased(KeyCode.Tab))
@@ -265,312 +254,273 @@ namespace Game
                 bool currentVisible = IsCursorVisible();
                 SetCursorVisible(!currentVisible);
 
-                if (!currentVisible)
-                {
-                    LogMessage("[SpaceshipController] Cursor unlocked");
-                }
-                else
-                {
-                    LogMessage("[SpaceshipController] Cursor locked");
-                }
+                if (!currentVisible) LogMessage("[SpaceshipController] Cursor unlocked");
+                else LogMessage("[SpaceshipController] Cursor locked");
             }
         }
 
-        // ========================================
-        // UPDATE: Camera rotation (visual only)
-        // ========================================
         private void UpdateCameraRotationFromMouse(float deltaTime)
         {
-            // Get mouse delta of -1 or 1 for both dx and dy
             GetMouseDelta(out float dx, out float dy);
 
-            // Convert to radians with delta time
             yawRad += -dx * yawSpeed * deltaTime;
             pitchRad += -dy * pitchSpeed * deltaTime;
 
-            // Clamping for pitch to ensure it does not flip the camera
             float limit = pitchLimitDegrees * SimpleMath.DEG_TO_RAD;
             pitchRad = SimpleMath.Clamp(pitchRad, -limit, limit);
 
-            // Convert yaw and pitch to quat
             Quat qYaw = Quat.FromAxisAngle(Vector3.Up, yawRad);
             Quat qPitch = Quat.FromAxisAngle(Vector3.Right, pitchRad);
 
-            // Integrate yaw first, then pitch in yawed space
             Quat camRot = (qYaw * qPitch).Normalized();
 
             cameraForward = camRot.Forward;
             cameraRight = camRot.Right;
             cameraUp = camRot.Up;
 
-            // Set rotation for camera
             SetRotation(cameraEntityID, ref camRot);
 
-            // Update player rotation
-            Quat playerRot = GetRotation(playerEntityID);
             Quat modelXOffset = Quat.FromAxisAngle(Vector3.Right, modelXRotationOffset * SimpleMath.DEG_TO_RAD);
-            Quat targetRot = (camRot * modelXOffset).Normalized();
-
-            // Treat playerRotationSpeed as an ANGULAR SPEED (radians/sec).
-            playerRot = RotateTowards(playerRot, targetRot, playerRotationSpeed, deltaTime);
-            SetRotation(playerEntityID, ref playerRot);
+            targetPlayerRotation = (camRot * modelXOffset).Normalized();
         }
 
         private void HandleMovementPhysics(float deltaTime)
         {
-            // Get S and W (-1 to 1) and A and D (-1 to 1)
-
-            // Store the value in a Vector3 move, and normalize it
-
-            // ----------------------------
-            // (a) Player movement based on CAMERA axes
-            // ----------------------------
-            GetCameraMoveAxes(out Vector3 camFwdFlat, out Vector3 camRightFlat, out Vector3 camUpFlat);
+            GetCameraMoveAxes(out Vector3 camFwd, out Vector3 camRight, out Vector3 camUp);
 
             Vector3 moveDir = Vector3.Zero;
 
-            if (IsKeyPressed(KeyCode.W)) moveDir += camFwdFlat;         // forward
-            if (IsKeyPressed(KeyCode.S)) moveDir -= camFwdFlat;         // backward
-            if (IsKeyPressed(KeyCode.D)) moveDir += camRightFlat;       // right
-            if (IsKeyPressed(KeyCode.A)) moveDir -= camRightFlat;       // left
-            if (IsKeyPressed(KeyCode.Space)) moveDir += camUpFlat;      // up
-            if (IsKeyPressed(KeyCode.LeftShift)) moveDir -= camUpFlat;  // down
+            if (IsKeyPressed(KeyCode.W)) moveDir += camFwd;
+            if (IsKeyPressed(KeyCode.S)) moveDir -= camFwd;
+            if (IsKeyPressed(KeyCode.D)) moveDir += camRight;
+            if (IsKeyPressed(KeyCode.A)) moveDir -= camRight;
+            if (IsKeyPressed(KeyCode.Space)) moveDir += camUp;
+            if (IsKeyPressed(KeyCode.LeftShift)) moveDir -= camUp;
 
-            if (moveDir.SqrMagnitude > 1e-8f)
+            bool hasInput = moveDir.SqrMagnitude > 1e-8f;
+            if (hasInput)
                 moveDir = moveDir.Normalized;
             else
                 moveDir = Vector3.Zero;
 
-            // Emit particles trail from player
-            emitParticles(moveDir);
+            Vector3 desiredVel = moveDir * spaceshipSpeed;
 
-            Vector3 playerPos = GetPosition(playerEntityID);
-            playerPos = playerPos + moveDir * spaceshipSpeed * deltaTime;
-            SetPosition(playerEntityID, ref playerPos);
-            // ----------------------------
-            // (b)(c) Camera "plays catch" while staying 5 above & 10 behind
-            // ----------------------------
+            // Use actual rigidbody velocity, not only cached commanded velocity.
+            Vector3 currentVel = RigidbodyGetVelocity(playerEntityID);
 
-            // Use the camera's current forward (flattened) to define "behind"
+            float maxDelta;
+            if (!hasInput)
+            {
+                maxDelta = deceleration * deltaTime;
+            }
+            else
+            {
+                bool reversing = false;
+
+                if (currentVel.SqrMagnitude > 1e-8f)
+                {
+                    Vector3 currentDir = currentVel.Normalized;
+                    float alignment = Vector3.Dot(currentDir, moveDir);
+                    reversing = alignment < -0.15f;
+                }
+
+                maxDelta = (reversing ? reverseBrakeAcceleration : acceleration) * deltaTime;
+            }
+
+            commandedVelocity = MoveTowards(currentVel, desiredVel, maxDelta);
+            RigidbodySetVelocity(playerEntityID, ref commandedVelocity);
+
+            // Kill collision-induced spin.
+            Vector3 zeroAngular = Vector3.Zero;
+            RigidbodySetAngularVelocity(playerEntityID, ref zeroAngular);
+
+            // Keep facing under controller control.
+            Quat playerRot = GetRotation(playerEntityID);
+            playerRot = RotateTowards(playerRot, targetPlayerRotation, playerRotationSpeed, deltaTime);
+            SetRotation(playerEntityID, ref playerRot);
+
+            emitParticles(commandedVelocity);
+
+            Vector3 playerPosNow = GetPosition(playerEntityID);
+            Vector3 predictedPlayerPos = playerPosNow + commandedVelocity * deltaTime;
+
             Vector3 desiredCamPos =
-                playerPos
-                - camFwdFlat * cameraDistanceBack
-                + camUpFlat * cameraHeightOffset;
+                predictedPlayerPos
+                - camFwd * cameraDistanceBack
+                + camUp * cameraHeightOffset;
 
             if (!camFollowInit)
             {
-                smoothCamPos = GetPosition(cameraEntityID); // start from current
+                smoothCamPos = GetPosition(cameraEntityID);
                 camFollowInit = true;
             }
 
-            // Frame-rate independent smoothing (no Exp needed)
-            // t = k*dt / (1 + k*dt) gives a nice "catch-up" feel
             float t = cameraFollowSmooth * deltaTime;
             t = t / (1.0f + t);
 
-            // Compute smooth camera position
             smoothCamPos = Vector3.Lerp(smoothCamPos, desiredCamPos, t);
-            
-            // Apply camera shake to smooth position if needed
-            if(camShakeTimer < camShakeTimerThreshold) {
 
-                // Update camera shake timer
+            if (camShakeTimer < camShakeTimerThreshold)
+            {
                 camShakeTimer += deltaTime;
 
-                // Choose a random value * right vector (X-axis) to apply for the shake
-                Vector3 xShake = camRightFlat * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
+                Vector3 xShake = camRight * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
+                Vector3 yShake = camUp * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
 
-                // Choose a random value * up vector (Y-axis) to apply for the shake
-                Vector3 yShake = camUpFlat * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
-
-                // Camera shake based on primary fire shake magnitude
                 smoothCamPos = smoothCamPos + xShake + yShake;
 
-                // Resets camera shake timer when it exceeds shake duration
-                if (camShakeTimer >= CAMSHAKE_DamageTakenDuration) camShakeTimer = camShakeTimerThreshold;
+                if (camShakeTimer >= CAMSHAKE_DamageTakenDuration)
+                    camShakeTimer = camShakeTimerThreshold;
+            }
 
-            } 
-            // Set camera position 
             SetPosition(cameraEntityID, ref smoothCamPos);
 
-            // Update camera target
             Vector3 camPos = GetPosition(cameraEntityID);
             Quat camRot = GetRotation(cameraEntityID);
-            Vector3 camForward = camRot.Forward;   // Engine convention (-Z)
+            Vector3 camForward = camRot.Forward;
             camAimTarget = camPos + camForward * cameraLookDistance;
             SetTarget(cameraEntityID, ref camAimTarget);
-
-            //---------------------- DEBUG LOG --------------------------//
-            //float distSmoothDesired = Vector3.Distance(smoothCamPos, desiredCamPos);
-            //LogMessage("[SpaceshipController] Dist from smooth to desired: " + distSmoothDesired);
-            //float distCamPlayer = Vector3.Distance(camPos, playerPos);
-            //LogMessage("[SpaceshipController] Dist from camera to player: " + distCamPlayer);
-
-            //float test = Vector3.Dot(cameraForward, camFwdFlat);
-            //LogMessage("[SpaceshipController] Dot from consec camForward vectors: " + test);
         }
 
         private void OnDamageReceived(string eventName, string payload)
         {
-
-            if(playerHP <= 0 || endscene){
+            if (playerHP <= 0 || endscene)
                 return;
-            }
 
             float damage = DamageSystem.ParseAmount(payload);
-
             playerHP -= damage;
 
-            // Sets camera shake timer to 0 upon damage received
             camShakeTimer = 0.0f;
 
-            // Reset hit sparks timer and begin new cycle of hit sparks
             if (hitSparksTimer <= 0.0f)
             {
                 hitSparksTimer = 0.3f;
                 tempPlayerHitSparksID = playerHitSparksID;
-                SceneDestroyEntity(tempPlayerHitSparksID);
+
+                if (tempPlayerHitSparksID != INVALID_ENTITY)
+                    SceneDestroyEntity(tempPlayerHitSparksID);
+
                 playerHitSparksID = INVALID_ENTITY;
                 isHitSparks = false;
             }
 
-            // Player hit sparks VFX
             if (playerHitSparksID == INVALID_ENTITY && isHitSparks == false)
             {
                 playerHitSparksID = PrefabInstantiate(playerHitSparksPrefabPath);
                 isHitSparks = true;
             }
-            Vector3 playerPos = GetPosition(playerEntityID);
-            Transform.SetPosition(playerHitSparksID, ref playerPos);
 
-            LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player " + playerEntityID.ToString() + " gets damage! Health: " + playerHP.ToString() + "/" + playerOriginalHP.ToString());
+            if (playerHitSparksID != INVALID_ENTITY)
+            {
+                Vector3 playerPos = GetPosition(playerEntityID);
+                Transform.SetPosition(playerHitSparksID, ref playerPos);
+            }
+
+            LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player " + playerEntityID.ToString() +
+                       " gets damage! Health: " + playerHP.ToString() + "/" + playerOriginalHP.ToString());
             LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player from payload" + payload);
-            //Send event here to ui 
-            //take note playerHP is a float!
+
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
 
-            //Check if player is <= 0 if so send signal that you are ded
             if (playerHP <= 0)
             {
-                //publish event here
-                //do what you need to do here
-                Publish("PlayerDead", "");  // ADD THIS
+                Publish("PlayerDead", "");
             }
         }
 
-        private void OnGameEnd(string eventName, string payload){
+        private void OnGameEnd(string eventName, string payload)
+        {
             LogMessage("[Spaceship Controller] Detect game end condition: " + eventName);
             endscene = true;
         }
 
-        private void emitParticles(Vector3 moveDir)
+        private void emitParticles(Vector3 velocity)
         {
-            // Particle trail
-            float currentSpeed = moveDir.Magnitude;
+            float currentSpeed = velocity.Magnitude;
 
-            // Emission rate scaling
-            float maxEmissionRate = 80.0f;   // Lots of particles when fast
-            float minEmissionRate = 1.0f;    // Single particle at very low speed
-            float stopThreshold = 1.0f;      // Below this = complete stop
+            float maxEmissionRate = 80.0f;
+            float minEmissionRate = 1.0f;
+            float stopThreshold = 1.0f;
 
-            // Calculate speed ratio (0.0 to 1.0)
-            float speedRatio = SimpleMath.Clamp((currentSpeed * spaceshipSpeed) / spaceshipSpeed, 0.0f, 1.0f);
-
-            LogMessage("speedRatio: " + speedRatio);
+            float speedRatio = 0.0f;
+            if (spaceshipSpeed > 1e-5f)
+                speedRatio = SimpleMath.Clamp(currentSpeed / spaceshipSpeed, 0.0f, 1.0f);
 
             float emissionRate;
             if (currentSpeed < stopThreshold)
             {
-                // Nearly stopped - emit final particle then stop
                 emissionRate = 0.0f;
             }
-            else if (speedRatio < 0.1f) // Less than 10% speed
+            else if (speedRatio < 0.1f)
             {
-                // Very slow - just 1-2 particles per second
                 emissionRate = minEmissionRate;
             }
             else
             {
-                // Scale emission rate with speed (quadratic for better feel)
                 emissionRate = SimpleMath.Lerp(minEmissionRate, maxEmissionRate, speedRatio * speedRatio);
             }
 
             SetEmissionRate(playerEntityID, emissionRate);
 
-            // Velocity still scales with speed for particle direction
-            Vector3 exhaustVelocity = -moveDir.Normalized * 50.0f;
+            Vector3 exhaustVelocity = Vector3.Zero;
+            if (velocity.SqrMagnitude > 1e-8f)
+                exhaustVelocity = -velocity.Normalized * 50.0f;
+
             SetEmitterVelocity(playerEntityID, ref exhaustVelocity);
         }
 
-        // ========================================
-        // HELPERS
-        // ========================================
-        // Movement axes based on the player's *visual facing* (includes modelRotationOffset)
-        // Assumes engine "forward" is -Z (so yaw=0 => forward = (0,0,-1))
         private void GetCameraMoveAxes(out Vector3 forward, out Vector3 right, out Vector3 up)
         {
-            // Camera rotation -> basis
             Quat camRot = GetRotation(cameraEntityID);
 
-            // Use camera forward, but PROJECT to XZ so looking up/down doesn’t make WASD fly vertically.
             forward = camRot.Forward;
-            //forward.Y = 0.0f;
-
-            if (forward.SqrMagnitude < 1e-8f)
-                forward = Vector3.Forward;
-            else
-                forward = forward.Normalized;
+            if (forward.SqrMagnitude < 1e-8f) forward = Vector3.Forward;
+            else forward = forward.Normalized;
 
             right = camRot.Right;
-            //right.Y = 0.0f;
-
-            if (right.SqrMagnitude < 1e-8f)
-                right = Vector3.Right;
-            else
-                right = right.Normalized;
+            if (right.SqrMagnitude < 1e-8f) right = Vector3.Right;
+            else right = right.Normalized;
 
             up = camRot.Up;
-            if (up.SqrMagnitude < 1e-8f)
-                up = Vector3.Up;
-            else
-                up = up.Normalized;
+            if (up.SqrMagnitude < 1e-8f) up = Vector3.Up;
+            else up = up.Normalized;
         }
 
-        // Rotates from "current" toward "target" by at most (maxRadiansPerSec * dt).
-        // Guaranteed to reach the target in finite time without an artificial snap threshold.
+        private static Vector3 MoveTowards(Vector3 current, Vector3 target, float maxDelta)
+        {
+            Vector3 delta = target - current;
+            float dist = delta.Magnitude;
+
+            if (dist <= 1e-8f || dist <= maxDelta)
+                return target;
+
+            return current + (delta / dist) * maxDelta;
+        }
+
         private static Quat RotateTowards(Quat current, Quat target, float maxRadiansPerSec, float dt)
         {
-            // Safety
             if (dt <= 0f || maxRadiansPerSec <= 0f)
                 return current;
 
-            // Make sure we take the shortest path (q and -q represent the same rotation)
             float dot = Quat.Dot(current, target);
             if (dot < 0f)
             {
-                // Negate target (same rotation, opposite quaternion)
                 target = new Quat(-target.W, -target.X, -target.Y, -target.Z);
                 dot = -dot;
             }
 
-            // Clamp for numeric safety
             dot = SimpleMath.Clamp(dot, -1f, 1f);
 
-            // Angle between quaternions:
-            // angle = 2 * acos(dot)
             float angle = 2f * SimpleMath.Acos(dot);
 
-            // If already basically identical, finish exactly
             if (angle < 1e-5f)
                 return target;
 
             float maxStep = maxRadiansPerSec * dt;
 
-            // If we can reach this frame, land exactly on target (not a “snap threshold” — it’s physically correct)
             if (maxStep >= angle)
                 return target;
 
-            // Otherwise slerp by the fraction of the angle we can cover this frame
             float t = maxStep / angle;
             return Quat.Slerp(current, target, t).Normalized();
         }
