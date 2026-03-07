@@ -29,6 +29,8 @@ namespace Game
                 return;
             }
 
+            ModuleRegistry.Register(EntityID);
+
             LogMessage("Payload " + EntityID + " initialized");
         }
 
@@ -44,6 +46,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            ModuleRegistry.Unregister(EntityID);
             //Unsubscribe(EVENT_ENEMYCORE_HIT, OnDamageReceived);
             LogMessage("Payload " + EntityID + " destroyed");
         }

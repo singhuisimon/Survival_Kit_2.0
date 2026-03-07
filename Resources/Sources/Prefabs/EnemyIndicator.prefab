@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: EnemyIndicator.prefab",
-    "Prefab GUID": 16481591946068803745,
+    "Prefab GUID": 15736422130694422691,
     "version": 1,
     "entities": [
         {
@@ -51,7 +51,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "15608421383742800027",
-                            "Texture": "Firewall-active-logo-triangle.png",
+                            "Texture": "ExclamationIcon.png",
                             "Color": [
                                 1.0,
                                 1.0,

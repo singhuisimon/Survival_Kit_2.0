@@ -72,11 +72,16 @@ namespace Game
         private const float VAMPIRISM_LOVELETTER  = 2.0f;
         private const float VAMPIRISM_BOTNET      = 2.0f;
         private const float VAMPIRISM_KEYLOGGER   = 2.0f;
+        private const float HEAL_VFX_DURATION     = 2.0f;
+        private float       HEAL_VFX_ACCUMULATOR  = 0.0f;
+
+        private const string HEAL_VFX_ENTITY_NAME = "HealingVFX";
 
         private const string TAG_PRIMARY_BULLET   = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
 
-        private bool endscene = false;
+        private bool endscene          = false;
+        private bool startHealVFXTimer = false;
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -86,6 +91,7 @@ namespace Game
         // ===== Internal State =====
         private uint cameraEntityID = 0;
         private uint playerEntityID = 0;
+        private uint healingVFXEntityID = 0;
         private Vector3 smoothCamPos = Vector3.Zero;
         private Vector3 camAimTarget = Vector3.Zero;
 
@@ -129,6 +135,7 @@ namespace Game
 
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
+            healingVFXEntityID = SceneFindEntityByName(HEAL_VFX_ENTITY_NAME);
 
             if (cameraEntityID == 0)
             {
@@ -172,7 +179,9 @@ namespace Game
             Subscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
             Subscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
             Subscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
-            
+
+            SetEmissionRate(healingVFXEntityID, 0.0f);
+
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - smoothed rigidbody movement in FixedUpdate");
         }
@@ -192,6 +201,18 @@ namespace Game
                 UpdateCameraRotationFromMouse(deltaTime);
             }
 
+            if (startHealVFXTimer)
+            {
+                HEAL_VFX_ACCUMULATOR += deltaTime;
+
+                if(HEAL_VFX_ACCUMULATOR >= HEAL_VFX_DURATION)
+                {
+                    HEAL_VFX_ACCUMULATOR = 0.0f;
+                    StopHealVFX();
+                }
+            }
+
+            // For hit sparks VFX
             hitSparksTimer -= deltaTime;
         }
 
@@ -522,7 +543,11 @@ namespace Game
             else if (eventName == EVENT_KEYLOGGER_DEAD)  healAmount = VAMPIRISM_KEYLOGGER;
 
             if (healAmount > 0.0f)
+            { 
                 HealPlayer(healAmount);
+                PlayHealVFX();
+            }
+                
         }
 
         private void HealPlayer(float amount)
@@ -533,6 +558,17 @@ namespace Game
 
             LogMessage("[SpaceshipController] Vampirism healed player +" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+        }
+
+        private void PlayHealVFX()
+        {
+            SetEmissionRate(healingVFXEntityID, 15.0f);
+            startHealVFXTimer = true;
+        }
+
+        private void StopHealVFX()
+        {
+            SetEmissionRate(healingVFXEntityID, 0.0f);
         }
 
     }

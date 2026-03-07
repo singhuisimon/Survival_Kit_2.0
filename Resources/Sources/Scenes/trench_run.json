@@ -138,7 +138,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -279,7 +279,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -330,7 +330,7 @@
                             -61.23538589477539
                         ],
                         "Rotation": [
-                            0.00009846469038166106,
+                            0.00009846468310570344,
                             -0.11598959565162659,
                             -0.23343868553638458
                         ],
@@ -462,7 +462,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -514,8 +514,8 @@
                         ],
                         "Rotation": [
                             -0.20593875646591187,
-                            -0.22188815474510193,
-                            0.0005506806191988289
+                            -0.22188818454742432,
+                            0.0005506805027835071
                         ],
                         "Scale": [
                             5.0,
@@ -603,7 +603,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -744,7 +744,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -885,7 +885,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1026,7 +1026,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1167,7 +1167,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1355,9 +1355,9 @@
                             -42.60850524902344
                         ],
                         "Rotation": [
-                            -0.000060133039369247854,
+                            -0.00006013303209329024,
                             0.4257443845272064,
-                            -0.10387812554836273
+                            -0.10387814044952393
                         ],
                         "Scale": [
                             5.0,
@@ -1492,9 +1492,9 @@
                             -43.40431594848633
                         ],
                         "Rotation": [
-                            -0.00010636446677381173,
+                            -0.00010636445949785411,
                             0.42574286460876465,
-                            -0.10387787222862244
+                            -0.10387788712978363
                         ],
                         "Scale": [
                             5.0,
@@ -1642,7 +1642,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1779,9 +1779,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -0.000010021541129390243,
+                            -0.000010021391062764451,
                             -89.98021697998047,
-                            -5.895718135917605e-9
+                            -5.932470070746376e-9
                         ],
                         "Scale": [
                             1.5,
@@ -2201,7 +2201,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2404,7 +2404,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2453,8 +2453,8 @@
                         ],
                         "Rotation": [
                             0.07365221530199051,
-                            0.17051047086715698,
-                            -0.058488257229328156
+                            0.17051050066947937,
+                            -0.05848827213048935
                         ],
                         "Scale": [
                             5.0,
@@ -2762,7 +2762,7 @@
                         "Rotation": [
                             -77.79869079589844,
                             -38.99236297607422,
-                            0.0
+                            -2.066160647018478e-7
                         ],
                         "Scale": [
                             1.0,
@@ -2785,7 +2785,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.7546265125274658,
+                        "Aspect": 1.8699780702590942,
                         "FOV": 110.0,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -2860,7 +2860,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2998,7 +2998,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3088,7 +3088,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3139,9 +3139,9 @@
                             275.4543762207031
                         ],
                         "Rotation": [
-                            -0.07467913627624512,
+                            -0.07467912137508392,
                             0.16988849639892578,
-                            0.044964954257011414
+                            0.04496496170759201
                         ],
                         "Scale": [
                             5.0,
@@ -3229,7 +3229,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3282,7 +3282,7 @@
                         "Rotation": [
                             0.07450363039970398,
                             0.14448124170303345,
-                            -0.05327276885509491
+                            -0.05327277630567551
                         ],
                         "Scale": [
                             5.0,
@@ -3370,7 +3370,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3422,8 +3422,8 @@
                         ],
                         "Rotation": [
                             -0.0755261480808258,
-                            0.14385215938091278,
-                            0.03982992097735405
+                            0.1438521146774292,
+                            0.03982992842793465
                         ],
                         "Scale": [
                             5.0,
@@ -3511,7 +3511,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3652,7 +3652,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3793,7 +3793,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3844,7 +3844,7 @@
                             -81.72562408447266
                         ],
                         "Rotation": [
-                            -0.24687986075878143,
+                            -0.24687990546226501,
                             -0.32872509956359863,
                             0.0009048921056091785
                         ],
@@ -3934,7 +3934,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4075,7 +4075,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4216,7 +4216,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4392,7 +4392,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4520,7 +4520,7 @@
                             0.0
                         ],
                         "Rotation": [
-                            -4.861003875732422,
+                            -4.861003398895264,
                             -32.99995803833008,
                             89.0831527709961
                         ],
@@ -4577,7 +4577,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4664,7 +4664,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4729,7 +4729,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5074,7 +5074,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5622,7 +5622,7 @@
                         "Rotation": [
                             43.99998092651367,
                             52.999996185302734,
-                            -0.000002837329020621837
+                            -0.000001888245378722786
                         ],
                         "Scale": [
                             16.700000762939453,
@@ -5713,7 +5713,7 @@
                         "Rotation": [
                             46.0000114440918,
                             -6.000002384185791,
-                            0.000012877147128165234
+                            0.000012886559488833882
                         ],
                         "Scale": [
                             0.09999998658895493,
@@ -6132,9 +6132,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000057220458984,
+                            -12.000065803527832,
                             85.9989013671875,
-                            -0.9997866749763489
+                            -0.9997880458831787
                         ],
                         "Scale": [
                             1.0,
@@ -6372,7 +6372,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6510,7 +6510,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6648,7 +6648,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6786,7 +6786,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6924,7 +6924,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7062,7 +7062,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -9723,7 +9723,8 @@
                             3145837,
                             3145829,
                             3145805,
-                            6291545
+                            6291545,
+                            81
                         ]
                     }
                 },
@@ -9737,9 +9738,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -77.90032958984375,
-                            -39.61634063720703,
-                            -0.0013033841969445348
+                            177.09902954101563,
+                            -89.61947631835938,
+                            0.00040267236181534827
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -9756,7 +9757,8 @@
                             3145837,
                             3145829,
                             3145805,
-                            6291545
+                            6291545,
+                            81
                         ]
                     }
                 },
@@ -10641,6 +10643,140 @@
                     "Properties": {
                         "ComponentGUID": "14631456924222096583",
                         "ScriptClassName": "Game.DestructableWall"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 81,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HealingVFX",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6024954893118096555",
+                        "PrefabAssetGuid": "8629926637709377695",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: HealingVFX.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3975043005382721689\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[60.000003814697266,3.5622213187015694e-13,0.0000019221624825149775],\"Scale\":[50.0,50.0,50.0],\"Parent\":3145815,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10892572033023803543\",\"Name\":\"HealingVFX\",\"Tag\":\"Default\"}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"vampirismVFX.mat\",\"Initial Velocity\":[0.0,1.2000000476837158,-1.5],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[2.5,1.0,1.0],\"Color Min\":[0.0,1.0,0.07748222351074219],\"Color Max\":[0.2857140302658081,1.0,0.0],\"Emitter Shape\":1,\"Max Particles\":1000,\"Particle Type\":1,\"Emission Rate\":15.0,\"Particle Lifetime\":1.0,\"Emission Accumulator\":0.7715435028076172,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":10.0,\"Min Speed\":0.5,\"Max Speed\":1.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":false,\"Loop\":false,\"Active\":true,\"World Space\":false,\"Burst Mode\":false}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3975043005382721689",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            60.000003814697266,
+                            3.5622213187015694e-13,
+                            0.0000019221624825149775
+                        ],
+                        "Scale": [
+                            50.0,
+                            50.0,
+                            50.0
+                        ],
+                        "Parent": 3145815,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "vampirismVFX.mat",
+                        "Initial Velocity": [
+                            0.0,
+                            1.2000000476837158,
+                            -1.5
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            2.5,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            0.0,
+                            1.0,
+                            0.07748222351074219
+                        ],
+                        "Color Max": [
+                            0.2857140302658081,
+                            1.0,
+                            0.0
+                        ],
+                        "Emitter Shape": 1,
+                        "Max Particles": 1000,
+                        "Particle Type": 1,
+                        "Emission Rate": 15.0,
+                        "Particle Lifetime": 1.0,
+                        "Emission Accumulator": 0.7715435028076172,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 10.0,
+                        "Min Speed": 0.5,
+                        "Max Speed": 1.0,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": false,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": false,
+                        "Burst Mode": false
                     }
                 }
             ]

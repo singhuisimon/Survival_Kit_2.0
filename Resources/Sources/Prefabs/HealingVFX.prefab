@@ -1,0 +1,120 @@
+{
+    "Prefab Name": "Prefab: HealingVFX.prefab",
+    "Prefab GUID": 8629926637709377695,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "HealingVFX",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3975043005382721689",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                60.000003814697266,
+                                3.56222131870157e-13,
+                                0.0000019221624825149775
+                            ],
+                            "Scale": [
+                                50.0,
+                                50.0,
+                                50.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "10892572033023803543",
+                            "Name": "HealingVFX",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "vampirismVFX.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.2000000476837158,
+                                -1.5
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                2.5,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                1.0,
+                                0.07748222351074219
+                            ],
+                            "Color Max": [
+                                0.2857140302658081,
+                                1.0,
+                                0.0
+                            ],
+                            "Emitter Shape": 1,
+                            "Max Particles": 1000,
+                            "Particle Type": 1,
+                            "Emission Rate": 15.0,
+                            "Particle Lifetime": 1.0,
+                            "Emission Accumulator": 0.7715435028076172,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 10.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.0,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 6.327827453613281,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": false
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
