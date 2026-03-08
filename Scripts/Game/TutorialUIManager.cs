@@ -4,6 +4,7 @@ using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Camera;
+using static Engine.Input;
 
 namespace Game
 {
@@ -16,7 +17,8 @@ namespace Game
             ShootWall,      // Show shoot wall
             DestroyTurret, // Show destroy turret
             DestroyEnemies, // Show destroy enemies
-            Wait
+            Wait,
+            AltFire
         }
 
         private TutorialState currentState = TutorialState.Move;
@@ -27,6 +29,7 @@ namespace Game
         private uint pressShootID; // UI_Shoot
         private uint destroyTurretID;  // UI_DestroyTurret
         private uint destroyEnemiesID; // UI_DestroyEnemies
+        private uint altFireID; // UI_AltFire
 
         // Entity IDs - Player, Wall
         private uint playerID;
@@ -40,16 +43,22 @@ namespace Game
         [SerializeField] private string pressShootName = "UI_Shoot";
         [SerializeField] private string destroyTurretName = "UI_DestroyTurret";
         [SerializeField] private string destroyEnemiesName = "UI_DestroyEnemies";
+        [SerializeField] private string altFireName = "UI_AltFire";
 
         // Events
         private string EVENT_ONE_TURRET_DESTROYED = "OneTurretDestroyed";
         private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
-        // private const string EVENT_ULT_CHARGED = "UltCharged";
-        // private const string EVENT_ALT_FIRED = "AltFired";
+        private const string EVENT_ULT_CHARGED = "UltCharged";
+        private const string EVENT_ALT_FIRED = "AltFired";
         
+        private bool movedWASD = false;
+        private bool movedSpacebar = false;
+        private bool movedShift = false;
         private bool oneturretDestroyed = false;
         private bool turretsDestroyed = false;
-        private Vector3 startPlayerPos;
+        private bool ultCharged = false;
+        private bool altUsed = false;
+        private bool altFireShown = false;
 
         public override void OnStart()
         {
@@ -60,8 +69,7 @@ namespace Game
             pressShootID = SceneFindEntityByName(pressShootName);
             destroyTurretID = SceneFindEntityByName(destroyTurretName);
             destroyEnemiesID = SceneFindEntityByName(destroyEnemiesName);
-
-            startPlayerPos = Transform.GetPosition(playerID);
+            altFireID = SceneFindEntityByName(altFireName);
 
             // Show initial UI
             ShowWASD(true);
@@ -69,9 +77,12 @@ namespace Game
             ShowShootUI(false);
             ShowDestroyTurret(false);
             ShowDestroyEnemies(false);
+            ShowAltFire(false);
 
             Subscribe(EVENT_ONE_TURRET_DESTROYED, OnTurretDestroyed);
             Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
+            Subscribe(EVENT_ULT_CHARGED, OnUltCharged);
+            Subscribe(EVENT_ALT_FIRED, OnAltFired);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -105,6 +116,11 @@ namespace Game
                     break;
 
                 case TutorialState.Wait:
+                    HandleWaitState();
+                    break;
+
+                case TutorialState.AltFire:
+                    HandleAltFire();
                     break;
             }
         }
@@ -113,11 +129,25 @@ namespace Game
         {
             Unsubscribe(EVENT_ONE_TURRET_DESTROYED, OnTurretDestroyed);
             Unsubscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
+            Unsubscribe(EVENT_ULT_CHARGED, OnUltCharged);
+            Unsubscribe(EVENT_ALT_FIRED, OnAltFired);
         }
 
         private void HandleMoveState(Vector3 currentPos)
         {
-            if (Vector3.Distance(currentPos, startPlayerPos) > 0.1f)
+            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A))){
+                movedWASD = true;
+            }
+
+            if (!movedSpacebar && IsKeyPressed(KeyCode.Space)){
+                movedSpacebar = true;
+            }
+
+            if (!movedShift && IsKeyPressed(KeyCode.LeftShift)){
+                movedShift = true;
+            }
+
+            if (movedWASD && movedSpacebar && movedShift)
             {
                 ShowWASD(false);
                 ShowFlyTunnel(true);
@@ -136,6 +166,8 @@ namespace Game
 
         private void HandleShootWallState(Vector3 currentPos, Vector3 wallPos)
         {
+            altUsed = false;
+
             if (currentPos.X < (wallPos.X - 2))
             {
                 ShowShootUI(false);
@@ -145,6 +177,9 @@ namespace Game
         }
 
         private void HandleDestroyTurretState(){
+
+            altUsed = false;
+
             if (oneturretDestroyed){
                 ShowDestroyTurret(false);
                 ShowDestroyEnemies(true);
@@ -154,8 +189,28 @@ namespace Game
 
         private void HandleDestroyEnemiesState()
         {
+            altUsed = false;
+
             if (turretsDestroyed){
                 ShowDestroyEnemies(false);
+                currentState = TutorialState.Wait;
+            }
+        }
+
+        private void HandleWaitState()
+        {
+            if (ultCharged && !altFireShown && !altUsed)
+            {
+                ShowAltFire(true);
+                altFireShown = true;
+                currentState = TutorialState.AltFire;
+            }
+        }
+
+        private void HandleAltFire()
+        {
+            if(altUsed){
+                ShowAltFire(false);
                 currentState = TutorialState.Wait;
             }
         }
@@ -186,12 +241,27 @@ namespace Game
             SpriteRenderer.SetIsVisible(destroyEnemiesID, value);
         }
 
+        private void ShowAltFire(bool value)
+        {
+            SpriteRenderer.SetIsVisible(altFireID, value);
+        }
+
         private void OnTurretDestroyed(string eventName, string payload){
             oneturretDestroyed = true;
         }
 
         private void OnFiveTurretDestroyed(string eventName, string payload){
             turretsDestroyed = true;
+        }
+
+        private void OnUltCharged(string eventName, string payload)
+        {
+            ultCharged = true;
+        }
+
+        private void OnAltFired(string eventName, string payload)
+        {
+            altUsed = true;
         }
     }
 }
