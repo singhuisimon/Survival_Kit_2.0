@@ -117,6 +117,7 @@ namespace Game
                 // Show ready indicator
                 if (readyIndicatorId != 0)
                 {
+                    //Publish("UltCharged", UltRecharged.ToString());
                     SpriteRenderer.SetIsVisible(readyIndicatorId, true);
                     LogMessage("  ALT FIRE READY - Indicator shown");
                 }

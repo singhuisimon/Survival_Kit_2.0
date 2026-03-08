@@ -21,6 +21,11 @@ namespace Game
         public override void OnFixedUpdate(float deltaTime)
         {
             if(!destroyed){
+
+                if(turretCount == 1){
+                    Publish("OneTurretDestroyed", EntityID.ToString());
+                }
+
                 if(turretCount == 5){
                     Publish("FiveTurretsDestroyed", EntityID.ToString());
                     destroyed = true;

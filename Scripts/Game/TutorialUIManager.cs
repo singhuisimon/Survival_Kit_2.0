@@ -14,18 +14,19 @@ namespace Game
             Move,           // Show WASD
             FlyThrough,     // Show fly tunnel
             ShootWall,      // Show shoot wall
+            DestroyTurret, // Show destroy turret
             DestroyEnemies, // Show destroy enemies
-            Done
+            Wait
         }
 
         private TutorialState currentState = TutorialState.Move;
 
         // Entity IDs - UI
-        private uint pressWASDID;
-        private uint pressFlyTunnelID;
-        private uint pressShootID;
-        private uint destroyWallID;
-        private uint destroyEnemiesID;
+        private uint pressWASDID; // UI_PressWASD
+        private uint pressFlyTunnelID; // UI_FlyTunnel
+        private uint pressShootID; // UI_Shoot
+        private uint destroyTurretID;  // UI_DestroyTurret
+        private uint destroyEnemiesID; // UI_DestroyEnemies
 
         // Entity IDs - Player, Wall
         private uint playerID;
@@ -37,11 +38,16 @@ namespace Game
         [SerializeField] private string playerName = "Player";
         [SerializeField] private string wallName = "DestructableWall";
         [SerializeField] private string pressShootName = "UI_Shoot";
-        [SerializeField] private string destroyWallName = "UI_DestroyWall";
+        [SerializeField] private string destroyTurretName = "UI_DestroyTurret";
         [SerializeField] private string destroyEnemiesName = "UI_DestroyEnemies";
 
         // Events
+        private string EVENT_ONE_TURRET_DESTROYED = "OneTurretDestroyed";
         private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
+        // private const string EVENT_ULT_CHARGED = "UltCharged";
+        // private const string EVENT_ALT_FIRED = "AltFired";
+        
+        private bool oneturretDestroyed = false;
         private bool turretsDestroyed = false;
         private Vector3 startPlayerPos;
 
@@ -52,7 +58,7 @@ namespace Game
             playerID = SceneFindEntityByName(playerName);
             wallID = SceneFindEntityByName(wallName);
             pressShootID = SceneFindEntityByName(pressShootName);
-            destroyWallID = SceneFindEntityByName(destroyWallName);
+            destroyTurretID = SceneFindEntityByName(destroyTurretName);
             destroyEnemiesID = SceneFindEntityByName(destroyEnemiesName);
 
             startPlayerPos = Transform.GetPosition(playerID);
@@ -61,8 +67,10 @@ namespace Game
             ShowWASD(true);
             ShowFlyTunnel(false);
             ShowShootUI(false);
+            ShowDestroyTurret(false);
             ShowDestroyEnemies(false);
 
+            Subscribe(EVENT_ONE_TURRET_DESTROYED, OnTurretDestroyed);
             Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
         }
 
@@ -88,17 +96,22 @@ namespace Game
                     HandleShootWallState(currentPos, wallPos);
                     break;
 
-                case TutorialState.DestroyEnemies:
-                    HandleDestroyEnemiesState(currentPos, wallPos);
+                case TutorialState.DestroyTurret:
+                    HandleDestroyTurretState();
                     break;
 
-                case TutorialState.Done:
+                case TutorialState.DestroyEnemies:
+                    HandleDestroyEnemiesState();
+                    break;
+
+                case TutorialState.Wait:
                     break;
             }
         }
 
         public override void OnDestroy()
         {
+            Unsubscribe(EVENT_ONE_TURRET_DESTROYED, OnTurretDestroyed);
             Unsubscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
         }
 
@@ -115,7 +128,6 @@ namespace Game
         private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos)
         {
             if (currentPos.X < (wallPos.X + 40)){
-            //if (Vector3.Distance(currentPos, wallPos) < 40f)
                 ShowFlyTunnel(false);
                 ShowShootUI(true);
                 currentState = TutorialState.ShootWall;
@@ -125,19 +137,26 @@ namespace Game
         private void HandleShootWallState(Vector3 currentPos, Vector3 wallPos)
         {
             if (currentPos.X < (wallPos.X - 2))
-            //if (Vector3.Distance(currentPos, wallPos) > 50f)
             {
                 ShowShootUI(false);
+                ShowDestroyTurret(true);
+                currentState = TutorialState.DestroyTurret;
+            }
+        }
+
+        private void HandleDestroyTurretState(){
+            if (oneturretDestroyed){
+                ShowDestroyTurret(false);
                 ShowDestroyEnemies(true);
                 currentState = TutorialState.DestroyEnemies;
             }
         }
 
-        private void HandleDestroyEnemiesState(Vector3 currentPos, Vector3 wallPos)
+        private void HandleDestroyEnemiesState()
         {
             if (turretsDestroyed){
                 ShowDestroyEnemies(false);
-                currentState = TutorialState.Done;
+                currentState = TutorialState.Wait;
             }
         }
 
@@ -145,26 +164,30 @@ namespace Game
         private void ShowWASD(bool value)
         {
             SpriteRenderer.SetIsVisible(pressWASDID, value);
-            Text.SetIsVisible(pressWASDID, value);
         }
 
         private void ShowFlyTunnel(bool value)
         {
             SpriteRenderer.SetIsVisible(pressFlyTunnelID, value);
-            Text.SetIsVisible(pressFlyTunnelID, value);
         }
 
         private void ShowShootUI(bool value)
         {
             SpriteRenderer.SetIsVisible(pressShootID, value);
-            Text.SetIsVisible(pressShootID, value);
-            Text.SetIsVisible(destroyWallID, value);
+        }
+
+        private void ShowDestroyTurret(bool value)
+        {
+            SpriteRenderer.SetIsVisible(destroyTurretID, value);
         }
 
         private void ShowDestroyEnemies(bool value)
         {
             SpriteRenderer.SetIsVisible(destroyEnemiesID, value);
-            Text.SetIsVisible(destroyEnemiesID, value);
+        }
+
+        private void OnTurretDestroyed(string eventName, string payload){
+            oneturretDestroyed = true;
         }
 
         private void OnFiveTurretDestroyed(string eventName, string payload){
