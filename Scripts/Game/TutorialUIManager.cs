@@ -170,6 +170,7 @@ namespace Game
 
             if (currentPos.X < (wallPos.X - 2))
             {
+                Publish("DestructableWallDestroyed", true.ToString());
                 ShowShootUI(false);
                 ShowDestroyTurret(true);
                 currentState = TutorialState.DestroyTurret;
