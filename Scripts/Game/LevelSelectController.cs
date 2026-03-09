@@ -76,6 +76,13 @@ namespace Game
             {
                 if (level2ButtonId != 0)
                     SetIsVisible(level2ButtonId, true);
+                // Ensure the selected (hover) variant is visible but transparent,
+                // so SetColor can reveal it on hover without IsVisible blocking rendering.
+                if (level2ButtonSelectedId != 0)
+                {
+                    SetIsVisible(level2ButtonSelectedId, true);
+                    SetColor(level2ButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+                }
                 LogMessage("LevelSelectController: Level 2 button visible (unlocked)");
             }
 
