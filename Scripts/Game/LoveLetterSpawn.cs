@@ -34,7 +34,9 @@ namespace Game
         // ===== SPAWN LIMITS =====
         // IMPORTANT: Increase this number to have more loveletters active at once!
         // Set to 10 for more constant pressure
-        [SerializeField] private int maxActiveLetters = 1;        // Max letters alive at once
+        [SerializeField] private int minActiveLetters = 1;  
+        [SerializeField] private int maxActiveLetters = 3;        // Max letters alive at once
+        private int currentWaveTarget = 2;
         [SerializeField] private int maxTotalSpawns = -1;          // -1 = infinite spawns
         
         // ===== SPAWN OFFSET =====
@@ -71,7 +73,9 @@ namespace Game
                 rngSeeded = true;
                 LogMessage("RNG seeded with: " + timeSeed);
             }
-            
+            currentWaveTarget = RNG.RandInt(minActiveLetters, maxActiveLetters);
+            LogMessage("First wave target: " + currentWaveTarget + " letters");
+
             // Find all wall entities
             wallEntityIDs = new uint[spawnWallNames.Length];
             int validWalls = 0;
@@ -146,7 +150,7 @@ namespace Game
                 else
                 {
                     // At max capacity - check again quickly
-                    spawnTimer = 0.2f;
+                    spawnTimer = 0.9f;
                 }
             }
         }
@@ -290,13 +294,26 @@ namespace Game
         {
             // A LoveLetter was destroyed (either killed or reached core)
             activeLetterCount--;
+            //if (activeLetterCount < 0) activeLetterCount = 0;
             if (activeLetterCount < 0) activeLetterCount = 0;
+
+            // Reset spawn timer for a gap before next letter
+            nextSpawnTime = GetRandomSpawnInterval();
+            spawnTimer = nextSpawnTime;
+
+            // When the wave is fully cleared, roll a new random target for the next wave
+            if (activeLetterCount == 0)
+            {
+                currentWaveTarget = RNG.RandInt(minActiveLetters, maxActiveLetters);
+                LogMessage(">>> Wave cleared! Next wave target: " + currentWaveTarget + " letters");
+            }
             
             LogMessage(">>> LoveLetter destroyed. Active count now: " + activeLetterCount + "/" + maxActiveLetters + " (Total spawned: " + totalSpawned + ")");
         }
 
         private void OnLoveLetterReachedCore(string eventName, string payload)
         {
+            
             // Additional handling if needed when letter reaches core
             LogWarning("!!! A LoveLetter reached the core! !!!");
             Publish("CoreMotherboardDestroyed", payload);

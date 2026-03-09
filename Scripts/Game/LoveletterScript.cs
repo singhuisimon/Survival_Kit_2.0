@@ -21,6 +21,11 @@ namespace Game
         [SerializeField] private string coreTag = "SEMICONDUCTOR";
         private uint selectedCoreEntityID = 0;
 
+        
+        // ===== PLAYER (for label billboard) =====
+        [SerializeField] private string playerEntityName = "Player";
+        private uint playerEntityID = 0;
+
         // ===== BULLET TAG ======
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
@@ -30,6 +35,10 @@ namespace Game
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         [SerializeField] private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
         [SerializeField] private string payloadPrefab = "Sources/Prefabs/Payload.prefab";
+        [SerializeField] private string mainExplosionPrefab = "Sources/Prefabs/MainExplosion1.prefab";
+        //[SerializeField] private string upgradeModuleLabelPrefab = "Sources/Prefabs/UpgradeModuleLabel.prefab";
+        [SerializeField] private float labelHeightOffset = 50.0f;
+
 
         // ===== CORE DIMENSIONS =====
         [SerializeField] private float coreHalfSizeX = 37.5f;
@@ -39,13 +48,13 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 100.0f;
+        [SerializeField] private float moveSpeed = 500.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 20.0f;
+        [SerializeField] private float waitTimeAtSurface = 3.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
-        [SerializeField] private float maxHealth = 150.0f;
-        [SerializeField] private float currentHealth = 150.0f;
+        [SerializeField] private float maxHealth = 300.0f;
+        [SerializeField] private float currentHealth = 300.0f;
         private bool isDead = false;
 
         // Vampirism: track who landed the killing blow
@@ -82,6 +91,8 @@ namespace Game
         // ==== OTHER VALUES =====
         private const uint INVALID_ENTITY = 0xffffffffu;
 
+        private uint labelEntityID = 0;
+
         public override void OnStart()
         {
             LogMessage("///////////////////////////Start of the Loveletter Script");
@@ -104,7 +115,9 @@ namespace Game
 
             // Subscribe to bullet hit event
             //(EVENT_BULLET_HIT, OnBulletHit);
-
+            playerEntityID = SceneFindEntityByTag(playerEntityName);
+            if (playerEntityID == 0)
+                LogWarning("[LoveLetterScript] Player entity not found for label billboard.");
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
@@ -210,26 +223,10 @@ namespace Game
         // ===== SIMPLE DAMAGE SYSTEM =====
         private void OnBulletHit(string eventName, string payload)
         {
-            // if (isDead || eventName != EVENT_BULLET_HIT)
-            //     return;
-
-            // // Parse the entity ID that was hit
-            // if (!uint.TryParse(payload, out uint hitId))
-            //     return;
-
-            // // Check if this LoveLetter was the one hit
-            // if (hitId != loveletterEntityID)
-            // {
-            //     return;
-            // }
-
-            // LogMessage("=== BULLET HIT LOVELETTER ===");
-            // LogMessage("  LoveLetter ID: " + loveletterEntityID);
             
-            // // Take damage
-            // TakeDamage(10.0f);
             if (isDead || eventName != EVENT_BULLET_HIT)
                 return;
+
             float damage = DamageSystem.ParseAmount(payload);
             currentHealth -= damage;
 
@@ -296,6 +293,19 @@ namespace Game
                 return;
             }
 
+            uint mainExplosion = PrefabInstantiate(mainExplosionPrefab);
+            if (mainExplosion == 0)
+            {
+                LogMessage("[LoveletterScript] MainExplosion1 failed to instantiate");
+            }
+            else
+            {
+                Transform.SetPosition(mainExplosion, ref spawnPos);
+                Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
+                Transform.SetScale(mainExplosion, ref explosionScale);
+                LogMessage("[LoveletterScript] MainExplosion1 spawned successfully");
+            }
+
             // Spawn in the payload
             Vector3 payloadScale = new Vector3(10.0f, 10.0f, 10.0f);
             uint payload = PrefabInstantiateWithTransform(payloadPrefab, ref spawnPos, ref spawnRot, ref payloadScale, false);
@@ -307,7 +317,7 @@ namespace Game
             RigidbodySetIsKinematic(payload, false);
             Vector3 halfboxExtend = new Vector3(15f, 15f, 15f);
             RigidbodySetBoxHalfExtents(payload, ref halfboxExtend);
-
+            
             // Destroy the LoveLetter
             SceneDestroyEntity(loveletterEntityID);
         }
