@@ -62,6 +62,7 @@ namespace Game
         [SerializeField("Indicator Prefab Path")]
         private string indicatorPrefabPath = "Sources/Prefabs/EnemyIndicator.prefab";
 
+
         private uint cameraEntityID = 0;
         private uint[] indicatorPool;
         private bool initialized = false;

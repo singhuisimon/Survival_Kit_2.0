@@ -105,6 +105,159 @@
             ]
         },
         {
+            "ID": 2097225,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Level2_Button_Selected",
+                        "Tag": "Level2_Button_Selected"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17708717282824487510",
+                        "Position": [
+                            259.0,
+                            695.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            39.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Level2Button_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097226,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "LevelSelectionPopup_Level1",
+                        "Tag": "LevelSelectionPopup_Level1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17708717282824487511",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            361.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "LevelSelectionPopup_Level1.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097227,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "LevelSelectionPopup_Level2",
+                        "Tag": "LevelSelectionPopup_Level2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17708717282824487512",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            361.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "LevelSelectionPopup_Level2.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
             "ID": 1,
             "Components": [
                 {
@@ -1005,7 +1158,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "CreditsButton.png",
+                        "Texture": "IOExchangeButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -1314,8 +1467,8 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Credits Popup",
-                        "Tag": "Credits Popup"
+                        "Name": "Credits Popup Main",
+                        "Tag": "Credits Popup Main"
                     }
                 },
                 {
@@ -1344,7 +1497,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "MainMenu_CreditsAlternative.png",
+                        "Texture": "MainMenu_CreditsMain.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -1353,6 +1506,57 @@
                         ],
                         "Quad": 3,
                         "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097229,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Credits Popup Resources",
+                        "Tag": "Credits Popup Resources"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "283815306214450984",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.51
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            650.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_CreditsResources.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -1374,7 +1578,7 @@
                     "Properties": {
                         "ComponentGUID": "7201344333855532845",
                         "Position": [
-                            725.0,
+                            766.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -1384,8 +1588,8 @@
                             0.0
                         ],
                         "Scale": [
-                            13.0,
-                            13.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1403,7 +1607,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 11,
+                        "Sprite Layer": 12,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -1425,7 +1629,7 @@
                     "Properties": {
                         "ComponentGUID": "10083648095372650291",
                         "Position": [
-                            555.0,
+                            1243.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -1435,8 +1639,8 @@
                             0.0
                         ],
                         "Scale": [
-                            13.0,
-                            13.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1454,7 +1658,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 11,
+                        "Sprite Layer": 12,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -4403,6 +4607,57 @@
             ]
         },
         {
+            "ID": 1048648,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Level1_Button_Selected",
+                        "Tag": "Level1_Button_Selected"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1803560307337888770",
+                        "Position": [
+                            176.0,
+                            695.0,
+                            -0.10000000149011612
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            39.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Level1Button_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
             "ID": 0,
             "Components": [
                 {
@@ -4456,108 +4711,6 @@
                             360.0,
                             0.0
                         ]
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 75,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "LevelSelectionPopUp_Level2",
-                        "Tag": "LevelSelectionPopUp_Level2"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "8718309769689186937",
-                        "Position": [
-                            640.0,
-                            360.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            638.0,
-                            361.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "LevelSelectionPopup_Level2.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 0,
-                        "IsActive": false,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097226,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "LevelSelectionPopUp_Level1",
-                        "Tag": "LevelSelectionPopUp_Level1"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16788760301931528815",
-                        "Position": [
-                            640.0,
-                            360.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            638.0,
-                            361.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "LevelSelectionPopup_Level1.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 0,
-                        "IsActive": true,
-                        "IsVisible": true
                     }
                 }
             ]

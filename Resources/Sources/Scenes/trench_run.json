@@ -3,22 +3,22 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 72,
+            "ID": 98,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyCoreHPRedFill",
-                        "Tag": "EnemyCoreHPRedFill"
+                        "Name": "UI_CollectUpgrade",
+                        "Tag": "UI_CollectUpgrade"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11256079373691634863",
+                        "ComponentGUID": "6991108957360325897",
                         "Position": [
-                            662.2000122070313,
-                            63.0,
+                            446.0,
+                            350.0,
                             0.0
                         ],
                         "Rotation": [
@@ -27,8 +27,8 @@
                             0.0
                         ],
                         "Scale": [
-                            215.0,
-                            7.0,
+                            880.0,
+                            500.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -36,16 +36,111 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "7797314859873338547",
-                        "ScriptClassName": "Game.EnemyCoreHPDamageBar"
+                        "Texture": "Tooltip_Objective_CollectUpgradeMod.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 97,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI_AltFire",
+                        "Tag": "UI_AltFire"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9296951966573544701",
+                        "Position": [
+                            446.0,
+                            350.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            880.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "EnemyHPBar_RedFill.png",
+                        "Texture": "Tooltip_CombatAlternateFire.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048604,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI_DestroyTurret",
+                        "Tag": "UI_DestroyTurret"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11026334223482537201",
+                        "Position": [
+                            446.0,
+                            350.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            880.0,
+                            500.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Tooltip_DescriptionTurret.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -138,7 +233,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -168,7 +263,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -243,9 +341,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -279,7 +377,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -309,7 +407,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -330,9 +431,9 @@
                             -61.23538589477539
                         ],
                         "Rotation": [
-                            0.00009846468310570344,
+                            0.00009846470493357629,
                             -0.11598959565162659,
-                            -0.23343868553638458
+                            -0.23343871533870697
                         ],
                         "Scale": [
                             5.0,
@@ -384,9 +485,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -462,7 +563,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -492,7 +593,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -514,7 +618,7 @@
                         ],
                         "Rotation": [
                             -0.20593875646591187,
-                            -0.22188818454742432,
+                            -0.22188827395439148,
                             0.0005506805027835071
                         ],
                         "Scale": [
@@ -567,9 +671,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -603,7 +707,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -633,7 +737,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -708,9 +815,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -744,7 +851,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -774,7 +881,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -849,9 +959,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -885,7 +995,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -915,7 +1025,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -990,9 +1103,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1026,7 +1139,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1056,7 +1169,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -1131,9 +1247,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1167,7 +1283,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1197,7 +1313,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -1272,9 +1391,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1334,7 +1453,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -1350,14 +1472,14 @@
                     "Properties": {
                         "ComponentGUID": "1286807396408853019",
                         "Position": [
-                            -379.20562744140625,
-                            2.9168953895568848,
+                            -593.7577514648438,
+                            -7.645486831665039,
                             -42.60850524902344
                         ],
                         "Rotation": [
-                            -0.00006013303209329024,
+                            -0.00006013308302499354,
                             0.4257443845272064,
-                            -0.10387814044952393
+                            -0.10387822240591049
                         ],
                         "Scale": [
                             5.0,
@@ -1409,9 +1531,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1471,7 +1593,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -1492,9 +1617,9 @@
                             -43.40431594848633
                         ],
                         "Rotation": [
-                            -0.00010636445949785411,
+                            -0.00010636448860168457,
                             0.42574286460876465,
-                            -0.10387788712978363
+                            -0.10387793183326721
                         ],
                         "Scale": [
                             5.0,
@@ -1546,9 +1671,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -1642,7 +1767,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1779,9 +1904,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -0.000010021391062764451,
+                            -0.000010021268280979712,
                             -89.98021697998047,
-                            -5.932470070746376e-9
+                            -5.810234959824356e-9
                         ],
                         "Scale": [
                             1.5,
@@ -2201,7 +2326,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2231,7 +2356,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -2306,9 +2434,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -2404,7 +2532,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2431,7 +2559,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -2453,8 +2584,8 @@
                         ],
                         "Rotation": [
                             0.07365221530199051,
-                            0.17051050066947937,
-                            -0.05848827213048935
+                            0.17051059007644653,
+                            -0.058488305658102036
                         ],
                         "Scale": [
                             5.0,
@@ -2506,9 +2637,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -2785,7 +2916,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.8699780702590942,
+                        "Aspect": 1.7546265125274658,
                         "FOV": 110.0,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -2860,7 +2991,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2887,7 +3018,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -2962,9 +3096,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -2998,7 +3132,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3088,7 +3222,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3118,7 +3252,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -3141,7 +3278,7 @@
                         "Rotation": [
                             -0.07467912137508392,
                             0.16988849639892578,
-                            0.04496496170759201
+                            0.04496496543288231
                         ],
                         "Scale": [
                             5.0,
@@ -3193,9 +3330,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -3229,7 +3366,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3259,7 +3396,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -3282,7 +3422,7 @@
                         "Rotation": [
                             0.07450363039970398,
                             0.14448124170303345,
-                            -0.05327277630567551
+                            -0.053272794932127
                         ],
                         "Scale": [
                             5.0,
@@ -3334,9 +3474,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -3370,7 +3510,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3400,7 +3540,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -3422,8 +3565,8 @@
                         ],
                         "Rotation": [
                             -0.0755261480808258,
-                            0.1438521146774292,
-                            0.03982992842793465
+                            0.14385196566581726,
+                            0.03982995077967644
                         ],
                         "Scale": [
                             5.0,
@@ -3475,9 +3618,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -3511,7 +3654,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3541,7 +3684,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -3616,9 +3762,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -3652,7 +3798,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3682,7 +3828,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -3757,9 +3906,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -3793,7 +3942,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3823,7 +3972,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -3844,7 +3996,7 @@
                             -81.72562408447266
                         ],
                         "Rotation": [
-                            -0.24687990546226501,
+                            -0.2468799352645874,
                             -0.32872509956359863,
                             0.0009048921056091785
                         ],
@@ -3898,9 +4050,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -3934,7 +4086,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3964,7 +4116,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -4039,9 +4194,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -4075,7 +4230,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4105,7 +4260,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -4126,7 +4284,7 @@
                             -27.22275161743164
                         ],
                         "Rotation": [
-                            -0.06328395009040833,
+                            -0.06328398734331131,
                             -0.20213618874549866,
                             0.0006744417478330433
                         ],
@@ -4180,9 +4338,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -4216,7 +4374,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4246,7 +4404,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -4321,9 +4482,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -4392,7 +4553,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4577,7 +4738,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4664,7 +4825,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4729,7 +4890,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5074,7 +5235,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5468,7 +5629,8 @@
                             1,
                             2,
                             12,
-                            13
+                            13,
+                            85
                         ]
                     }
                 },
@@ -5498,7 +5660,8 @@
                             1,
                             2,
                             12,
-                            13
+                            13,
+                            85
                         ]
                     }
                 },
@@ -5894,7 +6057,7 @@
                         ],
                         "Rotation": [
                             -130.0,
-                            -15.000007629394531,
+                            -15.000005722045898,
                             71.0
                         ],
                         "Scale": [
@@ -6132,9 +6295,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000065803527832,
+                            -12.000059127807617,
                             85.9989013671875,
-                            -0.9997880458831787
+                            -0.999779224395752
                         ],
                         "Scale": [
                             1.0,
@@ -6300,7 +6463,7 @@
                     "Properties": {
                         "ComponentGUID": "13478535419615511763",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "Mat_IndestructibleWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -6372,7 +6535,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6399,7 +6562,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -6474,9 +6640,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -6510,7 +6676,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6537,7 +6703,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -6612,9 +6781,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -6648,7 +6817,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6675,7 +6844,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -6750,9 +6922,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -6786,7 +6958,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6813,7 +6985,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -6888,9 +7063,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -6924,7 +7099,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6951,7 +7126,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -7026,9 +7204,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -7062,7 +7240,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyTurret.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyTurret.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7092,7 +7270,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -7167,9 +7348,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            30.0,
-                            30.0,
-                            30.0
+                            10.0,
+                            10.0,
+                            10.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -9738,9 +9919,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            177.09902954101563,
+                            177.09901428222656,
                             -89.61947631835938,
-                            0.00040267236181534827
+                            0.00039703064248897135
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -10191,8 +10372,8 @@
                     "Properties": {
                         "ComponentGUID": "3678702630440617073",
                         "Position": [
-                            1080.300048828125,
-                            355.8999938964844,
+                            446.0,
+                            350.0,
                             0.0
                         ],
                         "Rotation": [
@@ -10201,8 +10382,8 @@
                             0.0
                         ],
                         "Scale": [
-                            177.89999389648438,
-                            26.700000762939453,
+                            880.0,
+                            500.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -10212,37 +10393,17 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_FillActive.png",
+                        "Texture": "Tooltip_Movement.png",
                         "Color": [
-                            0.16862745583057404,
-                            0.5803921818733215,
-                            0.5882353186607361,
+                            1.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Quad": 3,
                         "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": true
-                    }
-                },
-                {
-                    "Type": "TextComponent",
-                    "Properties": {
-                        "ComponentGUID": "4831624135050970231",
-                        "text": "Press WASD to move",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 29.5,
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "isVisible": true,
-                        "align": 2,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
                     }
                 }
             ]
@@ -10262,8 +10423,8 @@
                     "Properties": {
                         "ComponentGUID": "3678702630447613055",
                         "Position": [
-                            1001.5,
-                            355.8999938964844,
+                            446.0,
+                            350.0,
                             0.0
                         ],
                         "Rotation": [
@@ -10272,8 +10433,8 @@
                             0.0
                         ],
                         "Scale": [
-                            280.0,
-                            26.700000762939453,
+                            880.0,
+                            500.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -10283,37 +10444,17 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_FillActive.png",
+                        "Texture": "Tooltip_InstructionsLvl1.png",
                         "Color": [
-                            0.16862745583057404,
-                            0.5803921818733215,
-                            0.5882353186607361,
+                            1.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Quad": 3,
                         "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": false
-                    }
-                },
-                {
-                    "Type": "TextComponent",
-                    "Properties": {
-                        "ComponentGUID": "8866849401178424455",
-                        "text": "Fly through the tunnel to the next area",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 29.5,
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            0.0
-                        ],
-                        "isVisible": false,
-                        "align": 2,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
                     }
                 }
             ]
@@ -10333,8 +10474,8 @@
                     "Properties": {
                         "ComponentGUID": "11172692410393543823",
                         "Position": [
-                            1101.699951171875,
-                            355.8999938964844,
+                            446.0,
+                            350.0,
                             0.0
                         ],
                         "Rotation": [
@@ -10343,8 +10484,8 @@
                             0.0
                         ],
                         "Scale": [
-                            177.89999389648438,
-                            26.700000762939453,
+                            880.0,
+                            500.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -10354,37 +10495,17 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_FillActive.png",
+                        "Texture": "Tooltip_Objective_KillEnemy.png",
                         "Color": [
-                            0.16862745583057404,
-                            0.5803921818733215,
-                            0.5882353186607361,
+                            1.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Quad": 3,
                         "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": false
-                    }
-                },
-                {
-                    "Type": "TextComponent",
-                    "Properties": {
-                        "ComponentGUID": "4831624135055885463",
-                        "text": "Destroy 5 Enemies",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 29.5,
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            0.0
-                        ],
-                        "isVisible": false,
-                        "align": 2,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
                     }
                 }
             ]
@@ -10446,8 +10567,8 @@
                     "Properties": {
                         "ComponentGUID": "5984545639665304741",
                         "Position": [
-                            1037.699951171875,
-                            368.1000061035156,
+                            446.0,
+                            350.0,
                             0.0
                         ],
                         "Rotation": [
@@ -10456,8 +10577,8 @@
                             0.0
                         ],
                         "Scale": [
-                            246.10000610351563,
-                            63.79999923706055,
+                            880.0,
+                            500.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -10467,11 +10588,11 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_FillActive.png",
+                        "Texture": "Tooltip_CombatPrimary.png",
                         "Color": [
-                            0.16862745583057404,
-                            0.5803921818733215,
-                            0.5882353186607361,
+                            1.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Quad": 3,
@@ -10479,46 +10600,26 @@
                         "IsActive": true,
                         "IsVisible": false
                     }
-                },
-                {
-                    "Type": "TextComponent",
-                    "Properties": {
-                        "ComponentGUID": "8290388648878998701",
-                        "text": "Press left mouse to shoot",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 29.5,
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            0.0
-                        ],
-                        "isVisible": false,
-                        "align": 2,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
-                    }
                 }
             ]
         },
         {
-            "ID": 28,
+            "ID": 72,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "UI_DestroyWall",
-                        "Tag": "UI_DestroyWall"
+                        "Name": "EnemyCoreHPRedFill",
+                        "Tag": "EnemyCoreHPRedFill"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "15784378428825650357",
+                        "ComponentGUID": "11256079373691634863",
                         "Position": [
-                            1036.0,
-                            322.20001220703125,
+                            662.2000122070313,
+                            63.0,
                             0.0
                         ],
                         "Rotation": [
@@ -10527,8 +10628,8 @@
                             0.0
                         ],
                         "Scale": [
-                            245.6999969482422,
-                            62.70000076293945,
+                            215.0,
+                            7.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -10536,23 +10637,26 @@
                     }
                 },
                 {
-                    "Type": "TextComponent",
+                    "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "3678702630453757117",
-                        "text": "Destroy the corrupted wall",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 29.5,
-                        "color": [
+                        "ComponentGUID": "7797314859873338547",
+                        "ScriptClassName": "Game.EnemyCoreHPDamageBar"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EnemyHPBar_RedFill.png",
+                        "Color": [
                             1.0,
                             1.0,
                             1.0,
-                            0.0
+                            1.0
                         ],
-                        "isVisible": false,
-                        "align": 2,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
@@ -10572,19 +10676,19 @@
                     "Properties": {
                         "ComponentGUID": "7137467144276051137",
                         "Position": [
-                            -271.3219909667969,
-                            0.0,
+                            -354.9010314941406,
+                            7.332736968994141,
                             -0.1289999932050705
                         ],
                         "Rotation": [
-                            0.0,
+                            180.0,
                             -0.0,
                             0.0
                         ],
                         "Scale": [
-                            3.9000000953674316,
-                            13.699999809265137,
-                            12.206000328063965
+                            1.7999999523162842,
+                            80.0,
+                            80.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -10595,7 +10699,7 @@
                     "Properties": {
                         "ComponentGUID": "11172692410401309893",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "Mat_DestructibleWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -10632,8 +10736,8 @@
                         "CollideType": 1,
                         "BoxHalfExtent": [
                             2.0,
-                            7.0,
-                            6.0
+                            35.0,
+                            35.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -10667,7 +10771,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "F:/GAM/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/Liliana/Documents/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10777,6 +10881,639 @@
                         "Active": true,
                         "World Space": false,
                         "Burst Mode": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 82,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyCoreShooter",
+                        "Tag": "EnemyCoreShooter"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17722817431178577071",
+                        "Position": [
+                            -5601.6689453125,
+                            -414.6419982910156,
+                            643.2869873046875
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "14264052917359396017",
+                        "ScriptClassName": "Game.EnemyCoreShooter"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 85,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorLoveletterMesh",
+                        "Tag": "DecorLoveletterMesh"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "17817736071507592389",
+                        "PrefabAssetGuid": "2534498008980025077",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Enemy_Core",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16664814566900843719\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "Name",
+                                    "Tag"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11476667796169934019",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.003000000026077032,
+                            0.003000000026077032,
+                            0.003000000026077032
+                        ],
+                        "Parent": 33554503,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "16664814566900843719",
+                        "Mesh": "E005_loveletterCombined_v004.fbx",
+                        "Material": "loveletterv4.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097236,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorIndestructibleWall1",
+                        "Tag": "DecorIndestructibleWall"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14358971557702632671",
+                        "Position": [
+                            -357.2691650390625,
+                            -2.024444580078125,
+                            -79.00777435302734
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            9.899999618530273,
+                            100.0,
+                            100.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "16088353814613148897",
+                        "Mesh": "",
+                        "Material": "Mat_IndestructibleWall.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "12053128548491396323",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 86,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorIndestructibleWall2",
+                        "Tag": "DecorIndestructibleWall"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12629589300795442411",
+                        "Position": [
+                            -357.2691650390625,
+                            -2.024444580078125,
+                            89.60879516601563
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            9.899999618530273,
+                            100.0,
+                            100.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "3982678016244090095",
+                        "Mesh": "",
+                        "Material": "Mat_IndestructibleWall.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "18394196823829677299",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 92,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorIndestructibleWall3",
+                        "Tag": "DecorIndestructibleWall"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10900207043885548795",
+                        "Position": [
+                            -357.2691650390625,
+                            -80.22016906738281,
+                            -10.448471069335938
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            9.899999618530273,
+                            100.0,
+                            100.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "12629589300795819263",
+                        "Mesh": "",
+                        "Material": "Mat_IndestructibleWall.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "14358971557706089731",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 93,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorIndestructibleWall4",
+                        "Tag": "DecorIndestructibleWall"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9170824786975950091",
+                        "Position": [
+                            -355.4054260253906,
+                            97.797607421875,
+                            104.9572982788086
+                        ],
+                        "Rotation": [
+                            -90.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            9.899999618530273,
+                            100.0,
+                            100.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "9170824786975950095",
+                        "Mesh": "",
+                        "Material": "Mat_IndestructibleWall.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "17817736071527302419",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 95,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorIndestructibleWall5",
+                        "Tag": "DecorIndestructibleWall"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18394196823832479003",
+                        "Position": [
+                            -357.2691650390625,
+                            98.5896987915039,
+                            7.645766258239746
+                        ],
+                        "Rotation": [
+                            -90.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            9.899999618530273,
+                            100.0,
+                            100.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "13206050053101667615",
+                        "Mesh": "",
+                        "Material": "Mat_IndestructibleWall.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "2829756511640044835",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 96,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DecorIndestructibleWall6",
+                        "Tag": "DecorIndestructibleWall"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9170824786978489643",
+                        "Position": [
+                            -355.4054260253906,
+                            97.797607421875,
+                            -91.29971313476563
+                        ],
+                        "Rotation": [
+                            -90.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            9.899999618530273,
+                            100.0,
+                            100.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "9170824786978489647",
+                        "Mesh": "",
+                        "Material": "Mat_IndestructibleWall.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "2829756511640831283",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
                     }
                 }
             ]

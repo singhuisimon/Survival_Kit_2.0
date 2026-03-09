@@ -3635,13 +3635,19 @@ namespace Engine
 						if (fileName.empty())
 							fileName = "NewController";
 
-						controllerRef.name = fileName;
+						// Clone current animator controller into a brand new asset
+						AnimatorController newCtrl = controllerRef;
+						newCtrl.name = fileName;
+
+						u32 newHandle = static_cast<u32>(m_AnimatorControllerStorage.size());
+						newCtrl.id = newHandle;
+						m_AnimatorControllerStorage[newHandle] = newCtrl;
 
 						std::string path1 = "../../Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
 						std::string path2 = "../bin/Debug/Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
 
-						SerializeAnimationController(controllerRef, path1);
-						SerializeAnimationController(controllerRef, path2);
+						SerializeAnimationController(newCtrl, path1);
+						SerializeAnimationController(newCtrl, path2);
 
 						ImGui::CloseCurrentPopup();
 					}

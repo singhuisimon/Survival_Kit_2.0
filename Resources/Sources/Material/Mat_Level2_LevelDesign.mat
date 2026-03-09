@@ -1,10 +1,10 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "trench_run_v005_BaseColor.png",
-    "normalMap": "",
-    "metallicMap": "",
-    "roughnessMap": "",
-    "emissionMap": "trench_run_v005_Emissive.png",
+    "baseMap": "trench_run_v006_BaseColor.png",
+    "normalMap": "trench_run_v002_v006_Normal.png",
+    "metallicMap": "trench_run_v006_Metallic.png",
+    "roughnessMap": "trench_run_v006_Roughness.png",
+    "emissionMap": "trench_run_v006_Emissive.png",
     "occlusionMap": "",
     "baseColor": [
         0.0,

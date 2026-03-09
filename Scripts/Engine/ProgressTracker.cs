@@ -55,6 +55,9 @@ namespace Engine
         {
             LogMessage("[ProgressTracker] Marking level won: " + levelName);
 
+            // Load existing progress first so we don't overwrite other level wins
+            LoadProgress();
+
             if (levelName == "trench_run")
                 HasWonTrenchRun = true;
             else if (levelName == "level2")

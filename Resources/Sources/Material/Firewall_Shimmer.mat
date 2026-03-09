@@ -1,27 +1,27 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Corrupted Core_v002_BaseColor.png",
+    "baseMap": "Firewall_active.png",
     "normalMap": "",
-    "metallicMap": "Corrupted Core_v002_Metallic.png",
-    "roughnessMap": "Corrupted Core_v002_Roughness.png",
-    "emissionMap": "Corrupted Core_v002_Emissive.png",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
         1.0,
-        1.0,
-        1.0
+        0.0,
+        0.0
     ],
     "emissionColor": [
-        0.0,
+        1.0,
         0.0,
         0.0
     ],
     "metallic": 0.0,
     "roughness": 0.0,
-    "opacity": 0.8600000143051147,
-    "emissionStrength": 1.2899999618530273,
-    "alphaThreshold": 0.5120000243186951,
-    "ambientOcclusion": 0.5,
+    "opacity": 1.0,
+    "emissionStrength": 1.7999999523162842,
+    "alphaThreshold": 1.0,
+    "ambientOcclusion": 1.0,
     "tiling": [
         1.0,
         1.0
@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": true,
     "castShadows": true,
-    "treatBlacksAsTransparent": false
+    "treatBlacksAsTransparent": true
 }
