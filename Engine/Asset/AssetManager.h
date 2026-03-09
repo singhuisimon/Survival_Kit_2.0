@@ -105,7 +105,7 @@ namespace Engine {
 			std::cout << "AssetManager: SourcesPath = " << sourcesPath << std::endl;
 
 			//get the build/Resources path for compiled path
-			std::string assetsPath = Engine::getAssetsPath();
+			std::string assetsPath = Engine::getRootResourcesPath();
 
 			// Normalize BOTH paths: convert to forward slashes and remove trailing slash
       std::replace(sourcesPath.begin(), sourcesPath.end(), '\\', '/');
