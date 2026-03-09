@@ -435,8 +435,15 @@ namespace Engine
 
 		mAccumulatorSeconds += static_cast<double>(frameDt);
 
-		// Clear once per engine frame, then accumulate/dedupe contacts across all
-		// fixed substeps performed in this update.
+		// High-FPS fix:
+		// Do NOT clear the collision frame unless we are actually going to step
+		// physics this update. Otherwise, render frames that take 0 fixed steps
+		// will wipe all contact data and scripts will observe "no collision".
+		if ((mAccumulatorSeconds + ACCUMULATOR_EPS) < mFixedStepSeconds)
+			return;
+
+		// Clear once per actual physics tick batch, then accumulate/dedupe contacts
+		// across all fixed substeps performed in this update.
 		PhysicsAPI::BeginCollisionFrame();
 
 		std::uint32_t stepsTaken = 0u;
@@ -461,8 +468,8 @@ namespace Engine
 		if (mAccumulatorSeconds < 0.0)
 			mAccumulatorSeconds = 0.0;
 
-		if (stepsTaken > 0u)
-			SyncPhysicsBodiesToECS(scene);
+		// We know at least one fixed step ran, so pull physics state back to ECS.
+		SyncPhysicsBodiesToECS(scene);
 	}
 
 	/*****************************************************************************/
