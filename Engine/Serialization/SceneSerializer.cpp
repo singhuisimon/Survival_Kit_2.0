@@ -427,6 +427,11 @@ namespace Engine {
 					allocator
 				);
 				propertiesObj.AddMember("FilePath", Value(audio.AudioFilePath.c_str(), allocator), allocator);
+
+				if (audio.Type == AudioType::SFX) {
+					audio.Type = AudioType::GAMESFX;
+				}
+
 				propertiesObj.AddMember("Type", static_cast<int>(audio.Type), allocator);
 				propertiesObj.AddMember("State", static_cast<int>(audio.State), allocator);
 				propertiesObj.AddMember("Volume", audio.Volume, allocator);
@@ -1397,8 +1402,17 @@ namespace Engine {
 						}
 						if(properties.HasMember("FilePath"))
 							audio.AudioFilePath = properties["FilePath"].GetString();
-						if(properties.HasMember("Type"))
-							audio.Type = static_cast<AudioType>(properties["Type"].GetInt());
+						/*if(properties.HasMember("Type"))
+							audio.Type = static_cast<AudioType>(properties["Type"].GetInt());*/
+						if (properties.HasMember("Type"))
+						{
+							AudioType loadedType = static_cast<AudioType>(properties["Type"].GetInt());
+
+							if (loadedType == AudioType::SFX)
+								audio.Type = AudioType::GAMESFX;
+							else
+								audio.Type = loadedType;
+						}
 						if(properties.HasMember("State"))
 							audio.State = static_cast<PlayState>(properties["State"].GetInt());
 						if(properties.HasMember("Volume"))

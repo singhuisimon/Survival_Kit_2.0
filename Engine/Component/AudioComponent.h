@@ -102,7 +102,12 @@ namespace Engine {
         // --- Setters that mark component dirty ---
 
         void SetAudioType(AudioType type) {
-            Type = type;
+            if (type == AudioType::SFX) {
+                Type = AudioType::GAMESFX; // Redirect SFX to GAMESFX group
+            }
+            else {
+                Type = type;
+            }
             IsDirty = true;
         }
 
