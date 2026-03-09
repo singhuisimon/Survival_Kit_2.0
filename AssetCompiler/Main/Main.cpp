@@ -23,6 +23,7 @@
 #include "../CompilerCore/MeshCompiler.h"
 #include "../CompilerCore/TextureCompiler.h"
 #include "../CompilerCore/FontCompiler.h"
+#include "../Utility/FilePath.h"
 
 
 namespace fs = std::filesystem;
@@ -32,8 +33,8 @@ namespace fs = std::filesystem;
 // ============================================================================
 
 struct CompilerConfig {
-    std::string descriptorsPath = "Resources/Descriptors";
-    std::string outputPath = "Resources/Compiled";
+    std::string descriptorsPath = getrepoRoot() + "/Resources/Descriptors";
+    std::string outputPath =  getrepoRoot() + "/Resources/Compiled";
     std::string resourceType = "all";  // "all", "texture", "mesh", "audio", "shader"
     std::string specifiedGuid = "";
     bool verbose = false;
@@ -335,7 +336,7 @@ bool compileAsset(const DescriptorInfo& descriptor, const CompilerConfig& config
     //    success = true;
     //}
     else {
-        std::cerr << "ERROR: Unknown resource type: " << descriptor.resourceType << "\n";
+       // std::cerr << "ERROR: Unknown resource type: " << descriptor.resourceType << "\n";
         return false;
     }
 
@@ -401,22 +402,33 @@ int main(int argc, char* argv[]) {
         fs::create_directories(config.outputPath);
     }
 
+    // Compile all fonts using absolute paths rooted at the repo root
+    std::string rootResources = getrepoRoot() + "/Resources";
+    std::string fontSourceDir = rootResources + "/Sources/Fonts/";
+    std::string fontOutputDir = rootResources + "/Compiled/Font/";
+
+    // Ensure font output directory exists
+    if (!fs::exists(fontOutputDir)) {
+        fs::create_directories(fontOutputDir);
+    }
+
     AssetCompiler::FontCompiler fontCompiler;
     std::vector<std::pair<std::string, std::string>> fontsToCompile = {
-        {"Resources/Sources/Fonts/Quantico-Bold.ttf",
-         "Resources/Compiled/Font/Quantico-Bold.font"},
-        {"Resources/Sources/Fonts/Quantico-BoldItalic.ttf",
-         "Resources/Compiled/Font/Quantico-BoldItalic.font"},
-        {"Resources/Sources/Fonts/Quantico-Regular.ttf",
-         "Resources/Compiled/Font/Quantico-Regular.font"},
-        {"Resources/Sources/Fonts/Quantico-Italic.ttf",
-         "Resources/Compiled/Font/Quantico-Italic.font"},
-        {"Resources/Sources/Fonts/DigitalNumbers-Regular.ttf",
-         "Resources/Compiled/Font/DigitalNumbers-Regular.font"}
+        {fontSourceDir + "Quantico-Bold.ttf",         fontOutputDir + "Quantico-Bold.font"},
+        {fontSourceDir + "Quantico-BoldItalic.ttf",   fontOutputDir + "Quantico-BoldItalic.font"},
+        {fontSourceDir + "Quantico-Regular.ttf",       fontOutputDir + "Quantico-Regular.font"},
+        {fontSourceDir + "Quantico-Italic.ttf",        fontOutputDir + "Quantico-Italic.font"},
+        {fontSourceDir + "DigitalNumbers-Regular.ttf", fontOutputDir + "DigitalNumbers-Regular.font"}
     };
-    
-    for (const auto& [sourcePath, outputPath] : fontsToCompile) {
-        fontCompiler.compile(sourcePath, outputPath);
+
+    std::cout << "Compiling fonts...\n";
+    for (const auto& [src, out] : fontsToCompile) {
+        if (fontCompiler.compile(src, out)) {
+            std::cout << "  OK: " << fs::path(src).filename().string() << "\n";
+        }
+        else {
+            std::cerr << "  FAILED: " << fs::path(src).filename().string() << "\n";
+        }
     }
 
     // Compile each asset

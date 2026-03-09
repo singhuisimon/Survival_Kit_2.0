@@ -54,17 +54,19 @@ namespace Engine {
 		initBloomMipChain(width, height);
 		setDefaultState();
 
-		initFontResources(); 
+		initFontResources();
+		//build font paths from AM's compiledPath
+		std::string compiledFontPath = Engine::getRootResourcesPath() + "/Compiled/Font/";
 		std::vector<std::pair<std::string, std::string>> fontsToLoad = {
-			 {"Quantico-Bold", "Compiled/Font/Quantico-Bold.font"},
-			{"Quantico-BoldItalic", "Compiled/Font/Quantico-BoldItalic.font"},
-			{"Quantico-Regular", "Compiled/Font/Quantico-Regular.font"},
-			{"Quantico-Italic", "Compiled/Font/Quantico-Italic.font"},
-			{"DigitalNumbers-Regular", "Compiled/Font/DigitalNumbers-Regular.font"}
+			{"Quantico-Bold",          compiledFontPath + "Quantico-Bold.font"},
+			{"Quantico-BoldItalic",    compiledFontPath + "Quantico-BoldItalic.font"},
+			{"Quantico-Regular",       compiledFontPath + "Quantico-Regular.font"},
+			{"Quantico-Italic",        compiledFontPath + "Quantico-Italic.font"},
+			{"DigitalNumbers-Regular", compiledFontPath + "DigitalNumbers-Regular.font"}
 		};
 
 		for (const auto& [fontName, fontPath] : fontsToLoad) {
-			if (loadFont(getAssetFilePath(fontPath), fontName)) {
+			if (loadFont(fontPath, fontName)) {
 				std::cout << fontName << " loaded successfully!" << std::endl;
 			}
 			else {
