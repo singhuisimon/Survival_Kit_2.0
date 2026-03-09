@@ -1107,7 +1107,7 @@ namespace Engine {
 		 * @param volume
 		 * New value to apply.
 		***************************************************************************/
-		void  AudioManager_SetGroupVolume(int groupType, float volume);
+		void  AudioManager_SetPlayerVolume(int groupType, float volume);
 		/**************************************************************************
 		 * @brief
 		 * Invokes an AudioManager operation.
@@ -1116,7 +1116,7 @@ namespace Engine {
 		 * @return
 		 * Requested floating-point value.
 		***************************************************************************/
-		float AudioManager_GetGroupVolume(int groupType);
+		float AudioManager_GetPlayerVolume(int groupType);
 		/**************************************************************************
 		 * @brief
 		 * Invokes an AudioManager operation.

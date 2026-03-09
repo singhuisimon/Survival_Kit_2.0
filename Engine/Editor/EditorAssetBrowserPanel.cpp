@@ -1395,6 +1395,13 @@ namespace Engine
 				m_Editor->GetRenderer()->getBloomStrength() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomStrength;
 				m_Editor->GetRenderer()->getBloomFilterRadius() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomFilterRadius;
 				m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
+
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::MASTER, m_Editor->GetActiveScene()->GetSceneSetting().s_MasterVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::SFX, m_Editor->GetActiveScene()->GetSceneSetting().s_SFXVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::BGM, m_Editor->GetActiveScene()->GetSceneSetting().s_BGMVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::UI, m_Editor->GetActiveScene()->GetSceneSetting().s_UIVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::VO, m_Editor->GetActiveScene()->GetSceneSetting().s_VOVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::GAMESFX, m_Editor->GetActiveScene()->GetSceneSetting().s_GameSFXVolume);
 			}
 
 			// Register prefabs

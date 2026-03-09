@@ -896,6 +896,12 @@ namespace Engine {
 		settingsObj.AddMember("BloomFilterRadius", sceneSettings.s_BloomFilterRadius, allocator);
 		settingsObj.AddMember("Exposure", sceneSettings.s_Exposure, allocator);
 		settingsObj.AddMember("GlobalBias", sceneSettings.s_GlobalBias, allocator);
+		settingsObj.AddMember("MasterVolume", sceneSettings.s_MasterVolume, allocator);
+		settingsObj.AddMember("SFXVolume", sceneSettings.s_SFXVolume, allocator);
+		settingsObj.AddMember("BGMVolume", sceneSettings.s_BGMVolume, allocator);
+		settingsObj.AddMember("VOVolume", sceneSettings.s_VOVolume, allocator);
+		settingsObj.AddMember("UIVolume", sceneSettings.s_UIVolume, allocator);
+		settingsObj.AddMember("GameSFXVolume", sceneSettings.s_GameSFXVolume, allocator);
 
 		settingsArray.PushBack(settingsObj, allocator);
 		doc.AddMember("Settings", settingsArray, allocator);
@@ -1937,6 +1943,24 @@ namespace Engine {
 
 					if(s.HasMember("Exposure") && s["Exposure"].IsFloat())
 						sceneSettings.s_Exposure = s["Exposure"].GetFloat();
+
+					if (s.HasMember("MasterVolume") && s["MasterVolume"].IsFloat())
+						sceneSettings.s_MasterVolume = s["MasterVolume"].GetFloat();
+
+					if (s.HasMember("SFXVolume") && s["SFXVolume"].IsFloat())
+						sceneSettings.s_SFXVolume = s["SFXVolume"].GetFloat();
+
+					if (s.HasMember("BGMVolume") && s["BGMVolume"].IsFloat())
+						sceneSettings.s_BGMVolume = s["BGMVolume"].GetFloat();
+
+					if (s.HasMember("UIVolume") && s["UIVolume"].IsFloat())
+						sceneSettings.s_UIVolume = s["UIVolume"].GetFloat();
+
+					if (s.HasMember("VOVolume") && s["VOVolume"].IsFloat())
+						sceneSettings.s_VOVolume = s["VOVolume"].GetFloat();
+
+					if (s.HasMember("GameSFXVolume") && s["GameSFXVolume"].IsFloat())
+						sceneSettings.s_GameSFXVolume = s["GameSFXVolume"].GetFloat();
 				}
 			}
 		}
