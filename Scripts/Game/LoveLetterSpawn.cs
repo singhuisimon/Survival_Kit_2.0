@@ -36,7 +36,7 @@ namespace Game
         // Set to 10 for more constant pressure
         [SerializeField] private int minActiveLetters = 1;  
         [SerializeField] private int maxActiveLetters = 3;        // Max letters alive at once
-        private int currentWaveTarget = 2;
+        private int currentWaveTarget = 1;
         [SerializeField] private int maxTotalSpawns = -1;          // -1 = infinite spawns
         
         // ===== SPAWN OFFSET =====

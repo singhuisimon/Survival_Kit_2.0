@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "UpgradeModuleLabel.png",
+    "occlusionMap": "",
+    "baseColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "emissionColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "metallic": 0.10000000149011612,
+    "roughness": 0.6000000238418579,
+    "opacity": 1.0,
+    "emissionStrength": 0.8199999928474426,
+    "alphaThreshold": 0.5,
+    "ambientOcclusion": 0.009999999776482582,
+    "tiling": [
+        1.0,
+        1.0
+    ],
+    "offset": [
+        0.0,
+        0.0
+    ],
+    "enableEmission": true,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": true,
+    "castShadows": true,
+    "treatBlacksAsTransparent": true
+}
