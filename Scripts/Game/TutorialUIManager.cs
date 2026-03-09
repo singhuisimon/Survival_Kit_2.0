@@ -30,6 +30,7 @@ namespace Game
         private uint destroyTurretID;  // UI_DestroyTurret
         private uint destroyEnemiesID; // UI_DestroyEnemies
         private uint altFireID; // UI_AltFire
+        private uint proceedID; // UI_E_ToProceed
 
         // Entity IDs - Player, Wall
         private uint playerID;
@@ -44,13 +45,25 @@ namespace Game
         [SerializeField] private string destroyTurretName = "UI_DestroyTurret";
         [SerializeField] private string destroyEnemiesName = "UI_DestroyEnemies";
         [SerializeField] private string altFireName = "UI_AltFire";
+        [SerializeField] private string proceedName = "UI_E_ToProceed";
 
         // Events
         private string EVENT_ONE_TURRET_DESTROYED = "OneTurretDestroyed";
         private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
         private const string EVENT_ULT_CHARGED = "UltCharged";
         private const string EVENT_ALT_FIRED = "AltFired";
-        
+
+        // Fading
+        private bool EPressed = false;
+        private float tooltipElapsed = 0.0f;
+        [SerializeField] private float tooltipMinTime = 3.0f;
+        private float fadeOutElapsed = 0.0f;
+        [SerializeField] private float fadeOutTime = 0.2f;
+        private float fadeUpElapsed = 0.0f;
+        [SerializeField] private float fadeUpTime = 1.0f;
+        [SerializeField] private float uiStartFadePos = 360.0f;
+        [SerializeField] private float switchTime = 0.5f;
+
         private bool movedWASD = false;
         private bool movedSpacebar = false;
         private bool movedShift = false;
@@ -70,14 +83,16 @@ namespace Game
             destroyTurretID = SceneFindEntityByName(destroyTurretName);
             destroyEnemiesID = SceneFindEntityByName(destroyEnemiesName);
             altFireID = SceneFindEntityByName(altFireName);
+            proceedID = SceneFindEntityByName(proceedName);
 
             // Show initial UI
-            ShowWASD(true);
-            ShowFlyTunnel(false);
-            ShowShootUI(false);
-            ShowDestroyTurret(false);
-            ShowDestroyEnemies(false);
-            ShowAltFire(false);
+            SpriteRenderer.SetIsVisible(pressWASDID, true);
+            SpriteRenderer.SetIsVisible(pressFlyTunnelID, false);
+            SpriteRenderer.SetIsVisible(pressShootID, false);
+            SpriteRenderer.SetIsVisible(destroyTurretID, false);
+            SpriteRenderer.SetIsVisible(destroyEnemiesID, false);
+            SpriteRenderer.SetIsVisible(altFireID, false);
+            SpriteRenderer.SetIsVisible(proceedID, false);
 
             Subscribe(EVENT_ONE_TURRET_DESTROYED, OnTurretDestroyed);
             Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
@@ -96,31 +111,31 @@ namespace Game
             switch (currentState)
             {
                 case TutorialState.Move:
-                    HandleMoveState(currentPos);
+                    HandleMoveState(currentPos, deltaTime);
                     break;
 
                 case TutorialState.FlyThrough:
-                    HandleFlyThroughState(currentPos, wallPos);
+                    HandleFlyThroughState(currentPos, wallPos, deltaTime);
                     break;
 
                 case TutorialState.ShootWall:
-                    HandleShootWallState(currentPos, wallPos);
+                    HandleShootWallState(currentPos, wallPos, deltaTime);
                     break;
 
                 case TutorialState.DestroyTurret:
-                    HandleDestroyTurretState();
+                    HandleDestroyTurretState(deltaTime);
                     break;
 
                 case TutorialState.DestroyEnemies:
-                    HandleDestroyEnemiesState();
+                    HandleDestroyEnemiesState(deltaTime);
                     break;
 
                 case TutorialState.Wait:
-                    HandleWaitState();
+                    HandleWaitState(deltaTime);
                     break;
 
                 case TutorialState.AltFire:
-                    HandleAltFire();
+                    HandleAltFire(deltaTime);
                     break;
             }
         }
@@ -133,7 +148,7 @@ namespace Game
             Unsubscribe(EVENT_ALT_FIRED, OnAltFired);
         }
 
-        private void HandleMoveState(Vector3 currentPos)
+        private void HandleMoveState(Vector3 currentPos, float dt)
         {
             if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A))){
                 movedWASD = true;
@@ -149,102 +164,244 @@ namespace Game
 
             if (movedWASD && movedSpacebar && movedShift)
             {
-                ShowWASD(false);
-                ShowFlyTunnel(true);
-                currentState = TutorialState.FlyThrough;
+                // Fade out WASD
+                ShowUI(pressWASDID, false, dt);
+
+                // Fade in Fly Tunnel
+                if (fadeOutElapsed > switchTime) {
+                    ShowUI(pressFlyTunnelID, true, dt);
+                }
+
+                // Ensure all fading effects are completed before moving on
+                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
+
+                    // Reset all elapsed time, 'E' pressed state, and set up for next state
+                    EPressed = false;
+                    tooltipElapsed = 0.0f;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    currentState = TutorialState.FlyThrough;
+                }
             }
         }
 
-        private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos)
+        private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos, float dt)
         {
-            if (currentPos.X < (wallPos.X + 40)){
-                ShowFlyTunnel(false);
-                ShowShootUI(true);
-                currentState = TutorialState.ShootWall;
+            // Update tooltip elapsed time
+            tooltipElapsed += dt;
+
+            // Fade out upon pressing E only AFTER tooltip exists beyond min duration
+            if (tooltipElapsed > tooltipMinTime) {
+
+                // Display assistance message: "Press "E" to proceed"
+                ShowProceedText(true);
+
+                // Check for 'E' input
+                if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
+                // Begin fade out
+                if (EPressed) {
+                    ShowUI(pressFlyTunnelID, false, dt);
+                    ShowProceedText(false);  // Remove assistance message
+                }
+
+                // Begin fade up for next 
+                if (currentPos.X < (wallPos.X + 40) && EPressed && (fadeOutElapsed > switchTime)) {
+                    //ShowShootUI(true, dt);
+                    ShowUI(pressShootID, true, dt);
+                }
+
+                // Ensure all fading effects are completed before moving on
+                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
+
+                    // Reset all elapsed time, 'E' pressed state, and set up for next state
+                    EPressed = false;
+                    tooltipElapsed = 0.0f;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    currentState = TutorialState.ShootWall;
+                }
             }
         }
 
-        private void HandleShootWallState(Vector3 currentPos, Vector3 wallPos)
+        private void HandleShootWallState(Vector3 currentPos, Vector3 wallPos, float dt)
         {
             altUsed = false;
 
-            if (currentPos.X < (wallPos.X - 2))
-            {
+            // Fade out shoot UI after destroying wall
+            if (currentPos.X < (wallPos.X - 2)) {
                 Publish("DestructableWallDestroyed", true.ToString());
-                ShowShootUI(false);
-                ShowDestroyTurret(true);
+                ShowUI(pressShootID, false, dt);
+            }
+            // Fade up destroy turret UI
+            if (fadeOutElapsed > switchTime) ShowUI(destroyTurretID, true, dt);
+
+            // Ensure all fading effects are completed before moving on
+            if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
+
+                // Reset all elapsed time, 'E' pressed state, and set up for next state
+                EPressed = false;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
                 currentState = TutorialState.DestroyTurret;
             }
         }
 
-        private void HandleDestroyTurretState(){
-
-            altUsed = false;
-
-            if (oneturretDestroyed){
-                ShowDestroyTurret(false);
-                ShowDestroyEnemies(true);
-                currentState = TutorialState.DestroyEnemies;
-            }
-        }
-
-        private void HandleDestroyEnemiesState()
+        private void HandleDestroyTurretState(float dt)
         {
             altUsed = false;
 
-            if (turretsDestroyed){
-                ShowDestroyEnemies(false);
+            // Update tooltip elapsed time
+            tooltipElapsed += dt;
+
+            // Fade out upon pressing E only AFTER tooltip exists beyond min duration
+            if (tooltipElapsed > tooltipMinTime) {
+
+                // Display assistance message: "Press "E" to proceed"
+                SetProceedTextPosition(1122, 295);
+                ShowProceedText(true);
+
+                // Check for 'E' input
+                if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
+                // Begin fade out
+                if (EPressed) {
+                    ShowUI(destroyTurretID, false, dt);
+                    ShowProceedText(false);  // Remove assistance message
+                }
+
+                // Begin fade up for next 
+                if (EPressed && (fadeOutElapsed > switchTime)) {
+                    ShowUI(destroyEnemiesID, true, dt);
+                }
+
+                // Ensure all fading effects are completed before moving on
+                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
+
+                    // Reset all elapsed time, 'E' pressed state, and set up for next state
+                    EPressed = false;
+                    tooltipElapsed = 0.0f;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    currentState = TutorialState.DestroyEnemies;
+                }
+
+            }
+        }
+
+        private void HandleDestroyEnemiesState(float dt)
+        {
+            altUsed = false;
+
+            // Fade out destroy enemies UIs
+            if (turretsDestroyed) ShowUI(destroyEnemiesID, false, dt);
+
+            // Ensure fading out effect are completed before moving on
+            if (fadeOutElapsed > fadeOutTime) {
+
+                // Reset fade out elapsed time and set up for the next state
+                fadeOutElapsed = 0.0f;
                 currentState = TutorialState.Wait;
             }
         }
 
-        private void HandleWaitState()
+        private void HandleWaitState(float dt)
         {
-            if (ultCharged && !altFireShown && !altUsed)
-            {
-                ShowAltFire(true);
+            if (ultCharged && !altFireShown && !altUsed) {
+                ShowUI(altFireID, true, dt);
+            }
+
+            // Ensure fading out effect are completed before moving on
+            if (fadeUpElapsed > fadeUpTime) {
+
+                // Reset fade up elapsed time and set up for the next state
+                fadeUpElapsed = 0.0f;
                 altFireShown = true;
                 currentState = TutorialState.AltFire;
             }
         }
 
-        private void HandleAltFire()
+        private void HandleAltFire(float dt)
         {
-            if(altUsed){
-                ShowAltFire(false);
+            if (altUsed) ShowUI(altFireID, false, dt);
+
+            // Ensure fading out effect are completed before moving on
+            if (fadeUpElapsed > fadeUpTime) {
+
+                // Reset fade up elapsed time and set up for the next state
+                fadeUpElapsed = 0.0f;
                 currentState = TutorialState.Wait;
             }
         }
 
         // UI Functions
-        private void ShowWASD(bool value)
+        private void ShowUI(uint entityID, bool value, float dt)
         {
-            SpriteRenderer.SetIsVisible(pressWASDID, value);
+            // Fade Up if true
+            if (value == true) {
+
+                // Fade up
+                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                SpriteRenderer.FadeIn(entityID, fadeUpElapsed, fadeUpTime);
+
+                Vector3 newPos = Transform.GetPosition(entityID);
+                newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
+                Transform.SetPosition(entityID, ref newPos);
+
+                // Set sprite to be true if not visible
+                if (SpriteRenderer.GetIsVisible(entityID) != value) SpriteRenderer.SetIsVisible(entityID, value);
+
+            } else { // Fade out if false
+
+                // Fade out
+                fadeOutElapsed += dt;
+                SpriteRenderer.FadeOut(entityID, fadeOutElapsed, fadeOutTime);
+
+                // Ensure sprite is not visible once it faded out
+                if (fadeOutElapsed > fadeOutTime) SpriteRenderer.SetIsVisible(entityID, value);
+            }
         }
 
-        private void ShowFlyTunnel(bool value)
+        //private void ShowWASD(bool value)
+        //{
+        //    SpriteRenderer.SetIsVisible(pressWASDID, value);
+        //}
+
+        //private void ShowFlyTunnel(bool value)
+        //{
+        //    SpriteRenderer.SetIsVisible(pressFlyTunnelID, value);
+        //}
+
+        //private void ShowShootUI(bool value)
+        //{
+        //    SpriteRenderer.SetIsVisible(pressShootID, value);
+        //}
+
+        //private void ShowDestroyTurret(bool value)
+        //{
+        //    SpriteRenderer.SetIsVisible(destroyTurretID, value);
+        //}
+
+        //private void ShowDestroyEnemies(bool value)
+        //{
+        //    SpriteRenderer.SetIsVisible(destroyEnemiesID, value);
+        //}
+
+        //private void ShowAltFire(bool value)
+        //{
+        //    SpriteRenderer.SetIsVisible(altFireID, value);
+        //}
+
+        private void ShowProceedText(bool value)
         {
-            SpriteRenderer.SetIsVisible(pressFlyTunnelID, value);
+            Engine.Text.SetIsVisible(proceedID, value);
         }
 
-        private void ShowShootUI(bool value)
+        private void SetProceedTextPosition(float x, float y)
         {
-            SpriteRenderer.SetIsVisible(pressShootID, value);
-        }
-
-        private void ShowDestroyTurret(bool value)
-        {
-            SpriteRenderer.SetIsVisible(destroyTurretID, value);
-        }
-
-        private void ShowDestroyEnemies(bool value)
-        {
-            SpriteRenderer.SetIsVisible(destroyEnemiesID, value);
-        }
-
-        private void ShowAltFire(bool value)
-        {
-            SpriteRenderer.SetIsVisible(altFireID, value);
+            Vector3 newPos = new Vector3(x, y, 0.0f);
+            Transform.SetPosition(proceedID, ref newPos);
         }
 
         private void OnTurretDestroyed(string eventName, string payload){

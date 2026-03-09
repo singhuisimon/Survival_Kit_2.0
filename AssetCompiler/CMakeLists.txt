@@ -24,7 +24,7 @@ source_group("Utils" REGULAR_EXPRESSION "${COMPILER_ROOT}/Utility/.*")
 add_executable(AssetCompiler
     ${COMPILER_SOURCES}
     ${COMPILER_HEADERS}
- "CompilerCore/FontCompiler.cpp")
+ "CompilerCore/FontCompiler.cpp" "Utility/FilePath.h")
 
 # Include directories
 target_include_directories(AssetCompiler PRIVATE

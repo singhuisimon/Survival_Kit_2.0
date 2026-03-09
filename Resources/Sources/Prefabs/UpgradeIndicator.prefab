@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: EnemyIndicator.prefab",
-    "Prefab GUID": 1331517989630066861,
+    "Prefab Name": "Prefab: UpgradeIndicator.prefab",
+    "Prefab GUID": 3637360998843482273,
     "version": 1,
     "entities": [
         {
-            "Name": "EnemyIndicator",
+            "Name": "UpgradeIndicator",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -40,8 +40,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "2926284833067368599",
-                            "Name": "EnemyIndicator",
-                            "Tag": "EnemyIndicator"
+                            "Name": "UpgradeIndicator",
+                            "Tag": "UpgradeIndicator"
                         }
                     }
                 },
@@ -51,7 +51,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "15608421383742800027",
-                            "Texture": "ExclamationIcon.png",
+                            "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
                             "Color": [
                                 1.0,
                                 1.0,

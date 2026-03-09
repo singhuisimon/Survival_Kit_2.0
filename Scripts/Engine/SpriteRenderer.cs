@@ -50,5 +50,43 @@ namespace Engine
         {
             SpriteRenderer_GetColor(entityID, out r, out g, out b, out a);
         }
+
+        /// <summary>
+        /// Fade sprite out of scene (alpha)
+        /// </summary>
+        public static void FadeOut(uint entityID, float fadeElapsed, float fadeOutTime)
+        {
+            float r, g, b, a;
+
+            SpriteRenderer_GetColor(entityID, out r, out g, out b, out a);
+
+            // Calculate alpha 
+            a = 1.0f - (fadeElapsed / fadeOutTime);
+
+            // Ensure value doesn't go below 0
+            if (a < 0.0f) a = 0.0f; 
+
+            SpriteRenderer_SetColor(entityID, r, g, b, a);
+        }
+
+        /// <summary>
+        /// Fade sprite into scene (alpha)
+        /// </summary>
+        public static void FadeIn(uint entityID, float fadeElapsed, float fadeInTime)
+        {
+            float r, g, b, a;
+
+            // Get current color
+            SpriteRenderer_GetColor(entityID, out r, out g, out b, out a);
+
+            // Calculate alpha
+            a = fadeElapsed / fadeInTime;
+
+            // Clamp to max 1
+            if (a > 1.0f) a = 1.0f;
+
+            // Apply new color
+            SpriteRenderer_SetColor(entityID, r, g, b, a);
+        }
     }
 }

@@ -165,7 +165,7 @@ namespace Game
                 Vector3 spritePos = new Vector3(screenX, screenY, 0.0f);
                 SetPosition(indicatorID, ref spritePos);
 
-                SetColor(indicatorID, 0.0f, 1.0f, 0.0f, alpha);
+                SetColor(indicatorID, 1.0f, 1.0f, 1.0f, alpha);
                 SetIsVisible(indicatorID, true);
 
                 indicatorIndex++;
