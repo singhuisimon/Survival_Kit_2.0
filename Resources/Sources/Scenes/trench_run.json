@@ -9045,7 +9045,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "18059364695356834353",
-                        "ScriptClassName": "Game.ScoreBoard2"
+                        "ScriptClassName": "Game.ScoreBoard1"
                     }
                 },
                 {
@@ -11588,6 +11588,36 @@
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
                         "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 99900,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DebugCheatsEntity",
+                        "Tag": "DebugCheats"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9182736455463728191",
+                        "Position": [0.0, 0.0, 0.0],
+                        "Rotation": [0.0, 0.0, 0.0],
+                        "Scale": [1.0, 1.0, 1.0],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9182736455463728193",
+                        "ScriptClassName": "Game.DebugCheats"
                     }
                 }
             ]

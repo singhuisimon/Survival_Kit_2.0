@@ -3058,7 +3058,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "18059364695356834353",
-                        "ScriptClassName": "Game.ScoreBoard1"
+                        "ScriptClassName": "Game.ScoreBoard2"
                     }
                 },
                 {
@@ -7921,6 +7921,36 @@
                     "Properties": {
                         "ComponentGUID": "13523615398481281973",
                         "ScriptClassName": "Game.UpgradeIndicatorManager"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 99901,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DebugCheatsEntity",
+                        "Tag": "DebugCheats"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9182736455463728192",
+                        "Position": [0.0, 0.0, 0.0],
+                        "Rotation": [0.0, 0.0, 0.0],
+                        "Scale": [1.0, 1.0, 1.0],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9182736455463728194",
+                        "ScriptClassName": "Game.DebugCheats"
                     }
                 }
             ]
