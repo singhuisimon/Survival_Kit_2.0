@@ -61,6 +61,8 @@ namespace Game
             if (currentHealth <= 0.0f)
             {
                 LogMessage("[GunshipHealthBar] Health zero - destroying bar entity");
+                Publish("GunshipNameDestroy:" + allyIndex, "");
+
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
