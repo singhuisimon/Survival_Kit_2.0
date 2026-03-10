@@ -3,19 +3,77 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 7,
+            "ID": 0,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Cutscene Page 3",
-                        "Tag": "Cutscene Page 3"
+                        "Name": "Epilepsy Warning Camera",
+                        "Tag": "Epilepsy Warning Camera"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12207236065066270915",
+                        "ComponentGUID": "12241048208468885765",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            10.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": true,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.9190404415130615,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 1000.0,
+                        "Target": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Epilepsy Warning Image",
+                        "Tag": "Epilepsy Warning Image"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13393969713075732747",
                         "Position": [
                             640.0,
                             360.0,
@@ -38,7 +96,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Cutscene_3.png",
+                        "Texture": "EpilepsyWarning.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -46,7 +104,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 3,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -54,121 +112,19 @@
             ]
         },
         {
-            "ID": 6,
+            "ID": 2,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Cutscene Page 2",
-                        "Tag": "Cutscene Page 2"
+                        "Name": "Cutscene Controller",
+                        "Tag": "Cutscene Controller"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "8748471551245729981",
-                        "Position": [
-                            640.0,
-                            360.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            640.0,
-                            360.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Cutscene_2.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 1,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 5,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Cutscene Page 1",
-                        "Tag": "Cutscene Page 1"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5866167789728612535",
-                        "Position": [
-                            640.0,
-                            360.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            640.0,
-                            360.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Cutscene_1.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 2,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 4,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "BGM Room Ambience",
-                        "Tag": "BGM Room Ambience"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16818922083493658801",
+                        "ComponentGUID": "8782283694648344851",
                         "Position": [
                             0.0,
                             0.0,
@@ -189,23 +145,10 @@
                     }
                 },
                 {
-                    "Type": "AudioComponent",
+                    "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "12207236065066270899",
-                        "FilePath": "RoomAmbience.wav",
-                        "Type": 2,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": true,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 0.0,
-                        "Pan2D": 0.0
+                        "ComponentGUID": "7019089294335459495",
+                        "ScriptClassName": "Game.CutsceneController"
                     }
                 }
             ]
@@ -266,19 +209,19 @@
             ]
         },
         {
-            "ID": 2,
+            "ID": 4,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Cutscene Controller",
-                        "Tag": "Cutscene Controller"
+                        "Name": "BGM Room Ambience",
+                        "Tag": "BGM Room Ambience"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "8782283694648344851",
+                        "ComponentGUID": "16818922083493658801",
                         "Position": [
                             0.0,
                             0.0,
@@ -299,28 +242,41 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "7019089294335459495",
-                        "ScriptClassName": "Game.CutsceneController"
+                        "ComponentGUID": "12207236065066270899",
+                        "FilePath": "RoomAmbience.wav",
+                        "Type": 2,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 0.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
         },
         {
-            "ID": 1,
+            "ID": 5,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Epilepsy Warning Image",
-                        "Tag": "Epilepsy Warning Image"
+                        "Name": "Cutscene Page 1",
+                        "Tag": "Cutscene Page 1"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13393969713075732747",
+                        "ComponentGUID": "5866167789728612535",
                         "Position": [
                             640.0,
                             360.0,
@@ -343,7 +299,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "EpilepsyWarning.png",
+                        "Texture": "Cutscene_1.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -351,7 +307,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 3,
+                        "Sprite Layer": 2,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -359,23 +315,23 @@
             ]
         },
         {
-            "ID": 0,
+            "ID": 6,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Epilepsy Warning Camera",
-                        "Tag": "Epilepsy Warning Camera"
+                        "Name": "Cutscene Page 2",
+                        "Tag": "Cutscene Page 2"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12241048208468885765",
+                        "ComponentGUID": "8748471551245729981",
                         "Position": [
                             640.0,
                             360.0,
-                            10.0
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -383,8 +339,8 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            640.0,
+                            360.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -392,26 +348,70 @@
                     }
                 },
                 {
-                    "Type": "CameraComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Enabled": true,
-                        "Primary": true,
-                        "Projection": true,
-                        "autoAspect": true,
-                        "Size": [
-                            0.0,
-                            20.0
+                        "Texture": "Cutscene_2.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "Depth": 0,
-                        "Aspect": 1.7135207653045654,
-                        "FOV": 45.0,
-                        "NearPlane": 0.5,
-                        "FarPlane": 1000.0,
-                        "Target": [
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 7,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Cutscene Page 3",
+                        "Tag": "Cutscene Page 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12207236065066270915",
+                        "Position": [
                             640.0,
                             360.0,
                             0.0
-                        ]
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            640.0,
+                            360.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Cutscene_3.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -423,7 +423,13 @@
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
             "Exposure": 1.0,
-            "GlobalBias": 0.004999999888241291
+            "GlobalBias": 0.004999999888241291,
+            "MasterVolume": 1.0,
+            "SFXVolume": 1.0,
+            "BGMVolume": 1.0,
+            "VOVolume": 1.0,
+            "UIVolume": 1.0,
+            "GameSFXVolume": 1.0
         }
     ]
 }

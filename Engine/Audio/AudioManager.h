@@ -18,6 +18,11 @@
 
 namespace Engine {
 
+	struct MixerBusSettings {
+		float editorCap = 1.0f; // Slider value from 0 to 2 for designers
+		float playerVolume = 1.0f; // Slider value from 0 to 100
+	};
+
     /**
 	 * @class Audio Manager
 	 * @brief Global FMOD Core API manager for handling sound playback, caching, and channelgroups.
@@ -83,6 +88,15 @@ namespace Engine {
 		FMOD::System* GetSystem() const { return coresystem; }
 		std::unordered_map<std::string, FMOD::Sound*>& GetSoundCache() { return soundCache; }
 
+		void SetEditorCap(AudioType type, float cap);
+		float GetEditorCap(AudioType type) const;
+
+		void SetPlayerVolume(AudioType type, float volume);
+		float GetPlayerVolume(AudioType type) const;
+
+		void ApplyBusVolume(AudioType type);
+		void ApplyAllBusVolumes();
+
     private:
         bool CreateChannelGroups();
 
@@ -94,12 +108,16 @@ namespace Engine {
 
 		void ApplyDirtySettings(AudioComponent* audio);
 
+		float ComputeFinalGroupVolume(float engineDefault, float playerSlider);
+
 		FMOD::System* coresystem = nullptr;
 
 		FMOD::ChannelGroup* mastergroup = nullptr;
 		FMOD::ChannelGroup* sfxgroup = nullptr;
 		FMOD::ChannelGroup* bgmgroup = nullptr;
 		FMOD::ChannelGroup* uigroup = nullptr;
+		FMOD::ChannelGroup* vogroup = nullptr;
+		FMOD::ChannelGroup* gamesfxgroup = nullptr;
 
 		std::unordered_map<std::string, FMOD::Sound*> soundCache;
 
@@ -107,6 +125,8 @@ namespace Engine {
 		std::unordered_map<DSPEffectType, FMOD::DSP*> m_SFXDSPs;
 		std::unordered_map<DSPEffectType, FMOD::DSP*> m_BGMDSPs;
 		std::unordered_map<DSPEffectType, FMOD::DSP*> m_UIDSPs;
+
+		std::unordered_map<AudioType, MixerBusSettings> m_MixerBusSettings;
 
 		bool initialized = false;
 

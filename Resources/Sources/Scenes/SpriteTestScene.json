@@ -3,23 +3,23 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048724,
+            "ID": 1048726,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "SpriteEntity",
-                        "Tag": "SpriteEntity"
+                        "Name": "Ground",
+                        "Tag": "Ground"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12250468862285218773",
+                        "ComponentGUID": "13403390366892065737",
                         "Position": [
-                            0.0,
-                            0.8258199691772461,
-                            0.0
+                            0.017335891723632813,
+                            -0.1342807412147522,
+                            0.13501310348510742
                         ],
                         "Rotation": [
                             0.0,
@@ -27,28 +27,30 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            4.679999828338623,
+                            4.679999828338623,
+                            4.679999828338623
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "MeshRendererComponent",
                     "Properties": {
+                        "ComponentGUID": "6485861339250983883",
+                        "Mesh": "",
+                        "Material": "",
                         "Texture": "",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 0,
-                        "IsActive": true,
-                        "IsVisible": true
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 1,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
                     }
                 }
             ]
@@ -111,23 +113,23 @@
             ]
         },
         {
-            "ID": 1048726,
+            "ID": 1048724,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Ground",
-                        "Tag": "Ground"
+                        "Name": "SpriteEntity",
+                        "Tag": "SpriteEntity"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13403390366892065737",
+                        "ComponentGUID": "12250468862285218773",
                         "Position": [
-                            0.017335891723632813,
-                            -0.1342807412147522,
-                            0.13501310348510742
+                            0.0,
+                            0.8258199691772461,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -135,29 +137,28 @@
                             0.0
                         ],
                         "Scale": [
-                            4.679999828338623,
-                            4.679999828338623,
-                            4.679999828338623
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "6485861339250983883",
-                        "Mesh": "",
-                        "Material": "",
                         "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -169,7 +170,13 @@
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
             "Exposure": 1.0,
-            "GlobalBias": 0.004999999888241291
+            "GlobalBias": 0.004999999888241291,
+            "MasterVolume": 1.0,
+            "SFXVolume": 1.0,
+            "BGMVolume": 1.0,
+            "VOVolume": 1.0,
+            "UIVolume": 1.0,
+            "GameSFXVolume": 1.0
         }
     ]
 }

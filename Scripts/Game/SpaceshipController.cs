@@ -121,6 +121,9 @@ namespace Game
         private bool isHitSparks = false;
         string playerHitSparksPrefabPath = "Sources/Prefabs/HitSparksPlayer.prefab";
 
+        // ===== Audio =====
+        string playerHealAudioPrefab = "Sources/Prefabs/Audio_PlayerHeal.prefab";
+
         // ===== Camera Shake =====
         private const float camShakeTimerThreshold = 1.0f;
         private float camShakeTimer = camShakeTimerThreshold;
@@ -545,6 +548,7 @@ namespace Game
             if (healAmount > 0.0f)
             { 
                 HealPlayer(healAmount);
+                PlayHealAudio();
                 PlayHealVFX();
             }
                 
@@ -569,6 +573,17 @@ namespace Game
         private void StopHealVFX()
         {
             SetEmissionRate(healingVFXEntityID, 0.0f);
+        }
+
+        private void PlayHealAudio(){
+            
+            uint healsound = 0;
+            healsound = PrefabInstantiate(playerHealAudioPrefab);
+
+            if(healsound == 0){
+                LogMessage("[SpaceshipController] failed to play playerheal audio upon vapirism");
+                return;
+            }
         }
 
     }

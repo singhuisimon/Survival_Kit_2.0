@@ -35,6 +35,12 @@ namespace Engine {
             float s_Exposure = 1.0;
             float s_GlobalBias = 0.005;
             float s_Gamma = 2.2f;
+            float s_MasterVolume = 1.0f;
+            float s_SFXVolume = 1.0f;
+			float s_BGMVolume = 1.0f;
+			float s_UIVolume = 1.0f;
+			float s_VOVolume = 1.0f;
+			float s_GameSFXVolume = 1.0f;
         };
 
         /**
