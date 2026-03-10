@@ -91,6 +91,7 @@ namespace Game
             { "obstacle_wall_indestructable", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_destructable", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT },
+            { "destructablewall", CollisionCategory.ENVIRONMENT },
 
             // Payload
             { "payload", CollisionCategory.PAYLOAD}

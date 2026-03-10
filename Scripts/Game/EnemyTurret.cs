@@ -16,6 +16,7 @@ namespace Game
     {
         // Range
         [SerializeField] private bool inRange = false;
+        private bool shootingAllowed = false;
 
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint playerID = INVALID_ENTITY;
@@ -28,6 +29,15 @@ namespace Game
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
         private const string GAMEOVER = "GameOver";
+        private const string EVENT_KEYLOGGER_DEATH = "KeyloggerDeath";
+        private const string EVENT_WALL_DESTROYED = "DestructableWallDestroyed";
+
+        // Bullet tags for player kill detection
+        private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
+        private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
+        // Vampirism: track who landed the killing blow
+        private string lastKillerTag = "";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.25f;
@@ -46,6 +56,8 @@ namespace Game
         private float hitSparksTimer = 0.1f;
         private bool isHitSparks = false;
 
+        private bool dead = false;
+
         // Lifecycle
         public override void OnStart()
         {
@@ -59,6 +71,7 @@ namespace Game
             LogMessage("======= playerID: " + playerID + " =======");
 
             inRange = false;
+            shootingAllowed = false;
 
             RigidbodySetIsKinematic(EntityID, true);
             RigidbodySetUseGravity(EntityID, false);
@@ -66,6 +79,7 @@ namespace Game
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(EVENT_WALL_DESTROYED, OnDestructableWallDestroyed);
             
             //Vector3 newpos = Engine.Transform.GetPosition(EntityID);
             Engine.Transform.SetPosition(EntityID, ref newpos);
@@ -92,7 +106,7 @@ namespace Game
                 direction.Z * direction.Z
             );
 
-            if (magnitude < 250.0f)
+            if (magnitude < 200.0f)
             {
                 inRange = true;
 
@@ -112,6 +126,10 @@ namespace Game
             }
 
             if(exploding && mainExplosionID != INVALID_ENTITY){
+                if(!dead){
+                    Publish("EnemyTurretDestroyed", EntityID.ToString());
+                    dead = true;
+                }
                 explosionTimer -= deltaTime;
                 if (explosionTimer <= 0.0f)
                 {
@@ -126,6 +144,7 @@ namespace Game
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(EVENT_WALL_DESTROYED, OnDestructableWallDestroyed);
         }
 
         // Combat
@@ -168,9 +187,19 @@ namespace Game
             Vector3 turretPos = GetPosition(EntityID);
             Transform.SetPosition(enemyHitSparksID, ref turretPos);
 
+            //track who hit the turret for vampisirm
+            uint attackerId = DamageSystem.ParseAttackerId(payload);
+            if(attackerId != INVALID_ENTITY)
+            {
+                string attackerTag = TagGetTag(attackerId);
+               if (attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET)
+                    lastKillerTag = attackerTag;
+            }
+
             if (health > 0)
                 return;
 
+            Publish(EVENT_KEYLOGGER_DEATH, "killer=" + lastKillerTag);
             exploding = true;
 
             uint explosionID = PrefabInstantiate(EnemyTurretBulletExplosionPrefabPath);
@@ -194,80 +223,82 @@ namespace Game
             if (playerID == INVALID_ENTITY)
                 return;
 
-            // Get positions
-            Vector3 wormPos = GetPosition(EntityID);
-            Vector3 playerPos = GetPosition(playerID);
+            if(shootingAllowed){
+                // Get positions
+                Vector3 wormPos = GetPosition(EntityID);
+                Vector3 playerPos = GetPosition(playerID);
 
-            // Calculate direction to player
-            Vector3 direction = new Vector3(
-                playerPos.X - wormPos.X,
-                playerPos.Y - wormPos.Y,
-                playerPos.Z - wormPos.Z
-            );
+                // Calculate direction to player
+                Vector3 direction = new Vector3(
+                    playerPos.X - wormPos.X,
+                    playerPos.Y - wormPos.Y,
+                    playerPos.Z - wormPos.Z
+                );
 
-            // Normalize direction
-            float magnitude = SimpleMath.Sqrt(
-                direction.X * direction.X +
-                direction.Y * direction.Y +
-                direction.Z * direction.Z
-            );
+                // Normalize direction
+                float magnitude = SimpleMath.Sqrt(
+                    direction.X * direction.X +
+                    direction.Y * direction.Y +
+                    direction.Z * direction.Z
+                );
 
-            if (magnitude < 0.001f)
-                return;
+                if (magnitude < 0.001f)
+                    return;
 
-            float invMag = 1.0f / magnitude;
-            Vector3 directionNorm = new Vector3(
-                direction.X * invMag,
-                direction.Y * invMag,
-                direction.Z * invMag
-            );
+                float invMag = 1.0f / magnitude;
+                Vector3 directionNorm = new Vector3(
+                    direction.X * invMag,
+                    direction.Y * invMag,
+                    direction.Z * invMag
+                );
 
-            // Spawn bullet slightly in front
-            float spawnDist = 1.5f;
-            Vector3 spawnPosition = new Vector3(
-                wormPos.X + directionNorm.X * spawnDist,
-                wormPos.Y + directionNorm.Y * spawnDist,
-                wormPos.Z + directionNorm.Z * spawnDist
-            );
+                // Spawn bullet slightly in front
+                float spawnDist = 1.5f;
+                Vector3 spawnPosition = new Vector3(
+                    wormPos.X + directionNorm.X * spawnDist,
+                    wormPos.Y + directionNorm.Y * spawnDist,
+                    wormPos.Z + directionNorm.Z * spawnDist
+                );
 
-            // Create bullet
-            uint enemyTurretBulletID = PrefabInstantiateScene(EnemyTurretBulletPrefabPath);
-            if (enemyTurretBulletID == 0)
-                return;
+                // Create bullet
+                uint enemyTurretBulletID = PrefabInstantiateScene(EnemyTurretBulletPrefabPath);
+                if (enemyTurretBulletID == 0)
+                    return;
 
-            Transform.SetPosition(enemyTurretBulletID, ref spawnPosition);
+                Transform.SetPosition(enemyTurretBulletID, ref spawnPosition);
 
-            // Set rotation to face the direction (optional, for visual)
-            Vector3 forward = Vector3.Forward;
-            Quat bulletRot = QuaternionFromTo(forward, directionNorm);
-            Transform.SetRotation(enemyTurretBulletID, ref bulletRot);
+                // Set rotation to face the direction (optional, for visual)
+                Vector3 forward = Vector3.Forward;
+                Quat bulletRot = QuaternionFromTo(forward, directionNorm);
+                Transform.SetRotation(enemyTurretBulletID, ref bulletRot);
 
-            // Setup rigidbody
-            // EntityAddRigidBody(enemyTurretBulletID);
-            // RigidbodySetIsKinematic(enemyTurretBulletID, false);
-            // RigidbodySetUseGravity(enemyTurretBulletID, false);
-            
-            // Set tag
-            TagSetTag(enemyTurretBulletID, "EnemyTurretBullet");
+                // Setup rigidbody
+                // EntityAddRigidBody(enemyTurretBulletID);
+                // RigidbodySetIsKinematic(enemyTurretBulletID, false);
+                // RigidbodySetUseGravity(enemyTurretBulletID, false);
+                
+                // Set tag
+                TagSetTag(enemyTurretBulletID, "EnemyTurretBullet");
 
-            // Apply force in the direction of the player
-            float bulletForce = 100.0f;
-            Vector3 force = new Vector3(
-                directionNorm.X * bulletForce,
-                directionNorm.Y * bulletForce,
-                directionNorm.Z * bulletForce
-            );
-            RigidbodyAddForce(enemyTurretBulletID, ref force);
+                // Apply force in the direction of the player
+                float bulletForce = 100.0f;
+                Vector3 force = new Vector3(
+                    directionNorm.X * bulletForce,
+                    directionNorm.Y * bulletForce,
+                    directionNorm.Z * bulletForce
+                );
+                RigidbodyAddForce(enemyTurretBulletID, ref force);
 
-            // Set collision box
-            Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
-            RigidbodySetBoxHalfExtents(enemyTurretBulletID, ref extents);
+                // Set collision box
+                Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
+                RigidbodySetBoxHalfExtents(enemyTurretBulletID, ref extents);
 
-            // Add visuals and script - Using WormBullet
-            EntityAddMeshRenderer(enemyTurretBulletID);
-            EntityAddScript(enemyTurretBulletID, "Game.WormBullet");
+                // Add visuals and script - Using WormBullet
+                EntityAddMeshRenderer(enemyTurretBulletID);
+                EntityAddScript(enemyTurretBulletID, "Game.WormBullet");
 
-            LogMessage("Turret fired bullet at player!");
+                LogMessage("Turret fired bullet at player!");
+            }
         }
 
         private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
@@ -304,6 +335,10 @@ namespace Game
 
         private void OnGameOver(string eventName, string payload){
             SceneDestroyEntity(EntityID);
+        }
+
+        private void OnDestructableWallDestroyed(string eventName, string payload){
+            shootingAllowed = true;
         }
     }
 }

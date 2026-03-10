@@ -23,7 +23,7 @@ namespace Game
         private bool isDead = false;
 
         // === WEAPON INFORMATION ===
-        [SerializeField] private float fireRate = 0.1f;
+        [SerializeField] private float fireRate = 0.2f;
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
         [SerializeField] private float bulletSpeed = 3000f;

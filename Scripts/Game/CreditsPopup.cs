@@ -15,7 +15,8 @@ namespace Game
     {
         // Entity names to find
         private const string CREDITS_BUTTON_NAME = "Credits Button";
-        private const string POPUP_NAME = "Credits Popup";
+        private const string POPUP_MAIN_NAME = "Credits Popup Main";
+        private const string POPUP_RESOURCES_NAME = "Credits Popup Resources";
         private const string CLOSE_BUTTON_NAME = "Credits Close Button";
         private const string CLOSE_BUTTON_2_NAME = "Credits Close Button 2";
 
@@ -25,14 +26,15 @@ namespace Game
         private const float CENTER_X = 640.0f;
 
         // Absolute button positions when visible
-        private const float CLOSE_BUTTON_X = 725.0f;
+        private const float CLOSE_BUTTON_X = 766.0f;
         private const float CLOSE_BUTTON_Y = 50.0f;
-        private const float CLOSE_BUTTON_2_X = 1196.0f;
-        private const float CLOSE_BUTTON_2_Y = 239.0f;
+        private const float CLOSE_BUTTON_2_X = 1243.0f;
+        private const float CLOSE_BUTTON_2_Y = 269.0f;
 
         // Entity IDs
         private uint creditsButtonId;
-        private uint popupId;
+        private uint popupMainId;
+        private uint popupResourcesId;
         private uint closeButtonId;
         private uint closeButton2Id;
 
@@ -51,7 +53,8 @@ namespace Game
             LogMessage("CreditsPopup: Initializing...");
 
             creditsButtonId = SceneFindEntityByName(CREDITS_BUTTON_NAME);
-            popupId = SceneFindEntityByName(POPUP_NAME);
+            popupMainId = SceneFindEntityByName(POPUP_MAIN_NAME);
+            popupResourcesId = SceneFindEntityByName(POPUP_RESOURCES_NAME);
             closeButtonId = SceneFindEntityByName(CLOSE_BUTTON_NAME);
             closeButton2Id = SceneFindEntityByName(CLOSE_BUTTON_2_NAME);
 
@@ -60,9 +63,14 @@ namespace Game
                 LogError("CreditsPopup: Could not find entity: " + CREDITS_BUTTON_NAME);
                 return;
             }
-            if (popupId == 0)
+            if (popupMainId == 0)
             {
-                LogError("CreditsPopup: Could not find entity: " + POPUP_NAME);
+                LogError("CreditsPopup: Could not find entity: " + POPUP_MAIN_NAME);
+                return;
+            }
+            if (popupResourcesId == 0)
+            {
+                LogError("CreditsPopup: Could not find entity: " + POPUP_RESOURCES_NAME);
                 return;
             }
             if (closeButtonId == 0)
@@ -140,8 +148,12 @@ namespace Game
             isPopupVisible = true;
             Event.Publish(EVENT_POPUP_OPENED, POPUP_ID);
 
-            Vector3 popupPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
-            SetPosition(popupId, ref popupPos);
+            // Show both popups (Resources in front of Main)
+            Vector3 mainPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
+            SetPosition(popupMainId, ref mainPos);
+
+            Vector3 resPos = new Vector3(CENTER_X, VISIBLE_Y, -0.51f);
+            SetPosition(popupResourcesId, ref resPos);
 
             Vector3 closePos = new Vector3(CLOSE_BUTTON_X, CLOSE_BUTTON_Y, -0.6f);
             SetPosition(closeButtonId, ref closePos);
@@ -159,8 +171,11 @@ namespace Game
             if (wasVisible)
                 Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
 
-            Vector3 popupPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
-            SetPosition(popupId, ref popupPos);
+            Vector3 mainHiddenPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
+            SetPosition(popupMainId, ref mainHiddenPos);
+
+            Vector3 resHiddenPos = new Vector3(CENTER_X, HIDDEN_Y, -0.51f);
+            SetPosition(popupResourcesId, ref resHiddenPos);
 
             Vector3 closePos = new Vector3(CLOSE_BUTTON_X, HIDDEN_Y, -0.6f);
             SetPosition(closeButtonId, ref closePos);

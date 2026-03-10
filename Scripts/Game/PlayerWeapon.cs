@@ -430,6 +430,7 @@ namespace Game
                 //spawn the prefab here
                 if(!primaryAltReady){
                     PrefabInstantiate(PrimaryUltChargedPrefab);
+                    Publish("UltCharged", true.ToString());
                 }
 
                 primaryAltReady = true;

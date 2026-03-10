@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryBullet.prefab",
-    "Prefab GUID": 13434343845025976091,
+    "Prefab GUID": 6925666019958036665,
     "version": 1,
     "entities": [
         {
@@ -74,7 +74,7 @@
                             "ComponentGUID": "14563155124308894535",
                             "Mass": 1.0,
                             "IsKinematic": false,
-                            "IsTrigger": false,
+                            "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
                                 0.0,
@@ -130,7 +130,7 @@
                             "ComponentGUID": "14829703208479391955",
                             "ScriptClassName": "Game.PrimaryBullet",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 2635
                         }
                     }
                 },

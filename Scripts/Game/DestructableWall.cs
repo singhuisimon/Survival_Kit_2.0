@@ -24,10 +24,13 @@ namespace Game
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
         // Health
-        [SerializeField] private float health = 1.0f;
+        [SerializeField] private float health = 5.0f;
 
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
+
+        private bool isDestroyed = false;
+        private Vector3 wallPos;
 
         // Lifecycle
         public override void OnStart()
@@ -40,13 +43,21 @@ namespace Game
 
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+
+            wallPos = Transform.GetPosition(EntityID);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // Don't update when game is paused
-            if (GameState.IsPaused)
-                return;
+            if (GameState.IsPaused || isDestroyed) return;
+            if (playerID == INVALID_ENTITY) return;
+
+            Vector3 playerPos = Transform.GetPosition(playerID);
+            if (playerPos.X <= wallPos.X + 4.0f)
+            {
+                playerPos.X = wallPos.X + 4.0f;
+                Transform.SetPosition(playerID, ref playerPos);
+            }
         }
 
         public override void OnDestroy()
@@ -78,6 +89,7 @@ namespace Game
 
             if (health <= 0)
             {
+                isDestroyed = true;
                 uint playerkillID = 0;
                 playerkillID = PrefabInstantiate(playerKillPrefab);
                 if(playerkillID == 0){

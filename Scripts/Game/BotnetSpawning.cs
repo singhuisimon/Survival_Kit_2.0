@@ -11,7 +11,8 @@ namespace Game {
     public class BotnetSpawning : ScriptBehaviour{
 
         [SerializeField] private float interval = 5.0f;
-        [SerializeField] private int maxBotnets = 20;
+        [SerializeField] private int maxBotnets = 30;
+        [SerializeField] private int botnetSpawnPerWave = 4;
 
         private string wall1Name = "Wall1";
         private string wall2Name = "Wall2";
@@ -82,7 +83,9 @@ namespace Game {
 
             if(timer <= 0.0f){
                 try {
-                    SpawnBotnetOnRandomWall();
+                    for(int i = 0; i < botnetSpawnPerWave; i++){
+                        SpawnBotnetOnRandomWall();
+                    }
                 }
                 catch(Exception e) {
                     LogMessage("[BotnetSpawning] ERROR during spawn: " + e.ToString());

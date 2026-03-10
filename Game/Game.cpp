@@ -182,6 +182,7 @@ void Game::OnInit()
 			m_Editor = std::make_unique<Engine::Editor>(GetWindow());
 			//m_Editor->SetScene(m_Scene.get());
 			m_Editor->SetRenderer(m_Renderer.get());
+			m_Editor->SetAudioManager(m_AudioManager.get());
 			m_Editor->SetGame(this);
 			m_Editor->OnInit();
 			LOG_INFO("Editor initialized successfully.");
@@ -260,6 +261,13 @@ void Game::OnInit()
 			m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 			m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 			m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+
+			m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
 		}
 		else {
 			LOG_WARNING("  -> Could not load scene file, will create default content");
@@ -288,6 +296,50 @@ void Game::OnInit()
 		LOG_CRITICAL("CRITICAL: No active scene at end of OnInit()!");
 		return;
 	}
+
+	Engine::m_AnimationClipStorage.clear();
+	Engine::m_AnimatorControllerStorage.clear();
+
+	LOG_INFO("Step 6.5: Loading animation clips...");
+	const std::string clipsDir = Engine::getAssetFilePath("Sources/AnimationClips");
+	if (std::filesystem::exists(clipsDir))
+	{
+		for (const auto& entry : std::filesystem::directory_iterator(clipsDir))
+		{
+			if (!entry.is_regular_file()) continue;
+			if (entry.path().extension() == ".animclip")
+			{
+				Engine::AnimationClip clip;
+				if (Engine::DeserializeAnimationClip(entry.path().string(), clip))
+					Engine::m_AnimationClipStorage[clip.id] = clip;
+			}
+		}
+	}
+	// ---------------------------------------------------------------------
+	// Load animator controllers
+	// ---------------------------------------------------------------------
+	const std::string ctrlDir = Engine::getAssetFilePath("Sources/AnimationControllers");
+
+	if (std::filesystem::exists(ctrlDir))
+	{
+		for (const auto& entry : std::filesystem::directory_iterator(ctrlDir))
+		{
+			if (!entry.is_regular_file())
+				continue;
+
+			if (entry.path().extension() == ".animcontroller")
+			{
+				Engine::AnimatorController ctrl;
+				if (Engine::DeserializeAnimationController(entry.path().string(), ctrl))
+				{
+					//Engine::u32 handle = static_cast<Engine::u32>(Engine::m_AnimatorControllerStorage.size());
+					//ctrl.id = handle;
+					Engine::m_AnimatorControllerStorage[ctrl.id] = ctrl;
+				}
+			}
+		}
+	}
+
 
 	// Step 8: Add systems to the scene
 	//LOG_INFO("Step 5: Adding systems to scene...");
@@ -409,6 +461,34 @@ void Game::OnInit()
 	{
 		LOG_ERROR("  -> Exception while initializing Tracy Profiler: ", e.what());
 	}
+
+	// ====================================
+	 // Step 8: Initialize Mono Scripting Engine
+	 // ====================================
+	LOG_INFO("Step 8: Initializing Mono Scripting Engine...");
+	try
+	{
+		std::string assemblyPath = "GameScripts.dll";
+
+		if (std::filesystem::exists(assemblyPath))
+		{
+			Engine::MonoScriptEngine::GetInstance().Initialize(assemblyPath);
+			LOG_INFO("  -> Mono Scripting Engine initialized successfully");
+		}
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR("  -> Exception while initializing Mono: ", e.what());
+	}
+	Engine::EventSystem::Instance().Subscribe<Engine::ScriptEvent>(
+		[this](const Engine::ScriptEvent& event) {
+			if (event.name == "QuitGame") {
+				LOG_INFO("QuitGame event received - closing application");
+				glfwSetWindowShouldClose(GetWindow(), GLFW_TRUE);
+			}
+		});
+
+	LOG_INFO("ApplicationSystem initialized");
 }
 
 //void Game::AddAllSystems()
@@ -464,6 +544,13 @@ void Game::CreateDefaultScene()
 	m_Renderer->getBloomStrength() = m_ActiveScene->GetSceneSetting().s_BloomStrength;
 	m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
+
+	m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
 
 	// ---------------------------------------------------------------------
 	// Load animation clips
@@ -559,7 +646,7 @@ void Game::CreateDefaultScene()
 
 	auto &playerAudio = player.AddComponent<Engine::AudioComponent>();
 	playerAudio.AudioFilePath = "laserSmall_001.ogg";
-	playerAudio.Type = Engine::AudioType::SFX;
+	playerAudio.Type = Engine::AudioType::GAMESFX;
 	playerAudio.State = Engine::PlayState::STOP;
 	playerAudio.Volume = 0.8f;
 	playerAudio.Pitch = 1.0f;
@@ -1630,6 +1717,13 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 	m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 	m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+
+	m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
 
 	LOG_INFO("Scene created successfully");
 	return m_ActiveScene;

@@ -230,4 +230,19 @@ namespace Engine {
 		return m;
 	}
 
+	MeshData2D make_circle_outline(int segments, float radius)
+	{
+		MeshData2D m;
+
+		for (int i = 0; i < segments; ++i)
+		{
+			float angle = (static_cast<float>(i) / segments) * glm::two_pi<float>();
+			m.positions.push_back({ radius * std::cos(angle), radius * std::sin(angle) });
+			m.colors.push_back(glm::vec3(1.0f));
+			m.texcoords.push_back({ 0.0f, 0.0f });
+			m.indices.push_back(static_cast<uint32_t>(i));
+		}
+
+		return m;
+	}
 }

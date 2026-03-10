@@ -10,8 +10,8 @@ namespace Game
 {
     public class EnemyCore : ScriptBehaviour
     {
-        [SerializeField] private const float MaxHealth = 150.0f;
-        [SerializeField] private float CurrentHealth = 150.0f;
+        [SerializeField] private const float MaxHealth = 600.0f;
+        [SerializeField] private float CurrentHealth = 600.0f;
         [SerializeField] private float prevHealth = 0.0f;
         [SerializeField] private bool isDead = false;
 
@@ -31,7 +31,7 @@ namespace Game
             prevHealth = CurrentHealth;
             isDead = false;
             //spawnTimer = SPAWN_GRACE_TIME;
-            EVENT_ENEMYCORE_HIT += EntityID.ToString();
+            EVENT_ENEMYCORE_HIT = "Damage:" + EntityID.ToString();
 
             // Subscribe to bullet hits
             Subscribe(EVENT_ENEMYCORE_HIT, OnDamageReceived);
@@ -78,6 +78,7 @@ namespace Game
 
         private void OnDamageReceived(string eventName, string payload)
         {
+            if(isDead) return;
 
             float damage = DamageSystem.ParseAmount(payload);
 

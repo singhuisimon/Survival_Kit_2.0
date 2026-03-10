@@ -10,8 +10,9 @@
 			- Body lifecycle mirroring ECS (create/refresh/destroy)
 			- Kinematic pose push & dynamic velocity push/pull
 			- Mesh collider support (triangle mesh / convex hull) with
-			  scaled-shape wrapping and shape caching
+				scaled-shape wrapping and shape caching
 			- Rotation helpers supporting glm::quat and Euler-deg vec3
+			- Internal accumulator-based fixed timestep stepping
 
 			Units: meters, kilograms, seconds.
 
@@ -22,6 +23,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 /*****************************************************************************/
 
 #include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <cstdarg>
 #include <cstdio>
@@ -45,6 +47,11 @@ namespace Engine
 {
 	static constexpr float DEFAULT_HALF_EXT = 0.5f;
 	static constexpr float WORLD_SCALE_EPS = 1e-6f;
+
+	static constexpr double DEFAULT_FIXED_STEP_SECONDS = 1.0 / 60.0;
+	static constexpr float  MAX_FRAME_DT_SECONDS = 0.25f;
+	static constexpr double ACCUMULATOR_EPS = 1e-9;
+	static constexpr std::uint32_t DEFAULT_MAX_CATCH_UP_STEPS = 8u;
 
 	/*****************************************************************************/
 	/*!
@@ -97,6 +104,18 @@ namespace Engine
 
 	/*****************************************************************************/
 	/*!
+	\brief      Extracts world translation from a 4x4 transform matrix.
+	\param      m   World transform matrix.
+	\return     Translation component.
+	*/
+	/*****************************************************************************/
+	static inline glm::vec3 ExtractWorldPosition(glm::mat4 const &m)
+	{
+		return glm::vec3(m[3]);
+	}
+
+	/*****************************************************************************/
+	/*!
 	\brief      Builds a stable cache key for a mesh instance + submesh.
 	\param      meshGuid     xresource instance GUID.
 	\param      submeshIndex Optional submesh index.
@@ -105,9 +124,7 @@ namespace Engine
 	/*****************************************************************************/
 	static inline std::uint64_t MakeMeshKey(xresource::instance_guid const &meshGuid, std::uint32_t submeshIndex)
 	{
-		// instance_guid is a thin wrapper around a 64-bit value (xresource_guid)
 		std::uint64_t h = static_cast<std::uint64_t>(meshGuid.m_Value);
-		// mix in submesh index so different submeshes don't collide in the cache
 		h ^= (static_cast<std::uint64_t>(submeshIndex) + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
 		return h;
 	}
@@ -125,7 +142,12 @@ namespace Engine
 	/*****************************************************************************/
 	static bool TryBuildMeshInfoFromEntity(Scene *scene, EntityID e, MeshBuildInfo &out, bool needGeometry)
 	{
+		assert(scene != nullptr);
+
 		auto &reg = scene->GetRegistry();
+		if (!reg.valid(e))
+			return false;
+
 		if (!reg.all_of<MeshRendererComponent, TransformComponent>(e))
 			return false;
 
@@ -148,8 +170,9 @@ namespace Engine
 			return false;
 
 		constexpr std::size_t STRIDE = 11; // pos3 + nrm3 + col3 + uv2
-		if (mesh->vertices.size() < STRIDE)
+		if (mesh->vertices.size() < STRIDE || (mesh->vertices.size() % STRIDE) != 0)
 		{
+			assert(false && "Mesh vertex data has invalid stride");
 			xresource::full_guid tmp = meshFull;
 			RM.releaseResource<MeshResource>(tmp);
 			return false;
@@ -158,6 +181,7 @@ namespace Engine
 		std::size_t vcount = mesh->vertices.size() / STRIDE;
 		out.vertices.clear();
 		out.vertices.reserve(vcount);
+
 		for (std::size_t i = 0; i < vcount; ++i)
 		{
 			std::size_t off = i * STRIDE;
@@ -174,14 +198,33 @@ namespace Engine
 			SubMeshDescriptor const &sm = mesh->subMeshes[mrc.SubmeshIndex];
 			std::uint32_t start = sm.startIndex;
 			std::uint32_t count = sm.indexCount;
-			if (count >= 3 && start < mesh->indices.size() && (static_cast<std::size_t>(start) + count) <= mesh->indices.size())
+
+			if (count >= 3 &&
+				start < mesh->indices.size() &&
+				(static_cast<std::size_t>(start) + count) <= mesh->indices.size())
+			{
 				out.indices.assign(mesh->indices.begin() + start, mesh->indices.begin() + start + count);
+			}
 			else
+			{
+				assert(false && "Submesh descriptor invalid, falling back to full index buffer");
 				out.indices = mesh->indices;
+			}
 		}
 		else
 		{
 			out.indices = mesh->indices;
+		}
+
+		for (std::uint32_t idx : out.indices)
+		{
+			if (idx >= out.vertices.size())
+			{
+				assert(false && "Mesh index out of range");
+				xresource::full_guid tmp = meshFull;
+				RM.releaseResource<MeshResource>(tmp);
+				return false;
+			}
 		}
 
 		xresource::full_guid tmp = meshFull;
@@ -265,7 +308,9 @@ namespace Engine
 	/*****************************************************************************/
 	static inline bool NearlyEqualVec3(glm::vec3 const &a, glm::vec3 const &b, float eps = 1e-4f)
 	{
-		return NearlyEqual(a.x, b.x, eps) && NearlyEqual(a.y, b.y, eps) && NearlyEqual(a.z, b.z, eps);
+		return NearlyEqual(a.x, b.x, eps) &&
+			NearlyEqual(a.y, b.y, eps) &&
+			NearlyEqual(a.z, b.z, eps);
 	}
 
 	/*****************************************************************************/
@@ -276,7 +321,12 @@ namespace Engine
 	/*****************************************************************************/
 	void PhysicsSystem::OnInit(Scene *scene)
 	{
+		assert(scene != nullptr);
 		(void)scene;
+
+		mAccumulatorSeconds = 0.0;
+		mFixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS;
+		mMaxCatchUpSteps = DEFAULT_MAX_CATCH_UP_STEPS;
 
 		JPH::RegisterDefaultAllocator();
 		if (JPH::Factory::sInstance == nullptr) JPH::Factory::sInstance = new JPH::Factory();
@@ -291,10 +341,13 @@ namespace Engine
 				va_end(args);
 				std::fputs(buf, stderr);
 			};
-		JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = [](char const *, char const *, char const *, JPH::uint)
+
+		JPH_IF_ENABLE_ASSERTS(
+			JPH::AssertFailed = [](char const *, char const *, char const *, JPH::uint)
 			{
 				return false;
-			};)
+			};
+		)
 
 #ifdef _DEBUG
 			mTempAllocator = new JPH::TempAllocatorMalloc();
@@ -320,7 +373,6 @@ namespace Engine
 			mObjPairFilter
 		);
 
-		// Engine-level gravity configured here (per-body gravity factor handled per rigidbody)
 		mPhysics.SetGravity(JPH::Vec3(0.0f, 0.0f, 0.0f));
 		mBodyInterface = &mPhysics.GetBodyInterface();
 
@@ -353,28 +405,118 @@ namespace Engine
 		JPH::UnregisterTypes();
 		delete JPH::Factory::sInstance;
 		JPH::Factory::sInstance = nullptr;
+
+		mAccumulatorSeconds = 0.0;
+		mFixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS;
+		mMaxCatchUpSteps = DEFAULT_MAX_CATCH_UP_STEPS;
 	}
 
 	/*****************************************************************************/
 	/*!
-	\brief      Simulation step: sync ECS -> physics (kinematic/props), simulate,
-				then sync physics -> ECS (dynamic pose/velocity). Also manages
-				collision frame boundaries.
+	\brief      Simulation step: sync ECS -> physics, advance using a fixed
+				internal timestep accumulator, then sync physics -> ECS.
 	\param      scene   Scene pointer.
-	\param      dt      Time step.
+	\param      dt      Variable frame time step.
 	*/
 	/*****************************************************************************/
 	void PhysicsSystem::OnUpdate(Scene *scene, Timestep dt)
 	{
+		assert(scene != nullptr);
 		if (!IsEnabled()) return;
 
 		BuildOrRefreshBodies(scene);
+		SyncECSBodiesToPhysics(scene);
+
+		float frameDt = dt.GetSeconds();
+		if (frameDt < 0.0f)
+			frameDt = 0.0f;
+		if (frameDt > MAX_FRAME_DT_SECONDS)
+			frameDt = MAX_FRAME_DT_SECONDS;
+
+		mAccumulatorSeconds += static_cast<double>(frameDt);
+
+		// Clear once per engine frame, then accumulate/dedupe contacts across all
+		// fixed substeps performed in this update.
+		PhysicsAPI::BeginCollisionFrame();
+
+		std::uint32_t stepsTaken = 0u;
+		while ((mAccumulatorSeconds + ACCUMULATOR_EPS) >= mFixedStepSeconds &&
+			stepsTaken < mMaxCatchUpSteps)
+		{
+			mPhysics.Update(
+				static_cast<float>(mFixedStepSeconds),
+				1,
+				mTempAllocator,
+				mJobSystem
+			);
+
+			mAccumulatorSeconds -= mFixedStepSeconds;
+			++stepsTaken;
+		}
+
+		// Prevent unbounded backlog growth under severe hitching.
+		if (stepsTaken == mMaxCatchUpSteps && mAccumulatorSeconds > mFixedStepSeconds)
+			mAccumulatorSeconds = mFixedStepSeconds;
+
+		if (mAccumulatorSeconds < 0.0)
+			mAccumulatorSeconds = 0.0;
+
+		if (stepsTaken > 0u)
+			SyncPhysicsBodiesToECS(scene);
+	}
+
+	/*****************************************************************************/
+	/*!
+	\brief      Mirrors ECS entities with RigidbodyComponent to Jolt bodies.
+				Creates missing bodies and destroys bodies for removed entities.
+	\param      scene   Scene pointer.
+	*/
+	/*****************************************************************************/
+	void PhysicsSystem::BuildOrRefreshBodies(Scene *scene)
+	{
+		assert(scene != nullptr);
 
 		auto &reg = scene->GetRegistry();
 
-		// ---------------------------------------------------------------------
-		// ECS -> Jolt
-		// ---------------------------------------------------------------------
+		std::unordered_set<EntityID> seen;
+		seen.reserve(mBodyOf.size() + 128u);
+
+		reg.view<TransformComponent, RigidbodyComponent>().each(
+			[&](EntityID e, TransformComponent &, RigidbodyComponent &)
+			{
+				seen.insert(e);
+				if (mBodyOf.find(e) == mBodyOf.end())
+					CreateBodyFor(scene, e);
+			}
+		);
+
+		std::vector<EntityID> to_remove;
+		to_remove.reserve(mBodyOf.size());
+		for (auto const &kv : mBodyOf)
+		{
+			if (seen.find(kv.first) == seen.end())
+				to_remove.push_back(kv.first);
+		}
+
+		for (EntityID e : to_remove)
+		{
+			DestroyBodyFor(e);
+		}
+	}
+
+	/*****************************************************************************/
+	/*!
+	\brief      Pushes ECS-authored transform/property/velocity changes into
+				Jolt bodies before fixed-step simulation.
+	\param      scene   Scene pointer.
+	*/
+	/*****************************************************************************/
+	void PhysicsSystem::SyncECSBodiesToPhysics(Scene *scene)
+	{
+		assert(scene != nullptr);
+
+		auto &reg = scene->GetRegistry();
+
 		reg.view<TransformComponent, RigidbodyComponent>().each(
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
 			{
@@ -384,7 +526,6 @@ namespace Engine
 
 				AppliedProps &ap = mApplied[e];
 
-				// Collider type change -> full rebuild
 				std::uint8_t const currentShapeKind = static_cast<std::uint8_t>(rb.Shape);
 				if (currentShapeKind != ap.shapeKind)
 				{
@@ -393,19 +534,15 @@ namespace Engine
 					return;
 				}
 
-				// Mass <= 0 => immovable/static: force a non-moving body and ignore drives.
 				bool const immovable = (rb.Mass <= 0.0f);
 				if (immovable)
 				{
 					mBodyInterface->SetMotionType(id, JPH::EMotionType::Static, JPH::EActivation::DontActivate);
 					mBodyInterface->SetObjectLayer(id, Layers::NON_MOVING);
-
-					// Keep tracking the flag (but motion type stays Static while immovable)
 					ap.isKinematic = rb.IsKinematic;
 				}
 				else
 				{
-					// Kinematic flag -> motion type & layer
 					if (rb.IsKinematic != ap.isKinematic)
 					{
 						mBodyInterface->SetMotionType(id, ToMotionType(rb), JPH::EActivation::Activate);
@@ -414,7 +551,6 @@ namespace Engine
 					}
 				}
 
-				// Gravity toggle -> gravity factor (static bodies have no MotionProperties, so guard it)
 				if (rb.UseGravity != ap.useGravity)
 				{
 					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
@@ -426,7 +562,6 @@ namespace Engine
 					ap.useGravity = rb.UseGravity;
 				}
 
-				// Mass change -> rebuild body (keeps inertia in sync)
 				if (!NearlyEqual(rb.Mass, ap.mass))
 				{
 					DestroyBodyFor(e);
@@ -434,7 +569,6 @@ namespace Engine
 					return;
 				}
 
-				// Mesh / shape changes for mesh-backed colliders
 				if (rb.Shape == ColliderType::AABB ||
 					rb.Shape == ColliderType::SPHERE ||
 					rb.Shape == ColliderType::MESH)
@@ -444,12 +578,12 @@ namespace Engine
 					if (mFetchMeshInfo)
 						ok = mFetchMeshInfo(scene, e, info);
 					else
-						ok = TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/false);
+						ok = TryBuildMeshInfoFromEntity(scene, e, info, false);
 
 					if (ok)
 					{
 						std::uint8_t ds = info.doubleSided ? 1u : 0u;
-						bool         scaleDiff = !NearlyEqualVec3(info.scale, ap.shapeScale);
+						bool scaleDiff = !NearlyEqualVec3(info.scale, ap.shapeScale);
 
 						if (info.key != ap.meshKey || ds != ap.shapeDS || scaleDiff)
 						{
@@ -460,7 +594,6 @@ namespace Engine
 					}
 				}
 
-				// Damping + restitution + trigger bindings
 				{
 					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
 					if (lock.Succeeded())
@@ -486,12 +619,11 @@ namespace Engine
 					}
 				}
 
-				// Pose push (disabled for immovable/static bodies)
-				glm::vec3 curPos = tc.Position;
-				glm::quat curRot = AsQuat(tc.Rotation);
-				float     dotq = std::abs(glm::dot(curRot, ap.lastRot));
-				bool      rotChanged = (1.0f - dotq) > 1e-4f;
-				bool      posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
+				glm::vec3 curPos = ExtractWorldPosition(tc.WorldTransform);
+				glm::quat curRot = ExtractWorldRotation(tc.WorldTransform);
+				float dotq = std::abs(glm::dot(curRot, ap.lastRot));
+				bool rotChanged = (1.0f - dotq) > 1e-4f;
+				bool posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
 
 				if (!immovable && (posChanged || rotChanged))
 				{
@@ -505,7 +637,6 @@ namespace Engine
 					ap.lastRot = curRot;
 				}
 
-				// Velocity push (disabled for immovable/static bodies)
 				if (!immovable && !rb.IsKinematic)
 				{
 					mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
@@ -513,16 +644,21 @@ namespace Engine
 				}
 			}
 		);
+	}
 
-		// ---------------------------------------------------------------------
-		// Step the physics world
-		// ---------------------------------------------------------------------
-		PhysicsAPI::BeginCollisionFrame();
-		mPhysics.Update(dt.GetSeconds(), 1, mTempAllocator, mJobSystem);
+	/*****************************************************************************/
+	/*!
+	\brief      Pulls latest transform and velocity state from Jolt into ECS
+				after fixed-step simulation.
+	\param      scene   Scene pointer.
+	*/
+	/*****************************************************************************/
+	void PhysicsSystem::SyncPhysicsBodiesToECS(Scene *scene)
+	{
+		assert(scene != nullptr);
 
-		// ---------------------------------------------------------------------
-		// Jolt -> ECS
-		// ---------------------------------------------------------------------
+		auto &reg = scene->GetRegistry();
+
 		reg.view<TransformComponent, RigidbodyComponent>().each(
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
 			{
@@ -530,7 +666,8 @@ namespace Engine
 				if (it == mBodyOf.end()) return;
 				JPH::BodyID const id = it->second;
 
-				JPH::RVec3 p{}; JPH::Quat q{};
+				JPH::RVec3 p{};
+				JPH::Quat q{};
 				mBodyInterface->GetPositionAndRotation(id, p, q);
 
 				tc.Position = glm::vec3(
@@ -542,8 +679,12 @@ namespace Engine
 				tc.IsDirty = true;
 
 				AppliedProps &ap = mApplied[e];
-				ap.lastPos = tc.Position;
-				ap.lastRot = AsQuat(tc.Rotation);
+				ap.lastPos = glm::vec3(
+					static_cast<float>(p.GetX()),
+					static_cast<float>(p.GetY()),
+					static_cast<float>(p.GetZ())
+				);
+				ap.lastRot = ToGLM(q);
 
 				if (!rb.IsKinematic)
 				{
@@ -555,40 +696,6 @@ namespace Engine
 				}
 			}
 		);
-	}
-	/*****************************************************************************/
-	/*!
-	\brief      Mirrors ECS entities with RigidbodyComponent to Jolt bodies.
-				Creates missing bodies and destroys bodies for removed entities.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
-	void PhysicsSystem::BuildOrRefreshBodies(Scene *scene)
-	{
-		auto &reg = scene->GetRegistry();
-
-		std::unordered_set<EntityID> seen;
-		seen.reserve(mBodyOf.size() + 128u);
-
-		reg.view<TransformComponent, RigidbodyComponent>().each(
-			[&](EntityID e, TransformComponent &, RigidbodyComponent &)
-			{
-				seen.insert(e);
-				if (mBodyOf.find(e) == mBodyOf.end()) CreateBodyFor(scene, e);
-			}
-		);
-
-		std::vector<EntityID> to_remove;
-		to_remove.reserve(mBodyOf.size());
-		for (auto const &kv : mBodyOf)
-			if (seen.find(kv.first) == seen.end())
-				to_remove.push_back(kv.first);
-
-		for (EntityID e : to_remove)
-		{
-			DestroyBodyFor(e);
-			mBodyOf.erase(e);
-		}
 	}
 
 	/*****************************************************************************/
@@ -609,15 +716,12 @@ namespace Engine
 		RigidbodyComponent const &rb
 	)
 	{
-		// 1) User-provided hook can override everything
 		if (mMakeEntityShape)
 		{
 			if (auto s = mMakeEntityShape(scene, e, tc, rb))
 				return s;
 		}
 
-		// 2) Gather mesh info once. If engine didn't register a callback,
-		//    we pull it directly from ResourceManager + MeshRendererComponent.
 		MeshBuildInfo info{};
 		bool hasMesh = false;
 		if (mFetchMeshInfo)
@@ -626,11 +730,21 @@ namespace Engine
 		}
 		else
 		{
-			bool wantGeom = (rb.Shape == ColliderType::AABB || rb.Shape == ColliderType::SPHERE || rb.Shape == ColliderType::MESH);
-			hasMesh = wantGeom && TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/true);
+			bool wantGeom = (rb.Shape == ColliderType::AABB ||
+				rb.Shape == ColliderType::SPHERE ||
+				rb.Shape == ColliderType::MESH);
+			hasMesh = wantGeom && TryBuildMeshInfoFromEntity(scene, e, info, true);
 		}
 
-		switch (rb.Shape)
+		bool const immovable = (rb.Mass <= 0.0f);
+		ColliderType effectiveShape = rb.Shape;
+
+		// Dynamic mesh colliders are poor for player/controller response.
+		// Force movable MESH bodies onto BOX unless explicitly authored otherwise.
+		if (!immovable && effectiveShape == ColliderType::MESH)
+			effectiveShape = ColliderType::BOX;
+
+		switch (effectiveShape)
 		{
 		case ColliderType::AABB:
 			if (hasMesh)
@@ -664,14 +778,44 @@ namespace Engine
 					return JPH::Ref<JPH::Shape>(new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
 				return base;
 			}
-			// No mesh? fall through to BOX behaviour using BoxHalfExtents.
 			[[fallthrough]];
 
 		case ColliderType::BOX:
 		{
 			glm::vec3 he = rb.BoxHalfExtents;
 			if (he.x <= 0.0f || he.y <= 0.0f || he.z <= 0.0f)
-				he = glm::vec3(DEFAULT_HALF_EXT);
+			{
+				if (hasMesh)
+				{
+					glm::vec3 minv(
+						std::numeric_limits<float>::max(),
+						std::numeric_limits<float>::max(),
+						std::numeric_limits<float>::max());
+					glm::vec3 maxv(
+						std::numeric_limits<float>::lowest(),
+						std::numeric_limits<float>::lowest(),
+						std::numeric_limits<float>::lowest());
+
+					for (auto const &v : info.vertices)
+					{
+						minv.x = std::min(minv.x, v.x);
+						minv.y = std::min(minv.y, v.y);
+						minv.z = std::min(minv.z, v.z);
+
+						maxv.x = std::max(maxv.x, v.x);
+						maxv.y = std::max(maxv.y, v.y);
+						maxv.z = std::max(maxv.z, v.z);
+					}
+
+					he = (maxv - minv) * 0.5f;
+					if (he.x <= 0.0f || he.y <= 0.0f || he.z <= 0.0f)
+						he = glm::vec3(DEFAULT_HALF_EXT);
+				}
+				else
+				{
+					he = glm::vec3(DEFAULT_HALF_EXT);
+				}
+			}
 
 			return JPH::Ref<JPH::Shape>(
 				new JPH::BoxShape(JPH::Vec3(he.x, he.y, he.z)));
@@ -683,7 +827,6 @@ namespace Engine
 
 			if (radius <= 0.0f && hasMesh)
 			{
-				// auto-fit from mesh if designer didn't set a positive radius
 				float maxLen2 = 0.0f;
 				for (auto const &v : info.vertices)
 				{
@@ -703,17 +846,15 @@ namespace Engine
 		case ColliderType::MESH:
 			if (hasMesh && info.indices.size() >= 3)
 			{
-				// Cache key uses collider type, mesh key, and double-sided flag
-				std::uint8_t kind = static_cast<std::uint8_t>(rb.Shape);
+				std::uint8_t kind = static_cast<std::uint8_t>(effectiveShape);
 				std::uint8_t ds = info.doubleSided ? 1u : 0u;
-				CacheKey     key{ info.key, kind, ds };
+				CacheKey key{ info.key, kind, ds };
 
 				if (auto it = mShapeCache.find(key); it != mShapeCache.end())
 				{
 					JPH::Ref<JPH::Shape> base = it->second;
-					if (info.scale != glm::vec3(1.0f))
-						return JPH::Ref<JPH::Shape>(
-							new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
+					if (!NearlyEqualVec3(info.scale, glm::vec3(1.0f)))
+						return JPH::Ref<JPH::Shape>(new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
 					return base;
 				}
 
@@ -738,22 +879,22 @@ namespace Engine
 				}
 
 				JPH::MeshShapeSettings mss(verts, tris);
-				auto                   res = mss.Create();
+				auto res = mss.Create();
 				if (!res.HasError())
 				{
 					JPH::Ref<JPH::Shape> base = res.Get();
 					mShapeCache.emplace(key, base);
 
-					if (info.scale != glm::vec3(1.0f))
-						return JPH::Ref<JPH::Shape>(
-							new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
+					if (!NearlyEqualVec3(info.scale, glm::vec3(1.0f)))
+						return JPH::Ref<JPH::Shape>(new JPH::ScaledShape(base, ToJPHVec3(info.scale)));
 					return base;
 				}
+
+				assert(false && "Failed to create mesh collider");
 			}
 			break;
 		}
 
-		// 3) Fallback: simple unit box if everything else fails
 		return JPH::Ref<JPH::Shape>(
 			new JPH::BoxShape(JPH::Vec3::sReplicate(DEFAULT_HALF_EXT)));
 	}
@@ -767,25 +908,29 @@ namespace Engine
 	/*****************************************************************************/
 	void PhysicsSystem::CreateBodyFor(Scene *scene, EntityID e)
 	{
+		assert(scene != nullptr);
+
 		auto &reg = scene->GetRegistry();
+		assert(reg.valid(e));
+		assert((reg.all_of<TransformComponent, RigidbodyComponent>(e)));
+
 		auto &tc = reg.get<TransformComponent>(e);
 		auto &rb = reg.get<RigidbodyComponent>(e);
 
 		bool const immovable = (rb.Mass <= 0.0f);
 
 		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
-		glm::vec3 worldPos = glm::vec3(tc.WorldTransform[3]);
+		glm::vec3 worldPos = ExtractWorldPosition(tc.WorldTransform);
 		glm::quat worldRot = ExtractWorldRotation(tc.WorldTransform);
 
 		JPH::BodyCreationSettings settings(
 			shape,
 			ToJPHRVec3(worldPos),
-			ToJPHRotation(worldRot),
+			ToJPHQuat(worldRot),
 			ToMotionType(rb),
 			ToObjectLayer(rb)
 		);
 
-		// Only override mass for *movable dynamic* bodies.
 		if (!immovable && !rb.IsKinematic)
 		{
 			settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
@@ -802,14 +947,12 @@ namespace Engine
 		JPH::BodyID const id =
 			mBodyInterface->CreateAndAddBody(settings, JPH::EActivation::Activate);
 
-		// Only push velocity for movable dynamics
 		if (!immovable && !rb.IsKinematic)
 		{
 			mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
 			mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
 		}
 
-		// Gravity factor is only valid if MotionProperties exist (not static)
 		if (!rb.UseGravity)
 		{
 			JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
@@ -826,8 +969,8 @@ namespace Engine
 		ap.isKinematic = rb.IsKinematic;
 		ap.useGravity = rb.UseGravity;
 		ap.mass = rb.Mass;
-		ap.lastPos = tc.Position;
-		ap.lastRot = AsQuat(tc.Rotation);
+		ap.lastPos = worldPos;
+		ap.lastRot = worldRot;
 		ap.shapeKind = static_cast<std::uint8_t>(rb.Shape);
 
 		{
@@ -836,13 +979,19 @@ namespace Engine
 			if (mFetchMeshInfo)
 				ok = mFetchMeshInfo(scene, e, info);
 			else
-				ok = TryBuildMeshInfoFromEntity(scene, e, info, /*needGeometry=*/false);
+				ok = TryBuildMeshInfoFromEntity(scene, e, info, false);
 
 			if (ok)
 			{
 				ap.meshKey = info.key;
 				ap.shapeDS = info.doubleSided ? 1u : 0u;
 				ap.shapeScale = info.scale;
+			}
+			else
+			{
+				ap.meshKey = 0u;
+				ap.shapeDS = 0u;
+				ap.shapeScale = glm::vec3(1.0f);
 			}
 		}
 

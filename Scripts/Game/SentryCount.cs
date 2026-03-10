@@ -30,6 +30,7 @@ namespace Game
         private bool initialized = false;
         private int initialcount = 0;
         private bool spawnAndLifted = true;
+        private bool allowedspawn = true;
 
         // ==== Timer =====
         [SerializeField] private float countdown = 0.0f;
@@ -72,6 +73,8 @@ namespace Game
 
             spawnAndLifted = true;
 
+            allowedspawn = true;
+
             // Display initial time
             UpdateCountDisplay();
 
@@ -84,8 +87,20 @@ namespace Game
                 return;
 
             // Don't count down when game is paused
-            if (GameState.IsPaused)
+            if (GameState.IsPaused){
+                if(GetIsVisible((uint)EntityID)){
+                    SetIsVisible((uint)EntityID, false);
+                }
                 return;
+            }
+
+            if(!allowedspawn){
+                return;
+            }
+
+            if(!GetIsVisible((uint)EntityID)){
+                SetIsVisible((uint)EntityID, true);
+            }
 
             if(IsKeyPressed(KeyCode.D1) && spawnAndLifted){
                 countdown -= deltaTime;
@@ -160,8 +175,10 @@ namespace Game
 
         private void OnGameOver(string eventName, string payload)
         {
-            LogMessage("[SentryCount] Game over triggered by: " + eventName + " - Timer stopped");
+            LogMessage("[SentryCount] Game over triggered by: " + eventName);
+            SetText((uint)EntityID, "");
             Text.SetIsVisible((uint)EntityID, false);
+            allowedspawn = false;
         }
 
         private void UpdateCountDisplay()

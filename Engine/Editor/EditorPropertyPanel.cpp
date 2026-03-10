@@ -1079,9 +1079,13 @@ namespace Engine
 				ImGui::Text("Audio Type:");
 				AudioType type = audio.Type;
 
-				if (ImGui::RadioButton("SFX", type == AudioType::SFX))
+				if (type == AudioType::SFX) {
+					type = AudioType::GAMESFX; // Display "SFX" instead of "GAMESFX"
+				}
+
+				if (ImGui::RadioButton("SFX", type == AudioType::GAMESFX))
 				{
-					audio.SetAudioType(AudioType::SFX);
+					audio.SetAudioType(AudioType::GAMESFX);
 					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("BGM", type == AudioType::BGM))
@@ -1092,6 +1096,11 @@ namespace Engine
 				if (ImGui::RadioButton("UI", type == AudioType::UI))
 				{
 					audio.SetAudioType(AudioType::UI);
+					MarkComponentOverridden(ComponentTypeID::Audio);
+				}
+				if(ImGui::RadioButton("VO", type == AudioType::VO))
+				{
+					audio.SetAudioType(AudioType::VO);
 					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 
@@ -3635,13 +3644,19 @@ namespace Engine
 						if (fileName.empty())
 							fileName = "NewController";
 
-						controllerRef.name = fileName;
+						// Clone current animator controller into a brand new asset
+						AnimatorController newCtrl = controllerRef;
+						newCtrl.name = fileName;
+
+						u32 newHandle = static_cast<u32>(m_AnimatorControllerStorage.size());
+						newCtrl.id = newHandle;
+						m_AnimatorControllerStorage[newHandle] = newCtrl;
 
 						std::string path1 = "../../Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
 						std::string path2 = "../bin/Debug/Resources/Sources/AnimationControllers/" + fileName + ".animcontroller";
 
-						SerializeAnimationController(controllerRef, path1);
-						SerializeAnimationController(controllerRef, path2);
+						SerializeAnimationController(newCtrl, path1);
+						SerializeAnimationController(newCtrl, path2);
 
 						ImGui::CloseCurrentPopup();
 					}

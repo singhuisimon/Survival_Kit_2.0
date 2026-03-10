@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "SentrySpawn",
-    "Prefab GUID": 9549558156949340321,
+    "Prefab Name": "Prefab: SentrySpawn.prefab",
+    "Prefab GUID": 12053480390320898211,
     "version": 1,
     "entities": [
         {
@@ -54,11 +54,11 @@
                             "FilePath": "Sentry Normal Spawn.wav",
                             "Type": 1,
                             "State": 0,
-                            "Volume": 0.902999997138977,
+                            "Volume": 0.44999998807907104,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
-                            "ReverbProperties": 0.0,
+                            "ReverbProperties": 1.0,
                             "Is3D": true,
                             "MinDistance": 50.0,
                             "MaxDistance": 100.0,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "13584783423073124509",
                             "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 }

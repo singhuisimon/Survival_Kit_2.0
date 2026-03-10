@@ -1,6 +1,6 @@
 {
     "Prefab Name": "ENVIRONMENT_LevelDesign",
-    "Prefab GUID": 4181971047671253643,
+    "Prefab GUID": 5366488163369682033,
     "version": 1,
     "entities": [
         {
@@ -15,19 +15,19 @@
                         "Properties": {
                             "ComponentGUID": "4947609348173578587",
                             "Position": [
-                                -14.100000381469728,
+                                -14.4000244140625,
                                 0.0,
                                 0.0
                             ],
                             "Rotation": [
-                                -0.000010018003195000348,
+                                -0.000010021541129390243,
                                 -89.98021697998047,
-                                0.0
+                                -5.895718135917605e-9
                             ],
                             "Scale": [
-                                15.0,
-                                15.0,
-                                15.0
+                                1.5,
+                                1.5,
+                                1.5
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -39,7 +39,8 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "13981803836829075803",
+                            "ComponentGUID": "5942948915668828465",
+                            "Name": "ENVIRONMENT_LevelDesign",
                             "Tag": "ENVIRONMENT_LevelDesign"
                         }
                     }
@@ -50,12 +51,13 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6100530852782408029",
-                            "Mesh": "trench_run_v001.fbx",
+                            "Mesh": "trench_run_v002.fbx",
                             "Material": "Mat_Level2_LevelDesign.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,

@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "Non destructible wall_v001_v001_BaseColor.png",
+    "normalMap": "",
+    "metallicMap": "Non destructible wall_v001_v001_Metallic.png",
+    "roughnessMap": "Non destructible wall_v001_v001_Roughness.png",
+    "emissionMap": "Non destructible wall_v001_v001_Emissive.png",
+    "occlusionMap": "Non destructible wall_v001_v001_Opacity.png",
+    "baseColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "emissionColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "metallic": 0.0,
+    "roughness": 0.0,
+    "opacity": 0.8999999761581421,
+    "emissionStrength": 0.30000001192092896,
+    "alphaThreshold": 1.0,
+    "ambientOcclusion": 1.0,
+    "tiling": [
+        1.0,
+        1.0
+    ],
+    "offset": [
+        0.0,
+        0.0
+    ],
+    "enableEmission": true,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": false,
+    "castShadows": false,
+    "treatBlacksAsTransparent": false
+}

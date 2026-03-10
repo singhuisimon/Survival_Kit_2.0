@@ -12,6 +12,7 @@ using static Engine.Audio;
 using static Engine.Tag;
 using static Engine.Transform;
 
+
 namespace Game
 {
     /// <summary>
@@ -70,6 +71,9 @@ namespace Game
         private bool isMoving = false;
         private bool isDead = false;
         private bool isExploding = false;
+
+        //Vampirisim: track who landed the killing blow
+        private string lastKillerTag = "";
 
         // Timers
         private float stunTimer = 0.0f;
@@ -139,6 +143,9 @@ namespace Game
             stunTimer = 0.0f;
 
             hasChosenInitialTarget = false;
+
+            // Register itself into the enemy registry
+            EnemyRegistry.Register(EntityID);
 
             // Immediate attempt (no busy-wait loops)
             chooseTargetTimer = 0.0f;
@@ -230,6 +237,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            EnemyRegistry.Unregister(EntityID);
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(EVENT_GAME_OVER, OnGameEnd);
             Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
@@ -267,14 +275,19 @@ namespace Game
             HP -= damage;
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY && HP > 0.0f){
+            if(attackerId != INVALID_ENTITY){
                 string attackerTag = TagGetTag(attackerId);
                 if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
+                    //add the lastKillerTag for Vampirisim
+                    lastKillerTag = attackerTag;
                     //instantiate the hitmarker audio
-                    uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                    if(hitmarkerID == 0){
-                        LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+
+                    if(HP > 0.0f){
+                        uint hitmarkerID = 0;
+                        hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if(hitmarkerID == 0){
+                            LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
+                        }
                     }
                 }
             }
@@ -310,7 +323,7 @@ namespace Game
                     LogMessage("[Botnet] Player Kill Botnet! But playerkillID fail to instantiate");
                 }
 
-                Publish("BotnetDeath", 1.ToString());
+                Publish("BotnetDeath","killer=" + lastKillerTag);
                 Explode();
             }
         }

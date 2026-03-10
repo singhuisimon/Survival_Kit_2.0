@@ -21,15 +21,25 @@ namespace Game
         [SerializeField] private string coreTag = "SEMICONDUCTOR";
         private uint selectedCoreEntityID = 0;
 
+        // ===== PLAYER (for label billboard) =====
+        [SerializeField] private string playerEntityName = "Player";
+        private uint playerEntityID = 0;
+
         // ===== BULLET TAG ======
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
+        private uint spawnedPayloadID = 0;
+        //private uint spawnedLabelID = 0;  // track the label entity
+        private const string EVENT_PAYLOAD_COLLECTED = "PayloadCollected";
 
         // ===== PREFAB =====
         [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         [SerializeField] private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
         [SerializeField] private string payloadPrefab = "Sources/Prefabs/Payload.prefab";
+        [SerializeField] private string mainExplosionPrefab = "Sources/Prefabs/MainExplosion1.prefab";
+        [SerializeField] private string upgradeModuleLabelPrefab = "Sources/Prefabs/UpgradeModuleLabel.prefab";
 
         // ===== CORE DIMENSIONS =====
         [SerializeField] private float coreHalfSizeX = 37.5f;
@@ -39,14 +49,17 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 200.0f;
 
         // ===== MOVEMENT SETTING ===== 
-        [SerializeField] private float moveSpeed = 100.0f;
+        [SerializeField] private float moveSpeed = 500.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 20.0f;
+        [SerializeField] private float waitTimeAtSurface = 3.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
-        [SerializeField] private float maxHealth = 150.0f;
-        [SerializeField] private float currentHealth = 150.0f;
+        [SerializeField] private float maxHealth = 300.0f;
+        [SerializeField] private float currentHealth = 300.0f;
         private bool isDead = false;
+
+        // Vampirism: track who landed the killing blow
+        private string lastKillerTag = "";
 
         // ===== MOVEMENT STATE =====
         private bool isMoving = false;
@@ -71,13 +84,14 @@ namespace Game
         private static bool rngSeeded = false;
 
         // ===== EVENTS =====
-        //private const string EVENT_BULLET_HIT = "BulletHit";
         private string EVENT_BULLET_HIT = "Damage:";
         private const string GAMEOVER = "GameOver";
         private const string GAMEWIN = "GameWin";
 
         // ==== OTHER VALUES =====
         private const uint INVALID_ENTITY = 0xffffffffu;
+
+        private uint labelEntityID = 0;
 
         public override void OnStart()
         {
@@ -99,14 +113,18 @@ namespace Game
             currentHealth = maxHealth;
             isDead = false;
 
-            // Subscribe to bullet hit event
-            //(EVENT_BULLET_HIT, OnBulletHit);
+            // FIX: was SceneFindEntityByTag — must be SceneFindEntityByName
+            playerEntityID = SceneFindEntityByName(playerEntityName);
+            if (playerEntityID == 0)
+                LogWarning("[LoveLetterScript] Player entity not found for label billboard.");
 
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
             Subscribe(GAMEWIN, OnGameOver);
-            
+            Subscribe(EVENT_PAYLOAD_COLLECTED, OnPayloadCollected);
+            EnemyRegistry.Register(EntityID);
+
             // Seed RNG if not already done
             if (!rngSeeded)
             {
@@ -116,12 +134,10 @@ namespace Game
                 LogMessage("RNG seeded with: " + timeSeed);
             }
             
-            // Select a random core by tag
             SelectRandomCoreByTag();
             
             if (selectedCoreEntityID != 0)
             {
-                // Start movement after delay
                 delayTimer = startDelay;
                 LogMessage("LoveLetter initialized - waiting " + startDelay + " seconds before movement");
                 LogMessage("Selected core ID: " + selectedCoreEntityID);
@@ -134,18 +150,14 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
 
-            // Don't update if dead or no core selected
             if (isDead || selectedCoreEntityID == 0) return;
 
-            // Handle spawn delay
             if (delayTimer > 0.0f)
             {
                 delayTimer -= deltaTime;
-                
                 if (delayTimer <= 0.0f)
                 {
                     LogMessage("Starting movement to SEMICONDUCTOR core!");
@@ -155,11 +167,9 @@ namespace Game
                 return;
             }
 
-            // Wait at surface before self-destruct
             if (isWaitingAtSurface)
             {
                 waitTimer -= deltaTime;
-                
                 if (waitTimer <= 0.0f)
                 {
                     LogMessage("Wait time finished - self destructing!");
@@ -168,7 +178,6 @@ namespace Game
                 return;
             }
 
-            // Movement logic using linear interpolation
             if (isMoving && targetCalculated)
             {
                 MoveTowardsTargetLinear(deltaTime);
@@ -177,7 +186,6 @@ namespace Game
 
         private void SelectRandomCoreByTag()
         {
-            // Find all entities with the SEMICONDUCTOR tag
             uint[] coreEntities = SceneFindEntitiesByTag(coreTag);
             
             if (coreEntities == null || coreEntities.Length == 0)
@@ -189,7 +197,6 @@ namespace Game
             
             LogMessage("Found " + coreEntities.Length + " cores with tag '" + coreTag + "'");
             
-            // Select a random core from the available ones
             if (coreEntities.Length == 1)
             {
                 selectedCoreEntityID = coreEntities[0];
@@ -206,61 +213,47 @@ namespace Game
         // ===== SIMPLE DAMAGE SYSTEM =====
         private void OnBulletHit(string eventName, string payload)
         {
-            // if (isDead || eventName != EVENT_BULLET_HIT)
-            //     return;
-
-            // // Parse the entity ID that was hit
-            // if (!uint.TryParse(payload, out uint hitId))
-            //     return;
-
-            // // Check if this LoveLetter was the one hit
-            // if (hitId != loveletterEntityID)
-            // {
-            //     return;
-            // }
-
-            // LogMessage("=== BULLET HIT LOVELETTER ===");
-            // LogMessage("  LoveLetter ID: " + loveletterEntityID);
-            
-            // // Take damage
-            // TakeDamage(10.0f);
             if (isDead || eventName != EVENT_BULLET_HIT)
                 return;
+
             float damage = DamageSystem.ParseAmount(payload);
             currentHealth -= damage;
 
-            if (currentHealth < 0.0f){
+            if (currentHealth < 0.0f)
                 currentHealth = 0.0f;
-            }
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
             LogMessage("[LoveLetterScript] Attacker ID is: " + attackerId.ToString());
-            if(attackerId != INVALID_ENTITY){
+
+            if (attackerId != INVALID_ENTITY)
+            {
                 string attackerTag = TagGetTag(attackerId);
                 LogMessage("[LoveLetterScript] attacker is: " + attackerTag);
-                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET && currentHealth > 0.0f){
-                    LogMessage("[LoveLetterScript] Instantiating the hitmarker");
-                    uint hitmarkerID = 0;
-                    hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                    if(hitmarkerID == 0){
-                        LogMessage("[LoveLetterScript] Player Hit! But hitmarkerID fail to instantiate");
+
+                if (attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET)
+                {
+                    lastKillerTag = attackerTag;
+
+                    if (currentHealth > 0.0f)
+                    {
+                        LogMessage("[LoveLetterScript] Instantiating the hitmarker");
+                        uint hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if (hitmarkerID == 0)
+                            LogMessage("[LoveLetterScript] Player Hit! But hitmarkerID fail to instantiate");
                     }
                 }
             }
 
             if (currentHealth <= 0.0f)
             {
-                uint playerkillID = 0;
-                playerkillID = PrefabInstantiate(playerKillPrefab);
-                if(playerkillID == 0){
+                uint playerkillID = PrefabInstantiate(playerKillPrefab);
+                if (playerkillID == 0)
                     LogMessage("[LoveLetterScript] Player Kill LoveLetter! But playerkillID fail to instantiate");
-                }
 
                 Publish("LoveLetterDeath", 1.ToString());
                 DestroyLoveLetter();
             }
         }
-
 
         private void DestroyLoveLetter()
         {
@@ -268,39 +261,69 @@ namespace Game
 
             isDead = true;
             LogMessage("=== LOVELETTER DESTROYED ===");
-            LogMessage("Health reached 0 - LoveLetter destroyed!");
 
-            // Stop movement
             isMoving = false;
             isWaitingAtSurface = false;
-            Publish("LoveLetterKilled", loveletterEntityID.ToString());
-            // Publish event for game systems
+            Publish("LoveLetterKilled", "killer=" + lastKillerTag);
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
 
-            // Spawn in a prefab for death audio
+            // Capture position BEFORE destroying the entity
             Vector3 spawnPos = GetPosition((uint)EntityID);
             Quat spawnRot = GetRotation((uint)EntityID);
+
+            // Death audio VFX
             Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
             uint explosion = PrefabInstantiateWithTransform(deathPrefab, ref spawnPos, ref spawnRot, ref scale, false);
-            if(explosion == 0){
+            if (explosion == 0)
                 LogMessage("[LoveletterScript] loveletter explosion entity fail to instantiate");
-                return;
+
+            // MainExplosion1 (same as EnemyTurret when killed by player)
+            uint mainExplosion = PrefabInstantiate(mainExplosionPrefab);
+            if (mainExplosion == 0)
+            {
+                LogMessage("[LoveletterScript] MainExplosion1 failed to instantiate");
+            }
+            else
+            {
+                Transform.SetPosition(mainExplosion, ref spawnPos);
+                Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
+                Transform.SetScale(mainExplosion, ref explosionScale);
             }
 
-            // Spawn in the payload
+            // Destroy the LoveLetter FIRST so it doesn't overlap spawned entities
+            SceneDestroyEntity(loveletterEntityID);
+
+            // Spawn the payload
             Vector3 payloadScale = new Vector3(10.0f, 10.0f, 10.0f);
             uint payload = PrefabInstantiateWithTransform(payloadPrefab, ref spawnPos, ref spawnRot, ref payloadScale, false);
-            if(payload == 0){
+            if (payload == 0)
+            {
                 LogMessage("[LoveletterScript] loveletter payload entity fail to instantiate");
                 return;
             }
-
+            spawnedPayloadID = payload;
             RigidbodySetIsKinematic(payload, false);
             Vector3 halfboxExtend = new Vector3(15f, 15f, 15f);
             RigidbodySetBoxHalfExtents(payload, ref halfboxExtend);
 
-            // Destroy the LoveLetter
-            SceneDestroyEntity(loveletterEntityID);
+            // Spawn label AFTER payload so it renders on top.
+            // UpgradeModuleLabel.cs positions itself on the payload surface facing the player.
+            Quat identityRot = new Quat(0f, 0f, 0f, 1f);
+            Vector3 labelScale = new Vector3(50.0f, 21.0f, 1.0f);
+            labelEntityID = PrefabInstantiateWithTransform(upgradeModuleLabelPrefab, ref spawnPos, ref identityRot, ref labelScale, false);
+            if (labelEntityID == 0)
+            {
+                LogMessage("[LoveletterScript] upgradeModuleLabel failed to instantiate");
+            }
+            else
+            {
+                // Pass payload ID to the label via event since EntityGetScript is unavailable.
+                // UpgradeModuleLabel listens for "UpgradeLabelInit:{labelEntityID}" and stores the payload ID.
+                string initEvent = "UpgradeLabelInit:" + labelEntityID.ToString();
+                Publish(initEvent, payload.ToString());
+                LogMessage("[LoveletterScript] upgradeModuleLabel spawned ID: " + labelEntityID +
+                    " | sent init event with payload ID: " + payload);
+            }
         }
 
         // ===== MOVEMENT SYSTEM =====
@@ -312,18 +335,15 @@ namespace Game
                 CalculateTargetSurfaceCenter();
                 targetCalculated = true;
                 
-                // Store start position and calculate direction
                 startPosition = GetPosition(loveletterEntityID);
                 currentPosition = startPosition;
                 totalDistanceTraveled = 0.0f;
                 
-                // Calculate total distance
                 float dx = targetSurfaceCenter.X - startPosition.X;
                 float dy = targetSurfaceCenter.Y - startPosition.Y;
                 float dz = targetSurfaceCenter.Z - startPosition.Z;
                 totalDistance = SimpleMath.Sqrt(dx * dx + dy * dy + dz * dz);
                 
-                // Normalize direction
                 if (totalDistance > 0.001f)
                 {
                     directionNormalized = new Engine.Vector3(
@@ -347,51 +367,41 @@ namespace Game
         {
             Engine.Vector3 loveletterPos = GetPosition(loveletterEntityID);
             
-            // Calculate direction from Core to LoveLetter
             Engine.Vector3 direction = new Engine.Vector3(
                 loveletterPos.X - corePosition.X,
                 loveletterPos.Y - corePosition.Y,
                 loveletterPos.Z - corePosition.Z
             );
             
-            // Find which axis has the largest absolute value
             float absX = direction.X > 0 ? direction.X : -direction.X;
             float absY = direction.Y > 0 ? direction.Y : -direction.Y;
             float absZ = direction.Z > 0 ? direction.Z : -direction.Z;
             
-            // Determine which face is most directly in line
             if (absX >= absY && absX >= absZ)
             {
-                // X-axis dominant
                 if (direction.X > 0)
                 {
                     targetSurfaceCenter = new Engine.Vector3(
                         corePosition.X + coreHalfSizeX + stopDistanceFromSurface,
-                        corePosition.Y,
-                        corePosition.Z
-                    );
+                        corePosition.Y, corePosition.Z);
                     LogMessage("Targeting RIGHT face center");
                 }
                 else
                 {
                     targetSurfaceCenter = new Engine.Vector3(
                         corePosition.X - coreHalfSizeX - stopDistanceFromSurface,
-                        corePosition.Y,
-                        corePosition.Z
-                    );
+                        corePosition.Y, corePosition.Z);
                     LogMessage("Targeting LEFT face center");
                 }
             }
             else if (absY >= absX && absY >= absZ)
             {
-                // Y-axis dominant
                 if (direction.Y > 0)
                 {
                     targetSurfaceCenter = new Engine.Vector3(
                         corePosition.X,
                         corePosition.Y + coreHalfSizeY + stopDistanceFromSurface,
-                        corePosition.Z
-                    );
+                        corePosition.Z);
                     LogMessage("Targeting TOP face center");
                 }
                 else
@@ -399,30 +409,24 @@ namespace Game
                     targetSurfaceCenter = new Engine.Vector3(
                         corePosition.X,
                         corePosition.Y - coreHalfSizeY - stopDistanceFromSurface,
-                        corePosition.Z
-                    );
+                        corePosition.Z);
                     LogMessage("Targeting BOTTOM face center");
                 }
             }
             else
             {
-                // Z-axis dominant
                 if (direction.Z > 0)
                 {
                     targetSurfaceCenter = new Engine.Vector3(
-                        corePosition.X,
-                        corePosition.Y,
-                        corePosition.Z + coreHalfSizeZ + stopDistanceFromSurface
-                    );
+                        corePosition.X, corePosition.Y,
+                        corePosition.Z + coreHalfSizeZ + stopDistanceFromSurface);
                     LogMessage("Targeting FRONT face center");
                 }
                 else
                 {
                     targetSurfaceCenter = new Engine.Vector3(
-                        corePosition.X,
-                        corePosition.Y,
-                        corePosition.Z - coreHalfSizeZ - stopDistanceFromSurface
-                    );
+                        corePosition.X, corePosition.Y,
+                        corePosition.Z - coreHalfSizeZ - stopDistanceFromSurface);
                     LogMessage("Targeting BACK face center");
                 }
             }
@@ -432,40 +436,31 @@ namespace Game
         {
             if (loveletterEntityID == 0) return;
 
-            // Calculate how far we should move this frame (constant speed)
             float distanceThisFrame = moveSpeed * deltaTime;
             totalDistanceTraveled += distanceThisFrame;
             
-            // Check if we've reached the target
             if (totalDistanceTraveled >= totalDistance)
             {
-                // Snap to exact target
                 SetPosition(loveletterEntityID, ref targetSurfaceCenter);
                 OnReachedTarget();
                 return;
             }
             
-            // Calculate new position based on total distance traveled
             currentPosition = new Engine.Vector3(
                 startPosition.X + directionNormalized.X * totalDistanceTraveled,
                 startPosition.Y + directionNormalized.Y * totalDistanceTraveled,
                 startPosition.Z + directionNormalized.Z * totalDistanceTraveled
             );
             
-            // Apply the calculated position
             SetPosition(loveletterEntityID, ref currentPosition);
         }
 
         private void OnReachedTarget()
         {
-            // Snap to exact target position
             SetPosition(loveletterEntityID, ref targetSurfaceCenter);
-            
-            // Stop moving and start waiting
             isMoving = false;
             isWaitingAtSurface = true;
             waitTimer = waitTimeAtSurface;
-            
             LogMessage("=== REACHED TARGET SURFACE ===");
             LogMessage("Traveled " + totalDistanceTraveled.ToString("F1") + " units in total");
             LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface before self-destruct...");
@@ -475,27 +470,22 @@ namespace Game
         {
             LogMessage("///////////////////////////Start of Onreached.");
             if (isDead) return;
-            LogMessage("Destroying LoveLetter | EntityID: " + loveletterEntityID);
 
             isDead = true;
+            isMoving = false;
+            isWaitingAtSurface = false;
             LogMessage("=== SELF DESTRUCTING AT CORE ===");
         
-            // Deal massive damage to the core (200 damage)
             if (selectedCoreEntityID != 0)
             {
                 LogMessage("Dealing 200 damage to core ID: " + selectedCoreEntityID);
-                
-                // Use DamageSystem like WormBullet does
                 DamageSystem.DealDamage(selectedCoreEntityID, 200.0f, loveletterEntityID);
-                
                 LogMessage("Core damaged successfully");
             }
 
-            // Publish event
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
             Publish("LoveLetterReachedCore", loveletterEntityID.ToString());
             
-            // Self-destruct
             SceneDestroyEntity(loveletterEntityID);
             LogMessage("///////////////////////////End of Onreached.");
         }
@@ -535,20 +525,40 @@ namespace Game
 
         public override void OnDestroy()
         {
+            EnemyRegistry.Unregister(EntityID);
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(GAMEOVER, OnGameOver);
             Unsubscribe(GAMEWIN, OnGameOver);
-
+            Unsubscribe(EVENT_PAYLOAD_COLLECTED, OnPayloadCollected);
             LogMessage("=== LoveLetter Destroyed ===");
         }
 
-        private void OnGameOver(string eventName, string payload){
+        private void OnGameOver(string eventName, string payload)
+        {
             if (isDead)
                 return;
             isDead = true;
             isMoving = false;
             isWaitingAtSurface = false;
+
+            if (labelEntityID != 0)              // <-- add this
+            {
+                SceneDestroyEntity(labelEntityID);
+                labelEntityID = 0;
+            }
             SceneDestroyEntity(loveletterEntityID);
+        }
+
+        private void OnPayloadCollected(string eventName, string payload)
+        {
+            if (!uint.TryParse(payload, out uint collectedID)) return;
+            if (collectedID != spawnedPayloadID) return; // only care about our own payload
+
+            if (labelEntityID != 0)
+            {
+                SceneDestroyEntity(labelEntityID);
+                labelEntityID = 0;
+            }
         }
     }
 }

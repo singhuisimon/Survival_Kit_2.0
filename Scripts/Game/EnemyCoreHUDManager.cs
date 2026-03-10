@@ -9,7 +9,7 @@ namespace Game
 {
     public class EnemyCoreHUDManager : ScriptBehaviour
     {
-        [SerializeField] private float visibilityRange = 100.0f;
+        [SerializeField] private float visibilityRange = 200.0f;
         [SerializeField] private float pollInterval = 0.5f;
 
         private const string PLAYER_NAME = "Player";
@@ -28,6 +28,7 @@ namespace Game
         private uint hpBarID = 0;
         private uint hpFrameID = 0;
         private uint hpRefillID = 0;
+        private uint hpRedFillID = 0;
 
         private float pollTimer = 0.0f;
         private bool isVisible = false;
@@ -42,6 +43,7 @@ namespace Game
             hpBarID = SceneFindEntityByName("EnemyCoreHP");
             hpFrameID = SceneFindEntityByName("EnemyCoreHPFrame");
             hpRefillID = SceneFindEntityByName("EnemyCoreHPRefill");
+            hpRedFillID = SceneFindEntityByName("EnemyCoreHPRedFill");
 
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
@@ -93,6 +95,7 @@ namespace Game
             if (hpBarID != 0) SpriteRenderer.SetIsVisible(hpBarID, visible);
             if (hpFrameID != 0) SpriteRenderer.SetIsVisible(hpFrameID, visible);
             if (hpRefillID != 0) SpriteRenderer.SetIsVisible(hpRefillID, visible);
+            if (hpRedFillID != 0) SpriteRenderer.SetIsVisible(hpRedFillID, visible);
         }
 
         private void OnGameEnd(string eventName, string payload)

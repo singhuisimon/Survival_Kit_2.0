@@ -29,6 +29,8 @@ namespace Game
                 return;
             }
 
+            ModuleRegistry.Register(EntityID);
+
             LogMessage("Payload " + EntityID + " initialized");
         }
 
@@ -44,6 +46,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            ModuleRegistry.Unregister(EntityID);
             //Unsubscribe(EVENT_ENEMYCORE_HIT, OnDamageReceived);
             LogMessage("Payload " + EntityID + " destroyed");
         }
@@ -72,7 +75,7 @@ namespace Game
             if(playercollided){
                 //publish event that payload is collected
                 Publish(EVENT_COLLECT_PAYLOAD, "");
-
+                Publish("PayloadCollected", EntityID.ToString());
 
                 //kills itself thereafter
                 SceneDestroyEntity((uint)EntityID);

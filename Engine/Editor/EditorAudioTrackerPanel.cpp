@@ -4,6 +4,7 @@
 #include "../Component/TagComponent.h"
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace Engine
 {
@@ -18,6 +19,84 @@ namespace Engine
             ImGui::End();
             return;
         }
+
+		// Add in the mixer controls at the top of the panel
+        AudioManager* audioManager = m_Editor ? m_Editor->GetAudioManager() : nullptr;
+        if (!audioManager)
+        {
+            LOG_DEBUG("AudioManager not found in EditorAudioTrackerPanel.");
+            ImGui::TextDisabled("AudioManager not available.");
+            ImGui::End();
+            return;
+        }
+
+        ImGui::Text("Audio Mixer");
+        ImGui::Separator();
+
+        auto DrawVolumeControl = [&](const char* label, AudioType type)
+            {
+                float value = audioManager->GetEditorCap(type);
+                bool changed = false;
+
+                ImGui::PushID(label);
+
+                ImGui::TextUnformatted(label);
+
+                ImGui::SetNextItemWidth(200.0f);
+                changed |= ImGui::SliderFloat("##slider", &value, 0.0f, 2.0f, "%.2f");
+
+                ImGui::SameLine();
+
+                ImGui::SetNextItemWidth(100.0f);
+                changed |= ImGui::DragFloat("##drag", &value, 0.01f, 0.0f, 2.0f, "%.3f");
+
+                value = std::clamp(value, 0.0f, 2.0f);
+
+                if (changed)
+                {
+                    audioManager->SetEditorCap(type, value);
+                }
+
+                ImGui::PopID();
+            };
+
+        ImGui::Columns(2, "AudioMixerColumns", false);
+
+        DrawVolumeControl("Master", AudioType::MASTER);
+        ImGui::NextColumn();
+
+        DrawVolumeControl("BGM", AudioType::BGM);
+        ImGui::NextColumn();
+
+        DrawVolumeControl("SFX", AudioType::SFX);
+        ImGui::NextColumn();
+
+        DrawVolumeControl("GameSFX", AudioType::GAMESFX);
+        ImGui::NextColumn();
+
+        DrawVolumeControl("UI", AudioType::UI);
+        ImGui::NextColumn();
+
+        DrawVolumeControl("VO", AudioType::VO);
+
+        ImGui::Columns(1);
+
+        ImGui::Separator();
+
+        ////add in sliders here
+        //float masterCap = audioManager->GetEditorCap(AudioType::MASTER);
+        //if (ImGui::SliderFloat("Master", &masterCap, 0.0f, 1.0f, "%.2f"))
+        //{
+        //    audioManager->SetEditorCap(AudioType::MASTER, masterCap);
+        //}
+
+        //float bgmCap = audioManager->GetEditorCap(AudioType::BGM);
+        //if (ImGui::SliderFloat("BGM", &bgmCap, 0.0f, 1.0f, "%.2f"))
+        //{
+        //    audioManager->SetEditorCap(AudioType::BGM, bgmCap);
+        //}
+
+        ImGui::Separator();
 
         bool openAll = ImGui::Button("Expand All");
         ImGui::SameLine();

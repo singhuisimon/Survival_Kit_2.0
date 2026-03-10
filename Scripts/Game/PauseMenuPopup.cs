@@ -240,13 +240,13 @@ namespace Game
             uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
             if (turrets != null && turrets.Length > 0)
             {
-                currentGameScenePath = LEVEL2_SCENE_PATH;
-                LogMessage("PauseMenuPopup: Detected Level 2");
+                currentGameScenePath = GAME_SCENE_PATH;
+                LogMessage("PauseMenuPopup: Detected Level 1");
             }
             else
             {
-                currentGameScenePath = GAME_SCENE_PATH;
-                LogMessage("PauseMenuPopup: Detected Level 1");
+                currentGameScenePath = LEVEL2_SCENE_PATH;
+                LogMessage("PauseMenuPopup: Detected Level 2");
             }
 
             Event.Subscribe("GameOver", OnGameEnded);

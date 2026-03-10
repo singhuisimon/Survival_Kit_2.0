@@ -3,6 +3,64 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 69,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicatorManager",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5565666893842760613",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            465.0,
+                            260.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11906735169180992425",
+                        "ScriptClassName": "Game.EnemyIndicatorManager"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Enemy.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.1764705926179886
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 0,
+                        "IsActive": false,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
             "ID": 58,
             "Components": [
                 {
@@ -22,7 +80,6 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryCount",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryCount.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -533,7 +590,7 @@
                     "Properties": {
                         "ComponentGUID": "8895243146519429947",
                         "FilePath": "Player Death.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 2,
                         "Volume": 0.968999981880188,
                         "Pitch": 1.0,
@@ -1025,7 +1082,7 @@
                     "Properties": {
                         "ComponentGUID": "2092028145730782025",
                         "FilePath": "Player_Move.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 2,
                         "Volume": 0.9319999814033508,
                         "Pitch": 1.0,
@@ -1064,8 +1121,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000024",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            526.5,
                             0.0
                         ],
                         "Rotation": [
@@ -1095,7 +1152,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1115,8 +1172,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000023",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            526.5,
                             0.0
                         ],
                         "Rotation": [
@@ -1146,7 +1203,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1166,8 +1223,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000022",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            560.0,
                             0.0
                         ],
                         "Rotation": [
@@ -1197,7 +1254,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1217,8 +1274,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000021",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1198.699951171875,
+                            560.0,
                             0.0
                         ],
                         "Rotation": [
@@ -1248,7 +1305,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1268,8 +1325,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000020",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1151.0999755859375,
+                            414.5,
                             0.0
                         ],
                         "Rotation": [
@@ -1299,7 +1356,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1319,8 +1376,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000019",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            526.0999755859375,
                             0.0
                         ],
                         "Rotation": [
@@ -1350,7 +1407,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1370,8 +1427,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000018",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            526.0999755859375,
                             0.0
                         ],
                         "Rotation": [
@@ -1401,7 +1458,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1600,8 +1657,8 @@
                     "Properties": {
                         "ComponentGUID": "8930726590763664989",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            834.5,
+                            618.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -1631,7 +1688,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1760,8 +1817,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000017",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            559.7000122070313,
                             0.0
                         ],
                         "Rotation": [
@@ -1791,7 +1848,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2040,7 +2097,7 @@
                     "Properties": {
                         "ComponentGUID": "16438482250874045513",
                         "FilePath": "Core_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8999999761581421,
                         "Pitch": 1.0,
@@ -2065,22 +2122,22 @@
             ]
         },
         {
-            "ID": 68,
+            "ID": 80,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "nextlevelbutton",
-                        "Tag": "nextlevelbutton"
+                        "Name": "AltFireFill",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13802257990996788065",
+                        "ComponentGUID": "9074577925281760651",
                         "Position": [
-                            855.0,
-                            518.0,
+                            1212.699951171875,
+                            568.4000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -2089,8 +2146,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            45.0,
+                            29.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -2100,14 +2157,14 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "3425964449535591267",
-                        "ScriptClassName": "Game.NextLevelButton"
+                        "ComponentGUID": "1004127393034044815",
+                        "ScriptClassName": "Game.AltFireBar"
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess_Level2Button.png",
+                        "Texture": "AlternateFire_Fill.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -2115,9 +2172,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 2,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2266,7 +2323,7 @@
                     "Properties": {
                         "ComponentGUID": "2839845586185503591",
                         "FilePath": "Primary_Reload.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 2,
                         "Volume": 0.7039999961853027,
                         "Pitch": 1.0,
@@ -2619,7 +2676,7 @@
                     "Properties": {
                         "ComponentGUID": "15427608859292877731",
                         "Position": [
-                            376.0,
+                            650.0,
                             518.0,
                             0.0
                         ],
@@ -3101,7 +3158,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "SentryWindows.png",
+                        "Texture": "NormalSentryWindow.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -3195,14 +3252,14 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "3177043809125597989",
-                        "ScriptClassName": "Game.StageCount"
+                        "ScriptClassName": "Game.Stage2Count"
                     }
                 },
                 {
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "14024139429208752661",
-                        "text": "STAGE 1",
+                        "text": "Protect Mainframe Core\n",
                         "fontName": "Quantico-Regular",
                         "fontSize": 24.0,
                         "color": [
@@ -3317,7 +3374,7 @@
                     "Properties": {
                         "ComponentGUID": "15387621816698290397",
                         "FilePath": "Core_Health_Damage_Alert.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
@@ -3548,7 +3605,7 @@
                     "Properties": {
                         "ComponentGUID": "18330838522979176399",
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8510000109672546,
                         "Pitch": 1.0,
@@ -3786,7 +3843,7 @@
                     "Properties": {
                         "ComponentGUID": "18330838522979176399",
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8510000109672546,
                         "Pitch": 1.0,
@@ -4024,7 +4081,7 @@
                     "Properties": {
                         "ComponentGUID": "18330838522979176399",
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8510000109672546,
                         "Pitch": 1.0,
@@ -4280,7 +4337,7 @@
                     "Properties": {
                         "ComponentGUID": "18330838522979176399",
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8510000109672546,
                         "Pitch": 1.0,
@@ -4518,7 +4575,7 @@
                     "Properties": {
                         "ComponentGUID": "18330838522979176399",
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8500000238418579,
                         "Pitch": 1.0,
@@ -4756,7 +4813,7 @@
                     "Properties": {
                         "ComponentGUID": "18330838522979176399",
                         "FilePath": "Flotilla_Gunship_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.8500000238418579,
                         "Pitch": 1.0,
@@ -4853,8 +4910,8 @@
                     "Properties": {
                         "ComponentGUID": "17001177123005449791",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1142.699951171875,
+                            619.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -4884,7 +4941,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -4904,8 +4961,8 @@
                     "Properties": {
                         "ComponentGUID": "11813030352277194309",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1142.699951171875,
+                            619.9000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -4935,7 +4992,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -4955,8 +5012,8 @@
                     "Properties": {
                         "ComponentGUID": "1436736810816407115",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            987.5999755859375,
+                            618.5,
                             0.0
                         ],
                         "Rotation": [
@@ -4986,7 +5043,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5006,8 +5063,8 @@
                     "Properties": {
                         "ComponentGUID": "13542412609189185105",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            987.5999755859375,
+                            618.5,
                             0.0
                         ],
                         "Rotation": [
@@ -5037,7 +5094,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5057,8 +5114,8 @@
                     "Properties": {
                         "ComponentGUID": "6048422829245597271",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            834.5,
+                            618.5,
                             0.0
                         ],
                         "Rotation": [
@@ -5088,7 +5145,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5832,7 +5889,8 @@
                             1048582,
                             1048581,
                             1048580,
-                            2097155
+                            2097155,
+                            78
                         ]
                     }
                 },
@@ -5865,7 +5923,8 @@
                             1048582,
                             1048581,
                             1048580,
-                            2097155
+                            2097155,
+                            78
                         ]
                     }
                 },
@@ -5922,7 +5981,7 @@
                     "Properties": {
                         "ComponentGUID": "16187705639371801403",
                         "FilePath": "Player_Ambience.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 0.9300000071525574,
                         "Pitch": 1.0,
@@ -6066,8 +6125,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000016",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            1043.0,
+                            559.7000122070313,
                             0.0
                         ],
                         "Rotation": [
@@ -6097,7 +6156,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6117,8 +6176,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000015",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            997.2999877929688,
+                            414.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6148,7 +6207,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6169,7 +6228,7 @@
                         "ComponentGUID": "100000000000000014",
                         "Position": [
                             640.0,
-                            -500.0,
+                            382.6000061035156,
                             0.0
                         ],
                         "Rotation": [
@@ -6199,7 +6258,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6220,7 +6279,7 @@
                         "ComponentGUID": "100000000000000013",
                         "Position": [
                             640.0,
-                            -500.0,
+                            382.6000061035156,
                             0.0
                         ],
                         "Rotation": [
@@ -6250,7 +6309,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6271,7 +6330,7 @@
                         "ComponentGUID": "100000000000000012",
                         "Position": [
                             640.0,
-                            -500.0,
+                            454.0,
                             0.0
                         ],
                         "Rotation": [
@@ -6301,7 +6360,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6442,7 +6501,7 @@
                     "Properties": {
                         "ComponentGUID": "601213425638908771",
                         "FilePath": "Botnet_Ambient.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 0,
                         "Volume": 1.0,
                         "Pitch": 1.0,
@@ -6482,7 +6541,7 @@
                         "ComponentGUID": "100000000000000011",
                         "Position": [
                             640.0,
-                            -500.0,
+                            454.0,
                             0.0
                         ],
                         "Rotation": [
@@ -6512,7 +6571,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6532,8 +6591,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000010",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            559.2999877929688,
                             0.0
                         ],
                         "Rotation": [
@@ -6563,7 +6622,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6583,8 +6642,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000009",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            559.2999877929688,
                             0.0
                         ],
                         "Rotation": [
@@ -6614,7 +6673,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6695,9 +6754,9 @@
                             93.68208312988281
                         ],
                         "Rotation": [
-                            -55.09593963623047,
-                            62.754249572753906,
-                            0.0
+                            -55.095943450927734,
+                            62.75425720214844,
+                            0.0000037298341339919716
                         ],
                         "Scale": [
                             0.10000000149011612,
@@ -6761,7 +6820,7 @@
                     "Properties": {
                         "ComponentGUID": "8204732253401207749",
                         "FilePath": "Player_Primary_Fire.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 2,
                         "Volume": 0.4880000054836273,
                         "Pitch": 1.0,
@@ -6839,8 +6898,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000008",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            844.4000244140625,
+                            414.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6870,7 +6929,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6890,8 +6949,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000007",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            524.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6921,7 +6980,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6941,8 +7000,8 @@
                     "Properties": {
                         "ComponentGUID": "100000000000000006",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            890.2000122070313,
+                            524.5,
                             0.0
                         ],
                         "Rotation": [
@@ -6972,7 +7031,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6993,7 +7052,7 @@
                         "ComponentGUID": "100000000000000005",
                         "Position": [
                             640.0,
-                            -500.0,
+                            309.5,
                             0.0
                         ],
                         "Rotation": [
@@ -7023,7 +7082,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -7044,7 +7103,7 @@
                         "ComponentGUID": "100000000000000004",
                         "Position": [
                             640.0,
-                            -500.0,
+                            309.5,
                             0.0
                         ],
                         "Rotation": [
@@ -7074,7 +7133,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -7095,7 +7154,7 @@
                         "ComponentGUID": "100000000000000003",
                         "Position": [
                             640.0,
-                            -500.0,
+                            236.0,
                             0.0
                         ],
                         "Rotation": [
@@ -7125,7 +7184,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -7146,7 +7205,7 @@
                         "ComponentGUID": "100000000000000002",
                         "Position": [
                             640.0,
-                            -500.0,
+                            236.0,
                             0.0
                         ],
                         "Rotation": [
@@ -7176,7 +7235,7 @@
                         "Quad": 3,
                         "Sprite Layer": 4,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -7197,7 +7256,7 @@
                         "ComponentGUID": "100000000000000001",
                         "Position": [
                             640.0,
-                            -500.0,
+                            360.0,
                             0.0
                         ],
                         "Rotation": [
@@ -7234,7 +7293,7 @@
                         "Quad": 3,
                         "Sprite Layer": 3,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -7277,7 +7336,7 @@
                     "Properties": {
                         "ComponentGUID": "10624625403430224701",
                         "FilePath": "Core Destruction.wav",
-                        "Type": 1,
+                        "Type": 5,
                         "State": 2,
                         "Volume": 0.9819999933242798,
                         "Pitch": 1.0,
@@ -7649,22 +7708,22 @@
             ]
         },
         {
-            "ID": 80,
+            "ID": 68,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "AltFireFill",
-                        "Tag": "Default"
+                        "Name": "AudioSettings",
+                        "Tag": "AudioSettings"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "9074577925281760651",
+                        "ComponentGUID": "200000000000000001",
                         "Position": [
-                            1212.699951171875,
-                            568.4000244140625,
+                            0.0,
+                            0.0,
                             0.0
                         ],
                         "Rotation": [
@@ -7673,8 +7732,8 @@
                             0.0
                         ],
                         "Scale": [
-                            45.0,
-                            29.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -7684,24 +7743,184 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "1004127393034044815",
-                        "ScriptClassName": "Game.AltFireBar"
+                        "ComponentGUID": "200000000000000002",
+                        "ScriptClassName": "Game.AudioSettings"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 78,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HealingVFX",
+                        "Tag": "Default"
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "PrefabComponent",
                     "Properties": {
-                        "Texture": "AlternateFire_Fill.png",
-                        "Color": [
+                        "ComponentGUID": "1125214420395951023",
+                        "PrefabAssetGuid": "8629926637709377695",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: HealingVFX.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3975043005382721689\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[60.000003814697266,3.5622213187015694e-13,0.0000019221624825149775],\"Scale\":[50.0,50.0,50.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10892572033023803543\",\"Name\":\"HealingVFX\",\"Tag\":\"Default\"}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"vampirismVFX.mat\",\"Initial Velocity\":[0.0,1.2000000476837158,-1.5],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[2.5,1.0,1.0],\"Color Min\":[0.0,1.0,0.07748222351074219],\"Color Max\":[0.2857140302658081,1.0,0.0],\"Emitter Shape\":1,\"Max Particles\":1000,\"Particle Type\":1,\"Emission Rate\":15.0,\"Particle Lifetime\":1.0,\"Emission Accumulator\":0.7715435028076172,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":10.0,\"Min Speed\":0.5,\"Max Speed\":1.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":false,\"Loop\":false,\"Active\":true,\"World Space\":false,\"Burst Mode\":false}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3975043005382721689",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            60.000003814697266,
+                            3.5622213187015694e-13,
+                            0.0000019221624825149775
+                        ],
+                        "Scale": [
+                            50.0,
+                            50.0,
+                            50.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "vampirismVFX.mat",
+                        "Initial Velocity": [
+                            0.0,
+                            1.2000000476837158,
+                            -1.5
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            2.5,
                             1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            0.0,
+                            1.0,
+                            0.07748222351074219
+                        ],
+                        "Color Max": [
+                            0.2857140302658081,
+                            1.0,
+                            0.0
+                        ],
+                        "Emitter Shape": 1,
+                        "Max Particles": 1000,
+                        "Particle Type": 1,
+                        "Emission Rate": 15.0,
+                        "Particle Lifetime": 1.0,
+                        "Emission Accumulator": 0.7715435028076172,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 10.0,
+                        "Min Speed": 0.5,
+                        "Max Speed": 1.0,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": false,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": false,
+                        "Burst Mode": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 81,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicatorManager",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "8911929380053697459",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
                             1.0,
                             1.0,
                             1.0
                         ],
-                        "Quad": 3,
-                        "Sprite Layer": 2,
-                        "IsActive": true,
-                        "IsVisible": true
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "13523615398481281973",
+                        "ScriptClassName": "Game.UpgradeIndicatorManager"
                     }
                 }
             ]
@@ -7713,7 +7932,13 @@
             "BloomStrength": 0.004999999888241291,
             "BloomFilterRadius": 0.0010000000474974513,
             "Exposure": 5.0,
-            "GlobalBias": 0.004999999888241291
+            "GlobalBias": 0.004999999888241291,
+            "MasterVolume": 1.0,
+            "SFXVolume": 1.0,
+            "BGMVolume": 1.0,
+            "VOVolume": 1.0,
+            "UIVolume": 1.0,
+            "GameSFXVolume": 1.0
         }
     ]
 }
