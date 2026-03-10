@@ -3,6 +3,7 @@ using System;
 using static Engine.Scene;
 using static Engine.Logger;
 using static Engine.SpriteRenderer;
+using static Engine.Event;
 
 namespace Game
 {
@@ -35,7 +36,7 @@ namespace Game
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
         private bool level2Unlocked = false;
-        private bool showingLevel2Popup = false;
+        public static bool IsLevel2Selected { get; private set; } = false;
 
         public override void OnStart()
         {
@@ -61,7 +62,7 @@ namespace Game
 
             entitiesFound = true;
             wasMousePressed = false;
-            showingLevel2Popup = false;
+            IsLevel2Selected = false;
 
             // Hide Level 2 button and its selected variant if not unlocked
             if (!level2Unlocked)
@@ -88,6 +89,9 @@ namespace Game
 
             // Default: show Level 1 popup, hide Level 2 popup
             ShowPopup(false);
+
+            // Listen for progress reset to hide level 2 immediately
+            Event.Subscribe("ProgressReset", OnProgressReset);
 
             LogMessage("LevelSelectController: Ready!");
         }
@@ -133,23 +137,23 @@ namespace Game
 
         private void ShowPopup(bool showLevel2)
         {
-            showingLevel2Popup = showLevel2;
+            IsLevel2Selected = showLevel2;
 
             if (showLevel2)
             {
                 // Show Level 2 popup, hide Level 1 popup
                 if (levelSelectionPopup1Id != 0)
-                    SetColor(levelSelectionPopup1Id, 1.0f, 1.0f, 1.0f, 0.0f);
+                    SetIsVisible(levelSelectionPopup1Id, false);
                 if (levelSelectionPopup2Id != 0)
-                    SetColor(levelSelectionPopup2Id, 1.0f, 1.0f, 1.0f, 1.0f);
+                    SetIsVisible(levelSelectionPopup2Id, true);
             }
             else
             {
                 // Show Level 1 popup, hide Level 2 popup
                 if (levelSelectionPopup1Id != 0)
-                    SetColor(levelSelectionPopup1Id, 1.0f, 1.0f, 1.0f, 1.0f);
+                    SetIsVisible(levelSelectionPopup1Id, true);
                 if (levelSelectionPopup2Id != 0)
-                    SetColor(levelSelectionPopup2Id, 1.0f, 1.0f, 1.0f, 0.0f);
+                    SetIsVisible(levelSelectionPopup2Id, false);
             }
         }
 
@@ -181,8 +185,28 @@ namespace Game
             return false;
         }
 
+        private void OnProgressReset(string eventName, string payload)
+        {
+            LogMessage("LevelSelectController: Progress reset - hiding Level 2");
+            level2Unlocked = false;
+            IsLevel2Selected = false;
+
+            // Hide Level 2 button and selected variant
+            if (level2ButtonId != 0)
+                SetIsVisible(level2ButtonId, false);
+            if (level2ButtonSelectedId != 0)
+            {
+                SetIsVisible(level2ButtonSelectedId, false);
+                SetColor(level2ButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+            }
+
+            // Swap popup back to Level 1
+            ShowPopup(false);
+        }
+
         public override void OnDestroy()
         {
+            Event.Unsubscribe("ProgressReset", OnProgressReset);
             LogMessage("LevelSelectController: Destroyed");
         }
     }
