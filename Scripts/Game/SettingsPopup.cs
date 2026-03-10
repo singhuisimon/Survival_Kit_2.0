@@ -53,17 +53,17 @@ namespace Game
         private uint volumeFill3Id;
 
         // Visible positions
-        private Vector3 popupVisiblePos = new Vector3(640.0f, 350.0f, -0.5f);
-        private Vector3 closeButtonVisiblePos = new Vector3(707.0f, 140.0f, -0.6f);
-        private Vector3 plusButton1VisiblePos = new Vector3(591.0f, 235.0f, -0.6f);
-        private Vector3 plusButton2VisiblePos = new Vector3(591.0f, 307.0f, -0.6f);
-        private Vector3 plusButton3VisiblePos = new Vector3(591.0f, 378.0f, -0.6f);
-        private Vector3 minusButton1VisiblePos = new Vector3(559.0f, 235.0f, -0.6f);
-        private Vector3 minusButton2VisiblePos = new Vector3(559.0f, 307.0f, -0.6f);
-        private Vector3 minusButton3VisiblePos = new Vector3(559.0f, 378.0f, -0.6f);
-        private Vector3 volumeFill1VisiblePos = new Vector3(353.0f, 234.0f, -0.6f);
-        private Vector3 volumeFill2VisiblePos = new Vector3(353.0f, 307.0f, -0.6f);
-        private Vector3 volumeFill3VisiblePos = new Vector3(353.0f, 377.0f, -0.6f);
+        private Vector3 popupVisiblePos = new Vector3(640.0f, 375.0f, -0.5f);
+        private Vector3 closeButtonVisiblePos = new Vector3(712.4f, 61.8f, -0.6f);
+        private Vector3 plusButton1VisiblePos = new Vector3(598.0f, 423.9f, -0.6f);
+        private Vector3 plusButton2VisiblePos = new Vector3(598.0f, 495.0f, -0.6f);
+        private Vector3 plusButton3VisiblePos = new Vector3(598.0f, 567.3f, -0.6f);
+        private Vector3 minusButton1VisiblePos = new Vector3(565.0f, 424.2f, -0.6f);
+        private Vector3 minusButton2VisiblePos = new Vector3(565.0f, 495.2f, -0.6f);
+        private Vector3 minusButton3VisiblePos = new Vector3(565.0f, 566.3f, -0.6f);
+        private Vector3 volumeFill1VisiblePos = new Vector3(359.4f, 423.0f, -0.6f);
+        private Vector3 volumeFill2VisiblePos = new Vector3(359.4f, 494.0f, -0.6f);
+        private Vector3 volumeFill3VisiblePos = new Vector3(359.4f, 565.0f, -0.6f);
 
         // Event names for popup coordination
         private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
