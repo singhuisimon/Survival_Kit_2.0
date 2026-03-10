@@ -52,6 +52,19 @@ namespace Game
         private uint volumeFill2Id;
         private uint volumeFill3Id;
 
+        private uint gammaPlusId;
+        private uint gammaMinusId;
+        private uint gammaVolumeId;
+
+        private uint mousePlusId;
+        private uint mouseMinusId;
+        private uint mouseVolumeId;
+
+        private uint gammaDefaultId;
+        private uint mouseDefaultId;
+
+
+
         // Visible positions
         private Vector3 popupVisiblePos = new Vector3(640.0f, 375.0f, -0.5f);
         private Vector3 closeButtonVisiblePos = new Vector3(712.4f, 61.8f, -0.6f);
@@ -65,16 +78,16 @@ namespace Game
         private Vector3 volumeFill2VisiblePos = new Vector3(359.4f, 494.0f, -0.6f);
         private Vector3 volumeFill3VisiblePos = new Vector3(359.4f, 565.0f, -0.6f);
 
-        private Vector3 GammaPlus = new Vector3(359.4f, 565.0f, -0.6f);
-        private Vector3 GammaMinus = new Vector3(359.4f, 565.0f, -0.6f);
-        private Vector3 GammaVolume = new Vector3(359.4f, 565.0f, -0.6f);
-        private Vector3 GammaDefault = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 GammaMinus = new Vector3(565.3f, 161.3f, -0.6f);
+        private Vector3 GammaPlus= new Vector3(598.7f, 161.3f, -0.6f);
+        private Vector3 GammaVolume = new Vector3(359.4f, 269.3f, -0.6f);
+        private Vector3 GammaDefault = new Vector3(225.9f, 199.5f, -0.6f);
 
 
-        private Vector3 MousePlus = new Vector3(359.4f, 565.0f, -0.6f);
-        private Vector3 MouseMinus = new Vector3(359.4f, 565.0f, -0.6f);
-        private Vector3 MouseVolume = new Vector3(359.4f, 565.0f, -0.6f);
-        private Vector3 MouseDefault = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 MouseMinus = new Vector3(564.8f, 269.8f, -0.6f);
+        private Vector3 MousePlus = new Vector3(598.2f, 269.3f, -0.6f);
+        private Vector3 MouseVolume = new Vector3(359.4f, 160.5f, -0.6f);
+        private Vector3 MouseDefault = new Vector3(226.2f, 306.8f, -0.6f);
 
 
 
@@ -95,6 +108,13 @@ namespace Game
         private Vector3 volumeFill1InitialPosition;
         private Vector3 volumeFill2InitialPosition;
         private Vector3 volumeFill3InitialPosition;
+
+        private float gammaVolumeInitialWidth;
+        private Vector3 gammaVolumeInitialPosition;
+
+        private float mouseVolumeInitialWidth;
+        private Vector3 mouseVolumeInitialPosition;
+
 
         public override void OnStart()
         {
@@ -120,6 +140,18 @@ namespace Game
             volumeFill1Id = SceneFindEntityByName(VOLUME_FILL_1_NAME);
             volumeFill2Id = SceneFindEntityByName(VOLUME_FILL_2_NAME);
             volumeFill3Id = SceneFindEntityByName(VOLUME_FILL_3_NAME);
+
+            gammaPlusId = SceneFindEntityByName("GammaPlus");
+            gammaMinusId = SceneFindEntityByName("GammaMinus");
+            gammaVolumeId = SceneFindEntityByName("GammaVolume");
+
+            mousePlusId = SceneFindEntityByName("MousePlus");
+            mouseMinusId = SceneFindEntityByName("MouseMinus");
+            mouseVolumeId = SceneFindEntityByName("MouseVolume");
+
+            gammaDefaultId = SceneFindEntityByName("GammaDefault");
+            mouseDefaultId = SceneFindEntityByName("MouseDefault");
+
 
             // Log which entities were found
             if (settingsPopupId == 0) LogError("SettingsPopup: Could not find: " + SETTINGS_POPUP_NAME);
@@ -149,6 +181,22 @@ namespace Game
                 volumeFill3InitialPosition = volumeFill3VisiblePos;  // USE THE VISIBLE POSITION, NOT GetPosition!
                 LogMessage("SettingsPopup: Volume Fill 3 initial width = " + volumeFill3InitialWidth);
             }
+
+            if (gammaVolumeId != 0)
+            {
+                Vector3 scaleG = GetScale(gammaVolumeId);
+                gammaVolumeInitialWidth = scaleG.X;
+                gammaVolumeInitialPosition = GammaVolume;
+            }
+
+            if (mouseVolumeId != 0)
+            {
+                Vector3 scaleM = GetScale(mouseVolumeId);
+                mouseVolumeInitialWidth = scaleM.X;
+                mouseVolumeInitialPosition = MouseVolume;
+            }
+
+
 
             entitiesFound = true;
             isPopupVisible = false;
@@ -258,6 +306,54 @@ namespace Game
                                              volumeFill3InitialWidth, volumeFill3InitialPosition);
                         return;
                     }
+
+                    // Gamma
+                    if (gammaPlusId != 0 && Collision2D.IsMouseCollidingWithEntity(gammaPlusId))
+                    {
+                        LogMessage("SettingsPopup: Gamma +");
+                        // TODO
+                        return;
+                    }
+
+                    if (gammaMinusId != 0 && Collision2D.IsMouseCollidingWithEntity(gammaMinusId))
+                    {
+                        LogMessage("SettingsPopup: Gamma -");
+                        // TODO
+                        return;
+                    }
+
+                    // Mouse Sensitivity
+                    if (mousePlusId != 0 && Collision2D.IsMouseCollidingWithEntity(mousePlusId))
+                    {
+                        LogMessage("SettingsPopup: Mouse Sensitivity +");
+                        // TODO
+                        return;
+                    }
+
+                    if (mouseMinusId != 0 && Collision2D.IsMouseCollidingWithEntity(mouseMinusId))
+                    {
+                        LogMessage("SettingsPopup: Mouse Sensitivity -");
+                        // TODO
+                        return;
+                    }
+
+                    if (gammaDefaultId != 0 && Collision2D.IsMouseCollidingWithEntity(gammaDefaultId))
+                    {
+                        LogMessage("SettingsPopup: Gamma Default");
+                        // TODO
+                        return;
+                    }
+
+                    if (mouseDefaultId != 0 && Collision2D.IsMouseCollidingWithEntity(mouseDefaultId))
+                    {
+                        LogMessage("SettingsPopup: Mouse Sensitivity Default");
+                        // TODO
+                        return;
+                    }
+
+
+
+
                 }
 
                 // Check if clicked outside popup to close
@@ -308,8 +404,21 @@ namespace Game
             if (volumeFill2Id != 0) SetPosition(volumeFill2Id, ref volumeFill2VisiblePos);
             if (volumeFill3Id != 0) SetPosition(volumeFill3Id, ref volumeFill3VisiblePos);
 
-            
-                UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(),
+            if (gammaPlusId != 0) SetPosition(gammaPlusId, ref GammaPlus);
+            if (gammaMinusId != 0) SetPosition(gammaMinusId, ref GammaMinus);
+            if (gammaVolumeId != 0) SetPosition(gammaVolumeId, ref GammaVolume);
+
+            if (mousePlusId != 0) SetPosition(mousePlusId, ref MousePlus);
+            if (mouseMinusId != 0) SetPosition(mouseMinusId, ref MouseMinus);
+            if (mouseVolumeId != 0) SetPosition(mouseVolumeId, ref MouseVolume);
+
+            if (gammaDefaultId != 0) SetPosition(gammaDefaultId, ref GammaDefault);
+            if (mouseDefaultId != 0) SetPosition(mouseDefaultId, ref MouseDefault);
+
+
+
+
+            UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(),
                                      volumeFill1InitialWidth, volumeFill1InitialPosition);
                 UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(),
                                      volumeFill2InitialWidth, volumeFill2InitialPosition);
@@ -341,6 +450,19 @@ namespace Game
             if (volumeFill1Id != 0) SetPosition(volumeFill1Id, ref hidePos2);
             if (volumeFill2Id != 0) SetPosition(volumeFill2Id, ref hidePos2);
             if (volumeFill3Id != 0) SetPosition(volumeFill3Id, ref hidePos2);
+
+            if (gammaPlusId != 0) SetPosition(gammaPlusId, ref hidePos2);
+            if (gammaMinusId != 0) SetPosition(gammaMinusId, ref hidePos2);
+            if (gammaVolumeId != 0) SetPosition(gammaVolumeId, ref hidePos2);
+
+            if (mousePlusId != 0) SetPosition(mousePlusId, ref hidePos2);
+            if (mouseMinusId != 0) SetPosition(mouseMinusId, ref hidePos2);
+            if (mouseVolumeId != 0) SetPosition(mouseVolumeId, ref hidePos2);
+
+            if (gammaDefaultId != 0) SetPosition(gammaDefaultId, ref hidePos2);
+            if (mouseDefaultId != 0) SetPosition(mouseDefaultId, ref hidePos2);
+
+
 
             LogMessage("SettingsPopup: Popup hidden");
         }
