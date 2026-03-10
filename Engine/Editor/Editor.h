@@ -39,7 +39,7 @@
 #include "../Editor/EditorLoggerPanel.h"
 #include "../Editor/EditorAudioTrackerPanel.h"
 #include "../Utility/Timestep.h"
-#include "../Profiler/Profiler.h"
+//#include "../Profiler/Profiler.h"
 #include "Graphics/GraphicsLoader.h"
 #include "Graphics/Renderer.h"
 #include "Audio/AudioManager.h"
@@ -51,7 +51,7 @@ namespace Engine
 	// forward declare
 	class Scene;
 	class Renderer;
-	class TracyProfiler;
+	//class TracyProfiler;
 	class EditorHierarchyPanel;
 	class EditorPropertyPanel;
 	class EditorPerformancePanel;
@@ -75,7 +75,7 @@ namespace Engine
 		ImGuiIO* io = nullptr;
 		AudioManager* m_AudioManager = nullptr;
 
-		std::weak_ptr<TracyProfiler> m_Profiler;
+		//std::weak_ptr<TracyProfiler> m_Profiler;
 
 		std::unique_ptr<EditorMenu> m_EditorMenu;
 		std::unique_ptr<EditorHierarchyPanel> m_EditorHierarchy;
@@ -190,10 +190,10 @@ namespace Engine
 		void SetOperation(ImGuizmo::OPERATION operation);
 
 		// =================== Use In Game.cpp ===================
-		void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
-			m_Profiler = profiler; // still increases refcount, no extra copy on call
-		}
-		std::weak_ptr<TracyProfiler> GetProfiler() const { return m_Profiler; }
+		//void SetTracy(const std::shared_ptr<TracyProfiler>& profiler) {
+		//	m_Profiler = profiler; // still increases refcount, no extra copy on call
+		//}
+		//std::weak_ptr<TracyProfiler> GetProfiler() const { return m_Profiler; }
 
 		void RetrievePickedID(u32 id) { m_PickedID = id; }
 		u32 GetPickedID() const { return m_PickedID; }

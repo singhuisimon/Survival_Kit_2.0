@@ -7,7 +7,7 @@ namespace Engine
     {
         if (!m_Editor->GetPerformanceProfileWindowRef()) return;
 
-        std::weak_ptr<TracyProfiler> profilerWeak = m_Editor->GetProfiler();
+        //std::weak_ptr<TracyProfiler> profilerWeak = m_Editor->GetProfiler();
         ImGui::SetNextWindowSize(ImVec2(500, 420), ImGuiCond_FirstUseEver);
 
         // Begin MUST be called, and End MUST be called regardless of the return value
@@ -76,7 +76,7 @@ namespace Engine
             ImGui::Spacing();
             ImGui::Separator();
 
-            ImGui::Text("Tracy Window:");
+      /*      ImGui::Text("Tracy Window:");
             if (ImGui::Button("Launch Tracy Window"))
             {
 #ifdef TRACY_ENABLE
@@ -92,7 +92,7 @@ namespace Engine
 #else
                 LOG_WARNING("  -> TRACY_ENABLE not defined. Skipping profiler launch.");
 #endif
-            }
+            }*/
 
             ImGui::Separator();
 
