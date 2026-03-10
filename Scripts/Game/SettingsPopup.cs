@@ -65,6 +65,20 @@ namespace Game
         private Vector3 volumeFill2VisiblePos = new Vector3(359.4f, 494.0f, -0.6f);
         private Vector3 volumeFill3VisiblePos = new Vector3(359.4f, 565.0f, -0.6f);
 
+        private Vector3 GammaPlus = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 GammaMinus = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 GammaVolume = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 GammaDefault = new Vector3(359.4f, 565.0f, -0.6f);
+
+
+        private Vector3 MousePlus = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 MouseMinus = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 MouseVolume = new Vector3(359.4f, 565.0f, -0.6f);
+        private Vector3 MouseDefault = new Vector3(359.4f, 565.0f, -0.6f);
+
+
+
+
         // Event names for popup coordination
         private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
         private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
