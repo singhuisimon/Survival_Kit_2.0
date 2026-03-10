@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "Firewall_active.png",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
+    "baseColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "emissionColor": [
+        0.0,
+        1.0,
+        0.9636802673339844
+    ],
+    "metallic": 0.0,
+    "roughness": 0.0,
+    "opacity": 1.0,
+    "emissionStrength": 0.0,
+    "alphaThreshold": 1.0,
+    "ambientOcclusion": 1.0,
+    "tiling": [
+        1.0,
+        1.0
+    ],
+    "offset": [
+        0.0,
+        0.0
+    ],
+    "enableEmission": true,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": true,
+    "castShadows": true,
+    "treatBlacksAsTransparent": false
+}
