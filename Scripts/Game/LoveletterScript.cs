@@ -29,6 +29,10 @@ namespace Game
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
 
+        private uint spawnedPayloadID = 0;
+        //private uint spawnedLabelID = 0;  // track the label entity
+        private const string EVENT_PAYLOAD_COLLECTED = "PayloadCollected";
+
         // ===== PREFAB =====
         [SerializeField] private string deathPrefab = "Sources/Prefabs/Logic_bomb_Explosion.prefab";
         [SerializeField] private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
@@ -118,6 +122,7 @@ namespace Game
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(GAMEOVER, OnGameOver);
             Subscribe(GAMEWIN, OnGameOver);
+            Subscribe(EVENT_PAYLOAD_COLLECTED, OnPayloadCollected);
             EnemyRegistry.Register(EntityID);
 
             // Seed RNG if not already done
@@ -296,7 +301,7 @@ namespace Game
                 LogMessage("[LoveletterScript] loveletter payload entity fail to instantiate");
                 return;
             }
-
+            spawnedPayloadID = payload;
             RigidbodySetIsKinematic(payload, false);
             Vector3 halfboxExtend = new Vector3(15f, 15f, 15f);
             RigidbodySetBoxHalfExtents(payload, ref halfboxExtend);
@@ -524,6 +529,7 @@ namespace Game
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
             Unsubscribe(GAMEOVER, OnGameOver);
             Unsubscribe(GAMEWIN, OnGameOver);
+            Unsubscribe(EVENT_PAYLOAD_COLLECTED, OnPayloadCollected);
             LogMessage("=== LoveLetter Destroyed ===");
         }
 
@@ -534,7 +540,25 @@ namespace Game
             isDead = true;
             isMoving = false;
             isWaitingAtSurface = false;
+
+            if (labelEntityID != 0)              // <-- add this
+            {
+                SceneDestroyEntity(labelEntityID);
+                labelEntityID = 0;
+            }
             SceneDestroyEntity(loveletterEntityID);
+        }
+
+        private void OnPayloadCollected(string eventName, string payload)
+        {
+            if (!uint.TryParse(payload, out uint collectedID)) return;
+            if (collectedID != spawnedPayloadID) return; // only care about our own payload
+
+            if (labelEntityID != 0)
+            {
+                SceneDestroyEntity(labelEntityID);
+                labelEntityID = 0;
+            }
         }
     }
 }
