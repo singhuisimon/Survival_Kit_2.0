@@ -28,14 +28,14 @@ namespace Game
         
         // ===== SPAWN TIMING =====
         [SerializeField] private float initialDelay = 5.0f;        // Wait before first spawn
-        [SerializeField] private float minSpawnInterval = 2.0f;    // Min time between spawns
-        [SerializeField] private float maxSpawnInterval = 4.0f;    // Max time between spawns
+        [SerializeField] private float minSpawnInterval = 5.0f;    // Min time between spawns
+        [SerializeField] private float maxSpawnInterval = 10.0f;    // Max time between spawns
         
         // ===== SPAWN LIMITS =====
         // IMPORTANT: Increase this number to have more loveletters active at once!
         // Set to 10 for more constant pressure
         [SerializeField] private int minActiveLetters = 1;  
-        [SerializeField] private int maxActiveLetters = 3;        // Max letters alive at once
+        [SerializeField] private int maxActiveLetters = 2;        // Max letters alive at once
         private int currentWaveTarget = 1;
         [SerializeField] private int maxTotalSpawns = -1;          // -1 = infinite spawns
         

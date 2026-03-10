@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: UpgradeModuleLabel.prefab",
-    "Prefab GUID": 6782931824518450549,
-    "version": 1,
+    "Prefab GUID": 17159225365980073331,
+    "version": 3,
     "entities": [
         {
             "Name": "UpgradeModuleLabel",
