@@ -10,7 +10,9 @@ namespace Engine
         MASTER = 0,
         SFX = 1,
         BGM = 2,
-        UI = 3
+        UI = 3,
+        VO = 4,
+        GAMESFX = 5
     }
 
     /// <summary>
@@ -47,8 +49,8 @@ namespace Engine
         // Native bindings (private)
         // Register as "Engine.AudioManager::AudioManager_*"
         // =========================
-        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float AudioManager_GetGroupVolume(int groupType);
-        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void AudioManager_SetGroupVolume(int groupType, float volume);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern float AudioManager_GetPlayerVolume(int groupType);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void AudioManager_SetPlayerVolume(int groupType, float volume);
 
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern float AudioManager_GetGroupPitch(int groupType);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void AudioManager_SetGroupPitch(int groupType, float pitch);
@@ -82,10 +84,10 @@ namespace Engine
         // Public Controls
         // =========================
         public static void SetGroupVolume(AudioType group, float volume)
-            => AudioManager_SetGroupVolume((int)group, volume);
+            => AudioManager_SetPlayerVolume((int)group, volume);
 
         public static float GetGroupVolume(AudioType group)
-            => AudioManager_GetGroupVolume((int)group);
+            => AudioManager_GetPlayerVolume((int)group);
 
         public static void SetGroupPitch(AudioType group, float pitch)
             => AudioManager_SetGroupPitch((int)group, pitch);

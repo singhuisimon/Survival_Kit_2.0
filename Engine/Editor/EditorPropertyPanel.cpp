@@ -1079,9 +1079,13 @@ namespace Engine
 				ImGui::Text("Audio Type:");
 				AudioType type = audio.Type;
 
-				if (ImGui::RadioButton("SFX", type == AudioType::SFX))
+				if (type == AudioType::SFX) {
+					type = AudioType::GAMESFX; // Display "SFX" instead of "GAMESFX"
+				}
+
+				if (ImGui::RadioButton("SFX", type == AudioType::GAMESFX))
 				{
-					audio.SetAudioType(AudioType::SFX);
+					audio.SetAudioType(AudioType::GAMESFX);
 					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 				if (ImGui::RadioButton("BGM", type == AudioType::BGM))
@@ -1092,6 +1096,11 @@ namespace Engine
 				if (ImGui::RadioButton("UI", type == AudioType::UI))
 				{
 					audio.SetAudioType(AudioType::UI);
+					MarkComponentOverridden(ComponentTypeID::Audio);
+				}
+				if(ImGui::RadioButton("VO", type == AudioType::VO))
+				{
+					audio.SetAudioType(AudioType::VO);
 					MarkComponentOverridden(ComponentTypeID::Audio);
 				}
 

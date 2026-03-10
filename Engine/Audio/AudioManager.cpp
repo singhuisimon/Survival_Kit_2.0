@@ -51,7 +51,17 @@ namespace Engine {
 			return false;
 		}
 
+		m_MixerBusSettings[AudioType::MASTER] = { 1.0f, 100 };
+		m_MixerBusSettings[AudioType::SFX] = { 1.0f, 100 };
+		m_MixerBusSettings[AudioType::BGM] = { 1.0f, 100 };
+		m_MixerBusSettings[AudioType::UI] = { 1.0f, 100 };
+		m_MixerBusSettings[AudioType::VO] = { 1.0f, 100 };
+		m_MixerBusSettings[AudioType::GAMESFX] = { 1.0f, 100 };
+
 		initialized = true;
+
+		ApplyAllBusVolumes();
+
 		LOG_INFO("AudioManager initialized successfully");
 		return true;
 	}
@@ -82,8 +92,20 @@ namespace Engine {
 		if (!LogFMODError(result, "createChannelGroup - UI")) {
 			return false;
 		}
+
+		// Create VO group
+		result = coresystem->createChannelGroup("VO", &vogroup);
+		if (!LogFMODError(result, "createChannelGroup - VO")) {
+			return false;
+		}
+
+		// Create Game SFX group
+		result = coresystem->createChannelGroup("GameSFX", &gamesfxgroup);
+		if (!LogFMODError(result, "createChannelGroup - GameSFX")) {
+			return false;
+		}
 		
-		// Set up hierarchy
+		// Set up hierarchy (Top level)
 		result = mastergroup->addGroup(sfxgroup);
 		if (!LogFMODError(result, "Add Group - SFX")) {
 			return false;
@@ -94,8 +116,21 @@ namespace Engine {
 			return false;
 		}
 
-		result = mastergroup->addGroup(uigroup);
+		// Children under BGM
+
+		result = bgmgroup->addGroup(vogroup);
+		if (!LogFMODError(result, "Add Group - VO")) {
+			return false;
+		}
+
+		// Children under SFX
+		result = sfxgroup->addGroup(uigroup);
 		if (!LogFMODError(result, "Add Group - UI")) {
+			return false;
+		}
+
+		result = sfxgroup->addGroup(gamesfxgroup);
+		if (!LogFMODError(result, "Add Group - GameSFX")) {
 			return false;
 		}
 
@@ -135,10 +170,22 @@ namespace Engine {
 
 
 		// Release channel groups
+
+		//releasing children first
+		if (vogroup) {
+			vogroup->release();
+			vogroup = nullptr;
+		}
 		if (uigroup) {
 			uigroup->release();
 			uigroup = nullptr;
 		}
+		if(gamesfxgroup) {
+			gamesfxgroup->release();
+			gamesfxgroup = nullptr;
+		}
+
+		//releasing parents
 		if (bgmgroup) {
 			bgmgroup->release();
 			bgmgroup = nullptr;
@@ -704,11 +751,15 @@ namespace Engine {
 		case AudioType::MASTER:
 			return mastergroup;
 		case AudioType::SFX:
-			return sfxgroup;
+			return gamesfxgroup;
 		case AudioType::BGM:
 			return bgmgroup;
 		case AudioType::UI:
 			return uigroup;
+		case AudioType::VO:
+			return vogroup;
+		case AudioType::GAMESFX:
+			return gamesfxgroup;
 		default:
 			return nullptr;
 		}
@@ -722,6 +773,78 @@ namespace Engine {
 		}
 
 		return true;
+	}
+
+	// New functions
+	void AudioManager::SetEditorCap(AudioType type, float value)
+	{
+		value = std::clamp(value, 0.0f, 2.0f);
+		m_MixerBusSettings[type].editorCap = value;
+		ApplyBusVolume(type);
+	}
+
+	float AudioManager::GetEditorCap(AudioType type) const
+	{
+		auto it = m_MixerBusSettings.find(type);
+		if (it == m_MixerBusSettings.end())
+			return 1.0f;
+
+		return it->second.editorCap;
+	}
+
+	void AudioManager::SetPlayerVolume(AudioType type, float value)
+	{
+		value = std::clamp(value, 0.0f, 1.0f);
+		m_MixerBusSettings[type].playerVolume = value;
+		ApplyBusVolume(type);
+	}
+
+	float AudioManager::GetPlayerVolume(AudioType type) const
+	{
+		auto it = m_MixerBusSettings.find(type);
+		if (it == m_MixerBusSettings.end())
+			return 100;
+
+		return it->second.playerVolume;
+	}
+
+	void AudioManager::ApplyBusVolume(AudioType type)
+	{
+		if (!initialized)
+			return;
+
+		auto it = m_MixerBusSettings.find(type);
+		if (it == m_MixerBusSettings.end())
+			return;
+
+		FMOD::ChannelGroup* group = nullptr;
+
+		group = GetGroup(type);
+
+		if (!group)
+			return;
+
+		float finalVolume = ComputeFinalGroupVolume(
+			it->second.editorCap,
+			it->second.playerVolume
+		);
+
+		FMOD_RESULT result = group->setVolume(finalVolume);
+		LogFMODError(result, "AudioManager::ApplyBusVolume - setVolume");
+	}
+
+	void AudioManager::ApplyAllBusVolumes()
+	{
+		ApplyBusVolume(AudioType::MASTER);
+		ApplyBusVolume(AudioType::SFX);
+		ApplyBusVolume(AudioType::BGM);
+		ApplyBusVolume(AudioType::UI);
+		ApplyBusVolume(AudioType::VO);
+		ApplyBusVolume(AudioType::GAMESFX);
+	}
+
+	float AudioManager::ComputeFinalGroupVolume(float engineDefault, float playerSlider) {
+		return engineDefault * playerSlider;
 	}
 
 	// AudioManager.cpp — NEW HELPER

@@ -221,6 +221,17 @@ namespace Engine
 							renderer->getExposure() = settings.s_Exposure;
 							renderer->getGamma() = settings.s_Gamma;
 						}
+
+						if(AudioManager* audioManager = m_Editor->GetAudioManager())
+						{
+							const auto& settings = newScene->GetSceneSetting();
+							audioManager->SetEditorCap(AudioType::SFX, settings.s_SFXVolume);
+							audioManager->SetEditorCap(AudioType::BGM, settings.s_BGMVolume);
+							audioManager->SetEditorCap(AudioType::UI, settings.s_UIVolume);
+							audioManager->SetEditorCap(AudioType::VO, settings.s_VOVolume);
+							audioManager->SetEditorCap(AudioType::GAMESFX, settings.s_GameSFXVolume);
+						}
+
 						// to register entity that contain prefab
 						auto prefabFiles = m_Editor->getAssetsInFolder(getAssetFilePath("Sources/Prefabs"));
 						for (auto& prefabAsset : prefabFiles)

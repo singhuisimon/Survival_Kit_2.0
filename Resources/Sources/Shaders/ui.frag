@@ -21,7 +21,7 @@ void main()
     }
 
     // gamma correction 
-    baseColor = pow(baseColor, vec4(1.0 / gamma));
+    baseColor.rgb = pow(baseColor.rgb, vec3(1.0 / gamma));
 
     FragColor = baseColor;
 }

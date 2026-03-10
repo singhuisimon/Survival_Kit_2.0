@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: EnemyIndicator.prefab",
-    "Prefab GUID": 15736422130694422691,
+    "Prefab GUID": 1331517989630066861,
     "version": 1,
     "entities": [
         {
@@ -59,7 +59,7 @@
                                 1.0
                             ],
                             "Quad": 3,
-                            "Sprite Layer": 10,
+                            "Sprite Layer": 1,
                             "IsActive": false,
                             "IsVisible": true
                         }

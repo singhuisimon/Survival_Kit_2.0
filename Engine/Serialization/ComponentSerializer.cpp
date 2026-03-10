@@ -938,8 +938,19 @@ namespace Engine {
 				}
 				if(properties.HasMember("FilePath"))
 					audio.AudioFilePath = properties["FilePath"].GetString();
-				if(properties.HasMember("Type"))
-					audio.Type = static_cast<AudioType>(properties["Type"].GetInt());
+				/*if(properties.HasMember("Type"))
+					audio.Type = static_cast<AudioType>(properties["Type"].GetInt());*/
+				if (properties.HasMember("Type")) {
+					AudioType loadedType = static_cast<AudioType>(properties["Type"].GetInt());
+
+					// Change SFX to GameSFX
+					if(loadedType == AudioType::SFX) {
+						audio.Type = AudioType::GAMESFX;
+					}
+					else {
+						audio.Type = loadedType;
+					}
+				}
 				if(properties.HasMember("State"))
 					audio.State = static_cast<PlayState>(properties["State"].GetInt());
 				if(properties.HasMember("Volume"))

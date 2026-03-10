@@ -467,6 +467,14 @@ namespace Engine
 					s_Renderer->getBloomFilterRadius() = s_CurrentScene->GetSceneSetting().s_BloomFilterRadius;
 					s_Renderer->getExposure() = s_CurrentScene->GetSceneSetting().s_Exposure;
 					s_Renderer->getGlobalBias() = s_CurrentScene->GetSceneSetting().s_GlobalBias;
+
+					//adding in the audio
+					s_AudioManager->SetEditorCap(AudioType::MASTER, s_CurrentScene->GetSceneSetting().s_MasterVolume);
+					s_AudioManager->SetEditorCap(AudioType::SFX, s_CurrentScene->GetSceneSetting().s_SFXVolume);
+					s_AudioManager->SetEditorCap(AudioType::BGM, s_CurrentScene->GetSceneSetting().s_BGMVolume);
+					s_AudioManager->SetEditorCap(AudioType::UI, s_CurrentScene->GetSceneSetting().s_UIVolume);
+					s_AudioManager->SetEditorCap(AudioType::VO, s_CurrentScene->GetSceneSetting().s_VOVolume);
+					s_AudioManager->SetEditorCap(AudioType::GAMESFX, s_CurrentScene->GetSceneSetting().s_GameSFXVolume);
 				}
 				
 			}
@@ -2355,11 +2363,12 @@ namespace Engine
 		 * @param volume
 		 * New value to apply.
 		***************************************************************************/
-		void AudioManager_SetGroupVolume(int groupType, float volume)
+		void AudioManager_SetPlayerVolume(int groupType, float volume)
 		{
 			auto *am = GetAudioManager();
 			if (!am) return;
-			am->SetGroupVolume(static_cast<AudioType>(groupType), volume);
+			//am->SetGroupVolume(static_cast<AudioType>(groupType), volume);
+			am->SetPlayerVolume(static_cast<AudioType>(groupType), volume);
 		}
 
 		/**************************************************************************
@@ -2370,12 +2379,13 @@ namespace Engine
 		 * @return
 		 * Requested floating-point value.
 		***************************************************************************/
-		float AudioManager_GetGroupVolume(int groupType)
+		float AudioManager_GetPlayerVolume(int groupType)
 		{
 			auto *am = GetAudioManager();
 			if (!am) return 0.0f;
 			float vol = 0.0f;
-			am->GetGroupVolume(static_cast<AudioType>(groupType), vol);
+			//am->GetGroupVolume(static_cast<AudioType>(groupType), vol);
+			vol = am->GetPlayerVolume(static_cast<AudioType>(groupType));
 			return vol;
 		}
 
