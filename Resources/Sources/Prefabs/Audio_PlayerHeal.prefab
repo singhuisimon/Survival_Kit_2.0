@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Audio_PlayerHeal",
+    "Prefab GUID": 376913198587330737,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Audio_PlayerHeal",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14788432006169624731",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9023824483138437287",
+                            "Name": "Audio_PlayerHeal",
+                            "Tag": "Audio_PlayerHeal"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4988599217011884189",
+                            "FilePath": "Player Heal.wav",
+                            "Type": 5,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11906128244655292581",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 27
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

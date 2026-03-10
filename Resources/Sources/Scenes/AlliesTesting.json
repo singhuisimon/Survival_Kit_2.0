@@ -3,6 +3,194 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 1048580,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Enemy",
+                        "Tag": "Enemy"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18167213566256497703",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048576,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Gunship",
+                        "Tag": "Gunship"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3179234006367487033",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "5485077015581180987",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 2,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "9520302281705145405",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": true,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048577,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Dreadnought",
+                        "Tag": "Dreadnought"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3179234006367487029",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048578,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Cruiser",
+                        "Tag": "Cruiser"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11826145290918839345",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                }
+            ]
+        },
+        {
             "ID": 1048584,
             "Components": [
                 {
@@ -22,7 +210,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Adware",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Adware.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Adware.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -90,6 +278,7 @@
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
+                        "Billboarding": false,
                         "MeshType": 0,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
@@ -128,193 +317,6 @@
                     }
                 }
             ]
-        },
-        {
-            "ID": 1048578,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Cruiser",
-                        "Tag": "Cruiser"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "11826145290918839345",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048577,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Dreadnought",
-                        "Tag": "Dreadnought"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3179234006367487029",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048576,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Gunship",
-                        "Tag": "Gunship"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3179234006367487033",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "5485077015581180987",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 2,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "9520302281705145405",
-                        "Mass": 1.0,
-                        "IsKinematic": false,
-                        "IsTrigger": false,
-                        "UseGravity": true,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048580,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Enemy",
-                        "Tag": "Enemy"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "18167213566256497703",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                }
-            ]
         }
     ],
     "Settings": [
@@ -323,7 +325,13 @@
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
             "Exposure": 1.0,
-            "GlobalBias": 0.004999999888241291
+            "GlobalBias": 0.004999999888241291,
+            "MasterVolume": 1.0,
+            "SFXVolume": 1.0,
+            "BGMVolume": 1.0,
+            "VOVolume": 1.0,
+            "UIVolume": 1.0,
+            "GameSFXVolume": 1.0
         }
     ]
 }

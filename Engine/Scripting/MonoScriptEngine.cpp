@@ -1473,10 +1473,10 @@ namespace Engine {
 		// =====================================================================
 		// AudioManager (global controls)
 		// =====================================================================
-		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupVolume",
-						 reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupVolume));
-		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupVolume",
-						 reinterpret_cast<void *>(InternalCalls::AudioManager_GetGroupVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetPlayerVolume",
+						 reinterpret_cast<void *>(InternalCalls::AudioManager_SetPlayerVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_GetPlayerVolume",
+						 reinterpret_cast<void *>(InternalCalls::AudioManager_GetPlayerVolume));
 		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupPitch",
 						 reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupPitch));
 		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupPitch",
