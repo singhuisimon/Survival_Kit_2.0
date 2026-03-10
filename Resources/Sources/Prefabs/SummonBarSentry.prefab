@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: SummonBarSentry.prefab",
-    "Prefab GUID": 5896479160599614247,
+    "Prefab GUID": 14757531329953464569,
     "version": 1,
     "entities": [
         {
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                1.0,
-                                1.0,
-                                1.0
+                                0.6000000238418579,
+                                0.6000000238418579,
+                                0.6000000238418579
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -51,9 +51,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "11954269258987733795",
-                            "ScriptClassName": "",
+                            "ScriptClassName": "Game.SummonBarSentry",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 27
                         }
                     }
                 }

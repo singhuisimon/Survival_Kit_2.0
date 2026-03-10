@@ -44,6 +44,10 @@ namespace Game
         private string sentryPrefab = "Sources/Prefabs/NormalSentry.prefab";
         private string sentrySpawnPrefab = "Sources/Prefabs/SentrySpawn.prefab";
 
+        private string summonBarPrefab = "Sources/Prefabs/SummonBarSentry.prefab";
+        private uint   barEntityID     = 0;
+        private bool   isHoldingKey    = false;
+
         public override void OnStart()
         {
             LogMessage("=== SentryCount OnStart ===");
@@ -102,16 +106,43 @@ namespace Game
                 SetIsVisible((uint)EntityID, true);
             }
 
-            if(IsKeyPressed(KeyCode.D1) && spawnAndLifted){
+            if(IsKeyPressed(KeyCode.D1) && spawnAndLifted)
+            {
+                // Spawn bar on the very first frame of press (only if we have payload)
+                if (!isHoldingKey && payloadCount > 0)
+                {
+                    isHoldingKey  = true;
+                    barEntityID   = PrefabInstantiate(summonBarPrefab);
+
+                    if (barEntityID == 0)
+                        LogWarning("[SentryCount] Failed to spawn SummonBarPrefab.");
+                }
+
                 countdown -= deltaTime;
+
+                // Publish progress (0 = just started, 1 = complete)
+                if (barEntityID != 0)
+                {
+                    float progress = 1f - (countdown / holdTimer);
+                    progress = SimpleMath.Clamp(progress, 0f, 1f);
+                    Publish("SummonBarProgress", progress.ToString("F4"));
+                }
 
                 if(countdown <= 0.0f){
 
                     LogMessage("[SentryCount] Detected sentry to be spawn!");
-                    
+
+                    // Destroy bar before spawning sentry
+                    if (barEntityID != 0)
+                    {
+                        SceneDestroyEntity(barEntityID);
+                        barEntityID = 0;
+                    }
+                                
                     SpawnSentry();
 
                     spawnAndLifted = false;
+                    isHoldingKey   = false;
                 }
             }
 
@@ -122,6 +153,15 @@ namespace Game
                 countdown = holdTimer;
 
                 spawnAndLifted = true;
+
+                isHoldingKey   = false;
+
+                // Cancelled early — destroy bar
+                if (barEntityID != 0)
+                {
+                    SceneDestroyEntity(barEntityID);
+                    barEntityID = 0;
+                }
             }
 
         }
@@ -179,6 +219,12 @@ namespace Game
             SetText((uint)EntityID, "");
             Text.SetIsVisible((uint)EntityID, false);
             allowedspawn = false;
+
+            if (barEntityID != 0)
+            {
+                SceneDestroyEntity(barEntityID);
+                barEntityID = 0;
+            }
         }
 
         private void UpdateCountDisplay()

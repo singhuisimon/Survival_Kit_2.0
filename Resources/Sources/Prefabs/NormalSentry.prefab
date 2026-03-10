@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: NormalSentry.prefab",
-    "Prefab GUID": 15119851197456585575,
+    "Prefab GUID": 3865628407750705415,
     "version": 1,
     "entities": [
         {
@@ -164,7 +164,7 @@
                             "ComponentGUID": "18008611278202062259",
                             "ScriptClassName": "Game.SentriesNormal",
                             "Started": false,
-                            "GCHandle": 579
+                            "GCHandle": 27
                         }
                     }
                 }
@@ -192,9 +192,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                1.0,
-                                1.0,
-                                1.0
+                                0.6000000238418579,
+                                0.6000000238418579,
+                                0.6000000238418579
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -209,18 +209,6 @@
                             "ComponentGUID": "3590636151367307131",
                             "Name": "SentryBarRoot",
                             "Tag": "SentryBarRoot"
-                        }
-                    }
-                },
-                {
-                    "type": 8,
-                    "typeName": "ScriptComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "14260112268212945745",
-                            "ScriptClassName": "",
-                            "Started": false,
-                            "GCHandle": 0
                         }
                     }
                 }
@@ -351,6 +339,18 @@
                             "TextureIdx": 0,
                             "SubmeshIndex": 0,
                             "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17124225710728560875",
+                            "ScriptClassName": "Game.SentryLifetimeBar",
+                            "Started": false,
+                            "GCHandle": 35
                         }
                     }
                 }

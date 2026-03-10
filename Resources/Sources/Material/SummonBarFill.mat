@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "WindowsBG.png",
+    "baseMap": "Worldspace_Bar.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",

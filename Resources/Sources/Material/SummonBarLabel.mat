@@ -1,6 +1,6 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "WindowsBG.png",
+    "baseMap": "SpawningSentryLabel.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",

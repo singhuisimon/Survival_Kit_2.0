@@ -7,7 +7,7 @@ using static Engine.Event;
 namespace Game
 {
 
-    public class SummonBar : ScriptBehaviour
+    public class SummonBarSentry : ScriptBehaviour
     {
         private const string FILL_NAME  = "SummonBarFill";
         private const string BG_NAME    = "SummonBarBG";
@@ -15,10 +15,10 @@ namespace Game
 
         private string playerName = "Player";
 
-        [SerializeField] private float heightOffset = 30.0f;
-        [SerializeField] private float fullScaleX   = 50.0f;
-        [SerializeField] private float barScaleY    = 6.0f;
-        [SerializeField] private float labelOffsetY = 10.0f;
+        [SerializeField] private float heightOffset = 10.0f;
+        [SerializeField] private float fullScaleX   = 20.0f;
+        [SerializeField] private float barScaleY    = 2.0f;
+        [SerializeField] private float labelOffsetY = 4.0f;
 
         private uint playerID = 0;
         private uint fillID   = 0;
@@ -86,13 +86,13 @@ namespace Game
 
             // Shift enter left so left edge stays anchored
             // Billboard faces camera so world X = screen horizontal
-            float shift = fullScaleX * (1f - progress) * 0.5f;
-            Vector3 fillPos = new Vector3(
-                barPos.X - shift,
-                barPos.Y,
-                barPos.Z
-            );
-            SetPosition(fillID, ref fillPos);
+            // float shift = fullScaleX * (1f - progress) * 0.5f;
+            // Vector3 fillPos = new Vector3(
+            //     barPos.X - shift,
+            //     barPos.Y,
+            //     barPos.Z
+            // );
+            // SetPosition(fillID, ref fillPos);
 
             // Label floats above
             if (labelID != 0 && labelID != INVALID_ENTITY)
@@ -114,16 +114,26 @@ namespace Game
 
         private void OnGameEnd(string eventName, string payload)
         {
-            SceneDestroyEntity((uint)EntityID);
+            DestroyAll();
         }
 
-                public override void OnDestroy()
+        public override void OnDestroy()
         {
             Unsubscribe(EVENT_PROGRESS,  OnProgressUpdate);
             Unsubscribe(EVENT_GAMEOVER,  OnGameEnd);
             Unsubscribe(EVENT_GAMEOVER2, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN,   OnGameEnd);
+
+            if (fillID  != 0 && fillID  != INVALID_ENTITY) SceneDestroyEntity(fillID);
+            if (bgID    != 0 && bgID    != INVALID_ENTITY) SceneDestroyEntity(bgID);
+            if (labelID != 0 && labelID != INVALID_ENTITY) SceneDestroyEntity(labelID);
+
             LogMessage("[SummonBar] Destroyed.");
+        }
+
+        private void DestroyAll()
+        {
+            SceneDestroyEntity((uint)EntityID); // triggers OnDestroy which cleans up children
         }
     }
 
